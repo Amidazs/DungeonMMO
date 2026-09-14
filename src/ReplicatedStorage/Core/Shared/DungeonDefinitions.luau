@@ -25,7 +25,6 @@ DungeonDefinitions.TEST_DUNGEON = table.freeze({
     MarauderCaptainReward = table.freeze({XP = 40, GoldMin = 15, GoldMax = 25}),
     MarauderCaptain = table.freeze({
         MaxHealth = 120,
-        SpawnPosition = Vector3.new(250, 2, -315),
     }),
     CompletionReward = table.freeze({
         Gold = 50,

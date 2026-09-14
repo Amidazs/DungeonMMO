@@ -58,6 +58,9 @@ local DungeonMarauderFactory = require(
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
 )
+local TempleEnvironmentAdapter = require(
+    Dungeon:WaitForChild("TempleEnvironmentAdapter")
+)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -84,35 +87,32 @@ local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 
-local dungeon_root = Workspace:WaitForChild("DungeonRuntime", 10)
-assert(dungeon_root, "DungeonRuntime greybox was not created")
-local spawn_part = dungeon_root:FindFirstChild("DungeonSpawn", true) :: BasePart
-local room1_trigger = dungeon_root:FindFirstChild("Room1StartTrigger", true) :: BasePart
-local room2_trigger = dungeon_root:FindFirstChild("Room2StartTrigger", true) :: BasePart
-local room1_gate = dungeon_root:FindFirstChild(
-    "Room1ExitGate",
-    true
-) :: BasePart
-local room2_gate = dungeon_root:FindFirstChild(
-    "Room2ExitGate",
-    true
-) :: BasePart
-local boss_trigger = dungeon_root:FindFirstChild(
-    "BossStartTrigger",
-    true
-) :: BasePart
-assert(
-    spawn_part
-        and room1_trigger
-        and room2_trigger
-        and room1_gate
-        and room2_gate
-        and boss_trigger
+local environment = TempleEnvironmentAdapter.wait_for_ready(
+    Workspace,
+    15
 )
+assert(
+    environment.ok,
+    "Temple environment invalid: " .. tostring(environment.reason)
+)
+
+local room1_trigger = assert(
+    environment:get("Temple.Room1.Trigger")
+) :: BasePart
+local room2_trigger = assert(
+    environment:get("Temple.Room2.Trigger")
+) :: BasePart
+local boss_trigger = assert(
+    environment:get("Temple.Room3.Trigger")
+) :: BasePart
+
+local runtime_root = Instance.new("Folder")
+runtime_root.Name = "DungeonGameplayRuntime"
+runtime_root.Parent = Workspace
 
 local enemies_folder = Instance.new("Folder")
 enemies_folder.Name = "DungeonEnemies"
-enemies_folder.Parent = dungeon_root
+enemies_folder.Parent = runtime_root
 
 local active_session_id: string? = nil
 local encounter_service: any = nil
@@ -155,11 +155,6 @@ local function current_session(): any?
     return if active_session_id then sessions:get(active_session_id) else nil
 end
 
-local function set_gate_open(gate: BasePart, open: boolean)
-    gate.CanCollide = not open
-    gate.Transparency = if open then 0.75 else 0
-    gate.Color = if open then Color3.fromRGB(70, 145, 85) else Color3.fromRGB(150, 72, 72)
-end
 
 local function send_objective(text: string, state_name: string?)
     for _, player in ipairs(Players:GetPlayers()) do
@@ -293,12 +288,17 @@ local function sync_encounter_members_from_session()
     end
 end
 
-local function spawn_marauder(encounter_id: string, enemy_id: string, position: Vector3, spawn_index: number): Model
+local function spawn_marauder(
+    encounter_id: string,
+    enemy_id: string,
+    spawn_cframe: CFrame,
+    spawn_index: number
+): Model
     local reward = DungeonDefinitions.TEST_DUNGEON.StandardMarauderReward
     return DungeonMarauderFactory.create({
         Parent = enemies_folder,
         Name = enemy_id,
-        SpawnCFrame = CFrame.new(position),
+        SpawnCFrame = spawn_cframe,
         SpawnIndex = spawn_index,
         RespawnEnabled = false,
         ControllerEnabled = true,
@@ -405,7 +405,7 @@ local function connect_enemy(enemy: Model, encounter_id: string)
         if result.cleared then
             room_cleared[encounter_id] = true
             if encounter_id == "CombatRoom1" then
-                set_gate_open(room1_gate, true)
+                environment:set_exit_open("Room1", true)
                 sync_all_character_encounters("")
                 advance_checkpoint("Room2Start")
                 sessions:set_runtime_progress(
@@ -417,7 +417,7 @@ local function connect_enemy(enemy: Model, encounter_id: string)
                     "Room 1 cleared. Room 2 unlocked; checkpoint moved."
                 )
             elseif encounter_id == "CombatRoom2" then
-                set_gate_open(room2_gate, true)
+                environment:set_exit_open("Room2", true)
                 sync_all_character_encounters("")
                 advance_checkpoint("BossRoomStart")
                 sessions:set_runtime_progress(
@@ -442,7 +442,7 @@ local function start_room1()
     room_started.CombatRoom1 = true
     sync_all_character_encounters("CombatRoom1")
     sessions:set_runtime_progress(active_session_id, "CombatRoom1", "CombatRoom1")
-    local room1_positions = {Vector3.new(238, 2, -48), Vector3.new(262, 2, -48)}
+    local room1_positions = environment:enemy_spawn_cframes("Room1")
     local enemies = {}
     for index = 1, DungeonDefinitions.TEST_DUNGEON.RoomPacks.CombatRoom1.MarauderCount do
         table.insert(enemies, spawn_marauder("CombatRoom1", "Room1_Marauder_" .. tostring(index), room1_positions[index], 100 + index))
@@ -459,7 +459,7 @@ local function start_room2()
     room_started.CombatRoom2 = true
     sync_all_character_encounters("CombatRoom2")
     sessions:set_runtime_progress(active_session_id, "CombatRoom2", "CombatRoom2")
-    local room2_positions = {Vector3.new(232, 2, -148), Vector3.new(250, 2, -160), Vector3.new(268, 2, -148)}
+    local room2_positions = environment:enemy_spawn_cframes("Room2")
     local enemies = {}
     for index = 1, DungeonDefinitions.TEST_DUNGEON.RoomPacks.CombatRoom2.MarauderCount do
         table.insert(enemies, spawn_marauder("CombatRoom2", "Room2_Marauder_" .. tostring(index), room2_positions[index], 200 + index))
@@ -551,7 +551,7 @@ local function start_boss()
     if not session or session.State ~= "Active" then return end
 
     if not DungeonBossSpawnGuard.claim(
-        dungeon_root,
+        runtime_root,
         active_session_id
     ) then
         boss_started = true
@@ -570,7 +570,7 @@ local function start_boss()
     local reward = DungeonDefinitions.TEST_DUNGEON.MarauderCaptainReward
     local captain = MarauderCaptainFactory.create({
         Parent = enemies_folder,
-        SpawnCFrame = CFrame.new(DungeonDefinitions.TEST_DUNGEON.MarauderCaptain.SpawnPosition),
+        SpawnCFrame = environment:captain_spawn_cframe(),
         EncounterId = "MarauderCaptain",
         RewardXP = reward.XP,
         RewardGoldMin = reward.GoldMin,
@@ -637,8 +637,8 @@ local function apply_recovery_plan(session: any): any
     boss_started = false
     boss_cleared = false
     sync_all_character_encounters("")
-    set_gate_open(room1_gate, plan.room1_cleared)
-    set_gate_open(room2_gate, plan.room2_cleared)
+    environment:set_exit_open("Room1", plan.room1_cleared)
+    environment:set_exit_open("Room2", plan.room2_cleared)
 
     if checkpoint_id ~= "Entrance" and active_session_id then
         sessions:set_runtime_progress(
@@ -662,22 +662,22 @@ local function initialize_session_services(session: any): (any?, boolean)
     checkpoint_service:register(
         "Entrance",
         0,
-        spawn_part.CFrame + Vector3.new(0, 3, 0)
+        environment:checkpoint_cframe("Temple.EntrySpawn")
     )
     checkpoint_service:register(
         "Room1Start",
         1,
-        room1_trigger.CFrame + Vector3.new(0, 3, 0)
+        environment:checkpoint_cframe("Temple.Room1.Checkpoint")
     )
     checkpoint_service:register(
         "Room2Start",
         2,
-        room2_trigger.CFrame + Vector3.new(0, 3, 0)
+        environment:checkpoint_cframe("Temple.Room2.Checkpoint")
     )
     checkpoint_service:register(
         "BossRoomStart",
         3,
-        boss_trigger.CFrame + Vector3.new(0, 3, 0)
+        environment:checkpoint_cframe("Temple.Room3.Checkpoint")
     )
     local recovery_plan = apply_recovery_plan(session)
     completion_service = CompletionService.new(
@@ -1050,7 +1050,8 @@ local function admit_player(player: Player)
         end)
     end)
 
-    local spawn_cframe = spawn_part.CFrame + Vector3.new(0, 3, 0)
+    local spawn_cframe =
+        environment:checkpoint_cframe("Temple.EntrySpawn")
     if reconnecting and checkpoint_service then
         spawn_cframe = checkpoint_service:get_active_checkpoint().CFrame
     end

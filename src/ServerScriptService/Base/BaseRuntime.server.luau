@@ -21,6 +21,9 @@ local RobloxTeleportAdapter = require(Adapters:WaitForChild("RobloxTeleportAdapt
 local TestFailureSwitches = require(Core:WaitForChild("TestFailureSwitches"))
 local BaseReconnectRouting = require(Base:WaitForChild("BaseReconnectRouting"))
 local BaseReturnAdmissionRules = require(Base:WaitForChild("BaseReturnAdmissionRules"))
+local BaseEnvironmentAdapter = require(
+    Base:WaitForChild("BaseEnvironmentAdapter")
+)
 local CharacterIdentityRules = require(
     ReplicatedStorage
         :WaitForChild("Core")
@@ -60,6 +63,14 @@ local loadout = runtime.LoadoutService
 local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
+local base_environment = BaseEnvironmentAdapter.wait_for_ready(
+    Workspace,
+    15
+)
+assert(
+    base_environment.ok,
+    "Base environment invalid: " .. tostring(base_environment.reason)
+)
 local progression_controller = BaseProgressionController.new({
     context = "Base",
     profiles = profiles,
@@ -300,26 +311,56 @@ local function route_recoverable_session(player: Player, session: any): boolean
     return true
 end
 
-local function claim_return_handoff_if_present(player: Player): (boolean, string?)
-    if RunService:IsStudio() then return true, nil end
+local function claim_return_handoff_if_present(
+    player: Player
+): (boolean, string?, boolean)
+    if RunService:IsStudio() then
+        return true, nil, false
+    end
+
     local join_data = player:GetJoinData()
     local teleport_data = join_data and join_data.TeleportData
-    if type(teleport_data) ~= "table" or type(teleport_data.SessionId) ~= "string" then
-        return true, nil
+
+    if (
+        type(teleport_data) ~= "table"
+        or type(teleport_data.SessionId) ~= "string"
+    ) then
+        return true, nil, false
     end
+
     local session = sessions:get(teleport_data.SessionId)
-    local admission = BaseReturnAdmissionRules.validate(session, teleport_data, player.UserId)
-    if not admission.ok then return false, admission.reason end
-    local nonce = sessions:get_handoff_nonce(session.SessionId, player.UserId)
-    if not nonce then return false, "MissingHandoffNonce" end
+    local admission = BaseReturnAdmissionRules.validate(
+        session,
+        teleport_data,
+        player.UserId
+    )
+    if not admission.ok then
+        return false, admission.reason, false
+    end
+
+    local nonce = sessions:get_handoff_nonce(
+        session.SessionId,
+        player.UserId
+    )
+    if not nonce then
+        return false, "MissingHandoffNonce", false
+    end
+
     local claimed = leases:claim_handoff(player.UserId, nonce)
-    if not claimed.ok then return false, claimed.reason end
-    sessions:clear_handoff_nonce(session.SessionId, player.UserId)
-    return true, nil
+    if not claimed.ok then
+        return false, claimed.reason, false
+    end
+
+    sessions:clear_handoff_nonce(
+        session.SessionId,
+        player.UserId
+    )
+    return true, nil, true
 end
 
 local function load_player(player: Player)
-    local handoff_ok, handoff_error = claim_return_handoff_if_present(player)
+    local handoff_ok, handoff_error, returned_from_dungeon =
+        claim_return_handoff_if_present(player)
     if not handoff_ok then
         warn(string.format("[Base Runtime] Return handoff rejected for %s: %s", player.Name, tostring(handoff_error)))
         player:Kick("Return-to-Base handoff rejected: " .. tostring(handoff_error))
@@ -339,14 +380,39 @@ local function load_player(player: Player)
         player.UserId,
         assert(profiles:get_character(player.UserId, 1))
     )
-    ProgressionRuntimeState.apply_runtime_stats(player)
-    apply_race_presentation(player, player.Character)
-    player.CharacterAdded:Connect(function(character)
+    local pending_destination = if returned_from_dungeon
+        then "ArrivalFromTemple"
+        else "Spawn"
+
+    local function initialize_character(character: Model)
+        local destination = pending_destination
+        pending_destination = "Spawn"
+
         task.defer(function()
+            if not character.Parent then
+                return
+            end
+
             ProgressionRuntimeState.apply_runtime_stats(player)
             apply_race_presentation(player, character)
+
+            local placed = base_environment:place_character(
+                character,
+                destination
+            )
+            if not placed.ok then
+                warn(
+                    "[Base Environment] Character placement failed: "
+                        .. tostring(placed.reason)
+                )
+            end
         end)
-    end)
+    end
+
+    if player.Character then
+        initialize_character(player.Character)
+    end
+    player.CharacterAdded:Connect(initialize_character)
     send_profile(player)
     print(string.format(
         "[Base Runtime] Slot1 loaded for %s (Level %d, XP %d, Gold %d).",
@@ -711,26 +777,6 @@ loadout_request.OnServerEvent:Connect(function(player: Player, first: any, secon
     finish_progression_action(player,"Loadout",result)
 end)
 
-local function connect_prompt()
-    local base_root = Workspace:WaitForChild("BasePrototype", 10)
-    if not base_root then
-        warn("[Base Runtime] BasePrototype was not created.")
-        return
-    end
-    local portal = base_root:WaitForChild("TestDungeonPortal", 5)
-    if not portal then
-        warn("[Base Runtime] TestDungeonPortal was not created.")
-        return
-    end
-    local prompt = portal:WaitForChild("DungeonEntryPrompt", 5)
-    if prompt and prompt:IsA("ProximityPrompt") then
-        prompt.Triggered:Connect(function(player: Player)
-            handle_entry(player, "TestDungeon")
-        end)
-    end
-end
-
-task.spawn(connect_prompt)
 
 Players.PlayerAdded:Connect(load_player)
 for _, player in ipairs(Players:GetPlayers()) do

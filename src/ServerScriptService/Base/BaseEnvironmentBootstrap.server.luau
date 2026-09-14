@@ -1,0 +1,261 @@
+--!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
+local Workspace = game:GetService("Workspace")
+
+local Definitions = require(
+    ReplicatedStorage
+        :WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("EnvironmentAnchorDefinitions")
+)
+local Environment = ServerScriptService
+    :WaitForChild("Core")
+    :WaitForChild("Environment")
+local RuntimeMode = require(
+    Environment:WaitForChild("EnvironmentRuntimeMode")
+)
+local Factory = require(
+    Environment:WaitForChild("EnvironmentAnchorFactory")
+)
+local Resolver = require(
+    Environment:WaitForChild("EnvironmentAnchorResolver")
+)
+local Synthetic = require(
+    script.Parent:WaitForChild("BaseSyntheticEnvironment")
+)
+local CandidateProfile = require(
+    script.Parent:WaitForChild("BaseCandidateAnchorProfile")
+)
+
+local READY_ATTRIBUTE = "DungeonMMOBaseEnvironmentReady"
+local ERROR_ATTRIBUTE = "DungeonMMOBaseEnvironmentError"
+local MODE_ATTRIBUTE = "DungeonMMOEnvironmentMode"
+
+Workspace:SetAttribute(READY_ATTRIBUTE, false)
+Workspace:SetAttribute(ERROR_ATTRIBUTE, nil)
+
+local function fail(reason: string): never
+    Workspace:SetAttribute(ERROR_ATTRIBUTE, reason)
+    Workspace:SetAttribute(READY_ATTRIBUTE, false)
+    error("[Base Environment] " .. reason)
+end
+
+local function find_unique_named(root: Instance, name: string): Instance?
+    local found: Instance? = nil
+    for _, instance in ipairs(root:GetDescendants()) do
+        if instance.Name == name then
+            if found then
+                return nil
+            end
+            found = instance
+        end
+    end
+    return found
+end
+
+local function pivot_of(instance: Instance): CFrame?
+    if instance:IsA("BasePart") then
+        return instance.CFrame
+    elseif instance:IsA("Model") then
+        return instance:GetPivot()
+    end
+    return nil
+end
+
+local function create_candidate_anchors()
+    for _, entry in ipairs(CandidateProfile.Entries) do
+        local selected: any = nil
+        local selected_pivot: CFrame? = nil
+
+        for _, selector in ipairs(entry.Selectors) do
+            local landmark = find_unique_named(
+                Workspace,
+                selector.Name
+            )
+            local pivot = landmark and pivot_of(landmark)
+            if landmark and pivot then
+                selected = selector
+                selected_pivot = pivot
+                break
+            end
+        end
+
+        if not selected or not selected_pivot then
+            fail(
+                "CandidateLandmarkMissing:"
+                    .. tostring(entry.AnchorId)
+            )
+        end
+
+        Factory.create(
+            Workspace,
+            CandidateProfile.EnvironmentId,
+            entry.AnchorId,
+            selected_pivot * selected.Offset,
+            entry.Size,
+            entry.Role
+        )
+    end
+end
+
+local function ensure_prompt(
+    anchor: BasePart,
+    name: string,
+    action_text: string,
+    object_text: string
+): ProximityPrompt
+    local existing = anchor:FindFirstChild(name)
+    if existing and existing:IsA("ProximityPrompt") then
+        return existing
+    end
+
+    local prompt = Instance.new("ProximityPrompt")
+    prompt.Name = name
+    prompt.ActionText = action_text
+    prompt.ObjectText = object_text
+    prompt.HoldDuration = 0.15
+    prompt.MaxActivationDistance = 12
+    prompt.RequiresLineOfSight = false
+    prompt.Parent = anchor
+    return prompt
+end
+
+local function ensure_label(
+    anchor: BasePart,
+    text: string
+)
+    local existing = anchor:FindFirstChild("EnvironmentAnchorLabel")
+    if existing then
+        return
+    end
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "EnvironmentAnchorLabel"
+    billboard.Size = UDim2.fromOffset(230, 46)
+    billboard.StudsOffset = Vector3.new(0, 4, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = anchor
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.fromScale(1, 1)
+    label.BackgroundTransparency = 0.3
+    label.TextScaled = true
+    label.TextWrapped = true
+    label.Text = text
+    label.Parent = billboard
+end
+
+local requested = Workspace:GetAttribute(MODE_ATTRIBUTE)
+local mode, mode_error = RuntimeMode.resolve(
+    RunService:IsStudio(),
+    requested
+)
+if not mode then
+    fail(tostring(mode_error))
+end
+
+if mode == "Synthetic" then
+    Factory.clear_generated(Workspace)
+    Synthetic.create(Workspace)
+elseif mode == "Candidate" then
+    Factory.clear_generated(Workspace)
+    create_candidate_anchors()
+end
+
+local resolved = Resolver.resolve(Workspace, Definitions.BASE)
+if not resolved.ok then
+    fail(
+        tostring(resolved.reason)
+            .. ":"
+            .. tostring(resolved.anchor_id or "")
+    )
+end
+
+local trainer_data = {
+    ["Base.Trainer.Fighter"] = {"FighterTrainer", "Fighter Trainer"},
+    ["Base.Trainer.Mage"] = {"MageTrainer", "Mage Trainer"},
+    ["Base.Trainer.Ranger"] = {"RangerTrainer", "Ranger Trainer"},
+}
+
+for anchor_id, data in pairs(trainer_data) do
+    local anchor = resolved.by_id[anchor_id]
+    anchor:SetAttribute("TrainerId", data[1])
+    ensure_prompt(
+        anchor,
+        "ProgressionTrainerPrompt",
+        "Train",
+        data[2]
+    )
+    ensure_label(anchor, data[2])
+end
+
+local equipment = resolved.by_id["Base.Service.Equipment"]
+ensure_prompt(
+    equipment,
+    "EquipmentManagerPrompt",
+    "Manage",
+    "Equipment"
+)
+ensure_label(equipment, "EQUIPMENT")
+
+local board = resolved.by_id["Base.DungeonBoard"]
+ensure_prompt(
+    board,
+    "DungeonBoardPrompt",
+    "Inspect",
+    "Temple Dungeon Board"
+)
+ensure_label(board, "TEMPLE DUNGEON")
+
+local portal = resolved.by_id["Base.TemplePortal"]
+portal:SetAttribute("DungeonId", "TestDungeon")
+ensure_prompt(
+    portal,
+    "DungeonEntryPrompt",
+    if RunService:IsStudio()
+        then "Test Temple"
+        else "Enter Temple",
+    "Temple Dungeon"
+)
+ensure_label(portal, "TEMPLE")
+
+local progression = resolved.by_id["Base.Service.Progression"]
+ensure_label(progression, "PROGRESSION")
+
+for anchor_id, text in pairs({
+    ["Base.Service.BankPlaceholder"] = "BANK • FUTURE",
+    ["Base.Service.TravelPlaceholder"] = "TRAVEL • FUTURE",
+    ["Base.Profession.BlacksmithingPlaceholder"] = "BLACKSMITHING • FUTURE",
+    ["Base.Profession.AlchemyPlaceholder"] = "ALCHEMY • FUTURE",
+    ["Base.TrainingArea"] = "TRAINING AREA",
+}) do
+    ensure_label(resolved.by_id[anchor_id], text)
+end
+
+if mode == "Candidate" then
+    local ids = {}
+    for anchor_id in pairs(resolved.by_id) do
+        table.insert(ids, anchor_id)
+    end
+    table.sort(ids)
+    for _, anchor_id in ipairs(ids) do
+        print(string.format(
+            "[Base Environment Candidate] %s -> %s",
+            anchor_id,
+            tostring(resolved.by_id[anchor_id].Position)
+        ))
+    end
+    print(string.format(
+        "[Base Environment Candidate] RESOLVED %d anchors.",
+        #ids
+    ))
+end
+
+Workspace:SetAttribute(
+    "DungeonMMOResolvedEnvironmentMode",
+    mode
+)
+Workspace:SetAttribute(READY_ATTRIBUTE, true)
+print("[Base Environment] Ready in " .. mode .. " mode.")

@@ -12,6 +12,9 @@ local remotes = core:WaitForChild("Remotes")
 
 local EquipmentSlots = require(shared:WaitForChild("EquipmentSlots"))
 local ItemDefinitions = require(shared:WaitForChild("ItemDefinitions"))
+local EnvironmentAnchorClient = require(
+    shared:WaitForChild("EnvironmentAnchorClient")
+)
 local EquipmentEffectPresentation = require(
     shared:WaitForChild("EquipmentEffectPresentation")
 )
@@ -432,19 +435,17 @@ Returns:
     None.
 ]]
 local function connect_equipment_prompt()
-    local root = Workspace:WaitForChild("BasePrototype", 15)
-
-    if not root then
-        return
-    end
-
-    local manager = root:WaitForChild("EquipmentManager", 10)
+    local manager = EnvironmentAnchorClient.wait_for(
+        "Base",
+        "Base.Service.Equipment",
+        15
+    )
 
     if not manager then
         return
     end
 
-    local prompt = manager:WaitForChild("EquipmentManagerPrompt", 5)
+    local prompt = manager:FindFirstChild("EquipmentManagerPrompt")
 
     if prompt and prompt:IsA("ProximityPrompt") then
         prompt.Triggered:Connect(function()

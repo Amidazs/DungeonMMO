@@ -28,6 +28,9 @@ local ProgressionClientState = require(
 local ProgressionTrainerRules = require(
     shared:WaitForChild("ProgressionTrainerRules")
 )
+local EnvironmentAnchorClient = require(
+    shared:WaitForChild("EnvironmentAnchorClient")
+)
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ProgressionTrainerUi"
@@ -485,21 +488,19 @@ local function connect_trainer(trainer: Instance)
 end
 
 task.spawn(function()
-    local root = Workspace:WaitForChild("BasePrototype", 15)
+    for _, anchor_id in ipairs({
+        "Base.Trainer.Fighter",
+        "Base.Trainer.Mage",
+        "Base.Trainer.Ranger",
+    }) do
+        local trainer = EnvironmentAnchorClient.wait_for(
+            "Base",
+            anchor_id,
+            15
+        )
 
-    if not root then
-        return
-    end
-
-    root.ChildAdded:Connect(function(child)
-        if type(child:GetAttribute("TrainerId")) == "string" then
-            connect_trainer(child)
-        end
-    end)
-
-    for _, child in ipairs(root:GetChildren()) do
-        if type(child:GetAttribute("TrainerId")) == "string" then
-            connect_trainer(child)
+        if trainer then
+            connect_trainer(trainer)
         end
     end
 end)
