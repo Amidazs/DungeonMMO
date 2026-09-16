@@ -1,150 +1,137 @@
 # DungeonMMO Current Engineering State
 
 **State date:** 16 September 2026
-**Canonical long-form roadmap:** `docs/roadmap/DungeonMMO_Roadmap_v1_35.docx`
+**Canonical long-form roadmap:** `docs/roadmap/DungeonMMO_Roadmap_v1_37.docx`
 **Current phase:** Phase 2 - Vertical Slice
-**Phase 2C status:** FUNCTIONALLY COMPLETE
+**Phase 2C:** FUNCTIONALLY COMPLETE
 **Starting Base + Temple integration:** ACCEPTED
-**Profession Foundation:** ACCEPTED / MERGED / PUSHED
+**Profession Foundation:** ACCEPTED
+**Second Modular Dungeon + Rare-State/Event Proof:** ACCEPTED
 
-## Canonical accepted baseline
+## Canonical accepted gameplay boundary
 
 - Phase 1: ACCEPTED / functionally complete.
 - Phase 2A: ACCEPTED / functionally complete.
 - Phase 2B.A/B/C: ACCEPTED; Phase 2B functionally complete.
 - Phase 2C.A through Phase 2C.E: ACCEPTED; Phase 2C functionally complete.
-- Starting Base + Temple integration checkpoint:
-  `c7fe89ebda3c97634c97e89ad12e52ec23983ae9`.
-- Phase 2 Profession Foundation gameplay checkpoint:
+- Starting Base + Temple integration: `c7fe89ebda3c97634c97e89ad12e52ec23983ae9`.
+- Profession Foundation gameplay checkpoint:
   `ce1577990f2795bf208d7b897e645f32a4a39a4f`.
+- Second Dungeon / Rare-State / Event gameplay checkpoint:
+  `d361348ec045873eed0fd992ceb04bfee908b06a`.
 
-The documentation closeout commit containing this state file becomes the
-canonical `main`. No Roblox place was published by this closeout.
+The documentation closeout commit containing this file and Roadmap v1.37 is
+fast-forwarded to local `main` by the approved local-merge closeout. The exact
+post-closeout local-main SHA is printed in the closeout receipt. `origin/main`
+is deliberately not pushed by this option.
 
-## Accepted environment integration boundary
+## Accepted second-dungeon architecture
 
-The authored Starting Base and Temple are integrated through semantic
-environment anchors rather than hard-coded mesh hierarchy or scattered world
-coordinates. The accepted loop preserves Base -> Temple -> Base admission,
-checkpoints, Captain completion, rewards, save-before-return and reconnect /
-recovery contracts.
+The second functional dungeon is **Abandoned Mine**.
 
-Environment art remains replaceable. Gameplay must continue to resolve stable
-semantic anchors and must not depend on current GLB/RBXL object names or exact
-geometry.
+Its functional route is:
 
-## Accepted Profession Foundation
+- Entry Shaft;
+- Room 1: Ore Gallery or Rooted Cavern;
+- Room 2: Winch Chamber or Flooded Cut;
+- Foreman's Vault.
 
-The first complete profession supply chains are:
+The Room 1 and Room 2 module selections are deterministic per session. The
+current Mine is a synthetic functional candidate, not final authored art.
 
-- Mining -> Blacksmithing;
-- Herbalism -> Alchemy.
+Run-scoped instance variation is server-owned and persisted once on
+`DungeonSessionService.InstanceState`. Reconnect/reconstruction reuses the same
+state instead of rerolling it.
 
-Persistent schema v6 adds profession state for Mining, Blacksmithing,
-Herbalism and Alchemy. Each profession stores Level and cumulative XP. The
-foundation cap is Level 5, with cumulative level thresholds 30, 60, 100 and
-150 XP.
+### Crystal Bloom
 
-Foundation profession XP awards are profession XP only, not character XP:
+`CrystalBloom` is the accepted first rare dungeon state. The current prototype
+chance for an ordinary new Abandoned Mine session is 20 percent. Studio may
+force it for deterministic tests.
 
-- Base gathering: 8 profession XP;
-- Temple gathering: 12 profession XP;
-- Iron Bar: 10 Blacksmithing XP;
-- Ironbound Gloves: 20 Blacksmithing XP;
-- Tempering Oil: 20 Alchemy XP;
-- Tempered Ironbound Gloves: 30 Blacksmithing XP.
+It adds Room 2 encounter pressure, visible crystal presentation and the rare
+completion-reward definition without invalidating the normal completion route.
 
-Blacksmithing smelts Iron Bars and forges Ironbound Gloves. Alchemy distils
-Tempering Oil from Silverleaf. Tempered Ironbound Gloves require Blacksmithing
-Level 2 and combine Ironbound Gloves, Iron Bar and Tempering Oil. This proves a
-cross-profession dependency while keeping basic Blacksmithing independently
-usable.
+### Deep Echoes
 
-Crafting remains server-authoritative. The accepted boundary separates
-non-mutating preparation from atomic completion. The current foundation uses a
-server-owned auto-success result; future crafting minigames may provide an
-outcome but may not grant items directly.
+`DeepEchoes` is the accepted first time-limited event proof. Eligibility is
+controlled by an operations start/end Unix window and is resolved only when a
+new eligible Abandoned Mine session is created. Already-created sessions do not
+change.
 
-The shared Inventory panel is authoritative ownership presentation driven by
-InventorySnapshot. Equipment remains a separate Base service, and Dungeon
-Equipment remains read-only/run-locked.
+It adds Room 1 encounter pressure, event presentation and the event completion
+reward. Crystal Bloom and Deep Echoes may coexist; event completion rewards take
+precedence while normal completion remains valid.
 
-## Accepted Temple gathering rules
+## Accepted evidence
 
-Dungeon resource nodes are personal and single-use per player per run. One
-player gathering a resource does not remove it for another player. Claims are
-stored on the Dungeon member session record, restored on reconnect and rejected
-when duplicated. A provisional claim rolls back if the authoritative profile
-mutation fails.
+The project owner completed both required Studio runs and reported that all
+requested checks worked as expected.
 
-Temple nodes must resolve against real floor, wall or rock geometry and remain
-partially embedded. Invalid placement is skipped. Resource visuals are
-non-colliding and non-queryable so they do not obstruct combat/navigation or
-interfere with later resource raycasts.
+Normal Abandoned Mine evidence:
 
-Room 1 and Room 2 each contain multiple resources. Each room uses a placement
-group and successfully resolved resource positions in that group must be at
-least 18 studs apart. Primary/fallback probes are deliberately spread across
-room sides/quadrants. Surface validity and room-wide spacing are both required.
+- focused new test families reported PASS;
+- player spawned in the synthetic Abandoned Mine rather than Temple;
+- `[Second Dungeon State]` printed two module IDs;
+- Room 1 used two enemies and Room 2 used three;
+- the boss was presented as Corrupted Foreman;
+- completion and Studio Return-to-Base simulation worked.
 
-## Acceptance evidence
+Forced Crystal Bloom + Deep Echoes evidence:
 
-Project-owner evidence accepted all Profession Foundation behaviour before the
-final distribution refinement, including profession UI, Inventory tabs,
-Mining/Blacksmithing, Herbalism/Alchemy, cross-profession crafting, profession
-XP, multiple personal Temple nodes, per-player depletion and reconnect-safe
-claims.
+- output reported `Rare=CrystalBloom` and `Event=DeepEchoes`;
+- purple Deep Echo presentation appeared in Room 1;
+- cyan Crystal Bloom presentation appeared in Room 2;
+- Room 1 used three enemies and Room 2 used four;
+- Corrupted Foreman and completion still worked;
+- no new red runtime errors were reported.
 
-The final closeout Studio gate additionally confirmed:
-
-- `[Profession Resource Distribution Tests] PASS`;
-- Room 1 resources are visibly distributed around the room rather than
-  clustered at one anchor;
-- Room 2 resources are visibly distributed around the room rather than
-  clustered at one anchor;
-- no new red runtime error was reported during the distribution check.
-
-The current Temple distribution is accepted. The project owner noted that nodes could be spread much farther across each room; treat that as deferred presentation/environment polish rather than a Profession Foundation blocker. The accepted functional floor remains the 18-stud same-group spacing contract plus valid embedded surfaces and combat-path safety.
-
-Before that Studio gate, the closeout script also requires the v4 static source
-contract, `git diff --check`, and fresh Rojo builds of all four compositions.
+Before Studio testing, the implementation runner also completed its automated
+baseline proof, static contract check, `git diff --check` and fresh Base,
+Dungeon, published Base and published Dungeon Rojo builds.
 
 Detailed evidence is recorded in
-`docs/testing/phase2-profession-foundation-acceptance-record.md`.
+`docs/testing/phase2-second-dungeon-rare-event-acceptance-record.md`.
 
-## Qualifications that remain visible
+## Existing accepted contracts preserved
 
-The pre-player live legacy migration waiver remains a qualification, not a
-migration PASS. Schema v6 must receive a real live migration proof before any
-release that must safely migrate real existing player profiles.
+The gate reuses rather than duplicates:
 
-Historical Phase 2C.C / Phase 2C.D evidence qualifications remain historical
-notes and are not rewritten by this closeout.
+- semantic environment anchors;
+- `DungeonSessionService`, handoff and reconnect;
+- server-authoritative combat/rewards;
+- completion eligibility and exactly-once rewards;
+- save-before-return and Base recovery;
+- schema-v6 Profile / Inventory / Equipment / Professions;
+- Dungeon Equipment run-lock;
+- Fighter, Mage and Ranger;
+- Mining / Blacksmithing and Herbalism / Alchemy;
+- personal reconnect-safe Temple resource claims.
 
-Final animation, VFX, audio, environment polish, broader Temple resource spread, broad economy/trading and additional profession families remain later scope.
+No profile-schema bump was required.
 
-## Environment and safety
+## Qualifications / deferred work
 
-- Primary repo: `C:\Users\Remko\Documents\Roblox\DungeonMMO`.
-- Profession worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_ProfessionFoundation_v1`.
-- Profession branch: `wip/phase-2-profession-foundation-v1`.
-- `base.project.json` = Starting Base.
-- `default.project.json` = Temple/Test Dungeon composition.
-- Environment: TEST.
-- Live paid revives: disabled.
-- No PROD / Robux / monetisation action is authorized by this closeout.
-- `art/dungeon-environment-prototype` remains isolated and must not be mixed
-  into gameplay work.
+- The synthetic Abandoned Mine is gameplay proof, not launch art.
+- Exact rare/event balance values remain tuning data.
+- Final Mine art must use the isolated environment asset-library workflow.
+- The pre-player live legacy migration waiver remains a qualification, not a
+  migration PASS.
+- Wider Temple resource spread remains deferred presentation/environment polish.
+- No Roblox place was published by this gate.
+- No PROD, Robux or monetisation action occurred.
 
 ## Exact next engineering action
 
-Do not infer a new gate number automatically. Select the next remaining Phase 2
-vertical-slice gate from Roadmap v1.35 before source work. The strongest
-remaining breadth is the second modular dungeon / rare-state proof plus its
-time-limited event interaction.
+The selected next Phase 2 gate is **real party formation + 1-4-player group
+entry**.
 
-Preserve semantic environment anchors, schema-v6 profession state, personal
-resource claims, crafting authority, Fighter/Mage/Ranger behaviour, Equipment
-run-lock, progression/loadout/proficiency, revive/completion and TEST/PROD
-contracts. Secondary-class advancement remains Phase 3 scope.
+Design/spec it before source work. Reuse the accepted
+`DungeonSessionService`, `TeleportCoordinator`, reconnect/completion authority
+and both Temple and Abandoned Mine definitions. Do not create a parallel
+persistent party system.
+
+The design still needs to lock invite flow, leader authority, membership
+changes, ready/entry rules, UI presentation and leave/reconnect behaviour.
+Public matchmaking, guild-party breadth and cross-server social discovery are
+not part of the first proof unless explicitly selected.

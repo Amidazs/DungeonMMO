@@ -774,3 +774,40 @@ Captain progression, save-before-return and reconnect/recovery preservation.
 The pre-player live legacy migration waiver remains a qualification. A real live
 schema-v6 migration proof is still required before releasing against real
 existing profiles.
+
+## Phase 2 - Second Modular Dungeon + Rare-State/Event Proof
+
+**Status:** ACCEPTED
+**Accepted gameplay checkpoint:** `d361348ec045873eed0fd992ceb04bfee908b06a`
+
+The project owner reported the required Studio gameplay gate passed on
+16 September 2026.
+
+### Normal Abandoned Mine
+
+- [x] New focused test families PASS.
+- [x] Synthetic Abandoned Mine selected instead of Temple.
+- [x] Two deterministic module IDs reported.
+- [x] Room 1 enemy count = 2.
+- [x] Room 2 enemy count = 3.
+- [x] Corrupted Foreman presentation.
+- [x] Completion and Studio return simulation.
+
+### Forced Crystal Bloom + Deep Echoes
+
+- [x] `Rare=CrystalBloom`.
+- [x] `Event=DeepEchoes`.
+- [x] Deep Echo presentation in Room 1.
+- [x] Crystal Bloom presentation in Room 2.
+- [x] Room 1 enemy count = 3.
+- [x] Room 2 enemy count = 4.
+- [x] Corrupted Foreman and completion remain functional.
+- [x] No new red runtime errors reported.
+
+Automated pre-Studio evidence included the RED-baseline contract proof, focused
+static verification, clean `git diff --check`, and successful builds of all four
+Base/Dungeon published/non-published Rojo compositions.
+
+The current synthetic Mine is functional gameplay proof, not accepted launch
+art. No Roblox publish, PROD, Robux, monetisation or art-worktree action
+occurred.
