@@ -41,15 +41,21 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
         Selectors = table.freeze({
             table.freeze({
                 Name = "Portal_02",
-                Offset = CFrame.new(0, -30, 7),
+                UseBounds = true,
+                HeightFraction = 0.55,
+                Offset = CFrame.new(),
             }),
             table.freeze({
                 Name = "Portal_01",
-                Offset = CFrame.new(0, -30, 7),
+                UseBounds = true,
+                HeightFraction = 0.55,
+                Offset = CFrame.new(),
             }),
             table.freeze({
                 Name = "Portal_03",
-                Offset = CFrame.new(0, -30, 7),
+                UseBounds = true,
+                HeightFraction = 0.55,
+                Offset = CFrame.new(),
             }),
         }),
     }),

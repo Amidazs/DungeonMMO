@@ -25,6 +25,7 @@ local SkillProgressionService = require(Services:WaitForChild("SkillProgressionS
 local ProficiencyService = require(Services:WaitForChild("ProficiencyService"))
 local IdentityService = require(Services:WaitForChild("IdentityService"))
 local EquipmentService = require(Services:WaitForChild("EquipmentService"))
+local ProfessionService = require(Services:WaitForChild("ProfessionService"))
 
 local RuntimeServices = {}
 
@@ -64,6 +65,7 @@ function RuntimeServices.new(place_kind: string): any
     ProficiencyService.bind_default(proficiency)
     local identity = IdentityService.new(profiles)
     local equipment = EquipmentService.new(profiles, place_kind)
+    local professions = ProfessionService.new(profiles, inventory)
 
     return {
         IsStudio = studio,
@@ -80,6 +82,7 @@ function RuntimeServices.new(place_kind: string): any
         ProficiencyService = proficiency,
         IdentityService = identity,
         EquipmentService = equipment,
+        ProfessionService = professions,
     }
 end
 

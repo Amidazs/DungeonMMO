@@ -22,6 +22,9 @@ local Factory = require(
 local Resolver = require(
     Environment:WaitForChild("EnvironmentAnchorResolver")
 )
+local CandidateAnchorPlacement = require(
+    Environment:WaitForChild("CandidateAnchorPlacement")
+)
 local Synthetic = require(
     script.Parent:WaitForChild("BaseSyntheticEnvironment")
 )
@@ -67,22 +70,25 @@ end
 local function create_candidate_anchors()
     for _, entry in ipairs(CandidateProfile.Entries) do
         local selected: any = nil
-        local selected_pivot: CFrame? = nil
+        local selected_cframe: CFrame? = nil
 
         for _, selector in ipairs(entry.Selectors) do
             local landmark = find_unique_named(
                 Workspace,
                 selector.Name
             )
-            local pivot = landmark and pivot_of(landmark)
-            if landmark and pivot then
+            local placement = landmark and CandidateAnchorPlacement.resolve(
+                landmark,
+                selector
+            )
+            if landmark and placement then
                 selected = selector
-                selected_pivot = pivot
+                selected_cframe = placement
                 break
             end
         end
 
-        if not selected or not selected_pivot then
+        if not selected or not selected_cframe then
             fail(
                 "CandidateLandmarkMissing:"
                     .. tostring(entry.AnchorId)
@@ -93,7 +99,7 @@ local function create_candidate_anchors()
             Workspace,
             CandidateProfile.EnvironmentId,
             entry.AnchorId,
-            selected_pivot * selected.Offset,
+            selected_cframe,
             entry.Size,
             entry.Role
         )
@@ -227,8 +233,8 @@ ensure_label(progression, "PROGRESSION")
 for anchor_id, text in pairs({
     ["Base.Service.BankPlaceholder"] = "BANK • FUTURE",
     ["Base.Service.TravelPlaceholder"] = "TRAVEL • FUTURE",
-    ["Base.Profession.BlacksmithingPlaceholder"] = "BLACKSMITHING • FUTURE",
-    ["Base.Profession.AlchemyPlaceholder"] = "ALCHEMY • FUTURE",
+    ["Base.Profession.BlacksmithingPlaceholder"] = "BLACKSMITHING",
+    ["Base.Profession.AlchemyPlaceholder"] = "ALCHEMY",
     ["Base.TrainingArea"] = "TRAINING AREA",
 }) do
     ensure_label(resolved.by_id[anchor_id], text)

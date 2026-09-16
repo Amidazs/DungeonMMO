@@ -22,6 +22,7 @@ local CharacterIdentityRules = require(
 )
 local CombatConfig = require(SharedCombat:WaitForChild("CombatConfig"))
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local ProfessionRuntime = require(Services:WaitForChild("ProfessionRuntime"))
 local ProgressionRuntimeState = require(Services:WaitForChild("ProgressionRuntimeState"))
 local RacePresentationService = require(
     Services:WaitForChild("RacePresentationService")
@@ -86,6 +87,7 @@ local loadout = runtime.LoadoutService
 local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
+local professions = runtime.ProfessionService
 
 local environment = TempleEnvironmentAdapter.wait_for_ready(
     Workspace,
@@ -195,6 +197,18 @@ local function send_profile(player: Player)
     )
     send_progression(player)
 end
+
+ProfessionRuntime.attach({
+    context = "Dungeon",
+    environment = environment,
+    professions = professions,
+    remotes = remotes,
+    sessions = sessions,
+    get_session_id = function(): string?
+        return active_session_id
+    end,
+    on_profile_changed = send_profile,
+})
 
 local function apply_race_presentation(
     player: Player,

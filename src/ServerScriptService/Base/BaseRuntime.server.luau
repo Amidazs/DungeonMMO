@@ -12,6 +12,7 @@ local Adapters = Core:WaitForChild("Adapters")
 local Base = ServerScriptService:WaitForChild("Base")
 
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local ProfessionRuntime = require(Services:WaitForChild("ProfessionRuntime"))
 local ProgressionRuntimeState = require(Services:WaitForChild("ProgressionRuntimeState"))
 local RacePresentationService = require(
     Services:WaitForChild("RacePresentationService")
@@ -63,6 +64,7 @@ local loadout = runtime.LoadoutService
 local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
+local professions = runtime.ProfessionService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -199,6 +201,14 @@ local function send_profile(player: Player)
     send_equipment(player)
     send_progression(player)
 end
+
+ProfessionRuntime.attach({
+    context = "Base",
+    environment = base_environment,
+    professions = professions,
+    remotes = remotes,
+    on_profile_changed = send_profile,
+})
 
 local function apply_race_presentation(
     player: Player,

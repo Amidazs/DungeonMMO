@@ -24,6 +24,10 @@
     {"Name": "ReviveRequest", "ClassName": "RemoteEvent"},
     {"Name": "ReviveStateChanged", "ClassName": "RemoteEvent"},
     {"Name": "ReturnRequest", "ClassName": "RemoteEvent"},
-    {"Name": "ProgressionDebugRequest", "ClassName": "RemoteEvent"}
+    {"Name": "ProgressionDebugRequest", "ClassName": "RemoteEvent"},
+    {"Name": "ProfessionSnapshot", "ClassName": "RemoteEvent"},
+    {"Name": "ProfessionStationOpen", "ClassName": "RemoteEvent"},
+    {"Name": "ProfessionCraftRequest", "ClassName": "RemoteEvent"},
+    {"Name": "ProfessionActionResult", "ClassName": "RemoteEvent"}
   ]
 }

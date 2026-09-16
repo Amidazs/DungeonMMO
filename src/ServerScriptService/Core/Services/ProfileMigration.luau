@@ -46,6 +46,10 @@ local ItemDefinitions = require(
     shared:WaitForChild("ItemDefinitions")
 )
 
+local ProfessionDefinitions = require(
+    shared:WaitForChild("ProfessionDefinitions")
+)
+
 local ProfileMigration = {}
 
 local IDENTITY_VERSION = 1
@@ -407,6 +411,17 @@ local function sanitize_loadout(
     return cleaned
 end
 
+local function sanitize_profession_state(value: any): any
+    local xp = if type(value) == "table"
+        then nonnegative_integer(value.XP, 0)
+        else 0
+
+    return {
+        Level = ProfessionDefinitions.level_from_xp(xp),
+        XP = xp,
+    }
+end
+
 function ProfileMigration.migrate(raw: any): any
     local raw_is_table = type(raw) == "table"
 
@@ -668,6 +683,19 @@ function ProfileMigration.migrate(raw: any): any
     ) then
         progression.ArchivedSkillKnowledge = {}
     end
+
+    local profession_source = if type(slot1.Professions) == "table"
+        then slot1.Professions
+        else {}
+    local sanitized_professions = {}
+
+    for _, profession_id in ipairs(ProfessionDefinitions.order()) do
+        sanitized_professions[profession_id] = sanitize_profession_state(
+            profession_source[profession_id]
+        )
+    end
+
+    slot1.Professions = sanitized_professions
 
     return migrated
 end

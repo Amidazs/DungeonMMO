@@ -237,6 +237,129 @@ function DungeonSessionService:get_for_user(user_id: number): any?
     return session
 end
 
+-- Personal resource claims are stored on each dungeon member so reconnecting
+-- to the same run reconstructs exactly which nodes that player depleted.
+function DungeonSessionService:claim_resource_node_once(
+    session_id: string,
+    user_id: number,
+    node_id: string
+): any
+    if type(node_id) ~= "string" or node_id == "" then
+        return operation(false, "InvalidResourceNodeId")
+    end
+
+    return self:_update(session_id, function(session: any, now: number)
+        if type(session) ~= "table" then
+            return {
+                State = "Expired",
+                SessionId = session_id,
+                Members = {},
+                UpdatedAt = now,
+                ExpiresAt = now,
+            }, operation(false, "SessionNotFound")
+        end
+        if session.State ~= "Active" then
+            return session, operation(false, "InvalidTransition")
+        end
+
+        local member = session.Members[member_key(user_id)]
+        if not member then
+            return session, operation(false, "NotMember")
+        end
+        if member.Abandoned == true then
+            return session, operation(false, "MemberAbandoned")
+        end
+
+        if type(member.ResourceClaims) ~= "table" then
+            member.ResourceClaims = {}
+        end
+        if member.ResourceClaims[node_id] == true then
+            return session, operation(false, "ResourceAlreadyClaimed")
+        end
+
+        member.ResourceClaims[node_id] = true
+        session.UpdatedAt = now
+        if any_connected(session) then
+            session.ExpiresAt = now
+                + DungeonSessionService.ACTIVE_HEARTBEAT_SECONDS
+        end
+        return session, operation(true, nil)
+    end)
+end
+
+function DungeonSessionService:get_claimed_resource_nodes(
+    session_id: string,
+    user_id: number
+): any
+    local session = self:get(session_id)
+    if not session then
+        return {
+            ok = false,
+            reason = "SessionNotFound",
+            node_ids = {},
+        }
+    end
+
+    local member = session.Members
+        and session.Members[member_key(user_id)]
+    if not member then
+        return {
+            ok = false,
+            reason = "NotMember",
+            node_ids = {},
+        }
+    end
+
+    local node_ids = {}
+    if type(member.ResourceClaims) == "table" then
+        for node_id, claimed in pairs(member.ResourceClaims) do
+            if type(node_id) == "string" and claimed == true then
+                table.insert(node_ids, node_id)
+            end
+        end
+    end
+    table.sort(node_ids)
+
+    return {
+        ok = true,
+        reason = nil,
+        node_ids = node_ids,
+    }
+end
+
+function DungeonSessionService:release_resource_node_claim(
+    session_id: string,
+    user_id: number,
+    node_id: string
+): any
+    if type(node_id) ~= "string" or node_id == "" then
+        return operation(false, "InvalidResourceNodeId")
+    end
+
+    return self:_update(session_id, function(session: any, now: number)
+        if type(session) ~= "table" then
+            return {
+                State = "Expired",
+                SessionId = session_id,
+                Members = {},
+                UpdatedAt = now,
+                ExpiresAt = now,
+            }, operation(false, "SessionNotFound")
+        end
+
+        local member = session.Members[member_key(user_id)]
+        if not member then
+            return session, operation(false, "NotMember")
+        end
+
+        if type(member.ResourceClaims) == "table" then
+            member.ResourceClaims[node_id] = nil
+        end
+        session.UpdatedAt = now
+        return session, operation(true, nil)
+    end)
+end
+
 function DungeonSessionService:set_handoff_nonce(session_id: string, user_id: number, nonce: string): any
     if type(nonce) ~= "string" or nonce == "" then
         return operation(false, "InvalidNonce")

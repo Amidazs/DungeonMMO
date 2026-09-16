@@ -4,6 +4,7 @@ local ItemDefinitions = {}
 local FIGHTER = table.freeze({"Fighter"})
 local MAGE = table.freeze({"Mage"})
 local RANGER = table.freeze({"Ranger"})
+local ALL_CLASSES = table.freeze({"Fighter", "Mage", "Ranger"})
 local ELF = table.freeze({"Elf"})
 
 local DEFINITIONS = table.freeze({
@@ -130,6 +131,74 @@ local DEFINITIONS = table.freeze({
         Rarity = "Basic",
         Stackable = false,
         TestOnly = true,
+    }),
+
+    iron_ore = table.freeze({
+        Id = "iron_ore",
+        Name = "Iron Ore",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+    }),
+
+    iron_bar = table.freeze({
+        Id = "iron_bar",
+        Name = "Iron Bar",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+    }),
+
+    silverleaf = table.freeze({
+        Id = "silverleaf",
+        Name = "Silverleaf",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+    }),
+
+    tempering_oil = table.freeze({
+        Id = "tempering_oil",
+        Name = "Tempering Oil",
+        Kind = "Material",
+        Category = "Reagent",
+        InventoryCategory = "Reagents",
+        Rarity = "Uncommon",
+        Stackable = true,
+    }),
+
+    ironbound_gloves = table.freeze({
+        Id = "ironbound_gloves",
+        Name = "Ironbound Gloves",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Gloves",
+        Category = "CraftedArmor",
+        AllowedBaseClasses = ALL_CLASSES,
+        Rarity = "Basic",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 5,
+        }),
+    }),
+
+    tempered_ironbound_gloves = table.freeze({
+        Id = "tempered_ironbound_gloves",
+        Name = "Tempered Ironbound Gloves",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Gloves",
+        Category = "CraftedArmor",
+        AllowedBaseClasses = ALL_CLASSES,
+        Rarity = "Uncommon",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 6,
+            CriticalChanceBonus = 0.02,
+        }),
     }),
 
     captain_emblem = table.freeze({

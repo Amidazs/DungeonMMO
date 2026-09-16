@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Phase 2C.B adds persistent six-slot equipment.
+-- Schema v6 adds persistent Phase 2 profession progression.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 5
+ProfileSchema.VERSION = 6
 
 local function deep_clone(
     value: any,
@@ -80,6 +80,12 @@ function ProfileSchema.create_default(_user_id: number): any
                 Level = 1,
                 XP = 0,
                 Gold = 0,
+                Professions = {
+                    Mining = {Level = 1, XP = 0},
+                    Blacksmithing = {Level = 1, XP = 0},
+                    Herbalism = {Level = 1, XP = 0},
+                    Alchemy = {Level = 1, XP = 0},
+                },
                 Inventory = {},
                 Equipment = {},
                 DungeonProgress = {},
