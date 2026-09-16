@@ -47,14 +47,13 @@ check(#reward_calls == 2 and reward_calls[1] == 101 and reward_calls[2] == 102, 
 check(#saves == 2, "Every rewarded profile must cross the save barrier before return opens.")
 check(session.CompletionRewardsCommitted == true, "Session must record completion rewards committed only after saves succeed.")
 check(result.member_results["101"].gold_granted == 50, "Completion result must expose per-member Gold.")
-check(#book_calls == 2 and book_calls[1].user_id == 101 and book_calls[2].user_id == 102, "Every completion recipient must receive the one-time Arc Slash book grant attempt before the save barrier.")
-check(result.member_results["101"].arc_slash_book.item_id == "arc_slash_book_bound", "Completion result must expose the Arc Slash book outcome for presentation and diagnostics.")
+check(#book_calls == 0, "Completion must not issue a guaranteed Arc Slash book grant.")
 
 local before = #reward_calls
 local repeated = service:commit("s1")
 check(repeated.ok == true and repeated.already_applied == true, "Repeated commit must reuse committed session result.")
 check(#reward_calls == before, "Repeated commit must not issue new reward grants.")
-check(#book_calls == 2, "Repeated committed session must not issue new Arc Slash book grants.")
+check(#book_calls == 0, "Repeated committed session must not issue guaranteed Arc Slash book grants.")
 
 session = {SessionId = "s2", State = "Complete", CompletionRecipients = {101, 102}, CompletionRewardsCommitted = false}
 reward_calls = {}

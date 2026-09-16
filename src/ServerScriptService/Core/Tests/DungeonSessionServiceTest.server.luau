@@ -16,6 +16,65 @@ end
 local fake_map = InMemoryMapAdapter.new(clock)
 local sessions = DungeonSessionService.new(fake_map, clock)
 
+-- STUDIO_NEGATIVE_USER_ID_REGRESSION
+-- Local-server Studio players use negative synthetic UserIds. They must be
+-- accepted only in Studio while production still requires positive Roblox IDs.
+do
+    local RunService = game:GetService("RunService")
+    local studio_map = InMemoryMapAdapter.new(clock)
+    local studio_sessions = DungeonSessionService.new(studio_map, clock)
+
+    if RunService:IsStudio() then
+        local studio_session, studio_error =
+            studio_sessions:create(
+                "TestDungeon",
+                {-1},
+                100,
+                "reserved-studio-negative"
+            )
+
+        assert(
+            studio_session ~= nil and studio_error == nil,
+            "Studio negative synthetic UserId must be accepted for dungeon sessions."
+        )
+        assert(
+            studio_session.Members["-1"] ~= nil,
+            "Studio negative synthetic member must be stored by string key."
+        )
+
+        local indexed = studio_sessions:get_for_user(-1)
+        assert(
+            indexed ~= nil
+                and indexed.SessionId == studio_session.SessionId,
+            "Studio negative synthetic UserId must support reconnect lookup."
+        )
+
+        assert(
+            studio_sessions:mark_connected(studio_session.SessionId, -1).ok,
+            "Studio negative synthetic member must be connectable."
+        )
+        assert(
+            studio_sessions:mark_complete(studio_session.SessionId, {-1}).ok,
+            "Studio negative synthetic member must be valid completion recipient."
+        )
+    else
+        local invalid_session, invalid_error =
+            studio_sessions:create(
+                "TestDungeon",
+                {-1},
+                100,
+                "reserved-production-negative"
+            )
+
+        assert(
+            invalid_session == nil
+                and invalid_error == "InvalidMemberUserId",
+            "Production must reject negative member UserIds."
+        )
+    end
+end
+
+
 local empty, empty_error = sessions:create("TestDungeon", {}, 100, "reserved-a")
 assert(empty == nil and empty_error == "MemberCountOutOfRange", "Zero-member sessions must be rejected.")
 

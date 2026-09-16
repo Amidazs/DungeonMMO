@@ -33,19 +33,9 @@ function CompletionService:commit(session_id: string): any
 
     local member_results: {[string]: any} = {}
     for _, user_id in ipairs(session.CompletionRecipients or {}) do
-        local granted = self._rewards:grant_completion(session_id, 1, user_id, self._reward_definition)
+        local granted = self._rewards:grant_completion(session_id, 1, user_id, self._reward_definition, nil, session.DungeonId)
         if not granted or granted.ok ~= true then
             return result(false, if granted then granted.reason else "RewardGrantFailed", {member_results = member_results})
-        end
-        if self._skills then
-            local book = self._skills:grant_arc_slash_first_clear(
-                user_id,
-                session_id .. ":ArcSlashFirstClear"
-            )
-            if not book or book.ok ~= true then
-                return result(false, if book then book.reason else "ArcSlashBookGrantFailed", {member_results = member_results})
-            end
-            granted.arc_slash_book = book
         end
         member_results[tostring(user_id)] = granted
     end

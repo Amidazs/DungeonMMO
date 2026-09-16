@@ -1,6 +1,7 @@
 --!strict
 -- Short-lived authoritative dungeon-run state shared across Base and Dungeon Places.
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ReviveConfig = require(
@@ -67,6 +68,23 @@ local function operation(ok: boolean, reason: string?, session: any?): any
     }
 end
 
+local function is_valid_member_user_id(user_id: any): boolean
+    if type(user_id) ~= "number"
+        or user_id % 1 ~= 0
+        or user_id == 0
+    then
+        return false
+    end
+
+    if user_id > 0 then
+        return true
+    end
+
+    -- Roblox Studio local-server players use negative synthetic UserIds.
+    -- Never broaden production identity validation: negatives are Studio-only.
+    return RunService:IsStudio() and user_id < 0
+end
+
 local function validate_members(member_user_ids: {number}): string?
     if #member_user_ids < 1 or #member_user_ids > 4 then
         return "MemberCountOutOfRange"
@@ -74,7 +92,7 @@ local function validate_members(member_user_ids: {number}): string?
 
     local seen: {[number]: boolean} = {}
     for _, user_id in ipairs(member_user_ids) do
-        if type(user_id) ~= "number" or user_id <= 0 or user_id % 1 ~= 0 then
+        if not is_valid_member_user_id(user_id) then
             return "InvalidMemberUserId"
         end
         if seen[user_id] then
@@ -220,7 +238,7 @@ function DungeonSessionService:get(session_id: string): any?
 end
 
 function DungeonSessionService:get_for_user(user_id: number): any?
-    if type(user_id) ~= "number" or user_id <= 0 or user_id % 1 ~= 0 then
+    if not is_valid_member_user_id(user_id) then
         return nil
     end
 
@@ -778,7 +796,7 @@ function DungeonSessionService:mark_complete(session_id: string, completion_reci
 
         local seen: {[number]: boolean} = {}
         for _, user_id in ipairs(recipients) do
-            if type(user_id) ~= "number" or user_id <= 0 or seen[user_id] or session.Members[member_key(user_id)] == nil then
+            if not is_valid_member_user_id(user_id) or seen[user_id] or session.Members[member_key(user_id)] == nil then
                 return session, operation(false, "InvalidCompletionRecipients")
             end
             seen[user_id] = true
