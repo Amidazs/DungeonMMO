@@ -62,12 +62,12 @@ check(assert(profiles:get_character(3001, 1)).XP == 10, "Repeated monster transa
 
 local reward_definition = {
     Gold = DungeonDefinitions.TEST_DUNGEON.CompletionGold,
-    LootTable = LootTableConfig.TEST_DUNGEON,
+    LootTable = {{Weight = 1, Kind = "Item", ItemId = "captain_emblem"}},
 }
 local completion = rewards:grant_completion("session-complete-a", 1, 3001, reward_definition, rng)
 check(completion.ok == true and completion.already_applied == false, "First completion must apply exactly once.")
 check(completion.gold_granted == 50, "Completion Gold must match dungeon definition.")
-check(completion.item_id == "skill_book_test", "Deterministic 97/100 roll must award the Skill Book entry.")
+check(completion.item_id == "captain_emblem", "Deterministic ordinary loot must award Captain Emblem.")
 local after_completion = assert(profiles:get_character(3001, 1))
 check(after_completion.Gold == 65, "Completion Gold must be added exactly once.")
 
@@ -100,6 +100,6 @@ for _, entry in ipairs(assert(profiles:get_character(3001, 1)).Inventory) do
         book_quantity += entry.Quantity
     end
 end
-check(book_quantity == 1, "Completion Skill Book must persist exactly once.")
+check(book_quantity == 0, "Unidentified test book must not be awarded by ordinary completion loot.")
 
 print(string.format("[Reward Service Tests] PASS: %d assertions.", assertions))

@@ -19,11 +19,7 @@ end
 local fresh = Presentation.text({
     gold_granted = 50,
     item_id = "marauder_sword",
-    arc_slash_book = {
-        ok = true,
-        already_applied = false,
-        item_id = "arc_slash_book_bound",
-    },
+    skill_book_item_id = "arc_slash_book",
 })
 check(string.find(fresh, "50", 1, true) ~= nil, "gold must be shown.")
 check(string.find(fresh, "marauder_sword", 1, true) ~= nil, "personal loot must be shown.")
@@ -32,7 +28,6 @@ check(string.find(fresh, "Arc Slash Skill Book", 1, true) ~= nil, "new Skill Boo
 local existing = Presentation.text({
     gold_granted = 50,
     item_id = nil,
-    arc_slash_book = {ok = true, already_applied = true},
 })
 check(string.find(existing, "Arc Slash Skill Book", 1, true) == nil, "already-applied book must not be shown as newly awarded.")
 

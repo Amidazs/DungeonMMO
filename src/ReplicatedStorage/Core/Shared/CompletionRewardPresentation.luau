@@ -1,6 +1,8 @@
 --!strict
 -- Pure completion-summary presentation. Reward grants remain unchanged.
 
+local ItemDefinitions = require(script.Parent:WaitForChild("ItemDefinitions"))
+
 local CompletionRewardPresentation = {}
 
 function CompletionRewardPresentation.lines(completion: any): {string}
@@ -16,14 +18,16 @@ function CompletionRewardPresentation.lines(completion: any): {string}
         "Personal loot: " .. tostring(completion.item_id or "Nothing"),
     }
 
-    local book = completion.arc_slash_book
-
-    if (
-        type(book) == "table"
-        and book.ok == true
-        and book.already_applied ~= true
-    ) then
-        table.insert(lines, "Bonus: Arc Slash Skill Book")
+    local skill_book_item_id = completion.skill_book_item_id
+    if type(skill_book_item_id) == "string"
+        and skill_book_item_id ~= ""
+    then
+        local definition = ItemDefinitions.get(skill_book_item_id)
+        local name =
+            if definition and type(definition.Name) == "string"
+                then definition.Name
+                else skill_book_item_id
+        table.insert(lines, "Bonus Skill Book: " .. name)
     end
 
     return lines

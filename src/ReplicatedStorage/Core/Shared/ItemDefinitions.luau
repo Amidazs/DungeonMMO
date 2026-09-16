@@ -216,6 +216,19 @@ local DEFINITIONS = table.freeze({
         Rarity = "Rare",
         Stackable = true,
         Learnable = false,
+        TestOnly = true,
+    }),
+
+    arc_slash_book = table.freeze({
+        Id = "arc_slash_book",
+        Name = "Arc Slash Skill Book",
+        Kind = "SkillBook",
+        Rarity = "Rare",
+        Stackable = true,
+        Learnable = true,
+        Bound = false,
+        Tradeable = true,
+        SkillId = "ArcSlash",
     }),
 
     arc_slash_book_bound = table.freeze({

@@ -31,10 +31,19 @@ local function operation(ok: boolean, reason: string?, extra: any?): any
 end
 
 local function reward_from_model(model: Model): any
+    local boss_id: string? = nil
+    if model:GetAttribute("Boss") == true then
+        local raw_boss_id = model:GetAttribute("BossId")
+        if type(raw_boss_id) == "string" and raw_boss_id ~= "" then
+            boss_id = raw_boss_id
+        end
+    end
+
     return {
         XP = model:GetAttribute("DungeonRewardXP"),
         GoldMin = model:GetAttribute("DungeonRewardGoldMin"),
         GoldMax = model:GetAttribute("DungeonRewardGoldMax"),
+        BossId = boss_id,
     }
 end
 

@@ -3,6 +3,8 @@
 -- and idempotent; ordinary per-runtime sources are deduped until encounter/session persistence
 -- becomes the long-lived source of truth in the dungeon runtime slice.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local ProfileSchema = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("ProfileSchema")
@@ -10,6 +12,27 @@ local ProfileSchema = require(
 
 local ProgressionService = require(script.Parent:WaitForChild("ProgressionService"))
 local InventoryService = require(script.Parent:WaitForChild("InventoryService"))
+
+local SkillBookDropConfig = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("SkillBookDropConfig")
+)
+
+local function roll_skill_book(definition: any, rng: any): string?
+    if not definition then
+        return nil
+    end
+
+    if RunService:IsStudio() then
+        if Workspace:GetAttribute("TEST_BlockSkillBookDrop") == true then
+            return nil
+        end
+        if Workspace:GetAttribute("TEST_ForceSkillBookDrop") == true then
+            return SkillBookDropConfig.first_item(definition)
+        end
+    end
+
+    return SkillBookDropConfig.roll(definition, rng)
+end
 
 local RewardService = {}
 RewardService.__index = RewardService
@@ -51,6 +74,7 @@ local function result_from_completion_record(transaction_id: string, record: any
         transaction_id = transaction_id,
         gold_granted = record.GoldGranted or 0,
         item_id = record.ItemId,
+        skill_book_item_id = record.SkillBookItemId,
         applied_at = record.AppliedAt,
     }
 end
@@ -207,6 +231,7 @@ function RewardService:grant_monster_reward(
                 already_applied = true,
                 xp_granted = existing_history.XPGranted or 0,
                 gold_granted = existing_history.GoldGranted or 0,
+                skill_book_item_id = existing_history.SkillBookItemId,
                 levels_gained = existing_history.LevelsGained or 0,
                 new_level = existing_history.NewLevel or existing_character.Level,
                 carried_xp = existing_history.CarriedXP or existing_character.XP,
@@ -234,6 +259,7 @@ function RewardService:grant_monster_reward(
                         already_applied = true,
                         xp_granted = already.XPGranted or 0,
                         gold_granted = already.GoldGranted or 0,
+                        skill_book_item_id = already.SkillBookItemId,
                         levels_gained = already.LevelsGained or 0,
                         new_level = already.NewLevel or character.Level,
                         carried_xp = already.CarriedXP or character.XP,
@@ -247,11 +273,41 @@ function RewardService:grant_monster_reward(
                 end
                 character.Gold += gold_roll
 
+                local skill_book_item_id: string? = nil
+                if type(monster_reward.BossId) == "string"
+                    and monster_reward.BossId ~= ""
+                then
+                    local drop_definition =
+                        SkillBookDropConfig.get_boss(monster_reward.BossId)
+                    skill_book_item_id =
+                        roll_skill_book(drop_definition, self._rng)
+
+                    if skill_book_item_id then
+                        local book_result =
+                            InventoryService.apply_item_to_character(
+                                character,
+                                skill_book_item_id,
+                                1
+                            )
+                        if book_result.ok ~= true then
+                            error(book_result.reason or "BossSkillBookApplyFailed")
+                        end
+
+                        print(string.format(
+                            "[Rare Skill Book Drop] Source=Boss:%s UserId=%d Item=%s",
+                            monster_reward.BossId,
+                            user_id,
+                            skill_book_item_id
+                        ))
+                    end
+                end
+
                 local record = {
                     SessionId = session_id,
                     AppliedAt = self._clock(),
                     XPGranted = monster_reward.XP,
                     GoldGranted = gold_roll,
+                    SkillBookItemId = skill_book_item_id,
                     LevelsGained = xp_result.levels_gained,
                     NewLevel = xp_result.new_level,
                     CarriedXP = xp_result.carried_xp,
@@ -262,6 +318,7 @@ function RewardService:grant_monster_reward(
                     already_applied = false,
                     xp_granted = record.XPGranted,
                     gold_granted = record.GoldGranted,
+                    skill_book_item_id = record.SkillBookItemId,
                     levels_gained = record.LevelsGained,
                     new_level = record.NewLevel,
                     carried_xp = record.CarriedXP,
@@ -392,7 +449,8 @@ function RewardService:grant_completion(
     slot: number,
     user_id: number,
     reward_definition: any,
-    rng: any?
+    rng: any?,
+    skill_book_source_id: string?
 ): any
     if type(session_id) ~= "string" or session_id == "" then
         return {ok = false, reason = "InvalidSessionId"}
@@ -419,6 +477,15 @@ function RewardService:grant_completion(
 
     local roll_rng = rng or self._rng
     local item_id = roll_loot(reward_definition.LootTable, roll_rng)
+    local skill_book_item_id: string? = nil
+    if type(skill_book_source_id) == "string"
+        and skill_book_source_id ~= ""
+    then
+        local drop_definition =
+            SkillBookDropConfig.get_completion(skill_book_source_id)
+        skill_book_item_id =
+            roll_skill_book(drop_definition, roll_rng)
+    end
     local applied_result: any = nil
     local mutated, mutate_error = self._profiles:mutate(user_id, function(profile: any)
         local character = profile.Characters["Slot" .. tostring(slot)]
@@ -441,12 +508,32 @@ function RewardService:grant_completion(
             end
         end
 
+        if skill_book_item_id then
+            local book_result =
+                InventoryService.apply_item_to_character(
+                    character,
+                    skill_book_item_id,
+                    1
+                )
+            if book_result.ok ~= true then
+                error(book_result.reason or "CompletionSkillBookApplyFailed")
+            end
+
+            print(string.format(
+                "[Rare Skill Book Drop] Source=Completion:%s UserId=%d Item=%s",
+                skill_book_source_id,
+                user_id,
+                skill_book_item_id
+            ))
+        end
+
         local record = {
             SessionId = session_id,
             Slot = slot,
             AppliedAt = self._clock(),
             GoldGranted = reward_definition.Gold,
             ItemId = item_id,
+            SkillBookItemId = skill_book_item_id,
         }
         history[transaction_id] = record
         applied_result = result_from_completion_record(transaction_id, record, false)
