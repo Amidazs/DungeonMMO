@@ -42,7 +42,7 @@ function BaseSyntheticEnvironment.create(parent: Instance)
         {"Base.Trainer.Ranger", CFrame.new(20, 3.5, -10), "Trainer", Vector3.new(5, 7, 4)},
         {"Base.Service.Equipment", CFrame.new(-20, 3.5, 8), "Service", Vector3.new(5, 7, 4)},
         {"Base.Service.Progression", CFrame.new(-20, 3.5, -2), "Service", Vector3.new(5, 7, 4)},
-        {"Base.Service.BankPlaceholder", CFrame.new(-20, 3.5, -12), "Placeholder", Vector3.new(5, 7, 4)},
+        {"Base.Service.Bank", CFrame.new(-20, 3.5, -12), "Service", Vector3.new(5, 7, 4)},
         {"Base.Service.TravelPlaceholder", CFrame.new(8, 2.5, 8), "Placeholder", Vector3.new(4, 5, 4)},
         {"Base.Profession.BlacksmithingPlaceholder", CFrame.new(-30, 3.5, 18), "Placeholder", Vector3.new(5, 7, 4)},
         {"Base.Profession.AlchemyPlaceholder", CFrame.new(-30, 3.5, -20), "Placeholder", Vector3.new(5, 7, 4)},

@@ -145,8 +145,8 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
         }),
     }),
     table.freeze({
-        AnchorId = "Base.Service.BankPlaceholder",
-        Role = "Placeholder",
+        AnchorId = "Base.Service.Bank",
+        Role = "Service",
         Selectors = table.freeze({
             table.freeze({
                 Name = "Central market circular cobbled plaza",

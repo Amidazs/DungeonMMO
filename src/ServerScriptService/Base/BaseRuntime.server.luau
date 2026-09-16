@@ -31,6 +31,8 @@ local CharacterIdentityRules = require(SharedCore:WaitForChild("CharacterIdentit
 local BaseProgressionController = require(Base:WaitForChild("BaseProgressionController"))
 local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 
+local BankRuntime = require(Base:WaitForChild("BankRuntime"))
+
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local entry_request = remotes:WaitForChild("DungeonEntryRequest") :: RemoteEvent
 local entry_result = remotes:WaitForChild("DungeonEntryResult") :: RemoteEvent
@@ -63,6 +65,7 @@ local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
+local bank = runtime.BankService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -112,6 +115,12 @@ local STUDIO_EQUIPMENT_TEST_KIT = table.freeze({
     "test_elf_helmet",
 })
 
+local STUDIO_BANK_TEST_KIT = table.freeze({
+    table.freeze({ItemId = "iron_ore", Quantity = 25}),
+    table.freeze({ItemId = "arc_slash_book", Quantity = 1}),
+    table.freeze({ItemId = "arc_slash_book_bound", Quantity = 1}),
+})
+
 local function has_inventory_item(
     character: any,
     item_id: string
@@ -148,6 +157,36 @@ local function grant_studio_equipment_test_kit(player: Player)
                 warn(
                     "[Phase 2C.B Studio Kit] "
                         .. item_id
+                        .. " grant blocked: "
+                        .. tostring(granted.reason)
+                )
+            end
+        end
+    end
+end
+
+local function grant_studio_bank_test_kit(player: Player)
+    if not RunService:IsStudio() then
+        return
+    end
+
+    for _, entry in ipairs(STUDIO_BANK_TEST_KIT) do
+        local character = profiles:get_character(player.UserId, 1)
+        local current = if character
+            then inventory.count_item(character, entry.ItemId)
+            else 0
+        local missing = math.max(0, entry.Quantity - current)
+
+        if missing > 0 then
+            local granted = inventory:add_item(
+                player.UserId,
+                entry.ItemId,
+                missing
+            )
+            if not granted.ok then
+                warn(
+                    "[Bank Studio Kit] "
+                        .. entry.ItemId
                         .. " grant blocked: "
                         .. tostring(granted.reason)
                 )
@@ -207,6 +246,17 @@ ProfessionRuntime.attach({
     professions = professions,
     remotes = remotes,
     on_profile_changed = send_profile,
+})
+
+BankRuntime.attach({
+    bank = bank,
+    profiles = profiles,
+    environment = base_environment,
+    remotes = remotes,
+    on_profile_changed = send_profile,
+    is_handoff_pending = function(user_id: number): boolean
+        return coordinator:is_pending(user_id)
+    end,
 })
 
 local function apply_race_presentation(
@@ -388,6 +438,7 @@ local function load_player(player: Player)
         task.defer(party_controller.broadcast)
     end
     grant_studio_equipment_test_kit(player)
+    grant_studio_bank_test_kit(player)
     ProgressionRuntimeState.set_character(
         player.UserId,
         assert(profiles:get_character(player.UserId, 1))

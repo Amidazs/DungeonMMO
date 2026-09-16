@@ -10,6 +10,13 @@ local Definitions = require(
         :WaitForChild("Shared")
         :WaitForChild("EnvironmentAnchorDefinitions")
 )
+local BankConfig = require(
+    ReplicatedStorage
+        :WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("BankConfig")
+)
+
 local Environment = ServerScriptService
     :WaitForChild("Core")
     :WaitForChild("Environment")
@@ -206,6 +213,17 @@ ensure_prompt(
 )
 ensure_label(equipment, "EQUIPMENT")
 
+local bank = resolved.by_id["Base.Service.Bank"]
+local bank_prompt = ensure_prompt(
+    bank,
+    "BankPrompt",
+    "Open",
+    "Bank"
+)
+bank_prompt.MaxActivationDistance = BankConfig.ACCESS_DISTANCE
+ensure_label(bank, "BANK")
+
+
 local board = resolved.by_id["Base.DungeonBoard"]
 ensure_prompt(
     board,
@@ -231,7 +249,6 @@ local progression = resolved.by_id["Base.Service.Progression"]
 ensure_label(progression, "PROGRESSION")
 
 for anchor_id, text in pairs({
-    ["Base.Service.BankPlaceholder"] = "BANK • FUTURE",
     ["Base.Service.TravelPlaceholder"] = "TRAVEL • FUTURE",
     ["Base.Profession.BlacksmithingPlaceholder"] = "BLACKSMITHING",
     ["Base.Profession.AlchemyPlaceholder"] = "ALCHEMY",
