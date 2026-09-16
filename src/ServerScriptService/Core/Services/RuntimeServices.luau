@@ -29,6 +29,8 @@ local ProfessionService = require(Services:WaitForChild("ProfessionService"))
 
 local BankService = require(Services:WaitForChild("BankService"))
 
+local TravelService = require(Services:WaitForChild("TravelService"))
+
 local RuntimeServices = {}
 
 function RuntimeServices.new(place_kind: string): any
@@ -69,6 +71,7 @@ function RuntimeServices.new(place_kind: string): any
     local equipment = EquipmentService.new(profiles, place_kind)
     local professions = ProfessionService.new(profiles, inventory)
     local bank = BankService.new(profiles, place_kind)
+    local travel = TravelService.new(profiles, place_kind)
 
     return {
         IsStudio = studio,
@@ -87,6 +90,7 @@ function RuntimeServices.new(place_kind: string): any
         EquipmentService = equipment,
         ProfessionService = professions,
         BankService = bank,
+        TravelService = travel,
     }
 end
 

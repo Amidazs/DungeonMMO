@@ -17,6 +17,13 @@ local BankConfig = require(
         :WaitForChild("BankConfig")
 )
 
+local TravelConfig = require(
+    ReplicatedStorage
+        :WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("TravelConfig")
+)
+
 local Environment = ServerScriptService
     :WaitForChild("Core")
     :WaitForChild("Environment")
@@ -37,6 +44,9 @@ local Synthetic = require(
 )
 local CandidateProfile = require(
     script.Parent:WaitForChild("BaseCandidateAnchorProfile")
+)
+local TravelCandidateLandmarkResolver = require(
+    script.Parent:WaitForChild("TravelCandidateLandmarkResolver")
 )
 
 local READY_ATTRIBUTE = "DungeonMMOBaseEnvironmentReady"
@@ -79,19 +89,60 @@ local function create_candidate_anchors()
         local selected: any = nil
         local selected_cframe: CFrame? = nil
 
-        for _, selector in ipairs(entry.Selectors) do
-            local landmark = find_unique_named(
-                Workspace,
-                selector.Name
-            )
-            local placement = landmark and CandidateAnchorPlacement.resolve(
-                landmark,
-                selector
-            )
-            if landmark and placement then
-                selected = selector
-                selected_cframe = placement
-                break
+        if type(entry.DynamicRule) == "table" then
+            local dynamic =
+                TravelCandidateLandmarkResolver.resolve(
+                    Workspace,
+                    entry.DynamicRule
+                )
+
+            if not dynamic.ok or not dynamic.instance then
+                local details = ""
+                if type(dynamic.matches) == "table"
+                    and #dynamic.matches > 0
+                then
+                    details = ":" .. table.concat(
+                        dynamic.matches,
+                        "|"
+                    )
+                end
+
+                fail(
+                    tostring(
+                        dynamic.reason
+                            or "CandidateLandmarkMissing"
+                    )
+                        .. ":"
+                        .. tostring(entry.AnchorId)
+                        .. details
+                )
+            end
+
+            selected = entry.DynamicSelector
+                or {Offset = CFrame.new()}
+
+            selected_cframe =
+                CandidateAnchorPlacement.resolve(
+                    dynamic.instance,
+                    selected
+                )
+        else
+            for _, selector in ipairs(entry.Selectors) do
+                local landmark = find_unique_named(
+                    Workspace,
+                    selector.Name
+                )
+                local placement = landmark
+                    and CandidateAnchorPlacement.resolve(
+                        landmark,
+                        selector
+                    )
+
+                if landmark and placement then
+                    selected = selector
+                    selected_cframe = placement
+                    break
+                end
             end
         end
 
@@ -223,6 +274,18 @@ local bank_prompt = ensure_prompt(
 bank_prompt.MaxActivationDistance = BankConfig.ACCESS_DISTANCE
 ensure_label(bank, "BANK")
 
+local travel_service = resolved.by_id["Base.Service.Travel"]
+local travel_prompt = ensure_prompt(
+    travel_service,
+    "TravelPrompt",
+    "Travel",
+    "Travel Gem"
+)
+travel_prompt.KeyboardKeyCode = Enum.KeyCode.E
+travel_prompt.HoldDuration = TravelConfig.HOLD_DURATION
+travel_prompt.MaxActivationDistance = TravelConfig.ACCESS_DISTANCE
+ensure_label(travel_service, "TRAVEL GEM")
+
 
 local board = resolved.by_id["Base.DungeonBoard"]
 ensure_prompt(
@@ -249,7 +312,6 @@ local progression = resolved.by_id["Base.Service.Progression"]
 ensure_label(progression, "PROGRESSION")
 
 for anchor_id, text in pairs({
-    ["Base.Service.TravelPlaceholder"] = "TRAVEL • FUTURE",
     ["Base.Profession.BlacksmithingPlaceholder"] = "BLACKSMITHING",
     ["Base.Profession.AlchemyPlaceholder"] = "ALCHEMY",
     ["Base.TrainingArea"] = "TRAINING AREA",

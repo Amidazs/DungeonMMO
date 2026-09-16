@@ -32,6 +32,7 @@ local BaseProgressionController = require(Base:WaitForChild("BaseProgressionCont
 local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 
 local BankRuntime = require(Base:WaitForChild("BankRuntime"))
+local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local entry_request = remotes:WaitForChild("DungeonEntryRequest") :: RemoteEvent
@@ -66,6 +67,7 @@ local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
 local bank = runtime.BankService
+local travel = runtime.TravelService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -343,6 +345,28 @@ local function current_session_for(user_id: number): any?
     end
     return session
 end
+
+travel:set_guards({
+    is_teleport_pending = function(user_id: number): boolean
+        return coordinator:is_pending(user_id)
+    end,
+    has_recoverable_session = function(user_id: number): boolean
+        local session = current_session_for(user_id)
+        return (
+            session ~= nil
+            and (
+                session.State == "Creating"
+                or session.State == "Active"
+            )
+        )
+    end,
+})
+
+BaseTravelRuntime.attach({
+    travel = travel,
+    environment = base_environment,
+    remotes = remotes,
+})
 
 local function route_recoverable_session(player: Player, session: any): boolean
     local decision = BaseReconnectRouting.decide(session, player.UserId, os.time())
