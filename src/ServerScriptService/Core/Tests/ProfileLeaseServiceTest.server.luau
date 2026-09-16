@@ -43,4 +43,19 @@ assert(lease_a:claim(77).ok)
 now += ProfileLeaseService.LEASE_TTL_SECONDS + 1
 assert(lease_b:claim(77).ok, "Expired lease must be reclaimable by another server.")
 
+if game:GetService("RunService"):IsStudio() then
+    assert(
+        lease_a:claim(-1).ok,
+        "Studio local-server synthetic negative UserIds must be leaseable."
+    )
+    assert(
+        lease_a:renew(-1).ok,
+        "Studio local-server synthetic negative UserId leases must renew."
+    )
+    assert(
+        lease_a:release(-1).ok,
+        "Studio local-server synthetic negative UserId leases must release."
+    )
+end
+
 print("[Profile Lease Tests] PASS")

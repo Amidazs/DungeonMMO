@@ -9,6 +9,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService(
     "ReplicatedStorage"
 )
+local RunService = game:GetService(
+    "RunService"
+)
 
 local player = Players.LocalPlayer
 
@@ -189,6 +192,12 @@ local current_stage = ""
 local selected_race: string? = nil
 local selected_class: string? = nil
 local request_pending = false
+local studio_party_test_auto_identity =
+    RunService:IsStudio()
+    and string.match(
+        player.Name,
+        "^Player%d+$"
+    ) ~= nil
 
 local race_buttons: {
     [string]: TextButton
@@ -624,6 +633,46 @@ local function render(
             "[Identity Selection] Authoritative stage: "
                 .. stage
         )
+    end
+
+    if (
+        studio_party_test_auto_identity
+        and not request_pending
+    ) then
+        if (
+            stage == "RaceSelection"
+            or stage == "LegacyRaceSelection"
+        ) then
+            request_pending = true
+            blocker.Visible = false
+
+            print(
+                "[Party Test Identity] Auto-selecting Human for "
+                    .. player.Name
+            )
+
+            identity_selection:FireServer(
+                "Race",
+                "Human"
+            )
+            return
+        end
+
+        if stage == "ClassSelection" then
+            request_pending = true
+            blocker.Visible = false
+
+            print(
+                "[Party Test Identity] Auto-selecting Fighter for "
+                    .. player.Name
+            )
+
+            identity_selection:FireServer(
+                "Class",
+                "Fighter"
+            )
+            return
+        end
     end
 
     if (

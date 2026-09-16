@@ -1,5 +1,7 @@
 --!strict
 -- Atomic single-writer profile authority with explicit Base <-> Dungeon handoff.
+local RunService = game:GetService("RunService")
+
 local ProfileLeaseService = {}
 ProfileLeaseService.__index = ProfileLeaseService
 
@@ -43,7 +45,22 @@ function ProfileLeaseService.new(map_adapter: any, server_id: string, clock: (()
 end
 
 function ProfileLeaseService:_update(user_id: number, transform: (any, number) -> (any, any)): any
-    assert(type(user_id) == "number" and user_id > 0, "user_id must be positive")
+    local valid_user_id =
+        type(user_id) == "number"
+        and user_id > 0
+
+    if (
+        RunService:IsStudio()
+        and type(user_id) == "number"
+        and user_id < 0
+    ) then
+        valid_user_id = true
+    end
+
+    assert(
+        valid_user_id,
+        "user_id must be positive outside Studio; Studio local test ids may be negative"
+    )
 
     local now = self._clock()
     local operation_result = result(false, "LeaseUpdateFailed")

@@ -29,6 +29,7 @@ local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
 local CharacterIdentityRules = require(SharedCore:WaitForChild("CharacterIdentityRules"))
 local BaseProgressionController = require(Base:WaitForChild("BaseProgressionController"))
+local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local entry_request = remotes:WaitForChild("DungeonEntryRequest") :: RemoteEvent
@@ -97,6 +98,7 @@ end
 local loaded_users: {[number]: boolean} = {}
 local last_entry_request: {[number]: number} = {}
 local ENTRY_RATE_LIMIT_SECONDS = 2
+local party_controller: any? = nil
 local AUTOSAVE_SECONDS = 30
 local LEASE_RENEW_SECONDS = 15
 
@@ -382,6 +384,9 @@ local function load_player(player: Player)
     end
 
     loaded_users[player.UserId] = true
+    if party_controller then
+        task.defer(party_controller.broadcast)
+    end
     grant_studio_equipment_test_kit(player)
     ProgressionRuntimeState.set_character(
         player.UserId,
@@ -439,6 +444,10 @@ local function handle_entry(player: Player, dungeon_id: any)
     local dungeon_definition = if type(dungeon_id) == "string" then DungeonDefinitions.get(dungeon_id) else nil
     if not dungeon_definition or dungeon_definition.SoloEntryEnabled ~= true then
         send_entry_result(player, {ok = false, reason = "UnknownDungeon"})
+        return
+    end
+    if party_controller and party_controller:party_size(player.UserId) > 1 then
+        send_entry_result(player, {ok = false, reason = "PartyEntryRequired"})
         return
     end
     if loaded_users[player.UserId] ~= true or not profiles:get_profile(player.UserId) then
@@ -502,6 +511,43 @@ local function handle_entry(player: Player, dungeon_id: any)
         warn(string.format("[Base Runtime] Dungeon start failed for %s: %s", player.Name, tostring(result.reason)))
     end
 end
+
+party_controller = PartyRuntime.attach({
+    remotes = remotes,
+    coordinator = coordinator,
+    is_studio = RunService:IsStudio(),
+    is_valid_dungeon = function(dungeon_id: string): boolean
+        return DungeonDefinitions.get(dungeon_id) ~= nil
+    end,
+    is_player_ready = function(player: Player): boolean
+        return loaded_users[player.UserId] == true and profiles:get_profile(player.UserId) ~= nil
+    end,
+    place_id_provider = configured_dungeon_place_id,
+    validate_member = function(player: Player): any
+        if loaded_users[player.UserId] ~= true or not profiles:get_profile(player.UserId) then
+            return {ok = false, reason = "ProfileNotReady"}
+        end
+
+        local character = profiles:get_character(player.UserId, 1)
+        if not character or not CharacterIdentityRules.is_complete(character) then
+            return {ok = false, reason = "IdentityIncomplete"}
+        end
+
+        if coordinator:is_pending(player.UserId) then
+            return {ok = false, reason = "TeleportAlreadyPending"}
+        end
+
+        local existing = current_session_for(player.UserId)
+        if existing then
+            local decision = BaseReconnectRouting.decide(existing, player.UserId, os.time())
+            if decision.route == "Dungeon" then
+                return {ok = false, reason = "ActiveDungeonSession"}
+            end
+        end
+
+        return {ok = true}
+    end,
+})
 
 entry_request.OnServerEvent:Connect(function(player: Player, dungeon_id: any)
     handle_entry(player, dungeon_id)
