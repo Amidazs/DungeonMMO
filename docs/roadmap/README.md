@@ -2,29 +2,29 @@
 
 The canonical long-form roadmap stored here is:
 
-`DungeonMMO_Roadmap_v1_37.docx`
+`DungeonMMO_Roadmap_v1_38.docx`
 
-Version: **1.37**
+Version: **1.38**
 Last updated: **16 September 2026**
 
 SHA-256:
 
-`b2012a0a27fa0ceea3c21c4d9ccca84d3b66be9209bd495f832389dd3de89d40`
+`160ba7a76123ce9c0ba30fcde2c71164a482c96b12727ce261d3f2cf1efb088f`
 
-Version 1.37 records the Phase 2 second modular dungeon / rare-state /
-time-limited-event proof as accepted at gameplay checkpoint
-`d361348ec045873eed0fd992ceb04bfee908b06a`.
+Version 1.38 records Party Formation + 1-4-Player Group Entry as accepted at
+gameplay checkpoint `726299322fb31689e5e321878f287cccfcb07d81`.
 
-The accepted proof locks Abandoned Mine as the functional second dungeon,
-deterministic handcrafted Room 1/Room 2 module selection, persistent
-`CrystalBloom`, operations-controlled `DeepEchoes`, and the Corrupted Foreman
-functional boss presentation while retaining ordinary completion.
+The accepted proof locks temporary same-Base-server party authority, 1-4
+membership, invite/accept, leader/member controls, readiness invalidation,
+deterministic leader transfer and group entry integration for both Temple and
+Abandoned Mine while handing run membership into the existing
+DungeonSessionService / TeleportCoordinator architecture.
 
-The current Mine shell is functional proof only; authored art remains later
-environment integration.
+Studio compatibility for negative synthetic Local Server UserIds and the
+PlayerN Human/Fighter identity harness remains strictly Studio-gated.
 
-The selected next Phase 2 gate is real party formation + 1-4-player group
-entry using the existing dungeon-session/handoff/reconnect architecture.
+The selected next Phase 2 gate is one targetable rare Skill Book acquisition
+path using existing server-authoritative reward/inventory/skill-book contracts.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

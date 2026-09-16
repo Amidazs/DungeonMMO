@@ -11,7 +11,7 @@ Before modifying source:
 2. Read `docs/ai/HANDOFF.md`.
 3. Read `docs/ai/TEST_MATRIX.md`.
 4. Read `docs/ai/AUTOMATION.md`.
-5. Treat `docs/roadmap/DungeonMMO_Roadmap_v1_37.docx` as the canonical
+5. Treat `docs/roadmap/DungeonMMO_Roadmap_v1_38.docx` as the canonical
    long-form roadmap.
 6. Read the active approved design and implementation plan under
    `docs/superpowers/specs/` and `docs/superpowers/plans/`.
@@ -30,8 +30,9 @@ modification and reconcile without destructive Git operations.
 - Starting Base + Temple integration: ACCEPTED.
 - Profession Foundation: ACCEPTED.
 - Second Modular Dungeon + Rare-State/Event Proof: ACCEPTED.
-- Second-dungeon gameplay checkpoint: `d361348ec045873eed0fd992ceb04bfee908b06a`.
-- Selected next gate: real party formation + 1-4-player group entry,
+- Party Formation + 1-4-Player Group Entry: ACCEPTED.
+- Party gameplay checkpoint: `726299322fb31689e5e321878f287cccfcb07d81`.
+- Selected next gate: one targetable rare Skill Book acquisition path,
   design not yet locked.
 
 Do not reopen accepted architecture merely for cosmetic polish unless a real
@@ -79,35 +80,42 @@ Do not autonomously:
 
 TEST-only debug hooks must remain rejected or disabled in PROD.
 
-## Accepted second-dungeon invariants
+## Accepted party invariants
 
-The Temple and Abandoned Mine both use the shared dungeon-session architecture.
-
-Abandoned Mine run variation is represented by immutable run-scoped
-`InstanceState`. Deterministic module selection, Crystal Bloom and Deep Echoes
-must not reroll on reconnect and must not create parallel profile persistence.
-
-Normal completion remains valid in rare/event states.
-
-Authored environment replacements continue through semantic anchors rather than
-hard-coded mesh hierarchy.
+- PartyService is temporary same-Base-server authority only.
+- Party membership is not Profile/DataStore persistence.
+- Party size is 1-4.
+- Multi-member parties require all members Ready.
+- Membership changes and selected-dungeon changes invalidate readiness.
+- Leader transfer is deterministic to the longest-standing remaining member.
+- Server revalidation occurs immediately before entry.
+- Accepted members are handed to existing TeleportCoordinator /
+  DungeonSessionService authority; the Base party is not parallel dungeon
+  membership authority.
+- Both Temple and Abandoned Mine entry are supported.
+- Studio negative synthetic UserIds are allowed only under
+  `RunService:IsStudio()`.
+- The Studio `PlayerN` Human/Fighter auto-identity harness must never become a
+  production identity shortcut.
 
 ## Selected next-gate discipline
 
-The next gate is party formation + 1-4-player group entry.
+The next gate is a targetable rare Skill Book acquisition proof.
 
 Reuse:
-- `DungeonSessionService`;
-- `TeleportCoordinator`;
-- existing profile handoff/nonces;
-- reconnect routing;
-- revive/spectating;
-- completion eligibility/rewards;
-- both accepted dungeon definitions.
+- `LootTableConfig`;
+- `RewardService`;
+- `InventoryService`;
+- skill-book learning / binding rules;
+- completion eligibility and idempotency;
+- accepted dungeon / rare-state / event definitions where appropriate.
 
-Do not create a separate persistent party save model merely for the first party
-proof. Public matchmaking, guild-party systems and cross-server social
-discovery remain later scope unless deliberately selected.
+Do not create a client-trusted reward-selection path. Avoid a schema bump unless
+an approved persistent target/pity mechanic genuinely requires it; if it does,
+lock migration/rollback first.
+
+Do not broaden the first proof into Bank, Travel, marketplace, public
+matchmaking or a full loot/economy rebalance.
 
 ## Separate environment-art branch
 
@@ -115,7 +123,7 @@ discovery remain later scope unless deliberately selected.
 
 Do not switch to it, merge it, reset it, clean it, apply its stash or wholesale
 copy it into gameplay. Follow the canonical asset-library REUSE -> VARIANT ->
-NEW ASSET workflow for later authored Mine art.
+NEW ASSET workflow for later authored environment work.
 
 ## Handoff discipline
 

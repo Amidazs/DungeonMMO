@@ -2,8 +2,8 @@
 
 **Date:** 16 September 2026
 **Active workstream:** Phase 2 - Vertical Slice
-**Canonical roadmap:** DungeonMMO Roadmap v1.37
-**Second Modular Dungeon + Rare-State/Event Proof:** ACCEPTED
+**Canonical roadmap:** DungeonMMO Roadmap v1.38
+**Party Formation + 1-4-Player Group Entry:** ACCEPTED
 
 ## Accepted gameplay checkpoints
 
@@ -13,60 +13,66 @@
   `ce1577990f2795bf208d7b897e645f32a4a39a4f`
 - Second Dungeon / Rare-State / Event:
   `d361348ec045873eed0fd992ceb04bfee908b06a`
+- Previous local-main docs closeout:
+  `304ab0535d4de7e77313b7e0aef8d3b7bd899449`
+- Party Formation / Group Entry:
+  `726299322fb31689e5e321878f287cccfcb07d81`
 
-The local-merge closeout fast-forwards local `main` to the documentation
-closeout commit after rebuilding the merged result. It deliberately does not
-push `origin/main`.
+The approved local-merge closeout fast-forwards local `main` to the party
+documentation closeout commit after merged-result verification. It deliberately
+does not push `origin/main`.
 
-## Accepted second-dungeon contract
+## Accepted party contract
 
-Abandoned Mine is the second functional dungeon. It proves two deterministic
-handcrafted mid-run module selections while retaining the accepted three-
-encounter checkpoint/revive/completion skeleton.
+`PartyService` is temporary Base-server authority. It supports 1-4 members,
+creator leadership, invite/accept, leader kick, member leave, deterministic
+leader transfer, dissolution on empty, readiness and selected-dungeon state.
 
-`DungeonSessionService.InstanceState` is immutable run-scoped authority for
-module selection, rare state and event state. It is initialized once and reused
-for reconnect/reconstruction.
+Multi-member entry requires all members Ready. Membership changes and dungeon
+selection changes invalidate readiness. Solo entry remains available without a
+Ready requirement.
 
-- `CrystalBloom`: first persistent rare state; prototype ordinary chance 20%;
-  adds Room 2 encounter pressure and rare completion rewards.
-- `DeepEchoes`: first time-limited event proof; new-session eligibility comes
-  from an operations start/end Unix window; adds Room 1 encounter pressure and
-  event rewards.
-- Both may coexist. Event reward selection takes precedence.
-- Normal completion remains valid in every accepted state.
+`PartyEntryCoordinator` validates the final member set and passes it into the
+existing `TeleportCoordinator` / `DungeonSessionService` architecture. Once a
+run is admitted, DungeonSession membership is authoritative and temporary party
+state does not become persistent run/profile state.
 
-The current synthetic Mine is accepted functional proof only. Authored Mine
-environment work remains isolated from gameplay.
+Temple and Abandoned Mine are both supported.
 
 ## Studio acceptance
 
-The project owner reported all requested normal and forced-special gameplay
-checks passed.
+The project owner completed the required four-player Studio Local Server gate and
+reported every requested check worked:
 
-Normal run:
-- new focused tests PASS;
-- Mine spawn, not Temple;
-- two module IDs;
-- 2 / 3 room enemy counts;
-- Corrupted Foreman;
-- completion and return simulation.
+- Profile Lease regression PASS;
+- Player1-Player4 identity auto-harness reached authoritative Complete;
+- create + invite/accept to 4/4;
+- not-ready start rejection;
+- all-member Ready flow;
+- kick updates and readiness reset;
+- leader leave -> longest-standing member leadership transfer;
+- Temple party entry Studio proof;
+- Abandoned Mine party entry Studio proof;
+- no new red DungeonMMO runtime errors.
 
-Forced Crystal Bloom + Deep Echoes:
-- both states reported;
-- purple Room 1 event markers;
-- cyan Room 2 crystal markers;
-- 3 / 4 room enemy counts;
-- Corrupted Foreman + completion;
-- no new red runtime errors.
+Roblox CoreGui/ChatScript CreatorType errors encountered during the gate were
+Studio CoreScript failures, not DungeonMMO runtime errors. The test-only identity
+harness and negative synthetic-UserId lease allowance remain Studio-gated.
+
+## Qualification
+
+The Studio party-entry proof does not itself perform a published reserved-server
+cross-Place teleport. The accepted lower-layer TeleportCoordinator /
+DungeonSession contracts already support player arrays; real published group
+teleport can be rechecked in a later published TEST/release gate.
 
 ## Safety
 
 - Primary repo: `C:\Users\Remko\Documents\Roblox\DungeonMMO`
-- Feature worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_SecondDungeon_v1_1`
+- Party feature worktree:
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_PartyEntry_v1`
 - Feature branch:
-  `wip/phase-2-second-dungeon-rare-event-v1-1`
+  `wip/phase-2-party-entry-v1`
 - Environment: TEST
 - No Roblox publish occurred.
 - Live paid revives remain disabled.
@@ -75,20 +81,11 @@ Forced Crystal Bloom + Deep Echoes:
 
 ## Exact next action
 
-Design the **party formation + 1-4-player group-entry proof**.
+Design the **targetable rare Skill Book acquisition proof** before source work.
 
-Use the existing Base, session, handoff, reserved-server, reconnect, revive,
-completion and return architecture. The proof must support both accepted
-dungeons and must not create a parallel persistent party-save model.
+Reuse current server-authoritative loot/reward/inventory/skill-learning systems.
+Keep the first proof narrow: one deliberate target path for one specific rare
+book. Do not turn it into a broad loot-table, market or economy rewrite.
 
-The compact design should lock:
-- party creation and invite/accept flow;
-- leader authority;
-- membership leave/kick rules;
-- ready / dungeon-entry validation;
-- Base UI surface;
-- reconnect/leave behaviour;
-- Studio acceptance plan.
-
-Targetable rare Skill Book acquisition, Bank/Travel services and broader visual
-polish remain later Phase 2 breadth.
+Bank/storage, Travel, public matchmaking, guild-party breadth and final UI/art
+polish remain later scope.

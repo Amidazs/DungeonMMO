@@ -811,3 +811,47 @@ Base/Dungeon published/non-published Rojo compositions.
 The current synthetic Mine is functional gameplay proof, not accepted launch
 art. No Roblox publish, PROD, Robux, monetisation or art-worktree action
 occurred.
+
+## Phase 2 - Party Formation + 1-4-Player Group Entry
+
+**Status:** ACCEPTED
+**Accepted gameplay checkpoint:** `726299322fb31689e5e321878f287cccfcb07d81`
+
+The project owner reported the required four-player Roblox Studio Local Server
+gate passed on 16 September 2026.
+
+### Multiplayer party flow
+
+- [x] Profile Lease regression PASS with Studio negative synthetic UserIds.
+- [x] Player1-Player4 reached authoritative identity Complete.
+- [x] Party created by Player 1.
+- [x] Players 2-4 invited and accepted.
+- [x] Correct 4/4 membership shown.
+- [x] Premature start blocked while not all members Ready.
+- [x] All-member Ready flow worked.
+- [x] Kick propagated and invalidated readiness.
+- [x] Leader leave transferred authority deterministically.
+- [x] Temple party entry Studio proof.
+- [x] Abandoned Mine party entry Studio proof.
+- [x] No new red DungeonMMO runtime errors reported.
+
+### Test-environment compatibility
+
+- [x] Negative local-server synthetic UserIds are permitted only in Studio.
+- [x] Production positive-UserId rule remains intact.
+- [x] Studio PlayerN Human/Fighter auto-identity routes through authoritative
+      IdentitySelectionRequest / IdentityService rather than mutating identity
+      client-side.
+
+### Qualification
+
+The local Studio proof does not perform a published reserved-server cross-Place
+teleport. Real published TEST group teleport remains a later integration/release
+check while the accepted party layer reuses the already group-capable
+TeleportCoordinator / DungeonSession lower layer.
+
+Automated evidence also included the party static contract, identity-harness
+contract, profile-lease regression contract, `git diff --check`, and successful
+builds of all four Base/Dungeon published/non-published Rojo compositions.
+
+No Roblox publish, PROD, Robux, monetisation or art-worktree action occurred.
