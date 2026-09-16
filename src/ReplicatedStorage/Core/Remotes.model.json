@@ -144,6 +144,22 @@
     {
       "Name": "BankActionResult",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "TravelSnapshotRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "TravelSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "TravelRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "TravelActionResult",
+      "ClassName": "RemoteEvent"
     }
   ]
 }

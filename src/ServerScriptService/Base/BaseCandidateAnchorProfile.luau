@@ -155,8 +155,8 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
         }),
     }),
     table.freeze({
-        AnchorId = "Base.Service.TravelPlaceholder",
-        Role = "Placeholder",
+        AnchorId = "Base.Service.Travel",
+        Role = "Service",
         Selectors = table.freeze({
             table.freeze({
                 Name = "Anchor_FastTravel_Central_Tree_Market",
@@ -166,6 +166,86 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
                 Name = "Central market circular cobbled plaza",
                 Offset = CFrame.new(20, 3.5, -12),
             }),
+        }),
+    }),
+    table.freeze({
+        AnchorId = "Base.Travel.Market",
+        Role = "TravelDestination",
+        Selectors = table.freeze({
+            table.freeze({
+                Name = "Central market circular cobbled plaza",
+                Offset = CFrame.new(20, 2.5, -12),
+            }),
+            table.freeze({
+                Name = "Market_SocialFurniture",
+                Offset = CFrame.new(12, -1.5, 0),
+            }),
+        }),
+    }),
+    table.freeze({
+        AnchorId = "Base.Travel.Dwarves",
+        Role = "TravelDestination",
+        DynamicRule = table.freeze({
+            PreferredNames = table.freeze({
+                "Anchor_FastTravel_Dwarf_Mine",
+                "Anchor_FastTravel_Dwarven_Mine",
+                "Anchor_FastTravel_Dwarves_Mine",
+                "DwarfMine",
+                "Dwarf Mine",
+                "Dwarven Mine",
+                "Dwarf_Mine",
+            }),
+            PreferredPrefix = "Anchor_FastTravel",
+            AreaFragments = table.freeze({
+                "Dwarf",
+                "Dwarven",
+                "Mine",
+            }),
+        }),
+        DynamicSelector = table.freeze({
+            UseBounds = true,
+            HeightFraction = 0.1,
+            Offset = CFrame.new(),
+        }),
+    }),
+    table.freeze({
+        AnchorId = "Base.Travel.Portals",
+        Role = "TravelDestination",
+        Selectors = table.freeze({
+            table.freeze({
+                Name = "Portal_02",
+                UseBounds = true,
+                HeightFraction = 0.55,
+                Offset = CFrame.new(0, 0, 10),
+            }),
+            table.freeze({
+                Name = "Central market circular cobbled plaza",
+                Offset = CFrame.new(-20, 2.5, -14),
+            }),
+        }),
+    }),
+    table.freeze({
+        AnchorId = "Base.Travel.Orcs",
+        Role = "TravelDestination",
+        DynamicRule = table.freeze({
+            PreferredNames = table.freeze({
+                "Anchor_FastTravel_Orc_Farm",
+                "Anchor_FastTravel_Orcs_Farm",
+                "OrcFarm",
+                "Orc Farm",
+                "Orc_Farm",
+            }),
+            PreferredPrefix = "Anchor_FastTravel",
+            AreaFragments = table.freeze({
+                "Orc",
+                "Orcs",
+                "Farm",
+            }),
+        }),
+        DynamicSelector = table.freeze({
+            UseBounds = true,
+            HeightFraction = 0.1,
+            Offset = CFrame.new(),
         }),
     }),
     table.freeze({
