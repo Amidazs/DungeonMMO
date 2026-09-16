@@ -124,6 +124,26 @@
     {
       "Name": "PartyActionResult",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "BankSnapshotRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "BankSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "BankDepositRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "BankWithdrawRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "BankActionResult",
+      "ClassName": "RemoteEvent"
     }
   ]
 }

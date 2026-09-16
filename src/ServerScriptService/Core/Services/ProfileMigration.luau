@@ -50,6 +50,14 @@ local ProfessionDefinitions = require(
     shared:WaitForChild("ProfessionDefinitions")
 )
 
+local BankConfig = require(
+    shared:WaitForChild("BankConfig")
+)
+
+local ItemTransferRules = require(
+    shared:WaitForChild("ItemTransferRules")
+)
+
 local ProfileMigration = {}
 
 local IDENTITY_VERSION = 1
@@ -422,6 +430,77 @@ local function sanitize_profession_state(value: any): any
     }
 end
 
+local function sanitize_bank(value: any): any
+    local source_items = if type(value) == "table"
+            and type(value.Items) == "table"
+        then value.Items
+        else {}
+
+    local cleaned = {
+        Version = BankConfig.VERSION,
+        Items = {},
+    }
+    local used = 0
+    local stack_entries: {[string]: any} = {}
+
+    for _, entry in ipairs(source_items) do
+        if type(entry) == "table"
+            and type(entry.ItemId) == "string"
+        then
+            local quantity = nonnegative_integer(
+                entry.Quantity,
+                0
+            )
+            local definition = ItemDefinitions.get(
+                entry.ItemId
+            )
+            local bankable = ItemTransferRules.can_bank(
+                entry.ItemId
+            )
+
+            if definition and bankable and quantity > 0 then
+                if definition.Stackable == true then
+                    local existing = stack_entries[entry.ItemId]
+                    if existing then
+                        existing.Quantity += quantity
+                    elseif used < BankConfig.CAPACITY then
+                        local new_entry = {
+                            ItemId = entry.ItemId,
+                            Quantity = quantity,
+                        }
+                        table.insert(cleaned.Items, new_entry)
+                        stack_entries[entry.ItemId] = new_entry
+                        used += 1
+                    end
+                else
+                    local remaining_slots =
+                        BankConfig.CAPACITY - used
+                    local accepted = math.min(
+                        quantity,
+                        math.max(0, remaining_slots)
+                    )
+
+                    for _ = 1, accepted do
+                        table.insert(cleaned.Items, {
+                            ItemId = entry.ItemId,
+                            Quantity = 1,
+                        })
+                    end
+
+                    used += accepted
+                end
+            end
+
+            if used >= BankConfig.CAPACITY then
+                -- Existing stackable rows later in the source may still
+                -- merge without consuming a slot, so do not break here.
+            end
+        end
+    end
+
+    return cleaned
+end
+
 function ProfileMigration.migrate(raw: any): any
     local raw_is_table = type(raw) == "table"
 
@@ -477,6 +556,9 @@ function ProfileMigration.migrate(raw: any): any
     end
 
     migrated.Account.SelectedCharacterSlot = 1
+    migrated.Account.Bank = sanitize_bank(
+        migrated.Account.Bank
+    )
 
     if type(migrated.Characters) ~= "table" then
         migrated.Characters = ProfileSchema.deep_clone(

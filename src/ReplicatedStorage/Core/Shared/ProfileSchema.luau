@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v6 adds persistent Phase 2 profession progression.
+-- Schema v7 adds account-wide persistent Bank / Storage.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 6
+ProfileSchema.VERSION = 7
 
 local function deep_clone(
     value: any,
@@ -74,6 +74,10 @@ function ProfileSchema.create_default(_user_id: number): any
         SchemaVersion = ProfileSchema.VERSION,
         Account = {
             SelectedCharacterSlot = 1,
+            Bank = {
+                Version = 1,
+                Items = {},
+            },
         },
         Characters = {
             Slot1 = {
