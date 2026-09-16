@@ -8,6 +8,8 @@ local DungeonDefinitions = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("DungeonDefinitions")
 )
 
+local DungeonInstanceDirector = require(script.Parent:WaitForChild("DungeonInstanceDirector"))
+
 local TeleportCoordinator = {}
 TeleportCoordinator.__index = TeleportCoordinator
 TeleportCoordinator.MAX_TELEPORT_ATTEMPTS = 2
@@ -29,7 +31,7 @@ local function user_id_from_player(player: any): number?
 end
 
 local function known_dungeon(dungeon_id: string): boolean
-    return dungeon_id == DungeonDefinitions.TEST_DUNGEON.Id
+    return DungeonDefinitions.get(dungeon_id) ~= nil
 end
 
 local function is_retryable(teleport_result: any): boolean
@@ -211,7 +213,9 @@ function TeleportCoordinator:start_dungeon(players: {any}, dungeon_id: string, d
     if type(dungeon_place_id) ~= "number" or dungeon_place_id <= 0 then
         return response(false, "InvalidDungeonPlaceId")
     end
-    if #players < 1 or #players > DungeonDefinitions.TEST_DUNGEON.MaxPlayers then
+    local definition = DungeonDefinitions.get(dungeon_id)
+    if not definition then return response(false, "UnknownDungeon") end
+    if #players < definition.MinPlayers or #players > definition.MaxPlayers then
         return response(false, "PlayerCountOutOfRange")
     end
 
@@ -246,6 +250,13 @@ function TeleportCoordinator:start_dungeon(players: {any}, dungeon_id: string, d
     if not session then
         return response(false, session_error or "SessionCreateFailed")
     end
+    local instance_state = DungeonInstanceDirector.resolve(dungeon_id, session.SessionId, os.time(), DungeonInstanceDirector.runtime_options())
+    local state_result = self._sessions:set_instance_state(session.SessionId, instance_state)
+    if not state_result.ok then
+        self._sessions:mark_failed(session.SessionId, state_result.reason or "InstanceStateFailed")
+        return response(false, state_result.reason or "InstanceStateFailed")
+    end
+    session = state_result.session
 
     local teleport_data = {SessionId = session.SessionId, DungeonId = session.DungeonId}
     local prepared, prepare_error = self:_prepare_handoffs(

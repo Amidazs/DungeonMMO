@@ -25,12 +25,9 @@ local BaseReturnAdmissionRules = require(Base:WaitForChild("BaseReturnAdmissionR
 local BaseEnvironmentAdapter = require(
     Base:WaitForChild("BaseEnvironmentAdapter")
 )
-local CharacterIdentityRules = require(
-    ReplicatedStorage
-        :WaitForChild("Core")
-        :WaitForChild("Shared")
-        :WaitForChild("CharacterIdentityRules")
-)
+local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
+local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
+local CharacterIdentityRules = require(SharedCore:WaitForChild("CharacterIdentityRules"))
 local BaseProgressionController = require(Base:WaitForChild("BaseProgressionController"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -439,7 +436,8 @@ local function load_player(player: Player)
 end
 
 local function handle_entry(player: Player, dungeon_id: any)
-    if dungeon_id ~= "TestDungeon" then
+    local dungeon_definition = if type(dungeon_id) == "string" then DungeonDefinitions.get(dungeon_id) else nil
+    if not dungeon_definition or dungeon_definition.SoloEntryEnabled ~= true then
         send_entry_result(player, {ok = false, reason = "UnknownDungeon"})
         return
     end
@@ -498,7 +496,7 @@ local function handle_entry(player: Player, dungeon_id: any)
         return
     end
 
-    local result = coordinator:start_dungeon({player}, "TestDungeon", dungeon_place_id)
+    local result = coordinator:start_dungeon({player}, dungeon_definition.Id, dungeon_place_id)
     send_entry_result(player, result)
     if not result.ok then
         warn(string.format("[Base Runtime] Dungeon start failed for %s: %s", player.Name, tostring(result.reason)))

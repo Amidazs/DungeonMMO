@@ -360,6 +360,17 @@ function DungeonSessionService:release_resource_node_claim(
     end)
 end
 
+function DungeonSessionService:set_instance_state(session_id: string, instance_state: any): any
+    if type(instance_state) ~= "table" then return operation(false, "InvalidInstanceState") end
+    return self:_update(session_id, function(session: any, now: number)
+        if type(session) ~= "table" then return {State="Expired",SessionId=session_id,Members={},UpdatedAt=now,ExpiresAt=now}, operation(false,"SessionNotFound") end
+        if session.State ~= "Creating" and session.State ~= "Active" then return session, operation(false,"InvalidTransition") end
+        if session.InstanceState ~= nil then return session, operation(false,"InstanceStateAlreadySet") end
+        session.InstanceState = deep_clone(instance_state); session.UpdatedAt = now
+        return session, operation(true,nil)
+    end)
+end
+
 function DungeonSessionService:set_handoff_nonce(session_id: string, user_id: number, nonce: string): any
     if type(nonce) ~= "string" or nonce == "" then
         return operation(false, "InvalidNonce")

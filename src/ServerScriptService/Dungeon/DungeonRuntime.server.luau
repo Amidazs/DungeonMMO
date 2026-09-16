@@ -59,9 +59,9 @@ local DungeonMarauderFactory = require(
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
 )
-local TempleEnvironmentAdapter = require(
-    Dungeon:WaitForChild("TempleEnvironmentAdapter")
-)
+local DungeonRuntimeSelection = require(Dungeon:WaitForChild("DungeonRuntimeSelection"))
+local DungeonEnvironmentRouter = require(Dungeon:WaitForChild("DungeonEnvironmentRouter"))
+local MineForemanFactory = require(Dungeon:WaitForChild("MineForemanFactory"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -89,14 +89,11 @@ local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
 
-local environment = TempleEnvironmentAdapter.wait_for_ready(
-    Workspace,
-    15
-)
-assert(
-    environment.ok,
-    "Temple environment invalid: " .. tostring(environment.reason)
-)
+local active_dungeon_id, active_dungeon_error = DungeonRuntimeSelection.resolve(Players, Workspace, RunService, DungeonDefinitions, 15)
+assert(active_dungeon_id ~= nil, "Dungeon selection failed: " .. tostring(active_dungeon_error))
+local active_definition = assert(DungeonDefinitions.get(active_dungeon_id :: string), "Selected dungeon definition missing")
+local environment = DungeonEnvironmentRouter.wait_for_ready(Workspace, active_definition.Id, 15)
+assert(environment.ok, "Dungeon environment invalid: " .. tostring(environment.reason))
 
 local room1_trigger = assert(
     environment:get("Temple.Room1.Trigger")
@@ -198,17 +195,9 @@ local function send_profile(player: Player)
     send_progression(player)
 end
 
-ProfessionRuntime.attach({
-    context = "Dungeon",
-    environment = environment,
-    professions = professions,
-    remotes = remotes,
-    sessions = sessions,
-    get_session_id = function(): string?
-        return active_session_id
-    end,
-    on_profile_changed = send_profile,
-})
+if active_definition.Id == active_definition.Id then
+    ProfessionRuntime.attach({context="Dungeon",environment=environment,professions=professions,remotes=remotes,sessions=sessions,get_session_id=function():string? return active_session_id end,on_profile_changed=send_profile})
+end
 
 local function apply_race_presentation(
     player: Player,
@@ -308,7 +297,7 @@ local function spawn_marauder(
     spawn_cframe: CFrame,
     spawn_index: number
 ): Model
-    local reward = DungeonDefinitions.TEST_DUNGEON.StandardMarauderReward
+    local reward = active_definition.StandardMarauderReward
     return DungeonMarauderFactory.create({
         Parent = enemies_folder,
         Name = enemy_id,
@@ -378,7 +367,7 @@ local function send_boss_state(humanoid: Humanoid)
                 objective = "Defeat the Marauder Captain.",
                 session_id = active_session_id,
                 encounter_id = "MarauderCaptain",
-                boss_name = "Marauder Captain",
+                boss_name = active_definition.Boss.DisplayName,
                 boss_health = math.max(0, humanoid.Health),
                 boss_max_health = humanoid.MaxHealth,
             })
@@ -451,6 +440,19 @@ local function connect_enemy(enemy: Model, encounter_id: string)
     end)
 end
 
+local function instance_state(): any
+    local session=current_session(); return session and session.InstanceState or nil
+end
+local function room_marauder_count(room_id:string):number
+    local count=active_definition.RoomPacks[room_id].MarauderCount
+    local state=instance_state()
+    if active_definition.Id=="AbandonedMine" and state then
+        if room_id=="CombatRoom1" and state.EventActive==true then count += active_definition.StateModifiers.DeepEchoes.Room1BonusMarauders end
+        if room_id=="CombatRoom2" and state.RareStateId=="CrystalBloom" then count += active_definition.StateModifiers.CrystalBloom.Room2BonusMarauders end
+    end
+    return count
+end
+
 local function start_room1()
     if room_started.CombatRoom1 or not active_session_id then return end
     room_started.CombatRoom1 = true
@@ -458,7 +460,7 @@ local function start_room1()
     sessions:set_runtime_progress(active_session_id, "CombatRoom1", "CombatRoom1")
     local room1_positions = environment:enemy_spawn_cframes("Room1")
     local enemies = {}
-    for index = 1, DungeonDefinitions.TEST_DUNGEON.RoomPacks.CombatRoom1.MarauderCount do
+    for index = 1, room_marauder_count("CombatRoom1") do
         table.insert(enemies, spawn_marauder("CombatRoom1", "Room1_Marauder_" .. tostring(index), room1_positions[index], 100 + index))
     end
     local started = encounter_service:start("CombatRoom1", member_user_ids(), enemies)
@@ -475,7 +477,7 @@ local function start_room2()
     sessions:set_runtime_progress(active_session_id, "CombatRoom2", "CombatRoom2")
     local room2_positions = environment:enemy_spawn_cframes("Room2")
     local enemies = {}
-    for index = 1, DungeonDefinitions.TEST_DUNGEON.RoomPacks.CombatRoom2.MarauderCount do
+    for index = 1, room_marauder_count("CombatRoom2") do
         table.insert(enemies, spawn_marauder("CombatRoom2", "Room2_Marauder_" .. tostring(index), room2_positions[index], 200 + index))
     end
     local started = encounter_service:start("CombatRoom2", member_user_ids(), enemies)
@@ -581,21 +583,15 @@ local function start_boss()
     boss_started = true
     sync_all_character_encounters("MarauderCaptain")
     sessions:set_runtime_progress(active_session_id, "MarauderCaptain", "MarauderCaptain")
-    local reward = DungeonDefinitions.TEST_DUNGEON.MarauderCaptainReward
-    local captain = MarauderCaptainFactory.create({
-        Parent = enemies_folder,
-        SpawnCFrame = environment:captain_spawn_cframe(),
-        EncounterId = "MarauderCaptain",
-        RewardXP = reward.XP,
-        RewardGoldMin = reward.GoldMin,
-        RewardGoldMax = reward.GoldMax,
-    })
+    local reward = active_definition.MarauderCaptainReward
+    local boss_factory = if active_definition.Id == "AbandonedMine" then MineForemanFactory else MarauderCaptainFactory
+    local captain = boss_factory.create({Parent=enemies_folder,SpawnCFrame=environment:captain_spawn_cframe(),EncounterId="MarauderCaptain",RewardXP=reward.XP,RewardGoldMin=reward.GoldMin,RewardGoldMax=reward.GoldMax})
     active_captain = captain
     local started = encounter_service:start("MarauderCaptain", member_user_ids(), {captain})
     if not started.ok then error("Captain encounter failed: " .. tostring(started.reason)) end
     sync_encounter_members_from_session()
     connect_enemy(captain, "MarauderCaptain")
-    send_objective("BOSS: Defeat the Marauder Captain.", "Boss")
+    send_objective("BOSS: Defeat the " .. active_definition.Boss.DisplayName .. ".", "Boss")
     local humanoid = captain:FindFirstChildOfClass("Humanoid")
     if humanoid then
         humanoid.HealthChanged:Connect(function() send_boss_state(humanoid) end)
@@ -693,14 +689,14 @@ local function initialize_session_services(session: any): (any?, boolean)
         3,
         environment:checkpoint_cframe("Temple.Room3.Checkpoint")
     )
+    if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
+    local completion_reward=active_definition.CompletionReward
+    if active_definition.Id=="AbandonedMine" and type(session.InstanceState)=="table" then
+        if session.InstanceState.EventActive==true then completion_reward=active_definition.EventCompletionReward elseif session.InstanceState.RareStateId=="CrystalBloom" then completion_reward=active_definition.RareCompletionReward end
+        print(string.format("[Second Dungeon State] %s | Module1=%s | Module2=%s | Rare=%s | Event=%s",active_definition.DisplayName,tostring(session.InstanceState.Module1Id),tostring(session.InstanceState.Module2Id),tostring(session.InstanceState.RareStateId),tostring(session.InstanceState.EventId)))
+    end
     local recovery_plan = apply_recovery_plan(session)
-    completion_service = CompletionService.new(
-        sessions,
-        rewards,
-        profiles,
-        DungeonDefinitions.TEST_DUNGEON.CompletionReward,
-        skills
-    )
+    completion_service = CompletionService.new(sessions,rewards,profiles,completion_reward,if active_definition.Id==DungeonDefinitions.TEST_DUNGEON.Id then skills else nil)
     return_service = ReturnPortalService.new(sessions, coordinator, {
         is_studio = RunService:IsStudio(),
         auto_return_seconds = 60,
@@ -789,7 +785,7 @@ local function reconnect_objective(plan: any): (string, string)
     elseif current_encounter_id == "CombatRoom2" then
         return "Combat Room 2: defeat the larger Marauder pack.", "Active"
     elseif current_encounter_id == "MarauderCaptain" then
-        return "BOSS: Defeat the Marauder Captain.", "Boss"
+        return "BOSS: Defeat the " .. active_definition.Boss.DisplayName .. ".", "Boss"
     end
     return plan.objective, plan.objective_state
 end
@@ -799,7 +795,7 @@ local function admit_player(player: Player)
     local teleport_data: any = nil
 
     if RunService:IsStudio() then
-        local studio = StudioSessionFactory.create_for_players({player}, sessions)
+        local studio = StudioSessionFactory.create_for_players({player}, sessions, active_definition.Id)
         if not studio.ok then
             player:Kick("Studio dungeon session failed: " .. tostring(studio.reason))
             return
@@ -819,7 +815,7 @@ local function admit_player(player: Player)
         session,
         teleport_data,
         player.UserId,
-        DungeonDefinitions.TEST_DUNGEON.Id
+        active_definition.Id
     )
     if not admission.ok then
         player:Kick("Dungeon admission rejected: " .. tostring(admission.reason))
