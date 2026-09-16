@@ -1,140 +1,105 @@
 # DungeonMMO Development Handoff
 
-**Date:** 11 September 2026
+**Date:** 16 September 2026
 **Active workstream:** Phase 2 - Vertical Slice
-**Phase 2C status:** FUNCTIONALLY COMPLETE
-**Phase 2C.E status:** ACCEPTED - GAMEPLAY MERGED / PUSHED
-**Canonical external roadmap:** DungeonMMO Roadmap v1.34
+**Phase 2C:** FUNCTIONALLY COMPLETE
+**Starting Base + Temple integration:** ACCEPTED
+**Profession Foundation:** ACCEPTED / MERGED / PUSHED
+**Canonical roadmap:** DungeonMMO Roadmap v1.35
 
 ## Accepted gameplay boundary
 
-- Phase 1: ACCEPTED.
-- Phase 2A: ACCEPTED.
-- Phase 2B.A/B/C: ACCEPTED; Phase 2B functionally complete.
-- Phase 2C.A: ACCEPTED / merged / pushed.
-- Phase 2C.B: ACCEPTED / merged / pushed.
-- Phase 2C.C: ACCEPTED / merged / pushed.
-- Phase 2C.D Mage: ACCEPTED / merged / pushed.
-- Phase 2C.E Ranger: ACCEPTED / merged / pushed.
-- Phase 2C.E accepted gameplay checkpoint:
-  `6fe47a178987dc51a75212692201651eb0167326`.
-- Ranger parent / prior canonical main:
-  `86d27228977dd6c98bd404f12086e93ad94fbe9a`.
+- Phase 1, Phase 2A and all Phase 2B gates are accepted.
+- Phase 2C.A through Phase 2C.E are accepted; Fighter, Mage and Ranger remain
+  the accepted starting-archetype foundation.
+- Starting Base + Temple integration is accepted at
+  `c7fe89ebda3c97634c97e89ad12e52ec23983ae9`.
+- Profession Foundation gameplay checkpoint is `ce1577990f2795bf208d7b897e645f32a4a39a4f`.
 
-The docs closeout commit containing this handoff is the new canonical `main`.
-Its SHA is recorded in the closeout receipt and Roadmap v1.34. No Roblox publish
-occurred.
+## Profession Foundation contracts
 
-## Phase 2C.E locked player-facing behaviour
+The accepted starting profession set is Mining, Blacksmithing, Herbalism and
+Alchemy. Mining -> Blacksmithing and Herbalism -> Alchemy are complete playable
+supply chains.
 
-Human and Elf can select Ranger.
+Schema v6 persists `{Level, XP}` for all four professions. The foundation level
+cap is 5 with cumulative thresholds 30 / 60 / 100 / 150 XP. Profession XP is
+separate from character XP.
 
-Ranger starts with:
+Blacksmithing supports Iron Bars, Ironbound Gloves and Tempered Ironbound
+Gloves. Alchemy supports Tempering Oil from Silverleaf. Tempering Oil is the
+first accepted cross-profession input. Tempered Ironbound Gloves require
+Blacksmithing Level 2.
 
-1. Apprentice Longbow in persistent Weapon Equipment.
-2. Normal / Precision / Full Draw as the free basic-attack draw tiers.
-3. Piercing Shot in starter skill slot 1.
-4. Crippling Shot in starter skill slot 2.
-5. Volley in starter skill slot 3.
+Crafting uses server-authoritative prepare/complete boundaries. A future
+minigame may determine a result, but it cannot directly mutate Inventory or
+award items. The current foundation auto-success remains server-owned.
 
-The Longbow is two-handed. It reserves OffHand, cannot present a shield and
-cannot use Block while equipped. This reservation is server-owned Equipment
-state, not dependent on the visible bow model.
+Inventory presentation consumes authoritative snapshots. Equipment remains a
+separate Base service, and Dungeon Equipment remains read-only/run-locked.
 
-Normal/Precision/Full Draw thresholds are server-timed. Precision begins at
-approximately 0.45 seconds and Full Draw at approximately 0.80 seconds. Drawing
-reduces movement without rooting the Ranger. Dodge cancels an active draw.
-Precision/Full Draw reward timing with increased damage and critical chance.
+## Personal Temple resource contracts
 
-Piercing Shot costs 20 Stamina and loses damage across successive penetrations;
-Human Ranger keeps more penetration damage. Crippling Shot costs 20 Stamina and
-applies a non-stacking slow; Elf Ranger receives stronger/slightly longer
-control. Volley costs 30 Stamina and uses ground-targeted initial impact plus a
-short arrow-rain pulse sequence.
+Each Dungeon gathering node is single-use per player per run. Resource claims
+live on the Dungeon member session record so reconnect reconstructs depleted
+nodes. Duplicate claims fail. If profile mutation fails after a provisional
+claim, the claim is released.
 
-Dexterity is the Ranger's primary ranged-damage scaling attribute. Basic arrows
-do not consume ammunition in this foundation gate.
+One player's claim never globally depletes another player's node.
 
-## Authority and persistence
+Every Temple resource placement must:
 
-Server authority owns:
+- raycast a real floor, wall or rock surface;
+- be partially embedded into that surface;
+- remain non-colliding and non-queryable;
+- avoid invalid/floating placement by skipping unresolved candidates;
+- belong to its room placement group;
+- remain at least 18 studs from already resolved resources in that group.
 
-- race/base-class runtime identity;
-- persistent Equipment and Longbow weapon tags;
-- two-handed OffHand reservation;
-- draw start/release elapsed timing and tier resolution;
-- ranged damage and critical rolls;
-- Stamina spending and cooldowns;
-- projectile travel/collision and penetration;
-- Crippling Shot slow state;
-- Volley ground placement/range and damage pulses;
-- target legality and race-specific Ranger behaviour.
+Room 1 and Room 2 each have multiple nodes with probes deliberately spread
+across distinct room sides/quadrants.
 
-Persistent Equipment, not Tool/model presence, owns weapon-family authority.
-Dungeon Equipment remains Base-selected, read-only and run-locked. Ranger uses
-the accepted schema-v5 identity/progression/inventory/equipment structures with
-no new profile schema version.
+## Final acceptance evidence
 
-## Accepted evidence
+The project owner previously accepted the functional profession/gathering loop.
+The final distribution closeout additionally requires and records:
 
-Project-owner Studio acceptance was received after the Ranger Base/Dungeon
-candidate and functional hotfix were tested.
+- `[Profession Resource Distribution Tests] PASS` in Studio;
+- visually distributed Room 1 nodes;
+- visually distributed Room 2 nodes;
+- no new red runtime error during that test.
 
-Observed/accepted behaviour included:
+The project owner accepted the gate while noting that the resource nodes could be distributed much farther across the authored Temple rooms. Record this as deferred visual/environment polish only; do not reopen personal depletion, reconnect claims, valid-surface embedding, combat-path safety or the accepted 18-stud minimum spacing contract.
 
-- Ranger identity and starter Longbow flow;
-- Longbow OffHand reservation;
-- Normal, Precision and Full Draw attacks;
-- movement reduction while drawing;
-- Dodge cancellation of a held draw;
-- Piercing Shot, Crippling Shot and Volley;
-- Crippling control against normal Marauders and the Captain;
-- normal enemy/Captain behaviour;
-- successful full Dungeon completion and rewards;
-- Ranger automated definition/identity/draw/slow test families reporting PASS;
-- follow-up retest confirming the Ranger has no fallback shield and cannot
-  Block with Longbow equipped;
-- stale Base-only test issues corrected and retested successfully;
-- no reported red Ranger runtime error after the accepted hotfix;
-- no Roblox publish, PROD, Robux, monetisation or art-branch action.
-
-Animation/VFX quality is still prototype-level and intentionally deferred.
-
-## Qualifications that must remain visible
-
-The historical Phase 2C.D Mage corrected-test qualification remains visible;
-do not rewrite it as a separately observed Studio PASS.
-
-Carry the earlier Phase 2C.C evidence qualifications as historical notes: Arc
-Slash was not manually exercised in that acceptance run and its newly authored
-runtime test family was not separately observed GREEN then.
-
-The pre-player legacy migration waiver is not a migration PASS and must be
-revalidated before a release involving real existing player profiles.
+The closeout script requires v4 source verification, clean diff checks and all
+four Rojo builds before it can offer the Studio gate. It performs no commit or
+push if the user reports FAIL.
 
 ## Safety / worktrees
 
 Primary repository:
 `C:\Users\Remko\Documents\Roblox\DungeonMMO`
 
-Accepted Ranger worktree:
-`C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase2CE_Ranger_v1`
+Profession worktree:
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_ProfessionFoundation_v1`
 
-Do not reset, clean, switch into, merge, copy from or otherwise disturb
-`C:\Users\Remko\Documents\Roblox\DungeonMMO_Art` or
-`art/dungeon-environment-prototype`.
+Profession branch:
+`wip/phase-2-profession-foundation-v1`
 
-Preserve older/recovery worktrees unless an explicit cleanup decision says
-otherwise.
+The separate art worktree/branch remains isolated. Do not reset, clean,
+force-checkout, force-push or history-rewrite any preserved worktree.
+
+No Roblox place was published by this closeout. No PROD / Robux /
+monetisation action is authorized.
 
 ## Exact next action
 
-Phase 2C is functionally complete. Do not infer a numbered Phase 2D from the
-sequence alone.
+Read Roadmap v1.35 and `docs/ai/CURRENT_STATE.md`, then select the next remaining
+Phase 2 gate. Prioritise the second modular dungeon / rare-state + time-limited
+event proof unless a demonstrated regression in the accepted loop requires a
+repair first.
 
-Read Roadmap v1.34 and select the next remaining Phase 2 vertical-slice gate
-before implementation. The next gate should continue toward a polished,
-repeatable Starting Base/dungeon experience or the next modular dungeon/rare
-state proof while preserving the accepted Fighter/Mage/Ranger, equipment,
-persistence, progression and Dungeon contracts. Secondary-class advancement
+Do not reopen accepted Base/Temple integration, profession architecture,
+Fighter/Mage/Ranger, Equipment, persistence, progression, revive or completion
+contracts without evidence of a real defect. Secondary-class advancement
 remains Phase 3.

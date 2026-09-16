@@ -1,28 +1,29 @@
 # Canonical Roadmap
 
-The canonical long-form roadmap currently stored here is:
+The canonical long-form roadmap stored here is:
 
-`DungeonMMO_Roadmap_v1_23.docx`
+`DungeonMMO_Roadmap_v1_35.docx`
 
-Version: **1.23**
-Last updated: **7 September 2026**
+Version: **1.35**
+Last updated: **15 September 2026**
 
 SHA-256:
 
-`5a309b220f22cffc8578ad714f9695578983625710eceadfa9c71c025a7e0944`
+`fd4d84bc5eb88d7c5be9cf6062e7fd030e826fdf573bdf0a3e04ef711a7be9b9`
 
-Version 1.23 records Phase 2B Gate 2B.C as ACCEPTED and Phase 2B as
-FUNCTIONALLY COMPLETE. The accepted Phase 2B code checkpoint is
-`4a82d7486e7455f7597a777e862393c5bbb56cfb`, merged into `main` at
-`8be005ff1ef87712bff8fde01d313fd2569771ac`.
+Version 1.35 records Phase 2C as functionally complete, Starting Base + Temple
+integration as accepted at
+`c7fe89ebda3c97634c97e89ad12e52ec23983ae9`, and the Phase 2 Profession
+Foundation as accepted at gameplay checkpoint `ce1577990f2795bf208d7b897e645f32a4a39a4f`.
 
-The next gameplay slice is Phase 2C: the first real race/base-class definitions
-and class-specific trainer catalogues. It begins by locking two prototype races
-and one shared starting archetype, then extending the accepted class-definition
-interface without replacing the Phase 2B profile/progression services.
+The accepted Profession Foundation locks the Mining -> Blacksmithing and
+Herbalism -> Alchemy supply chains, schema-v6 profession Level/XP,
+server-authoritative crafting, personal reconnect-safe Temple resource claims
+and the room-wide 18-stud resource-distribution contract. The project owner accepted the gate while deferring substantially wider room-scale node spread as later presentation/environment polish.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
-replace the canonical roadmap's LOCKED/WORKING/LATER/OPEN design decisions.
+replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.
 
-When the roadmap is deliberately revised, replace the DOCX, update its version
-here, refresh the hash, and update `CURRENT_STATE.md`.
+When the roadmap is deliberately revised, add the new canonical DOCX, update
+its version/hash here, refresh `CURRENT_STATE.md` and preserve an acceptance or
+handoff record for the superseded engineering boundary.

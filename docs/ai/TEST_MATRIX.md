@@ -709,3 +709,68 @@ must be replaced by real migration evidence before a release that must support
 real existing player profiles.
 
 **Phase 2C status:** FUNCTIONALLY COMPLETE after accepted Phase 2C.A-E.
+
+## Phase 2 - Starting Base + Temple Integration
+
+**Status:** ACCEPTED
+**Accepted integration checkpoint:**
+`c7fe89ebda3c97634c97e89ad12e52ec23983ae9`
+
+Accepted evidence includes semantic environment-anchor integration, authored
+Starting Base/Temple composition, Base -> Temple -> Base flow, checkpoint and
+Captain progression, save-before-return and reconnect/recovery preservation.
+
+## Phase 2 - Profession Foundation
+
+**Status:** ACCEPTED / MERGED / PUSHED
+**Accepted gameplay checkpoint:** `ce1577990f2795bf208d7b897e645f32a4a39a4f`
+
+### Supply-chain and persistence evidence
+
+- [x] schema v6 profession state exists for Mining, Blacksmithing, Herbalism and
+  Alchemy;
+- [x] profession Level/XP migration/default contract;
+- [x] Mining -> Blacksmithing complete supply chain;
+- [x] Herbalism -> Alchemy complete supply chain;
+- [x] Iron Bar / Ironbound Gloves crafting;
+- [x] Tempering Oil crafting;
+- [x] Blacksmithing Level 2 tempered-gloves gate;
+- [x] Tempered Ironbound Gloves cross-profession recipe;
+- [x] profession XP is explicitly separate from character XP;
+- [x] authoritative Inventory presentation / category tabs;
+- [x] crafting prepare is non-mutating and complete is atomic/server-owned;
+- [x] Dungeon Equipment remains read-only/run-locked.
+
+### Personal Temple gathering evidence
+
+- [x] multiple resources exist in both Room 1 and Room 2;
+- [x] floor/wall/rock raycast placement and partial embedding;
+- [x] invalid placements are skipped;
+- [x] resources do not collide/query as combat/navigation blockers;
+- [x] each node is single-use per player per run;
+- [x] another player retains their own copy of the resource;
+- [x] duplicate claim rejection;
+- [x] reconnect-safe claimed-node reconstruction;
+- [x] provisional claim rollback when profile mutation fails;
+- [x] client presentation hides claimed nodes only for the owning player.
+
+### Final distribution refinement
+
+- [x] v4 source contract verification PASS;
+- [x] `git diff --check` PASS before Studio gate;
+- [x] Base Rojo build PASS;
+- [x] Dungeon Rojo build PASS;
+- [x] published Base Rojo build PASS;
+- [x] published Dungeon Rojo build PASS;
+- [x] `[Profession Resource Distribution Tests] PASS` observed in Studio;
+- [x] Room 1 resources visually distributed around the room;
+- [x] Room 2 resources visually distributed around the room;
+- [x] minimum same-room resolved spacing contract = 18 studs;
+- [x] no new red runtime error reported during the final distribution gate;
+- [ ] wider room-scale visual spread beyond the accepted 18-stud minimum is deferred presentation/environment polish and is not a gate blocker.
+
+### Qualification
+
+The pre-player live legacy migration waiver remains a qualification. A real live
+schema-v6 migration proof is still required before releasing against real
+existing profiles.
