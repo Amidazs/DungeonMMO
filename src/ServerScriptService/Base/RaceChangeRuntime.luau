@@ -13,6 +13,7 @@ function RaceChangeRuntime.attach(config: any): any
     local preview_remote = config.remotes:WaitForChild("RaceChangePreview") :: RemoteEvent
     local apply_request = config.remotes:WaitForChild("RaceChangeApplyRequest") :: RemoteEvent
     local action_result = config.remotes:WaitForChild("RaceChangeActionResult") :: RemoteEvent
+    local rate_limits = config.rate_limits
 
     local function available(player: Player): boolean
         local callback = config.is_loaded
@@ -30,6 +31,10 @@ function RaceChangeRuntime.attach(config: any): any
 
     preview_request.OnServerEvent:Connect(function(player: Player, target_race_id: any)
         if not available(player) then return end
+        if rate_limits and not rate_limits:allow(player.UserId, "RaceChangePreview", 6, 10) then
+            preview_remote:FireClient(player, {ok=false, reason="RateLimited"})
+            return
+        end
         if not valid_short_string(target_race_id) then
             preview_remote:FireClient(player, {ok=false, reason="InvalidRaceChangeRequest"})
             return
@@ -46,6 +51,10 @@ function RaceChangeRuntime.attach(config: any): any
         request_id: any
     )
         if not available(player) then return end
+        if rate_limits and not rate_limits:allow(player.UserId, "RaceChangeApply", 2, 30) then
+            fire_action(player, {ok=false, reason="RateLimited"})
+            return
+        end
         if not valid_short_string(target_race_id)
             or not valid_short_string(preview_hash)
             or not valid_short_string(request_id)

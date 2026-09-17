@@ -145,7 +145,22 @@ function RewardService.new(
     self._clock = clock or os.time
     self._runtime_sources = {}
     self._runtime_monsters = {}
+    self._audit = nil
     return self
+end
+
+function RewardService:set_audit_service(audit_service: any?)
+    self._audit = audit_service
+end
+
+function RewardService:_record_audit(event: any)
+    if not self._audit then return end
+    local ok, response = pcall(function()
+        return self._audit:record(event)
+    end)
+    if not ok or type(response) ~= "table" or response.ok ~= true then
+        warn("[Economy Audit] Reward event failed: " .. tostring(if ok then response and response.reason else response))
+    end
 end
 
 function RewardService:_runtime_source_key(user_id: number, source_id: string): string
@@ -425,6 +440,16 @@ function RewardService:grant_monster_reward(
             end
             if member_result and member_result.already_applied ~= true then
                 any_new_application = true
+                if (member_result.gold_granted or 0) > 0 then
+                    self:_record_audit({
+                        TransactionId = transaction_id .. ":User:" .. tostring(user_id),
+                        Kind = "MonsterGoldReward",
+                        UserId = user_id,
+                        GoldDelta = member_result.gold_granted,
+                        Reason = tostring(monster_reward.BestiaryCreatureId or monster_reward.BossId or "MonsterReward"),
+                        Timestamp = self._clock(),
+                    })
+                end
             end
             results[tostring(user_id)] = member_result
         end
@@ -634,6 +659,18 @@ function RewardService:grant_completion(
         return {ok = false, reason = mutate_error or "ProfileMutationFailed"}
     end
 
+    if applied_result and applied_result.already_applied ~= true
+        and (applied_result.gold_granted or 0) > 0
+    then
+        self:_record_audit({
+            TransactionId = transaction_id .. ":User:" .. tostring(user_id),
+            Kind = "CompletionGoldReward",
+            UserId = user_id,
+            GoldDelta = applied_result.gold_granted,
+            Reason = "DungeonCompletion",
+            Timestamp = self._clock(),
+        })
+    end
     self:_prune_completion_history(user_id)
     return applied_result
 end

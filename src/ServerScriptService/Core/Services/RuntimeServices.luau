@@ -51,6 +51,8 @@ local GuildService = require(Services:WaitForChild("GuildService"))
 local GuildHallService = require(Services:WaitForChild("GuildHallService"))
 local MarketService = require(Services:WaitForChild("MarketService"))
 local RaceChangeService = require(Services:WaitForChild("RaceChangeService"))
+local EconomyAuditService = require(Services:WaitForChild("EconomyAuditService"))
+local RateLimitService = require(Services:WaitForChild("RateLimitService"))
 
 local RuntimeServices = {}
 
@@ -87,6 +89,8 @@ function RuntimeServices.new(place_kind: string): any
     local guild_hall = GuildHallService.new(guilds)
     local market = MarketService.new(entity_adapter, profiles)
     local race_change = RaceChangeService.new(profiles)
+    local audit = EconomyAuditService.new()
+    local rate_limits = RateLimitService.new()
     local sessions = DungeonSessionService.new(session_map)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
@@ -97,6 +101,10 @@ function RuntimeServices.new(place_kind: string): any
         inventory
     )
     local rewards = RewardService.new(profiles, progression, inventory, sessions)
+    rewards:set_audit_service(audit)
+    guilds:set_audit_service(audit)
+    market:set_audit_service(audit)
+    race_change:set_audit_service(audit)
     local attributes = AttributeService.new(profiles)
     local loadout = LoadoutService.new(profiles)
     local skills = SkillProgressionService.new(profiles, inventory, loadout)
@@ -128,6 +136,8 @@ function RuntimeServices.new(place_kind: string): any
         GuildHallService = guild_hall,
         MarketService = market,
         RaceChangeService = race_change,
+        EconomyAuditService = audit,
+        RateLimitService = rate_limits,
         ProgressionService = progression,
         InventoryService = inventory,
         RecipeKnowledgeService = recipe_knowledge,

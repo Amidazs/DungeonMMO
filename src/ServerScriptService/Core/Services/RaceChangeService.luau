@@ -49,7 +49,20 @@ function RaceChangeService.new(
     self._profiles = profile_service
     self._environment_override = environment_override
     self._clock = clock or os.time
+    self._audit = nil
     return self
+end
+
+function RaceChangeService:set_audit_service(audit_service: any?)
+    self._audit = audit_service
+end
+
+function RaceChangeService:_record_audit(event: any)
+    if not self._audit then return end
+    local ok, response = pcall(function() return self._audit:record(event) end)
+    if not ok or type(response) ~= "table" or response.ok ~= true then
+        warn("[Economy Audit] Race Change event failed: " .. tostring(if ok then response and response.reason else response))
+    end
 end
 
 function RaceChangeService:_environment(): string
@@ -159,6 +172,7 @@ function RaceChangeService:apply(
 
     local receipt: any = nil
     local failure: string? = nil
+    local newly_applied = false
     local mutated, mutate_error = self._profiles:mutate(user_id, function(profile: any)
         local character = profile.Characters.Slot1
         local state = ensure_state(character)
@@ -205,10 +219,21 @@ function RaceChangeService:apply(
             AppliedAt = self._clock(),
         }
         state.History[transaction_id] = ProfileSchema.deep_clone(receipt)
+        newly_applied = true
     end)
 
     if not mutated then
         return result(false, failure or mutate_error or "ProfileMutationFailed")
+    end
+
+    if newly_applied and receipt then
+        self:_record_audit({
+            TransactionId = transaction_id,
+            Kind = "RaceChangeApply",
+            UserId = user_id,
+            Reason = tostring(receipt.SourceRaceId) .. "->" .. tostring(receipt.TargetRaceId),
+            Timestamp = self._clock(),
+        })
     end
 
     return result(true, nil, {

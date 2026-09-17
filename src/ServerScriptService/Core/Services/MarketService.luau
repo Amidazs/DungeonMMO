@@ -84,7 +84,20 @@ function MarketService.new(
     self._id_generator = id_generator or function()
         return HttpService:GenerateGUID(false)
     end
+    self._audit = nil
     return self
+end
+
+function MarketService:set_audit_service(audit_service: any?)
+    self._audit = audit_service
+end
+
+function MarketService:_record_audit(event: any)
+    if not self._audit then return end
+    local ok, response = pcall(function() return self._audit:record(event) end)
+    if not ok or type(response) ~= "table" or response.ok ~= true then
+        warn("[Economy Audit] Market event failed: " .. tostring(if ok then response and response.reason else response))
+    end
 end
 
 function MarketService:get_listing(listing_id: string): any?
@@ -289,6 +302,16 @@ function MarketService:create_listing(
         if type(receipt) == "table" then receipt.State = "Active" end
     end)
 
+    self:_record_audit({
+        TransactionId = transaction_id,
+        Kind = "MarketEscrowCreate",
+        UserId = user_id,
+        ListingId = listing_id,
+        ItemId = item_id,
+        Reason = "ListingCreate",
+        Timestamp = self._clock(),
+    })
+
     return result(true, nil, {
         already_applied = false,
         listing = clone(stored),
@@ -302,6 +325,7 @@ function MarketService:_apply_buyer_sale(
     transaction_id: string
 ): any
     local applied: any = nil
+    local newly_applied = false
     local ok, err = self._profiles:mutate(buyer_user_id, function(profile: any)
         local character = profile.Characters.Slot1
         local market = ensure_market(character)
@@ -326,10 +350,23 @@ function MarketService:_apply_buyer_sale(
             GoldDelta = -listing.Price,
             Item = clone(listing.Item),
         }
+        newly_applied = true
         applied = clone(market.History[transaction_id])
     end)
     if not ok then return result(false, err or "BuyerMutationFailed") end
-    return result(true, nil, {receipt = applied})
+    if newly_applied then
+        self:_record_audit({
+            TransactionId = transaction_id,
+            Kind = "MarketSaleBuyer",
+            UserId = buyer_user_id,
+            ListingId = listing.ListingId,
+            ItemId = listing.Item.ItemId,
+            GoldDelta = -listing.Price,
+            Reason = "MarketPurchase",
+            Timestamp = self._clock(),
+        })
+    end
+    return result(true, nil, {receipt = applied, newly_applied = newly_applied})
 end
 
 function MarketService:_apply_seller_sale(
@@ -338,6 +375,7 @@ function MarketService:_apply_seller_sale(
     transaction_id: string
 ): any
     local applied: any = nil
+    local newly_applied = false
     local proceeds = MarketConfig.seller_proceeds(listing.Price)
     local tax = MarketConfig.tax_amount(listing.Price)
     local ok, err = self._profiles:mutate(seller_user_id, function(profile: any)
@@ -358,10 +396,15 @@ function MarketService:_apply_seller_sale(
             GoldDelta = proceeds,
             Tax = tax,
         }
+        newly_applied = true
         applied = clone(market.History[transaction_id])
     end)
     if not ok then return result(false, err or "SellerMutationFailed") end
-    return result(true, nil, {receipt = applied, proceeds = proceeds, tax = tax})
+    if newly_applied then
+        self:_record_audit({TransactionId=transaction_id,Kind="MarketSaleSeller",UserId=seller_user_id,ListingId=listing.ListingId,ItemId=listing.Item.ItemId,GoldDelta=proceeds,Reason="MarketSale",Timestamp=self._clock()})
+        self:_record_audit({TransactionId=transaction_id,Kind="MarketTax",UserId=seller_user_id,ListingId=listing.ListingId,GoldDelta=-tax,Reason="MarketSaleTax",Timestamp=self._clock()})
+    end
+    return result(true, nil, {receipt = applied, proceeds = proceeds, tax = tax, newly_applied = newly_applied})
 end
 
 function MarketService:buy(
@@ -457,6 +500,7 @@ function MarketService:_apply_return(
     terminal_state: string
 ): any
     local applied: any = nil
+    local newly_applied = false
     local ok, err = self._profiles:mutate(seller_user_id, function(profile: any)
         local character = profile.Characters.Slot1
         local market = ensure_market(character)
@@ -484,10 +528,22 @@ function MarketService:_apply_return(
             ListingId = listing.ListingId,
             Item = clone(listing.Item),
         }
+        newly_applied = true
         applied = clone(market.History[transaction_id])
     end)
     if not ok then return result(false, err or "ReturnMutationFailed") end
-    return result(true, nil, {receipt = applied})
+    if newly_applied then
+        self:_record_audit({
+            TransactionId = transaction_id,
+            Kind = if terminal_state == "Cancelled" then "MarketCancelReturn" else "MarketExpiryReturn",
+            UserId = seller_user_id,
+            ListingId = listing.ListingId,
+            ItemId = listing.Item.ItemId,
+            Reason = terminal_state,
+            Timestamp = self._clock(),
+        })
+    end
+    return result(true, nil, {receipt = applied, newly_applied = newly_applied})
 end
 function MarketService:_begin_return(
     listing_id: string,

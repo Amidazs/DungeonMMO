@@ -54,7 +54,20 @@ function GuildService.new(adapter: any, clock: (() -> number)?, id_generator: ((
     self._id_generator = id_generator or function()
         return HttpService:GenerateGUID(false)
     end
+    self._audit = nil
     return self
+end
+
+function GuildService:set_audit_service(audit_service: any?)
+    self._audit = audit_service
+end
+
+function GuildService:_record_audit(event: any)
+    if not self._audit then return end
+    local ok, response = pcall(function() return self._audit:record(event) end)
+    if not ok or type(response) ~= "table" or response.ok ~= true then
+        warn("[Economy Audit] Guild event failed: " .. tostring(if ok then response and response.reason else response))
+    end
 end
 
 function GuildService:get_guild(guild_id: string): any?
@@ -378,6 +391,7 @@ function GuildService:award_dungeon_clear(user_ids: {number}, transaction_id: st
         local count = #members
         if count >= 2 then
             local reward = GuildProgressionConfig.clear_reward(count)
+            local applied_new = false
             local updated, err = self._adapter:update(guild_key(guild_id), function(guild)
                 if type(guild) ~= "table" then
                     return nil
@@ -389,6 +403,7 @@ function GuildService:award_dungeon_clear(user_ids: {number}, transaction_id: st
                 guild.XP = math.max(0, math.floor(tonumber(guild.XP) or 0)) + reward.XP
                 guild.Gold = math.max(0, math.floor(tonumber(guild.Gold) or 0)) + reward.Gold
                 guild.History[transaction_id] = true
+                applied_new = true
                 return guild
             end)
             if not updated then
@@ -400,6 +415,16 @@ function GuildService:award_dungeon_clear(user_ids: {number}, transaction_id: st
                 Gold = reward.Gold,
                 Level = updated.Level,
             }
+            if applied_new and reward.Gold > 0 then
+                self:_record_audit({
+                    TransactionId = transaction_id .. ":Guild:" .. guild_id,
+                    Kind = "GuildDungeonReward",
+                    GuildId = guild_id,
+                    GuildGoldDelta = reward.Gold,
+                    Reason = "DungeonClear",
+                    Timestamp = self._clock(),
+                })
+            end
         end
     end
     return result(true, nil, {awards = awards})
@@ -411,6 +436,7 @@ function GuildService:upgrade_guild(actor_user_id: number, transaction_id: strin
         return result(false, "GuildPermissionDenied")
     end
 
+    local spent_gold = 0
     local updated, err = self._adapter:update(guild_key(membership.GuildId), function(guild)
         if type(guild) ~= "table" then
             return nil
@@ -433,10 +459,22 @@ function GuildService:upgrade_guild(actor_user_id: number, transaction_id: strin
         guild.Gold -= required.Gold
         guild.Level = level + 1
         guild.History[transaction_id] = true
+        spent_gold = required.Gold
         return guild
     end)
     if not updated then
         return result(false, err or "GuildUpgradeRequirementsNotMet")
+    end
+    if spent_gold > 0 then
+        self:_record_audit({
+            TransactionId = transaction_id .. ":Guild:" .. membership.GuildId,
+            Kind = "GuildUpgradeSpend",
+            UserId = actor_user_id,
+            GuildId = membership.GuildId,
+            GuildGoldDelta = -spent_gold,
+            Reason = "GuildLevelUpgrade",
+            Timestamp = self._clock(),
+        })
     end
     return result(true, nil, {guild = updated})
 end

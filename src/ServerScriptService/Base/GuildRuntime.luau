@@ -22,6 +22,18 @@ local function safe_request_id(value: any): string?
     return value
 end
 
+local function valid_user_id(value: any): number?
+    if type(value) ~= "number" or value ~= value or value < 1 or value >= math.huge or value % 1 ~= 0 then
+        return nil
+    end
+    return value
+end
+
+local function valid_short_id(value: any): string?
+    if type(value) ~= "string" or value == "" or #value > 128 then return nil end
+    return value
+end
+
 local function transaction_id(player: Player, action: string, request_id: string): string
     return string.format("Guild:%d:%s:%s", player.UserId, action, request_id)
 end
@@ -94,6 +106,7 @@ function GuildRuntime.attach(config: any): any
     local travel = assert(config.travel, "GuildRuntime requires TravelService")
     local environment = assert(config.environment, "GuildRuntime requires Base environment")
     local remotes = assert(config.remotes, "GuildRuntime requires Remotes")
+    local rate_limits = config.rate_limits
 
     local snapshot_request = remotes:WaitForChild("GuildSnapshotRequest") :: RemoteEvent
     local snapshot_remote = remotes:WaitForChild("GuildSnapshot") :: RemoteEvent
@@ -132,6 +145,10 @@ function GuildRuntime.attach(config: any): any
             finish(player, action, {ok = false, reason = "InvalidRequestId"})
             return
         end
+        if rate_limits and not rate_limits:allow(player.UserId, "GuildManagement", 12, 10) then
+            finish(player, action, {ok = false, reason = "RateLimited"})
+            return
+        end
         local body = if type(payload) == "table" then payload else {}
         local tx = transaction_id(player, action, request)
         local response: any
@@ -139,24 +156,21 @@ function GuildRuntime.attach(config: any): any
         if action == "Create" then
             response = guilds:create_guild(player.UserId, 1, body.Name, tx)
         elseif action == "Invite" then
-            response = guilds:create_invite(player.UserId, tonumber(body.TargetUserId) or 0, tx)
+            local target = valid_user_id(body.TargetUserId)
+            response = if target then guilds:create_invite(player.UserId, target, tx) else {ok=false, reason="InvalidGuildRequest"}
         elseif action == "Accept" then
-            response = guilds:accept_invite(player.UserId, tostring(body.GuildId or ""), tx)
+            local guild_id = valid_short_id(body.GuildId)
+            response = if guild_id then guilds:accept_invite(player.UserId, guild_id, tx) else {ok=false, reason="InvalidGuildRequest"}
         elseif action == "SetRole" then
-            response = guilds:set_role(
-                player.UserId,
-                tonumber(body.TargetUserId) or 0,
-                tostring(body.Role or ""),
-                tx
-            )
+            local target = valid_user_id(body.TargetUserId)
+            local role = valid_short_id(body.Role)
+            response = if target and role then guilds:set_role(player.UserId, target, role, tx) else {ok=false, reason="InvalidGuildRequest"}
         elseif action == "TransferLeader" then
-            response = guilds:transfer_leadership(
-                player.UserId,
-                tonumber(body.TargetUserId) or 0,
-                tx
-            )
+            local target = valid_user_id(body.TargetUserId)
+            response = if target then guilds:transfer_leadership(player.UserId, target, tx) else {ok=false, reason="InvalidGuildRequest"}
         elseif action == "Kick" then
-            response = guilds:kick(player.UserId, tonumber(body.TargetUserId) or 0, tx)
+            local target = valid_user_id(body.TargetUserId)
+            response = if target then guilds:kick(player.UserId, target, tx) else {ok=false, reason="InvalidGuildRequest"}
         elseif action == "Leave" then
             response = guilds:leave(player.UserId, tx)
         elseif action == "Upgrade" then

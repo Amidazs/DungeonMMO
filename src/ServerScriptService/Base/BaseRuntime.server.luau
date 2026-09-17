@@ -80,6 +80,7 @@ local guilds = runtime.GuildService
 local guild_hall = runtime.GuildHallService
 local market = runtime.MarketService
 local race_change = runtime.RaceChangeService
+local rate_limits = runtime.RateLimitService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -396,6 +397,7 @@ GuildRuntime.attach({
     travel = travel,
     environment = base_environment,
     remotes = remotes,
+    rate_limits = rate_limits,
 })
 
 local function route_recoverable_session(player: Player, session: any): boolean
@@ -712,10 +714,25 @@ market_snapshot_request.OnServerEvent:Connect(function(player: Player)
     if loaded_users[player.UserId] then send_market(player) end
 end)
 
+local function valid_market_id(value: any): boolean
+    return type(value) == "string" and value ~= "" and #value <= 128
+end
+
+local function valid_market_integer(value: any, minimum: number): boolean
+    return type(value) == "number" and value == value
+        and value >= minimum and value < math.huge and value % 1 == 0
+end
+
 market_create_request.OnServerEvent:Connect(function(player: Player, item_id: any, quantity: any, price: any, request_id: any)
     if not loaded_users[player.UserId] then return end
-    if type(item_id) ~= "string" or type(quantity) ~= "number" or type(price) ~= "number" or type(request_id) ~= "string" then
+    if not valid_market_id(item_id) or not valid_market_integer(quantity, 1)
+        or not valid_market_integer(price, 1) or not valid_market_id(request_id)
+    then
         finish_market_action(player, "Create", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    if not rate_limits:allow(player.UserId, "MarketCreate", 10, 10) then
+        finish_market_action(player, "Create", {ok = false, reason = "RateLimited"})
         return
     end
     local tx = "MarketCreate:" .. tostring(player.UserId) .. ":" .. request_id
@@ -724,8 +741,12 @@ end)
 
 market_buy_request.OnServerEvent:Connect(function(player: Player, listing_id: any, request_id: any)
     if not loaded_users[player.UserId] then return end
-    if type(listing_id) ~= "string" or type(request_id) ~= "string" then
+    if not valid_market_id(listing_id) or not valid_market_id(request_id) then
         finish_market_action(player, "Buy", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    if not rate_limits:allow(player.UserId, "MarketBuy", 10, 10) then
+        finish_market_action(player, "Buy", {ok = false, reason = "RateLimited"})
         return
     end
     local tx = "MarketBuy:" .. tostring(player.UserId) .. ":" .. request_id
@@ -734,8 +755,12 @@ end)
 
 market_cancel_request.OnServerEvent:Connect(function(player: Player, listing_id: any, request_id: any)
     if not loaded_users[player.UserId] then return end
-    if type(listing_id) ~= "string" or type(request_id) ~= "string" then
+    if not valid_market_id(listing_id) or not valid_market_id(request_id) then
         finish_market_action(player, "Cancel", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    if not rate_limits:allow(player.UserId, "MarketCancel", 10, 10) then
+        finish_market_action(player, "Cancel", {ok = false, reason = "RateLimited"})
         return
     end
     local tx = "MarketCancel:" .. tostring(player.UserId) .. ":" .. request_id
@@ -762,6 +787,7 @@ end
 RaceChangeRuntime.attach({
     race_change = race_change,
     remotes = remotes,
+    rate_limits = rate_limits,
     is_loaded = function(user_id: number): boolean
         return loaded_users[user_id] == true
     end,
@@ -1011,6 +1037,7 @@ Players.PlayerRemoving:Connect(function(player: Player)
     loaded_users[user_id] = nil
     ProgressionRuntimeState.clear_character(user_id)
     last_entry_request[user_id] = nil
+    rate_limits:clear_user(user_id)
 
     if coordinator:is_pending(user_id) then
         local forgot, forget_error = profiles:forget_for_handoff(user_id)
