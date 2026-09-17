@@ -17,7 +17,7 @@ local function check(condition: boolean, message: string)
     end
 end
 
-check(ProfileSchema.VERSION == 9, "Recipe knowledge gate must use schema v9.")
+check(ProfileSchema.VERSION == 10, "Recipe knowledge gate must use schema v9.")
 
 local raw = ProfileSchema.create_default(8401)
 raw.SchemaVersion = 8
@@ -36,7 +36,7 @@ raw.Account.Bank.Items = {
 local migrated = ProfileMigration.migrate(raw)
 local character = migrated.Characters.Slot1
 
-check(migrated.SchemaVersion == 9, "v8 profile must migrate to schema v9.")
+check(migrated.SchemaVersion == 10, "v8 profile must migrate to schema v9.")
 check(
     type(character.CraftingKnowledge) == "table",
     "Migration must create CraftingKnowledge."
@@ -76,7 +76,7 @@ local migrated_again = ProfileMigration.migrate(migrated)
 local again_character = migrated_again.Characters.Slot1
 
 check(
-    migrated_again.SchemaVersion == 9,
+    migrated_again.SchemaVersion == 10,
     "Current profile must remain schema v9 after re-migration."
 )
 check(
