@@ -145,6 +145,18 @@ function TravelService:clear_user(user_id: number)
     self._cooldown_until[user_id] = nil
 end
 
+function TravelService:validate_special_request(user_id: number, now: number?): any
+    local _, _, profile_reason = self:_profile_and_character(user_id)
+    if profile_reason then return rejected(profile_reason) end
+    local runtime_reason = self:_runtime_block_reason(user_id)
+    if runtime_reason then return rejected(runtime_reason) end
+    local remaining = self:remaining_cooldown(user_id, now)
+    if remaining > 0 then
+        return {ok = false, reason = "TravelCooldown", CooldownRemaining = remaining}
+    end
+    return {ok = true}
+end
+
 function TravelService:validate_request(
     user_id: number,
     destination_id: any,

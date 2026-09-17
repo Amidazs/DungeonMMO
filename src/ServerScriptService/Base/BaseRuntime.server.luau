@@ -33,6 +33,7 @@ local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 
 local BankRuntime = require(Base:WaitForChild("BankRuntime"))
 local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
+local GuildRuntime = require(Base:WaitForChild("GuildRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local entry_request = remotes:WaitForChild("DungeonEntryRequest") :: RemoteEvent
@@ -68,6 +69,8 @@ local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
 local bank = runtime.BankService
 local travel = runtime.TravelService
+local guilds = runtime.GuildService
+local guild_hall = runtime.GuildHallService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -363,6 +366,14 @@ travel:set_guards({
 })
 
 BaseTravelRuntime.attach({
+    travel = travel,
+    environment = base_environment,
+    remotes = remotes,
+})
+
+GuildRuntime.attach({
+    guilds = guilds,
+    hall = guild_hall,
     travel = travel,
     environment = base_environment,
     remotes = remotes,

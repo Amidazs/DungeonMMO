@@ -160,6 +160,22 @@
     {
       "Name": "TravelActionResult",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "GuildSnapshotRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "GuildSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "GuildActionRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "GuildActionResult",
+      "ClassName": "RemoteEvent"
     }
   ]
 }
