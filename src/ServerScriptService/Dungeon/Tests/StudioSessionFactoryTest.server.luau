@@ -30,6 +30,29 @@ if RunService:IsStudio() then
         }
     end
     function fake_sessions:get_for_user(_user_id: number): any return nil end
+    function fake_sessions:set_instance_state(
+        _session_id: string,
+        instance_state: any
+    ): any
+        return {
+            ok = true,
+            session = {
+                SessionId = "studio-session",
+                DungeonId = "TestDungeon",
+                State = "Creating",
+                Members = {
+                    ["777"] = {
+                        UserId = 777,
+                        Connected = false,
+                        Mode = "Active",
+                    },
+                },
+                ReturnPlaceId = 0,
+                ReservedAccessCode = "StudioReservedServer",
+                InstanceState = instance_state,
+            },
+        }
+    end
 
     local fake_player: any = {UserId = 777}
     local created = StudioSessionFactory.create_for_players({fake_player}, fake_sessions)

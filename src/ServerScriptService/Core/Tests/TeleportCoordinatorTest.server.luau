@@ -61,6 +61,28 @@ function fake_sessions:create(dungeon_id: string, member_ids: {number}, return_p
         Members = { ["42"] = {UserId = 42, Connected = false, Mode = "Active"} },
     }, nil
 end
+function fake_sessions:set_instance_state(_session_id: string, instance_state: any)
+    table.insert(calls, "SetInstanceState")
+    return {
+        ok = true,
+        session = {
+            SessionId = "session-a",
+            DungeonId = "TestDungeon",
+            MemberUserIds = {42},
+            ReturnPlaceId = game.PlaceId,
+            ReservedAccessCode = "reserved-code-1",
+            State = "Creating",
+            Members = {
+                ["42"] = {
+                    UserId = 42,
+                    Connected = false,
+                    Mode = "Active",
+                },
+            },
+            InstanceState = instance_state,
+        },
+    }
+end
 function fake_sessions:set_handoff_nonce(_session_id: string, _user_id: number, _nonce: string)
     table.insert(calls, "SetHandoffNonce")
     return {ok = true}
@@ -74,7 +96,7 @@ local coordinator = TeleportCoordinator.new(fake_adapter, fake_profile, fake_lea
 local player: any = {UserId = 42}
 local result = coordinator:start_dungeon({player}, "TestDungeon", 987654)
 check(result.ok == true, "Valid solo dungeon start must initiate teleport.")
-local expected = {"ReserveServerAsync", "CreateSession", "SaveProfile", "BeginHandoff", "SetHandoffNonce", "TeleportAsync"}
+local expected = {"ReserveServerAsync", "CreateSession", "SetInstanceState", "SaveProfile", "BeginHandoff", "SetHandoffNonce", "TeleportAsync"}
 for index, name in ipairs(expected) do
     check(calls[index] == name, string.format("Call %d must be %s, got %s", index, name, tostring(calls[index])))
 end
@@ -107,6 +129,21 @@ local failing_sessions: any = {}
 function failing_sessions:get_for_user(_user_id: number) return nil end
 function failing_sessions:create(dungeon_id: string, members: {number}, return_place_id: number, code: string)
     return {SessionId="session-fail", DungeonId=dungeon_id, MemberUserIds=members, ReturnPlaceId=return_place_id, ReservedAccessCode=code, State="Creating", Members={["42"]={UserId=42}}}, nil
+end
+function failing_sessions:set_instance_state(_session_id: string, instance_state: any)
+    return {
+        ok = true,
+        session = {
+            SessionId = "session-fail",
+            DungeonId = "TestDungeon",
+            MemberUserIds = {42},
+            ReturnPlaceId = game.PlaceId,
+            ReservedAccessCode = "reserved-fail",
+            State = "Creating",
+            Members = {["42"] = {UserId = 42, Connected = false, Mode = "Active"}},
+            InstanceState = instance_state,
+        },
+    }
 end
 function failing_sessions:set_handoff_nonce(_session_id: string, _user_id: number, _nonce: string) return {ok = true} end
 function failing_sessions:mark_failed(_session_id: string, _reason: string) self.failed = true return {ok = true} end

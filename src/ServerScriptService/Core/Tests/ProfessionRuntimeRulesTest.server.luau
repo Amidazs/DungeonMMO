@@ -63,6 +63,7 @@ floor.Parent = test_root
 local anchor = Instance.new("Part")
 anchor.Name = "Anchor"
 anchor.Anchored = true
+anchor.CanCollide = false
 anchor.CanQuery = false
 anchor.CFrame = CFrame.new(0, 4, 0)
 anchor.Parent = test_root

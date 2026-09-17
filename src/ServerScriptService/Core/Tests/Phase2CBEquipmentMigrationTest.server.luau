@@ -8,9 +8,9 @@ local Services = ServerScriptService:WaitForChild("Core"):WaitForChild("Services
 local ProfileSchema = require(Shared:WaitForChild("ProfileSchema"))
 local ProfileMigration = require(Services:WaitForChild("ProfileMigration"))
 
-if ProfileSchema.VERSION ~= 5 then
+if ProfileSchema.VERSION < 5 then
     error(
-        "[Phase 2C.B Equipment Migration Tests] RED: expected schema v5; current schema is "
+        "[Phase 2C.B Equipment Migration Tests] Equipment foundation requires schema v5 or newer; current schema is "
             .. tostring(ProfileSchema.VERSION)
             .. "."
     )
@@ -74,7 +74,7 @@ local v4 = {
 local migrated = ProfileMigration.migrate(v4)
 local c = migrated.Characters.Slot1
 
-check(migrated.SchemaVersion == 5, "v4 must migrate to schema v5.")
+check(migrated.SchemaVersion == ProfileSchema.VERSION, "v4 must migrate through the equipment migration into the current schema.")
 check(c.Identity.RaceId == "Elf", "schema-v4 Elf identity must NOT be reclassified as legacy.")
 check(c.Identity.BaseClassId == "Fighter" and c.Identity.ClassId == "Fighter", "Fighter identity must remain complete.")
 check(c.Identity.CreationStage == "Complete", "accepted v4 creation stage must remain complete.")
@@ -90,7 +90,7 @@ check(c.Progression.RespecCounters.Attributes == 1 and c.Progression.RespecCount
 check(c.Progression.OneTimeRewards.ArcSlashFirstClear == true, "one-time rewards must survive.")
 
 local twice = ProfileMigration.migrate(migrated)
-check(twice.SchemaVersion == 5, "repeat migration must remain v5.")
+check(twice.SchemaVersion == ProfileSchema.VERSION, "repeat migration must remain on the current schema.")
 check(twice.Characters.Slot1.Identity.RaceId == "Elf", "repeat migration must preserve identity.")
 check(type(twice.Characters.Slot1.Equipment) == "table", "repeat migration must preserve Equipment.")
 

@@ -17,7 +17,7 @@ local function check(condition: boolean, message: string)
     end
 end
 
-check(ProfileSchema.VERSION == 6, "Profession foundation must use schema v6.")
+check(ProfileSchema.VERSION >= 6, "Profession foundation requires schema v6 or newer.")
 
 local fresh = ProfileMigration.migrate(nil)
 local fresh_character = fresh.Characters.Slot1
@@ -39,7 +39,7 @@ legacy_v5.Characters.Slot1.Equipment = {
 }
 
 local migrated = ProfileMigration.migrate(legacy_v5)
-check(migrated.SchemaVersion == 6, "v5 profile must migrate to v6.")
+check(migrated.SchemaVersion == ProfileSchema.VERSION, "v5 profile must migrate to the current schema.")
 check(migrated.Characters.Slot1.Inventory[1].Quantity == 4, "Migration must preserve inventory.")
 check(migrated.Characters.Slot1.Equipment.Weapon == "marauder_sword", "Migration must preserve equipment.")
 

@@ -36,7 +36,7 @@ local totalWeight = 0
 for _, entry in ipairs(LootTableConfig.TEST_DUNGEON) do
     totalWeight += entry.Weight
 end
-assert(totalWeight == 100, "Test dungeon loot weights must total 100")
+assert(totalWeight > 0 and totalWeight <= 100, "Test dungeon explicit loot weights must occupy 1..100 percent; any remainder is an implicit no-drop outcome")
 
 local ItemDefinitions = require(shared:WaitForChild("ItemDefinitions"))
 assert(ItemDefinitions.get("marauder_sword") ~= nil, "Prototype equipment item missing")

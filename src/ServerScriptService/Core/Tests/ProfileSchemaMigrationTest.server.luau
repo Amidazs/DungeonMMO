@@ -44,8 +44,8 @@ local fresh_character = fresh_a.Characters.Slot1
 local fresh_progression = fresh_character.Progression
 
 check(
-    fresh_a.SchemaVersion == 5,
-    "Fresh profile must use schema version 5."
+    fresh_a.SchemaVersion == ProfileSchema.VERSION,
+    "Fresh profile must use the current schema version."
 )
 check(
     fresh_a.Account.SelectedCharacterSlot == 1,
@@ -112,8 +112,8 @@ local migrated_new_character =
     migrated_new.Characters.Slot1
 
 check(
-    migrated_new.SchemaVersion == 5,
-    "Nil storage must create schema v5."
+    migrated_new.SchemaVersion == ProfileSchema.VERSION,
+    "Nil storage must create the current schema version."
 )
 check(
     migrated_new_character.Identity.CreationStage
@@ -138,14 +138,14 @@ local migrated_new_again = ProfileMigration.migrate(
 check(
     migrated_new_again.Characters.Slot1
         .Identity.CreationStage == "RaceSelection",
-    "Fresh v4 re-migration must remain fresh."
+    "Fresh current-schema re-migration must remain fresh."
 )
 check(
     next(
         migrated_new_again.Characters.Slot1
             .Progression.Skills
     ) == nil,
-    "Fresh v4 re-migration must not gain starters."
+    "Fresh current-schema re-migration must not gain starters."
 )
 
 -- An existing table without a schema version is old data,
@@ -153,8 +153,8 @@ check(
 local migrated_empty = ProfileMigration.migrate({})
 
 check(
-    migrated_empty.SchemaVersion == 5,
-    "Existing empty profile must migrate to v5."
+    migrated_empty.SchemaVersion == ProfileSchema.VERSION,
+    "Existing empty profile must migrate to the current schema."
 )
 check(
     migrated_empty.Characters.Slot1

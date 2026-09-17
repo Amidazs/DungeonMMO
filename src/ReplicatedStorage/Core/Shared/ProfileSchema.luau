@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v7 adds account-wide persistent Bank / Storage.
+-- Schema v8 adds persistent quest and secondary-class advancement state.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 7
+ProfileSchema.VERSION = 8
 
 local function deep_clone(
     value: any,
@@ -89,6 +89,15 @@ function ProfileSchema.create_default(_user_id: number): any
                     Blacksmithing = {Level = 1, XP = 0},
                     Herbalism = {Level = 1, XP = 0},
                     Alchemy = {Level = 1, XP = 0},
+                },
+                Quests = {
+                    Version = 1,
+                    Active = {},
+                    Completed = {},
+                },
+                ClassAdvancement = {
+                    Version = 1,
+                    CompletedByRace = {},
                 },
                 Inventory = {},
                 Equipment = {},

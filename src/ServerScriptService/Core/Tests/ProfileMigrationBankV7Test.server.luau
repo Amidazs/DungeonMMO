@@ -8,7 +8,7 @@ local Services = ServerScriptService:WaitForChild("Core"):WaitForChild("Services
 local ProfileSchema = require(Shared:WaitForChild("ProfileSchema"))
 local ProfileMigration = require(Services:WaitForChild("ProfileMigration"))
 
-assert(ProfileSchema.VERSION == 7, "Bank gate must use profile schema v7.")
+assert(ProfileSchema.VERSION >= 7, "Bank gate requires profile schema v7 or newer.")
 
 local legacy_v6 = ProfileSchema.create_default(100)
 legacy_v6.SchemaVersion = 6
@@ -19,7 +19,7 @@ legacy_v6.Characters.Slot1.Inventory = {
 }
 
 local migrated = ProfileMigration.migrate(legacy_v6)
-assert(migrated.SchemaVersion == 7)
+assert(migrated.SchemaVersion == ProfileSchema.VERSION)
 assert(type(migrated.Account.Bank) == "table")
 assert(migrated.Account.Bank.Version == 1)
 assert(type(migrated.Account.Bank.Items) == "table")

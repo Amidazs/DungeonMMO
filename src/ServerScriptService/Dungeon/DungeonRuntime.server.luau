@@ -88,6 +88,7 @@ local skills = runtime.SkillProgressionService
 local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
+local quests = runtime.QuestService
 
 local active_dungeon_id, active_dungeon_error = DungeonRuntimeSelection.resolve(Players, Workspace, RunService, DungeonDefinitions, 15)
 assert(active_dungeon_id ~= nil, "Dungeon selection failed: " .. tostring(active_dungeon_error))
@@ -696,7 +697,7 @@ local function initialize_session_services(session: any): (any?, boolean)
         print(string.format("[Second Dungeon State] %s | Module1=%s | Module2=%s | Rare=%s | Event=%s",active_definition.DisplayName,tostring(session.InstanceState.Module1Id),tostring(session.InstanceState.Module2Id),tostring(session.InstanceState.RareStateId),tostring(session.InstanceState.EventId)))
     end
     local recovery_plan = apply_recovery_plan(session)
-    completion_service = CompletionService.new(sessions,rewards,profiles,completion_reward,if active_definition.Id==DungeonDefinitions.TEST_DUNGEON.Id then skills else nil)
+    completion_service = CompletionService.new(sessions,rewards,profiles,completion_reward,if active_definition.Id==DungeonDefinitions.TEST_DUNGEON.Id then skills else nil, quests)
     return_service = ReturnPortalService.new(sessions, coordinator, {
         is_studio = RunService:IsStudio(),
         auto_return_seconds = 60,
