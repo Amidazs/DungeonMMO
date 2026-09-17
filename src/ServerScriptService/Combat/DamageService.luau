@@ -17,8 +17,17 @@ export type DamageContext = {
     critical_chance: number?, critical_damage_multiplier: number?, critical_roll: number?,
 }
 
+local damage_callback:
+    ((DamageContext, number) -> ())? = nil
+
 function DamageService.calculate_damage(base_damage: number, multiplier: number): number
     return math.max(0, base_damage * multiplier)
+end
+
+function DamageService.set_damage_callback(
+    callback: ((DamageContext, number) -> ())?
+)
+    damage_callback = callback
 end
 
 local function resolve_critical_multiplier(context: DamageContext): number
@@ -53,6 +62,11 @@ function DamageService.apply_damage(context: DamageContext): number
     if CombatConfig.DEBUG.PRINT_DAMAGE then
         print(string.format("[Damage] %s -%.1f HP", context.target.Name, health_damage))
     end
+
+    if health_damage > 0 and damage_callback then
+        damage_callback(context, health_damage)
+    end
+
     return health_damage
 end
 

@@ -1,0 +1,212 @@
+--!strict
+local DungeonContributionBridge = {}
+
+local event_serial = 0
+local bound_service: any = nil
+local recorder_override: ((number, any) -> any)? = nil
+
+local function next_event_id(
+    kind: string,
+    user_id: number,
+    source_id: string
+): string
+    event_serial += 1
+
+    return string.format(
+        "%s:%d:%s:%d",
+        kind,
+        user_id,
+        source_id,
+        event_serial
+    )
+end
+
+local function valid_amount(amount: any): boolean
+    return type(amount) == "number"
+        and amount == amount
+        and amount > 0
+        and math.abs(amount) < math.huge
+end
+
+local function user_id_of(value: any): number?
+    if type(value) ~= "table" and typeof(value) ~= "Instance" then
+        return nil
+    end
+
+    local ok, user_id = pcall(function()
+        return value.UserId
+    end)
+
+    if ok
+        and type(user_id) == "number"
+        and user_id > 0
+        and user_id % 1 == 0
+    then
+        return user_id
+    end
+
+    return nil
+end
+
+function DungeonContributionBridge.bind_service(service: any?)
+    bound_service = service
+end
+
+function DungeonContributionBridge.set_recorder_for_test(
+    recorder: ((number, any) -> any)?
+)
+    recorder_override = recorder
+end
+
+local function record(
+    user_id: number,
+    event_type: string,
+    amount: number,
+    source_id: string,
+    metadata: any?
+): any
+    if not valid_amount(amount) then
+        return {
+            ok = false,
+            reason = "InvalidContributionEvent",
+        }
+    end
+
+    local event = {
+        EventId = next_event_id(
+            event_type,
+            user_id,
+            source_id
+        ),
+        Type = event_type,
+        Amount = amount,
+        Metadata = metadata,
+    }
+
+    if recorder_override then
+        return recorder_override(user_id, event)
+    end
+
+    if not bound_service then
+        return {
+            ok = false,
+            reason = "ContributionUnavailable",
+        }
+    end
+
+    return bound_service:record_for_user(
+        user_id,
+        event
+    )
+end
+
+function DungeonContributionBridge.record_damage(
+    context: any,
+    applied_damage: number
+): any
+    if type(context) ~= "table" then
+        return {ok = false, reason = "InvalidContributionEvent"}
+    end
+
+    local attacker_id = user_id_of(context.attacker)
+    if not attacker_id then
+        return {ok = false, reason = "NoContributionOwner"}
+    end
+
+    local source_id = tostring(
+        context.attack_id
+            or context.source_id
+            or "Damage"
+    )
+
+    return record(
+        attacker_id,
+        "DamageDealt",
+        applied_damage,
+        source_id,
+        {
+            SourceId = source_id,
+            SequenceId = context.sequence_id,
+            TargetName = if context.target
+                then context.target.Name
+                else nil,
+        }
+    )
+end
+
+function DungeonContributionBridge.record_heal(
+    caster: any,
+    target: any,
+    healed: number,
+    source_id: string?
+): any
+    local caster_id = user_id_of(caster)
+    if not caster_id then
+        return {ok = false, reason = "NoContributionOwner"}
+    end
+
+    local resolved_source = source_id or "MageHeal"
+
+    return record(
+        caster_id,
+        "EffectiveHealing",
+        healed,
+        resolved_source,
+        {
+            SourceId = resolved_source,
+            TargetUserId = user_id_of(target),
+        }
+    )
+end
+
+function DungeonContributionBridge.record_ward(
+    caster: any,
+    target: any,
+    absorbed: number,
+    source_id: string?
+): any
+    local caster_id = user_id_of(caster)
+    if not caster_id then
+        return {ok = false, reason = "NoContributionOwner"}
+    end
+
+    local resolved_source = source_id or "ArcaneWard"
+
+    return record(
+        caster_id,
+        "EffectiveWard",
+        absorbed,
+        resolved_source,
+        {
+            SourceId = resolved_source,
+            TargetUserId = user_id_of(target),
+        }
+    )
+end
+
+function DungeonContributionBridge.record_mitigation(
+    user_id: number,
+    mitigated: number,
+    source_id: string?
+): any
+    if type(user_id) ~= "number"
+        or user_id <= 0
+        or user_id % 1 ~= 0
+    then
+        return {ok = false, reason = "NoContributionOwner"}
+    end
+
+    local resolved_source = source_id or "DamageMitigation"
+
+    return record(
+        user_id,
+        "DamageMitigated",
+        mitigated,
+        resolved_source,
+        {
+            SourceId = resolved_source,
+        }
+    )
+end
+
+return table.freeze(DungeonContributionBridge)
