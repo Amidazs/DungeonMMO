@@ -12,6 +12,8 @@ local Adapters = Core:WaitForChild("Adapters")
 local Base = ServerScriptService:WaitForChild("Base")
 
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local ProgressionService = require(Services:WaitForChild("ProgressionService"))
+local ProficiencyService = require(Services:WaitForChild("ProficiencyService"))
 local ProfessionRuntime = require(Services:WaitForChild("ProfessionRuntime"))
 local ProgressionRuntimeState = require(Services:WaitForChild("ProgressionRuntimeState"))
 local RacePresentationService = require(
@@ -64,6 +66,8 @@ local market_cancel_request = remotes:WaitForChild("MarketCancelRequest") :: Rem
 local market_action_result = remotes:WaitForChild("MarketActionResult") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Base")
+ProgressionService.bind_default(runtime.ProgressionService)
+ProficiencyService.bind_default(runtime.ProficiencyService)
 local profiles = runtime.ProfileService
 local leases = runtime.LeaseService
 local sessions = runtime.SessionService

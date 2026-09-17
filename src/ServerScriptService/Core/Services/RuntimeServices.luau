@@ -94,7 +94,6 @@ function RuntimeServices.new(place_kind: string): any
     local sessions = DungeonSessionService.new(session_map)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
-    ProgressionService.bind_default(progression)
     local inventory = InventoryService.new(profiles)
     local recipe_knowledge = RecipeKnowledgeService.new(
         profiles,
@@ -109,7 +108,6 @@ function RuntimeServices.new(place_kind: string): any
     local loadout = LoadoutService.new(profiles)
     local skills = SkillProgressionService.new(profiles, inventory, loadout)
     local proficiency = ProficiencyService.new(profiles)
-    ProficiencyService.bind_default(proficiency)
     local identity = IdentityService.new(profiles)
     local equipment = EquipmentService.new(profiles, place_kind)
     local professions = ProfessionService.new(profiles, inventory)

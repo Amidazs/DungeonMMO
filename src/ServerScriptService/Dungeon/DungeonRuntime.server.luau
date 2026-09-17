@@ -25,6 +25,8 @@ local CharacterIdentityRules = require(
 )
 local CombatConfig = require(SharedCombat:WaitForChild("CombatConfig"))
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local ProgressionService = require(Services:WaitForChild("ProgressionService"))
+local ProficiencyService = require(Services:WaitForChild("ProficiencyService"))
 local ProfessionRuntime = require(Services:WaitForChild("ProfessionRuntime"))
 local ProgressionRuntimeState = require(Services:WaitForChild("ProgressionRuntimeState"))
 local RacePresentationService = require(
@@ -82,6 +84,8 @@ local loadout_request = remotes:WaitForChild("LoadoutRequest") :: RemoteEvent
 local return_request = remotes:WaitForChild("ReturnRequest") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Dungeon")
+ProgressionService.bind_default(runtime.ProgressionService)
+ProficiencyService.bind_default(runtime.ProficiencyService)
 DungeonContributionBridge.bind_service(
     runtime.ContributionService
 )
