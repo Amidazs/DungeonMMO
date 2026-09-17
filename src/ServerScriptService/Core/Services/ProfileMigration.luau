@@ -640,7 +640,32 @@ function ProfileMigration.migrate(raw: any): any
     end
 
     if type(slot1.Progression) ~= "table" then
-        slot1.Progression = ProfileSchema.deep_clone(
+        -- Recipe knowledge v9: preserve only explicit learned-membership
+    -- booleans and create an empty current structure for older profiles.
+    local raw_crafting_knowledge = slot1.CraftingKnowledge
+    local sanitized_learned_recipes = {}
+
+    if type(raw_crafting_knowledge) == "table"
+        and type(raw_crafting_knowledge.LearnedRecipes) == "table"
+    then
+        for recipe_id, learned in pairs(
+            raw_crafting_knowledge.LearnedRecipes
+        ) do
+            if type(recipe_id) == "string"
+                and recipe_id ~= ""
+                and learned == true
+            then
+                sanitized_learned_recipes[recipe_id] = true
+            end
+        end
+    end
+
+    slot1.CraftingKnowledge = {
+        Version = 1,
+        LearnedRecipes = sanitized_learned_recipes,
+    }
+
+    slot1.Progression = ProfileSchema.deep_clone(
             defaults.Characters.Slot1.Progression
         )
     end

@@ -9,6 +9,9 @@ local ItemDefinitions = require(Shared:WaitForChild("ItemDefinitions"))
 local ProfessionDefinitions = require(Shared:WaitForChild("ProfessionDefinitions"))
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
+local RecipeKnowledgeService = require(
+    Services:WaitForChild("RecipeKnowledgeService")
+)
 
 local ProfessionService = {}
 ProfessionService.__index = ProfessionService
@@ -91,6 +94,15 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
         return "ProfessionLevelTooLow"
     end
 
+    local knowledge_rejection =
+        RecipeKnowledgeService.recipe_rejection_for_character(
+            character,
+            recipe
+        )
+    if knowledge_rejection then
+        return knowledge_rejection
+    end
+
     for _, input in ipairs(recipe.Inputs) do
         if InventoryService.count_item(character, input.ItemId) < input.Quantity then
             return "MissingMaterials"
@@ -147,8 +159,17 @@ function ProfessionService:build_snapshot(user_id: number): any
     local recipes = {}
     for recipe_id, recipe in pairs(ProfessionRecipes.all()) do
         local state = professions[recipe.ProfessionId]
+        local knowledge_rejection =
+            RecipeKnowledgeService.recipe_rejection_for_character(
+                character,
+                recipe
+            )
+        local level_unlocked =
+            state ~= nil and state.Level >= recipe.RequiredLevel
+
         recipes[recipe_id] = {
-            Unlocked = state ~= nil and state.Level >= recipe.RequiredLevel,
+            Unlocked = level_unlocked and knowledge_rejection == nil,
+            Known = knowledge_rejection == nil,
             RequiredLevel = recipe.RequiredLevel,
             CraftingMinigameId = crafting_minigame_id(recipe.ProfessionId),
         }

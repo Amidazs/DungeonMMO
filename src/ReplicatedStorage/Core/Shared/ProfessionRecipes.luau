@@ -8,6 +8,7 @@ local RECIPES = table.freeze({
         ProfessionId = "Blacksmithing",
         StationId = "Blacksmithing",
         RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
         Inputs = table.freeze({
             table.freeze({ItemId = "iron_ore", Quantity = 2}),
         }),
@@ -20,6 +21,7 @@ local RECIPES = table.freeze({
         ProfessionId = "Blacksmithing",
         StationId = "Blacksmithing",
         RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
         Inputs = table.freeze({
             table.freeze({ItemId = "iron_bar", Quantity = 3}),
         }),
@@ -32,10 +34,49 @@ local RECIPES = table.freeze({
         ProfessionId = "Alchemy",
         StationId = "Alchemy",
         RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
         Inputs = table.freeze({
             table.freeze({ItemId = "silverleaf", Quantity = 3}),
         }),
         Output = table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        XP = 20,
+    }),
+    forge_blueprinted_ironbound_gloves = table.freeze({
+        Id = "forge_blueprinted_ironbound_gloves",
+        Name = "Forge Blueprint Ironbound Gloves",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 2,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "blacksmith_iron_guard_blueprint",
+        }),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_bar", Quantity = 3}),
+        }),
+        Output = table.freeze({
+            ItemId = "ironbound_gloves",
+            Quantity = 1,
+        }),
+        XP = 20,
+    }),
+    distill_blueprinted_tempering_oil = table.freeze({
+        Id = "distill_blueprinted_tempering_oil",
+        Name = "Distill Blueprint Tempering Oil",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 2,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "alchemy_restorative_tonic_recipe",
+        }),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 3}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil",
+            Quantity = 1,
+        }),
         XP = 20,
     }),
     temper_ironbound_gloves = table.freeze({
@@ -44,6 +85,7 @@ local RECIPES = table.freeze({
         ProfessionId = "Blacksmithing",
         StationId = "Blacksmithing",
         RequiredLevel = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
         Inputs = table.freeze({
             table.freeze({ItemId = "ironbound_gloves", Quantity = 1}),
             table.freeze({ItemId = "iron_bar", Quantity = 1}),
@@ -58,10 +100,12 @@ local STATION_ORDER = table.freeze({
     Blacksmithing = table.freeze({
         "smelt_iron_bar",
         "forge_ironbound_gloves",
+        "forge_blueprinted_ironbound_gloves",
         "temper_ironbound_gloves",
     }),
     Alchemy = table.freeze({
         "distill_tempering_oil",
+        "distill_blueprinted_tempering_oil",
     }),
 })
 
