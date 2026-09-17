@@ -12,6 +12,8 @@ local ProfileSchema = require(
 
 local ProgressionService = require(script.Parent:WaitForChild("ProgressionService"))
 local InventoryService = require(script.Parent:WaitForChild("InventoryService"))
+local BestiaryService = require(script.Parent:WaitForChild("BestiaryService"))
+local ReputationService = require(script.Parent:WaitForChild("ReputationService"))
 
 local SkillBookDropConfig = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("SkillBookDropConfig")
@@ -201,6 +203,15 @@ function RewardService:grant_monster_reward(
         return {ok = false, reason = "InvalidMonsterReward"}
     end
 
+    if monster_reward.BestiaryCreatureId ~= nil
+        and (
+            type(monster_reward.BestiaryCreatureId) ~= "string"
+            or monster_reward.BestiaryCreatureId == ""
+        )
+    then
+        return {ok = false, reason = "InvalidMonsterReward"}
+    end
+
     local runtime_previous = self._runtime_monsters[transaction_id]
     if runtime_previous then
         local repeated = clone(runtime_previous)
@@ -235,6 +246,10 @@ function RewardService:grant_monster_reward(
                 levels_gained = existing_history.LevelsGained or 0,
                 new_level = existing_history.NewLevel or existing_character.Level,
                 carried_xp = existing_history.CarriedXP or existing_character.XP,
+                bestiary_creature_id = existing_history.BestiaryCreatureId,
+                bestiary_kill_count = existing_history.BestiaryKillCount,
+                bestiary_milestones = clone(existing_history.BestiaryMilestones or {}),
+                reputation_awards = clone(existing_history.ReputationAwards or {}),
             }
         else
             local gold_roll = self._rng:NextInteger(monster_reward.GoldMin, monster_reward.GoldMax)
@@ -263,6 +278,10 @@ function RewardService:grant_monster_reward(
                         levels_gained = already.LevelsGained or 0,
                         new_level = already.NewLevel or character.Level,
                         carried_xp = already.CarriedXP or character.XP,
+                        bestiary_creature_id = already.BestiaryCreatureId,
+                        bestiary_kill_count = already.BestiaryKillCount,
+                        bestiary_milestones = clone(already.BestiaryMilestones or {}),
+                        reputation_awards = clone(already.ReputationAwards or {}),
                     }
                     return
                 end
@@ -272,6 +291,50 @@ function RewardService:grant_monster_reward(
                     error(xp_result.reason or "XPApplyFailed")
                 end
                 character.Gold += gold_roll
+
+                local bestiary_result: any = nil
+                local reputation_awards = {}
+                local creature_id = monster_reward.BestiaryCreatureId
+
+                if type(creature_id) == "string" and creature_id ~= "" then
+                    bestiary_result = BestiaryService.apply_kill_to_character(
+                        character,
+                        creature_id
+                    )
+
+                    if bestiary_result.ok ~= true then
+                        error(bestiary_result.reason or "BestiaryApplyFailed")
+                    end
+
+                    for _, milestone in ipairs(
+                        bestiary_result.newly_unlocked or {}
+                    ) do
+                        local reputation_reward = milestone.reputation
+
+                        if type(reputation_reward) == "table" then
+                            local reputation_result =
+                                ReputationService.apply_points_to_character(
+                                    character,
+                                    reputation_reward.faction_id,
+                                    reputation_reward.points
+                                )
+
+                            if reputation_result.ok ~= true then
+                                error(
+                                    reputation_result.reason
+                                        or "ReputationApplyFailed"
+                                )
+                            end
+
+                            table.insert(reputation_awards, {
+                                FactionId = reputation_result.faction_id,
+                                PointsGranted = reputation_result.points_granted,
+                                NewPoints = reputation_result.new_points,
+                                MilestoneId = milestone.id,
+                            })
+                        end
+                    end
+                end
 
                 local skill_book_item_id: string? = nil
                 if type(monster_reward.BossId) == "string"
@@ -311,6 +374,18 @@ function RewardService:grant_monster_reward(
                     LevelsGained = xp_result.levels_gained,
                     NewLevel = xp_result.new_level,
                     CarriedXP = xp_result.carried_xp,
+                    BestiaryCreatureId = if bestiary_result
+                            and bestiary_result.tracked == true
+                        then bestiary_result.creature_id
+                        else nil,
+                    BestiaryKillCount = if bestiary_result
+                            and bestiary_result.tracked == true
+                        then bestiary_result.kill_count
+                        else nil,
+                    BestiaryMilestones = if bestiary_result
+                        then clone(bestiary_result.newly_unlocked or {})
+                        else {},
+                    ReputationAwards = clone(reputation_awards),
                 }
                 character.RewardHistory.Monster[transaction_id] = record
                 member_result = {
@@ -322,6 +397,10 @@ function RewardService:grant_monster_reward(
                     levels_gained = record.LevelsGained,
                     new_level = record.NewLevel,
                     carried_xp = record.CarriedXP,
+                    bestiary_creature_id = record.BestiaryCreatureId,
+                    bestiary_kill_count = record.BestiaryKillCount,
+                    bestiary_milestones = clone(record.BestiaryMilestones or {}),
+                    reputation_awards = clone(record.ReputationAwards or {}),
                 }
             end)
 
