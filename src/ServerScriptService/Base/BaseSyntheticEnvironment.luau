@@ -40,6 +40,7 @@ function BaseSyntheticEnvironment.create(parent: Instance)
         {"Base.Trainer.Fighter", CFrame.new(20, 3.5, 10), "Trainer", Vector3.new(5, 7, 4)},
         {"Base.Trainer.Mage", CFrame.new(20, 3.5, 0), "Trainer", Vector3.new(5, 7, 4)},
         {"Base.Trainer.Ranger", CFrame.new(20, 3.5, -10), "Trainer", Vector3.new(5, 7, 4)},
+        {"Base.Trainer.Rogue", CFrame.new(10, 3.5, -20), "Trainer", Vector3.new(5, 7, 4)},
         {"Base.Service.Equipment", CFrame.new(-20, 3.5, 8), "Service", Vector3.new(5, 7, 4)},
         {"Base.Service.Progression", CFrame.new(-20, 3.5, -2), "Service", Vector3.new(5, 7, 4)},
         {"Base.Service.Bank", CFrame.new(-20, 3.5, -12), "Service", Vector3.new(5, 7, 4)},

@@ -28,6 +28,12 @@ local CharacterIdentityRules = require(
     )
 )
 
+local SkillProgressionDefinitions = require(
+    Shared:WaitForChild(
+        "SkillProgressionDefinitions"
+    )
+)
+
 local ProgressionRuntimeState = require(
     Services:WaitForChild(
         "ProgressionRuntimeState"
@@ -106,6 +112,14 @@ local function validate_character(
                 }
             end
 
+            local definition = SkillProgressionDefinitions.get(skill_id)
+            if definition and definition.Kind == "Passive" then
+                return {
+                    ok = false,
+                    reason = "PassiveSkillNotLoadoutEligible",
+                }
+            end
+
             seen[skill_id] = true
             cleaned[slot] = skill_id
         end
@@ -169,6 +183,11 @@ function LoadoutService:auto_equip_first_free(
         not current
         or not complete(current)
     ) then
+        return false
+    end
+
+    local definition = SkillProgressionDefinitions.get(skill_id)
+    if definition and definition.Kind == "Passive" then
         return false
     end
 

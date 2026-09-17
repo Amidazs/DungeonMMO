@@ -117,6 +117,20 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
         }),
     }),
     table.freeze({
+        AnchorId = "Base.Trainer.Rogue",
+        Role = "Trainer",
+        Selectors = table.freeze({
+            table.freeze({
+                Name = "Central market circular cobbled plaza",
+                Offset = CFrame.new(18, 3.5, -8),
+            }),
+            table.freeze({
+                Name = "Anchor_FastTravel_Central_Tree_Market",
+                Offset = CFrame.new(10, 2.5, -5),
+            }),
+        }),
+    }),
+    table.freeze({
         AnchorId = "Base.Service.Equipment",
         Role = "Service",
         Selectors = table.freeze({

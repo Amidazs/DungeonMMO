@@ -46,6 +46,10 @@ check(
     "Ranger trainer required"
 )
 check(
+    adapter:get("Base.Trainer.Rogue") ~= nil,
+    "Rogue trainer required"
+)
+check(
     adapter:get("Base.Service.Equipment") ~= nil,
     "Equipment service required"
 )

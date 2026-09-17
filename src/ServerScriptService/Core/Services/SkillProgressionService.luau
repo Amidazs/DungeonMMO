@@ -34,6 +34,12 @@ local ClassDefinitions = require(
     )
 )
 
+local SecondaryClassDefinitions = require(
+    Shared:WaitForChild(
+        "SecondaryClassDefinitions"
+    )
+)
+
 local CharacterIdentityRules = require(
     Shared:WaitForChild(
         "CharacterIdentityRules"
@@ -77,6 +83,28 @@ local function identity_complete(
     return type(character) == "table"
         and CharacterIdentityRules
             .is_complete(character)
+end
+
+local function class_can_teach(
+    character: any,
+    skill_id: string
+): boolean
+    if not identity_complete(character) then
+        return false
+    end
+
+    local identity = character.Identity
+    if ClassDefinitions.can_teach(identity.BaseClassId, skill_id) then
+        return true
+    end
+
+    local advancement = character.ClassAdvancement
+    local active_class_id = if type(advancement) == "table"
+        then advancement.ActiveClassId
+        else nil
+
+    return type(active_class_id) == "string"
+        and SecondaryClassDefinitions.can_teach(active_class_id, skill_id)
 end
 
 local function allocated(
@@ -258,17 +286,7 @@ function SkillProgressionService:learn_skill(
                     error(failure)
                 end
 
-                local class_id =
-                    character.Identity.ClassId
-
-                if (
-                    type(class_id) ~= "string"
-                    or not ClassDefinitions
-                        .can_teach(
-                            class_id,
-                            skill_id
-                        )
-                ) then
+                if not class_can_teach(character, skill_id) then
                     failure =
                         "ClassCannotTeachSkill"
 
@@ -379,6 +397,91 @@ function SkillProgressionService:learn_skill(
             )
     end
 
+    return result
+end
+
+function SkillProgressionService:learn_trainer_skill(
+    user_id: number,
+    skill_id: string
+): any
+    local definition = SkillDefinitions.get(skill_id)
+    if not definition then
+        return rejected("UnknownSkill")
+    end
+
+    local current_character = self._profiles:get_character(user_id)
+    if not current_character then
+        return rejected("ProfileNotLoaded")
+    end
+    if not identity_complete(current_character) then
+        return rejected("IdentityIncomplete")
+    end
+    if not class_can_teach(current_character, skill_id) then
+        return rejected("ClassCannotTeachSkill")
+    end
+
+    local result: any = nil
+    local failure: string? = nil
+    local ok, mutation_error = self._profiles:mutate(
+        user_id,
+        function(profile: any)
+            local character = profile.Characters[
+                "Slot" .. tostring(profile.Account.SelectedCharacterSlot)
+            ]
+            if not identity_complete(character) then
+                failure = "IdentityIncomplete"
+                error(failure)
+            end
+            if not class_can_teach(character, skill_id) then
+                failure = "ClassCannotTeachSkill"
+                error(failure)
+            end
+
+            local progression = character.Progression
+            local existing = progression.Skills[skill_id]
+            if existing and existing.Known == true then
+                failure = "AlreadyKnown"
+                error(failure)
+            end
+
+            local cost = SkillProgressionConfig.get_rank_cost(
+                definition.Tier,
+                1
+            ) or 0
+            if SkillProgressionService.get_available_sp_for_character(character) < cost then
+                failure = "InsufficientSP"
+                error(failure)
+            end
+
+            progression.Skills[skill_id] = {
+                Known = true,
+                StarterGranted = false,
+                PurchasedRank = 1,
+                Proficiency = if existing and type(existing.Proficiency) == "number"
+                    then existing.Proficiency
+                    else 0,
+            }
+            result = {
+                ok = true,
+                skill_id = skill_id,
+                rank = 1,
+                cost = cost,
+            }
+        end
+    )
+
+    if not ok then
+        return rejected(failure or mutation_error or "ProfileMutationFailed")
+    end
+
+    if definition.Kind ~= "Passive" then
+        self._loadout:auto_equip_first_free(user_id, skill_id)
+    end
+
+    local refreshed = self._profiles:get_character(user_id)
+    if refreshed then
+        ProgressionRuntimeState.set_character(user_id, refreshed)
+    end
     return result
 end
 

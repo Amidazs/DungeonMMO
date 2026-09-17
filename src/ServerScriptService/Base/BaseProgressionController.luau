@@ -184,14 +184,17 @@ function BaseProgressionController:learn_skill(
         return failure("SkillNotLearnableHere")
     end
 
-    if type(entry.SourceItemId) ~= "string" or entry.SourceItemId == "" then
-        return failure("SkillSourceItemMissing")
+    if type(entry.SourceItemId) == "string" and entry.SourceItemId ~= "" then
+        return self._skills:learn_skill(
+            user_id,
+            skill_id,
+            entry.SourceItemId
+        )
     end
 
-    return self._skills:learn_skill(
+    return self._skills:learn_trainer_skill(
         user_id,
-        skill_id,
-        entry.SourceItemId
+        skill_id
     )
 end
 

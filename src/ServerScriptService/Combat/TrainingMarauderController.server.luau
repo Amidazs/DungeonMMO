@@ -165,9 +165,12 @@ local function get_target_context(
         return nil
     end
 
+    local threat_drop_until = tonumber(
+        character:GetAttribute("RogueThreatDropUntil")
+    ) or 0
     local aggro_suppressed = character:GetAttribute(
         MarauderConfig.AGGRO_SUPPRESSED_ATTRIBUTE
-    ) == true
+    ) == true or threat_drop_until > os.clock()
 
     if not AggroGraceRules.can_target(aggro_suppressed) then
         return nil

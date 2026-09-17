@@ -241,6 +241,7 @@ local trainer_data = {
     ["Base.Trainer.Fighter"] = {"FighterTrainer", "Fighter Trainer"},
     ["Base.Trainer.Mage"] = {"MageTrainer", "Mage Trainer"},
     ["Base.Trainer.Ranger"] = {"RangerTrainer", "Ranger Trainer"},
+    ["Base.Trainer.Rogue"] = {"RogueTrainer", "Rogue Trainer"},
 }
 
 for anchor_id, data in pairs(trainer_data) do

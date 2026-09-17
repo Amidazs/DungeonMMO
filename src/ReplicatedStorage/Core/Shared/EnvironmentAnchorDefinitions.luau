@@ -10,7 +10,7 @@ EnvironmentAnchorDefinitions.BASE = table.freeze({
     EnvironmentId = "Base",
     Required = table.freeze({
         "Base.PlayerSpawn", "Base.ArrivalFromTemple", "Base.TemplePortal", "Base.DungeonBoard",
-        "Base.Trainer.Fighter", "Base.Trainer.Mage", "Base.Trainer.Ranger",
+        "Base.Trainer.Fighter", "Base.Trainer.Mage", "Base.Trainer.Ranger", "Base.Trainer.Rogue",
         "Base.Service.Equipment", "Base.Service.Progression", "Base.Service.Bank",
         "Base.Service.Travel", "Base.Profession.BlacksmithingPlaceholder",
         "Base.Travel.Market",

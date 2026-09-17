@@ -21,6 +21,23 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+
+    RogueAdvancementTrial = table.freeze({
+        Id = "RogueAdvancementTrial",
+        DisplayName = "Rogue Advancement Trial",
+        Kind = "ClassAdvancement",
+        MinimumLevel = 20,
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearAbandonedMine",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+                Required = 1,
+            }),
+        }),
+    }),
 })
 
 local function list_contains(values: any, expected: string): boolean

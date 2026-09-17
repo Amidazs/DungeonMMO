@@ -58,18 +58,53 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Ranger Trainer",
         AllowedBaseClasses = table.freeze({"Ranger"}),
         Skills = table.freeze({
-            table.freeze({
-                SkillId = "PiercingShot",
-                Mode = "Rank",
-            }),
-            table.freeze({
-                SkillId = "CripplingShot",
-                Mode = "Rank",
-            }),
-            table.freeze({
-                SkillId = "Volley",
-                Mode = "Rank",
-            }),
+            table.freeze({SkillId = "PiercingShot", Mode = "Rank"}),
+            table.freeze({SkillId = "CripplingShot", Mode = "Rank"}),
+            table.freeze({SkillId = "Volley", Mode = "Rank"}),
+        }),
+    }),
+
+    RogueTrainer = table.freeze({
+        Id = "RogueTrainer",
+        DisplayName = "Rogue Trainer",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        Skills = table.freeze({
+            table.freeze({SkillId = "QuickStrike", Mode = "Rank"}),
+            table.freeze({SkillId = "Backstab", Mode = "Rank"}),
+            table.freeze({SkillId = "EvasiveStep", Mode = "Rank"}),
+            table.freeze({SkillId = "Feint", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "ShadowDash", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "CriticalFocus", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "LightFoot", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "ThreatDrop", Mode = "LearnOrRank"}),
+        }),
+    }),
+
+    DuelistTrainer = table.freeze({
+        Id = "DuelistTrainer",
+        DisplayName = "Duelist Trainer",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        AllowedAdvancedClasses = table.freeze({"HumanRogueDuelist"}),
+        Skills = table.freeze({
+            table.freeze({SkillId = "DuelistAmbush", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "DuelistDeadlyBlow", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "DuelistExposeWeakness", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "DuelistRush", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "DuelistCriticalMastery", Mode = "LearnOrRank"}),
+        }),
+    }),
+
+    WindstalkerTrainer = table.freeze({
+        Id = "WindstalkerTrainer",
+        DisplayName = "Windstalker Trainer",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        AllowedAdvancedClasses = table.freeze({"ElfRogueWindstalker"}),
+        Skills = table.freeze({
+            table.freeze({SkillId = "WindstalkerFlurry", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "WindstalkerSlipstream", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "WindstalkerBlur", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "WindstalkerQuickstep", Mode = "LearnOrRank"}),
+            table.freeze({SkillId = "WindstalkerEvasionMastery", Mode = "LearnOrRank"}),
         }),
     }),
 })
@@ -151,6 +186,13 @@ function TrainerCatalogues.resolve_for_character(
     end
 
     if not allowed(definition.AllowedClasses, identity.ClassId) then
+        return failure("TrainerRestricted")
+    end
+
+    local active_advanced_class = if type(character.ClassAdvancement) == "table"
+        then character.ClassAdvancement.ActiveClassId
+        else nil
+    if not allowed(definition.AllowedAdvancedClasses, active_advanced_class) then
         return failure("TrainerRestricted")
     end
 

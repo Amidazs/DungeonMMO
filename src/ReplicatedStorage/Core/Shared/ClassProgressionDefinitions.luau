@@ -44,6 +44,26 @@ local DEFINITIONS = table.freeze({
         }),
         TeachableSkills = table.freeze({}),
     }),
+
+    Rogue = table.freeze({
+        Id = "Rogue",
+        AllowedRaces = HUMAN_ELF,
+        StarterSkills = table.freeze({
+            "QuickStrike",
+            "Backstab",
+            "EvasiveStep",
+        }),
+        StarterEquipment = table.freeze({
+            Weapon = "marauder_sword",
+        }),
+        TeachableSkills = table.freeze({
+            "Feint",
+            "ShadowDash",
+            "CriticalFocus",
+            "LightFoot",
+            "ThreatDrop",
+        }),
+    }),
 })
 
 function ClassProgressionDefinitions.get(

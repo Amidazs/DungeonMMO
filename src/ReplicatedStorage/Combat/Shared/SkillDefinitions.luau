@@ -285,6 +285,72 @@ local VOLLEY: RangerVolleySkillDefinition = table.freeze({
     }),
 })
 
+local function rogue_melee(
+    id: string,
+    display_name: string,
+    stamina: number,
+    cooldown: number,
+    damage: number,
+    step: number,
+    extras: any?
+): any
+    local definition: any = {
+        KIND = "Melee",
+        ID = id,
+        DISPLAY_NAME = display_name,
+        STAMINA_COST = stamina,
+        COOLDOWN_SECONDS = cooldown,
+        WIND_UP_SECONDS = 0.14,
+        ACTIVE_SECONDS = 0.08,
+        RECOVERY_SECONDS = 0.24,
+        FORWARD_STEP_STUDS = step,
+        REACH_STUDS = 6.5,
+        ARC_DEGREES = 90,
+        HITBOX = table.freeze({
+            SIZE = Vector3.new(11.5, 5.0, 6.5),
+            FORWARD_OFFSET = 3.0,
+            SAMPLE_COUNT = 3,
+        }),
+        BASE_DAMAGE = damage,
+        STAGGER_SECONDS = 0,
+        MOVEMENT_SCALE = table.freeze({
+            WIND_UP = 0.55,
+            ACTIVE = 0.35,
+            RECOVERY = 0.78,
+        }),
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = damage}),
+            [2] = table.freeze({
+                BASE_DAMAGE = if damage > 0 then damage + 3 else 0,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = if damage > 0 then damage + 6 else 0,
+            }),
+        }),
+    }
+    for key, value in pairs(extras or {}) do
+        definition[key] = value
+    end
+    return table.freeze(definition)
+end
+
+local QUICK_STRIKE = rogue_melee("QuickStrike", "Quick Strike", 10, 3.0, 10, 1.8, nil)
+local BACKSTAB = rogue_melee("Backstab", "Backstab", 18, 5.0, 14, 2.0, {REAR_MULTIPLIER = 1.75})
+local FEINT = rogue_melee("Feint", "Feint", 12, 5.0, 6, 1.2, {EXPOSE_SECONDS = 2.0})
+local SHADOW_DASH = rogue_melee("ShadowDash", "Shadow Dash", 16, 7.0, 4, 6.5, nil)
+local EVASIVE_STEP = rogue_melee("EvasiveStep", "Evasive Step", 15, 6.0, 0, 4.5, {EVASION_IFRAME_SECONDS = 0.22})
+local THREAT_DROP = rogue_melee("ThreatDrop", "Threat Drop", 12, 9.0, 0, 0.2, {AGGRO_SUPPRESS_SECONDS = 2.5})
+
+local DUELIST_AMBUSH = rogue_melee("DuelistAmbush", "Ambush", 18, 7.0, 12, 7.0, {REAR_MULTIPLIER = 1.35})
+local DUELIST_DEADLY_BLOW = rogue_melee("DuelistDeadlyBlow", "Deadly Blow", 22, 8.0, 18, 2.0, {REAR_MULTIPLIER = 1.80})
+local DUELIST_EXPOSE = rogue_melee("DuelistExposeWeakness", "Expose Weakness", 14, 8.0, 8, 1.4, {EXPOSE_SECONDS = 4.0})
+local DUELIST_RUSH = rogue_melee("DuelistRush", "Rush", 18, 7.0, 8, 7.0, nil)
+
+local WINDSTALKER_FLURRY = rogue_melee("WindstalkerFlurry", "Flurry", 16, 5.0, 11, 2.2, nil)
+local WINDSTALKER_SLIPSTREAM = rogue_melee("WindstalkerSlipstream", "Slipstream", 14, 6.0, 5, 6.0, nil)
+local WINDSTALKER_BLUR = rogue_melee("WindstalkerBlur", "Blur", 16, 8.0, 0, 4.8, {EVASION_IFRAME_SECONDS = 0.28})
+local WINDSTALKER_QUICKSTEP = rogue_melee("WindstalkerQuickstep", "Quickstep", 10, 4.0, 4, 5.0, nil)
+
 local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
     Mend = MEND,
@@ -295,6 +361,20 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     PiercingShot = PIERCING_SHOT,
     CripplingShot = CRIPPLING_SHOT,
     Volley = VOLLEY,
+    QuickStrike = QUICK_STRIKE,
+    Backstab = BACKSTAB,
+    Feint = FEINT,
+    ShadowDash = SHADOW_DASH,
+    EvasiveStep = EVASIVE_STEP,
+    ThreatDrop = THREAT_DROP,
+    DuelistAmbush = DUELIST_AMBUSH,
+    DuelistDeadlyBlow = DUELIST_DEADLY_BLOW,
+    DuelistExposeWeakness = DUELIST_EXPOSE,
+    DuelistRush = DUELIST_RUSH,
+    WindstalkerFlurry = WINDSTALKER_FLURRY,
+    WindstalkerSlipstream = WINDSTALKER_SLIPSTREAM,
+    WindstalkerBlur = WINDSTALKER_BLUR,
+    WindstalkerQuickstep = WINDSTALKER_QUICKSTEP,
 })
 
 local SkillDefinitions = {}

@@ -1716,6 +1716,92 @@ local function apply_arc_slash_target(
 end
 
 
+local function apply_rogue_melee_target(
+    player: Player,
+    character: Model,
+    skill_definition: any,
+    target: Model,
+    sequence_id: number,
+    target_index: number
+)
+    local multiplier = ProgressionRuntimeState.get_physical_multiplier(
+        player.UserId
+    )
+
+    local attacker_root = character:FindFirstChild("HumanoidRootPart")
+    local target_root = target:FindFirstChild("HumanoidRootPart")
+    local rear_multiplier = tonumber(skill_definition.REAR_MULTIPLIER) or 1
+    if rear_multiplier > 1
+        and attacker_root and attacker_root:IsA("BasePart")
+        and target_root and target_root:IsA("BasePart")
+    then
+        local offset = attacker_root.Position - target_root.Position
+        local planar = Vector3.new(offset.X, 0, offset.Z)
+        local facing = Vector3.new(
+            target_root.CFrame.LookVector.X,
+            0,
+            target_root.CFrame.LookVector.Z
+        )
+        if planar.Magnitude > 0.001
+            and facing.Magnitude > 0.001
+            and facing.Unit:Dot(planar.Unit) < -0.35
+        then
+            multiplier *= rear_multiplier
+        end
+    end
+
+    local exposed_until = tonumber(target:GetAttribute("RogueExposeUntil")) or 0
+    if exposed_until > os.clock() then
+        multiplier *= 1.15
+    end
+
+    local critical_chance = ProgressionRuntimeState.get_critical_chance(
+        player.UserId
+    )
+    local focus_rank = ProgressionRuntimeState.get_skill_rank(
+        player.UserId,
+        "CriticalFocus"
+    )
+    local mastery_rank = ProgressionRuntimeState.get_skill_rank(
+        player.UserId,
+        "DuelistCriticalMastery"
+    )
+    critical_chance = math.clamp(
+        critical_chance + focus_rank * 0.01 + mastery_rank * 0.015,
+        0,
+        1
+    )
+
+    local applied_damage = DamageService.apply_damage({
+        attacker = player,
+        attacker_character = character,
+        target = target,
+        source_kind = "Skill",
+        source_id = skill_definition.ID,
+        attack_id = nil,
+        base_damage = skill_definition.BASE_DAMAGE,
+        multiplier = multiplier,
+        sequence_id = sequence_id,
+        critical_chance = critical_chance,
+        critical_damage_multiplier = ProgressionRuntimeState
+            .get_critical_damage_multiplier(player.UserId),
+    })
+
+    local expose_seconds = tonumber(skill_definition.EXPOSE_SECONDS) or 0
+    if expose_seconds > 0 then
+        target:SetAttribute("RogueExposeUntil", os.clock() + expose_seconds)
+    end
+
+    DungeonProgressionBridge.award_damage(
+        player,
+        skill_definition.ID,
+        target,
+        applied_damage,
+        target_index
+    )
+end
+
+
 --[[
 Finishes active-skill recovery and returns the player to Locomotion.
 
@@ -1845,6 +1931,30 @@ local function enter_skill_active(
 
     local character = player.Character
 
+    if character then
+        local evasion_seconds = tonumber(
+            skill_definition.EVASION_IFRAME_SECONDS
+        ) or 0
+        if evasion_seconds > 0 then
+            DefenseService.begin_dodge(player, character, os.clock())
+            task.delay(evasion_seconds, function()
+                if player.Character == character then
+                    DefenseService.end_dodge(player)
+                end
+            end)
+        end
+
+        local aggro_seconds = tonumber(
+            skill_definition.AGGRO_SUPPRESS_SECONDS
+        ) or 0
+        if aggro_seconds > 0 then
+            character:SetAttribute(
+                "RogueThreatDropUntil",
+                os.clock() + aggro_seconds
+            )
+        end
+    end
+
     if character and skill_definition.KIND == "Melee" then
         apply_forward_step(
             player,
@@ -1880,13 +1990,22 @@ local function enter_skill_active(
                             sequence_id,
                             target_index
                         )
-                    else
+                    elseif skill_definition.ID == "ShieldBash" then
                         apply_shield_bash_target(
                             player,
                             character,
                             skill_definition,
                             target,
                             sequence_id
+                        )
+                    else
+                        apply_rogue_melee_target(
+                            player,
+                            character,
+                            skill_definition,
+                            target,
+                            sequence_id,
+                            target_index
                         )
                     end
                 end

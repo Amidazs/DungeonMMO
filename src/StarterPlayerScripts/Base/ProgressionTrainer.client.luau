@@ -492,6 +492,7 @@ task.spawn(function()
         "Base.Trainer.Fighter",
         "Base.Trainer.Mage",
         "Base.Trainer.Ranger",
+        "Base.Trainer.Rogue",
     }) do
         local trainer = EnvironmentAnchorClient.wait_for(
             "Base",
