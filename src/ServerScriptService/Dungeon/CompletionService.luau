@@ -9,7 +9,7 @@ local function result(ok: boolean, reason: string?, extra: any?): any
     return out
 end
 
-function CompletionService.new(session_service: any, reward_service: any, profile_service: any, reward_definition: any, skill_progression_service: any?): any
+function CompletionService.new(session_service: any, reward_service: any, profile_service: any, reward_definition: any, skill_progression_service: any?, quest_service: any?): any
     assert(session_service and reward_service and profile_service, "CompletionService dependencies are required")
     local self = setmetatable({}, CompletionService)
     self._sessions = session_service
@@ -17,6 +17,7 @@ function CompletionService.new(session_service: any, reward_service: any, profil
     self._profiles = profile_service
     self._reward_definition = reward_definition
     self._skills = skill_progression_service
+    self._quests = quest_service
     return self
 end
 
@@ -37,6 +38,33 @@ function CompletionService:commit(session_id: string): any
         if not granted or granted.ok ~= true then
             return result(false, if granted then granted.reason else "RewardGrantFailed", {member_results = member_results})
         end
+        if self._quests
+            and type(session.DungeonId) == "string"
+            and session.DungeonId ~= ""
+        then
+            local quest_result = self._quests:record_event(
+                user_id,
+                {
+                    EventId = session_id .. ":DungeonClear",
+                    Type = "DungeonClear",
+                    TargetId = session.DungeonId,
+                    Amount = 1,
+                }
+            )
+
+            if not quest_result or quest_result.ok ~= true then
+                return result(
+                    false,
+                    if quest_result and quest_result.reason
+                        then quest_result.reason
+                        else "QuestProgressFailed",
+                    {member_results = member_results}
+                )
+            end
+
+            granted.quest_progress = quest_result
+        end
+
         member_results[tostring(user_id)] = granted
     end
 

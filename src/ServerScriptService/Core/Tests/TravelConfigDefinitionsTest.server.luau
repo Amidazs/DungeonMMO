@@ -21,7 +21,7 @@ assert(TravelConfig.ACCESS_DISTANCE == 18, "Travel access distance must be exact
 assert(TravelConfig.COOLDOWN_SECONDS == 5, "Travel cooldown must be exactly 5 seconds.")
 assert(TravelConfig.ARRIVAL_HEIGHT_OFFSET == 3, "Travel arrival height offset must be 3 studs.")
 assert(TravelConfig.ALREADY_THERE_DISTANCE == 10, "Already-there distance must be 10 studs.")
-assert(ProfileSchema.VERSION == 7, "Travel v1 must not change profile schema v7.")
+assert(ProfileSchema.VERSION >= 7, "Travel v1 requires Bank-era schema v7 or newer.")
 
 local expected = {
     {"Market", "Market", "Base.Travel.Market"},

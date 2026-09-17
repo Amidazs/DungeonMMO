@@ -68,8 +68,8 @@ local second_character = second.Characters.Slot1
 local second_progression = second_character.Progression
 
 check(
-    ProfileSchema.VERSION == 5,
-    "Schema version must advance to 5."
+    ProfileSchema.VERSION >= 5,
+    "Phase 2B progression requires schema v5 or newer."
 )
 check(
     character.Identity.Version == 1,

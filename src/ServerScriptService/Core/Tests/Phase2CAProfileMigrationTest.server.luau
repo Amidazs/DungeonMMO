@@ -197,8 +197,8 @@ check(
 )
 
 check(
-    first.SchemaVersion == 5,
-    "Legacy profile must migrate through schema v5."
+    first.SchemaVersion == ProfileSchema.VERSION,
+    "Legacy profile must migrate through the Phase 2C.A identity migration into the current schema."
 )
 check(
     character.Identity.Version == 1,
