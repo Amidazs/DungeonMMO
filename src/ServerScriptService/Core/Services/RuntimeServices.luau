@@ -43,6 +43,9 @@ local ContributionService = require(
     Services:WaitForChild("ContributionService")
 )
 
+local BestiaryService = require(Services:WaitForChild("BestiaryService"))
+local ReputationService = require(Services:WaitForChild("ReputationService"))
+
 local RuntimeServices = {}
 
 function RuntimeServices.new(place_kind: string): any
@@ -69,6 +72,8 @@ function RuntimeServices.new(place_kind: string): any
 
     local leases = ProfileLeaseService.new(lease_map, server_id)
     local profiles = ProfileService.new(profile_adapter, leases)
+    local bestiary = BestiaryService.new(profiles)
+    local reputation = ReputationService.new(profiles)
     local sessions = DungeonSessionService.new(session_map)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
@@ -103,6 +108,8 @@ function RuntimeServices.new(place_kind: string): any
         ProfileService = profiles,
         SessionService = sessions,
         ContributionService = contributions,
+        BestiaryService = bestiary,
+        ReputationService = reputation,
         ProgressionService = progression,
         InventoryService = inventory,
         RecipeKnowledgeService = recipe_knowledge,
