@@ -17,7 +17,7 @@ local function check(condition: boolean, message: string)
     end
 end
 
-check(ProfileSchema.VERSION == 8, "Quest/advancement foundation must use schema v8.")
+check(ProfileSchema.VERSION == 9, "Quest/advancement foundation must use current schema v9.")
 
 local raw = ProfileSchema.create_default(5301)
 raw.SchemaVersion = 7
@@ -33,7 +33,7 @@ raw.Characters.Slot1.Professions.Blacksmithing = {
 }
 
 local migrated = ProfileMigration.migrate(raw)
-check(migrated.SchemaVersion == 8, "v7 profile must migrate to v8.")
+check(migrated.SchemaVersion == 9, "v7 profile must migrate to current schema v9.")
 check(
     migrated.Account.Bank ~= nil
         and migrated.Account.Bank.Version == 1

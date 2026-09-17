@@ -166,12 +166,41 @@ check(
 )
 
 -- A missing profession state must fail closed rather than inventing eligibility.
+-- ProfileService:mutate sanitizes profiles after every successful mutation, so
+-- deleting a default profession through that authority cannot create this
+-- malformed-state fixture. Use a focused test-only profile proxy instead.
 assert(inventory:add_item(8501, "alchemy_restorative_tonic_recipe", 1).ok)
-assert(profiles:mutate(8501, function(profile: any)
-    profile.Characters.Slot1.Professions.Alchemy = nil
-end))
 
-local unavailable = knowledge:learn_from_item(
+local missing_profession_character = assert(
+    profiles:get_character(8501, 1)
+)
+missing_profession_character.Professions.Alchemy = nil
+
+local missing_profession_profiles = {}
+
+function missing_profession_profiles:get_character(
+    user_id: number,
+    slot: number?
+): any?
+    if user_id ~= 8501 or (slot ~= nil and slot ~= 1) then
+        return nil
+    end
+
+    return missing_profession_character
+end
+
+function missing_profession_profiles:mutate(
+    _user_id: number,
+    _mutator: (any) -> ()
+): (boolean, string?)
+    error("Missing profession state must reject before mutation.")
+end
+
+local unavailable_knowledge = RecipeKnowledgeService.new(
+    missing_profession_profiles,
+    inventory
+)
+local unavailable = unavailable_knowledge:learn_from_item(
     8501,
     "alchemy_restorative_tonic_recipe"
 )
