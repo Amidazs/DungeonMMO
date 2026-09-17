@@ -77,6 +77,19 @@ function CompletionService:commit(session_id: string): any
         member_results[tostring(user_id)] = granted
     end
 
+    -- Save barrier: no shared progression or return portal opens until every
+    -- affected player profile has persisted its completion rewards.
+    for _, user_id in ipairs(session.CompletionRecipients or {}) do
+        local saved, save_error = self._profiles:save(user_id, "DungeonCompletion")
+        if not saved then
+            return result(false, "ProfileSaveFailed", {
+                save_user_id = user_id,
+                save_error = save_error,
+                member_results = member_results,
+            })
+        end
+    end
+
     local guild_progress: any = nil
     if self._guilds then
         guild_progress = self._guilds:award_dungeon_clear(
@@ -87,18 +100,6 @@ function CompletionService:commit(session_id: string): any
             return result(false, "GuildProgressionFailed", {
                 member_results = member_results,
                 guild_progress = guild_progress,
-            })
-        end
-    end
-
-    -- Save barrier: no return portal opens until every affected profile has persisted.
-    for _, user_id in ipairs(session.CompletionRecipients or {}) do
-        local saved, save_error = self._profiles:save(user_id, "DungeonCompletion")
-        if not saved then
-            return result(false, "ProfileSaveFailed", {
-                save_user_id = user_id,
-                save_error = save_error,
-                member_results = member_results,
             })
         end
     end

@@ -81,4 +81,5 @@ fail_user = 102
 local failed = service:commit("s2")
 check(failed.ok == false and failed.reason == "ProfileSaveFailed", "Save failure must block completion opening.")
 check(session.CompletionRewardsCommitted ~= true, "Save failure must not mark rewards committed.")
+check(guild_calls == 1, "Save failure must not award guild progression before the save barrier.")
 print(string.format("[Completion Service Tests] PASS: %d assertions.", assertions))
