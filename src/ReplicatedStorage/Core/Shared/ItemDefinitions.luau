@@ -209,6 +209,47 @@ local DEFINITIONS = table.freeze({
         Stackable = true,
     }),
 
+    blacksmith_iron_guard_blueprint = table.freeze({
+        Id = "blacksmith_iron_guard_blueprint",
+        Name = "Iron Guard Blueprint",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Uncommon",
+        Stackable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "blacksmith_iron_guard_blueprint",
+            ProfessionId = "Blacksmithing",
+            RequiredProfessionLevel = 2,
+        }),
+    }),
+
+    alchemy_restorative_tonic_recipe = table.freeze({
+        Id = "alchemy_restorative_tonic_recipe",
+        Name = "Restorative Tonic Recipe",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Uncommon",
+        Stackable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "alchemy_restorative_tonic_recipe",
+            ProfessionId = "Alchemy",
+            RequiredProfessionLevel = 2,
+        }),
+    }),
+
+    recipe_blueprint_invalid_test = table.freeze({
+        Id = "recipe_blueprint_invalid_test",
+        Name = "TEST Invalid Recipe Blueprint",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Basic",
+        Stackable = true,
+        TestOnly = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "invalid_recipe_test",
+        }),
+    }),
+
     skill_book_test = table.freeze({
         Id = "skill_book_test",
         Name = "Unidentified Skill Book",

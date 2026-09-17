@@ -26,6 +26,9 @@ local ProficiencyService = require(Services:WaitForChild("ProficiencyService"))
 local IdentityService = require(Services:WaitForChild("IdentityService"))
 local EquipmentService = require(Services:WaitForChild("EquipmentService"))
 local ProfessionService = require(Services:WaitForChild("ProfessionService"))
+local RecipeKnowledgeService = require(
+    Services:WaitForChild("RecipeKnowledgeService")
+)
 
 local BankService = require(Services:WaitForChild("BankService"))
 
@@ -71,6 +74,10 @@ function RuntimeServices.new(place_kind: string): any
     local progression = ProgressionService.new(profiles)
     ProgressionService.bind_default(progression)
     local inventory = InventoryService.new(profiles)
+    local recipe_knowledge = RecipeKnowledgeService.new(
+        profiles,
+        inventory
+    )
     local rewards = RewardService.new(profiles, progression, inventory, sessions)
     local attributes = AttributeService.new(profiles)
     local loadout = LoadoutService.new(profiles)
@@ -98,6 +105,7 @@ function RuntimeServices.new(place_kind: string): any
         ContributionService = contributions,
         ProgressionService = progression,
         InventoryService = inventory,
+        RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
         AttributeService = attributes,
         LoadoutService = loadout,

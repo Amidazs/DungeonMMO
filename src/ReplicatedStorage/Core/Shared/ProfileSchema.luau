@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v8 adds persistent quest and secondary-class advancement state.
+-- Schema v9 adds persistent crafting recipe knowledge.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 8
+ProfileSchema.VERSION = 9
 
 local function deep_clone(
     value: any,
@@ -98,6 +98,10 @@ function ProfileSchema.create_default(_user_id: number): any
                 ClassAdvancement = {
                     Version = 1,
                     CompletedByRace = {},
+                },
+                CraftingKnowledge = {
+                    Version = 1,
+                    LearnedRecipes = {},
                 },
                 Inventory = {},
                 Equipment = {},
