@@ -22,12 +22,12 @@ raw.Bestiary = nil
 raw.Reputation = nil
 raw.Characters.Slot1.CraftingKnowledge.LearnedRecipes["blacksmith_iron_guard_blueprint"] = true
 raw.Characters.Slot1.Quests.Completed["migration_sentinel"] = true
-raw.Characters.Slot1.ClassAdvancement.CompletedByRace.Elf = "Ranger"
+raw.Characters.Slot1.ClassAdvancement.CompletedByRace.Elf = {ElfSpellweaver = true}
 
 local migrated = ProfileMigration.migrate(raw)
 
-check(ProfileSchema.VERSION == 10, "Current schema must be v10.")
-check(migrated.SchemaVersion == 10, "v9 profile must migrate to v10.")
+check(ProfileSchema.VERSION >= 10, "Current schema must include bestiary/reputation state.")
+check(migrated.SchemaVersion == ProfileSchema.VERSION, "v9 profile must migrate to current schema.")
 check(migrated.Characters.Slot1.Bestiary.Version == 1, "Bestiary version missing.")
 check(
     next(migrated.Characters.Slot1.Bestiary.Entries) == nil,
@@ -49,7 +49,7 @@ check(
     "Quest sentinel must survive."
 )
 check(
-    migrated.Characters.Slot1.ClassAdvancement.CompletedByRace.Elf == "Ranger",
+    migrated.Characters.Slot1.ClassAdvancement.CompletedByRace.Elf.ElfSpellweaver == true,
     "Class advancement sentinel must survive."
 )
 

@@ -20,7 +20,7 @@ legacy.Characters.Slot1.Gold = 321
 legacy.Characters.Slot1.Bestiary.Entries.marauder = {Kills = 7, Milestones = {first_defeat = true}}
 
 local migrated = ProfileMigration.migrate(legacy)
-check(migrated.SchemaVersion == 11, "v10 profile must migrate to v11.")
+check(migrated.SchemaVersion == ProfileSchema.VERSION, "v10 profile must migrate to current schema.")
 check(migrated.Characters.Slot1.Gold == 321, "Market migration must preserve Gold.")
 check(migrated.Characters.Slot1.Bestiary.Entries.marauder.Kills == 7,
     "Market migration must preserve prior Phase 3 state.")
@@ -48,7 +48,7 @@ check(cleaned.Characters.Slot1.Market.Recovery.broken == nil,
     "Malformed Market recovery receipt must be removed.")
 
 local repeated = ProfileMigration.migrate(cleaned)
-check(repeated.SchemaVersion == 11, "Repeated migration must remain v11.")
+check(repeated.SchemaVersion == ProfileSchema.VERSION, "Repeated migration must remain current schema.")
 check(#repeated.Characters.Slot1.Market.ActiveListingIds == 2,
     "Repeated migration must be idempotent for active listings.")
 print(string.format("[Profile Migration Market V11 Tests] PASS: %d assertions.", assertions))

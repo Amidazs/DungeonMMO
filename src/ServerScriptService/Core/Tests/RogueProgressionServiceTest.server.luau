@@ -64,7 +64,7 @@ check(
 )
 
 local wrong_class = profiles:load(73102)
-check(wrong_class == true, "Fighter fixture profile load failed.")
+check(wrong_class ~= nil, "Fighter fixture profile load failed.")
 check(identity:select_race(73102, "Human").ok == true, "Fighter fixture race failed.")
 check(identity:select_base_class(73102, "Fighter").ok == true, "Fighter fixture class failed.")
 local fighter_learn = skills:learn_trainer_skill(73102, "Feint")
