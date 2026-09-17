@@ -501,6 +501,75 @@ local function sanitize_bank(value: any): any
     return cleaned
 end
 
+
+local function sanitize_bestiary(value: any): any
+    local result = {
+        Version = 1,
+        Entries = {},
+    }
+
+    if type(value) ~= "table" or type(value.Entries) ~= "table" then
+        return result
+    end
+
+    for creature_id, raw_entry in pairs(value.Entries) do
+        if type(creature_id) == "string" and type(raw_entry) == "table" then
+            local kills = raw_entry.Kills
+            if type(kills) ~= "number"
+                or kills ~= kills
+                or kills < 0
+                or kills >= math.huge
+                or kills % 1 ~= 0
+            then
+                kills = 0
+            end
+
+            local milestones = {}
+            if type(raw_entry.Milestones) == "table" then
+                for milestone_id, unlocked in pairs(raw_entry.Milestones) do
+                    if type(milestone_id) == "string" and unlocked == true then
+                        milestones[milestone_id] = true
+                    end
+                end
+            end
+
+            result.Entries[creature_id] = {
+                Kills = kills,
+                Milestones = milestones,
+            }
+        end
+    end
+
+    return result
+end
+
+local function sanitize_reputation(value: any): any
+    local points = 0
+
+    if type(value) == "table"
+        and type(value.Factions) == "table"
+        and type(value.Factions.Scholars) == "table"
+    then
+        local candidate = value.Factions.Scholars.Points
+        if type(candidate) == "number"
+            and candidate == candidate
+            and candidate >= 0
+            and candidate < math.huge
+            and candidate % 1 == 0
+        then
+            points = candidate
+        end
+    end
+
+    return {
+        Version = 1,
+        Factions = {
+            Scholars = {
+                Points = points,
+            },
+        },
+    }
+end
 function ProfileMigration.migrate(raw: any): any
     local raw_is_table = type(raw) == "table"
 
@@ -573,6 +642,9 @@ function ProfileMigration.migrate(raw: any): any
     end
 
     local slot1 = migrated.Characters.Slot1
+
+    slot1.Bestiary = sanitize_bestiary(slot1.Bestiary)
+    slot1.Reputation = sanitize_reputation(slot1.Reputation)
 
     if legacy_source then
         slot1.Identity = legacy_identity(slot1.Identity)
