@@ -4,7 +4,7 @@
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 10
+ProfileSchema.VERSION = 11
 
 local function deep_clone(
     value: any,
@@ -114,7 +114,14 @@ function ProfileSchema.create_default(_user_id: number): any
                             Points = 0,
                         },
                     },
-                },                Inventory = {},
+                },
+                Market = {
+                    Version = 1,
+                    ActiveListingIds = {},
+                    History = {},
+                    Recovery = {},
+                },
+                Inventory = {},
                 Equipment = {},
                 DungeonProgress = {},
                 RewardHistory = {

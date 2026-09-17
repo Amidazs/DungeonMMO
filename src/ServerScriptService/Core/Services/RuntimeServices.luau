@@ -49,6 +49,7 @@ local BestiaryService = require(Services:WaitForChild("BestiaryService"))
 local ReputationService = require(Services:WaitForChild("ReputationService"))
 local GuildService = require(Services:WaitForChild("GuildService"))
 local GuildHallService = require(Services:WaitForChild("GuildHallService"))
+local MarketService = require(Services:WaitForChild("MarketService"))
 
 local RuntimeServices = {}
 
@@ -83,6 +84,7 @@ function RuntimeServices.new(place_kind: string): any
     local reputation = ReputationService.new(profiles)
     local guilds = GuildService.new(entity_adapter)
     local guild_hall = GuildHallService.new(guilds)
+    local market = MarketService.new(entity_adapter, profiles)
     local sessions = DungeonSessionService.new(session_map)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
@@ -122,6 +124,7 @@ function RuntimeServices.new(place_kind: string): any
         EntityAdapter = entity_adapter,
         GuildService = guilds,
         GuildHallService = guild_hall,
+        MarketService = market,
         ProgressionService = progression,
         InventoryService = inventory,
         RecipeKnowledgeService = recipe_knowledge,

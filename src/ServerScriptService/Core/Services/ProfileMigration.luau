@@ -570,6 +570,35 @@ local function sanitize_reputation(value: any): any
         },
     }
 end
+local function sanitize_market(value: any): any
+    local result = {Version = 1, ActiveListingIds = {}, History = {}, Recovery = {}}
+    if type(value) ~= "table" then return result end
+    if type(value.ActiveListingIds) == "table" then
+        local seen = {}
+        for _, listing_id in ipairs(value.ActiveListingIds) do
+            if type(listing_id) == "string" and listing_id ~= "" and not seen[listing_id] then
+                table.insert(result.ActiveListingIds, listing_id)
+                seen[listing_id] = true
+            end
+        end
+    end
+    if type(value.History) == "table" then
+        for transaction_id, receipt in pairs(value.History) do
+            if type(transaction_id) == "string" and transaction_id ~= "" and type(receipt) == "table" then
+                result.History[transaction_id] = ProfileSchema.deep_clone(receipt)
+            end
+        end
+    end
+    if type(value.Recovery) == "table" then
+        for listing_id, receipt in pairs(value.Recovery) do
+            if type(listing_id) == "string" and listing_id ~= "" and type(receipt) == "table" then
+                result.Recovery[listing_id] = ProfileSchema.deep_clone(receipt)
+            end
+        end
+    end
+    return result
+end
+
 function ProfileMigration.migrate(raw: any): any
     local raw_is_table = type(raw) == "table"
 
@@ -645,6 +674,7 @@ function ProfileMigration.migrate(raw: any): any
 
     slot1.Bestiary = sanitize_bestiary(slot1.Bestiary)
     slot1.Reputation = sanitize_reputation(slot1.Reputation)
+    slot1.Market = sanitize_market(slot1.Market)
 
     if legacy_source then
         slot1.Identity = legacy_identity(slot1.Identity)

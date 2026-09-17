@@ -55,6 +55,12 @@ local equipment_unequip_request = remotes:WaitForChild("EquipmentUnequipRequest"
 local equipment_action_result = remotes:WaitForChild("EquipmentActionResult") :: RemoteEvent
 local trainer_snapshot = remotes:WaitForChild("TrainerSnapshot") :: RemoteEvent
 local trainer_snapshot_request = remotes:WaitForChild("TrainerSnapshotRequest") :: RemoteEvent
+local market_snapshot_request = remotes:WaitForChild("MarketSnapshotRequest") :: RemoteEvent
+local market_snapshot = remotes:WaitForChild("MarketSnapshot") :: RemoteEvent
+local market_create_request = remotes:WaitForChild("MarketCreateRequest") :: RemoteEvent
+local market_buy_request = remotes:WaitForChild("MarketBuyRequest") :: RemoteEvent
+local market_cancel_request = remotes:WaitForChild("MarketCancelRequest") :: RemoteEvent
+local market_action_result = remotes:WaitForChild("MarketActionResult") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Base")
 local profiles = runtime.ProfileService
@@ -71,6 +77,7 @@ local bank = runtime.BankService
 local travel = runtime.TravelService
 local guilds = runtime.GuildService
 local guild_hall = runtime.GuildHallService
+local market = runtime.MarketService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -227,6 +234,16 @@ local function send_trainer(
             trainer_id
         )
     )
+end
+
+local function send_market(player: Player)
+    local character = profiles:get_character(player.UserId, 1)
+    market_snapshot:FireClient(player, {
+        ok = character ~= nil,
+        reason = if character then nil else "ProfileNotLoaded",
+        Listings = market:list_active(50),
+        MyListingIds = if character and character.Market then character.Market.ActiveListingIds else {},
+    })
 end
 
 local function send_profile(player: Player)
@@ -469,6 +486,10 @@ local function load_player(player: Player)
     end
 
     loaded_users[player.UserId] = true
+    local market_recovery = market:recover_user(player.UserId)
+    if market_recovery.ok ~= true then
+        warn("[Market Recovery] " .. tostring(market_recovery.reason))
+    end
     if party_controller then
         task.defer(party_controller.broadcast)
     end
@@ -670,6 +691,53 @@ trainer_snapshot_request.OnServerEvent:Connect(function(
     end
 
     send_trainer(player, trainer_id)
+end)
+
+local function finish_market_action(player: Player, action: string, response: any)
+    market_action_result:FireClient(player, {
+        action = action,
+        ok = response and response.ok == true,
+        reason = response and response.reason or nil,
+        pending_recovery = response and response.pending_recovery == true,
+    })
+    if response and (response.ok == true or response.pending_recovery == true) then
+        send_profile(player)
+        send_market(player)
+    end
+end
+
+market_snapshot_request.OnServerEvent:Connect(function(player: Player)
+    if loaded_users[player.UserId] then send_market(player) end
+end)
+
+market_create_request.OnServerEvent:Connect(function(player: Player, item_id: any, quantity: any, price: any, request_id: any)
+    if not loaded_users[player.UserId] then return end
+    if type(item_id) ~= "string" or type(quantity) ~= "number" or type(price) ~= "number" or type(request_id) ~= "string" then
+        finish_market_action(player, "Create", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    local tx = "MarketCreate:" .. tostring(player.UserId) .. ":" .. request_id
+    finish_market_action(player, "Create", market:create_listing(player.UserId, item_id, quantity, price, tx))
+end)
+
+market_buy_request.OnServerEvent:Connect(function(player: Player, listing_id: any, request_id: any)
+    if not loaded_users[player.UserId] then return end
+    if type(listing_id) ~= "string" or type(request_id) ~= "string" then
+        finish_market_action(player, "Buy", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    local tx = "MarketBuy:" .. tostring(player.UserId) .. ":" .. request_id
+    finish_market_action(player, "Buy", market:buy(player.UserId, listing_id, tx))
+end)
+
+market_cancel_request.OnServerEvent:Connect(function(player: Player, listing_id: any, request_id: any)
+    if not loaded_users[player.UserId] then return end
+    if type(listing_id) ~= "string" or type(request_id) ~= "string" then
+        finish_market_action(player, "Cancel", {ok = false, reason = "InvalidMarketRequest"})
+        return
+    end
+    local tx = "MarketCancel:" .. tostring(player.UserId) .. ":" .. request_id
+    finish_market_action(player, "Cancel", market:cancel(player.UserId, listing_id, tx))
 end)
 
 local function refresh_runtime_character(player: Player)
@@ -968,6 +1036,16 @@ task.spawn(function()
                     warn(string.format("[Base Runtime] Autosave failed for %d: %s", user_id, tostring(save_error)))
                 end
             end
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(60)
+        local sweep = market:expire_indexed()
+        if sweep.ok ~= true then
+            warn("[Market Expiry] " .. tostring(sweep.reason))
         end
     end
 end)

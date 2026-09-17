@@ -176,6 +176,30 @@
     {
       "Name": "GuildActionResult",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketSnapshotRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketCreateRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketBuyRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketCancelRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "MarketActionResult",
+      "ClassName": "RemoteEvent"
     }
   ]
 }
