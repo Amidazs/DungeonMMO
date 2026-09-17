@@ -151,3 +151,40 @@ behaviour, reward transaction rules and whether persistent targeting progress is
 needed. Reuse existing LootTableConfig, RewardService, InventoryService and
 skill-book learning authority. Bank/storage, Travel and broader economy/loot
 rebalance remain separate later Phase 2 breadth.
+
+<!-- PHASE3_BLUEPRINT_RECIPE_LEARNING_ACCEPTED_20260917 -->
+## Phase 3 Blueprint / Recipe-Learning Foundation â€” ACCEPTED
+
+Runtime acceptance was completed on 17 September 2026.
+
+Accepted implementation commit: `c89419e4f54aa098048aab4214fcd73d486d7402`
+Local gameplay merge commit: `3162b0fe918fc6d827c67485daddf8ca3232b4dd`
+
+Accepted behavior:
+- profile schema v9 persists `CraftingKnowledge.LearnedRecipes`;
+- blueprint/recipe learning is authoritative and consumes exactly one owned
+  teaching item atomically with learned knowledge;
+- duplicate learning is rejected without consuming another item;
+- missing profession state rejects with `ProfessionUnavailable`;
+- learned recipes remain gated by profession level, station/context and
+  ingredient requirements;
+- default recipes remain definition-driven;
+- Blacksmithing and Alchemy learned-recipe proofs are covered;
+- no blueprint drop/vendor/market/reputation wiring was added in this gate.
+
+Fresh Studio acceptance:
+- Base: Recipe Knowledge Crafting Gate 12/12 PASS;
+- Base: Recipe Knowledge Service 23/23 PASS;
+- Base: Quest Advancement Migration 8/8 PASS;
+- Base identity flow completed Elf / Ranger;
+- Dungeon: Recipe Knowledge Service 23/23 PASS;
+- Dungeon: Recipe Knowledge Crafting Gate 12/12 PASS;
+- Dungeon: Quest Advancement Migration 8/8 PASS;
+- Dungeon full loop reached ready state and admitted the player.
+
+Known non-blocking environment debt:
+- four Temple profession resource placements currently log
+  `Skipping resource without valid surface` in the synthetic Dungeon
+  environment; profession runtime tests and dungeon admission still pass.
+
+No push or publish was part of this closeout.

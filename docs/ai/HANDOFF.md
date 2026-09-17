@@ -89,3 +89,29 @@ book. Do not turn it into a broad loot-table, market or economy rewrite.
 
 Bank/storage, Travel, public matchmaking, guild-party breadth and final UI/art
 polish remain later scope.
+
+<!-- PHASE3_BLUEPRINT_RECIPE_LEARNING_ACCEPTED_20260917 -->
+## Accepted Phase 3 recipe-learning checkpoint
+
+The Blueprint / Recipe-Learning Foundation is runtime accepted as of
+17 September 2026.
+
+Feature commit: `c89419e4f54aa098048aab4214fcd73d486d7402`
+Local gameplay merge: `3162b0fe918fc6d827c67485daddf8ca3232b4dd`
+
+The accepted public learning boundary remains
+`RecipeKnowledgeService:learn_from_item(user_id, item_id)`. Do not re-add
+a character-table guard to the numeric `user_id` argument.
+
+The missing-profession regression is intentionally modeled through a focused
+test-only profile proxy because `ProfileService:mutate` sanitizes successful
+mutations and restores default profession structure.
+
+Fresh Base and Dungeon Studio runs passed Recipe Knowledge Service, Recipe
+Knowledge Crafting Gate, Quest Advancement Migration, and the normal
+identity/admission runtime paths.
+
+The four synthetic Temple profession-resource `invalid surface` skips are
+tracked as environment/polish debt, not a recipe-learning blocker.
+
+Local-only closeout: nothing was pushed or published.

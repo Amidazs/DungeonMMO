@@ -855,3 +855,21 @@ contract, profile-lease regression contract, `git diff --check`, and successful
 builds of all four Base/Dungeon published/non-published Rojo compositions.
 
 No Roblox publish, PROD, Robux, monetisation or art-worktree action occurred.
+
+<!-- PHASE3_BLUEPRINT_RECIPE_LEARNING_ACCEPTED_20260917 -->
+## Runtime acceptance â€” Phase 3 Blueprint / Recipe-Learning â€” 2026-09-17
+
+- Base â€” `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
+- Base â€” `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
+- Base â€” `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
+- Base â€” identity runtime: PASS, completed `Elf / Ranger`.
+- Dungeon â€” `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
+- Dungeon â€” `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
+- Dungeon â€” `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
+- Dungeon â€” completion/quest bridge: PASS, 8 assertions.
+- Dungeon â€” admission: PASS, player admitted after full dungeon loop ready.
+
+Non-blocking log debt:
+- four synthetic Temple profession-resource placements are skipped because
+  their resolved surface is invalid. No test or runtime admission failure
+  accompanies these messages.
