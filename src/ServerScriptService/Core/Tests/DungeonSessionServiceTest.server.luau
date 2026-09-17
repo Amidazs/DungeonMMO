@@ -91,6 +91,12 @@ assert(solo.SessionId ~= party.SessionId, "Generated session IDs must be unique.
 assert(solo.State == "Creating", "New session must begin in Creating state.")
 assert(solo.Members["42"].FreeReviveUsed == false)
 assert(solo.Members["42"].PaidReviveCount == 0)
+assert(type(solo.Modifier) == "table" and type(solo.Modifier.Id) == "string", "New session must persist one modifier.")
+local initial_modifier_id = solo.Modifier.Id
+local initial_rotation_key = solo.Modifier.RotationKey
+local modifier_reload = assert(sessions:get(solo.SessionId))
+assert(modifier_reload.Modifier.Id == initial_modifier_id, "Session reload must preserve modifier ID.")
+assert(modifier_reload.Modifier.RotationKey == initial_rotation_key, "Session reload must preserve modifier rotation key.")
 
 local indexed_solo = sessions:get_for_user(42)
 assert(indexed_solo ~= nil and indexed_solo.SessionId == solo.SessionId, "Session creation must index each member for reconnect routing.")

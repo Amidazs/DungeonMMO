@@ -60,6 +60,20 @@ local monster_repeat = rewards:grant_monster_reward({3001, 3002}, {XP = 10, Gold
 check(monster_repeat.ok == true and monster_repeat.already_applied == true, "Repeated monster transaction must be runtime-idempotent.")
 check(assert(profiles:get_character(3001, 1)).XP == 10, "Repeated monster transaction must not duplicate XP.")
 
+local bounty = rewards:grant_monster_reward(
+    {3002},
+   {XP = 10, GoldMin = 10, GoldMax = 10, DungeonModifierId = "Bounty"},
+    "Monster:bounty:1"
+)
+check(bounty.ok == true, "Bounty monster reward must succeed.")
+check(bounty.member_results["3002"].gold_granted == 11, "Bounty must increase 10 Gold to 11.")
+local bounty_repeat = rewards:grant_monster_reward(
+    {3002},
+    {XP = 10, GoldMin = 10, GoldMax = 10, DungeonModifierId = "Bounty"},
+    "Monster:bounty:1"
+)
+check(bounty_repeat.ok == true and bounty_repeat.already_applied == true, "Bounty replay must remain idempotent.")
+
 local reward_definition = {
     Gold = DungeonDefinitions.TEST_DUNGEON.CompletionGold,
     LootTable = {{Weight = 1, Kind = "Item", ItemId = "captain_emblem"}},

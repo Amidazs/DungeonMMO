@@ -5,6 +5,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
+local DungeonModifierDefinitions = require(
+    Shared:WaitForChild("DungeonModifierDefinitions")
+)
 
 local ProfessionRuntime = {}
 
@@ -84,6 +87,7 @@ local NODE_DEFINITIONS = table.freeze({
         table.freeze({
             Id = "Temple.RichIronVein.02",
             Name = "Wall Iron Vein",
+            FallbackOffset = CFrame.new(12, -3, -12),
             ProfessionId = "Mining",
             ItemId = "iron_ore",
             Quantity = 2,
@@ -109,6 +113,7 @@ local NODE_DEFINITIONS = table.freeze({
         table.freeze({
             Id = "Temple.Room1.Silverleaf",
             Name = "Temple Silverleaf",
+            FallbackOffset = CFrame.new(0, -3, 12),
             ProfessionId = "Herbalism",
             ItemId = "silverleaf",
             Quantity = 1,
@@ -147,6 +152,7 @@ local NODE_DEFINITIONS = table.freeze({
         table.freeze({
             Id = "Temple.AncientSilverleaf.02",
             Name = "Silverleaf Cluster",
+            FallbackOffset = CFrame.new(-12, -3, -12),
             ProfessionId = "Herbalism",
             ItemId = "silverleaf",
             Quantity = 1,
@@ -166,6 +172,7 @@ local NODE_DEFINITIONS = table.freeze({
         table.freeze({
             Id = "Temple.Room2.IronVein",
             Name = "Temple Iron Vein",
+            FallbackOffset = CFrame.new(0, -3, 12),
             ProfessionId = "Mining",
             ItemId = "iron_ore",
             Quantity = 1,
@@ -496,6 +503,17 @@ function ProfessionRuntime.resolve_surface_placement(
         end
     end
 
+    if typeof(node.FallbackOffset) == "CFrame" then
+        local fallback = anchor.CFrame * node.FallbackOffset
+        if ProfessionRuntime.is_position_spaced(
+            fallback.Position,
+            occupied_positions,
+            minimum_spacing
+        ) then
+            return fallback, "AuthoredFallback"
+        end
+    end
+
     return nil, nil
 end
 
@@ -548,6 +566,22 @@ function ProfessionRuntime.attach(config: any): any
         end
         local value = get_session_id()
         return if type(value) == "string" and value ~= "" then value else nil
+    end
+
+    local function current_gather_bonus(): number
+        if context ~= "Dungeon" or not sessions then
+            return 0
+        end
+        local session_id = current_session_id()
+        local session = session_id and sessions:get(session_id) or nil
+        local modifier_id = session and session.Modifier and session.Modifier.Id
+        local modifier = if type(modifier_id) == "string"
+            then DungeonModifierDefinitions.get(modifier_id)
+            else nil
+        return math.max(
+            0,
+            math.floor(tonumber(modifier and modifier.GatherYieldBonus) or 0)
+        )
     end
 
     local function claimed_node_ids(player: Player): {string}
@@ -729,7 +763,11 @@ function ProfessionRuntime.attach(config: any): any
                 return
             end
 
-            local result = professions:gather(player.UserId, node)
+            local result = professions:gather(
+                player.UserId,
+                node,
+                current_gather_bonus()
+            )
             result.node_id = node.Id
 
             if result.ok ~= true then

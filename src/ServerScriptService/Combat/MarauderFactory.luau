@@ -24,6 +24,8 @@ export type CreateOptions = {
     RewardXP: number?,
     RewardGoldMin: number?,
     RewardGoldMax: number?,
+    HealthMultiplier: number?,
+    BestiaryCreatureId: string?,
 }
 
 local function create_part(
@@ -73,10 +75,15 @@ local function create_collision_weld(root: BasePart, collision_body: BasePart)
     weld.Parent = root
 end
 
-local function create_humanoid(parent: Model): Humanoid
+local function create_humanoid(
+    parent: Model,
+    health_multiplier: number?
+): Humanoid
     local humanoid = Instance.new("Humanoid")
-    humanoid.MaxHealth = MarauderConfig.MAX_HEALTH
-    humanoid.Health = MarauderConfig.MAX_HEALTH
+    local multiplier = math.max(0.01, tonumber(health_multiplier) or 1)
+    local max_health = MarauderConfig.MAX_HEALTH * multiplier
+    humanoid.MaxHealth = max_health
+    humanoid.Health = max_health
     humanoid.DisplayName = "Training Marauder"
     humanoid.BreakJointsOnDeath = false
     humanoid.Parent = parent
@@ -137,7 +144,7 @@ function MarauderFactory.create(options: CreateOptions): Model
     local root = create_part(model, "HumanoidRootPart", Vector3.new(2, 2, 1), CFrame.new(), true, false)
     root.Transparency = 1
     create_visual_rig(model, root)
-    create_humanoid(model)
+    create_humanoid(model, options.HealthMultiplier)
 
     model.PrimaryPart = root
     local spawn_position = options.SpawnCFrame.Position
@@ -152,6 +159,7 @@ function MarauderFactory.create(options: CreateOptions): Model
     model:SetAttribute("DungeonRewardXP", options.RewardXP or 0)
     model:SetAttribute("DungeonRewardGoldMin", options.RewardGoldMin or 0)
     model:SetAttribute("DungeonRewardGoldMax", options.RewardGoldMax or 0)
+    model:SetAttribute("BestiaryCreatureId", options.BestiaryCreatureId or "")
 
     if options.TargetEnabled ~= false then
         CollectionService:AddTag(model, CombatConfig.TARGETS.NPC_TAG)

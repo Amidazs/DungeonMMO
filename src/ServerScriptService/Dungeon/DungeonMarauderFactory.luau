@@ -18,8 +18,10 @@ function DungeonMarauderFactory.create(options: any): Model
     local humanoid = marauder:FindFirstChildOfClass("Humanoid")
     assert(humanoid ~= nil, "Dungeon Marauder requires a Humanoid")
 
-    local max_health =
-        DungeonDefinitions.TEST_DUNGEON.StandardMarauderMaxHealth
+    local base_health = tonumber(options.BaseMaxHealth)
+        or DungeonDefinitions.TEST_DUNGEON.StandardMarauderMaxHealth
+    local multiplier = math.max(0.01, tonumber(options.HealthMultiplier) or 1)
+    local max_health = base_health * multiplier
     humanoid.MaxHealth = max_health
     humanoid.Health = max_health
 

@@ -183,7 +183,11 @@ function ProfessionService:build_snapshot(user_id: number): any
     }
 end
 
-function ProfessionService:gather(user_id: number, node: any): any
+function ProfessionService:gather(
+    user_id: number,
+    node: any,
+    quantity_bonus: number?
+): any
     if type(node) ~= "table" then
         return {ok = false, reason = "UnknownNode"}
     end
@@ -191,6 +195,8 @@ function ProfessionService:gather(user_id: number, node: any): any
     local profession_id = node.ProfessionId
     local item_id = node.ItemId
     local quantity = math.floor(tonumber(node.Quantity) or 0)
+    local bonus = math.max(0, math.floor(tonumber(quantity_bonus) or 0))
+    local awarded_quantity = quantity + bonus
     local xp = math.floor(tonumber(node.XP) or 0)
 
     if not ProfessionDefinitions.get(profession_id) then
@@ -213,7 +219,7 @@ function ProfessionService:gather(user_id: number, node: any): any
         local added = InventoryService.apply_item_to_character(
             character,
             item_id,
-            quantity
+            awarded_quantity
         )
         if not added.ok then
             error(tostring(added.reason))
@@ -223,7 +229,9 @@ function ProfessionService:gather(user_id: number, node: any): any
             ok = true,
             profession_id = profession_id,
             item_id = item_id,
-            quantity = quantity,
+            quantity = awarded_quantity,
+            base_quantity = quantity,
+            quantity_bonus = bonus,
             xp = xp,
             level_before = before_level,
             level_after = after_level,

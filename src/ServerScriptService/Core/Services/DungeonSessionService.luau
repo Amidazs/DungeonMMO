@@ -7,6 +7,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReviveConfig = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("ReviveConfig")
 )
+local DungeonModifierDefinitions = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonModifierDefinitions"
+    )
+)
 
 local DungeonSessionService = {}
 DungeonSessionService.__index = DungeonSessionService
@@ -177,6 +182,12 @@ function DungeonSessionService:create(
     for _attempt = 1, 3 do
         local session_id = HttpService:GenerateGUID(false)
         local created = false
+        local rotation_key = tostring(math.floor(now / 86400))
+        local modifier_id = DungeonModifierDefinitions.resolve(
+            dungeon_id,
+            session_id,
+            rotation_key
+        )
         local record = {
             SessionId = session_id,
             DungeonId = dungeon_id,
@@ -192,6 +203,10 @@ function DungeonSessionService:create(
             },
             CurrentRoomId = "Entrance",
             CurrentEncounterId = "",
+            Modifier = {
+                Id = modifier_id,
+                RotationKey = rotation_key,
+            },
             CreatedAt = now,
             UpdatedAt = now,
             ExpiresAt = now + DungeonSessionService.RECONNECT_GRACE_SECONDS,

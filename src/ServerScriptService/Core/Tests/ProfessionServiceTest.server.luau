@@ -42,6 +42,16 @@ end
 local character = assert(profiles:get_character(4101, 1))
 check(InventoryService.count_item(character, "iron_ore") == 6, "Six gathers must produce six Iron Ore.")
 
+local rich = professions:gather(4101, {
+    ProfessionId = "Mining",
+    ItemId = "iron_ore",
+    Quantity = 1,
+    XP = 8,
+}, 1)
+check(rich.ok == true and rich.quantity == 2, "Rich Deposits must add exactly one gathered item.")
+character = assert(profiles:get_character(4101, 1))
+check(InventoryService.count_item(character, "iron_ore") == 8, "Rich Deposits must add base plus bonus quantity.")
+
 local prepared_smelt = professions:prepare_craft(4101, "smelt_iron_bar")
 check(prepared_smelt.ok == true, "Smelt must prepare with materials present.")
 check(prepared_smelt.minigame_id == "BlacksmithingForge", "Prepared Blacksmithing craft must identify its minigame hook.")
@@ -53,7 +63,7 @@ local failed_outcome = professions:complete_craft(4101, "smelt_iron_bar", {
 })
 check(failed_outcome.ok == false and failed_outcome.reason == "MinigameNotCompleted", "Failed minigame outcome must reject crafting.")
 character = assert(profiles:get_character(4101, 1))
-check(InventoryService.count_item(character, "iron_ore") == 6, "Failed minigame must not consume ingredients.")
+check(InventoryService.count_item(character, "iron_ore") == 8, "Failed minigame must not consume ingredients.")
 
 local mismatched = professions:complete_craft(4101, "smelt_iron_bar", {
     Succeeded = true,

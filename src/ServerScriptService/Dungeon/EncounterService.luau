@@ -30,7 +30,7 @@ local function operation(ok: boolean, reason: string?, extra: any?): any
     return out
 end
 
-local function reward_from_model(model: Model): any
+local function reward_from_model(model: Model, modifier_id: string?): any
     local boss_id: string? = nil
     if model:GetAttribute("Boss") == true then
         local raw_boss_id = model:GetAttribute("BossId")
@@ -44,6 +44,8 @@ local function reward_from_model(model: Model): any
         GoldMin = model:GetAttribute("DungeonRewardGoldMin"),
         GoldMax = model:GetAttribute("DungeonRewardGoldMax"),
         BossId = boss_id,
+        BestiaryCreatureId = model:GetAttribute("BestiaryCreatureId"),
+        DungeonModifierId = modifier_id,
     }
 end
 
@@ -56,12 +58,17 @@ local function transaction_id(session_id: string, model: Model): string
     )
 end
 
-function EncounterService.new(reward_service: any, session_id: string): any
+function EncounterService.new(
+    reward_service: any,
+    session_id: string,
+    modifier_id: string?
+): any
     assert(reward_service ~= nil, "EncounterService requires RewardService")
     assert(type(session_id) == "string" and session_id ~= "", "EncounterService requires SessionId")
     local self = setmetatable({}, EncounterService)
     self._rewards = reward_service
     self._session_id = session_id
+    self._modifier_id = modifier_id
     self._encounters = {}
     self._current_id = nil
     return self
@@ -160,7 +167,7 @@ function EncounterService:on_enemy_died(enemy_model: Model): any
     local eligible = self:get_eligible_members(encounter_id)
     local reward_result = self._rewards:grant_monster_reward(
         eligible,
-        reward_from_model(enemy_model),
+        reward_from_model(enemy_model, self._modifier_id),
         transaction_id(self._session_id, enemy_model)
     )
     if reward_result.ok ~= true then

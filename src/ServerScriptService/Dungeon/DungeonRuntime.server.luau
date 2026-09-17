@@ -17,6 +17,9 @@ local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local SharedCombat = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 
 local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
+local DungeonModifierDefinitions = require(
+    SharedCore:WaitForChild("DungeonModifierDefinitions")
+)
 local CharacterIdentityRules = require(
     SharedCore:WaitForChild("CharacterIdentityRules")
 )
@@ -279,6 +282,21 @@ local function get_player_from_touch(hit: BasePart): Player?
     return player
 end
 
+local function active_modifier(): any?
+    local session = current_session()
+    local modifier_id = session
+        and session.Modifier
+        and session.Modifier.Id
+    return if type(modifier_id) == "string"
+        then DungeonModifierDefinitions.get(modifier_id)
+        else nil
+end
+
+local function active_modifier_id(): string?
+    local modifier = active_modifier()
+    return if modifier then modifier.Id else nil
+end
+
 local function member_user_ids(): {number}
     local result = {}
     local session = current_session()
@@ -305,6 +323,7 @@ local function spawn_marauder(
     spawn_index: number
 ): Model
     local reward = active_definition.StandardMarauderReward
+    local modifier = active_modifier()
     return DungeonMarauderFactory.create({
         Parent = enemies_folder,
         Name = enemy_id,
@@ -318,6 +337,11 @@ local function spawn_marauder(
         RewardXP = reward.XP,
         RewardGoldMin = reward.GoldMin,
         RewardGoldMax = reward.GoldMax,
+        BaseMaxHealth = active_definition.StandardMarauderMaxHealth,
+        HealthMultiplier = if modifier
+            then modifier.EnemyHealthMultiplier
+            else 1,
+        BestiaryCreatureId = reward.BestiaryCreatureId,
     })
 end
 
@@ -673,7 +697,11 @@ local function initialize_session_services(session: any): (any?, boolean)
     end
     if encounter_service then return nil, false end
     active_session_id = session.SessionId
-    encounter_service = EncounterService.new(rewards, session.SessionId)
+    encounter_service = EncounterService.new(
+        rewards,
+        session.SessionId,
+        session.Modifier and session.Modifier.Id or nil
+    )
     DungeonProgressionBridge.bind({proficiency_service = proficiency, encounter_service = encounter_service})
     checkpoint_service = CheckpointService.new(sessions, session.SessionId)
     checkpoint_service:register(

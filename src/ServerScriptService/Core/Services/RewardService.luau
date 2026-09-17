@@ -9,6 +9,11 @@ local Workspace = game:GetService("Workspace")
 local ProfileSchema = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("ProfileSchema")
 )
+local DungeonModifierDefinitions = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonModifierDefinitions"
+    )
+)
 
 local ProgressionService = require(script.Parent:WaitForChild("ProgressionService"))
 local InventoryService = require(script.Parent:WaitForChild("InventoryService"))
@@ -253,6 +258,13 @@ function RewardService:grant_monster_reward(
             }
         else
             local gold_roll = self._rng:NextInteger(monster_reward.GoldMin, monster_reward.GoldMax)
+            local modifier = if type(monster_reward.DungeonModifierId) == "string"
+                then DungeonModifierDefinitions.get(monster_reward.DungeonModifierId)
+                else nil
+            local gold_multiplier = if modifier
+                then tonumber(modifier.MonsterGoldMultiplier) or 1
+                else 1
+            gold_roll = math.max(0, math.floor(gold_roll * gold_multiplier + 0.5))
             local member_result: any = nil
             local mutated, mutate_error = self._profiles:mutate(user_id, function(profile: any)
                 local slot = profile.Account.SelectedCharacterSlot
