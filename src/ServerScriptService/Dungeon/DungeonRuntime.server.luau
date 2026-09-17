@@ -39,6 +39,9 @@ local EncounterService = require(Dungeon:WaitForChild("EncounterService"))
 local CheckpointService = require(Dungeon:WaitForChild("CheckpointService"))
 local DungeonRecoveryRules = require(Dungeon:WaitForChild("DungeonRecoveryRules"))
 local DungeonProgressionBridge = require(Dungeon:WaitForChild("DungeonProgressionBridge"))
+local DungeonContributionBridge = require(
+    Dungeon:WaitForChild("DungeonContributionBridge")
+)
 local DungeonDeathService = require(
     Dungeon:WaitForChild("DungeonDeathService")
 )
@@ -76,6 +79,9 @@ local loadout_request = remotes:WaitForChild("LoadoutRequest") :: RemoteEvent
 local return_request = remotes:WaitForChild("ReturnRequest") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Dungeon")
+DungeonContributionBridge.bind_service(
+    runtime.ContributionService
+)
 local profiles = runtime.ProfileService
 local leases = runtime.LeaseService
 local sessions = runtime.SessionService

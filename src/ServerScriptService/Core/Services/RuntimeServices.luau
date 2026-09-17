@@ -36,6 +36,10 @@ local ClassAdvancementService = require(
     Services:WaitForChild("ClassAdvancementService")
 )
 
+local ContributionService = require(
+    Services:WaitForChild("ContributionService")
+)
+
 local RuntimeServices = {}
 
 function RuntimeServices.new(place_kind: string): any
@@ -63,6 +67,7 @@ function RuntimeServices.new(place_kind: string): any
     local leases = ProfileLeaseService.new(lease_map, server_id)
     local profiles = ProfileService.new(profile_adapter, leases)
     local sessions = DungeonSessionService.new(session_map)
+    local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
     ProgressionService.bind_default(progression)
     local inventory = InventoryService.new(profiles)
@@ -90,6 +95,7 @@ function RuntimeServices.new(place_kind: string): any
         LeaseService = leases,
         ProfileService = profiles,
         SessionService = sessions,
+        ContributionService = contributions,
         ProgressionService = progression,
         InventoryService = inventory,
         RewardService = rewards,

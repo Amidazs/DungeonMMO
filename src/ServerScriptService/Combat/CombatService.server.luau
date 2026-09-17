@@ -96,6 +96,19 @@ local ProgressionRuntimeState = require(
 local DungeonProgressionBridge = require(
     ServerScriptService:WaitForChild("Dungeon"):WaitForChild("DungeonProgressionBridge")
 )
+local DungeonContributionBridge = require(
+    ServerScriptService:WaitForChild("Dungeon"):WaitForChild("DungeonContributionBridge")
+)
+
+DamageService.set_damage_callback(function(
+    context: any,
+    applied_damage: number
+)
+    DungeonContributionBridge.record_damage(
+        context,
+        applied_damage
+    )
+end)
 
 WardService.set_absorb_callback(function(
     caster: Player,
@@ -107,6 +120,12 @@ WardService.set_absorb_callback(function(
         "ArcaneWard",
         target,
         absorbed
+    )
+    DungeonContributionBridge.record_ward(
+        caster,
+        target,
+        absorbed,
+        "ArcaneWard"
     )
 end)
 
@@ -120,6 +139,12 @@ MageHealService.set_heal_callback(function(
         "MageHeal",
         target,
         healed
+    )
+    DungeonContributionBridge.record_heal(
+        caster,
+        target,
+        healed,
+        "MageHeal"
     )
 end)
 
