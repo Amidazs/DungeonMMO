@@ -200,6 +200,22 @@
     {
       "Name": "MarketActionResult",
       "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "RaceChangePreviewRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "RaceChangePreview",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "RaceChangeApplyRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "RaceChangeActionResult",
+      "ClassName": "RemoteEvent"
     }
   ]
 }

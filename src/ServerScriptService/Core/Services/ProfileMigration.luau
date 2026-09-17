@@ -34,6 +34,10 @@ local ClassProgressionDefinitions = require(
     shared:WaitForChild("ClassProgressionDefinitions")
 )
 
+local SecondaryClassDefinitions = require(
+    shared:WaitForChild("SecondaryClassDefinitions")
+)
+
 local CharacterIdentityRules = require(
     shared:WaitForChild("CharacterIdentityRules")
 )
@@ -599,6 +603,65 @@ local function sanitize_market(value: any): any
     return result
 end
 
+local function sanitize_race_change(value: any): any
+    local result = {Version = 1, ArchivedByRace = {}, History = {}}
+    if type(value) ~= "table" then return result end
+    if type(value.ArchivedByRace) == "table" then
+        for race_id, archive in pairs(value.ArchivedByRace) do
+            if RaceDefinitions.get(race_id) and type(archive) == "table" then
+                local clean = {Skills = {}, Advancement = {}}
+                if type(archive.Skills) == "table" then
+                    for skill_id, state in pairs(archive.Skills) do
+                        if type(skill_id) == "string" and type(state) == "table" then
+                            clean.Skills[skill_id] = sanitize_skill_state(skill_id, state, {})
+                        end
+                    end
+                end
+                if type(archive.Advancement) == "table" then
+                    clean.Advancement = ProfileSchema.deep_clone(archive.Advancement)
+                end
+                result.ArchivedByRace[race_id] = clean
+            end
+        end
+    end
+    if type(value.History) == "table" then
+        for transaction_id, receipt in pairs(value.History) do
+            if type(transaction_id) == "string" and transaction_id ~= "" and type(receipt) == "table" then
+                result.History[transaction_id] = ProfileSchema.deep_clone(receipt)
+            end
+        end
+    end
+    return result
+end
+
+local function sanitize_class_advancement(value: any, current_race_id: any): any
+    local result = {Version = 1, CompletedByRace = {}}
+    if type(value) ~= "table" then return result end
+    if type(value.CompletedByRace) == "table" then
+        for race_id, completed in pairs(value.CompletedByRace) do
+            if RaceDefinitions.get(race_id) and type(completed) == "table" then
+                local clean = {}
+                for class_id, done in pairs(completed) do
+                    local definition = type(class_id) == "string" and SecondaryClassDefinitions.get(class_id) or nil
+                    if definition and definition.RaceId == race_id and done == true then
+                        clean[class_id] = true
+                    end
+                end
+                result.CompletedByRace[race_id] = clean
+            end
+        end
+    end
+    local active = value.ActiveClassId
+    if type(current_race_id) == "string" and type(active) == "string" then
+        local definition = SecondaryClassDefinitions.get(active)
+        local completed = result.CompletedByRace[current_race_id]
+        if definition and definition.RaceId == current_race_id and completed and completed[active] == true then
+            result.ActiveClassId = active
+        end
+    end
+    return result
+end
+
 function ProfileMigration.migrate(raw: any): any
     local raw_is_table = type(raw) == "table"
 
@@ -675,6 +738,7 @@ function ProfileMigration.migrate(raw: any): any
     slot1.Bestiary = sanitize_bestiary(slot1.Bestiary)
     slot1.Reputation = sanitize_reputation(slot1.Reputation)
     slot1.Market = sanitize_market(slot1.Market)
+    slot1.RaceChange = sanitize_race_change(slot1.RaceChange)
 
     if legacy_source then
         slot1.Identity = legacy_identity(slot1.Identity)
@@ -693,6 +757,11 @@ function ProfileMigration.migrate(raw: any): any
         else nonnegative_integer(slot1.XP, 0)
 
     slot1.Gold = nonnegative_integer(slot1.Gold, 0)
+
+    slot1.ClassAdvancement = sanitize_class_advancement(
+        slot1.ClassAdvancement,
+        slot1.Identity and slot1.Identity.RaceId or nil
+    )
 
     if type(slot1.Inventory) ~= "table" then
         slot1.Inventory = {}

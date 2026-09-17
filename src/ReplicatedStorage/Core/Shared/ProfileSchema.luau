@@ -4,7 +4,7 @@
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 11
+ProfileSchema.VERSION = 12
 
 local function deep_clone(
     value: any,
@@ -120,6 +120,11 @@ function ProfileSchema.create_default(_user_id: number): any
                     ActiveListingIds = {},
                     History = {},
                     Recovery = {},
+                },
+                RaceChange = {
+                    Version = 1,
+                    ArchivedByRace = {},
+                    History = {},
                 },
                 Inventory = {},
                 Equipment = {},

@@ -15,6 +15,7 @@ local QuestService = require(Services:WaitForChild("QuestService"))
 local ClassAdvancementService = require(
     Services:WaitForChild("ClassAdvancementService")
 )
+local RaceChangeService = require(Services:WaitForChild("RaceChangeService"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
 
 local assertions = 0
@@ -158,5 +159,26 @@ check(
         == true,
     "Elf advancement history must persist by race."
 )
+
+local race_change = RaceChangeService.new(profiles, "TEST", function() return 888 end)
+local elf_preview = race_change:preview(5201, "Elf")
+check(elf_preview.ok == true, "Human advanced Mage must preview Elf Race Change.")
+check(race_change:apply(5201, "Elf", elf_preview.Hash, "adv-human-to-elf").ok == true,
+    "Human advanced Mage must apply Elf Race Change.")
+local changed_snapshot = base:build_snapshot(5201)
+check(changed_snapshot.ActiveClassId == nil,
+    "HumanArcanist completion must not activate as an Elf class.")
+check(changed_snapshot.CandidateClassId == "ElfSpellweaver" and changed_snapshot.Completed == false,
+    "Human advancement must not manufacture equivalent Elf completion.")
+check(assert(profiles:get_character(5201, 1)).ClassAdvancement.CompletedByRace.Human.HumanArcanist == true,
+    "Human advancement history must remain stored while Elf.")
+
+local human_preview = race_change:preview(5201, "Human")
+check(human_preview.ok == true, "Elf Mage must preview return to Human.")
+check(race_change:apply(5201, "Human", human_preview.Hash, "adv-elf-to-human").ok == true,
+    "Elf Mage must return to Human.")
+local restored_snapshot = base:build_snapshot(5201)
+check(restored_snapshot.ActiveClassId == "HumanArcanist" and restored_snapshot.Completed == true,
+    "Returning race must reactivate historical Human advancement without re-claiming.")
 
 print(string.format("[Class Advancement Tests] PASS: %d assertions.", assertions))

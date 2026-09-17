@@ -34,6 +34,7 @@ local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 local BankRuntime = require(Base:WaitForChild("BankRuntime"))
 local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
 local GuildRuntime = require(Base:WaitForChild("GuildRuntime"))
+local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local entry_request = remotes:WaitForChild("DungeonEntryRequest") :: RemoteEvent
@@ -78,6 +79,7 @@ local travel = runtime.TravelService
 local guilds = runtime.GuildService
 local guild_hall = runtime.GuildHallService
 local market = runtime.MarketService
+local race_change = runtime.RaceChangeService
 local base_environment = BaseEnvironmentAdapter.wait_for_ready(
     Workspace,
     15
@@ -756,6 +758,19 @@ local function refresh_runtime_character(player: Player)
         player
     )
 end
+
+RaceChangeRuntime.attach({
+    race_change = race_change,
+    remotes = remotes,
+    is_loaded = function(user_id: number): boolean
+        return loaded_users[user_id] == true
+    end,
+    on_changed = function(player: Player)
+        refresh_runtime_character(player)
+        apply_race_presentation(player, player.Character)
+        send_profile(player)
+    end,
+})
 
 local function finish_progression_action(
     player: Player,
