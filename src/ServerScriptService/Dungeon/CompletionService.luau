@@ -9,7 +9,15 @@ local function result(ok: boolean, reason: string?, extra: any?): any
     return out
 end
 
-function CompletionService.new(session_service: any, reward_service: any, profile_service: any, reward_definition: any, skill_progression_service: any?, quest_service: any?): any
+function CompletionService.new(
+    session_service: any,
+    reward_service: any,
+    profile_service: any,
+    reward_definition: any,
+    skill_progression_service: any?,
+    quest_service: any?,
+    guild_service: any?
+): any
     assert(session_service and reward_service and profile_service, "CompletionService dependencies are required")
     local self = setmetatable({}, CompletionService)
     self._sessions = session_service
@@ -18,6 +26,7 @@ function CompletionService.new(session_service: any, reward_service: any, profil
     self._reward_definition = reward_definition
     self._skills = skill_progression_service
     self._quests = quest_service
+    self._guilds = guild_service
     return self
 end
 
@@ -68,6 +77,20 @@ function CompletionService:commit(session_id: string): any
         member_results[tostring(user_id)] = granted
     end
 
+    local guild_progress: any = nil
+    if self._guilds then
+        guild_progress = self._guilds:award_dungeon_clear(
+            session.CompletionRecipients or {},
+            session_id .. ":GuildClear"
+        )
+        if not guild_progress or guild_progress.ok ~= true then
+            return result(false, "GuildProgressionFailed", {
+                member_results = member_results,
+                guild_progress = guild_progress,
+            })
+        end
+    end
+
     -- Save barrier: no return portal opens until every affected profile has persisted.
     for _, user_id in ipairs(session.CompletionRecipients or {}) do
         local saved, save_error = self._profiles:save(user_id, "DungeonCompletion")
@@ -84,7 +107,11 @@ function CompletionService:commit(session_id: string): any
     if not committed or committed.ok ~= true then
         return result(false, if committed then committed.reason else "SessionCommitFailed", {member_results = member_results})
     end
-    return result(true, nil, {already_applied = false, member_results = member_results})
+    return result(true, nil, {
+        already_applied = false,
+        member_results = member_results,
+        guild_progress = guild_progress,
+    })
 end
 
 return table.freeze(CompletionService)

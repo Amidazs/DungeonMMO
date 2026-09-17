@@ -10,6 +10,8 @@ local Services = Core:WaitForChild("Services")
 
 local DataStoreProfileAdapter = require(Adapters:WaitForChild("DataStoreProfileAdapter"))
 local InMemoryMapAdapter = require(Adapters:WaitForChild("InMemoryMapAdapter"))
+local InMemoryEntityAdapter = require(Adapters:WaitForChild("InMemoryEntityAdapter"))
+local RobloxEntityAdapter = require(Adapters:WaitForChild("RobloxEntityAdapter"))
 local InMemoryProfileAdapter = require(Adapters:WaitForChild("InMemoryProfileAdapter"))
 local MemoryStoreMapAdapter = require(Adapters:WaitForChild("MemoryStoreMapAdapter"))
 
@@ -45,6 +47,8 @@ local ContributionService = require(
 
 local BestiaryService = require(Services:WaitForChild("BestiaryService"))
 local ReputationService = require(Services:WaitForChild("ReputationService"))
+local GuildService = require(Services:WaitForChild("GuildService"))
+local GuildHallService = require(Services:WaitForChild("GuildHallService"))
 
 local RuntimeServices = {}
 
@@ -64,6 +68,9 @@ function RuntimeServices.new(place_kind: string): any
     local session_map = if studio
         then InMemoryMapAdapter.new()
         else MemoryStoreMapAdapter.new("DungeonSessions")
+    local entity_adapter = if studio
+        then InMemoryEntityAdapter.new()
+        else RobloxEntityAdapter.new("SharedEntities")
 
     local job_id = game.JobId
     local server_id = if type(job_id) == "string" and job_id ~= ""
@@ -74,6 +81,8 @@ function RuntimeServices.new(place_kind: string): any
     local profiles = ProfileService.new(profile_adapter, leases)
     local bestiary = BestiaryService.new(profiles)
     local reputation = ReputationService.new(profiles)
+    local guilds = GuildService.new(entity_adapter)
+    local guild_hall = GuildHallService.new(guilds)
     local sessions = DungeonSessionService.new(session_map)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
@@ -110,6 +119,9 @@ function RuntimeServices.new(place_kind: string): any
         ContributionService = contributions,
         BestiaryService = bestiary,
         ReputationService = reputation,
+        EntityAdapter = entity_adapter,
+        GuildService = guilds,
+        GuildHallService = guild_hall,
         ProgressionService = progression,
         InventoryService = inventory,
         RecipeKnowledgeService = recipe_knowledge,
