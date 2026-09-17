@@ -58,6 +58,7 @@ export type CreateOptions = {
     RewardXP: number?,
     RewardGoldMin: number?,
     RewardGoldMax: number?,
+    BestiaryCreatureId: string?,
 }
 
 function MarauderCaptainFactory.create(options: CreateOptions): Model
@@ -75,6 +76,7 @@ function MarauderCaptainFactory.create(options: CreateOptions): Model
         RewardXP = options.RewardXP or 0,
         RewardGoldMin = options.RewardGoldMin or 0,
         RewardGoldMax = options.RewardGoldMax or 0,
+        BestiaryCreatureId = options.BestiaryCreatureId,
     })
 
     captain:SetAttribute("Boss", true)

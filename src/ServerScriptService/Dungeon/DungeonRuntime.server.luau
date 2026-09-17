@@ -616,7 +616,7 @@ local function start_boss()
     sessions:set_runtime_progress(active_session_id, "MarauderCaptain", "MarauderCaptain")
     local reward = active_definition.MarauderCaptainReward
     local boss_factory = if active_definition.Id == "AbandonedMine" then MineForemanFactory else MarauderCaptainFactory
-    local captain = boss_factory.create({Parent=enemies_folder,SpawnCFrame=environment:captain_spawn_cframe(),EncounterId="MarauderCaptain",RewardXP=reward.XP,RewardGoldMin=reward.GoldMin,RewardGoldMax=reward.GoldMax})
+    local captain = boss_factory.create({Parent=enemies_folder,SpawnCFrame=environment:captain_spawn_cframe(),EncounterId="MarauderCaptain",RewardXP=reward.XP,RewardGoldMin=reward.GoldMin,RewardGoldMax=reward.GoldMax,BestiaryCreatureId=reward.BestiaryCreatureId})
     active_captain = captain
     local started = encounter_service:start("MarauderCaptain", member_user_ids(), {captain})
     if not started.ok then error("Captain encounter failed: " .. tostring(started.reason)) end

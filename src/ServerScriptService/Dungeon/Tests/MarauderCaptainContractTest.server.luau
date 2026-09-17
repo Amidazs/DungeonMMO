@@ -16,12 +16,20 @@ local function check(condition: boolean, message: string)
 end
 
 local holder = Instance.new("Folder")
-local captain = Factory.create({Parent = holder, SpawnCFrame = CFrame.new(0, 3, 0)})
+local captain = Factory.create({
+    Parent = holder,
+    SpawnCFrame = CFrame.new(0, 3, 0),
+    RewardXP = 40,
+    RewardGoldMin = 15,
+    RewardGoldMax = 25,
+    BestiaryCreatureId = "marauder_captain",
+})
 local humanoid = captain:FindFirstChildOfClass("Humanoid")
 check(humanoid ~= nil, "Captain must have a Humanoid.")
 check(captain:FindFirstChild("HumanoidRootPart") ~= nil, "Captain must have a HumanoidRootPart.")
 check(captain:GetAttribute("Boss") == true, "Captain must be marked Boss=true.")
 check(captain:GetAttribute("BossId") == "MarauderCaptain", "Captain BossId must be MarauderCaptain.")
+check(captain:GetAttribute("BestiaryCreatureId") == "marauder_captain", "Captain must retain its bestiary reward identity.")
 check(CollectionService:HasTag(captain, "DungeonMarauderCaptain"), "Captain must be tagged for its dedicated server controller.")
 check(Dungeon:FindFirstChild("MarauderCaptainController") ~= nil, "Dedicated Captain controller script must exist.")
 check(

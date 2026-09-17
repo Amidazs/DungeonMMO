@@ -7,6 +7,7 @@ if not module then
     error("[Encounter Service Tests] RED: EncounterService is missing.")
 end
 local EncounterService = require(module)
+local MarauderCaptainFactory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
 
 local assertions = 0
 local function check(condition: boolean, message: string)
@@ -63,5 +64,23 @@ check(#reward_calls == 1, "Duplicate death must not call RewardService again.")
 local second = encounters:on_enemy_died(enemy_b)
 check(second.ok == true and second.cleared == true, "Final registered enemy death must clear encounter.")
 check(encounters:is_clear("CombatRoom1") == true, "Encounter must report clear after all registered enemies die.")
+
+local boss = MarauderCaptainFactory.create({
+    Parent = workspace,
+    SpawnCFrame = CFrame.new(0, 1000, 0),
+    EncounterId = "MarauderCaptain",
+    RewardXP = 40,
+    RewardGoldMin = 15,
+    RewardGoldMax = 25,
+    BestiaryCreatureId = "marauder_captain",
+})
+local boss_encounters = EncounterService.new(fake_rewards, "session-boss")
+check(boss_encounters:start("MarauderCaptain", {101}, {boss}).ok == true, "Boss encounter must start.")
+local boss_result = boss_encounters:on_enemy_died(boss)
+check(boss_result.ok == true and boss_result.cleared == true, "Captain death must clear its encounter.")
+local boss_reward = reward_calls[#reward_calls].reward
+check(boss_reward.XP == 40 and boss_reward.GoldMin == 15 and boss_reward.GoldMax == 25, "Captain reward values must reach RewardService.")
+check(boss_reward.BestiaryCreatureId == "marauder_captain", "Captain bestiary identity must reach RewardService.")
+boss:Destroy()
 
 print(string.format("[Encounter Service Tests] PASS: %d assertions.", assertions))
