@@ -69,6 +69,22 @@ local function analyze_slot(
         end
     end
 
+    if slot_definition.ExitBarrierRoomId ~= nil
+        and (
+            not is_non_empty_string(
+                slot_definition.ExitBarrierRoomId
+            )
+            or not is_non_empty_string(
+                slot_definition.ExitBarrierAnchor
+            )
+        )
+    then
+        add_issue(issues, "ExitBarrierBindingMissing", {
+            EncounterId = encounter.Id,
+            RoomSlotId = encounter.RoomSlotId,
+        })
+    end
+
     if encounter.ExecutorId == COMBAT_EXECUTOR_ID then
         if slot_definition.SupportsCombat ~= true then
             add_issue(issues, "EncounterBindingCapabilityMismatch", {

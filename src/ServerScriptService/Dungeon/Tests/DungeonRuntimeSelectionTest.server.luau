@@ -110,6 +110,22 @@ check(
     "Studio default selection must use Depth1."
 )
 
+studio_workspace.Attributes.DungeonMMOStudioDifficultyId = "Depth1"
+local studio_explicit_depth1 = Selection.resolve_selection(
+    no_players,
+    studio_workspace,
+    studio_run,
+    definitions,
+    difficulties,
+    layouts,
+    0
+)
+check(
+    studio_explicit_depth1.ok == true
+        and studio_explicit_depth1.DifficultyId == "Depth1",
+    "Explicit Studio Depth1 selection must resolve."
+)
+
 studio_workspace.Attributes.DungeonMMOStudioDifficultyId = "Depth2"
 local studio_depth2 = Selection.resolve_selection(
     no_players,

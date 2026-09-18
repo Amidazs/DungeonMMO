@@ -35,6 +35,7 @@ local function slot(
     supports_combat: boolean,
     supports_boss: boolean,
     exit_barrier_room_id: string?,
+    exit_barrier_anchor: string?,
     boss_spawn_anchor: string?
 ): any
     return table.freeze({
@@ -44,6 +45,7 @@ local function slot(
         SupportsCombat = supports_combat,
         SupportsBoss = supports_boss,
         ExitBarrierRoomId = exit_barrier_room_id,
+        ExitBarrierAnchor = exit_barrier_anchor,
         BossSpawnAnchor = boss_spawn_anchor,
     })
 end
@@ -61,6 +63,7 @@ local LAYOUTS = table.freeze({
                     true,
                     false,
                     "Room1",
+                    "Temple.Room1.ExitBarrier",
                     nil
                 ),
                 Room2 = slot(
@@ -70,6 +73,7 @@ local LAYOUTS = table.freeze({
                     true,
                     false,
                     "Room2",
+                    "Temple.Room2.ExitBarrier",
                     nil
                 ),
 
@@ -79,6 +83,7 @@ local LAYOUTS = table.freeze({
                     "Room3",
                     false,
                     true,
+                    nil,
                     nil,
                     "Temple.Room3.CaptainSpawn"
                 ),
@@ -97,6 +102,7 @@ local LAYOUTS = table.freeze({
                     true,
                     false,
                     "Room1",
+                    "Mine.Room1.ExitBarrier",
                     nil
                 ),
 
@@ -107,6 +113,7 @@ local LAYOUTS = table.freeze({
                     true,
                     false,
                     "Room2",
+                    "Mine.Room2.ExitBarrier",
                     nil
                 ),
                 Room3 = slot(
@@ -115,6 +122,7 @@ local LAYOUTS = table.freeze({
                     "Room3",
                     false,
                     true,
+                    nil,
                     nil,
                     "Mine.Room3.ForemanSpawn"
                 ),

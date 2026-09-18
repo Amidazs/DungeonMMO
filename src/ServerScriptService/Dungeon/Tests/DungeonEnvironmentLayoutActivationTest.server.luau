@@ -125,6 +125,23 @@ check(
     "Missing declared trigger must fail closed."
 )
 
+local missing_barrier = table.clone(layout)
+missing_barrier.Slots = table.clone(layout.Slots)
+missing_barrier.Slots.Room3 = {
+    TriggerAnchor = "Synthetic.Room3.Trigger",
+    ExitBarrierAnchor = "Synthetic.Missing.ExitBarrier",
+}
+local missing_barrier_result = Activation.apply(
+    missing_barrier,
+    {
+        by_id = by_id,
+    }
+)
+check(
+    missing_barrier_result.reason == "LayoutAnchorMissing",
+    "Missing declared barrier must fail closed."
+)
+
 for _, part in ipairs(created) do
     part:Destroy()
 end
