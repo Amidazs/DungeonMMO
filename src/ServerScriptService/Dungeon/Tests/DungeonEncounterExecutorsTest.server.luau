@@ -45,17 +45,22 @@ function fake_marauder_factory.create(options: any): Model
     return model
 end
 
-local fake_environment = {}
+local pack_spawn_parts = {}
+for index = 1, 3 do
+    local part = Instance.new("Part")
+    part.CFrame = CFrame.new(index, 0, 0)
+    table.insert(pack_spawn_parts, part)
+end
 
-function fake_environment:enemy_spawn_cframes(
-    room_id: string
-): {CFrame}
-    check(room_id == "Room1", "Pack room ID mismatch.")
-    return {
-        CFrame.new(1, 0, 0),
-        CFrame.new(2, 0, 0),
-        CFrame.new(3, 0, 0),
-    }
+local fake_environment = {}
+function fake_environment:get_group(
+    group_name: string
+): {BasePart}
+    check(
+        group_name == "Synthetic.Room1.EnemySpawns",
+        "Pack spawn-group binding mismatch."
+    )
+    return pack_spawn_parts
 end
 
 local boss_spawn_anchor = Instance.new("Part")
@@ -117,6 +122,7 @@ local pack_encounter = {
 local pack_binding = {
     RuntimeEncounterId = "CombatRoom1",
     EnvironmentRoomId = "Room1",
+    EnemySpawnGroup = "Synthetic.Room1.EnemySpawns",
 }
 
 check(
@@ -325,6 +331,9 @@ check(
     "Unimplemented future boss must fail closed."
 )
 
+for _, part in ipairs(pack_spawn_parts) do
+    part:Destroy()
+end
 boss_spawn_anchor:Destroy()
 context.RuntimeRoot:Destroy()
 parent:Destroy()

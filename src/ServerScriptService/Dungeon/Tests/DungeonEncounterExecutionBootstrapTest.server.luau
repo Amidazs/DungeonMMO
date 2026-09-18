@@ -23,12 +23,8 @@ local enemies = Instance.new("Folder")
 local runtime_root = Instance.new("Folder")
 
 local environment: any = {}
-function environment:enemy_spawn_cframes(_room_id: string): {CFrame}
-    return {
-        CFrame.new(),
-        CFrame.new(2, 0, 0),
-        CFrame.new(4, 0, 0),
-    }
+function environment:get_group(_group_name: string): {BasePart}
+    return {}
 end
 local boss_spawn_anchor = Instance.new("Part")
 boss_spawn_anchor.CFrame = CFrame.new()
@@ -80,6 +76,7 @@ check(
         {
             RuntimeEncounterId = "CombatRoom1",
             EnvironmentRoomId = "Room1",
+            EnemySpawnGroup = "Synthetic.Room1.EnemySpawns",
         },
         context
     ).ok == true,

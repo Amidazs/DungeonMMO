@@ -205,11 +205,15 @@ function DungeonEncounterBindings.resolve_layout(
             RuntimeEncounterId = runtime_encounter_id,
             EnvironmentRoomId =
                 slot_definition.EnvironmentRoomId,
+            EnemySpawnGroup =
+                slot_definition.EnemySpawnGroup,
             TriggerAnchor = slot_definition.TriggerAnchor,
             CheckpointAnchor =
                 slot_definition.CheckpointAnchor,
             ExitBarrierRoomId =
                 slot_definition.ExitBarrierRoomId,
+            ExitBarrierAnchor =
+                slot_definition.ExitBarrierAnchor,
             BossSpawnAnchor =
                 slot_definition.BossSpawnAnchor,
             CheckpointId =

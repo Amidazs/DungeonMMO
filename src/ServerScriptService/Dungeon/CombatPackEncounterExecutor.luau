@@ -127,9 +127,14 @@ function CombatPackEncounterExecutor:validate(
         return result(false, "EncounterRoomBindingMissing")
     end
 
+    if type(binding.EnemySpawnGroup) ~= "string"
+        or binding.EnemySpawnGroup == ""
+    then
+        return result(false, "EnemySpawnBindingMissing")
+    end
+
     if type(context.Environment) ~= "table"
-        or type(context.Environment.enemy_spawn_cframes)
-            ~= "function"
+        or type(context.Environment.get_group) ~= "function"
         or typeof(context.EnemiesFolder) ~= "Instance"
     then
         return result(false, "EncounterExecutionContextInvalid")
@@ -198,6 +203,27 @@ local function total_enemy_count(
         )
     end
     return count
+end
+
+local function spawn_cframes_for_group(
+    environment: any,
+    group_name: string
+): {CFrame}?
+    local anchors = environment:get_group(group_name)
+    if type(anchors) ~= "table" then
+        return nil
+    end
+
+    local positions = {}
+    for _, anchor in ipairs(anchors) do
+        if typeof(anchor) ~= "Instance"
+            or not anchor:IsA("BasePart")
+        then
+            return nil
+        end
+        table.insert(positions, anchor.CFrame)
+    end
+    return positions
 end
 
 local function resolve_entry_execution(
@@ -325,10 +351,10 @@ function CombatPackEncounterExecutor:execute(
     end
 
     local total_count = total_enemy_count(resolved_entries)
-    local positions =
-        context.Environment:enemy_spawn_cframes(
-            binding.EnvironmentRoomId
-        )
+    local positions = spawn_cframes_for_group(
+        context.Environment,
+        binding.EnemySpawnGroup
+    )
     if type(positions) ~= "table"
         or #positions < total_count
     then

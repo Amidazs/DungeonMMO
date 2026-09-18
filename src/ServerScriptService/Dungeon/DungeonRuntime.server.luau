@@ -88,7 +88,12 @@ local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
 )
 local DungeonRuntimeSelection = require(Dungeon:WaitForChild("DungeonRuntimeSelection"))
-local DungeonEnvironmentRouter = require(Dungeon:WaitForChild("DungeonEnvironmentRouter"))
+local DungeonEnvironmentRouter = require(
+    Dungeon:WaitForChild("DungeonEnvironmentRouter")
+)
+local DungeonEncounterEnvironmentRuntime = require(
+    Dungeon:WaitForChild("DungeonEncounterEnvironmentRuntime")
+)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -666,12 +671,14 @@ local function connect_enemy(enemy: Model, encounter_id: string)
 
             local binding = flow_clear.binding
             if binding
-                and type(binding.ExitBarrierRoomId) == "string"
+                and type(binding.ExitBarrierAnchor) == "string"
             then
-                local opened = environment:set_exit_open(
-                    binding.ExitBarrierRoomId,
-                    true
-                )
+                local opened =
+                    DungeonEncounterEnvironmentRuntime.set_exit_open(
+                        binding,
+                        environment,
+                        true
+                    )
                 if type(opened) == "table"
                     and opened.ok == false
                 then
@@ -1010,16 +1017,18 @@ local function apply_recovery_plan(session: any): any
         for _, binding in ipairs(
             encounter_bindings.ordered
         ) do
-            if type(binding.ExitBarrierRoomId) == "string" then
+            if type(binding.ExitBarrierAnchor) == "string" then
                 local state = encounter_flow:state_for_slot(
                     binding.RoomSlotId
                 )
                 local should_open = state == "Cleared"
                     or state == "Skipped"
-                local updated = environment:set_exit_open(
-                    binding.ExitBarrierRoomId,
-                    should_open
-                )
+                local updated =
+                    DungeonEncounterEnvironmentRuntime.set_exit_open(
+                        binding,
+                        environment,
+                        should_open
+                    )
                 if type(updated) == "table"
                     and updated.ok == false
                 then
