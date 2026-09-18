@@ -129,16 +129,23 @@ function fake_catalog.resolve_pack_entries(
     }
 end
 
+local spawn_parts = {}
+for index = 1, 3 do
+    local part = Instance.new("Part")
+    part.CFrame = CFrame.new(index, 0, 0)
+    table.insert(spawn_parts, part)
+end
+
+local requested_spawn_group = ""
 local environment = {}
-function environment:enemy_spawn_cframes(
-    room_id: string
-): {CFrame}
-    check(room_id == "Room1", "Environment room ID mismatch.")
-    return {
-        CFrame.new(1, 0, 0),
-        CFrame.new(2, 0, 0),
-        CFrame.new(3, 0, 0),
-    }
+function environment:get_group(
+    group_name: string
+): {BasePart}
+    requested_spawn_group = group_name
+    if group_name == "SyntheticEnemySpawns" then
+        return spawn_parts
+    end
+    return {}
 end
 
 local parent = Instance.new("Folder")
@@ -184,6 +191,7 @@ local encounter = {
 local binding = {
     RuntimeEncounterId = "MixedPackEncounter",
     EnvironmentRoomId = "Room1",
+    EnemySpawnGroup = "SyntheticEnemySpawns",
 }
 
 check(
@@ -199,6 +207,10 @@ local executed = executor:execute(
 check(executed.ok == true, "Heterogeneous pack must execute.")
 check(#executed.Enemies == 3, "Pack must return all three enemies.")
 check(#factory_calls == 3, "All entry factories must be called.")
+check(
+    requested_spawn_group == "SyntheticEnemySpawns",
+    "Combat pack must use the binding-owned enemy spawn group."
+)
 check(
     factory_calls[1].FactoryId == "Marauder"
         and factory_calls[2].FactoryId == "Marauder"
@@ -299,6 +311,20 @@ check(
     "Unknown combat packs must fail closed."
 )
 
+local missing_group_binding = table.clone(binding)
+missing_group_binding.EnemySpawnGroup = "MissingGroup"
+check(
+    executor:execute(
+        encounter,
+        missing_group_binding,
+        context
+    ).reason == "InsufficientEnemySpawnPoints",
+    "Missing resolved spawn groups must fail closed."
+)
+
+for _, part in ipairs(spawn_parts) do
+    part:Destroy()
+end
 failing_parent:Destroy()
 parent:Destroy()
 

@@ -106,6 +106,16 @@ for _, entry in ipairs({
         result.by_slot.Room3.BossSpawnAnchor ~= nil,
         "Depth1 boss slot must expose a physical boss spawn anchor."
     )
+    check(
+        type(result.by_slot.Room1.EnemySpawnGroup) == "string"
+            and type(result.by_slot.Room2.EnemySpawnGroup) == "string",
+        "Depth1 combat slots must expose binding-owned spawn groups."
+    )
+    check(
+        type(result.by_slot.Room1.ExitBarrierAnchor) == "string"
+            and type(result.by_slot.Room2.ExitBarrierAnchor) == "string",
+        "Depth1 combat slots must expose physical exit-barrier anchors."
+    )
 end
 
 for _, entry in ipairs({
