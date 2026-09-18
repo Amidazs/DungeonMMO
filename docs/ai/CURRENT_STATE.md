@@ -612,14 +612,70 @@ Final committed acceptance from `b525235` includes:
 - source-boundary audit: **8 source/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior Depth2-content worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth2Content_v1
 
-Active branch:
+Prior Depth2-content branch:
 wip/phase-4-depth2-content-v1
 
 Acceptance evidence:
 docs/testing/phase4-depth2-content-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Depth3 Backend Combat + Boss Content** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`092bd99`
+
+Accepted local engineering result:
+
+- TestDungeon Depth3Room1/2/3/4 packs are registered at 4/5/6/7 Marauders;
+- AbandonedMine Depth3Room1/2/3/4 packs are registered at 4/5/6/7 Marauders;
+- Mine Depth3 Room1 retains Deep Echoes +1 behavior;
+- Mine Depth3 Room2 retains Crystal Bloom +1 behavior;
+- TempleDepth3Boss is registered with the Relic Guardian identity;
+- AbandonedMineDepth3Boss is registered with the Hollow Taskmaster identity;
+- both Depth3 bosses reuse accepted Captain/Foreman server combat behavior;
+- both factories are registered in execution bootstrap;
+- Depth2 and Depth3 readiness each have exactly one issue per dungeon:
+  DungeonLayoutNotRegistered;
+- Depth3 no longer reports EncounterContentNotRegistered;
+- Depth2 and Depth3 remain release-disabled and physically unregistered;
+- Depth4 remains content-incomplete and release-disabled;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `092bd99` includes:
+
+- **522** Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions building;
+- Depth3 Content: **36 assertions PASS**;
+- Depth3 Boss Factory: **8 assertions PASS**;
+- Depth2 Content: **32 assertions PASS**;
+- Depth2 Boss Factory: **8 assertions PASS**;
+- Encounter Spawn Catalog: **19 assertions PASS**;
+- Encounter Execution Bootstrap: **4 assertions PASS**;
+- Runtime Content Readiness: **68 assertions PASS**;
+- Studio Session Factory: **7 assertions PASS**;
+- Layout Environment Contract: **14 assertions PASS**;
+- Encounter Bindings: **34 assertions PASS**;
+- Combat Pack Encounter Executor: **15 assertions PASS**;
+- final committed Base regression green;
+- final committed Dungeon regression green;
+- Training Dummy and Combat Target Rules: **9 assertions PASS** each;
+- Phase 3 Systems Stress green;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **8 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth3Content_v1
+
+Active branch:
+wip/phase-4-depth3-content-v1
+
+Acceptance evidence:
+docs/testing/phase4-depth3-content-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 

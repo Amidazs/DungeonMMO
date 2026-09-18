@@ -2181,3 +2181,114 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-depth2-content-acceptance-record.md`.
+
+
+<!-- PHASE4_DEPTH3_CONTENT_LOCAL_GREEN_20260918 -->
+## Phase 4 - Depth3 Backend Combat + Boss Content
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `3d978af`
+**RED checkpoint:** `b205914`
+**Implementation checkpoint:** `092bd99`
+
+### Test-first content contract
+
+- [x] RED captured before implementation.
+- [x] missing Depth3 combat packs failed as expected.
+- [x] missing TempleDepth3BossFactory failed as expected.
+- [x] Depth3 readiness reported missing encounter content before implementation.
+
+### Depth3 combat content
+
+- [x] TestDungeon Depth3Room1 registered with 4 Marauders.
+- [x] TestDungeon Depth3Room2 registered with 5 Marauders.
+- [x] TestDungeon Depth3Room3 registered with 6 Marauders.
+- [x] TestDungeon Depth3Room4 registered with 7 Marauders.
+- [x] AbandonedMine Depth3Room1 registered with 4 Marauders.
+- [x] AbandonedMine Depth3Room2 registered with 5 Marauders.
+- [x] AbandonedMine Depth3Room3 registered with 6 Marauders.
+- [x] AbandonedMine Depth3Room4 registered with 7 Marauders.
+- [x] Mine Deep Echoes adds one Depth3 Room1 Marauder.
+- [x] Mine Crystal Bloom adds one Depth3 Room2 Marauder.
+- [x] Depth3 Content: 36 assertions PASS.
+### Depth3 boss content
+
+- [x] TempleDepth3Boss registered.
+- [x] TempleDepth3Boss display identity: Relic Guardian.
+- [x] AbandonedMineDepth3Boss registered.
+- [x] AbandonedMineDepth3Boss display identity: Hollow Taskmaster.
+- [x] both factories registered in execution bootstrap.
+- [x] both bosses retain accepted Captain controller tag/behavior.
+- [x] Depth3 Boss Factory: 8 assertions PASS.
+- [x] Encounter Spawn Catalog: 19 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+
+### Readiness boundary
+
+- [x] Depth2 and Depth3 remain Ready = false.
+- [x] Depth2 and Depth3 remain ReleaseEnabled = false.
+- [x] Depth3 no longer reports EncounterContentNotRegistered.
+- [x] Depth2/Depth3 each report exactly one issue: DungeonLayoutNotRegistered.
+- [x] no Depth2/Depth3 physical layout registered.
+- [x] Depth4 remains content-incomplete.
+- [x] Runtime Content Readiness: 68 assertions PASS.
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `092bd99`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 522 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 68 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+### Final committed Dungeon regression
+
+- [x] Depth3 Content: 36 assertions PASS.
+- [x] Depth3 Boss Factory: 8 assertions PASS.
+- [x] Depth2 Content: 32 assertions PASS.
+- [x] Depth2 Boss Factory: 8 assertions PASS.
+- [x] Encounter Spawn Catalog: 19 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Studio Session Factory: 7 assertions PASS.
+- [x] Layout Environment Contract: 14 assertions PASS.
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Phase2A Failure Path: 24 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Progression: 19 assertions PASS.
+- [x] Runtime Content Readiness: 68 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+
+### Release qualification
+
+- [x] Depth3 remains release-disabled.
+- [x] Depth3 remains physically unregistered.
+- [x] Depth2 remains release-disabled and physically unregistered.
+- [x] Depth4 remains content-incomplete and release-disabled.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 8 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-depth3-content-acceptance-record.md`.

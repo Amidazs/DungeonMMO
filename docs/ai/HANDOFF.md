@@ -393,6 +393,37 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Depth3 Backend Combat + Boss Content** gate is locally complete
+and green at:
+
+`092bd99`
+
+Accepted proof now also includes:
+
+- four registered Depth3 combat packs per current dungeon;
+- 4/5/6/7 Marauder base counts;
+- Mine Deep Echoes and Crystal Bloom Depth3 bonus preservation;
+- TempleDepth3Boss / Relic Guardian factory identity;
+- AbandonedMineDepth3Boss / Hollow Taskmaster factory identity;
+- both Depth3 bosses retaining accepted Captain controller behavior;
+- Depth2 and Depth3 readiness failing only on DungeonLayoutNotRegistered;
+- Depth3 remaining release-disabled and physically unregistered;
+- Depth3 Content: 36 assertions PASS;
+- Depth3 Boss Factory: 8 assertions PASS;
+- Encounter Spawn Catalog: 19 assertions PASS;
+- Runtime Content Readiness: 68 assertions PASS;
+- 522 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- 8 source/test files from `3d978af`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-depth3-content-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
@@ -400,11 +431,13 @@ backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
 Generic higher-depth framework blockers remain cleared through
-`d9297f8`, and Depth2 backend content is complete at `b525235`.
+`d9297f8`; Depth2 content is complete at `b525235` and Depth3 content is
+complete at `092bd99`.
 
-Continue backend-only work with Depth3 content: four combat packs plus the
-Depth3 boss for each current dungeon. Keep Depth2-Depth4 release-disabled and
-do not register physical layouts until authored rooms exist.
+Continue backend-only work with Depth4 content. Preserve the locked rule that
+the final depth reuses earlier difficulty bosses as minibosses before the new
+true final boss. Keep Depth2-Depth4 release-disabled and do not register
+physical layouts until authored rooms exist.
 
 Carry forward these readiness rules:
 
@@ -424,13 +457,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 Depth2-content worktree:
+Active Phase 4 Depth3-content worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth2Content_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth3Content_v1
 
 Active branch:
 
-wip/phase-4-depth2-content-v1
+wip/phase-4-depth3-content-v1
 
 Phase 3 completion worktree:
 
