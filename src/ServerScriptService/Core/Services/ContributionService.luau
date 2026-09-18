@@ -239,17 +239,6 @@ function ContributionService:record(event: any): any
         return result(false, "UserNotInSession")
     end
 
-    local instance_state = deep_clone(session.InstanceState or {})
-    local contribution = normalize_contribution(instance_state)
-    local player_state = normalize_player(contribution, event.UserId)
-
-    if player_state.Events[event.EventId] == true then
-        return result(true, nil, {
-            already_applied = true,
-            snapshot = public_player_snapshot(player_state),
-        })
-    end
-
     local channel = event_definition.Channel
     local breakdown = event_definition.Breakdown
     local weight = tonumber(event_definition.Weight) or 1
@@ -262,26 +251,61 @@ function ContributionService:record(event: any): any
         return result(false, "UnknownContributionType")
     end
 
-    local amount = event.Amount
-    player_state.Breakdown[breakdown] =
-        (tonumber(player_state.Breakdown[breakdown]) or 0) + amount
-    player_state[channel] =
-        (tonumber(player_state[channel]) or 0) + (amount * weight)
-    player_state.Events[event.EventId] = true
+    local function apply_to_instance_state(instance_state: any): (any, any)
+        local contribution = normalize_contribution(instance_state)
+        local player_state = normalize_player(contribution, event.UserId)
 
+        if player_state.Events[event.EventId] == true then
+            return instance_state, {
+                already_applied = true,
+                snapshot = public_player_snapshot(player_state),
+            }
+        end
+
+        local amount = event.Amount
+        player_state.Breakdown[breakdown] =
+            (tonumber(player_state.Breakdown[breakdown]) or 0) + amount
+        player_state[channel] =
+            (tonumber(player_state[channel]) or 0) + (amount * weight)
+        player_state.Events[event.EventId] = true
+
+        return instance_state, {
+            already_applied = false,
+            snapshot = public_player_snapshot(player_state),
+        }
+    end
+
+    if type(self._sessions.update_instance_state) == "function" then
+        local persisted = self._sessions:update_instance_state(
+            event.SessionId,
+            apply_to_instance_state
+        )
+
+        if type(persisted) ~= "table"
+            or persisted.ok ~= true
+            or type(persisted.value) ~= "table"
+        then
+            return result(false, "ContributionPersistenceFailed")
+        end
+
+        return result(true, nil, persisted.value)
+    end
+
+    -- Compatibility fallback for focused test doubles that predate the
+    -- mutable runtime-state API. Production DungeonSessionService uses the
+    -- atomic update path above.
+    local instance_state = deep_clone(session.InstanceState or {})
+    local next_state, value = apply_to_instance_state(instance_state)
     local persisted = self._sessions:set_instance_state(
         event.SessionId,
-        instance_state
+        next_state
     )
 
     if type(persisted) ~= "table" or persisted.ok ~= true then
         return result(false, "ContributionPersistenceFailed")
     end
 
-    return result(true, nil, {
-        already_applied = false,
-        snapshot = public_player_snapshot(player_state),
-    })
+    return result(true, nil, value)
 end
 
 function ContributionService:get_player_snapshot(
@@ -346,6 +370,22 @@ function ContributionService:reset_for_test(session_id: string): any
 
     if not session then
         return result(false, "UnknownSession")
+    end
+
+    if type(self._sessions.update_instance_state) == "function" then
+        local persisted = self._sessions:update_instance_state(
+            session_id,
+            function(instance_state: any): (any, any?)
+                instance_state.Contribution = nil
+                return instance_state, nil
+            end
+        )
+
+        if type(persisted) ~= "table" or persisted.ok ~= true then
+            return result(false, "ContributionPersistenceFailed")
+        end
+
+        return result(true, nil)
     end
 
     local instance_state = deep_clone(session.InstanceState or {})

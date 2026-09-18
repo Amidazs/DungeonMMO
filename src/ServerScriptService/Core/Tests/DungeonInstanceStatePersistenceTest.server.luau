@@ -13,4 +13,5 @@ local function check(condition: boolean, message: string)
 end
 
 check(type(ServiceClass.set_instance_state) == "function", "session service exposes immutable instance state setter")
+check(type(ServiceClass.update_instance_state) == "function", "session service exposes atomic mutable instance state updater")
 print(string.format("[Dungeon Instance State Persistence Tests] PASS: %d assertions.", assertions))

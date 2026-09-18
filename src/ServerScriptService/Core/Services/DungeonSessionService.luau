@@ -404,6 +404,45 @@ function DungeonSessionService:set_instance_state(session_id: string, instance_s
     end)
 end
 
+function DungeonSessionService:update_instance_state(
+    session_id: string,
+    transform: (any) -> (any, any?)
+): any
+    if type(transform) ~= "function" then
+        return operation(false, "InvalidInstanceStateTransform")
+    end
+
+    return self:_update(session_id, function(session: any, now: number)
+        if type(session) ~= "table" then
+            return {
+                State = "Expired",
+                SessionId = session_id,
+                Members = {},
+                UpdatedAt = now,
+                ExpiresAt = now,
+            }, operation(false, "SessionNotFound")
+        end
+        if session.State ~= "Creating" and session.State ~= "Active" then
+            return session, operation(false, "InvalidTransition")
+        end
+
+        local current_state = if type(session.InstanceState) == "table"
+            then deep_clone(session.InstanceState)
+            else {}
+        local next_state, transform_value = transform(current_state)
+        if type(next_state) ~= "table" then
+            return session, operation(false, "InvalidInstanceState")
+        end
+
+        session.InstanceState = deep_clone(next_state)
+        session.UpdatedAt = now
+
+        local succeeded = operation(true, nil)
+        succeeded.value = deep_clone(transform_value)
+        return session, succeeded
+    end)
+end
+
 function DungeonSessionService:set_handoff_nonce(session_id: string, user_id: number, nonce: string): any
     if type(nonce) ~= "string" or nonce == "" then
         return operation(false, "InvalidNonce")
