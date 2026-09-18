@@ -150,27 +150,40 @@ function MarauderPackEncounterExecutor:execute(
 
     local enemies = {}
     for index = 1, count do
-        local enemy = self._marauder_factory.create({
-            Parent = context.EnemiesFolder,
-            Name = pack.EnemyNamePrefix .. tostring(index),
-            SpawnCFrame = positions[index],
-            SpawnIndex = pack.SpawnIndexBase + index,
-            RespawnEnabled = false,
-            ControllerEnabled = true,
-            EncounterId = binding.RuntimeEncounterId,
-            EnemyId = pack.EnemyNamePrefix .. tostring(index),
-            LifeIndex = 1,
-            RewardXP = reward.XP,
-            RewardGoldMin = reward.GoldMin,
-            RewardGoldMax = reward.GoldMax,
-            BaseMaxHealth = base_health,
-            HealthMultiplier =
-                context.Tuning.EnemyHealthMultiplier,
-            DamageMultiplier =
-                context.Tuning.EnemyDamageMultiplier,
-            BestiaryCreatureId = reward.BestiaryCreatureId,
-        })
-        table.insert(enemies, enemy)
+        local created_ok, enemy_or_error = pcall(function()
+            return self._marauder_factory.create({
+                Parent = context.EnemiesFolder,
+                Name = pack.EnemyNamePrefix .. tostring(index),
+                SpawnCFrame = positions[index],
+                SpawnIndex = pack.SpawnIndexBase + index,
+                RespawnEnabled = false,
+                ControllerEnabled = true,
+                EncounterId = binding.RuntimeEncounterId,
+                EnemyId = pack.EnemyNamePrefix .. tostring(index),
+                LifeIndex = 1,
+                RewardXP = reward.XP,
+                RewardGoldMin = reward.GoldMin,
+                RewardGoldMax = reward.GoldMax,
+                BaseMaxHealth = base_health,
+                HealthMultiplier =
+                    context.Tuning.EnemyHealthMultiplier,
+                DamageMultiplier =
+                    context.Tuning.EnemyDamageMultiplier,
+                BestiaryCreatureId = reward.BestiaryCreatureId,
+            })
+        end)
+
+        if not created_ok
+            or typeof(enemy_or_error) ~= "Instance"
+            or not enemy_or_error:IsA("Model")
+        then
+            for _, existing in ipairs(enemies) do
+                existing:Destroy()
+            end
+            return result(false, "EnemyFactoryExecutionFailed")
+        end
+
+        table.insert(enemies, enemy_or_error :: Model)
     end
 
     return result(true, nil, {
@@ -180,6 +193,25 @@ function MarauderPackEncounterExecutor:execute(
             count
         ),
     })
+end
+
+-- Removes spawned pack models after downstream startup rejection.
+function MarauderPackEncounterExecutor:cleanup(
+    _encounter: any,
+    _binding: any,
+    execution: any,
+    _context: any
+): any
+    for _, enemy in ipairs(
+        type(execution) == "table"
+            and execution.Enemies
+            or {}
+    ) do
+        if typeof(enemy) == "Instance" then
+            enemy:Destroy()
+        end
+    end
+    return result(true, nil)
 end
 
 return table.freeze(MarauderPackEncounterExecutor)

@@ -75,22 +75,20 @@ local DungeonDeathPresentation = require(
     Dungeon:WaitForChild("DungeonDeathPresentation")
 )
 local DungeonEnemyCleanup = require(Dungeon:WaitForChild("DungeonEnemyCleanup"))
-local MarauderCaptainFactory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
-local DungeonBossSpawnGuard = require(
-    Dungeon:WaitForChild("DungeonBossSpawnGuard")
+local DungeonEncounterExecutionBootstrap = require(
+    Dungeon:WaitForChild("DungeonEncounterExecutionBootstrap")
+)
+local DungeonEncounterExecutionController = require(
+    Dungeon:WaitForChild("DungeonEncounterExecutionController")
 )
 local CompletionEligibilityRules = require(Dungeon:WaitForChild("CompletionEligibilityRules"))
 local CompletionService = require(Dungeon:WaitForChild("CompletionService"))
 local ReturnPortalService = require(Dungeon:WaitForChild("ReturnPortalService"))
-local DungeonMarauderFactory = require(
-    Dungeon:WaitForChild("DungeonMarauderFactory")
-)
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
 )
 local DungeonRuntimeSelection = require(Dungeon:WaitForChild("DungeonRuntimeSelection"))
 local DungeonEnvironmentRouter = require(Dungeon:WaitForChild("DungeonEnvironmentRouter"))
-local MineForemanFactory = require(Dungeon:WaitForChild("MineForemanFactory"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -151,6 +149,7 @@ enemies_folder.Parent = runtime_root
 local active_session_id: string? = nil
 local encounter_service: any = nil
 local encounter_runtime_controller: any = nil
+local encounter_execution_controller: any = nil
 local depth1_flow: any = nil
 local depth1_bindings: any = nil
 local checkpoint_service: any = nil
@@ -486,36 +485,30 @@ local function sync_encounter_members_from_session()
     end
 end
 
-local function spawn_marauder(
-    encounter_id: string,
-    enemy_id: string,
-    spawn_cframe: CFrame,
-    spawn_index: number
-): Model
-    local tuning = active_difficulty_tuning()
-    local reward = DungeonDifficultyTuning.scale_monster_reward(
-        active_definition.StandardMarauderReward,
-        tuning
+local function active_instance_state(): any
+    local session = current_session()
+    return if session
+        and type(session.InstanceState) == "table"
+        then session.InstanceState
+        else {}
+end
+
+-- Builds server-owned execution context for the current dungeon run.
+local function encounter_execution_context(): any
+    assert(
+        active_session_id ~= nil,
+        "Encounter execution requires an active session."
     )
 
-    return DungeonMarauderFactory.create({
-        Parent = enemies_folder,
-        Name = enemy_id,
-        SpawnCFrame = spawn_cframe,
-        SpawnIndex = spawn_index,
-        RespawnEnabled = false,
-        ControllerEnabled = true,
-        EncounterId = encounter_id,
-        EnemyId = enemy_id,
-        LifeIndex = 1,
-        RewardXP = reward.XP,
-        RewardGoldMin = reward.GoldMin,
-        RewardGoldMax = reward.GoldMax,
-        BaseMaxHealth = active_definition.StandardMarauderMaxHealth,
-        HealthMultiplier = tuning.EnemyHealthMultiplier,
-        DamageMultiplier = tuning.EnemyDamageMultiplier,
-        BestiaryCreatureId = reward.BestiaryCreatureId,
-    })
+    return {
+        DungeonDefinition = active_definition,
+        Tuning = active_difficulty_tuning(),
+        InstanceState = active_instance_state(),
+        Environment = environment,
+        EnemiesFolder = enemies_folder,
+        RuntimeRoot = runtime_root,
+        SessionId = active_session_id,
+    }
 end
 
 local function print_reward_result(result: any)
@@ -563,15 +556,19 @@ local function connected_loaded_players(): {Player}
     return result
 end
 
-local function send_boss_state(humanoid: Humanoid)
+local function send_boss_state(
+    humanoid: Humanoid,
+    boss_name: string,
+    encounter_id: string
+)
     for _, player in ipairs(Players:GetPlayers()) do
         if loaded_users[player.UserId] then
             dungeon_state:FireClient(player, {
                 state = "Boss",
-                objective = "Defeat the Marauder Captain.",
+                objective = "Defeat " .. boss_name .. ".",
                 session_id = active_session_id,
-                encounter_id = "MarauderCaptain",
-                boss_name = active_definition.Boss.DisplayName,
+                encounter_id = encounter_id,
+                boss_name = boss_name,
                 boss_health = math.max(0, humanoid.Health),
                 boss_max_health = humanoid.MaxHealth,
             })
@@ -596,32 +593,12 @@ local function advance_checkpoint(checkpoint_id: string): boolean
     return true
 end
 
--- Starts one physical Depth1 slot only when the generic sequence permits it.
-local function start_depth1_slot(room_slot_id: string): any?
-    if not active_session_id or not depth1_flow then
-        return nil
-    end
-
-    local started = depth1_flow:start_slot(room_slot_id)
-    if started.ok == true then
-        return started.binding
-    end
-
-    if started.reason == "EncounterAlreadyActive"
-        or started.reason == "EncounterAlreadyCleared"
-        or started.reason == "EncounterAlreadySkipped"
-        or started.reason == "EncounterOutOfOrder"
-    then
-        return nil
-    end
-
-    warn(
-        "[Dungeon Runtime] Encounter start rejected for "
-            .. room_slot_id
-            .. ": "
-            .. tostring(started.reason)
-    )
-    return nil
+local function normal_start_rejection(reason: string?): boolean
+    return reason == "EncounterAlreadyActive"
+        or reason == "EncounterAlreadyCleared"
+        or reason == "EncounterAlreadySkipped"
+        or reason == "EncounterOutOfOrder"
+        or reason == "AnotherEncounterActive"
 end
 
 local function connect_enemy(enemy: Model, encounter_id: string)
@@ -697,26 +674,50 @@ local function connect_enemy(enemy: Model, encounter_id: string)
     end)
 end
 
-local function instance_state(): any
-    local session=current_session(); return session and session.InstanceState or nil
-end
-local function room_marauder_count(room_id:string):number
-    local count=active_definition.RoomPacks[room_id].MarauderCount
-    local state=instance_state()
-    if active_definition.Id=="AbandonedMine" and state then
-        if room_id=="CombatRoom1" and state.EventActive==true then count += active_definition.StateModifiers.DeepEchoes.Room1BonusMarauders end
-        if room_id=="CombatRoom2" and state.RareStateId=="CrystalBloom" then count += active_definition.StateModifiers.CrystalBloom.Room2BonusMarauders end
-    end
-    return count
-end
-
-local function start_room1()
-    local binding = start_depth1_slot("Room1")
-    if not binding or not active_session_id then
-        return
+-- Starts, spawns and registers one physical slot as a single transaction.
+local function start_executed_slot(room_slot_id: string): any?
+    if not active_session_id
+        or not encounter_execution_controller
+        or not encounter_service
+    then
+        return nil
     end
 
+    local context = encounter_execution_context()
+    local started = encounter_execution_controller:start_slot(
+        room_slot_id,
+        context
+    )
+    if started.ok ~= true then
+        if not normal_start_rejection(started.reason) then
+            warn(
+                "[Dungeon Runtime] Encounter execution rejected for "
+                    .. room_slot_id
+                    .. ": "
+                    .. tostring(started.reason)
+            )
+        end
+        return nil
+    end
+
+    local binding = started.Binding
+    local execution = started.Execution
     local encounter_id = binding.RuntimeEncounterId
+    local enemies = execution.Enemies
+
+    if type(enemies) ~= "table" or #enemies == 0 then
+        encounter_execution_controller:abort_slot(
+            room_slot_id,
+            execution,
+            context
+        )
+        warn(
+            "[Dungeon Runtime] Encounter executor returned no enemies for "
+                .. tostring(binding.PlanEncounterId)
+        )
+        return nil
+    end
+
     sync_all_character_encounters(encounter_id)
     sessions:set_runtime_progress(
         active_session_id,
@@ -724,83 +725,52 @@ local function start_room1()
         encounter_id
     )
 
-    local positions = environment:enemy_spawn_cframes("Room1")
-    local enemies = {}
-    for index = 1, room_marauder_count(encounter_id) do
-        table.insert(
-            enemies,
-            spawn_marauder(
-                encounter_id,
-                "Room1_Marauder_" .. tostring(index),
-                positions[index],
-                100 + index
-            )
-        )
-    end
-
-    local started = encounter_service:start(
+    local service_started = encounter_service:start(
         encounter_id,
         member_user_ids(),
         enemies
     )
-    if not started.ok then
-        error(
-            "Room1 encounter failed: "
-                .. tostring(started.reason)
+    if service_started.ok ~= true then
+        local aborted = encounter_execution_controller:abort_slot(
+            room_slot_id,
+            execution,
+            context
         )
+        warn(
+            "[Dungeon Runtime] EncounterService start failed for "
+                .. encounter_id
+                .. ": "
+                .. tostring(service_started.reason)
+                .. " | rollback="
+                .. tostring(aborted.ok)
+        )
+        sync_all_character_encounters("")
+        return nil
     end
 
     sync_encounter_members_from_session()
     for _, enemy in ipairs(enemies) do
         connect_enemy(enemy, encounter_id)
     end
+
+    return started
+end
+
+local function start_room1()
+    local started = start_executed_slot("Room1")
+    if not started then
+        return
+    end
+
     send_objective("Combat Room 1: defeat both Marauders.")
 end
 
 local function start_room2()
-    local binding = start_depth1_slot("Room2")
-    if not binding or not active_session_id then
+    local started = start_executed_slot("Room2")
+    if not started then
         return
     end
 
-    local encounter_id = binding.RuntimeEncounterId
-    sync_all_character_encounters(encounter_id)
-    sessions:set_runtime_progress(
-        active_session_id,
-        encounter_id,
-        encounter_id
-    )
-
-    local positions = environment:enemy_spawn_cframes("Room2")
-    local enemies = {}
-    for index = 1, room_marauder_count(encounter_id) do
-        table.insert(
-            enemies,
-            spawn_marauder(
-                encounter_id,
-                "Room2_Marauder_" .. tostring(index),
-                positions[index],
-                200 + index
-            )
-        )
-    end
-
-    local started = encounter_service:start(
-        encounter_id,
-        member_user_ids(),
-        enemies
-    )
-    if not started.ok then
-        error(
-            "Room2 encounter failed: "
-                .. tostring(started.reason)
-        )
-    end
-
-    sync_encounter_members_from_session()
-    for _, enemy in ipairs(enemies) do
-        connect_enemy(enemy, encounter_id)
-    end
     send_objective(
         "Combat Room 2: defeat the larger Marauder pack."
     )
@@ -885,86 +855,44 @@ handle_boss_cleared = function()
 end
 
 local function start_boss()
-    local binding = start_depth1_slot("Room3")
-    if not binding or not active_session_id then
+    local started = start_executed_slot("Room3")
+    if not started then
         return
     end
 
-    local session = current_session()
-    if not session or session.State ~= "Active" then
-        return
+    local binding = started.Binding
+    local execution = started.Execution
+    local boss = execution.BossModel
+    local humanoid = execution.BossHumanoid
+    local boss_name = execution.BossDisplayName
+        or active_definition.Boss.DisplayName
+
+    if typeof(boss) == "Instance"
+        and boss:IsA("Model")
+    then
+        active_captain = boss
     end
 
-    if not DungeonBossSpawnGuard.claim(
-        runtime_root,
-        active_session_id
-    ) then
-        warn(
-            "[Dungeon Runtime] Duplicate Captain spawn blocked "
-                .. "for session "
-                .. active_session_id
-                .. "."
-        )
-        return
-    end
-
-    local encounter_id = binding.RuntimeEncounterId
-    sync_all_character_encounters(encounter_id)
-    sessions:set_runtime_progress(
-        active_session_id,
-        encounter_id,
-        encounter_id
-    )
-
-    local tuning = active_difficulty_tuning()
-    local reward = DungeonDifficultyTuning.scale_monster_reward(
-        active_definition.MarauderCaptainReward,
-        tuning
-    )
-    local boss_factory = if active_definition.Id == "AbandonedMine"
-        then MineForemanFactory
-        else MarauderCaptainFactory
-    local captain = boss_factory.create({
-        Parent = enemies_folder,
-        SpawnCFrame = environment:captain_spawn_cframe(),
-        EncounterId = encounter_id,
-        RewardXP = reward.XP,
-        RewardGoldMin = reward.GoldMin,
-        RewardGoldMax = reward.GoldMax,
-        BestiaryCreatureId = reward.BestiaryCreatureId,
-        HealthMultiplier = tuning.EnemyHealthMultiplier,
-        DamageMultiplier = tuning.EnemyDamageMultiplier,
-        BossRole = binding.Kind or "Boss",
-    })
-    active_captain = captain
-
-    local started = encounter_service:start(
-        encounter_id,
-        member_user_ids(),
-        {captain}
-    )
-    if not started.ok then
-        error(
-            "Captain encounter failed: "
-                .. tostring(started.reason)
-        )
-    end
-
-    sync_encounter_members_from_session()
-    connect_enemy(captain, encounter_id)
     send_objective(
-        "BOSS: Defeat the "
-            .. active_definition.Boss.DisplayName
-            .. ".",
-        "Boss"
+        "BOSS: " .. tostring(execution.Objective),
+        execution.ObjectiveState or "Boss"
     )
 
-    local humanoid = captain:FindFirstChildOfClass("Humanoid")
-    if humanoid then
+    if typeof(humanoid) == "Instance"
+        and humanoid:IsA("Humanoid")
+    then
         humanoid.HealthChanged:Connect(function()
-            send_boss_state(humanoid)
+            send_boss_state(
+                humanoid,
+                boss_name,
+                binding.RuntimeEncounterId
+            )
         end)
-        send_boss_state(humanoid)
+        send_boss_state(
+            humanoid,
+            boss_name,
+            binding.RuntimeEncounterId
+        )
     end
 end
 
@@ -1091,6 +1019,14 @@ local function initialize_session_services(session: any): (any?, boolean)
                 .. tostring(encounter_runtime_result.reason)
         )
     end
+
+    local execution_registry =
+        DungeonEncounterExecutionBootstrap.create()
+    encounter_execution_controller =
+        DungeonEncounterExecutionController.new(
+            depth1_flow,
+            execution_registry
+        )
 
     checkpoint_service = CheckpointService.new(
         sessions,

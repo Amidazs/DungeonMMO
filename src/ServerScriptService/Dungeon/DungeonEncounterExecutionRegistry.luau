@@ -142,4 +142,54 @@ function DungeonEncounterExecutionRegistry:execute(
     return executed
 end
 
+-- Cleans up a successful execution when downstream startup is rejected.
+function DungeonEncounterExecutionRegistry:cleanup(
+    encounter: any,
+    binding: any,
+    execution: any,
+    context: any
+): any
+    local executor_id = self:resolve_id(encounter)
+    if not executor_id then
+        return result(false, "UnknownEncounterExecutor")
+    end
+
+    local executor = self._executors[executor_id]
+    if not executor then
+        return result(false, "EncounterExecutorMissing", {
+            ExecutorId = executor_id,
+        })
+    end
+
+    if type(executor.cleanup) == "function" then
+        local cleaned = executor:cleanup(
+            encounter,
+            binding,
+            execution,
+            context
+        )
+        if type(cleaned) ~= "table" then
+            return result(false, "InvalidExecutorCleanupResult", {
+                ExecutorId = executor_id,
+            })
+        end
+        cleaned.ExecutorId = executor_id
+        return cleaned
+    end
+
+    for _, enemy in ipairs(
+        type(execution) == "table"
+            and execution.Enemies
+            or {}
+    ) do
+        if typeof(enemy) == "Instance" then
+            enemy:Destroy()
+        end
+    end
+
+    return result(true, nil, {
+        ExecutorId = executor_id,
+    })
+end
+
 return table.freeze(DungeonEncounterExecutionRegistry)

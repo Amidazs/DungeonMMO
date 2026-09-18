@@ -120,6 +120,25 @@ check(
     flow:state_for_slot("Room1") == "Cleared",
     "Flow state lookup must use logical plan ID."
 )
+
+local cancel_controller: any = {}
+function cancel_controller:cancel_active(encounter_id: string): any
+    return {
+        ok = encounter_id == "Depth1Boss",
+        reason = if encounter_id == "Depth1Boss"
+            then nil
+            else "EncounterNotActive",
+    }
+end
+local cancel_flow = Flow.new(cancel_controller, binding_result)
+check(
+    cancel_flow:cancel_slot("Room3").ok == true,
+    "Flow cancel must translate room slot to logical encounter ID."
+)
+check(
+    cancel_flow:cancel_slot("Unknown").reason == "UnknownRoomSlot",
+    "Flow cancel must fail closed for unknown slots."
+)
 check(
     flow:binding_for_runtime("MarauderCaptain")
         .PlanEncounterId == "Depth1Boss",

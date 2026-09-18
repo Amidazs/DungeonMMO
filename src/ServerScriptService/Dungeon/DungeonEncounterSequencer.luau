@@ -160,6 +160,30 @@ function DungeonEncounterSequencer:start(
         encounter_id = encounter_id,
     })
 end
+-- Returns one active encounter to Pending after execution setup fails.
+function DungeonEncounterSequencer:cancel_active(
+    encounter_id: string
+): any
+    local state = self._states[encounter_id]
+    if state == nil then
+        return operation(false, "UnknownEncounter")
+    end
+
+    if self._active_id ~= encounter_id
+        or state ~= "Active"
+    then
+        return operation(false, "EncounterNotActive")
+    end
+
+    self._states[encounter_id] = "Pending"
+    self._active_id = nil
+
+    return operation(true, nil, {
+        encounter_id = encounter_id,
+        next_encounter_id = self:next_id(),
+    })
+end
+
 -- Clears the active encounter exactly once.
 function DungeonEncounterSequencer:clear(
     encounter_id: string

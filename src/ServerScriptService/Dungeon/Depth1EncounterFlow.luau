@@ -100,6 +100,20 @@ function Depth1EncounterFlow:clear_runtime(
     return cleared
 end
 
+-- Cancels one active room-slot encounter back to Pending.
+function Depth1EncounterFlow:cancel_slot(
+    room_slot_id: string
+): any
+    local binding = self._by_slot[room_slot_id]
+    if not binding then
+        return operation(false, "UnknownRoomSlot")
+    end
+
+    return self._controller:cancel_active(
+        binding.PlanEncounterId
+    )
+end
+
 -- Returns lifecycle state for the logical encounter bound to one room slot.
 function Depth1EncounterFlow:state_for_slot(
     room_slot_id: string

@@ -87,6 +87,8 @@ local context = {
     InstanceState = {},
     Environment = fake_environment,
     EnemiesFolder = parent,
+    RuntimeRoot = Instance.new("Folder"),
+    SessionId = "executor-test-session",
 }
 
 local pack_executor = PackExecutor.new({
@@ -130,6 +132,39 @@ check(
     "Pack must forward difficulty combat scaling."
 )
 
+local partial_parent = Instance.new("Folder")
+local partial_calls = 0
+local failing_factory = {}
+function failing_factory.create(options: any): Model
+    partial_calls += 1
+    if partial_calls == 2 then
+        error("synthetic factory failure")
+    end
+    local model = Instance.new("Model")
+    model.Parent = options.Parent
+    return model
+end
+
+local failing_pack_executor = PackExecutor.new({
+    marauder_factory = failing_factory,
+})
+local failing_context = table.clone(context)
+failing_context.EnemiesFolder = partial_parent
+local partial_result = failing_pack_executor:execute(
+    pack_encounter,
+    pack_binding,
+    failing_context
+)
+check(
+    partial_result.reason == "EnemyFactoryExecutionFailed",
+    "Pack factory exception must fail closed."
+)
+check(
+    #partial_parent:GetChildren() == 0,
+    "Partial pack failure must destroy already-created enemies."
+)
+partial_parent:Destroy()
+
 check(
     pack_executor:validate(
         {
@@ -165,8 +200,38 @@ function fake_registry:get(boss_id: string): any?
     return nil
 end
 
+local guard_claims = {}
+local fake_guard = {}
+
+function fake_guard.claim(
+    _root: Instance,
+    session_id: string,
+    encounter_id: string
+): boolean
+    local key = session_id .. ":" .. encounter_id
+    if guard_claims[key] then
+        return false
+    end
+    guard_claims[key] = true
+    return true
+end
+
+function fake_guard.release(
+    _root: Instance,
+    session_id: string,
+    encounter_id: string
+): boolean
+    local key = session_id .. ":" .. encounter_id
+    if not guard_claims[key] then
+        return false
+    end
+    guard_claims[key] = nil
+    return true
+end
+
 local boss_executor = BossExecutor.new({
     boss_factory_registry = fake_registry,
+    boss_spawn_guard = fake_guard,
 })
 
 local boss_encounter = {
@@ -207,6 +272,18 @@ check(
     boss_calls[1].RewardXP == 60,
     "Boss reward must use difficulty scaling."
 )
+check(
+    guard_claims["executor-test-session:Depth1Boss"] == true,
+    "Boss execution must claim its stable encounter ID."
+)
+check(
+    boss_executor:execute(
+        boss_encounter,
+        boss_binding,
+        context
+    ).reason == "BossSpawnAlreadyClaimed",
+    "Duplicate execution of the same boss encounter must fail closed."
+)
 
 check(
     boss_executor:validate(
@@ -221,6 +298,7 @@ check(
     "Unimplemented future boss must fail closed."
 )
 
+context.RuntimeRoot:Destroy()
 parent:Destroy()
 
 print(string.format(

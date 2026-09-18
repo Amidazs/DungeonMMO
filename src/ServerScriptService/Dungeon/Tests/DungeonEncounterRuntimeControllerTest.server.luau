@@ -154,6 +154,23 @@ check(
     controller:start("FestivalChampion").ok == true,
     "Inserted event boss must start normally."
 )
+local cancelled = controller:cancel_active("FestivalChampion")
+check(
+    cancelled.ok == true
+        and controller:state_of("FestivalChampion") == "Pending",
+    "Runtime cancel must return active encounter to Pending."
+)
+local cancelled_session = assert(sessions:get(session.SessionId))
+check(
+    cancelled_session.InstanceState.EncounterRuntime.ActiveEncounterId == nil
+        and cancelled_session.InstanceState.EncounterRuntime.NextEncounterId
+            == "FestivalChampion",
+    "Runtime cancel must persist the rollback snapshot."
+)
+check(
+    controller:start("FestivalChampion").ok == true,
+    "Cancelled event boss must restart normally."
+)
 
 local latest = assert(sessions:get(session.SessionId))
 check(

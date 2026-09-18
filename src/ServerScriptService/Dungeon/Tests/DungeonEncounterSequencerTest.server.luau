@@ -70,6 +70,18 @@ check(
     "Required EventBoss must not be skippable."
 )
 check(sequence:start("EventBoss").ok == true, "EventBoss must start.")
+local cancelled_event = sequence:cancel_active("EventBoss")
+check(
+    cancelled_event.ok == true
+        and sequence:state_of("EventBoss") == "Pending"
+        and sequence:next_id() == "EventBoss",
+    "Cancelled active encounter must return to Pending."
+)
+check(
+    sequence:cancel_active("EventBoss").reason == "EncounterNotActive",
+    "Cancelling a non-active encounter must fail closed."
+)
+check(sequence:start("EventBoss").ok == true, "Cancelled EventBoss must restart.")
 check(sequence:clear("EventBoss").ok == true, "EventBoss must clear.")
 
 check(sequence:next_id() == "SecretBoss", "SecretBoss must become available.")

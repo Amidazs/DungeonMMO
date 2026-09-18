@@ -198,6 +198,23 @@ function DungeonEncounterRuntimeController:start(
     return started
 end
 
+-- Rolls an active encounter back to Pending and persists the rollback.
+function DungeonEncounterRuntimeController:cancel_active(
+    encounter_id: string
+): any
+    local cancelled =
+        self._sequencer:cancel_active(encounter_id)
+    if cancelled.ok ~= true then
+        return cancelled
+    end
+
+    local persisted = self:_persist()
+    if persisted.ok ~= true then
+        return persisted
+    end
+    return cancelled
+end
+
 -- Clears one active encounter and persists progression.
 function DungeonEncounterRuntimeController:clear(
     encounter_id: string
