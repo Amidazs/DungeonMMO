@@ -791,7 +791,8 @@ local function initialize_session_services(session: any): (any?, boolean)
         completion_reward,
         if active_definition.Id == DungeonDefinitions.TEST_DUNGEON.Id then skills else nil,
         quests,
-        runtime.GuildService
+        runtime.GuildService,
+        runtime.DungeonDifficultyProgressionService
     )
     return_service = ReturnPortalService.new(sessions, coordinator, {
         is_studio = RunService:IsStudio(),

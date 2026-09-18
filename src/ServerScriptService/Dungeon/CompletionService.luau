@@ -2,6 +2,8 @@
 local CompletionService = {}
 CompletionService.__index = CompletionService
 
+local LEGACY_DEFAULT_DIFFICULTY_ID = "Depth1"
+
 local function result(ok: boolean, reason: string?, extra: any?): any
     local out = extra or {}
     out.ok = ok
@@ -16,7 +18,8 @@ function CompletionService.new(
     reward_definition: any,
     skill_progression_service: any?,
     quest_service: any?,
-    guild_service: any?
+    guild_service: any?,
+    dungeon_difficulty_progression_service: any?
 ): any
     assert(session_service and reward_service and profile_service, "CompletionService dependencies are required")
     local self = setmetatable({}, CompletionService)
@@ -27,6 +30,8 @@ function CompletionService.new(
     self._skills = skill_progression_service
     self._quests = quest_service
     self._guilds = guild_service
+    self._dungeon_difficulty_progression =
+        dungeon_difficulty_progression_service
     return self
 end
 
@@ -74,11 +79,56 @@ function CompletionService:commit(session_id: string): any
             granted.quest_progress = quest_result
         end
 
+        if self._dungeon_difficulty_progression then
+            if type(session.DungeonId) ~= "string"
+                or session.DungeonId == ""
+            then
+                return result(
+                    false,
+                    "DifficultyProgressionFailed",
+                    {
+                        difficulty_reason = "UnknownDungeon",
+                        member_results = member_results,
+                    }
+                )
+            end
+
+            local raw_difficulty_id = session.Difficulty
+                and session.Difficulty.Id
+            local difficulty_id = if type(raw_difficulty_id) == "string"
+                and raw_difficulty_id ~= ""
+                then raw_difficulty_id
+                else LEGACY_DEFAULT_DIFFICULTY_ID
+
+            local difficulty_progress =
+                self._dungeon_difficulty_progression:record_clear(
+                    user_id,
+                    session.DungeonId,
+                    difficulty_id
+                )
+            if not difficulty_progress
+                or difficulty_progress.ok ~= true
+            then
+                return result(
+                    false,
+                    "DifficultyProgressionFailed",
+                    {
+                        difficulty_reason = if difficulty_progress
+                            then difficulty_progress.reason
+                            else "DifficultyProgressionMissingResult",
+                        member_results = member_results,
+                    }
+                )
+            end
+
+            granted.difficulty_progress = difficulty_progress
+        end
+
         member_results[tostring(user_id)] = granted
     end
 
     -- Save barrier: no shared progression or return portal opens until every
-    -- affected player profile has persisted its completion rewards.
+    -- affected profile has persisted rewards and dungeon-depth progression.
     for _, user_id in ipairs(session.CompletionRecipients or {}) do
         local saved, save_error = self._profiles:save(user_id, "DungeonCompletion")
         if not saved then
