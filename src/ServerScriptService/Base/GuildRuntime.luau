@@ -3,7 +3,7 @@ local Workspace = game:GetService("Workspace")
 
 local GuildRuntime = {}
 
-local HALL_Y = -900
+local HALL_Y = Workspace.FallenPartsDestroyHeight + 120
 local HALL_SPACING = 180
 local hall_slots: {[string]: number} = {}
 local next_hall_slot = 0
