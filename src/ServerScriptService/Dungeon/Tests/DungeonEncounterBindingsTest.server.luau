@@ -108,23 +108,51 @@ for _, entry in ipairs({
     )
 end
 
-check(
-    Layouts.is_registered("TestDungeon", "Depth2") == false,
-    "Depth2 physical layout must remain unregistered."
-)
-local depth2 = assert(
-    Difficulties.get("TestDungeon", "Depth2")
-)
-local unregistered = Bindings.resolve(
-    "TestDungeon",
-    depth2.LayoutId,
-    depth2.EncounterSequence,
-    temple_env
-)
-check(
-    unregistered.reason == "DungeonLayoutNotRegistered",
-    "Unimplemented higher-depth layout must fail closed."
-)
+for _, entry in ipairs({
+    {"TestDungeon", temple_env},
+    {"AbandonedMine", mine_env},
+}) do
+    local dungeon_id = entry[1] :: string
+    local environment = entry[2]
+
+    for _, difficulty_id in ipairs({
+        "Depth2",
+        "Depth3",
+        "Depth4",
+    }) do
+        check(
+            Layouts.is_registered(
+                dungeon_id,
+                difficulty_id
+            ) == false,
+            dungeon_id
+                .. " "
+                .. difficulty_id
+                .. " physical layout must remain unregistered."
+        )
+
+        local difficulty = assert(
+            Difficulties.get(
+                dungeon_id,
+                difficulty_id
+            )
+        )
+        local unregistered = Bindings.resolve(
+            dungeon_id,
+            difficulty.LayoutId,
+            difficulty.EncounterSequence,
+            environment
+        )
+        check(
+            unregistered.reason
+                == "DungeonLayoutNotRegistered",
+            dungeon_id
+                .. " "
+                .. difficulty_id
+                .. " must fail closed until its physical layout exists."
+        )
+    end
+end
 
 local synthetic_anchors = {"Synthetic.Entrance"}
 local synthetic_slots = {}
