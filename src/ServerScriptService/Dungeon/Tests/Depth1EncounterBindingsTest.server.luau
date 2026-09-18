@@ -67,6 +67,19 @@ for _, dungeon_id in ipairs({
                 == "EncounterStart:Depth1Boss",
         "Checkpoint IDs must derive from stable plan IDs."
     )
+    check(
+        result.by_slot.Room1.Encounter.ExecutorId
+            == "CombatPack"
+            and result.by_slot.Room1.Encounter.PackId
+                == "StandardRoom1",
+        "Room1 binding must retain its full combat descriptor."
+    )
+    check(
+        result.by_slot.Room3.Encounter.ExecutorId == "Boss"
+            and type(result.by_slot.Room3.Encounter.BossId)
+                == "string",
+        "Boss binding must retain its full boss descriptor."
+    )
 end
 
 local inserted_event = {

@@ -7,6 +7,18 @@ local DungeonEncounterRuntimeState = require(
 
 local Depth1EncounterBindings = {}
 
+local function clone_table(source: any): any
+    local result = {}
+    for key, value in pairs(source) do
+        if type(value) == "table" then
+            result[key] = clone_table(value)
+        else
+            result[key] = value
+        end
+    end
+    return result
+end
+
 local SLOT_BINDINGS = table.freeze({
     Room1 = table.freeze({
         RuntimeEncounterId = "CombatRoom1",
@@ -72,6 +84,7 @@ function Depth1EncounterBindings.resolve(
 
         local binding = {
             PlanEncounterId = encounter.Id,
+            RoomSlotId = encounter.RoomSlotId,
             RuntimeEncounterId = physical.RuntimeEncounterId,
             EnvironmentRoomId = physical.EnvironmentRoomId,
             CheckpointAnchor = physical.CheckpointAnchor,
@@ -81,7 +94,10 @@ function Depth1EncounterBindings.resolve(
                 ),
             CheckpointSequence = sequence,
             Kind = encounter.Kind,
+            ExecutorId = encounter.ExecutorId,
+            PackId = encounter.PackId,
             BossId = encounter.BossId,
+            Encounter = clone_table(encounter),
         }
 
         by_slot[encounter.RoomSlotId] = binding

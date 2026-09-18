@@ -121,6 +121,15 @@ check(
     "Flow state lookup must use logical plan ID."
 )
 check(
+    flow:binding_for_runtime("MarauderCaptain")
+        .PlanEncounterId == "Depth1Boss",
+    "Runtime boss ID must resolve back to its physical binding."
+)
+check(
+    flow:binding_for_runtime("Unknown") == nil,
+    "Unknown runtime encounter IDs must not resolve a binding."
+)
+check(
     flow:start_slot("Unknown").reason == "UnknownRoomSlot",
     "Unknown physical room slots must fail closed."
 )

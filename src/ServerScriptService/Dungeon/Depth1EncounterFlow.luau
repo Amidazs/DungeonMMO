@@ -121,6 +121,13 @@ function Depth1EncounterFlow:binding_for_slot(
     return self._by_slot[room_slot_id]
 end
 
+-- Returns the physical binding for one legacy runtime encounter ID.
+function Depth1EncounterFlow:binding_for_runtime(
+    runtime_encounter_id: string
+): any?
+    return self._by_runtime_id[runtime_encounter_id]
+end
+
 -- Returns whether the generic controller considers the required run complete.
 function Depth1EncounterFlow:is_complete(): boolean
     return self._controller:is_complete()
