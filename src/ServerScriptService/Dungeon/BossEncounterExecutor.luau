@@ -1,0 +1,157 @@
+--!strict
+local ServerScriptService = game:GetService("ServerScriptService")
+
+local Core = ServerScriptService:WaitForChild("Core")
+local Services = Core:WaitForChild("Services")
+local Dungeon = ServerScriptService:WaitForChild("Dungeon")
+
+local DungeonDifficultyTuning = require(
+    Services:WaitForChild("DungeonDifficultyTuning")
+)
+local DungeonEncounterSpawnCatalog = require(
+    Dungeon:WaitForChild("DungeonEncounterSpawnCatalog")
+)
+
+local BossEncounterExecutor = {}
+BossEncounterExecutor.__index = BossEncounterExecutor
+
+local function result(
+    ok: boolean,
+    reason: string?,
+    extra: any?
+): any
+    local response = extra or {}
+    response.ok = ok
+    response.reason = reason
+    return response
+end
+
+-- Creates a boss executor backed by a stable BossId factory registry.
+function BossEncounterExecutor.new(options: any): any
+    assert(
+        type(options) == "table"
+            and options.boss_factory_registry ~= nil,
+        "BossEncounterExecutor requires boss_factory_registry."
+    )
+
+    return setmetatable({
+        _boss_factories = options.boss_factory_registry,
+    }, BossEncounterExecutor)
+end
+
+local function resolve_spec(encounter: any): any?
+    if type(encounter.BossId) ~= "string"
+        or encounter.BossId == ""
+    then
+        return nil
+    end
+
+    return DungeonEncounterSpawnCatalog.get_boss(
+        encounter.BossId
+    )
+end
+
+-- Validates registered boss content without spawning it.
+function BossEncounterExecutor:validate(
+    encounter: any,
+    binding: any,
+    context: any
+): any
+    local spec = resolve_spec(encounter)
+    if not spec then
+        return result(false, "BossContentNotRegistered")
+    end
+
+    if self._boss_factories:get(spec.FactoryId) == nil then
+        return result(false, "BossFactoryNotRegistered")
+    end
+
+    if type(binding) ~= "table"
+        or type(binding.RuntimeEncounterId) ~= "string"
+        or binding.RuntimeEncounterId == ""
+        or type(context.Environment) ~= "table"
+        or type(context.Environment.captain_spawn_cframe)
+            ~= "function"
+        or typeof(context.EnemiesFolder) ~= "Instance"
+    then
+        return result(false, "EncounterExecutionContextInvalid")
+    end
+
+    return result(true, nil, {
+        BossSpec = spec,
+    })
+end
+
+local function scaled_reward(
+    spec: any,
+    context: any
+): any?
+    local reward =
+        context.DungeonDefinition[spec.RewardKey]
+    if type(reward) ~= "table"
+        or type(context.Tuning) ~= "table"
+    then
+        return nil
+    end
+
+    return DungeonDifficultyTuning.scale_monster_reward(
+        reward,
+        context.Tuning
+    )
+end
+
+-- Spawns one registered boss and returns its presentation handles.
+function BossEncounterExecutor:execute(
+    encounter: any,
+    binding: any,
+    context: any
+): any
+    local validated = self:validate(
+        encounter,
+        binding,
+        context
+    )
+    if validated.ok ~= true then
+        return validated
+    end
+
+    local spec = validated.BossSpec
+    local reward = scaled_reward(spec, context)
+    if not reward then
+        return result(false, "EncounterRewardDefinitionMissing")
+    end
+
+    local factory = self._boss_factories:get(spec.FactoryId)
+    local boss = factory.create({
+        Parent = context.EnemiesFolder,
+        SpawnCFrame =
+            context.Environment:captain_spawn_cframe(),
+        EncounterId = binding.RuntimeEncounterId,
+        RewardXP = reward.XP,
+        RewardGoldMin = reward.GoldMin,
+        RewardGoldMax = reward.GoldMax,
+        BestiaryCreatureId = reward.BestiaryCreatureId,
+        HealthMultiplier =
+            context.Tuning.EnemyHealthMultiplier,
+        DamageMultiplier =
+            context.Tuning.EnemyDamageMultiplier,
+        BossRole = encounter.Kind or "Boss",
+    })
+
+    local humanoid = boss:FindFirstChildOfClass("Humanoid")
+    if not humanoid then
+        boss:Destroy()
+        return result(false, "BossHumanoidMissing")
+    end
+
+    return result(true, nil, {
+        Enemies = {boss},
+        BossModel = boss,
+        BossHumanoid = humanoid,
+        BossDisplayName = spec.DisplayName,
+        Objective = "Defeat " .. spec.DisplayName .. ".",
+        ObjectiveState = "Boss",
+    })
+end
+
+return table.freeze(BossEncounterExecutor)

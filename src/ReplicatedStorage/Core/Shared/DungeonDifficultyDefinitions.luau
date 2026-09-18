@@ -49,6 +49,7 @@ local function combat(
         Id = encounter_id,
         RoomSlotId = room_slot_id,
         Kind = "Combat",
+        ExecutorId = "CombatPack",
         PackId = pack_id,
     })
 end
@@ -63,6 +64,7 @@ local function boss_encounter(
         Id = encounter_id,
         RoomSlotId = room_slot_id,
         Kind = kind,
+        ExecutorId = "Boss",
         BossId = boss_id,
     })
 end

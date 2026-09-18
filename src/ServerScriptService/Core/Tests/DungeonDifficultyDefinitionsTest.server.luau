@@ -64,6 +64,21 @@ local function check_ladder(
             dungeon_id .. " monster rewards must increase by depth."
         )
 
+        for _, encounter in ipairs(
+            difficulty.EncounterSequence
+        ) do
+            local expected_executor = if encounter.Kind == "Combat"
+                then "CombatPack"
+                else "Boss"
+            check(
+                encounter.ExecutorId == expected_executor,
+                dungeon_id
+                    .. " "
+                    .. encounter.Id
+                    .. " executor ID mismatch."
+            )
+        end
+
         previous_health = difficulty.EnemyHealthMultiplier
         previous_damage = difficulty.EnemyDamageMultiplier
         previous_reward = difficulty.MonsterRewardMultiplier
