@@ -62,6 +62,10 @@ local ItemTransferRules = require(
     shared:WaitForChild("ItemTransferRules")
 )
 
+local DungeonDifficultyDefinitions = require(
+    shared:WaitForChild("DungeonDifficultyDefinitions")
+)
+
 local ProfileMigration = {}
 
 local IDENTITY_VERSION = 1
@@ -574,6 +578,49 @@ local function sanitize_reputation(value: any): any
         },
     }
 end
+-- Sanitizes versioned dungeon-depth progression without touching legacy
+-- DungeonProgress data.
+local function sanitize_dungeon_difficulty_progress(value: any): any
+    local result = {
+        Version = 1,
+        Dungeons = {},
+    }
+
+    if type(value) ~= "table" or type(value.Dungeons) ~= "table" then
+        return result
+    end
+
+    for dungeon_id, raw_state in pairs(value.Dungeons) do
+        local ordered = DungeonDifficultyDefinitions.ordered(dungeon_id)
+        if #ordered > 0 and type(raw_state) == "table" then
+            local raw_completed = raw_state.Completed
+            local completed = {}
+            local highest_order = 0
+            local prefix_complete = true
+
+            for _, difficulty in ipairs(ordered) do
+                local is_complete = type(raw_completed) == "table"
+                    and raw_completed[difficulty.Id] == true
+                if prefix_complete and is_complete then
+                    completed[difficulty.Id] = true
+                    highest_order = difficulty.Order
+                else
+                    prefix_complete = false
+                end
+            end
+
+            if highest_order > 0 then
+                result.Dungeons[dungeon_id] = {
+                    Completed = completed,
+                    HighestClearedOrder = highest_order,
+                }
+            end
+        end
+    end
+
+    return result
+end
+
 local function sanitize_market(value: any): any
     local result = {Version = 1, ActiveListingIds = {}, History = {}, Recovery = {}}
     if type(value) ~= "table" then return result end
@@ -794,6 +841,11 @@ function ProfileMigration.migrate(raw: any): any
     if type(slot1.DungeonProgress) ~= "table" then
         slot1.DungeonProgress = {}
     end
+
+    slot1.DungeonDifficultyProgress =
+        sanitize_dungeon_difficulty_progress(
+            slot1.DungeonDifficultyProgress
+        )
 
     if type(slot1.RewardHistory) ~= "table" then
         slot1.RewardHistory = {

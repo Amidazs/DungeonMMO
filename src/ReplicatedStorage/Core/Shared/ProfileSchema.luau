@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v9 adds persistent crafting recipe knowledge.
+-- Schema v13 adds independent persistent dungeon-difficulty progression.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 12
+ProfileSchema.VERSION = 13
 
 local function deep_clone(
     value: any,
@@ -129,6 +129,10 @@ function ProfileSchema.create_default(_user_id: number): any
                 Inventory = {},
                 Equipment = {},
                 DungeonProgress = {},
+                DungeonDifficultyProgress = {
+                    Version = 1,
+                    Dungeons = {},
+                },
                 RewardHistory = {
                     Completion = {},
                     Monster = {},

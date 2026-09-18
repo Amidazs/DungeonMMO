@@ -58,7 +58,10 @@ raw.Characters.Slot1.RaceChange = {
 }
 
 local migrated = ProfileMigration.migrate(raw)
-check(migrated.SchemaVersion == 12, "Migration must advance schema to v12.")
+check(
+    migrated.SchemaVersion == ProfileSchema.VERSION,
+    "Migration must advance to the current schema."
+)
 local character = migrated.Characters.Slot1
 check(character.RaceChange.Version == 1, "Race Change state must sanitize to version 1.")
 check(character.RaceChange.ArchivedByRace.BogusRace == nil,
@@ -79,7 +82,10 @@ check(character.ClassAdvancement.ActiveClassId == "HumanRogueDuelist",
     "Valid current-race active advancement must survive.")
 
 local twice = ProfileMigration.migrate(migrated)
-check(twice.SchemaVersion == 12, "Repeated migration must remain v12.")
+check(
+    twice.SchemaVersion == ProfileSchema.VERSION,
+    "Repeated migration must remain on the current schema."
+)
 check(twice.Characters.Slot1.RaceChange.ArchivedByRace.Human.Skills.DuelistDeadlyBlow.Proficiency == 250,
     "Repeated migration must preserve archived proficiency.")
 check(twice.Characters.Slot1.ClassAdvancement.ActiveClassId == "HumanRogueDuelist",

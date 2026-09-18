@@ -40,11 +40,17 @@ for index = 1, 250 do
     check(profile_service:load(user_id) ~= nil,
         "Profile reload failed at cycle " .. index)
     local reloaded = assert(profile_service:get_profile(user_id))
-    check(reloaded.SchemaVersion == 12 and reloaded.Characters.Slot1.Gold == index,
-        "Reloaded profile invariant failed at cycle " .. index)
+    check(
+        reloaded.SchemaVersion == ProfileSchema.VERSION
+            and reloaded.Characters.Slot1.Gold == index,
+        "Reloaded profile invariant failed at cycle " .. index
+    )
     local migrated = ProfileMigration.migrate(reloaded)
-    check(migrated.SchemaVersion == 12,
-        "Reloaded profile must remain valid v12 at cycle " .. index)
+    check(
+        migrated.SchemaVersion == ProfileSchema.VERSION,
+        "Reloaded profile must remain on the current schema at cycle "
+            .. index
+    )
     check(profile_service:release(user_id, "StressFinalRelease") == true,
         "Final release failed at cycle " .. index)
 end
@@ -253,7 +259,11 @@ check(InventoryService.count_item(race_final, "arc_slash_book") == books_before,
 check(type(race_final.RaceChange.ArchivedByRace.Human) == "table"
         and type(race_final.RaceChange.ArchivedByRace.Elf) == "table",
     "Race round trips must retain stable per-race archives.")
-check(ProfileMigration.migrate(race_profiles:get_profile(race_user)).SchemaVersion == 12,
-    "Final Race Change profile must remain valid schema v12.")
+check(
+    ProfileMigration.migrate(
+        race_profiles:get_profile(race_user)
+    ).SchemaVersion == ProfileSchema.VERSION,
+    "Final Race Change profile must remain on the current schema."
+)
 
 print("[Phase 3 Systems Stress] PASS: profiles=250 market=1000 replay=1000 guild=250 sessions=100 race_roundtrips=100")

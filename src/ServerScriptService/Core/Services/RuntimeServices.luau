@@ -18,6 +18,9 @@ local MemoryStoreMapAdapter = require(Adapters:WaitForChild("MemoryStoreMapAdapt
 local ProfileLeaseService = require(Services:WaitForChild("ProfileLeaseService"))
 local ProfileService = require(Services:WaitForChild("ProfileService"))
 local DungeonSessionService = require(Services:WaitForChild("DungeonSessionService"))
+local DungeonDifficultyProgressionService = require(
+    Services:WaitForChild("DungeonDifficultyProgressionService")
+)
 local ProgressionService = require(Services:WaitForChild("ProgressionService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RewardService = require(Services:WaitForChild("RewardService"))
@@ -92,6 +95,8 @@ function RuntimeServices.new(place_kind: string): any
     local audit = EconomyAuditService.new()
     local rate_limits = RateLimitService.new()
     local sessions = DungeonSessionService.new(session_map)
+    local dungeon_difficulty_progression =
+        DungeonDifficultyProgressionService.new(profiles)
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
     local inventory = InventoryService.new(profiles)
@@ -126,6 +131,8 @@ function RuntimeServices.new(place_kind: string): any
         LeaseService = leases,
         ProfileService = profiles,
         SessionService = sessions,
+        DungeonDifficultyProgressionService =
+            dungeon_difficulty_progression,
         ContributionService = contributions,
         BestiaryService = bestiary,
         ReputationService = reputation,
