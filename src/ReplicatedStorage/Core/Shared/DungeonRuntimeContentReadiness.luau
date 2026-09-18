@@ -102,7 +102,14 @@ local function analyze_slot(
         end
         if not is_non_empty_string(
             slot_definition.EnemySpawnGroup
-        ) then
+        )
+            or not is_non_empty_string(
+                slot_definition.EnemySpawnPrefix
+            )
+            or type(slot_definition.EnemySpawnMinCount)
+                ~= "number"
+            or slot_definition.EnemySpawnMinCount < 1
+        then
             add_issue(issues, "EnemySpawnBindingMissing", {
                 EncounterId = encounter.Id,
                 RoomSlotId = encounter.RoomSlotId,

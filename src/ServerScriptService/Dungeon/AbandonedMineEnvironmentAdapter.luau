@@ -36,8 +36,14 @@ local BARRIER_BY_ROOM = table.freeze({
     Room2 = "Mine.Room2.ExitBarrier",
 })
 
-function AbandonedMineEnvironmentAdapter.resolve(root: Instance): any
-    local resolved = Resolver.resolve(root, Definitions.ABANDONED_MINE)
+function AbandonedMineEnvironmentAdapter.resolve(
+    root: Instance,
+    contract: any?
+): any
+    local resolved = Resolver.resolve(
+        root,
+        contract or Definitions.ABANDONED_MINE
+    )
     if not resolved.ok then return resolved end
     return setmetatable({
         ok = true,

@@ -31,8 +31,14 @@ local BARRIER_BY_ROOM = {
     Room2 = "Temple.Room2.ExitBarrier",
 }
 
-function TempleEnvironmentAdapter.resolve(root: Instance): any
-    local resolved = Resolver.resolve(root, Definitions.TEMPLE)
+function TempleEnvironmentAdapter.resolve(
+    root: Instance,
+    contract: any?
+): any
+    local resolved = Resolver.resolve(
+        root,
+        contract or Definitions.TEMPLE
+    )
     if not resolved.ok then
         return resolved
     end

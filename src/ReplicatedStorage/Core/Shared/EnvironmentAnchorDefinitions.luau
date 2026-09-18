@@ -23,6 +23,27 @@ EnvironmentAnchorDefinitions.BASE = table.freeze({
     Groups = table.freeze({}),
 })
 
+EnvironmentAnchorDefinitions.TEMPLE_RUNTIME_BASE = table.freeze({
+    EnvironmentId = "Temple",
+    Required = table.freeze({
+        "Temple.CompletionPosition",
+        "Temple.ReturnToBase",
+    }),
+    Optional = table.freeze({}),
+    Groups = table.freeze({}),
+})
+
+EnvironmentAnchorDefinitions.ABANDONED_MINE_RUNTIME_BASE =
+    table.freeze({
+        EnvironmentId = "AbandonedMine",
+        Required = table.freeze({
+            "Mine.CompletionPosition",
+            "Mine.ReturnToBase",
+        }),
+        Optional = table.freeze({}),
+        Groups = table.freeze({}),
+    })
+
 EnvironmentAnchorDefinitions.TEMPLE = table.freeze({
     EnvironmentId = "Temple",
     Required = table.freeze({

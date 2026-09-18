@@ -47,6 +47,9 @@ local DungeonRoomLayoutDefinitions = require(
 local DungeonEnvironmentLayoutActivation = require(
     Dungeon:WaitForChild("DungeonEnvironmentLayoutActivation")
 )
+local DungeonLayoutEnvironmentContract = require(
+    Dungeon:WaitForChild("DungeonLayoutEnvironmentContract")
+)
 
 local selection = DungeonRuntimeSelection.resolve_selection(
     Players,
@@ -97,22 +100,6 @@ then
     error("MineCandidateEnvironmentNotAuthoredYet")
 end
 
-local environment_definition =
-    if dungeon_id == DungeonDefinitions.TEST_DUNGEON.Id
-        then EnvironmentAnchorDefinitions.TEMPLE
-        else EnvironmentAnchorDefinitions.ABANDONED_MINE
-
-local resolved_environment = EnvironmentAnchorResolver.resolve(
-    Workspace,
-    environment_definition
-)
-assert(
-    resolved_environment.ok,
-    tostring(resolved_environment.reason)
-        .. ":"
-        .. tostring(resolved_environment.anchor_id)
-)
-
 local layout = DungeonRoomLayoutDefinitions.get(
     dungeon_id,
     layout_id
@@ -120,6 +107,34 @@ local layout = DungeonRoomLayoutDefinitions.get(
 assert(
     layout ~= nil,
     "Selected dungeon layout disappeared after selection."
+)
+
+local environment_base =
+    if dungeon_id == DungeonDefinitions.TEST_DUNGEON.Id
+        then EnvironmentAnchorDefinitions.TEMPLE_RUNTIME_BASE
+        else EnvironmentAnchorDefinitions
+            .ABANDONED_MINE_RUNTIME_BASE
+
+local contract_result =
+    DungeonLayoutEnvironmentContract.build(
+        environment_base,
+        layout
+    )
+assert(
+    contract_result.ok == true,
+    "Dungeon environment contract failed: "
+        .. tostring(contract_result.reason)
+)
+
+local resolved_environment = EnvironmentAnchorResolver.resolve(
+    Workspace,
+    contract_result.Contract
+)
+assert(
+    resolved_environment.ok,
+    tostring(resolved_environment.reason)
+        .. ":"
+        .. tostring(resolved_environment.anchor_id)
 )
 
 local activated = DungeonEnvironmentLayoutActivation.apply(
