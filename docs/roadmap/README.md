@@ -66,13 +66,23 @@ supports multiple miniboss/boss/event/secret encounters in a single future run.
 Temple and forced Abandoned Mine live execution proofs passed. Depth2-Depth4
 remain `RuntimeReady = false`, and no Event/Secret boss content is enabled.
 
+The follow-on **Multi-Depth Physical Room-Binding Runtime** is locally green at
+`1aa81b5`. Physical room-slot metadata, triggers, spawn anchors, barriers and
+checkpoints are now resolved generically from layout data; live progression no
+longer branches on fixed Room1/Room2/Boss cases. Real Temple compatibility and
+forced Abandoned Mine + event/rare compatibility each passed 23/23 assertions.
+Both current dungeons explicitly reject unimplemented Depth2-Depth4 physical
+layouts, so higher depths remain fail closed while the runtime is ready for
+future authored room sets and later Event/Secret boss bindings.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
 
 - `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`;
 - `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`;
-- `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`.
+- `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`;
+- `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

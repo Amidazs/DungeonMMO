@@ -35,10 +35,12 @@ modification and reconcile without destructive Git operations.
 - Generic-runtime implementation checkpoint: `5ba9f4d`.
 - Encounter execution/spawn registry gate: LOCAL GREEN.
 - Execution-registry implementation checkpoint: `fe1856e`.
+- Multi-depth physical room-binding runtime gate: LOCAL GREEN.
+- Multi-depth room-runtime implementation checkpoint: `1aa81b5`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-encounter-execution-registry-v1`.
+- Active branch: `wip/phase-4-multidepth-room-runtime-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -106,14 +108,14 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 
 ## Selected next-gate discipline
 
-The generic encounter execution/spawn registry defined in:
+The generic encounter execution/spawn registry is locally green at `fe1856e`.
+The follow-on multi-depth physical room-binding runtime is locally green at
+`1aa81b5`.
 
-- `docs/superpowers/specs/2026-09-18-phase-4-encounter-execution-registry-design.md`;
-- `docs/superpowers/plans/2026-09-18-phase-4-encounter-execution-registry-implementation.md`.
-
-is locally green at `fe1856e`. Do not push, merge, publish, enable higher
-depths, or enable Event/Secret boss content without a deliberate next action
-from the project owner.
+Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
+content without a deliberate next action from the project owner. If backend-only
+work continues, build on the generic execution registry and room-binding layer
+rather than adding fixed depth/room branches to DungeonRuntime.
 
 Locked rules that carry forward:
 
@@ -149,6 +151,12 @@ Locked rules that carry forward:
 - Missing packs/boss IDs/factories/execution bindings fail closed.
 - Failed encounter startup must clean partial spawns and roll sequence state
   back to Pending.
+- Physical room slots/triggers/spawn anchors/barriers/checkpoints resolve from
+  generic layout/binding data; live progression must not reintroduce fixed
+  Room1/Room2/Boss branching.
+- Boss spawn anchors are binding-specific.
+- Both current dungeons must continue to fail closed for unregistered Depth2,
+  Depth3 and Depth4 physical layouts.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

@@ -1335,3 +1335,124 @@ Validation-only build forced DeepEchoes + CrystalBloom:
 
 Detailed evidence:
 `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`.
+
+
+<!-- PHASE4_MULTI_DEPTH_ROOM_RUNTIME_LOCAL_GREEN_20260918 -->
+## Phase 4 - Multi-Depth Physical Room-Binding Runtime
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `2deb540`
+**Implementation checkpoint:** `1aa81b5`
+
+### Runtime architecture
+
+- [x] physical room-slot metadata is data-driven.
+- [x] logical encounters bind to room slots generically.
+- [x] trigger anchors resolve from binding data.
+- [x] enemy spawn anchors resolve from binding data.
+- [x] boss spawn anchors are binding-specific.
+- [x] exit barriers resolve from binding data.
+- [x] stable encounter checkpoints resolve from binding data.
+- [x] live progression no longer branches on fixed Room1/Room2/Boss clears.
+- [x] legacy Depth1 checkpoint aliases remain recoverable.
+- [x] existing Depth1 Temple behaviour remains compatible.
+- [x] existing Depth1 Abandoned Mine behaviour remains compatible.
+### Permanent fail-closed coverage
+
+- [x] Temple Depth2 physical layout rejected as unregistered.
+- [x] Temple Depth3 physical layout rejected as unregistered.
+- [x] Temple Depth4 physical layout rejected as unregistered.
+- [x] Abandoned Mine Depth2 physical layout rejected as unregistered.
+- [x] Abandoned Mine Depth3 physical layout rejected as unregistered.
+- [x] Abandoned Mine Depth4 physical layout rejected as unregistered.
+- [x] Dungeon Encounter Bindings: 30 assertions PASS.
+
+### Temple real-trigger compatibility
+
+- [x] temporary acceptance harness used only for validation.
+- [x] three resolved Depth1 slots.
+- [x] real Room1 trigger.
+- [x] Room1 spawned exactly 2 enemies.
+- [x] real Room2 trigger.
+- [x] Room2 spawned exactly 3 enemies.
+- [x] real boss trigger.
+- [x] compatibility boss ID `MarauderCaptain` preserved.
+- [x] stable checkpoints advanced correctly.
+- [x] final completion/save barrier succeeded.
+- [x] generic flow completed.
+- [x] 23/23 assertions PASS.
+- [x] temporary harness removed after validation.
+### Abandoned Mine compatibility
+
+Validation-only selection forced `AbandonedMine + DeepEchoes + CrystalBloom`.
+
+- [x] Mine-specific anchors resolved through layout data.
+- [x] Room1 spawned exactly 3 enemies.
+- [x] Room2 spawned exactly 4 enemies.
+- [x] Room3 used `Mine.Room3.ForemanSpawn`.
+- [x] boss registry produced `Corrupted Foreman`.
+- [x] stable checkpoints advanced correctly.
+- [x] final completion/save barrier succeeded.
+- [x] generic flow completed.
+- [x] 23/23 assertions PASS.
+- [x] all forced-selection/acceptance hooks removed afterward.
+
+### Final committed static/build gate
+
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 501 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+- [x] source-boundary audit: 12 changed code/test files from `2deb540`.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+### Final committed Dungeon regression
+
+- [x] Dungeon Encounter Bindings: 30 assertions PASS.
+- [x] Dungeon Encounter Flow: 24 assertions PASS.
+- [x] Dungeon Encounter Recovery: 10 assertions PASS.
+- [x] Dungeon Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Dungeon Encounter Executors: 21 assertions PASS.
+- [x] Dungeon Encounter Execution Controller: 17 assertions PASS.
+- [x] Dungeon Encounter Runtime Controller: 22 assertions PASS.
+- [x] Dungeon Difficulty Definitions: 114 assertions PASS.
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Difficulty Session: 7 assertions PASS.
+- [x] Dungeon Difficulty Instance Director: 7 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Tuning: 10 assertions PASS.
+- [x] Dungeon Enemy Difficulty Scaling: 5 assertions PASS.
+- [x] Enemy Damage Multiplier Rules: 3 assertions PASS.
+- [x] Dungeon Difficulty Completion Unlock: 9 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+- [x] no project CreatorErrors.
+### Final committed Base regression
+
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain `RuntimeReady=false`.
+- [x] no Event/Secret boss content enabled.
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`.

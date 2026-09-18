@@ -144,17 +144,54 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this Phase 4 gate.
 
+The follow-on **Multi-Depth Physical Room-Binding Runtime** is now locally
+complete and green at implementation checkpoint:
+
+`1aa81b5`
+
+Accepted proof now also includes:
+
+- generic physical room-slot definitions for current Dungeon layouts;
+- logical encounter -> room/trigger/spawn/barrier/checkpoint binding;
+- generic live progression instead of fixed Room1/Room2/Boss branches;
+- binding-specific boss spawn anchors;
+- legacy Depth1 checkpoint recovery compatibility;
+- Temple real-trigger compatibility: 23/23 assertions PASS;
+- forced Abandoned Mine DeepEchoes + CrystalBloom compatibility:
+  23/23 assertions PASS;
+- explicit fail-closed production binding checks for Depth2, Depth3 and Depth4
+  in both current dungeons;
+- 501 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Dungeon and Base regressions green;
+- Phase 3 Systems Stress remains green;
+- 12 changed code/test files from `2deb540`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`
+
+Depth2-Depth4 remain `RuntimeReady = false`. Event/Secret boss content remains
+disabled. No modelling, meshes, terrain, authored rooms or presentation work
+was performed.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-If backend-only work continues before modelling, build from the registry rather
-than adding new concrete factory branches to DungeonRuntime. Depth2-Depth4 must
-remain `RuntimeReady = false` until their physical execution/binding content is
-deliberately implemented and accepted. Event/Secret boss content remains
-disabled until its own content/binding gate is approved.
+If backend-only work continues before modelling, the next gate should build on
+the generic execution registry and generic physical room bindings rather than
+adding depth-specific branches to DungeonRuntime. A sensible next backend target
+is a **runtime-content readiness/registration layer** that can validate a
+difficulty's complete physical requirements before `RuntimeReady` may become
+true, while keeping all current higher depths fail closed.
+
+Depth2-Depth4 must remain `RuntimeReady = false` until their physical
+execution/binding content is deliberately implemented and accepted.
+Event/Secret boss content remains disabled until its own content/binding gate is
+approved.
 
 No modelling, meshes, terrain, authored rooms, visual polish or difficulty UI
 was performed in this gate.
@@ -165,13 +202,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 encounter execution worktree:
+Active Phase 4 multi-depth room runtime worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1
 
 Active branch:
 
-wip/phase-4-encounter-execution-registry-v1
+wip/phase-4-multidepth-room-runtime-v1
 
 Phase 3 completion worktree:
 

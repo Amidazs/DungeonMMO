@@ -187,10 +187,10 @@ Final local evidence includes:
 - source-boundary audit: **26 changed code/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior encounter-execution gate worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1
 
-Active branch:
+Prior encounter-execution branch:
 wip/phase-4-encounter-execution-registry-v1
 
 Design/spec:
@@ -198,6 +198,55 @@ docs/superpowers/specs/2026-09-18-phase-4-encounter-execution-registry-design.md
 
 Acceptance evidence:
 docs/testing/phase4-encounter-execution-registry-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Multi-Depth Physical Room-Binding Runtime** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`1aa81b5`
+
+Accepted local engineering result:
+
+- physical room metadata is data-driven through generic layout definitions;
+- logical encounters bind to generic room slots, triggers, spawn anchors, exit
+  barriers and stable checkpoints;
+- live DungeonRuntime progression no longer branches on fixed
+  Room1/Room2/Boss clear cases;
+- boss placement is binding-specific rather than hard-coded to one depth;
+- checkpoint recovery remains compatible with legacy Depth1 aliases;
+- Temple compatibility passed 23/23 assertions through the real generic path;
+- forced Abandoned Mine + DeepEchoes + CrystalBloom compatibility passed 23/23;
+- both production dungeons explicitly reject unimplemented Depth2, Depth3 and
+  Depth4 physical layouts;
+- Depth2-Depth4 therefore remain `RuntimeReady = false`;
+- future EventBoss/SecretBoss insertion remains supported by the generic
+  binding contract but no such content is enabled;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `1aa81b5` includes:
+
+- **501** Lua/Luau files parsed with 0 failures;
+- clean `git diff --check`;
+- all four Rojo compositions building;
+- Dungeon Encounter Bindings: **30 assertions PASS**;
+- Dungeon Encounter Flow: **24 assertions PASS**;
+- Dungeon Encounter Recovery: **10 assertions PASS**;
+- final committed Dungeon regression green, including Phase 3 stress,
+  Training Dummy, Combat Target Rules and successful player admission;
+- final committed Base regression green, including party/difficulty families
+  and Phase 3 stress;
+- source-boundary audit from `2deb540`: **12 changed code/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1
+
+Active branch:
+wip/phase-4-multidepth-room-runtime-v1
+
+Acceptance evidence:
+docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 
