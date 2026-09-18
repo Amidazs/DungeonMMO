@@ -130,8 +130,25 @@ local quests = runtime.QuestService
 local active_dungeon_id, active_dungeon_error = DungeonRuntimeSelection.resolve(Players, Workspace, RunService, DungeonDefinitions, 15)
 assert(active_dungeon_id ~= nil, "Dungeon selection failed: " .. tostring(active_dungeon_error))
 local active_definition = assert(DungeonDefinitions.get(active_dungeon_id :: string), "Selected dungeon definition missing")
-local environment = DungeonEnvironmentRouter.wait_for_ready(Workspace, active_definition.Id, 15)
-assert(environment.ok, "Dungeon environment invalid: " .. tostring(environment.reason))
+local environment = DungeonEnvironmentRouter.wait_for_ready(
+    Workspace,
+    active_definition.Id,
+    15
+)
+assert(
+    environment.ok,
+    "Dungeon environment invalid: "
+        .. tostring(environment.reason)
+)
+
+local resolved_difficulty_id = Workspace:GetAttribute(
+    "DungeonMMOResolvedDifficultyId"
+)
+assert(
+    type(resolved_difficulty_id) == "string"
+        and resolved_difficulty_id ~= "",
+    "Resolved dungeon difficulty is missing."
+)
 
 local runtime_root = Instance.new("Folder")
 runtime_root.Name = "DungeonGameplayRuntime"
@@ -1291,7 +1308,12 @@ local function admit_player(player: Player)
     local teleport_data: any = nil
 
     if RunService:IsStudio() then
-        local studio = StudioSessionFactory.create_for_players({player}, sessions, active_definition.Id)
+        local studio = StudioSessionFactory.create_for_players(
+            {player},
+            sessions,
+            active_definition.Id,
+            resolved_difficulty_id
+        )
         if not studio.ok then
             player:Kick("Studio dungeon session failed: " .. tostring(studio.reason))
             return
