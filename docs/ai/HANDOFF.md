@@ -241,20 +241,48 @@ No new production enemy archetype was enabled.
 Depth2-Depth4 remain release-disabled/content-incomplete.
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Authoritative Runtime Layout Selection + Environment
+Activation** gate is locally complete and green at:
+
+`ccd289b`
+
+Accepted proof now also includes:
+
+- authoritative DungeonId + DifficultyId + LayoutId selection;
+- TeleportData difficulty preservation in production;
+- optional Studio difficulty selection with default fallback;
+- explicit physical exit-barrier anchors in layout metadata;
+- generic arbitrary-slot trigger/barrier activation;
+- no hard-coded Temple/Mine trigger/barrier arrays in environment bootstrap;
+- readiness validation for missing physical barrier bindings;
+- Runtime Selection: 7 assertions PASS;
+- Environment Layout Activation: 12 assertions PASS;
+- 510 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- 7 source/test files from `0177b17`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-runtime-layout-selection-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-If backend-only work continues before modelling, first audit the remaining
-Depth2-Depth4 backend dependencies rather than inventing another abstraction
-without a demonstrated gap.
+If backend-only work continues before modelling, audit the remaining
+Depth2-Depth4 dependencies from `ccd289b` before creating another abstraction.
 
 The encounter sequence, execution registry, physical bindings, readiness
-authority and enemy-pack/factory layers are now generic. The next gate should
-target the next concrete hard-coded dependency that would prevent authored
-higher-depth content from being registered cleanly.
+authority, enemy-pack/factory layer, runtime layout selection and environment
+trigger/barrier activation are now generic. The next gate should target only a
+concrete remaining dependency that would still force depth-specific runtime
+code.
 
 Carry forward these readiness rules:
 
@@ -274,13 +302,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 enemy-pack-registry worktree:
+Active Phase 4 runtime-layout-selection worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnemyPackRegistry_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeLayoutSelection_v1
 
 Active branch:
 
-wip/phase-4-enemy-archetype-combat-pack-v1
+wip/phase-4-runtime-layout-selection-v1
 
 Phase 3 completion worktree:
 

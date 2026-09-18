@@ -93,6 +93,13 @@ explicit entries. Current Temple/Mine Depth1 counts and naming remain
 compatible. A synthetic 2-Marauder + 1-Elite pack proves mixed-factory
 execution and rollback without enabling Elite as production content.
 
+The follow-on **Authoritative Runtime Layout Selection + Environment
+Activation** gate is locally green at `ccd289b`. Runtime startup now preserves
+the selected DifficultyId and resolves its LayoutId before environment setup.
+Encounter triggers and exit barriers are activated from registered layout data,
+not hard-coded Temple/Mine arrays. A synthetic four-slot layout proves arbitrary
+slot-count activation while current Depth1 boot/admission remains compatible.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -102,7 +109,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`;
 - `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`;
 - `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`;
-- `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`.
+- `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`;
+- `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

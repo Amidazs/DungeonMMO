@@ -41,10 +41,12 @@ modification and reconcile without destructive Git operations.
 - Runtime-readiness implementation checkpoint: `2e2420b`.
 - Generic enemy archetype + combat-pack registry gate: LOCAL GREEN.
 - Enemy-pack implementation checkpoint: `464bd44`.
+- Runtime layout selection + environment activation gate: LOCAL GREEN.
+- Runtime-layout implementation checkpoint: `ccd289b`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-enemy-archetype-combat-pack-v1`.
+- Active branch: `wip/phase-4-runtime-layout-selection-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnemyPackRegistry_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeLayoutSelection_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -117,11 +119,13 @@ The multi-depth physical room-binding runtime is locally green at `1aa81b5`.
 The runtime content readiness registry is locally green at `2e2420b`.
 The generic enemy archetype/combat-pack registry is locally green at
 `464bd44`.
+The runtime layout-selection/environment-activation gate is locally green at
+`ccd289b`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
-content without a deliberate next action from the project owner. Before adding
-another backend abstraction, audit the remaining Depth2-Depth4 content
-dependencies and target a demonstrated hard-coded blocker.
+content without a deliberate next action from the project owner. Continue
+backend-only work only when a concrete remaining higher-depth blocker is
+demonstrated.
 
 Locked rules that carry forward:
 
@@ -171,6 +175,10 @@ Locked rules that carry forward:
   entry path may treat the release switch alone as runtime readiness.
 - Shared static layout/pack/boss/executor/factory registrations belong in
   `DungeonRuntimeContentCatalog`; Dungeon wrappers must not duplicate them.
+- Runtime environment setup must derive triggers/barriers from the selected
+  registered layout; do not reintroduce dungeon-specific trigger arrays.
+- Production runtime selection must preserve TeleportData DifficultyId and
+  validate the selected registered layout.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

@@ -1712,3 +1712,90 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`.
+
+
+<!-- PHASE4_RUNTIME_LAYOUT_SELECTION_LOCAL_GREEN_20260918 -->
+## Phase 4 - Runtime Layout Selection + Environment Activation
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `0177b17`
+**RED checkpoint:** `5ab0b4e`
+**Implementation checkpoint:** `ccd289b`
+
+### Test-first contract
+
+- [x] RED captured before implementation.
+- [x] missing `resolve_selection` failed as expected.
+- [x] missing layout-activation module failed as expected.
+
+### Runtime selection
+
+- [x] Studio default difficulty resolves.
+- [x] explicit Studio Depth1 resolves.
+- [x] unregistered selected layout fails closed.
+- [x] unknown difficulty fails closed.
+- [x] production preserves TeleportData DifficultyId.
+- [x] Runtime Selection: 7 assertions PASS.
+### Environment activation
+
+- [x] physical slots declare explicit ExitBarrierAnchor.
+- [x] arbitrary four-slot trigger activation works.
+- [x] arbitrary three-barrier activation works.
+- [x] missing trigger fails closed.
+- [x] missing barrier fails closed.
+- [x] Environment Layout Activation: 12 assertions PASS.
+- [x] bootstrap contains no Temple/Mine trigger arrays.
+- [x] readiness requires a physical barrier anchor when a logical
+      ExitBarrierRoomId exists.
+
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `ccd289b`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 510 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors observed.
+
+### Final committed Dungeon regression
+
+- [x] Runtime Selection: 7 assertions PASS.
+- [x] Environment Layout Activation: 12 assertions PASS.
+- [x] Encounter Bindings: 30 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+- [x] Roblox Controls Emulator plugin errors classified as external.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain release-disabled/content-incomplete.
+- [x] no physical higher-depth rooms or anchors added.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 7 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-runtime-layout-selection-acceptance-record.md`.
