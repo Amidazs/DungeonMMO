@@ -7,6 +7,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DungeonDefinitions = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("DungeonDefinitions")
 )
+local DungeonDifficultyDefinitions = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonDifficultyDefinitions"
+    )
+)
 
 local DungeonInstanceDirector = require(script.Parent:WaitForChild("DungeonInstanceDirector"))
 
@@ -32,6 +37,25 @@ end
 
 local function known_dungeon(dungeon_id: string): boolean
     return DungeonDefinitions.get(dungeon_id) ~= nil
+end
+
+local function routing_data(session: any): any
+    local difficulty_id = nil
+    if type(session.Difficulty) == "table"
+        and type(session.Difficulty.Id) == "string"
+    then
+        difficulty_id = session.Difficulty.Id
+    else
+        difficulty_id = DungeonDifficultyDefinitions.default_id(
+            session.DungeonId
+        )
+    end
+
+    return {
+        SessionId = session.SessionId,
+        DungeonId = session.DungeonId,
+        DifficultyId = difficulty_id,
+    }
 end
 
 local function is_retryable(teleport_result: any): boolean
@@ -187,10 +211,7 @@ function TeleportCoordinator:_prepare_handoffs(
 end
 
 function TeleportCoordinator:_teleport_prepared(players: {any}, session: any, place_id: number, reserved_code: string?): any
-    local teleport_data = {
-        SessionId = session.SessionId,
-        DungeonId = session.DungeonId,
-    }
+    local teleport_data = routing_data(session)
 
     local ok, teleport_error = self._teleport:teleport(place_id, players, reserved_code, teleport_data)
     if not ok then
@@ -206,10 +227,27 @@ function TeleportCoordinator:_teleport_prepared(players: {any}, session: any, pl
     return response(true, nil, session)
 end
 
-function TeleportCoordinator:start_dungeon(players: {any}, dungeon_id: string, dungeon_place_id: number): any
+function TeleportCoordinator:start_dungeon(
+    players: {any},
+    dungeon_id: string,
+    dungeon_place_id: number,
+    difficulty_id: string?
+): any
     if not known_dungeon(dungeon_id) then
         return response(false, "UnknownDungeon")
     end
+
+    local difficulty = DungeonDifficultyDefinitions.resolve(
+        dungeon_id,
+        difficulty_id
+    )
+    if not difficulty then
+        return response(false, "UnknownDifficulty")
+    end
+    if difficulty.RuntimeReady ~= true then
+        return response(false, "DifficultyContentNotReady")
+    end
+
     if type(dungeon_place_id) ~= "number" or dungeon_place_id <= 0 then
         return response(false, "InvalidDungeonPlaceId")
     end
@@ -245,12 +283,19 @@ function TeleportCoordinator:start_dungeon(players: {any}, dungeon_id: string, d
         dungeon_id,
         member_user_ids,
         game.PlaceId,
-        reserved_code
+        reserved_code,
+        difficulty.Id
     )
     if not session then
         return response(false, session_error or "SessionCreateFailed")
     end
-    local instance_state = DungeonInstanceDirector.resolve(dungeon_id, session.SessionId, os.time(), DungeonInstanceDirector.runtime_options())
+    local instance_state = DungeonInstanceDirector.resolve(
+        dungeon_id,
+        session.SessionId,
+        os.time(),
+        DungeonInstanceDirector.runtime_options(),
+        difficulty.Id
+    )
     local state_result = self._sessions:set_instance_state(session.SessionId, instance_state)
     if not state_result.ok then
         self._sessions:mark_failed(session.SessionId, state_result.reason or "InstanceStateFailed")
@@ -258,7 +303,7 @@ function TeleportCoordinator:start_dungeon(players: {any}, dungeon_id: string, d
     end
     session = state_result.session
 
-    local teleport_data = {SessionId = session.SessionId, DungeonId = session.DungeonId}
+    local teleport_data = routing_data(session)
     local prepared, prepare_error = self:_prepare_handoffs(
         players,
         session,
@@ -297,7 +342,7 @@ function TeleportCoordinator:rejoin_session(player: any, session_record: any, du
         return response(false, "InvalidDungeonPlaceId")
     end
 
-    local teleport_data = {SessionId = session_record.SessionId, DungeonId = session_record.DungeonId}
+    local teleport_data = routing_data(session_record)
     local prepared, prepare_error = self:_prepare_handoffs(
         {player},
         session_record,
@@ -322,7 +367,7 @@ function TeleportCoordinator:return_to_base(players: {any}, session_record: any)
         return response(false, "InvalidReturnDestination")
     end
 
-    local teleport_data = {SessionId = session_record.SessionId, DungeonId = session_record.DungeonId}
+    local teleport_data = routing_data(session_record)
     local prepared, prepare_error = self:_prepare_handoffs(
         players,
         session_record,

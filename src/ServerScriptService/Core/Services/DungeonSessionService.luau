@@ -12,6 +12,11 @@ local DungeonModifierDefinitions = require(
         "DungeonModifierDefinitions"
     )
 )
+local DungeonDifficultyDefinitions = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonDifficultyDefinitions"
+    )
+)
 
 local DungeonSessionService = {}
 DungeonSessionService.__index = DungeonSessionService
@@ -143,10 +148,22 @@ function DungeonSessionService:create(
     dungeon_id: string,
     member_user_ids: {number},
     return_place_id: number,
-    reserved_code: string
+    reserved_code: string,
+    difficulty_id: string?
 ): (any?, string?)
     if type(dungeon_id) ~= "string" or dungeon_id == "" then
         return nil, "InvalidDungeonId"
+    end
+
+    local difficulty = DungeonDifficultyDefinitions.resolve(
+        dungeon_id,
+        difficulty_id
+    )
+    if not difficulty then
+        if DungeonDifficultyDefinitions.default_id(dungeon_id) == nil then
+            return nil, "InvalidDungeonId"
+        end
+        return nil, "UnknownDifficulty"
     end
     local member_error = validate_members(member_user_ids)
     if member_error then
@@ -192,6 +209,11 @@ function DungeonSessionService:create(
             SessionId = session_id,
             DungeonId = dungeon_id,
             DungeonVersion = 1,
+            Difficulty = {
+                Id = difficulty.Id,
+                Order = difficulty.Order,
+                Version = difficulty.Version or 1,
+            },
             ReservedAccessCode = reserved_code,
             ReturnPlaceId = return_place_id,
             MemberUserIds = deep_clone(member_user_ids),
@@ -229,6 +251,7 @@ function DungeonSessionService:create(
                     return {
                         SessionId = session_id,
                         DungeonId = dungeon_id,
+                        DifficultyId = difficulty.Id,
                         UpdatedAt = now,
                     }
                 end, DungeonSessionService.STORAGE_TTL_SECONDS)

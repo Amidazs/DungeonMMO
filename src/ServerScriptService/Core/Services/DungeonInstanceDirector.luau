@@ -6,6 +6,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DungeonDefinitions = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("DungeonDefinitions")
 )
+local DungeonDifficultyDefinitions = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonDifficultyDefinitions"
+    )
+)
 
 local DungeonInstanceDirector = {}
 
@@ -22,6 +27,18 @@ local function optional_boolean(value: any): boolean?
     return if type(value) == "boolean" then value else nil
 end
 
+local function copy_encounters(encounters: {any}): {any}
+    local result = {}
+    for _, encounter in ipairs(encounters) do
+        local copy = {}
+        for key, value in pairs(encounter) do
+            copy[key] = value
+        end
+        table.insert(result, copy)
+    end
+    return result
+end
+
 function DungeonInstanceDirector.runtime_options(): any
     return {
         force_rare = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceRareState")),
@@ -35,15 +52,30 @@ function DungeonInstanceDirector.resolve(
     dungeon_id: string,
     session_id: string,
     now: number,
-    options: any?
+    options: any?,
+    difficulty_id: string?
 ): any
     local definition = DungeonDefinitions.get(dungeon_id)
     assert(definition ~= nil, "Unknown dungeon " .. tostring(dungeon_id))
+
+    local difficulty = DungeonDifficultyDefinitions.resolve(
+        dungeon_id,
+        difficulty_id
+    )
+    assert(
+        difficulty ~= nil,
+        "Unknown dungeon difficulty " .. tostring(difficulty_id)
+    )
     local opts = options or {}
 
     if dungeon_id ~= DungeonDefinitions.ABANDONED_MINE.Id then
         return {
             DungeonId = dungeon_id,
+            DifficultyId = difficulty.Id,
+            DifficultyOrder = difficulty.Order,
+            EncounterSequence = copy_encounters(
+                difficulty.EncounterSequence
+            ),
             Module1Id = "TempleRoom1",
             Module2Id = "TempleRoom2",
             RareStateId = nil,
@@ -83,6 +115,11 @@ function DungeonInstanceDirector.resolve(
 
     return {
         DungeonId = dungeon_id,
+        DifficultyId = difficulty.Id,
+        DifficultyOrder = difficulty.Order,
+        EncounterSequence = copy_encounters(
+            difficulty.EncounterSequence
+        ),
         Module1Id = module1_pool[module1_index],
         Module2Id = module2_pool[module2_index],
         RareStateId = if rare_active then "CrystalBloom" else nil,
