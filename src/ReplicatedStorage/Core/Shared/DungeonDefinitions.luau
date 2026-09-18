@@ -19,7 +19,17 @@ DungeonDefinitions.TEST_DUNGEON = table.freeze({
     CompletionGold = 50,
     StandardMarauderReward = table.freeze({XP = 10, GoldMin = 3, GoldMax = 6, BestiaryCreatureId = "marauder"}),
     MarauderCaptainReward = table.freeze({XP = 40, GoldMin = 15, GoldMax = 25, BestiaryCreatureId = "marauder_captain"}),
-    Boss = table.freeze({DisplayName = "Marauder Captain"}),
+    Boss = table.freeze({
+        Id = "MarauderCaptain",
+        DisplayName = "Marauder Captain",
+    }),
+    DifficultyBossIds = table.freeze({
+        "MarauderCaptain",
+        "TempleDepth2Boss",
+        "TempleDepth3Boss",
+        "TempleDepth4Boss",
+    }),
+    DefaultDifficultyId = "Depth1",
     MarauderCaptain = table.freeze({MaxHealth = 120}),
     CompletionReward = table.freeze({Gold = 50, LootTable = LootTableConfig.TEST_DUNGEON}),
 })
@@ -48,7 +58,17 @@ DungeonDefinitions.ABANDONED_MINE = table.freeze({
     StandardMarauderMaxHealth = 40,
     StandardMarauderReward = table.freeze({XP = 11, GoldMin = 3, GoldMax = 7, BestiaryCreatureId = "marauder"}),
     MarauderCaptainReward = table.freeze({XP = 45, GoldMin = 16, GoldMax = 27, BestiaryCreatureId = "marauder_captain"}),
-    Boss = table.freeze({DisplayName = "Corrupted Foreman"}),
+    Boss = table.freeze({
+        Id = "CorruptedForeman",
+        DisplayName = "Corrupted Foreman",
+    }),
+    DifficultyBossIds = table.freeze({
+        "CorruptedForeman",
+        "AbandonedMineDepth2Boss",
+        "AbandonedMineDepth3Boss",
+        "AbandonedMineDepth4Boss",
+    }),
+    DefaultDifficultyId = "Depth1",
     MarauderCaptain = table.freeze({MaxHealth = 120}),
     CompletionReward = table.freeze({Gold = 55, LootTable = LootTableConfig.ABANDONED_MINE_NORMAL}),
     RareCompletionReward = table.freeze({Gold = 70, LootTable = LootTableConfig.ABANDONED_MINE_RARE}),
