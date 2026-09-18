@@ -74,9 +74,10 @@ function BossEncounterExecutor:validate(
     if type(binding) ~= "table"
         or type(binding.RuntimeEncounterId) ~= "string"
         or binding.RuntimeEncounterId == ""
+        or type(binding.BossSpawnAnchor) ~= "string"
+        or binding.BossSpawnAnchor == ""
         or type(context.Environment) ~= "table"
-        or type(context.Environment.captain_spawn_cframe)
-            ~= "function"
+        or type(context.Environment.get) ~= "function"
         or typeof(context.EnemiesFolder) ~= "Instance"
         or typeof(context.RuntimeRoot) ~= "Instance"
         or type(context.SessionId) ~= "string"
@@ -85,8 +86,18 @@ function BossEncounterExecutor:validate(
         return result(false, "EncounterExecutionContextInvalid")
     end
 
+    local spawn_anchor = context.Environment:get(
+        binding.BossSpawnAnchor
+    )
+    if typeof(spawn_anchor) ~= "Instance"
+        or not spawn_anchor:IsA("BasePart")
+    then
+        return result(false, "BossSpawnAnchorMissing")
+    end
+
     return result(true, nil, {
         BossSpec = spec,
+        SpawnCFrame = spawn_anchor.CFrame,
     })
 end
 
@@ -141,8 +152,7 @@ function BossEncounterExecutor:execute(
     local created_ok, boss_or_error = pcall(function()
         return factory.create({
             Parent = context.EnemiesFolder,
-            SpawnCFrame =
-                context.Environment:captain_spawn_cframe(),
+            SpawnCFrame = validated.SpawnCFrame,
             EncounterId = binding.RuntimeEncounterId,
             RewardXP = reward.XP,
             RewardGoldMin = reward.GoldMin,

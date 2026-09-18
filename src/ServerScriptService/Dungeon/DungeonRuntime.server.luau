@@ -55,14 +55,14 @@ local DungeonEncounterRuntimeState = require(
 local DungeonEncounterRuntimeController = require(
     Dungeon:WaitForChild("DungeonEncounterRuntimeController")
 )
-local Depth1EncounterBindings = require(
-    Dungeon:WaitForChild("Depth1EncounterBindings")
+local DungeonEncounterBindings = require(
+    Dungeon:WaitForChild("DungeonEncounterBindings")
 )
-local Depth1EncounterFlow = require(
-    Dungeon:WaitForChild("Depth1EncounterFlow")
+local DungeonEncounterFlow = require(
+    Dungeon:WaitForChild("DungeonEncounterFlow")
 )
-local Depth1EncounterRecovery = require(
-    Dungeon:WaitForChild("Depth1EncounterRecovery")
+local DungeonEncounterRecovery = require(
+    Dungeon:WaitForChild("DungeonEncounterRecovery")
 )
 local DungeonProgressionBridge = require(Dungeon:WaitForChild("DungeonProgressionBridge"))
 local DungeonContributionBridge = require(
@@ -128,16 +128,6 @@ local active_definition = assert(DungeonDefinitions.get(active_dungeon_id :: str
 local environment = DungeonEnvironmentRouter.wait_for_ready(Workspace, active_definition.Id, 15)
 assert(environment.ok, "Dungeon environment invalid: " .. tostring(environment.reason))
 
-local room1_trigger = assert(
-    environment:get("Temple.Room1.Trigger")
-) :: BasePart
-local room2_trigger = assert(
-    environment:get("Temple.Room2.Trigger")
-) :: BasePart
-local boss_trigger = assert(
-    environment:get("Temple.Room3.Trigger")
-) :: BasePart
-
 local runtime_root = Instance.new("Folder")
 runtime_root.Name = "DungeonGameplayRuntime"
 runtime_root.Parent = Workspace
@@ -150,8 +140,8 @@ local active_session_id: string? = nil
 local encounter_service: any = nil
 local encounter_runtime_controller: any = nil
 local encounter_execution_controller: any = nil
-local depth1_flow: any = nil
-local depth1_bindings: any = nil
+local encounter_flow: any = nil
+local encounter_bindings: any = nil
 local checkpoint_service: any = nil
 local death_service: any = nil
 local purchase_service: any = nil
@@ -178,7 +168,7 @@ local completion_pending = false
 local completion_committed = false
 local next_completion_retry_at = 0
 local current_encounter_id = ""
-local active_captain: Model? = nil
+local encounter_triggers_bound = false
 local AUTOSAVE_SECONDS = 30
 local LEASE_RENEW_SECONDS = 15
 local SESSION_REFRESH_SECONDS = 30
@@ -216,6 +206,34 @@ local function optional_encounter_definitions(): {any}
     return if type(optional) == "table" then optional else {}
 end
 
+local LEGACY_CHECKPOINT_SLOTS = table.freeze({
+    Room1Start = "Room1",
+    Room2Start = "Room2",
+    BossRoomStart = "Room3",
+})
+
+-- Returns the authoritative difficulty definition for one session.
+local function session_difficulty_definition(
+    session: any
+): any?
+    local difficulty_id = session
+        and session.Difficulty
+        and session.Difficulty.Id
+    if type(difficulty_id) ~= "string"
+        and type(session) == "table"
+        and type(session.InstanceState) == "table"
+    then
+        difficulty_id = session.InstanceState.DifficultyId
+    end
+
+    return DungeonDifficultyDefinitions.resolve(
+        active_definition.Id,
+        if type(difficulty_id) == "string"
+            then difficulty_id
+            else nil
+    )
+end
+
 -- Returns the currently persisted checkpoint ID, defaulting to Entrance.
 local function persisted_checkpoint_id(session: any): string
     if type(session) == "table"
@@ -240,8 +258,8 @@ local function create_encounter_controller(
     })
 end
 
--- Initializes the generic progression authority and Depth1 compatibility flow.
-local function initialize_depth1_encounter_runtime(
+-- Initializes generic encounter authority against the selected physical layout.
+local function initialize_encounter_runtime(
     session: any
 ): any
     local base_sequence = base_encounter_sequence(session)
@@ -249,6 +267,16 @@ local function initialize_depth1_encounter_runtime(
         return {
             ok = false,
             reason = "EncounterSequenceMissing",
+        }
+    end
+
+    local difficulty = session_difficulty_definition(session)
+    if not difficulty
+        or type(difficulty.LayoutId) ~= "string"
+    then
+        return {
+            ok = false,
+            reason = "DungeonLayoutIdMissing",
         }
     end
 
@@ -262,8 +290,11 @@ local function initialize_depth1_encounter_runtime(
         }
     end
 
-    local bindings = Depth1EncounterBindings.resolve(
-        controller:encounters()
+    local bindings = DungeonEncounterBindings.resolve(
+        active_definition.Id,
+        difficulty.LayoutId,
+        controller:encounters(),
+        environment
     )
     if bindings.ok ~= true then
         return bindings
@@ -272,9 +303,10 @@ local function initialize_depth1_encounter_runtime(
     local latest = sessions:get(session.SessionId)
     if DungeonEncounterRuntimeState.from_session(latest) == nil then
         local recovery_snapshot =
-            Depth1EncounterRecovery.snapshot_from_checkpoint(
+            DungeonEncounterRecovery.snapshot_from_checkpoint(
                 bindings,
-                persisted_checkpoint_id(session)
+                persisted_checkpoint_id(session),
+                LEGACY_CHECKPOINT_SLOTS
             )
         if not recovery_snapshot then
             return {
@@ -304,8 +336,8 @@ local function initialize_depth1_encounter_runtime(
     end
 
     encounter_runtime_controller = controller
-    depth1_bindings = bindings
-    depth1_flow = Depth1EncounterFlow.new(
+    encounter_bindings = bindings
+    encounter_flow = DungeonEncounterFlow.new(
         controller,
         bindings
     )
@@ -576,7 +608,7 @@ local function send_boss_state(
     end
 end
 
-local handle_boss_cleared: (() -> ())? = nil
+local handle_run_cleared: (() -> ())? = nil
 
 local function advance_checkpoint(checkpoint_id: string): boolean
     if not checkpoint_service or not active_session_id then
@@ -615,7 +647,7 @@ local function connect_enemy(enemy: Model, encounter_id: string)
         print_reward_result(result)
         DungeonEnemyCleanup.retire(enemy)
         if result.cleared then
-            if not depth1_flow then
+            if not encounter_flow then
                 warn(
                     "[Dungeon Runtime] Generic encounter flow is missing."
                 )
@@ -623,7 +655,7 @@ local function connect_enemy(enemy: Model, encounter_id: string)
             end
 
             local flow_clear =
-                depth1_flow:clear_runtime(encounter_id)
+                encounter_flow:clear_runtime(encounter_id)
             if flow_clear.ok ~= true then
                 warn(
                     "[Dungeon Runtime] Generic encounter clear failed: "
@@ -632,43 +664,52 @@ local function connect_enemy(enemy: Model, encounter_id: string)
                 return
             end
 
-            if encounter_id == "CombatRoom1" then
-                environment:set_exit_open("Room1", true)
-                sync_all_character_encounters("")
-                if flow_clear.next_binding then
-                    advance_checkpoint(
-                        flow_clear.next_binding.CheckpointId
+            local binding = flow_clear.binding
+            if binding
+                and type(binding.ExitBarrierRoomId) == "string"
+            then
+                local opened = environment:set_exit_open(
+                    binding.ExitBarrierRoomId,
+                    true
+                )
+                if type(opened) == "table"
+                    and opened.ok == false
+                then
+                    warn(
+                        "[Dungeon Runtime] Exit barrier update failed for "
+                            .. binding.RoomSlotId
+                            .. ": "
+                            .. tostring(opened.reason)
                     )
                 end
+            end
+
+            sync_all_character_encounters("")
+
+            if flow_clear.next_binding then
+                advance_checkpoint(
+                    flow_clear.next_binding.CheckpointId
+                )
+            end
+
+            if active_session_id and binding then
                 sessions:set_runtime_progress(
-                    active_session_id :: string,
-                    "CombatRoom1Clear",
+                    active_session_id,
+                    binding.PlanEncounterId .. "Clear",
                     ""
                 )
-                send_objective(
-                    "Room 1 cleared. Room 2 unlocked; checkpoint moved."
-                )
-            elseif encounter_id == "CombatRoom2" then
-                environment:set_exit_open("Room2", true)
-                sync_all_character_encounters("")
-                if flow_clear.next_binding then
-                    advance_checkpoint(
-                        flow_clear.next_binding.CheckpointId
-                    )
+            end
+
+            if flow_clear.complete then
+                if handle_run_cleared then
+                    handle_run_cleared()
                 end
-                sessions:set_runtime_progress(
-                    active_session_id :: string,
-                    "CombatRoom2Clear",
-                    ""
-                )
+            elseif flow_clear.next_binding then
                 send_objective(
-                    "Room 2 cleared. Boss unlocked; checkpoint moved."
+                    "Encounter cleared. "
+                        .. flow_clear.next_binding.RoomSlotId
+                        .. " unlocked; checkpoint moved."
                 )
-            elseif encounter_id == "MarauderCaptain" then
-                sync_all_character_encounters("")
-                if flow_clear.complete and handle_boss_cleared then
-                    handle_boss_cleared()
-                end
             end
         end
     end)
@@ -753,27 +794,41 @@ local function start_executed_slot(room_slot_id: string): any?
         connect_enemy(enemy, encounter_id)
     end
 
+    local objective = execution.Objective
+    if type(objective) == "string" and objective ~= "" then
+        send_objective(
+            if execution.ObjectiveState == "Boss"
+                then "BOSS: " .. objective
+                else objective,
+            execution.ObjectiveState
+        )
+    end
+
+    local boss_humanoid = execution.BossHumanoid
+    if typeof(boss_humanoid) == "Instance"
+        and boss_humanoid:IsA("Humanoid")
+    then
+        local boss_name = if type(
+            execution.BossDisplayName
+        ) == "string"
+            then execution.BossDisplayName
+            else binding.PlanEncounterId
+
+        boss_humanoid.HealthChanged:Connect(function()
+            send_boss_state(
+                boss_humanoid,
+                boss_name,
+                encounter_id
+            )
+        end)
+        send_boss_state(
+            boss_humanoid,
+            boss_name,
+            encounter_id
+        )
+    end
+
     return started
-end
-
-local function start_room1()
-    local started = start_executed_slot("Room1")
-    if not started then
-        return
-    end
-
-    send_objective("Combat Room 1: defeat both Marauders.")
-end
-
-local function start_room2()
-    local started = start_executed_slot("Room2")
-    if not started then
-        return
-    end
-
-    send_objective(
-        "Combat Room 2: defeat the larger Marauder pack."
-    )
 end
 
 local function send_completion_state(commit_result: any, return_at: number)
@@ -799,7 +854,10 @@ local function commit_and_open_completion()
     local committed = completion_service:commit(active_session_id)
     if not committed.ok then
         next_completion_retry_at = os.clock() + 5
-        send_objective("Captain defeated. Saving completion rewards before return...", "CompletionSaveError")
+        send_objective(
+            "Dungeon cleared. Saving completion rewards before return...",
+            "CompletionSaveError"
+        )
         warn("[Dungeon Runtime] Completion save barrier failed: " .. tostring(committed.reason))
         return
     end
@@ -823,7 +881,7 @@ local function commit_and_open_completion()
     )
 end
 
-handle_boss_cleared = function()
+handle_run_cleared = function()
     if not active_session_id
         or completion_pending
         or completion_committed
@@ -836,9 +894,9 @@ handle_boss_cleared = function()
         return
     end
 
-    if not depth1_flow or not depth1_flow:is_complete() then
+    if not encounter_flow or not encounter_flow:is_complete() then
         warn(
-            "[Dungeon Runtime] Boss clear rejected because "
+            "[Dungeon Runtime] Run clear rejected because "
                 .. "required generic encounters are incomplete."
         )
         return
@@ -854,63 +912,34 @@ handle_boss_cleared = function()
     commit_and_open_completion()
 end
 
-local function start_boss()
-    local started = start_executed_slot("Room3")
-    if not started then
+-- Connects every resolved physical encounter trigger exactly once.
+local function bind_encounter_triggers()
+    if encounter_triggers_bound then
         return
     end
-
-    local binding = started.Binding
-    local execution = started.Execution
-    local boss = execution.BossModel
-    local humanoid = execution.BossHumanoid
-    local boss_name = execution.BossDisplayName
-        or active_definition.Boss.DisplayName
-
-    if typeof(boss) == "Instance"
-        and boss:IsA("Model")
-    then
-        active_captain = boss
-    end
-
-    send_objective(
-        "BOSS: " .. tostring(execution.Objective),
-        execution.ObjectiveState or "Boss"
+    assert(
+        encounter_bindings ~= nil,
+        "Encounter bindings must exist before trigger binding."
     )
 
-    if typeof(humanoid) == "Instance"
-        and humanoid:IsA("Humanoid")
-    then
-        humanoid.HealthChanged:Connect(function()
-            send_boss_state(
-                humanoid,
-                boss_name,
-                binding.RuntimeEncounterId
-            )
-        end)
-        send_boss_state(
-            humanoid,
-            boss_name,
-            binding.RuntimeEncounterId
+    for _, binding in ipairs(encounter_bindings.ordered) do
+        local trigger = environment:get(binding.TriggerAnchor)
+        assert(
+            trigger ~= nil,
+            "Resolved encounter trigger disappeared: "
+                .. tostring(binding.TriggerAnchor)
         )
-    end
-end
 
-room1_trigger.Touched:Connect(function(hit)
-    if get_player_from_touch(hit) then
-        start_room1()
+        local room_slot_id = binding.RoomSlotId
+        trigger.Touched:Connect(function(hit)
+            if get_player_from_touch(hit) then
+                start_executed_slot(room_slot_id)
+            end
+        end)
     end
-end)
-room2_trigger.Touched:Connect(function(hit)
-    if get_player_from_touch(hit) then
-        start_room2()
-    end
-end)
-boss_trigger.Touched:Connect(function(hit)
-    if get_player_from_touch(hit) then
-        start_boss()
-    end
-end)
+
+    encounter_triggers_bound = true
+end
 
 local function emit_revive_state(user_id: number, payload: any)
     local player = Players:GetPlayerByUserId(user_id)
@@ -920,55 +949,139 @@ local function emit_revive_state(user_id: number, payload: any)
     end
 end
 
+local function binding_for_checkpoint(
+    checkpoint_id: string
+): any?
+    if not encounter_bindings then
+        return nil
+    end
+
+    local legacy_slot =
+        LEGACY_CHECKPOINT_SLOTS[checkpoint_id]
+    if type(legacy_slot) == "string" then
+        return encounter_bindings.by_slot[legacy_slot]
+    end
+
+    for _, binding in ipairs(encounter_bindings.ordered) do
+        if binding.CheckpointId == checkpoint_id then
+            return binding
+        end
+    end
+    return nil
+end
+
+local function recovery_objective(
+    binding: any?
+): (string, string)
+    if not binding then
+        return "Enter the first encounter to begin the dungeon.",
+            "Active"
+    end
+
+    if binding.ExecutorId == "Boss" then
+        return "Boss encounter ready. Enter "
+                .. binding.RoomSlotId
+                .. ".",
+            "Boss"
+    end
+
+    return "Enter "
+            .. binding.RoomSlotId
+            .. " to continue the dungeon.",
+        "Active"
+end
+
 local function apply_recovery_plan(session: any): any
     local checkpoint_id = persisted_checkpoint_id(session)
-    local plan = DungeonRecoveryRules.from_checkpoint(checkpoint_id)
+    local checkpoint_binding =
+        binding_for_checkpoint(checkpoint_id)
 
-    if not plan.valid_checkpoint then
+    if checkpoint_id ~= "Entrance"
+        and not checkpoint_binding
+    then
         warn(
             "[Dungeon Runtime] Unknown persisted checkpoint "
                 .. tostring(checkpoint_id)
-                .. "; recovering at Entrance."
+                .. "; presenting recovery from the next encounter."
         )
     end
 
-    local room1_cleared = depth1_flow ~= nil
-        and depth1_flow:state_for_slot("Room1") == "Cleared"
-    local room2_cleared = depth1_flow ~= nil
-        and depth1_flow:state_for_slot("Room2") == "Cleared"
+    if encounter_bindings and encounter_flow then
+        for _, binding in ipairs(
+            encounter_bindings.ordered
+        ) do
+            if type(binding.ExitBarrierRoomId) == "string" then
+                local state = encounter_flow:state_for_slot(
+                    binding.RoomSlotId
+                )
+                local should_open = state == "Cleared"
+                    or state == "Skipped"
+                local updated = environment:set_exit_open(
+                    binding.ExitBarrierRoomId,
+                    should_open
+                )
+                if type(updated) == "table"
+                    and updated.ok == false
+                then
+                    warn(
+                        "[Dungeon Runtime] Recovery barrier update failed for "
+                            .. binding.RoomSlotId
+                            .. ": "
+                            .. tostring(updated.reason)
+                    )
+                end
+            end
+        end
+    end
 
     sync_all_character_encounters("")
-    environment:set_exit_open("Room1", room1_cleared)
-    environment:set_exit_open("Room2", room2_cleared)
 
-    if checkpoint_id ~= "Entrance" and active_session_id then
+    local next_binding = encounter_flow
+        and encounter_flow:next_binding()
+        or nil
+    local objective, objective_state =
+        recovery_objective(next_binding)
+
+    if active_session_id and next_binding then
         sessions:set_runtime_progress(
             active_session_id,
-            plan.runtime_room_id,
+            next_binding.PlanEncounterId .. "Ready",
             ""
         )
     end
-    return plan
+
+    return {
+        valid_checkpoint = checkpoint_id == "Entrance"
+            or checkpoint_binding ~= nil,
+        spawn_checkpoint_id = checkpoint_id,
+        runtime_room_id = next_binding
+            and next_binding.PlanEncounterId .. "Ready"
+            or "Complete",
+        objective = objective,
+        objective_state = objective_state,
+    }
 end
 
--- Registers stable encounter checkpoints plus legacy aliases for reconnects.
-local function register_depth1_checkpoints()
+-- Registers stable encounter checkpoints plus legacy Depth1 aliases.
+local function register_encounter_checkpoints()
     assert(
         checkpoint_service ~= nil,
         "Checkpoint service must exist before registration."
     )
     assert(
-        depth1_bindings ~= nil,
-        "Depth1 encounter bindings must exist before registration."
+        encounter_bindings ~= nil,
+        "Encounter bindings must exist before registration."
     )
 
     checkpoint_service:register(
         "Entrance",
         0,
-        environment:checkpoint_cframe("Temple.EntrySpawn")
+        environment:checkpoint_cframe(
+            encounter_bindings.entrance_anchor
+        )
     )
 
-    for _, binding in ipairs(depth1_bindings.ordered) do
+    for _, binding in ipairs(encounter_bindings.ordered) do
         checkpoint_service:register(
             binding.CheckpointId,
             binding.CheckpointSequence,
@@ -978,20 +1091,20 @@ local function register_depth1_checkpoints()
         )
     end
 
-    local legacy_slots = {
-        Room1Start = "Room1",
-        Room2Start = "Room2",
-        BossRoomStart = "Room3",
-    }
-    for legacy_id, room_slot_id in pairs(legacy_slots) do
-        local binding = depth1_bindings.by_slot[room_slot_id]
-        checkpoint_service:register(
-            legacy_id,
-            binding.CheckpointSequence,
-            environment:checkpoint_cframe(
-                binding.CheckpointAnchor
+    for legacy_id, room_slot_id in pairs(
+        LEGACY_CHECKPOINT_SLOTS
+    ) do
+        local binding =
+            encounter_bindings.by_slot[room_slot_id]
+        if binding then
+            checkpoint_service:register(
+                legacy_id,
+                binding.CheckpointSequence,
+                environment:checkpoint_cframe(
+                    binding.CheckpointAnchor
+                )
             )
-        )
+        end
     end
 end
 
@@ -1012,7 +1125,7 @@ local function initialize_session_services(session: any): (any?, boolean)
     })
 
     local encounter_runtime_result =
-        initialize_depth1_encounter_runtime(session)
+        initialize_encounter_runtime(session)
     if encounter_runtime_result.ok ~= true then
         error(
             "Generic encounter runtime failed: "
@@ -1024,7 +1137,7 @@ local function initialize_session_services(session: any): (any?, boolean)
         DungeonEncounterExecutionBootstrap.create()
     encounter_execution_controller =
         DungeonEncounterExecutionController.new(
-            depth1_flow,
+            encounter_flow,
             execution_registry
         )
 
@@ -1032,7 +1145,8 @@ local function initialize_session_services(session: any): (any?, boolean)
         sessions,
         session.SessionId
     )
-    register_depth1_checkpoints()
+    register_encounter_checkpoints()
+    bind_encounter_triggers()
     if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
     local completion_reward=active_definition.CompletionReward
     if active_definition.Id=="AbandonedMine" and type(session.InstanceState)=="table" then
@@ -1140,13 +1254,26 @@ local function member_is_reconnecting(session: any, user_id: number): boolean
 end
 
 local function reconnect_objective(plan: any): (string, string)
-    if current_encounter_id == "CombatRoom1" then
-        return "Combat Room 1: defeat both Marauders.", "Active"
-    elseif current_encounter_id == "CombatRoom2" then
-        return "Combat Room 2: defeat the larger Marauder pack.", "Active"
-    elseif current_encounter_id == "MarauderCaptain" then
-        return "BOSS: Defeat the " .. active_definition.Boss.DisplayName .. ".", "Boss"
+    if current_encounter_id ~= ""
+        and encounter_flow
+    then
+        local binding = encounter_flow:binding_for_runtime(
+            current_encounter_id
+        )
+        if binding then
+            if binding.ExecutorId == "Boss" then
+                return "BOSS: Resume "
+                        .. binding.PlanEncounterId
+                        .. ".",
+                    "Boss"
+            end
+            return "Resume "
+                    .. binding.PlanEncounterId
+                    .. ".",
+                "Active"
+        end
     end
+
     return plan.objective, plan.objective_state
 end
 
@@ -1405,18 +1532,21 @@ local function admit_player(player: Player)
     end
     if not reconnecting
         and checkpoint_service
-        and depth1_bindings
+        and encounter_flow
     then
-        local first_binding = depth1_bindings.by_slot.Room1
-        local initial_checkpoint =
-            checkpoint_service:activate(
-                first_binding.CheckpointId
-            )
-        if not initial_checkpoint.ok then
-            warn(
-                "[Dungeon Runtime] Initial room checkpoint failed: "
-                    .. tostring(initial_checkpoint.reason)
-            )
+        local first_binding =
+            encounter_flow:first_binding()
+        if first_binding then
+            local initial_checkpoint =
+                checkpoint_service:activate(
+                    first_binding.CheckpointId
+                )
+            if not initial_checkpoint.ok then
+                warn(
+                    "[Dungeon Runtime] Initial encounter checkpoint failed: "
+                        .. tostring(initial_checkpoint.reason)
+                )
+            end
         end
     end
 
@@ -1429,8 +1559,13 @@ local function admit_player(player: Player)
         end)
     end)
 
-    local spawn_cframe =
-        environment:checkpoint_cframe("Temple.EntrySpawn")
+    local spawn_cframe = environment:checkpoint_cframe(
+        assert(
+            encounter_bindings
+                and encounter_bindings.entrance_anchor,
+            "Encounter entrance binding is missing."
+        )
+    )
     if reconnecting and checkpoint_service then
         spawn_cframe = checkpoint_service:get_active_checkpoint().CFrame
     end
@@ -1440,11 +1575,18 @@ local function admit_player(player: Player)
 
     if reconnecting then
         local plan = recovery_plan
-        if not plan and checkpoint_service then
-            local checkpoint = checkpoint_service:get_active_checkpoint()
-            plan = DungeonRecoveryRules.from_checkpoint(checkpoint.Id)
+        if not plan then
+            local next_binding = encounter_flow
+                and encounter_flow:next_binding()
+                or nil
+            local objective, objective_state =
+                recovery_objective(next_binding)
+            plan = {
+                spawn_checkpoint_id = "Entrance",
+                objective = objective,
+                objective_state = objective_state,
+            }
         end
-        plan = plan or DungeonRecoveryRules.from_checkpoint("Entrance")
         local objective, state_name = reconnect_objective(plan)
         send_objective(objective, state_name)
         if runtime_created then
@@ -1456,7 +1598,12 @@ local function admit_player(player: Player)
             ))
         end
     else
-        send_objective("Enter Combat Room 1 to begin the dungeon.")
+        local first_binding = encounter_flow
+            and encounter_flow:first_binding()
+            or nil
+        local objective, state_name =
+            recovery_objective(first_binding)
+        send_objective(objective, state_name)
     end
     print(string.format("[Dungeon Runtime] %s admitted to %s.", player.Name, session.SessionId))
 end

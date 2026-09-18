@@ -58,8 +58,14 @@ function fake_environment:enemy_spawn_cframes(
     }
 end
 
-function fake_environment:captain_spawn_cframe(): CFrame
-    return CFrame.new(9, 0, 0)
+local boss_spawn_anchor = Instance.new("Part")
+boss_spawn_anchor.CFrame = CFrame.new(9, 0, 0)
+
+function fake_environment:get(anchor_id: string): BasePart?
+    if anchor_id == "Synthetic.Room6.BossSpawn" then
+        return boss_spawn_anchor
+    end
+    return nil
 end
 
 local context = {
@@ -241,6 +247,7 @@ local boss_encounter = {
 }
 local boss_binding = {
     RuntimeEncounterId = "MarauderCaptain",
+    BossSpawnAnchor = "Synthetic.Room6.BossSpawn",
 }
 
 check(
@@ -273,6 +280,10 @@ check(
     "Boss reward must use difficulty scaling."
 )
 check(
+    boss_calls[1].SpawnCFrame == CFrame.new(9, 0, 0),
+    "Boss spawn must come from the binding-specific anchor."
+)
+check(
     guard_claims["executor-test-session:Depth1Boss"] == true,
     "Boss execution must claim its stable encounter ID."
 )
@@ -298,6 +309,7 @@ check(
     "Unimplemented future boss must fail closed."
 )
 
+boss_spawn_anchor:Destroy()
 context.RuntimeRoot:Destroy()
 parent:Destroy()
 

@@ -30,8 +30,14 @@ function environment:enemy_spawn_cframes(_room_id: string): {CFrame}
         CFrame.new(4, 0, 0),
     }
 end
-function environment:captain_spawn_cframe(): CFrame
-    return CFrame.new()
+local boss_spawn_anchor = Instance.new("Part")
+boss_spawn_anchor.CFrame = CFrame.new()
+
+function environment:get(anchor_id: string): BasePart?
+    if anchor_id == "Synthetic.BossSpawn" then
+        return boss_spawn_anchor
+    end
+    return nil
 end
 
 local context = {
@@ -90,6 +96,7 @@ check(
         },
         {
             RuntimeEncounterId = "MarauderCaptain",
+            BossSpawnAnchor = "Synthetic.BossSpawn",
         },
         context
     ).ok == true,
@@ -106,6 +113,7 @@ check(
         },
         {
             RuntimeEncounterId = "MarauderCaptain",
+            BossSpawnAnchor = "Synthetic.BossSpawn",
         },
         context
     ).ok == true,
@@ -128,6 +136,7 @@ check(
     "Unimplemented Event Boss content must fail closed."
 )
 
+boss_spawn_anchor:Destroy()
 runtime_root:Destroy()
 enemies:Destroy()
 
