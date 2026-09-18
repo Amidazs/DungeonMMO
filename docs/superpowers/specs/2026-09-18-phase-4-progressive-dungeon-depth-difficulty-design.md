@@ -2,8 +2,9 @@
 
 **Date:** 18 September 2026
 **Phase:** Phase 4 - Content Alpha, backend-only gate
-**Status:** Approved in conversation
+**Status:** Implemented / local green; awaiting project-owner closeout
 **Baseline:** `a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9`
+**Implementation checkpoint:** `1230e6c`
 
 ## 1. Purpose
 

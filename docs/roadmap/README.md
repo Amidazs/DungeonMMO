@@ -42,9 +42,17 @@ explicitly deferred.
 Roadmap v1.43 opened Phase 4 with Starting Base presentation as the first
 default gate. On 18 September 2026 the project owner explicitly parked modelling
 and presentation work and selected a backend-only **Progressive Dungeon Depth +
-Difficulty** gate instead. The roadmap DOCX is not rewritten for an in-progress
-gate; this working priority is recorded in the continuity/spec documents until
-the gate is accepted.
+Difficulty** gate instead.
+
+That backend gate is now locally green at implementation checkpoint
+`1230e6c`: schema v13 progression, 3/4/5/6 logical depths, authoritative
+solo/party/session routing, fail-closed higher depths, combat/reward scaling and
+completion unlock integration all passed the local acceptance matrix.
+
+The canonical DOCX remains v1.43 because this gate has not yet received a
+project-owner release/closeout decision and has not been pushed, merged or
+published. The local acceptance evidence is recorded in
+`docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

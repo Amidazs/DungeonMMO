@@ -51,7 +51,10 @@ Do not recreate or replace these systems when continuing:
 - economy audit and request/replay/ownership safeguards;
 - shared persisted entity adapter.
 
-Current profile schema: v12.
+Current profile schema: v13.
+
+Schema v13 adds independent persistent Dungeon difficulty progression while
+preserving legacy `DungeonProgress`.
 
 ## Final accepted evidence
 
@@ -76,28 +79,47 @@ docs/testing/phase3-systems-alpha-acceptance-record.md
 Do not silently pull either back into the immediate plan. Revisit them only when
 the roadmap conditions that justified deferral change.
 
-## Exact next action
+## Phase 4 backend gate result
 
-Implement the approved **Progressive Dungeon Depth + Difficulty backend
-foundation** in the isolated Phase 4 worktree.
+The approved **Progressive Dungeon Depth + Difficulty backend foundation** is
+locally complete and green at implementation checkpoint:
 
-The locked backend proof is:
+`1230e6c`
+
+The accepted local proof now includes:
 
 - Depth1/2/3/4 = 3/4/5/6 logical encounters;
-- progressively stronger enemies and reward bands;
-- a distinct boss at each ordinary depth;
-- previous depth bosses return as minibosses on the final depth;
-- a new true final boss ends the final depth;
-- difficulty persists with the authoritative dungeon session;
-- completion unlocks the next depth for eligible players;
-- party entry validates every member's unlock;
-- existing run modifiers compose independently;
-- unbuilt higher depths fail closed rather than entering incomplete content;
-- Depth1 current gameplay remains backward compatible.
+- progressively stronger server-owned enemy and reward tuning;
+- previous bosses reused as minibosses on the final depth;
+- a new true final boss at the end of Depth4;
+- authoritative solo/party/session/reconnect difficulty routing;
+- schema v13 persistent sequential unlock progression;
+- completion-driven unlock recording inside the save barrier;
+- Fortified/Bounty composition preserved independently;
+- Depth2-Depth4 fail closed with `DifficultyContentNotReady`;
+- Depth1 compatibility regressions remain green;
+- all four Rojo compositions build cleanly;
+- 467 repository Lua/Luau files parse with 0 failures;
+- no art/model/mesh/terrain files changed.
+
+Evidence:
+`docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this Phase 4 gate.
+
+## Exact next action
+
+Stop at the local-green boundary until the project owner chooses the closeout
+action for this gate. Push/merge/publish are not implied by the implementation
+approval and require an explicit closeout instruction.
+
+If the owner chooses to continue backend work without modelling, design the next
+Phase 4 backend gate from this checkpoint rather than silently enabling
+Depth2-Depth4. Those depths must remain `RuntimeReady = false` until their
+required runtime/content contracts are deliberately implemented and accepted.
 
 No modelling, meshes, terrain, authored rooms, visual polish or difficulty UI
-belongs in this gate. The approved design and implementation plan are under
-docs/superpowers for 18 September 2026.
+was performed in this gate.
 
 ## Safety and repository paths
 

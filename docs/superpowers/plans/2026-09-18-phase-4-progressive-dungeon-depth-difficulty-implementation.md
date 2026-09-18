@@ -42,10 +42,10 @@ Required proof:
 - final depth ends in a unique FinalBoss;
 - default difficulty is Depth1.
 
-- [ ] RED test
-- [ ] implementation
-- [ ] GREEN test
-- [ ] static/build check
+- [x] RED test
+- [x] implementation
+- [x] GREEN test
+- [x] static/build check
 
 ---
 
@@ -71,9 +71,9 @@ Required proof:
 - replaying the same clear does not mint/increment state;
 - later depth cannot unlock by skipping the previous depth.
 
-- [ ] RED migration/service tests
-- [ ] implementation
-- [ ] GREEN tests
+- [x] RED migration/service tests
+- [x] implementation
+- [x] GREEN tests
 
 ---
 
@@ -100,9 +100,9 @@ Required proof:
 
 No player-facing difficulty UI is required in this backend gate.
 
-- [ ] RED party/entry tests
-- [ ] implementation
-- [ ] GREEN tests
+- [x] RED party/entry tests
+- [x] implementation
+- [x] GREEN tests
 
 ---
 
@@ -125,9 +125,9 @@ Required proof:
 - unknown difficulty is rejected;
 - non-runtime-ready depth is blocked by entry/coordinator authority.
 
-- [ ] RED tests
-- [ ] implementation
-- [ ] GREEN tests
+- [x] RED tests
+- [x] implementation
+- [x] GREEN tests
 
 ---
 
@@ -152,9 +152,9 @@ Required proof:
 - reward transaction IDs remain unchanged/replay-safe;
 - Bestiary/Reputation/Contribution semantics do not multiply.
 
-- [ ] RED tuning tests
-- [ ] implementation
-- [ ] GREEN tests
+- [x] RED tuning tests
+- [x] implementation
+- [x] GREEN tests
 
 ---
 
@@ -173,9 +173,9 @@ Required proof:
 - save barrier includes the new progression mutation;
 - quest/guild completion integration remains green.
 
-- [ ] RED completion progression test
-- [ ] implementation
-- [ ] GREEN test
+- [x] RED completion progression test
+- [x] implementation
+- [x] GREEN test
 
 ---
 
@@ -183,20 +183,20 @@ Required proof:
 
 Required checks:
 
-- [ ] repository-wide Luau parse;
-- [ ] `git diff --check`;
-- [ ] focused difficulty/profile/session/party/reward/completion tests;
-- [ ] existing Dungeon modifier tests;
-- [ ] existing Dungeon session tests;
-- [ ] existing TeleportCoordinator tests;
-- [ ] existing Party Service/Party Entry tests;
-- [ ] existing Completion Service tests;
-- [ ] existing Reward Service tests;
-- [ ] Base Rojo build;
-- [ ] Dungeon Rojo build;
-- [ ] published Base Rojo build;
-- [ ] published Dungeon Rojo build;
-- [ ] source-boundary review confirms no art/model/mesh change.
+- [x] repository-wide Luau parse;
+- [x] `git diff --check`;
+- [x] focused difficulty/profile/session/party/reward/completion tests;
+- [x] existing Dungeon modifier tests;
+- [x] existing Dungeon session tests;
+- [x] existing TeleportCoordinator tests;
+- [x] existing Party Service/Party Entry tests;
+- [x] existing Completion Service tests;
+- [x] existing Reward Service tests;
+- [x] Base Rojo build;
+- [x] Dungeon Rojo build;
+- [x] published Base Rojo build;
+- [x] published Dungeon Rojo build;
+- [x] source-boundary review confirms no art/model/mesh change.
 
 Studio runtime is only required if automated evidence identifies a genuine
 Depth1 runtime risk.

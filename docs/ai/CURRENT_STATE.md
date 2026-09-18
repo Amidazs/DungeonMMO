@@ -51,7 +51,8 @@ The accepted Systems Alpha boundary now includes:
 - shared economy audit events and request-rate/replay/ownership validation;
 - the reusable persisted entity-adapter boundary used by shared MMO entities.
 
-The current profile schema is v12.
+The current profile schema is v13. Schema v13 adds independent persistent
+Dungeon difficulty progression while preserving legacy `DungeonProgress`.
 
 ## Final runtime and stress evidence
 
@@ -105,28 +106,43 @@ Two roadmap concepts were intentionally not implemented:
 
 These are future work, not missing Phase 3 exit criteria.
 
-## Phase 4 active backend gate
+## Phase 4 progressive-depth backend gate
 
-Phase 4 - Content Alpha is active.
+Phase 4 - Content Alpha remains active.
 
 The user has explicitly parked Starting Base presentation, modelling, meshes and
-environment-art work for now. The active engineering gate is:
+environment-art work for now.
 
-**Progressive Dungeon Depth + Difficulty - backend foundation.**
+The **Progressive Dungeon Depth + Difficulty backend foundation** is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT**.
 
-Approved direction:
+Implementation checkpoint:
 
-- Depth1/2/3/4 represent progressively deeper 3/4/5/6-encounter runs;
-- each depth increases enemy challenge and reward bands;
-- each ordinary depth ends with a new boss;
-- the final depth reuses the previous depth bosses as minibosses before a new
+`1230e6c`
+
+Accepted local engineering result:
+
+- Depth1/2/3/4 expose progressively deeper 3/4/5/6-encounter logical plans;
+- each depth has monotonic server-owned health, damage and reward scaling;
+- the final depth reuses the three earlier bosses as minibosses before a new
   true final boss;
 - Fortified, Rich Deposits and Bounty remain independent run modifiers;
-- Depth1 preserves current Temple/Mine gameplay;
-- Depth2-Depth4 are defined in backend data but fail closed until their physical
-  room/boss content is explicitly runtime-ready;
-- legacy DungeonProgress remains untouched; new unlock state is versioned
-  separately.
+- Fortified composes with depth HP and Bounty applies after depth reward
+  scaling;
+- schema v13 stores difficulty progress separately from legacy
+  `DungeonProgress`;
+- completion records sequential, idempotent clears before the save barrier;
+- solo/party/session/reconnect/TeleportData contracts carry and validate
+  difficulty;
+- Depth1 remains the current runtime-ready compatibility baseline;
+- Depth2-Depth4 remain `RuntimeReady = false` and fail closed until their
+  physical/runtime content exists;
+- no modelling, meshes, terrain, authored-room or environment-art work was
+  performed.
+
+Final local evidence includes 467 Luau files parsed with 0 failures, clean
+`git diff --check`, all four Rojo compositions building, final Base/Dungeon
+Studio suites green, and the Phase 3 stress harness still passing.
 
 Active worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1
@@ -136,6 +152,11 @@ wip/phase-4-dungeon-depth-difficulty-v1
 
 Design/spec:
 docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md
+
+Acceptance evidence:
+docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this Phase 4 gate.
 
 ## Repository safety
 

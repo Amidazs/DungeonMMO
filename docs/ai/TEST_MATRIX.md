@@ -965,3 +965,97 @@ docs/testing/phase3-systems-alpha-acceptance-record.md.
 
 **Next phase:** Phase 4 - Content Alpha.
 **First design gate:** Starting Base launch-quality content/presentation.\n
+
+<!-- PHASE4_PROGRESSIVE_DUNGEON_DEPTH_LOCAL_GREEN_20260918 -->
+## Phase 4 - Progressive Dungeon Depth + Difficulty Backend Foundation
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT
+**Implementation checkpoint:** `1230e6c`
+**Baseline:** `a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9`
+
+### Backend contract
+
+- [x] Temple and Abandoned Mine expose Depth1-Depth4.
+- [x] Depth1/2/3/4 expose 3/4/5/6 logical encounters.
+- [x] scaling increases monotonically by depth.
+- [x] Depth4 reuses prior bosses as minibosses.
+- [x] Depth4 ends with a new final boss.
+- [x] schema v13 persists independent dungeon-depth progression.
+- [x] legacy `DungeonProgress` remains independent.
+- [x] Depth1 is logically unlocked by default.
+- [x] sequential clears unlock the next depth idempotently.
+- [x] solo and party entry validate authoritative difficulty.
+- [x] all party members must own the selected unlock.
+- [x] difficulty persists through session/reconnect/TeleportData.
+- [x] immutable instance state carries the logical encounter plan.
+- [x] Fortified composes with depth HP.
+- [x] Bounty applies after depth monster-reward scaling.
+- [x] completion Gold scales by depth.
+- [x] completion records the depth clear before the profile save barrier.
+- [x] Depth1 remains RuntimeReady.
+- [x] Depth2-Depth4 remain fail-closed / RuntimeReady=false.
+
+### Repository-wide validation
+
+- [x] Luau parse: 467 files, 0 failures.
+- [x] `git diff --check`: PASS.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+- [x] source-boundary review: 44 changed files, 0 art/model/mesh/terrain/image
+      files.
+- [x] no `DungeonMMO_Art` merge or modification.
+
+### Final Dungeon Studio evidence
+
+- [x] Dungeon Difficulty Definitions: 78 assertions PASS.
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Difficulty Session: 7 assertions PASS.
+- [x] Dungeon Difficulty Instance Director: 7 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Tuning: 10 assertions PASS.
+- [x] Enemy Damage Multiplier Rules: 3 assertions PASS.
+- [x] Dungeon Enemy Difficulty Scaling: 5 assertions PASS.
+- [x] Dungeon Difficulty Completion Unlock: 9 assertions PASS.
+- [x] Dungeon Modifier Definitions: 6 assertions PASS.
+- [x] Teleport Coordinator: 16 assertions PASS.
+- [x] Completion Service: 14 assertions PASS.
+- [x] Reward Service: 27 assertions PASS.
+- [x] Dungeon Session: PASS.
+- [x] no project CreatorErrors reported.
+
+### Final Base Studio evidence
+
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] no project CreatorErrors reported.
+
+### Carried-forward stress regression
+
+- [x] 250 profile cycles.
+- [x] 1,000 market operations.
+- [x] 1,000 duplicate/replay attempts.
+- [x] 250 guild operations.
+- [x] 100 session cycles.
+- [x] 100 race-change round trips.
+- [x] Phase 3 Systems Stress reported PASS in both final compositions.
+
+### Release qualification
+
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] project-owner closeout decision.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`.

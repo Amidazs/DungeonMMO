@@ -29,7 +29,9 @@ modification and reconcile without destructive Git operations.
 - Phase 3 gameplay release: `84662948127eb1a37c9f184c6abbafe6f2daddb6`.
 - Phase 3 documentation closeout: `a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9`.
 - Phase 4 - Content Alpha: ACTIVE.
-- Current backend-only gate: progressive Dungeon depth + difficulty.
+- Progressive Dungeon depth + difficulty backend gate: LOCAL GREEN.
+- Gate implementation checkpoint: `1230e6c`.
+- Gate release state: not pushed, merged or published.
 - Active branch: `wip/phase-4-dungeon-depth-difficulty-v1`.
 - Active worktree:
   `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1`.
@@ -100,13 +102,16 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 
 ## Selected next-gate discipline
 
-The active gate is the backend-only progressive Dungeon depth + difficulty
-foundation defined in:
+The progressive Dungeon depth + difficulty backend foundation defined in:
 
 - `docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md`;
 - `docs/superpowers/plans/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-implementation.md`.
 
-Locked rules:
+is locally green at `1230e6c`. Do not silently extend it or mark higher depths
+runtime-ready. Await the project owner's closeout/next-gate instruction before
+push, merge, publish or new implementation.
+
+Locked rules that carry forward:
 
 - Depth1/2/3/4 expose 3/4/5/6 logical encounters respectively.
 - Each deeper difficulty adds content and stronger enemies; it is not merely a
@@ -117,8 +122,10 @@ Locked rules:
 - Existing Depth1 behaviour is the compatibility baseline.
 - Depth2-Depth4 are defined in backend data but fail closed until their physical
   runtime content is explicitly ready.
-- Persistent unlock progression uses a new versioned profile field; legacy
-  `DungeonProgress` remains untouched.
+- Persistent unlock progression uses schema v13 and a separate versioned
+  profile field; legacy `DungeonProgress` remains untouched.
+- A completed Depth1 may unlock Depth2 logically while Depth2 entry still fails
+  closed until runtime content is deliberately accepted.
 - No client may supply authoritative difficulty tuning values.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.
