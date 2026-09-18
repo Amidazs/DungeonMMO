@@ -55,12 +55,24 @@ Combat/MiniBoss/Boss/FinalBoss plus future EventBoss/SecretBoss insertion from
 server-owned conditions. Unbound optional content fails closed, no Event/Secret
 boss content is enabled, and Depth2-Depth4 remain `RuntimeReady = false`.
 
+The next **Encounter Execution / Spawn Registry** gate is locally green at
+`fe1856e`. Encounter descriptors now select stable CombatPack/Boss executors;
+combat packs resolve through server-owned catalogue data; boss-family content
+resolves through stable BossId -> factory registration; live DungeonRuntime no
+longer chooses concrete Marauder/Captain/Foreman factories. Transactional
+startup cleans partial spawns and returns the generic sequence to Pending on
+failure. Boss duplicate claims are scoped by session + encounter ID, which
+supports multiple miniboss/boss/event/secret encounters in a single future run.
+Temple and forced Abandoned Mine live execution proofs passed. Depth2-Depth4
+remain `RuntimeReady = false`, and no Event/Secret boss content is enabled.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
 
 - `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`;
-- `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`.
+- `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`;
+- `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

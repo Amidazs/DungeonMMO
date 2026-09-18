@@ -109,29 +109,52 @@ The accepted local proof now includes:
 - Depth2-Depth4 remain fail closed;
 - Event/Secret boss content remains disabled.
 
-Final evidence:
+The follow-on **Encounter Execution / Spawn Registry** is locally complete and
+green at implementation checkpoint:
 
-- 481 repository Lua/Luau files parsed with 0 failures;
+`fe1856e`
+
+Accepted proof now also includes:
+
+- stable CombatPack and Boss executor selection from encounter descriptors;
+- server-owned combat-pack spawn catalogue;
+- stable BossId -> factory registration;
+- MarauderCaptain + CorruptedForeman registered as current boss content;
+- DungeonRuntime concrete factory decisions removed;
+- transactional startup and rollback to Pending on execution failure;
+- cleanup on partial pack failure, boss factory failure and downstream
+  EncounterService rejection;
+- encounter-scoped boss duplicate claims, allowing several distinct boss-family
+  encounters in one dungeon run;
+- future boss content fails closed until its BossId/catalogue/factory/binding is
+  deliberately registered;
+- real Temple execution-registry acceptance: 15 assertions PASS;
+- forced Abandoned Mine DeepEchoes + CrystalBloom execution-registry
+  acceptance: 16 assertions PASS;
+- 494 repository Lua/Luau files parsed with 0 failures;
 - all four Rojo compositions build cleanly;
-- final Dungeon and Base Studio compositions have no project errors;
+- final repeat committed Dungeon regression has no project errors;
+- final committed Base regression has no project errors;
 - Phase 3 Systems Stress remains green;
-- live real-trigger/real-enemy generic encounter acceptance: 13 assertions PASS;
-- 19 changed files from baseline, 0 art/model/mesh/terrain/image files.
+- 26 changed code/test files from `c6e181c`, 0
+  art/model/mesh/terrain/image files.
 
 Evidence:
-`docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`
+`docs/testing/phase4-encounter-execution-registry-acceptance-record.md`
 
 No push, merge or Roblox publish has been performed for this Phase 4 gate.
 
 ## Exact next action
 
-Stop at this local-green boundary until the project owner chooses the closeout
-action. Push, merge and Roblox publish each require an explicit instruction.
+Stop at this local-green boundary until the project owner chooses the next
+backend gate or release closeout. Push, merge and Roblox publish each require an
+explicit instruction.
 
-If backend-only work continues before modelling, start a new isolated gate from
-this checkpoint. Do not silently mark Depth2-Depth4 runtime-ready and do not
-enable Event/Secret boss definitions until their execution/binding contract is
-deliberately designed and accepted.
+If backend-only work continues before modelling, build from the registry rather
+than adding new concrete factory branches to DungeonRuntime. Depth2-Depth4 must
+remain `RuntimeReady = false` until their physical execution/binding content is
+deliberately implemented and accepted. Event/Secret boss content remains
+disabled until its own content/binding gate is approved.
 
 No modelling, meshes, terrain, authored rooms, visual polish or difficulty UI
 was performed in this gate.
@@ -142,13 +165,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 generic encounter worktree:
+Active Phase 4 encounter execution worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterRuntime_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1
 
 Active branch:
 
-wip/phase-4-generic-encounter-runtime-v1
+wip/phase-4-encounter-execution-registry-v1
 
 Phase 3 completion worktree:
 

@@ -1200,3 +1200,138 @@ Temporary validation-only harness, removed before final source checkpoint:
 
 Detailed evidence:
 `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`.
+
+
+<!-- PHASE4_ENCOUNTER_EXECUTION_REGISTRY_LOCAL_GREEN_20260918 -->
+## Phase 4 - Encounter Execution / Spawn Registry
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT
+**Baseline:** `c6e181c`
+**Implementation checkpoint:** `fe1856e`
+
+### Execution architecture
+
+- [x] stable executor IDs.
+- [x] CombatPack executor.
+- [x] Boss executor.
+- [x] server-owned combat-pack spawn catalogue.
+- [x] stable BossId -> factory registry.
+- [x] MarauderCaptain registered.
+- [x] CorruptedForeman registered.
+- [x] DungeonRuntime does not select concrete enemy/boss factories.
+- [x] validation occurs before generic sequence start.
+- [x] failed executor rolls Active back to Pending.
+- [x] downstream EncounterService failure cleans spawned content and rolls back.
+- [x] partial combat-pack factory failure cleans already-created enemies.
+- [x] boss factory failure releases its spawn claim.
+- [x] missing boss Humanoid cleans model and releases claim.
+- [x] boss duplicate claims scoped by session + stable encounter ID.
+- [x] several distinct boss-family encounters can coexist in one run.
+- [x] missing packs/boss IDs/factories/bindings fail closed.
+- [x] unimplemented Event/Secret boss content remains disabled.
+
+### Focused Studio evidence
+
+- [x] Dungeon Encounter Execution Registry: 16 assertions PASS.
+- [x] Dungeon Encounter Spawn Catalog: 10 assertions PASS.
+- [x] Dungeon Boss Factory Registry: 8 assertions PASS.
+- [x] Dungeon Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Dungeon Encounter Execution Controller: 17 assertions PASS.
+- [x] Dungeon Encounter Executors: 20 assertions PASS.
+- [x] Boss Spawn Guard: 10 assertions PASS.
+- [x] Dungeon Encounter Sequencer: 25 assertions PASS.
+- [x] Dungeon Encounter Runtime Controller: 22 assertions PASS.
+- [x] Depth1 Encounter Flow: 18 assertions PASS.
+- [x] Depth1 Encounter Bindings: 18 assertions PASS.
+
+### Temple live execution proof
+
+- [x] real Room1 trigger.
+- [x] StandardRoom1 spawned exactly 2 live enemies.
+- [x] Room1 pack names came from catalogue.
+- [x] real Room2 trigger.
+- [x] StandardRoom2 spawned exactly 3 live enemies.
+- [x] real boss trigger.
+- [x] boss executor preserved DungeonBossRole=Boss.
+- [x] compatibility runtime ID MarauderCaptain preserved.
+- [x] logical Depth1Boss persisted Cleared.
+- [x] completion/save barrier succeeded.
+- [x] Execution Registry Live Acceptance: 15 assertions PASS.
+- [x] no project CreatorErrors in validation run.
+
+### Abandoned Mine live execution proof
+
+Validation-only build forced DeepEchoes + CrystalBloom:
+
+- [x] AbandonedMine selected.
+- [x] DeepEchoes active.
+- [x] CrystalBloom active.
+- [x] Room1 spawned exactly 3 enemies (2 + event bonus 1).
+- [x] Room2 spawned exactly 4 enemies (3 + rare bonus 1).
+- [x] boss registry resolved CorruptedForeman.
+- [x] Foreman display identity preserved.
+- [x] logical Boss role preserved.
+- [x] logical Depth1Boss persisted Cleared.
+- [x] completion/save barrier succeeded.
+- [x] Mine Execution Registry Live Acceptance: 16 assertions PASS.
+- [x] all forced-selection hooks removed after validation.
+
+### Repository-wide validation
+
+- [x] `git diff --check`: PASS.
+- [x] repository parse: 494 Lua/Luau files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+- [x] source-boundary audit: 26 changed code/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+
+### Final committed Dungeon regression
+
+- [x] execution-registry focused families PASS.
+- [x] Dungeon Difficulty Definitions: 114 assertions PASS.
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Difficulty Session: 7 assertions PASS.
+- [x] Dungeon Difficulty Instance Director: 7 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Tuning: 10 assertions PASS.
+- [x] Dungeon Enemy Difficulty Scaling: 5 assertions PASS.
+- [x] Enemy Damage Multiplier Rules: 3 assertions PASS.
+- [x] Dungeon Difficulty Completion Unlock: 9 assertions PASS.
+- [x] Dungeon Modifier Definitions: 6 assertions PASS.
+- [x] Teleport Coordinator: 16 assertions PASS.
+- [x] Completion Service: 14 assertions PASS.
+- [x] Reward Service: 27 assertions PASS.
+- [x] Dungeon Session: PASS.
+- [x] repeat clean run: Training Dummy 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] repeat clean run: no project CreatorErrors.
+
+### Final committed Base regression
+
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain RuntimeReady=false.
+- [x] no Event/Secret boss content enabled.
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] project-owner closeout decision.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-encounter-execution-registry-acceptance-record.md`.

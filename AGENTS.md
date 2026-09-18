@@ -33,10 +33,12 @@ modification and reconcile without destructive Git operations.
 - Progressive-depth checkpoint: `1230e6c`.
 - Generic Dungeon encounter runtime gate: LOCAL GREEN.
 - Generic-runtime implementation checkpoint: `5ba9f4d`.
+- Encounter execution/spawn registry gate: LOCAL GREEN.
+- Execution-registry implementation checkpoint: `fe1856e`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-generic-encounter-runtime-v1`.
+- Active branch: `wip/phase-4-encounter-execution-registry-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterRuntime_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -104,12 +106,12 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 
 ## Selected next-gate discipline
 
-The generic Dungeon encounter runtime defined in:
+The generic encounter execution/spawn registry defined in:
 
-- `docs/superpowers/specs/2026-09-18-phase-4-generic-dungeon-encounter-runtime-design.md`;
-- `docs/superpowers/plans/2026-09-18-phase-4-generic-dungeon-encounter-runtime-implementation.md`.
+- `docs/superpowers/specs/2026-09-18-phase-4-encounter-execution-registry-design.md`;
+- `docs/superpowers/plans/2026-09-18-phase-4-encounter-execution-registry-implementation.md`.
 
-is locally green at `5ba9f4d`. Do not push, merge, publish, enable higher
+is locally green at `fe1856e`. Do not push, merge, publish, enable higher
 depths, or enable Event/Secret boss content without a deliberate next action
 from the project owner.
 
@@ -138,6 +140,15 @@ Locked rules that carry forward:
 - Required inserted encounters cannot be bypassed by later room triggers.
 - Current Depth1 physical bindings fail closed when an activated encounter has
   no authored room/spawn/checkpoint binding.
+- DungeonRuntime must not choose concrete enemy/boss factories; encounter
+  descriptors route through the server-owned execution registry.
+- Combat packs resolve through server-owned catalogue data.
+- Boss-family content resolves through stable BossId -> factory registration.
+- Boss spawn claims are scoped by session + stable encounter ID so multiple
+  miniboss/boss/event/secret encounters can coexist in one run.
+- Missing packs/boss IDs/factories/execution bindings fail closed.
+- Failed encounter startup must clean partial spawns and roll sequence state
+  back to Pending.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

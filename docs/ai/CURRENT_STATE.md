@@ -148,28 +148,56 @@ Accepted local engineering result:
 - no modelling, meshes, terrain, authored rooms or environment-art work was
   performed.
 
+The follow-on **Encounter Execution / Spawn Registry** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT** at:
+
+`fe1856e`
+
+Accepted local engineering result:
+
+- encounter descriptors select stable execution/content IDs;
+- CombatPack execution resolves through a server-owned spawn catalogue;
+- Boss-family execution resolves through stable BossId -> factory registration;
+- MarauderCaptain and CorruptedForeman are the currently registered boss
+  contents;
+- DungeonRuntime no longer chooses concrete Marauder/Captain/Foreman factories;
+- encounter startup is transactional across validation, generic sequence start,
+  spawn and EncounterService registration;
+- failed execution rolls Active back to Pending;
+- downstream start rejection cleans spawned content and rolls back;
+- partial combat-pack and boss-factory failures clean up safely;
+- boss duplicate protection is scoped by session + stable encounter ID, allowing
+  multiple miniboss/boss/event/secret encounters in one run;
+- missing future packs/boss IDs/factories/bindings fail closed;
+- no Event/Secret boss content is enabled yet;
+- Depth2-Depth4 remain `RuntimeReady = false`;
+- no modelling, meshes, terrain or authored-room work was performed.
+
 Final local evidence includes:
 
-- **481** Lua/Luau files parsed with 0 failures;
+- **494** Lua/Luau files parsed with 0 failures;
 - clean `git diff --check`;
 - all four Rojo compositions building;
-- final committed Dungeon and Base Studio suites green with no project errors;
+- real Temple registry-driven acceptance PASS with **15 assertions**;
+- forced Abandoned Mine event+rare registry acceptance PASS with
+  **16 assertions**;
+- final repeat committed Dungeon regression green with no project errors;
+- final committed Base regression green with no project errors;
 - Phase 3 stress harness still passing in both final compositions;
-- temporary real-trigger/live-enemy acceptance PASS with **13 assertions**;
-- source-boundary audit: **19 changed files, 0 art/model/mesh/terrain/image
-  files**.
+- source-boundary audit: **26 changed code/test files, 0
+  art/model/mesh/terrain/image files**.
 
 Active worktree:
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterRuntime_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterExecution_v1
 
 Active branch:
-wip/phase-4-generic-encounter-runtime-v1
+wip/phase-4-encounter-execution-registry-v1
 
 Design/spec:
-docs/superpowers/specs/2026-09-18-phase-4-generic-dungeon-encounter-runtime-design.md
+docs/superpowers/specs/2026-09-18-phase-4-encounter-execution-registry-design.md
 
 Acceptance evidence:
-docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md
+docs/testing/phase4-encounter-execution-registry-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 
