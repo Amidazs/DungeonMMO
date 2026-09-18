@@ -11,6 +11,22 @@ local BOSS_FACTORY_IDS = table.freeze({
     "CorruptedForeman",
 })
 
+local ENEMY_FACTORY_IDS = table.freeze({
+    "Marauder",
+})
+
+local ENEMY_ARCHETYPES = table.freeze({
+    Marauder = table.freeze({
+        FactoryId = "Marauder",
+        RewardKey = "StandardMarauderReward",
+        MaxHealthKey = "StandardMarauderMaxHealth",
+    }),
+})
+
+local ENEMY_FACTORIES = table.freeze({
+    Marauder = true,
+})
+
 -- Creates one immutable physical room-slot definition.
 local function slot(
     trigger_anchor: string,
@@ -107,53 +123,85 @@ local LAYOUTS = table.freeze({
     }),
 })
 
+local function pack_entry(
+    entry_id: string,
+    enemy_archetype_id: string,
+    base_count: number,
+    enemy_name_prefix: string,
+    spawn_index_base: number
+): any
+    return table.freeze({
+        EntryId = entry_id,
+        EnemyArchetypeId = enemy_archetype_id,
+        BaseCount = base_count,
+        EnemyNamePrefix = enemy_name_prefix,
+        SpawnIndexBase = spawn_index_base,
+    })
+end
+
 local PACKS = table.freeze({
     TestDungeon = table.freeze({
         StandardRoom1 = table.freeze({
-            BaseCount = 2,
-            RewardKey = "StandardMarauderReward",
-
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room1_Marauder_",
-            SpawnIndexBase = 100,
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    2,
+                    "Room1_Marauder_",
+                    100
+                ),
+            }),
             BonusRules = table.freeze({}),
         }),
         StandardRoom2 = table.freeze({
-            BaseCount = 3,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room2_Marauder_",
-            SpawnIndexBase = 200,
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    3,
+                    "Room2_Marauder_",
+                    200
+                ),
+            }),
             BonusRules = table.freeze({}),
         }),
     }),
     AbandonedMine = table.freeze({
         StandardRoom1 = table.freeze({
-            BaseCount = 2,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room1_Marauder_",
-            SpawnIndexBase = 100,
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    2,
+                    "Room1_Marauder_",
+                    100
+                ),
+            }),
             BonusRules = table.freeze({
                 table.freeze({
                     Type = "InstanceFlag",
                     Key = "EventActive",
                     Value = true,
+                    EntryId = "Marauders",
                     Add = 1,
                 }),
-
             }),
         }),
         StandardRoom2 = table.freeze({
-            BaseCount = 3,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room2_Marauder_",
-            SpawnIndexBase = 200,
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    3,
+                    "Room2_Marauder_",
+                    200
+                ),
+            }),
             BonusRules = table.freeze({
                 table.freeze({
                     Type = "RareState",
                     Id = "CrystalBloom",
+                    EntryId = "Marauders",
                     Add = 1,
                 }),
             }),
@@ -208,6 +256,29 @@ function DungeonRuntimeContentCatalog.get_pack(
         return nil
     end
     return dungeon[pack_id]
+end
+
+-- Returns one registered enemy-archetype specification.
+function DungeonRuntimeContentCatalog.get_enemy_archetype(
+    archetype_id: string
+): any?
+    return ENEMY_ARCHETYPES[archetype_id]
+end
+
+-- Returns whether an enemy factory is implemented by the Dungeon server.
+function DungeonRuntimeContentCatalog.is_enemy_factory_implemented(
+    factory_id: string
+): boolean
+    return ENEMY_FACTORIES[factory_id] == true
+end
+
+-- Returns the stable implemented enemy-factory IDs.
+function DungeonRuntimeContentCatalog.enemy_factory_ids(): {string}
+    local result = {}
+    for _, factory_id in ipairs(ENEMY_FACTORY_IDS) do
+        table.insert(result, factory_id)
+    end
+    return result
 end
 
 -- Returns one registered boss-content specification.

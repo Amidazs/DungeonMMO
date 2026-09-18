@@ -105,6 +105,125 @@ local function analyze_slot(
     end
 end
 
+-- Validates one combat-pack entry and records its stable EntryId.
+local function analyze_pack_entry(
+    encounter: any,
+    pack_id: string,
+    entry: any,
+    entry_ids: any,
+    issues: {any}
+)
+    local entry_id = entry.EntryId
+    if not is_non_empty_string(entry_id)
+        or entry_ids[entry_id]
+        or not is_non_empty_string(entry.EnemyArchetypeId)
+        or not is_non_empty_string(entry.EnemyNamePrefix)
+        or type(entry.SpawnIndexBase) ~= "number"
+        or type(entry.BaseCount) ~= "number"
+        or entry.BaseCount < 0
+    then
+        add_issue(issues, "InvalidCombatPack", {
+            EncounterId = encounter.Id,
+            ContentId = pack_id,
+        })
+        return
+    end
+
+    entry_ids[entry_id] = true
+    local archetype =
+        DungeonRuntimeContentCatalog.get_enemy_archetype(
+            entry.EnemyArchetypeId
+        )
+    if not archetype then
+        add_issue(issues, "EnemyArchetypeNotRegistered", {
+            EncounterId = encounter.Id,
+            ContentId = entry.EnemyArchetypeId,
+        })
+        return
+    end
+
+    local factory_id = archetype.FactoryId
+    if not is_non_empty_string(factory_id)
+        or not DungeonRuntimeContentCatalog
+            .is_enemy_factory_implemented(factory_id)
+    then
+        add_issue(issues, "EnemyFactoryNotRegistered", {
+            EncounterId = encounter.Id,
+            ContentId = factory_id,
+        })
+    end
+end
+
+-- Validates that all pack bonus rules target registered entries.
+local function analyze_pack_bonus_rules(
+    encounter: any,
+    pack: any,
+    entry_ids: any,
+    issues: {any}
+)
+    for _, rule in ipairs(pack.BonusRules or {}) do
+        if not is_non_empty_string(rule.EntryId)
+            or not entry_ids[rule.EntryId]
+        then
+            add_issue(issues, "PackBonusTargetNotRegistered", {
+                EncounterId = encounter.Id,
+                ContentId = rule.EntryId,
+            })
+        end
+    end
+end
+
+-- Validates one registered heterogeneous combat pack.
+local function analyze_combat_pack(
+    dungeon_id: string,
+    encounter: any,
+    issues: {any}
+)
+    local pack_id = encounter.PackId
+    local pack = if is_non_empty_string(pack_id)
+        then DungeonRuntimeContentCatalog.get_pack(
+            dungeon_id,
+            pack_id
+        )
+        else nil
+    if not pack then
+        add_issue(issues, "EncounterContentNotRegistered", {
+            EncounterId = encounter.Id,
+            ContentType = "CombatPack",
+            ContentId = pack_id,
+        })
+        return
+    end
+
+    if type(pack.Entries) ~= "table"
+        or #pack.Entries == 0
+    then
+        add_issue(issues, "InvalidCombatPack", {
+            EncounterId = encounter.Id,
+            ContentId = pack_id,
+        })
+        return
+    end
+
+    local entry_ids = {}
+    for _, entry in ipairs(pack.Entries) do
+        analyze_pack_entry(
+            encounter,
+            pack_id,
+            entry,
+            entry_ids,
+            issues
+        )
+    end
+
+    analyze_pack_bonus_rules(
+        encounter,
+        pack,
+        entry_ids,
+        issues
+    )
+end
+
 -- Validates static executor and content registrations for one encounter.
 local function analyze_content(
     dungeon_id: string,
@@ -124,19 +243,11 @@ local function analyze_content(
     end
 
     if executor_id == COMBAT_EXECUTOR_ID then
-        local pack_id = encounter.PackId
-        if not is_non_empty_string(pack_id)
-            or DungeonRuntimeContentCatalog.get_pack(
-                dungeon_id,
-                pack_id
-            ) == nil
-        then
-            add_issue(issues, "EncounterContentNotRegistered", {
-                EncounterId = encounter.Id,
-                ContentType = "CombatPack",
-                ContentId = pack_id,
-            })
-        end
+        analyze_combat_pack(
+            dungeon_id,
+            encounter,
+            issues
+        )
         return
     end
 

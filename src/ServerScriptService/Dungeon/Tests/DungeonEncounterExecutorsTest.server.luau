@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Dungeon = ServerScriptService:WaitForChild("Dungeon")
 
 local pack_module = Dungeon:FindFirstChild(
-    "MarauderPackEncounterExecutor"
+    "CombatPackEncounterExecutor"
 )
 local boss_module = Dungeon:FindFirstChild(
     "BossEncounterExecutor"
@@ -97,8 +97,16 @@ local context = {
     SessionId = "executor-test-session",
 }
 
+local fake_enemy_registry = {}
+function fake_enemy_registry:get(factory_id: string): any?
+    if factory_id == "Marauder" then
+        return fake_marauder_factory
+    end
+    return nil
+end
+
 local pack_executor = PackExecutor.new({
-    marauder_factory = fake_marauder_factory,
+    enemy_factory_registry = fake_enemy_registry,
 })
 
 local pack_encounter = {
@@ -151,8 +159,16 @@ function failing_factory.create(options: any): Model
     return model
 end
 
+local failing_enemy_registry = {}
+function failing_enemy_registry:get(factory_id: string): any?
+    if factory_id == "Marauder" then
+        return failing_factory
+    end
+    return nil
+end
+
 local failing_pack_executor = PackExecutor.new({
-    marauder_factory = failing_factory,
+    enemy_factory_registry = failing_enemy_registry,
 })
 local failing_context = table.clone(context)
 failing_context.EnemiesFolder = partial_parent

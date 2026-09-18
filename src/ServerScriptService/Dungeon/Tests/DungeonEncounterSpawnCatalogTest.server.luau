@@ -33,6 +33,11 @@ check(
     Catalog.resolve_pack_count(temple_room1, {}) == 2,
     "Temple Room1 pack count must remain 2."
 )
+check(
+    #temple_room1.Entries == 1
+        and temple_room1.Entries[1].EnemyArchetypeId == "Marauder",
+    "Temple Room1 must remain one Marauder pack entry."
+)
 
 local temple_room2 = assert(
     Catalog.get_pack("TestDungeon", "StandardRoom2")
@@ -52,6 +57,15 @@ check(
     ) == 3,
     "Deep Echoes must add one Room1 Marauder."
 )
+local mine_room1_entries = Catalog.resolve_pack_entries(
+    mine_room1,
+    {EventActive = true}
+)
+check(
+    #mine_room1_entries == 1
+        and mine_room1_entries[1].Count == 3,
+    "Deep Echoes bonus must target the Marauder entry."
+)
 
 local mine_room2 = assert(
     Catalog.get_pack("AbandonedMine", "StandardRoom2")
@@ -62,6 +76,27 @@ check(
         {RareStateId = "CrystalBloom"}
     ) == 4,
     "Crystal Bloom must add one Room2 Marauder."
+)
+local mine_room2_entries = Catalog.resolve_pack_entries(
+    mine_room2,
+    {RareStateId = "CrystalBloom"}
+)
+check(
+    #mine_room2_entries == 1
+        and mine_room2_entries[1].Count == 4,
+    "Crystal Bloom bonus must target the Marauder entry."
+)
+
+local marauder = assert(
+    Catalog.get_enemy_archetype("Marauder")
+)
+check(
+    marauder.FactoryId == "Marauder",
+    "Marauder archetype factory ID mismatch."
+)
+check(
+    Catalog.get_enemy_archetype("Unknown") == nil,
+    "Unknown enemy archetypes must fail closed."
 )
 
 check(

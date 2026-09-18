@@ -17,8 +17,11 @@ local DungeonEncounterExecutionRegistry = require(
 local DungeonBossFactoryRegistry = require(
     Dungeon:WaitForChild("DungeonBossFactoryRegistry")
 )
-local MarauderPackEncounterExecutor = require(
-    Dungeon:WaitForChild("MarauderPackEncounterExecutor")
+local DungeonEnemyFactoryRegistry = require(
+    Dungeon:WaitForChild("DungeonEnemyFactoryRegistry")
+)
+local CombatPackEncounterExecutor = require(
+    Dungeon:WaitForChild("CombatPackEncounterExecutor")
 )
 local BossEncounterExecutor = require(
     Dungeon:WaitForChild("BossEncounterExecutor")
@@ -28,6 +31,9 @@ local MarauderCaptainFactory = require(
 )
 local MineForemanFactory = require(
     Dungeon:WaitForChild("MineForemanFactory")
+)
+local DungeonMarauderFactory = require(
+    Dungeon:WaitForChild("DungeonMarauderFactory")
 )
 
 local DungeonEncounterExecutionBootstrap = {}
@@ -39,7 +45,8 @@ local function require_registration(result: any, label: string)
     )
 end
 
--- Builds the server-owned execution registry for currently implemented content.
+-- Builds the server-owned execution registry.
+-- Registers only currently implemented content.
 function DungeonEncounterExecutionBootstrap.create(): any
     local boss_factories = DungeonBossFactoryRegistry.new()
 
@@ -68,11 +75,32 @@ function DungeonEncounterExecutionBootstrap.create(): any
         )
     end
 
+    local enemy_factories = DungeonEnemyFactoryRegistry.new()
+    require_registration(
+        enemy_factories:register(
+            "Marauder",
+            DungeonMarauderFactory
+        ),
+        "Marauder enemy factory"
+    )
+
+    for _, factory_id in ipairs(
+        DungeonRuntimeContentCatalog.enemy_factory_ids()
+    ) do
+        assert(
+            enemy_factories:is_registered(factory_id),
+            "Declared enemy factory is not registered: "
+                .. factory_id
+        )
+    end
+
     local registry = DungeonEncounterExecutionRegistry.new()
     require_registration(
         registry:register(
             "CombatPack",
-            MarauderPackEncounterExecutor.new()
+            CombatPackEncounterExecutor.new({
+                enemy_factory_registry = enemy_factories,
+            })
         ),
         "CombatPack executor"
     )
