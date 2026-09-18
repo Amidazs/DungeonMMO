@@ -321,14 +321,14 @@ check(
 check(
     boss_executor:validate(
         {
-            Id = "FutureBoss",
+            Id = "UnknownBossEncounter",
             Kind = "FinalBoss",
-            BossId = "TempleDepth4Boss",
+            BossId = "UnknownBoss",
         },
         boss_binding,
         context
     ).reason == "BossContentNotRegistered",
-    "Unimplemented future boss must fail closed."
+    "Unknown boss content must fail closed."
 )
 
 for _, part in ipairs(pack_spawn_parts) do

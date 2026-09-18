@@ -13,6 +13,8 @@ local BOSS_FACTORY_IDS = table.freeze({
     "AbandonedMineDepth2Boss",
     "TempleDepth3Boss",
     "AbandonedMineDepth3Boss",
+    "TempleDepth4Boss",
+    "AbandonedMineDepth4Boss",
 })
 
 local ENEMY_FACTORY_IDS = table.freeze({
@@ -285,6 +287,30 @@ local PACKS = table.freeze({
             }),
             BonusRules = table.freeze({}),
         }),
+        Depth4Room1 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    5,
+                    "Depth4Room1_Marauder_",
+                    6100
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
+        Depth4Room3 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    7,
+                    "Depth4Room3_Marauder_",
+                    6300
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
     }),
     AbandonedMine = table.freeze({
         StandardRoom1 = table.freeze({
@@ -440,6 +466,45 @@ local PACKS = table.freeze({
             }),
             BonusRules = table.freeze({}),
         }),
+        Depth4Room1 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    5,
+                    "Depth4Room1_Marauder_",
+                    7100
+                ),
+            }),
+            BonusRules = table.freeze({
+                table.freeze({
+                    Type = "InstanceFlag",
+                    Key = "EventActive",
+                    Value = true,
+                    EntryId = "Marauders",
+                    Add = 1,
+                }),
+            }),
+        }),
+        Depth4Room3 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    7,
+                    "Depth4Room3_Marauder_",
+                    7300
+                ),
+            }),
+            BonusRules = table.freeze({
+                table.freeze({
+                    Type = "RareState",
+                    Id = "CrystalBloom",
+                    EntryId = "Marauders",
+                    Add = 1,
+                }),
+            }),
+        }),
     }),
 })
 
@@ -474,6 +539,16 @@ local BOSSES = table.freeze({
         RewardKey = "MarauderCaptainReward",
         DisplayName = "Hollow Taskmaster",
     }),
+    TempleDepth4Boss = table.freeze({
+        FactoryId = "TempleDepth4Boss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Sanctum Ascendant",
+    }),
+    AbandonedMineDepth4Boss = table.freeze({
+        FactoryId = "AbandonedMineDepth4Boss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Buried Tyrant",
+    }),
 })
 
 local EXECUTORS = table.freeze({
@@ -488,6 +563,8 @@ local BOSS_FACTORIES = table.freeze({
     AbandonedMineDepth2Boss = true,
     TempleDepth3Boss = true,
     AbandonedMineDepth3Boss = true,
+    TempleDepth4Boss = true,
+    AbandonedMineDepth4Boss = true,
 })
 
 -- Returns one registered physical layout.

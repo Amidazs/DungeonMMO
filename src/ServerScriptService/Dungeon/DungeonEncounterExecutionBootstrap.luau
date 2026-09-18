@@ -44,6 +44,12 @@ local TempleDepth3BossFactory = require(
 local AbandonedMineDepth3BossFactory = require(
     Dungeon:WaitForChild("AbandonedMineDepth3BossFactory")
 )
+local TempleDepth4BossFactory = require(
+    Dungeon:WaitForChild("TempleDepth4BossFactory")
+)
+local AbandonedMineDepth4BossFactory = require(
+    Dungeon:WaitForChild("AbandonedMineDepth4BossFactory")
+)
 local DungeonMarauderFactory = require(
     Dungeon:WaitForChild("DungeonMarauderFactory")
 )
@@ -103,6 +109,20 @@ function DungeonEncounterExecutionBootstrap.create(): any
             AbandonedMineDepth3BossFactory
         ),
         "AbandonedMineDepth3Boss"
+    )
+    require_registration(
+        boss_factories:register(
+            "TempleDepth4Boss",
+            TempleDepth4BossFactory
+        ),
+        "TempleDepth4Boss"
+    )
+    require_registration(
+        boss_factories:register(
+            "AbandonedMineDepth4Boss",
+            AbandonedMineDepth4BossFactory
+        ),
+        "AbandonedMineDepth4Boss"
     )
 
     for _, factory_id in ipairs(

@@ -147,25 +147,25 @@ for _, dungeon in ipairs(dungeons) do
         dungeon.Id .. " Depth4 must keep six encounters."
     )
     check(
-        encounters[2].Role == "MiniBoss"
+        encounters[2].Kind == "MiniBoss"
             and encounters[2].BossId
                 == dungeon.DifficultyBossIds[1],
         dungeon.Id .. " Room2 must reuse the Depth1 boss."
     )
     check(
-        encounters[4].Role == "MiniBoss"
+        encounters[4].Kind == "MiniBoss"
             and encounters[4].BossId
                 == dungeon.DifficultyBossIds[2],
         dungeon.Id .. " Room4 must reuse the Depth2 boss."
     )
     check(
-        encounters[5].Role == "MiniBoss"
+        encounters[5].Kind == "MiniBoss"
             and encounters[5].BossId
                 == dungeon.DifficultyBossIds[3],
         dungeon.Id .. " Room5 must reuse the Depth3 boss."
     )
     check(
-        encounters[6].Role == "FinalBoss"
+        encounters[6].Kind == "FinalBoss"
             and encounters[6].BossId
                 == dungeon.DifficultyBossIds[4],
         dungeon.Id .. " Room6 must use the new final boss."
