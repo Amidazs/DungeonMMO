@@ -120,9 +120,25 @@ check(
     "Mine Depth1 boss factory ID mismatch."
 )
 
+local temple_depth2 = assert(
+    Catalog.get_boss("TempleDepth2Boss")
+)
 check(
-    Catalog.get_boss("TempleDepth2Boss") == nil,
-    "Unimplemented future bosses must fail closed."
+    temple_depth2.FactoryId == "TempleDepth2Boss",
+    "Temple Depth2 boss factory ID mismatch."
+)
+
+local mine_depth2 = assert(
+    Catalog.get_boss("AbandonedMineDepth2Boss")
+)
+check(
+    mine_depth2.FactoryId == "AbandonedMineDepth2Boss",
+    "Mine Depth2 boss factory ID mismatch."
+)
+
+check(
+    Catalog.get_boss("TempleDepth3Boss") == nil,
+    "Unimplemented Depth3 bosses must fail closed."
 )
 check(
     Catalog.get_boss("AbandonedMineDepth4Boss") == nil,

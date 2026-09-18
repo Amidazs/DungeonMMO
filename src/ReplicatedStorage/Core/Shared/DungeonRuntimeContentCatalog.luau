@@ -9,6 +9,8 @@ local EXECUTOR_IDS = table.freeze({
 local BOSS_FACTORY_IDS = table.freeze({
     "MarauderCaptain",
     "CorruptedForeman",
+    "TempleDepth2Boss",
+    "AbandonedMineDepth2Boss",
 })
 
 local ENEMY_FACTORY_IDS = table.freeze({
@@ -197,6 +199,42 @@ local PACKS = table.freeze({
             }),
             BonusRules = table.freeze({}),
         }),
+        Depth2Room1 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    3,
+                    "Depth2Room1_Marauder_",
+                    2100
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
+        Depth2Room2 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    4,
+                    "Depth2Room2_Marauder_",
+                    2200
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
+        Depth2Room3 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    5,
+                    "Depth2Room3_Marauder_",
+                    2300
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
     }),
     AbandonedMine = table.freeze({
         StandardRoom1 = table.freeze({
@@ -238,6 +276,57 @@ local PACKS = table.freeze({
                 }),
             }),
         }),
+        Depth2Room1 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    3,
+                    "Depth2Room1_Marauder_",
+                    3100
+                ),
+            }),
+            BonusRules = table.freeze({
+                table.freeze({
+                    Type = "InstanceFlag",
+                    Key = "EventActive",
+                    Value = true,
+                    EntryId = "Marauders",
+                    Add = 1,
+                }),
+            }),
+        }),
+        Depth2Room2 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    4,
+                    "Depth2Room2_Marauder_",
+                    3200
+                ),
+            }),
+            BonusRules = table.freeze({
+                table.freeze({
+                    Type = "RareState",
+                    Id = "CrystalBloom",
+                    EntryId = "Marauders",
+                    Add = 1,
+                }),
+            }),
+        }),
+        Depth2Room3 = table.freeze({
+            Entries = table.freeze({
+                pack_entry(
+                    "Marauders",
+                    "Marauder",
+                    5,
+                    "Depth2Room3_Marauder_",
+                    3300
+                ),
+            }),
+            BonusRules = table.freeze({}),
+        }),
     }),
 })
 
@@ -249,9 +338,18 @@ local BOSSES = table.freeze({
     }),
     CorruptedForeman = table.freeze({
         FactoryId = "CorruptedForeman",
-
         RewardKey = "MarauderCaptainReward",
         DisplayName = "Corrupted Foreman",
+    }),
+    TempleDepth2Boss = table.freeze({
+        FactoryId = "TempleDepth2Boss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Temple Warden",
+    }),
+    AbandonedMineDepth2Boss = table.freeze({
+        FactoryId = "AbandonedMineDepth2Boss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Deep Overseer",
     }),
 })
 
@@ -263,6 +361,8 @@ local EXECUTORS = table.freeze({
 local BOSS_FACTORIES = table.freeze({
     MarauderCaptain = true,
     CorruptedForeman = true,
+    TempleDepth2Boss = true,
+    AbandonedMineDepth2Boss = true,
 })
 
 -- Returns one registered physical layout.
