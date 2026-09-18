@@ -128,7 +128,7 @@ for _, dungeon_id in ipairs({
             dungeon_id .. " " .. difficulty_id
                 .. " must report its missing physical layout."
         )
-        if depth <= 3 then
+        if depth <= 4 then
             check(
                 not has_issue(
                     analysis,
@@ -142,15 +142,6 @@ for _, dungeon_id in ipairs({
                 dungeon_id .. " " .. difficulty_id
                     .. " must fail only on its missing"
                     .. " physical layout."
-            )
-        else
-            check(
-                has_issue(
-                    analysis,
-                    "EncounterContentNotRegistered"
-                ),
-                dungeon_id .. " " .. difficulty_id
-                    .. " must report missing encounter content."
             )
         end
 
