@@ -85,13 +85,13 @@ local function check_ladder(
 
         if order == 1 then
             check(
-                difficulty.RuntimeReady == true,
-                dungeon_id .. " Depth1 must remain runtime-ready."
+                difficulty.RuntimeReleaseEnabled == true,
+                dungeon_id .. " Depth1 release must remain enabled."
             )
         else
             check(
-                difficulty.RuntimeReady == false,
-                dungeon_id .. " unbuilt higher depths must fail closed."
+                difficulty.RuntimeReleaseEnabled == false,
+                dungeon_id .. " higher-depth release must remain disabled."
             )
         end
     end

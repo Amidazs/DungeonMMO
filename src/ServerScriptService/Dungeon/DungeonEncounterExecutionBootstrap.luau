@@ -1,7 +1,15 @@
 --!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local Shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
 local Dungeon = ServerScriptService:WaitForChild("Dungeon")
+
+local DungeonRuntimeContentCatalog = require(
+    Shared:WaitForChild("DungeonRuntimeContentCatalog")
+)
 
 local DungeonEncounterExecutionRegistry = require(
     Dungeon:WaitForChild("DungeonEncounterExecutionRegistry")
@@ -50,6 +58,16 @@ function DungeonEncounterExecutionBootstrap.create(): any
         "CorruptedForeman"
     )
 
+    for _, factory_id in ipairs(
+        DungeonRuntimeContentCatalog.boss_factory_ids()
+    ) do
+        assert(
+            boss_factories:get(factory_id) ~= nil,
+            "Declared boss factory is not registered: "
+                .. factory_id
+        )
+    end
+
     local registry = DungeonEncounterExecutionRegistry.new()
     require_registration(
         registry:register(
@@ -67,6 +85,16 @@ function DungeonEncounterExecutionBootstrap.create(): any
         ),
         "Boss executor"
     )
+
+    for _, executor_id in ipairs(
+        DungeonRuntimeContentCatalog.executor_ids()
+    ) do
+        assert(
+            registry:is_registered(executor_id),
+            "Declared encounter executor is not registered: "
+                .. executor_id
+        )
+    end
 
     return registry
 end

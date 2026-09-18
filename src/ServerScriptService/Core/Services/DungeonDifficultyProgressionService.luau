@@ -11,6 +11,9 @@ local ProfileSchema = require(
 local DungeonDifficultyDefinitions = require(
     Shared:WaitForChild("DungeonDifficultyDefinitions")
 )
+local DungeonRuntimeContentReadiness = require(
+    Shared:WaitForChild("DungeonRuntimeContentReadiness")
+)
 
 local DungeonDifficultyProgressionService = {}
 DungeonDifficultyProgressionService.__index =
@@ -58,7 +61,8 @@ local function completed_for(
 end
 -- Creates the profile-backed difficulty progression authority.
 function DungeonDifficultyProgressionService.new(
-    profile_service: any
+    profile_service: any,
+    content_readiness: any?
 ): any
     assert(
         profile_service ~= nil,
@@ -67,6 +71,8 @@ function DungeonDifficultyProgressionService.new(
 
     return setmetatable({
         _profiles = profile_service,
+        _content_readiness =
+            content_readiness or DungeonRuntimeContentReadiness,
     }, DungeonDifficultyProgressionService)
 end
 
@@ -149,14 +155,20 @@ function DungeonDifficultyProgressionService:validate_entry(
         return result(false, "DifficultyLocked")
     end
 
-    if difficulty.RuntimeReady ~= true then
+    local readiness = self._content_readiness.analyze(
+        dungeon_id,
+        difficulty_id
+    )
+    if readiness.ok ~= true or readiness.Ready ~= true then
         return result(false, "DifficultyContentNotReady", {
             difficulty = difficulty,
+            readiness = readiness,
         })
     end
 
     return result(true, nil, {
         difficulty = difficulty,
+        readiness = readiness,
     })
 end
 

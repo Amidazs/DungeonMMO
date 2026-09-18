@@ -106,6 +106,45 @@ check(teleport_data.Gold == nil and teleport_data.XP == nil and teleport_data.In
 check(teleport_data.ReviveCount == nil and teleport_data.Loot == nil and teleport_data.Eligible == nil, "TeleportData must never contain reward/revive authority.")
 check(coordinator:is_pending(42) == true, "Successful outbound teleport remains pending until the player leaves or destination claims.")
 
+local readiness_calls = 0
+local blocked_readiness: any = {}
+function blocked_readiness.analyze(
+    _dungeon_id: string,
+    _difficulty_id: string
+): any
+    readiness_calls += 1
+    return {
+        ok = true,
+        Ready = false,
+    }
+end
+
+local calls_before_blocked_entry = #calls
+local blocked_coordinator = TeleportCoordinator.new(
+    fake_adapter,
+    fake_profile,
+    fake_lease,
+    fake_sessions,
+    blocked_readiness
+)
+local blocked = blocked_coordinator:start_dungeon(
+    {player},
+    "TestDungeon",
+    987654
+)
+check(
+    blocked.reason == "DifficultyContentNotReady",
+    "Teleport entry must obey computed runtime-content readiness."
+)
+check(
+    readiness_calls == 1,
+    "Teleport entry must consult readiness exactly once."
+)
+check(
+    #calls == calls_before_blocked_entry,
+    "Not-ready content must block before reserving a server."
+)
+
 local failed_calls = {}
 local failing_adapter: any = {}
 function failing_adapter:reserve_server(_place_id: number)

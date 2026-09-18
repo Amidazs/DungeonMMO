@@ -59,6 +59,37 @@ local depth1_entry = service:validate_entry(
 )
 check(depth1_entry.ok == true, "Depth1 entry must validate.")
 
+local readiness_calls = 0
+local blocked_readiness: any = {}
+function blocked_readiness.analyze(
+    _dungeon_id: string,
+    _difficulty_id: string
+): any
+    readiness_calls += 1
+    return {
+        ok = true,
+        Ready = false,
+    }
+end
+
+local blocked_service = ProgressionService.new(
+    profiles,
+    blocked_readiness
+)
+local blocked_entry = blocked_service:validate_entry(
+    9501,
+    "TestDungeon",
+    "Depth1"
+)
+check(
+    blocked_entry.reason == "DifficultyContentNotReady",
+    "Entry must obey computed runtime-content readiness."
+)
+check(
+    readiness_calls == 1,
+    "Entry must consult runtime-content readiness exactly once."
+)
+
 local first_clear = service:record_clear(
     9501,
     "TestDungeon",

@@ -1,71 +1,16 @@
 --!strict
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
+local DungeonRuntimeContentCatalog = require(
+    Shared:WaitForChild("DungeonRuntimeContentCatalog")
+)
+
 local DungeonEncounterSpawnCatalog = {}
 
-local PACKS = table.freeze({
-    TestDungeon = table.freeze({
-        StandardRoom1 = table.freeze({
-            BaseCount = 2,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room1_Marauder_",
-            SpawnIndexBase = 100,
-            BonusRules = table.freeze({}),
-        }),
-        StandardRoom2 = table.freeze({
-            BaseCount = 3,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room2_Marauder_",
-            SpawnIndexBase = 200,
-            BonusRules = table.freeze({}),
-        }),
-    }),
-    AbandonedMine = table.freeze({
-        StandardRoom1 = table.freeze({
-            BaseCount = 2,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room1_Marauder_",
-            SpawnIndexBase = 100,
-            BonusRules = table.freeze({
-                table.freeze({
-                    Type = "InstanceFlag",
-                    Key = "EventActive",
-                    Value = true,
-                    Add = 1,
-                }),
-            }),
-        }),
-        StandardRoom2 = table.freeze({
-            BaseCount = 3,
-            RewardKey = "StandardMarauderReward",
-            MaxHealthKey = "StandardMarauderMaxHealth",
-            EnemyNamePrefix = "Room2_Marauder_",
-            SpawnIndexBase = 200,
-            BonusRules = table.freeze({
-                table.freeze({
-                    Type = "RareState",
-                    Id = "CrystalBloom",
-                    Add = 1,
-                }),
-            }),
-        }),
-    }),
-})
-
-local BOSSES = table.freeze({
-    MarauderCaptain = table.freeze({
-        FactoryId = "MarauderCaptain",
-        RewardKey = "MarauderCaptainReward",
-        DisplayName = "Marauder Captain",
-    }),
-    CorruptedForeman = table.freeze({
-        FactoryId = "CorruptedForeman",
-        RewardKey = "MarauderCaptainReward",
-        DisplayName = "Corrupted Foreman",
-    }),
-})
-
+-- Returns whether one immutable instance-state bonus rule applies.
 local function rule_matches(rule: any, state: any): boolean
     if rule.Type == "InstanceFlag" then
         return type(rule.Key) == "string"
@@ -85,12 +30,11 @@ function DungeonEncounterSpawnCatalog.get_pack(
     dungeon_id: string,
     pack_id: string
 ): any?
-    local dungeon_packs = PACKS[dungeon_id]
-    if not dungeon_packs then
-        return nil
-    end
 
-    return dungeon_packs[pack_id]
+    return DungeonRuntimeContentCatalog.get_pack(
+        dungeon_id,
+        pack_id
+    )
 end
 
 -- Resolves a pack count from immutable server-owned instance state.
@@ -122,7 +66,7 @@ end
 function DungeonEncounterSpawnCatalog.get_boss(
     boss_id: string
 ): any?
-    return BOSSES[boss_id]
+    return DungeonRuntimeContentCatalog.get_boss(boss_id)
 end
 
 return table.freeze(DungeonEncounterSpawnCatalog)

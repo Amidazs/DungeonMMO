@@ -12,6 +12,11 @@ local DungeonDifficultyDefinitions = require(
         "DungeonDifficultyDefinitions"
     )
 )
+local DungeonRuntimeContentReadiness = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild(
+        "DungeonRuntimeContentReadiness"
+    )
+)
 
 local DungeonInstanceDirector = require(script.Parent:WaitForChild("DungeonInstanceDirector"))
 
@@ -67,7 +72,8 @@ function TeleportCoordinator.new(
     teleport_adapter: any,
     profile_service: any,
     lease_service: any,
-    session_service: any
+    session_service: any,
+    content_readiness: any?
 ): any
     assert(teleport_adapter ~= nil, "TeleportCoordinator requires a teleport adapter.")
     assert(profile_service ~= nil, "TeleportCoordinator requires ProfileService.")
@@ -79,6 +85,8 @@ function TeleportCoordinator.new(
     self._profiles = profile_service
     self._leases = lease_service
     self._sessions = session_service
+    self._content_readiness =
+        content_readiness or DungeonRuntimeContentReadiness
     self._pending = {}
 
     if type(teleport_adapter.connect_init_failed) == "function" then
@@ -244,7 +252,12 @@ function TeleportCoordinator:start_dungeon(
     if not difficulty then
         return response(false, "UnknownDifficulty")
     end
-    if difficulty.RuntimeReady ~= true then
+
+    local readiness = self._content_readiness.analyze(
+        dungeon_id,
+        difficulty.Id
+    )
+    if readiness.ok ~= true or readiness.Ready ~= true then
         return response(false, "DifficultyContentNotReady")
     end
 

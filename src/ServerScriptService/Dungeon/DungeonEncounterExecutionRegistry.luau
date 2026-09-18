@@ -51,6 +51,13 @@ function DungeonEncounterExecutionRegistry:register(
     return result(true, nil)
 end
 
+-- Returns whether one stable executor ID is actually registered.
+function DungeonEncounterExecutionRegistry:is_registered(
+    executor_id: string
+): boolean
+    return self._executors[executor_id] ~= nil
+end
+
 -- Resolves an explicit executor ID or a legacy kind fallback.
 function DungeonEncounterExecutionRegistry:resolve_id(
     encounter: any

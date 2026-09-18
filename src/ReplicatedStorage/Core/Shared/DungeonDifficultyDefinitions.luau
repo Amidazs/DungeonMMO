@@ -77,7 +77,7 @@ end
 local function difficulty(
     id: string,
     order: number,
-    runtime_ready: boolean,
+    runtime_release_enabled: boolean,
     previous_id: string?,
     encounters: {any}
 ): any
@@ -90,7 +90,7 @@ local function difficulty(
         Version = 1,
         DisplayName = "Depth " .. tostring(order),
         LayoutId = id,
-        RuntimeReady = runtime_ready,
+        RuntimeReleaseEnabled = runtime_release_enabled,
         RequiredPreviousDifficultyId = previous_id,
         EnemyHealthMultiplier = scaling.EnemyHealthMultiplier,
         EnemyDamageMultiplier = scaling.EnemyDamageMultiplier,
