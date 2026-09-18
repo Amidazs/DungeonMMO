@@ -44,12 +44,17 @@ function PartyEntryCoordinator:start(requester: any): any
             })
         end
 
-        local validation = self._validate_member(player)
+        local validation = self._validate_member(
+            player,
+            prepared.DungeonId,
+            prepared.DifficultyId
+        )
         if not validation or validation.ok ~= true then
             return response(false, (validation and validation.reason) or "PartyMemberInvalid", {
                 MemberUserId = user_id,
                 MemberName = player.Name,
                 DungeonId = prepared.DungeonId,
+                DifficultyId = prepared.DifficultyId,
             })
         end
 
@@ -63,6 +68,7 @@ function PartyEntryCoordinator:start(requester: any): any
     if self._is_studio and #players > 1 then
         return response(true, "StudioPartyEntryProof", {
             DungeonId = prepared.DungeonId,
+            DifficultyId = prepared.DifficultyId,
             Players = players,
             MemberUserIds = prepared.MemberUserIds,
             PartyId = prepared.PartyId,
@@ -73,10 +79,16 @@ function PartyEntryCoordinator:start(requester: any): any
     if not dungeon_place_id then
         return response(false, place_error or "DungeonPlaceIdNotConfigured", {
             DungeonId = prepared.DungeonId,
+            DifficultyId = prepared.DifficultyId,
         })
     end
 
-    local result = self._coordinator:start_dungeon(players, prepared.DungeonId, dungeon_place_id)
+    local result = self._coordinator:start_dungeon(
+        players,
+        prepared.DungeonId,
+        dungeon_place_id,
+        prepared.DifficultyId
+    )
     if type(result) ~= "table" then
         return response(false, "DungeonStartFailed")
     end

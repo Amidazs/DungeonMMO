@@ -15,6 +15,7 @@ local function action_result(remote: RemoteEvent, player: Player, action: string
         MemberUserId = result.MemberUserId,
         MemberName = result.MemberName,
         DungeonId = result.DungeonId,
+        DifficultyId = result.DifficultyId,
     })
 end
 
@@ -29,6 +30,8 @@ function PartyRuntime.attach(options: any): any
     local party = PartyService.new({
         invite_seconds = 30,
         is_valid_dungeon = options.is_valid_dungeon,
+        default_difficulty = options.default_difficulty,
+        is_valid_difficulty = options.is_valid_difficulty,
     })
 
     local entry = PartyEntryCoordinator.new({
@@ -97,6 +100,10 @@ function PartyRuntime.attach(options: any): any
                 reason = result.reason,
                 SessionId = if result.session then result.session.SessionId else nil,
                 DungeonId = result.DungeonId or (if result.session then result.session.DungeonId else nil),
+                DifficultyId = result.DifficultyId
+                    or (if result.session and result.session.Difficulty
+                        then result.session.Difficulty.Id
+                        else nil),
             })
         end
     end
@@ -121,8 +128,9 @@ function PartyRuntime.attach(options: any): any
                 table.insert(names, string.format("%s(%d)", member.Name, member.UserId))
             end
             print(string.format(
-                "[Party Entry Studio Proof] Dungeon=%s Members=%s",
+                "[Party Entry Studio Proof] Dungeon=%s Difficulty=%s Members=%s",
                 tostring(result.DungeonId),
+                tostring(result.DifficultyId),
                 table.concat(names, ",")
             ))
             send_entry_to_players(result)
@@ -165,7 +173,15 @@ function PartyRuntime.attach(options: any): any
         elseif action == "SetReady" then
             result = party:set_ready(player, payload.Ready == true)
         elseif action == "SelectDungeon" then
-            result = party:select_dungeon(player, tostring(payload.DungeonId or ""))
+            result = party:select_dungeon(
+                player,
+                tostring(payload.DungeonId or "")
+            )
+        elseif action == "SelectDifficulty" then
+            result = party:select_difficulty(
+                player,
+                tostring(payload.DifficultyId or "")
+            )
         elseif action == "Kick" then
             local target_id = tonumber(payload.TargetUserId)
             result = if target_id then party:kick(player, target_id) else {ok = false, reason = "InvalidTarget"}
@@ -185,6 +201,7 @@ function PartyRuntime.attach(options: any): any
                 ok = false,
                 reason = result.reason,
                 DungeonId = result.DungeonId,
+                DifficultyId = result.DifficultyId,
             })
         end
     end)

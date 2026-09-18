@@ -15,6 +15,7 @@ export type Party = {
     PartyId: string,
     LeaderUserId: number,
     SelectedDungeonId: string,
+    SelectedDifficultyId: string,
     Members: {PartyMember},
 }
 
@@ -44,6 +45,7 @@ local function clone_party(party: Party): Party
         PartyId = party.PartyId,
         LeaderUserId = party.LeaderUserId,
         SelectedDungeonId = party.SelectedDungeonId,
+        SelectedDifficultyId = party.SelectedDifficultyId,
         Members = members,
     }
 end
@@ -68,6 +70,14 @@ function PartyService.new(options: any?): any
         _is_valid_dungeon = options.is_valid_dungeon or function(dungeon_id: string): boolean
             return dungeon_id == "TestDungeon" or dungeon_id == "AbandonedMine"
         end,
+        _default_difficulty = options.default_difficulty
+            or function(_dungeon_id: string): string
+                return "Depth1"
+            end,
+        _is_valid_difficulty = options.is_valid_difficulty
+            or function(_dungeon_id: string, difficulty_id: string): boolean
+                return difficulty_id == "Depth1"
+            end,
     }, PartyService)
 end
 
@@ -138,10 +148,13 @@ function PartyService:create(player: any): any
 
     self._next_party_id += 1
     local party_id = "Party-" .. tostring(self._next_party_id)
+    local default_dungeon_id = "TestDungeon"
     local party: Party = {
         PartyId = party_id,
         LeaderUserId = user_id,
-        SelectedDungeonId = "TestDungeon",
+        SelectedDungeonId = default_dungeon_id,
+        SelectedDifficultyId =
+            self._default_difficulty(default_dungeon_id),
         Members = {self:_new_member(player)},
     }
     self._parties[party_id] = party
@@ -280,6 +293,35 @@ function PartyService:select_dungeon(player: any, dungeon_id: string): any
 
     if party.SelectedDungeonId ~= dungeon_id then
         party.SelectedDungeonId = dungeon_id
+        party.SelectedDifficultyId =
+            self._default_difficulty(dungeon_id)
+        self:_clear_readiness(party)
+    end
+    return result(true, nil, {party = clone_party(party)})
+end
+
+function PartyService:select_difficulty(
+    player: any,
+    difficulty_id: string
+): any
+    local party = self:_party_for_user(player.UserId)
+    if not party then
+        return result(false, "NotInParty")
+    end
+    if party.LeaderUserId ~= player.UserId then
+        return result(false, "LeaderOnly")
+    end
+    if type(difficulty_id) ~= "string"
+        or not self._is_valid_difficulty(
+            party.SelectedDungeonId,
+            difficulty_id
+        )
+    then
+        return result(false, "UnknownDifficulty")
+    end
+
+    if party.SelectedDifficultyId ~= difficulty_id then
+        party.SelectedDifficultyId = difficulty_id
         self:_clear_readiness(party)
     end
     return result(true, nil, {party = clone_party(party)})
@@ -444,6 +486,7 @@ function PartyService:prepare_entry(requester_user_id: number): any
     return result(true, nil, {
         PartyId = party.PartyId,
         DungeonId = party.SelectedDungeonId,
+        DifficultyId = party.SelectedDifficultyId,
         MemberUserIds = member_user_ids,
     })
 end

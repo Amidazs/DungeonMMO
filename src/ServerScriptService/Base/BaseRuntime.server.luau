@@ -29,8 +29,14 @@ local BaseEnvironmentAdapter = require(
 )
 local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
+local DungeonDifficultyDefinitions = require(
+    SharedCore:WaitForChild("DungeonDifficultyDefinitions")
+)
 local CharacterIdentityRules = require(SharedCore:WaitForChild("CharacterIdentityRules"))
 local BaseProgressionController = require(Base:WaitForChild("BaseProgressionController"))
+local DungeonEntrySelectionRules = require(
+    Base:WaitForChild("DungeonEntrySelectionRules")
+)
 local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
 
 local BankRuntime = require(Base:WaitForChild("BankRuntime"))
@@ -71,6 +77,8 @@ ProficiencyService.bind_default(runtime.ProficiencyService)
 local profiles = runtime.ProfileService
 local leases = runtime.LeaseService
 local sessions = runtime.SessionService
+local dungeon_difficulty_progression =
+    runtime.DungeonDifficultyProgressionService
 local inventory = runtime.InventoryService
 local attributes = runtime.AttributeService
 local loadout = runtime.LoadoutService
@@ -348,7 +356,12 @@ local function send_entry_result(player: Player, result: any)
         ok = result.ok == true,
         reason = result.reason,
         SessionId = if result.session then result.session.SessionId else nil,
-        DungeonId = if result.session then result.session.DungeonId else nil,
+        DungeonId = result.DungeonId
+            or (if result.session then result.session.DungeonId else nil),
+        DifficultyId = result.DifficultyId
+            or (if result.session and result.session.Difficulty
+                then result.session.Difficulty.Id
+                else nil),
     })
 end
 
@@ -555,12 +568,15 @@ local function load_player(player: Player)
     end
 end
 
-local function handle_entry(player: Player, dungeon_id: any)
-    local dungeon_definition = if type(dungeon_id) == "string" then DungeonDefinitions.get(dungeon_id) else nil
-    if not dungeon_definition or dungeon_definition.SoloEntryEnabled ~= true then
-        send_entry_result(player, {ok = false, reason = "UnknownDungeon"})
+local function handle_entry(player: Player, request: any)
+    local selection = DungeonEntrySelectionRules.resolve(request)
+    if selection.ok ~= true then
+        send_entry_result(player, selection)
         return
     end
+
+    local dungeon_definition = selection.DungeonDefinition
+    local difficulty_id = selection.DifficultyId
     if party_controller and party_controller:party_size(player.UserId) > 1 then
         send_entry_result(player, {ok = false, reason = "PartyEntryRequired"})
         return
@@ -588,6 +604,22 @@ local function handle_entry(player: Player, dungeon_id: any)
             }
         )
 
+        return
+    end
+
+    local difficulty_validation =
+        dungeon_difficulty_progression:validate_entry(
+            player.UserId,
+            dungeon_definition.Id,
+            difficulty_id
+        )
+    if difficulty_validation.ok ~= true then
+        send_entry_result(player, {
+            ok = false,
+            reason = difficulty_validation.reason,
+            DungeonId = dungeon_definition.Id,
+            DifficultyId = difficulty_id,
+        })
         return
     end
 
@@ -620,7 +652,16 @@ local function handle_entry(player: Player, dungeon_id: any)
         return
     end
 
-    local result = coordinator:start_dungeon({player}, dungeon_definition.Id, dungeon_place_id)
+    local result = coordinator:start_dungeon(
+        {player},
+        dungeon_definition.Id,
+        dungeon_place_id,
+        difficulty_id
+    )
+    if type(result) == "table" then
+        result.DungeonId = result.DungeonId or dungeon_definition.Id
+        result.DifficultyId = result.DifficultyId or difficulty_id
+    end
     send_entry_result(player, result)
     if not result.ok then
         warn(string.format("[Base Runtime] Dungeon start failed for %s: %s", player.Name, tostring(result.reason)))
@@ -634,18 +675,52 @@ party_controller = PartyRuntime.attach({
     is_valid_dungeon = function(dungeon_id: string): boolean
         return DungeonDefinitions.get(dungeon_id) ~= nil
     end,
+    default_difficulty = function(dungeon_id: string): string
+        return DungeonDifficultyDefinitions.default_id(dungeon_id)
+            or "Depth1"
+    end,
+    is_valid_difficulty = function(
+        dungeon_id: string,
+        difficulty_id: string
+    ): boolean
+        return DungeonDifficultyDefinitions.get(
+            dungeon_id,
+            difficulty_id
+        ) ~= nil
+    end,
     is_player_ready = function(player: Player): boolean
         return loaded_users[player.UserId] == true and profiles:get_profile(player.UserId) ~= nil
     end,
     place_id_provider = configured_dungeon_place_id,
-    validate_member = function(player: Player): any
-        if loaded_users[player.UserId] ~= true or not profiles:get_profile(player.UserId) then
+    validate_member = function(
+        player: Player,
+        dungeon_id: string,
+        difficulty_id: string
+    ): any
+        if loaded_users[player.UserId] ~= true
+            or not profiles:get_profile(player.UserId)
+        then
             return {ok = false, reason = "ProfileNotReady"}
         end
 
         local character = profiles:get_character(player.UserId, 1)
-        if not character or not CharacterIdentityRules.is_complete(character) then
+        if not character
+            or not CharacterIdentityRules.is_complete(character)
+        then
             return {ok = false, reason = "IdentityIncomplete"}
+        end
+
+        local difficulty_validation =
+            dungeon_difficulty_progression:validate_entry(
+                player.UserId,
+                dungeon_id,
+                difficulty_id
+            )
+        if difficulty_validation.ok ~= true then
+            return {
+                ok = false,
+                reason = difficulty_validation.reason,
+            }
         end
 
         if coordinator:is_pending(player.UserId) then
