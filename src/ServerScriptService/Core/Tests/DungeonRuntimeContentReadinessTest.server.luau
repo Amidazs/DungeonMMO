@@ -128,19 +128,20 @@ for _, dungeon_id in ipairs({
             dungeon_id .. " " .. difficulty_id
                 .. " must report its missing physical layout."
         )
-        if depth == 2 then
+        if depth <= 3 then
             check(
                 not has_issue(
                     analysis,
                     "EncounterContentNotRegistered"
                 ),
-                dungeon_id .. " Depth2 encounter content"
-                    .. " must be fully registered."
+                dungeon_id .. " " .. difficulty_id
+                    .. " encounter content must be fully registered."
             )
             check(
                 #(analysis.Issues or {}) == 1,
-                dungeon_id .. " Depth2 must fail only"
-                    .. " on its missing physical layout."
+                dungeon_id .. " " .. difficulty_id
+                    .. " must fail only on its missing"
+                    .. " physical layout."
             )
         else
             check(
