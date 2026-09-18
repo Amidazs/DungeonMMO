@@ -206,20 +206,55 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Generic Enemy Archetype + Heterogeneous Combat Pack Registry**
+is locally complete and green at implementation checkpoint:
+
+`464bd44`
+
+Accepted proof now also includes:
+
+- stable shared enemy archetypes;
+- stable server-only enemy factory IDs;
+- a dedicated `DungeonEnemyFactoryRegistry`;
+- ordered heterogeneous combat-pack entries;
+- generic `CombatPackEncounterExecutor`;
+- old Marauder-specific combat-pack executor removed;
+- Deep Echoes / Crystal Bloom pack bonuses targeting explicit EntryIds;
+- exact existing Temple/Mine Depth1 pack-count compatibility;
+- synthetic 2-Marauder + 1-Elite execution proof without enabling Elite as
+  production content;
+- mixed-pack transactional cleanup on factory failure;
+- readiness validation for pack entries/archetypes/factories/bonus targets;
+- 507 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and clean-repeat Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- Training Dummy and Combat Target Rules green;
+- live Dungeon player admission succeeded;
+- 11 source/test files from `5298699`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`
+
+No new production enemy archetype was enabled.
+Depth2-Depth4 remain release-disabled/content-incomplete.
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-If backend-only work continues before modelling, the next high-value gate is a
-**generic enemy-archetype + heterogeneous combat-pack registry**.
+If backend-only work continues before modelling, first audit the remaining
+Depth2-Depth4 backend dependencies rather than inventing another abstraction
+without a demonstrated gap.
 
-The current `CombatPack` executor is still implemented by the
-Marauder-specific pack executor. Generalising that layer will let deeper
-difficulties use stronger/different enemy compositions without adding
-depth-specific runtime branches, while preserving the accepted pack/executor
-contract.
+The encounter sequence, execution registry, physical bindings, readiness
+authority and enemy-pack/factory layers are now generic. The next gate should
+target the next concrete hard-coded dependency that would prevent authored
+higher-depth content from being registered cleanly.
 
 Carry forward these readiness rules:
 
@@ -239,13 +274,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 runtime-readiness worktree:
+Active Phase 4 enemy-pack-registry worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnemyPackRegistry_v1
 
 Active branch:
 
-wip/phase-4-runtime-content-readiness-v1
+wip/phase-4-enemy-archetype-combat-pack-v1
 
 Phase 3 completion worktree:
 

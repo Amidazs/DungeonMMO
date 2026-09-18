@@ -85,6 +85,14 @@ result, so incomplete content is rejected before server reservation. Current
 Depth1 is complete+enabled+ready; Depth2-Depth4 remain
 incomplete+release-disabled+not-ready with explicit diagnostics.
 
+The follow-on **Generic Enemy Archetype + Heterogeneous Combat Pack Registry**
+is locally green at `464bd44`. CombatPack execution is no longer
+Marauder-specific: ordered pack entries resolve stable enemy archetypes and
+server-owned factory IDs, while Deep Echoes / Crystal Bloom bonuses target
+explicit entries. Current Temple/Mine Depth1 counts and naming remain
+compatible. A synthetic 2-Marauder + 1-Elite pack proves mixed-factory
+execution and rollback without enabling Elite as production content.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -93,7 +101,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`;
 - `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`;
 - `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`;
-- `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`.
+- `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`;
+- `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

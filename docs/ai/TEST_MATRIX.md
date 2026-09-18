@@ -1584,3 +1584,131 @@ Dungeon:
 
 Detailed evidence:
 `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`.
+
+
+<!-- PHASE4_ENEMY_ARCHETYPE_COMBAT_PACK_LOCAL_GREEN_20260918 -->
+## Phase 4 - Generic Enemy Archetype + Heterogeneous Combat Pack Registry
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `5298699`
+**RED checkpoint:** `ad56735`
+**Implementation checkpoint:** `464bd44`
+
+### Test-first contract
+
+- [x] enemy-factory registry test authored before implementation.
+- [x] heterogeneous CombatPack executor test authored before implementation.
+- [x] Studio RED observed because `DungeonEnemyFactoryRegistry` was missing.
+- [x] Studio RED observed because `CombatPackEncounterExecutor` was missing.
+- [x] no unrelated failure was required to establish RED.
+
+### Generic enemy architecture
+
+- [x] shared enemy archetype definitions.
+- [x] stable enemy FactoryId values.
+- [x] server-owned `DungeonEnemyFactoryRegistry`.
+- [x] production Marauder factory registered through stable FactoryId.
+- [x] CombatPack entries are ordered and typed.
+- [x] CombatPack execution no longer assumes Marauders.
+- [x] generic `CombatPackEncounterExecutor`.
+- [x] old `MarauderPackEncounterExecutor` removed.
+- [x] per-entry naming preserved.
+- [x] per-entry spawn-index ranges preserved.
+- [x] per-archetype reward definitions preserved.
+- [x] difficulty health/damage/reward scaling applies across archetypes.
+- [x] partial mixed-pack failure cleans all prior spawns.
+- [x] Deep Echoes bonus targets an explicit EntryId.
+- [x] Crystal Bloom bonus targets an explicit EntryId.
+- [x] readiness validates pack entry structure.
+- [x] readiness validates enemy archetype registration.
+- [x] readiness validates implemented enemy factories.
+- [x] readiness validates pack bonus targets.
+- [x] no new production enemy archetype enabled.
+
+### Depth1 compatibility
+
+- [x] Temple Room1 count remains 2.
+- [x] Temple Room2 count remains 3.
+- [x] Mine Room1 normal count remains 2.
+- [x] Mine Deep Echoes Room1 count remains 3.
+- [x] Mine Room2 normal count remains 3.
+- [x] Mine Crystal Bloom Room2 count remains 4.
+### Heterogeneous synthetic proof
+
+- [x] synthetic pack contains two Marauder enemies.
+- [x] synthetic pack contains one Elite enemy.
+- [x] distinct injected factories are selected by archetype.
+- [x] deterministic entry/factory order.
+- [x] per-entry names verified.
+- [x] per-entry spawn-index ranges verified.
+- [x] per-archetype scaled rewards verified.
+- [x] mixed-archetype combat scaling verified.
+- [x] synthetic Elite factory failure cleans Marauder spawns.
+- [x] missing enemy factory fails closed.
+- [x] unknown pack fails closed.
+- [x] synthetic Elite is test-only, not production content.
+
+### Focused GREEN evidence
+
+- [x] Enemy Factory Registry: 8 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Encounter Spawn Catalog: 15 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Combat Target Rules repeat: 9 assertions PASS.
+### Final committed static/build acceptance
+
+- [x] clean committed implementation checkpoint `464bd44`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 507 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+- [x] added implementation source lines meet 79-character limit.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors observed.
+### Final committed Dungeon regression
+
+- [x] Enemy Factory Registry: 8 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Encounter Spawn Catalog: 15 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Encounter Bindings: 30 assertions PASS.
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS on clean repeat.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+- [x] no project CreatorErrors observed on clean repeat.
+
+### Release qualification
+
+- [x] no new production enemy archetype enabled.
+- [x] Depth2-Depth4 remain release-disabled/content-incomplete.
+- [x] no Event/Secret boss content enabled.
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] source-boundary audit: 11 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`.

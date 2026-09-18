@@ -39,10 +39,12 @@ modification and reconcile without destructive Git operations.
 - Multi-depth room-runtime implementation checkpoint: `1aa81b5`.
 - Runtime content readiness registry gate: LOCAL GREEN.
 - Runtime-readiness implementation checkpoint: `2e2420b`.
+- Generic enemy archetype + combat-pack registry gate: LOCAL GREEN.
+- Enemy-pack implementation checkpoint: `464bd44`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-runtime-content-readiness-v1`.
+- Active branch: `wip/phase-4-enemy-archetype-combat-pack-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnemyPackRegistry_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -113,11 +115,13 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 The generic encounter execution/spawn registry is locally green at `fe1856e`.
 The multi-depth physical room-binding runtime is locally green at `1aa81b5`.
 The runtime content readiness registry is locally green at `2e2420b`.
+The generic enemy archetype/combat-pack registry is locally green at
+`464bd44`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
-content without a deliberate next action from the project owner. If backend-only
-work continues, the next high-value gate is a generic enemy-archetype and
-heterogeneous combat-pack registry rather than depth-specific spawn branches.
+content without a deliberate next action from the project owner. Before adding
+another backend abstraction, audit the remaining Depth2-Depth4 content
+dependencies and target a demonstrated hard-coded blocker.
 
 Locked rules that carry forward:
 
@@ -146,7 +150,10 @@ Locked rules that carry forward:
   no authored room/spawn/checkpoint binding.
 - DungeonRuntime must not choose concrete enemy/boss factories; encounter
   descriptors route through the server-owned execution registry.
-- Combat packs resolve through server-owned catalogue data.
+- Combat packs contain ordered typed entries rather than assuming Marauders.
+- Pack entries resolve stable enemy archetypes and server-owned factory IDs.
+- Pack bonus rules target explicit EntryIds.
+- Current production enemy archetypes remain intentionally limited to Marauder.
 - Boss-family content resolves through stable BossId -> factory registration.
 - Boss spawn claims are scoped by session + stable encounter ID so multiple
   miniboss/boss/event/secret encounters can coexist in one run.

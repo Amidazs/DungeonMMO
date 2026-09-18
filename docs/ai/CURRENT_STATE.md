@@ -293,10 +293,10 @@ Final committed acceptance from `2e2420b` includes:
 - source-boundary audit: **13 source/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior runtime-readiness worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1
 
-Active branch:
+Prior runtime-readiness branch:
 wip/phase-4-runtime-content-readiness-v1
 
 Design/spec:
@@ -304,6 +304,65 @@ docs/superpowers/specs/2026-09-18-phase-4-runtime-content-readiness-design.md
 
 Acceptance evidence:
 docs/testing/phase4-runtime-content-readiness-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Generic Enemy Archetype + Heterogeneous Combat Pack Registry**
+gate is now **LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`464bd44`
+
+Accepted local engineering result:
+
+- `CombatPack` no longer means "spawn Marauders";
+- shared combat-pack content now uses ordered typed entries;
+- each entry references a stable enemy archetype;
+- each enemy archetype references a stable server factory ID;
+- `DungeonEnemyFactoryRegistry` owns server-only factory registration;
+- `CombatPackEncounterExecutor` executes mixed-archetype packs generically;
+- the old `MarauderPackEncounterExecutor` was removed;
+- Deep Echoes and Crystal Bloom bonuses target explicit pack EntryIds;
+- existing Temple/Mine Depth1 Marauder counts, names and spawn-index ranges are
+  preserved;
+- a synthetic 2-Marauder + 1-Elite pack proves heterogeneous execution without
+  enabling Elite as production content;
+- partial mixed-pack failures clean all previously spawned enemies;
+- runtime readiness now validates pack entries, enemy archetypes, enemy
+  factories and bonus-rule targets;
+- no new production enemy archetype was enabled;
+- Depth2-Depth4 remain release-disabled/content-incomplete;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `464bd44` includes:
+
+- **507** Lua/Luau files parsed with 0 failures;
+- clean `git diff --check`;
+- all four Rojo compositions building;
+- Enemy Factory Registry: **8 assertions PASS**;
+- Combat Pack Encounter Executor: **15 assertions PASS**;
+- Encounter Spawn Catalog: **15 assertions PASS**;
+- existing Encounter Executors: **21 assertions PASS**;
+- Encounter Execution Bootstrap: **4 assertions PASS**;
+- Runtime Content Readiness: **64 assertions PASS**;
+- final committed Base party/difficulty regressions green;
+- final committed Dungeon binding/execution regressions green;
+- Phase 3 Systems Stress green in both compositions;
+- Training Dummy and Combat Target Rules green in the clean Dungeon rerun;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **11 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnemyPackRegistry_v1
+
+Active branch:
+wip/phase-4-enemy-archetype-combat-pack-v1
+
+Design/spec:
+docs/superpowers/specs/2026-09-18-phase-4-enemy-archetype-combat-pack-design.md
+
+Acceptance evidence:
+docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 
