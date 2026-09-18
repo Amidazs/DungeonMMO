@@ -1,5 +1,9 @@
 # DungeonMMO Test and Acceptance Matrix
 
+**Current phase:** Phase 4 - Content Alpha
+**Canonical roadmap:** docs/roadmap/DungeonMMO_Roadmap_v1_43.docx
+**Phase 3 gameplay release:** 84662948127eb1a37c9f184c6abbafe6f2daddb6
+
 This file records accepted evidence and current gate status. It is not a
 replacement for fresh test output when claiming a new result.
 
@@ -857,19 +861,107 @@ builds of all four Base/Dungeon published/non-published Rojo compositions.
 No Roblox publish, PROD, Robux, monetisation or art-worktree action occurred.
 
 <!-- PHASE3_BLUEPRINT_RECIPE_LEARNING_ACCEPTED_20260917 -->
-## Runtime acceptance â€” Phase 3 Blueprint / Recipe-Learning â€” 2026-09-17
+## Runtime acceptance Ã¢â‚¬â€ Phase 3 Blueprint / Recipe-Learning Ã¢â‚¬â€ 2026-09-17
 
-- Base â€” `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
-- Base â€” `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
-- Base â€” `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
-- Base â€” identity runtime: PASS, completed `Elf / Ranger`.
-- Dungeon â€” `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
-- Dungeon â€” `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
-- Dungeon â€” `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
-- Dungeon â€” completion/quest bridge: PASS, 8 assertions.
-- Dungeon â€” admission: PASS, player admitted after full dungeon loop ready.
+- Base Ã¢â‚¬â€ `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
+- Base Ã¢â‚¬â€ `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
+- Base Ã¢â‚¬â€ `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
+- Base Ã¢â‚¬â€ identity runtime: PASS, completed `Elf / Ranger`.
+- Dungeon Ã¢â‚¬â€ `RecipeKnowledgeServiceTest`: PASS, 23 assertions.
+- Dungeon Ã¢â‚¬â€ `RecipeKnowledgeCraftingGateTest`: PASS, 12 assertions.
+- Dungeon Ã¢â‚¬â€ `ProfileMigrationQuestAdvancementV8Test`: PASS, 8 assertions.
+- Dungeon Ã¢â‚¬â€ completion/quest bridge: PASS, 8 assertions.
+- Dungeon Ã¢â‚¬â€ admission: PASS, player admitted after full dungeon loop ready.
 
 Non-blocking log debt:
 - four synthetic Temple profession-resource placements are skipped because
   their resolved surface is invalid. No test or runtime admission failure
   accompanies these messages.
+
+<!-- PHASE3_SYSTEMS_ALPHA_ACCEPTED_20260918 -->
+## Phase 3 - Systems Alpha
+
+**Status:** FORMALLY COMPLETE / ACCEPTED
+**Accepted gameplay release checkpoint:** 84662948127eb1a37c9f184c6abbafe6f2daddb6
+**Formal closeout date:** 18 September 2026
+
+### Accepted architecture
+
+- [x] Quest + first race-specific Secondary-Class Advancement foundation.
+- [x] Damage/Tank/Support Contribution foundation.
+- [x] Blueprint / Recipe Knowledge persistence and learning.
+- [x] Bestiary + Scholars Reputation foundation.
+- [x] Rogue selected/proven as the fourth prototype starting archetype.
+- [x] Human Duelist / Elf Windstalker prototype advancement targets.
+- [x] broader Rogue skill-tree/progression architecture.
+- [x] deterministic Fortified / Rich Deposits / Bounty Dungeon modifiers.
+- [x] Rich Deposits integration with reconnect-safe personal gathering.
+- [x] Guild creation/membership/roles/progression/leader upgrades.
+- [x] private functional Guild Hall.
+- [x] limited fixed-price Market with escrow, tax and recovery.
+- [x] DEV/TEST Race Change preview/apply/archive/restore.
+- [x] shared economy audit events.
+- [x] request-rate, stale-state, ownership/membership and replay safeguards.
+- [x] shared persisted entity-adapter contract.
+- [x] existing Phase 1/2 accepted gameplay architecture preserved.
+- [x] catch-up deliberately deferred.
+- [x] Transmog deliberately deferred.
+
+### Final Studio evidence
+
+- [x] Rogue Definitions - 43 assertions PASS.
+- [x] Rogue Progression - 17 assertions PASS.
+- [x] Rogue Advancement - 12 assertions PASS.
+- [x] Class Advancement - 29 assertions PASS.
+- [x] Contribution Service - 36 assertions PASS.
+- [x] Contribution Damage Bridge - 9 assertions PASS.
+- [x] Contribution Support Bridge - 13 assertions PASS.
+- [x] Contribution real-session persistence - 10 assertions PASS.
+- [x] Recipe Knowledge Service - 23 assertions PASS.
+- [x] Recipe Knowledge Crafting Gate - 12 assertions PASS.
+- [x] Bestiary Service - 33 assertions PASS.
+- [x] Bestiary/Reputation reward integration - 25 assertions PASS.
+- [x] Guild membership authority - 21 assertions PASS.
+- [x] Guild Service / Guild Hall / Dungeon progression - PASS.
+- [x] Market listing - 15 assertions PASS.
+- [x] Market purchase recovery - 17 assertions PASS.
+- [x] Market cancel/expiry - 15 assertions PASS.
+- [x] Market remote contract - 6 assertions PASS.
+- [x] Race Change planner - 15 assertions PASS.
+- [x] Race Change migration - 13 assertions PASS.
+- [x] Race Change service - 23 assertions PASS.
+- [x] Race Change remote contract - 5 assertions PASS.
+- [x] Economy Audit Integration - 27 assertions PASS.
+- [x] Rate Limit - 8 assertions PASS.
+- [x] Entity Adapter Contract - PASS.
+- [x] Dungeon Modifier Definitions - 6 assertions PASS.
+- [x] Profession Resource Distribution - PASS.
+- [x] existing combat/progression/equipment/Bank/Travel/Dungeon regressions
+      remained green in the consolidated run.
+
+### Stress acceptance
+
+- [x] 250 profile migration/save/reload cycles.
+- [x] 1,000 market operations.
+- [x] 1,000 duplicate/replay attempts.
+- [x] 250 guild operations.
+- [x] 100 session cycles.
+- [x] 100 race-change round trips.
+- [x] stress harness reported PASS.
+
+### Release and published TEST evidence
+
+- [x] feature branch pushed.
+- [x] local main fast-forwarded to 84662948127eb1a37c9f184c6abbafe6f2daddb6.
+- [x] origin/main pushed to 84662948127eb1a37c9f184c6abbafe6f2daddb6.
+- [x] GitHub server main independently verified at the same SHA.
+- [x] TEST Dungeon 117293035754309 published successfully.
+- [x] TEST Starting Base 134132328219009 published successfully.
+- [x] both Studio publish state machines reached PublishSuccessful.
+- [x] no PROD publish / Robux / monetisation action.
+
+Detailed evidence:
+docs/testing/phase3-systems-alpha-acceptance-record.md.
+
+**Next phase:** Phase 4 - Content Alpha.
+**First design gate:** Starting Base launch-quality content/presentation.\n

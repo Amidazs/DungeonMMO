@@ -1,108 +1,133 @@
 # DungeonMMO AI Automation Boundary
 
-**Automation status:** Prior Base smoke test verified Studio MCP connection,
-read-only DataModel inspection, local Play start, console inspection, viewport
-inspection, and Play stop/return to Edit (user-reported evidence). Git remained
-clean. Local Studio resolving EnvironmentConfig to DEV is expected.
-
-Current accepted checkpoint: `ac9546c73d3f2f57221ae71b2f1e7a6ebcd35137`.
-Gate 2B.B is accepted and frozen on `main`. Gate 2B.C / Task 9 is active on
-`wip/phase-2b-c-published-persistence`.
-
-Task 9 RED is verified and the shared snapshot GREEN passes in fresh Base and
-Dungeon runs with 22 assertions. The two pre-existing regression-test defects
-are also repaired and verified in a fresh Dungeon run:
-`Phase2A Failure Path Tests` PASS with 25 assertions and
-`Automatic Free Revive Tests` PASS with 10 assertions, with no red errors
-reported. Published TEST cross-Place verification remains outstanding. MCP has
-no local-file opening command; inspect available Studio instances before
-claiming fresh-build runtime evidence.
+**State date:** 18 September 2026
+**Current phase:** Phase 4 - Content Alpha
+**Accepted gameplay release checkpoint:** 84662948127eb1a37c9f184c6abbafe6f2daddb6
 
 ## Goal
 
-Use higher-autonomy development when available without making the project
-dependent on it. Ordinary ChatGPT must always be able to continue from the
-repository handoff.
+Use automation to reduce manual repetition while keeping repository state,
+Roblox environment boundaries and value-bearing actions explicit and
+recoverable.
 
-## Preferred Roblox control path
+Ordinary ChatGPT must always be able to continue from the repository handoff;
+the project must not depend on one transient autonomous session.
 
-Use Roblox Studio's built-in MCP server with a trusted MCP-aware client such as
-Codex CLI.
+## Preferred control paths
 
-Do not build a custom Roblox HTTP/plugin control bridge unless the built-in MCP
-server is proven to lack a required capability.
+Use the simplest trusted path that fits the task:
 
-## Initial allowed actions
+1. repository/filesystem work through the authorised Desktop Commander bridge;
+2. Rojo for deterministic source composition and Studio sync;
+3. Roblox Studio's authenticated editor for TEST runtime validation and
+   explicitly approved TEST publishing;
+4. Studio MCP when it provides useful DataModel/playtest control.
 
-After the MCP connection is deliberately enabled and verified, an agent may:
+Do not extract or expose Roblox browser/session cookies. If command-line Rojo
+upload has no configured Open Cloud/API credential, use the already-authenticated
+Studio + Rojo sync path rather than harvesting credentials.
 
-- inspect the open Studio DataModel;
-- read instances and properties;
-- run DEV/TEST Luau;
-- start and stop local playtests;
-- inspect Studio output;
-- capture viewport state;
-- use test input/navigation;
-- modify local repository source;
-- run Rojo builds;
-- update repository handoff/test documents;
-- create deliberate WIP branches/commits after review.
+## Allowed autonomous actions
 
-## Initial prohibited actions
+An agent may:
 
-An agent must not autonomously:
+- inspect Git status, branches, commits and worktrees;
+- modify local repository source/docs inside the approved worktree;
+- run parsers, static checks and git diff --check;
+- build Base/Dungeon Rojo projects to TEMP;
+- start/stop Rojo serve sessions;
+- inspect or run TEST/DEV Studio sessions;
+- inspect Studio output and viewport state;
+- update handoff, test and roadmap documentation;
+- create deliberate feature commits/branches;
+- push/merge only when the user has explicitly approved that release action;
+- publish the approved TEST place only when the user has explicitly approved
+  publishing for that release.
+
+## Prohibited without separate explicit approval
+
+An agent must not:
 
 - publish PROD;
-- activate live paid revives;
+- mutate PROD DataStores or production save data;
+- activate live paid revives or monetisation;
 - spend Robux;
-- mutate production DataStores;
-- modify production save data;
-- alter monetisation;
+- create/alter Developer Products;
 - force-push;
 - rewrite Git history;
-- run destructive Git cleanup/reset commands;
-- mark a roadmap gate accepted without its complete fresh acceptance evidence.
+- run git reset --hard or broad git clean;
+- delete unrelated user files/worktrees;
+- mark a roadmap gate accepted without the required fresh evidence;
+- expose credentials, cookies or API keys.
 
-## First MCP acceptance milestone
+## Current TEST publish boundary
 
-Before using MCP to debug Gate 2B.B, prove this harmless loop:
+Published TEST environment:
 
-1. Open the newest Base validation build.
-2. Connect the trusted MCP client.
-3. Read Studio state/DataModel.
-4. Start Play.
-5. Read Studio output.
-6. Capture viewport state.
-7. Stop Play.
-8. Confirm no PROD publish or value-bearing mutation occurred.
-9. Record observed results in `HANDOFF.md` and `TEST_MATRIX.md`.
+- Universe: 10765241947
+- Starting Base: 134132328219009
+- Dungeon: 117293035754309
 
-Game source mutation is not required to pass this milestone.
+For the Phase 3 release the safe publish sequence was:
+
+1. build/validate the TEST Rojo composition;
+2. open the existing cloud Dungeon place in authenticated Studio;
+3. connect the Rojo plugin to the local TEST Dungeon project;
+4. confirm the Studio process has an established localhost Rojo connection;
+5. use Studio's normal Publish to Roblox command;
+6. verify the Studio publish state reaches PublishSuccessful;
+7. repeat for Starting Base;
+8. inspect Studio logs for the final success messages.
+
+Dungeon should be published before Base during a coordinated update so the entry
+place does not point players at a half-updated Dungeon.
 
 ## Build commands
 
 Dungeon:
 
-```powershell
 rojo build default.project.json -o "$env:TEMP\DungeonMMO_AI_Dungeon.rbxl"
-```
 
 Starting Base:
 
-```powershell
 rojo build base.project.json -o "$env:TEMP\DungeonMMO_AI_Base.rbxl"
-```
 
-## Credit-exhaustion fallback
+Published composition validation:
 
-When higher-autonomy credits are unavailable:
+rojo build published-dungeon.project.json -o "$env:TEMP\DungeonMMO_AI_Dungeon_Published.rbxl"
 
-1. Stop relying on the autonomous session transcript.
-2. Use the current Git branch and commit.
-3. Read `CURRENT_STATE.md`, `HANDOFF.md`, and `TEST_MATRIX.md`.
-4. Continue through ordinary ChatGPT with manual Studio execution where
-   required.
-5. Update the same handoff files before returning to autonomous development.
+rojo build published-base.project.json -o "$env:TEMP\DungeonMMO_AI_Base_Published.rbxl"
 
-There is one DungeonMMO project state, not separate "Astra" and "regular chat"
+Published TEST environments must fail closed unless
+ServerScriptService.DungeonMMOEnvironment resolves to TEST or PROD.
+For TEST, the Base must also point at the TEST Dungeon Place ID.
+
+## Phase 4 automation rule
+
+Phase 4.A is presentation/content integration work. Automation may inspect,
+assemble and validate environment changes, but semantic anchors and server-owned
+service boundaries remain authoritative.
+
+Do not allow visual polish to silently change:
+
+- Travel destinations/ranges;
+- Bank/Market/Guild/trainer interaction ownership;
+- spawn or Dungeon handoff semantics;
+- collision/pathing safety;
+- persistence or profile authority.
+
+Run targeted gameplay regressions after any environment integration that could
+affect those contracts.
+
+## Credit/tool fallback
+
+If a higher-autonomy tool is unavailable:
+
+1. read CURRENT_STATE.md, HANDOFF.md and TEST_MATRIX.md;
+2. inspect current Git branch/status;
+3. continue with ordinary ChatGPT + Desktop Commander/PowerShell;
+4. use manual Studio input only where automation cannot safely prove the result;
+5. update the same continuity documents before handing off again.
+
+There is one canonical DungeonMMO repository state, not separate AI-specific
 versions.

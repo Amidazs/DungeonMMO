@@ -1,117 +1,118 @@
 # DungeonMMO Development Handoff
 
-**Date:** 16 September 2026
-**Active workstream:** Phase 2 - Vertical Slice
-**Canonical roadmap:** DungeonMMO Roadmap v1.38
-**Party Formation + 1-4-Player Group Entry:** ACCEPTED
+**Date:** 18 September 2026
+**Active workstream:** Phase 4 - Content Alpha
+**Canonical roadmap:** DungeonMMO Roadmap v1.43
+**Phase 3 - Systems Alpha:** FORMALLY COMPLETE / ACCEPTED
+**Gameplay release checkpoint:** 84662948127eb1a37c9f184c6abbafe6f2daddb6
 
-## Accepted gameplay checkpoints
+## Where the project is now
 
-- Starting Base + Temple integration:
-  `c7fe89ebda3c97634c97e89ad12e52ec23983ae9`
-- Profession Foundation:
-  `ce1577990f2795bf208d7b897e645f32a4a39a4f`
-- Second Dungeon / Rare-State / Event:
-  `d361348ec045873eed0fd992ceb04bfee908b06a`
-- Previous local-main docs closeout:
-  `304ab0535d4de7e77313b7e0aef8d3b7bd899449`
-- Party Formation / Group Entry:
-  `726299322fb31689e5e321878f287cccfcb07d81`
+Phase 2 and Phase 3 are closed.
 
-The approved local-merge closeout fast-forwards local `main` to the party
-documentation closeout commit after merged-result verification. It deliberately
-does not push `origin/main`.
+The accepted Phase 3 gameplay checkpoint 84662948127eb1a37c9f184c6abbafe6f2daddb6 was:
 
-## Accepted party contract
+1. pushed to wip/phase-3-systems-alpha-completion-v1;
+2. fast-forwarded into local main;
+3. pushed to origin/main;
+4. independently verified against the GitHub server main ref.
 
-`PartyService` is temporary Base-server authority. It supports 1-4 members,
-creator leadership, invite/accept, leader kick, member leave, deterministic
-leader transfer, dissolution on empty, readiness and selected-dungeon state.
+The documentation closeout is layered on top of that accepted gameplay release.
 
-Multi-member entry requires all members Ready. Membership changes and dungeon
-selection changes invalidate readiness. Solo entry remains available without a
-Ready requirement.
+## Published TEST environment
 
-`PartyEntryCoordinator` validates the final member set and passes it into the
-existing `TeleportCoordinator` / `DungeonSessionService` architecture. Once a
-run is admitted, DungeonSession membership is authoritative and temporary party
-state does not become persistent run/profile state.
+- Starting Base Place ID: 134132328219009
+- Dungeon Place ID: 117293035754309
+- Universe ID: 10765241947
+- environment namespace: TEST
 
-Temple and Abandoned Mine are both supported.
+The Dungeon was Rojo-synced into the authenticated cloud place and published
+first. Studio reported PublishSuccessful. The Starting Base was then synced and
+published, and Studio again reported PublishSuccessful.
 
-## Studio acceptance
+No PROD publish or Robux/monetisation action occurred.
 
-The project owner completed the required four-player Studio Local Server gate and
-reported every requested check worked:
+## Accepted Phase 3 boundary
 
-- Profile Lease regression PASS;
-- Player1-Player4 identity auto-harness reached authoritative Complete;
-- create + invite/accept to 4/4;
-- not-ready start rejection;
-- all-member Ready flow;
-- kick updates and readiness reset;
-- leader leave -> longest-standing member leadership transfer;
-- Temple party entry Studio proof;
-- Abandoned Mine party entry Studio proof;
-- no new red DungeonMMO runtime errors.
+Do not recreate or replace these systems when continuing:
 
-Roblox CoreGui/ChatScript CreatorType errors encountered during the gate were
-Studio CoreScript failures, not DungeonMMO runtime errors. The test-only identity
-harness and negative synthetic-UserId lease allowance remain Studio-gated.
+- Quest + race-specific Secondary-Class Advancement foundation;
+- Damage/Tank/Support Contribution;
+- Blueprint / Recipe Knowledge;
+- Bestiary + Scholars Reputation;
+- Fighter, Mage, Ranger and Rogue prototype starting archetypes;
+- Rogue skill-tree breadth and Human Duelist / Elf Windstalker advancement
+  targets;
+- deterministic Fortified / Rich Deposits / Bounty Dungeon modifiers;
+- personal reconnect-safe profession gathering and modifier interaction;
+- Guild membership/progression/roles + private Guild Hall;
+- limited fixed-price escrowed Market;
+- DEV/TEST Race Change migration/archive/restore;
+- economy audit and request/replay/ownership safeguards;
+- shared persisted entity adapter.
 
-## Qualification
+Current profile schema: v12.
 
-The Studio party-entry proof does not itself perform a published reserved-server
-cross-Place teleport. The accepted lower-layer TeleportCoordinator /
-DungeonSession contracts already support player arrays; real published group
-teleport can be rechecked in a later published TEST/release gate.
+## Final accepted evidence
 
-## Safety
+The 18 September consolidated Studio run kept the earlier accepted combat,
+progression, equipment, Dungeon, profession, Bank, Travel and reward suites
+green while also passing the Phase 3 Rogue, contribution, bestiary/reputation,
+guild, market, race-change, audit, modifier and entity-adapter families.
 
-- Primary repo: `C:\Users\Remko\Documents\Roblox\DungeonMMO`
-- Party feature worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_PartyEntry_v1`
-- Feature branch:
-  `wip/phase-2-party-entry-v1`
-- Environment: TEST
-- No Roblox publish occurred.
-- Live paid revives remain disabled.
-- No PROD / Robux / monetisation action is authorized.
-- `art/dungeon-environment-prototype` remains isolated.
+The Phase 3 stress harness passed:
+
+profiles=250 market=1000 replay=1000 guild=250 sessions=100 race_roundtrips=100
+
+The dedicated record is:
+
+docs/testing/phase3-systems-alpha-acceptance-record.md
+
+## Deliberate deferrals
+
+- progression catch-up;
+- Transmog.
+
+Do not silently pull either back into the immediate plan. Revisit them only when
+the roadmap conditions that justified deferral change.
 
 ## Exact next action
 
-Design the **targetable rare Skill Book acquisition proof** before source work.
+Design **Phase 4.A - Starting Base launch-quality content/presentation** before
+source or art integration work.
 
-Reuse current server-authoritative loot/reward/inventory/skill-learning systems.
-Keep the first proof narrow: one deliberate target path for one specific rare
-book. Do not turn it into a broad loot-table, market or economy rewrite.
+The design should retain one compact connected town and use gradual Human/Elf/
+Orc/Dwarf flavour rather than isolated race quadrants. It should specifically
+lock:
 
-Bank/storage, Travel, public matchmaking, guild-party breadth and final UI/art
-polish remain later scope.
+- player arrival and first-read sight lines;
+- service visibility and landmark hierarchy;
+- market/social-centre composition;
+- paths/streets and elevation changes;
+- race-flavour transitions;
+- tree/vegetation/flower/bush density;
+- lighting and atmosphere;
+- where accepted reusable assets are reused versus where variants/new assets
+  are genuinely required;
+- semantic-anchor placement and service-range safety;
+- collision/pathing and Base gameplay regression checks.
 
-<!-- PHASE3_BLUEPRINT_RECIPE_LEARNING_ACCEPTED_20260917 -->
-## Accepted Phase 3 recipe-learning checkpoint
+Do not implement raid/world-boss/castle-siege, broad new class/profession
+systems, catch-up or Transmog as part of Phase 4.A.
 
-The Blueprint / Recipe-Learning Foundation is runtime accepted as of
-17 September 2026.
+## Safety and repository paths
 
-Feature commit: `c89419e4f54aa098048aab4214fcd73d486d7402`
-Local gameplay merge: `3162b0fe918fc6d827c67485daddf8ca3232b4dd`
+Primary repo:
 
-The accepted public learning boundary remains
-`RecipeKnowledgeService:learn_from_item(user_id, item_id)`. Do not re-add
-a character-table guard to the numeric `user_id` argument.
+C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-The missing-profession regression is intentionally modeled through a focused
-test-only profile proxy because `ProfileService:mutate` sanitizes successful
-mutations and restores default profession structure.
+Phase 3 completion worktree:
 
-Fresh Base and Dungeon Studio runs passed Recipe Knowledge Service, Recipe
-Knowledge Crafting Gate, Quest Advancement Migration, and the normal
-identity/admission runtime paths.
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase3_Completion_v1
 
-The four synthetic Temple profession-resource `invalid surface` skips are
-tracked as environment/polish debt, not a recipe-learning blocker.
+Art worktree remains isolated:
 
-Local-only closeout: nothing was pushed or published.
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Art
+
+No hard reset, clean, force-push or history rewrite. Do not use PROD DataStores
+or publish PROD without a separate explicit approval.
