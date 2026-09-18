@@ -48,6 +48,7 @@ local function combat(
     return table.freeze({
         Id = encounter_id,
         RoomSlotId = room_slot_id,
+        RuntimeEncounterId = encounter_id,
         Kind = "Combat",
         ExecutorId = "CombatPack",
         PackId = pack_id,
@@ -58,11 +59,14 @@ local function boss_encounter(
     encounter_id: string,
     room_slot_id: string,
     kind: string,
-    boss_id: string
+    boss_id: string,
+    runtime_encounter_id: string?
 ): any
     return table.freeze({
         Id = encounter_id,
         RoomSlotId = room_slot_id,
+        RuntimeEncounterId =
+            runtime_encounter_id or encounter_id,
         Kind = kind,
         ExecutorId = "Boss",
         BossId = boss_id,
@@ -85,6 +89,7 @@ local function difficulty(
         Order = order,
         Version = 1,
         DisplayName = "Depth " .. tostring(order),
+        LayoutId = id,
         RuntimeReady = runtime_ready,
         RequiredPreviousDifficultyId = previous_id,
         EnemyHealthMultiplier = scaling.EnemyHealthMultiplier,
@@ -111,7 +116,8 @@ local function build_ladder(boss_ids: {string}): any
                 "Depth1Boss",
                 "Room3",
                 "Boss",
-                boss_ids[1]
+                boss_ids[1],
+                "MarauderCaptain"
             ),
         }
     )
