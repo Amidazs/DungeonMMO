@@ -30,6 +30,35 @@ local entrance = DungeonRecoveryRules.from_checkpoint("Entrance")
 check(entrance.spawn_checkpoint_id == "Entrance", "Fresh admission starts at Entrance.")
 check(entrance.room1_cleared == false and entrance.room2_cleared == false, "Entrance has no cleared rooms.")
 
+local stable_room1 = DungeonRecoveryRules.from_checkpoint(
+    "EncounterStart:CombatRoom1"
+)
+check(
+    stable_room1.valid_checkpoint == true
+        and stable_room1.room1_cleared == false,
+    "Stable Room1 checkpoint must replay Room1."
+)
+
+local stable_room2 = DungeonRecoveryRules.from_checkpoint(
+    "EncounterStart:CombatRoom2"
+)
+check(
+    stable_room2.valid_checkpoint == true
+        and stable_room2.room1_cleared == true
+        and stable_room2.room2_cleared == false,
+    "Stable Room2 checkpoint must preserve only Room1 clear."
+)
+
+local stable_boss = DungeonRecoveryRules.from_checkpoint(
+    "EncounterStart:Depth1Boss"
+)
+check(
+    stable_boss.valid_checkpoint == true
+        and stable_boss.room1_cleared == true
+        and stable_boss.room2_cleared == true,
+    "Stable boss checkpoint must preserve both combat-room clears."
+)
+
 local unknown = DungeonRecoveryRules.from_checkpoint("NotARealCheckpoint")
 check(unknown.spawn_checkpoint_id == "Entrance", "Unknown checkpoints must fail safe to Entrance.")
 check(unknown.valid_checkpoint == false, "Unknown checkpoints must be flagged invalid.")

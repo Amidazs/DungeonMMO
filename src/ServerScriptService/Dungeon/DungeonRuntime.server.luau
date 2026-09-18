@@ -17,6 +17,9 @@ local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local SharedCombat = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 
 local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
+local DungeonDifficultyDefinitions = require(
+    SharedCore:WaitForChild("DungeonDifficultyDefinitions")
+)
 local DungeonModifierDefinitions = require(
     SharedCore:WaitForChild("DungeonModifierDefinitions")
 )
@@ -46,6 +49,21 @@ local StudioSessionFactory = require(Dungeon:WaitForChild("StudioSessionFactory"
 local EncounterService = require(Dungeon:WaitForChild("EncounterService"))
 local CheckpointService = require(Dungeon:WaitForChild("CheckpointService"))
 local DungeonRecoveryRules = require(Dungeon:WaitForChild("DungeonRecoveryRules"))
+local DungeonEncounterRuntimeState = require(
+    Dungeon:WaitForChild("DungeonEncounterRuntimeState")
+)
+local DungeonEncounterRuntimeController = require(
+    Dungeon:WaitForChild("DungeonEncounterRuntimeController")
+)
+local Depth1EncounterBindings = require(
+    Dungeon:WaitForChild("Depth1EncounterBindings")
+)
+local Depth1EncounterFlow = require(
+    Dungeon:WaitForChild("Depth1EncounterFlow")
+)
+local Depth1EncounterRecovery = require(
+    Dungeon:WaitForChild("Depth1EncounterRecovery")
+)
 local DungeonProgressionBridge = require(Dungeon:WaitForChild("DungeonProgressionBridge"))
 local DungeonContributionBridge = require(
     Dungeon:WaitForChild("DungeonContributionBridge")
@@ -132,6 +150,9 @@ enemies_folder.Parent = runtime_root
 
 local active_session_id: string? = nil
 local encounter_service: any = nil
+local encounter_runtime_controller: any = nil
+local depth1_flow: any = nil
+local depth1_bindings: any = nil
 local checkpoint_service: any = nil
 local death_service: any = nil
 local purchase_service: any = nil
@@ -154,10 +175,6 @@ if force_return_failure then
 end
 local loaded_users: {[number]: boolean} = {}
 local bound_characters: {[Model]: boolean} = {}
-local room_started = {CombatRoom1 = false, CombatRoom2 = false}
-local room_cleared = {CombatRoom1 = false, CombatRoom2 = false}
-local boss_started = false
-local boss_cleared = false
 local completion_pending = false
 local completion_committed = false
 local next_completion_retry_at = 0
@@ -171,6 +188,133 @@ local function current_session(): any?
     return if active_session_id then sessions:get(active_session_id) else nil
 end
 
+-- Returns the authoritative base encounter sequence for the admitted session.
+local function base_encounter_sequence(session: any): {any}?
+    local instance_state = session
+        and session.InstanceState
+    if type(instance_state) == "table"
+        and type(instance_state.EncounterSequence) == "table"
+        and #instance_state.EncounterSequence > 0
+    then
+        return instance_state.EncounterSequence
+    end
+
+    local difficulty_id = session
+        and session.Difficulty
+        and session.Difficulty.Id
+    local difficulty = DungeonDifficultyDefinitions.resolve(
+        active_definition.Id,
+        if type(difficulty_id) == "string"
+            then difficulty_id
+            else nil
+    )
+    return difficulty and difficulty.EncounterSequence or nil
+end
+
+-- Returns server-owned optional encounter definitions when configured.
+local function optional_encounter_definitions(): {any}
+    local optional = active_definition.OptionalEncounters
+    return if type(optional) == "table" then optional else {}
+end
+
+-- Returns the currently persisted checkpoint ID, defaulting to Entrance.
+local function persisted_checkpoint_id(session: any): string
+    if type(session) == "table"
+        and type(session.Checkpoint) == "table"
+        and type(session.Checkpoint.Id) == "string"
+    then
+        return session.Checkpoint.Id
+    end
+    return "Entrance"
+end
+
+-- Creates one generic encounter controller over the session's frozen plan.
+local function create_encounter_controller(
+    session: any,
+    base_sequence: {any}
+): (any?, string?)
+    return DungeonEncounterRuntimeController.new({
+        session_service = sessions,
+        session_id = session.SessionId,
+        base_sequence = base_sequence,
+        optional_encounters = optional_encounter_definitions(),
+    })
+end
+
+-- Initializes the generic progression authority and Depth1 compatibility flow.
+local function initialize_depth1_encounter_runtime(
+    session: any
+): any
+    local base_sequence = base_encounter_sequence(session)
+    if not base_sequence then
+        return {
+            ok = false,
+            reason = "EncounterSequenceMissing",
+        }
+    end
+
+    local controller, controller_error =
+        create_encounter_controller(session, base_sequence)
+    if not controller then
+        return {
+            ok = false,
+            reason = controller_error
+                or "EncounterRuntimeCreationFailed",
+        }
+    end
+
+    local bindings = Depth1EncounterBindings.resolve(
+        controller:encounters()
+    )
+    if bindings.ok ~= true then
+        return bindings
+    end
+
+    local latest = sessions:get(session.SessionId)
+    if DungeonEncounterRuntimeState.from_session(latest) == nil then
+        local recovery_snapshot =
+            Depth1EncounterRecovery.snapshot_from_checkpoint(
+                bindings,
+                persisted_checkpoint_id(session)
+            )
+        if not recovery_snapshot then
+            return {
+                ok = false,
+                reason = "EncounterRecoveryMigrationFailed",
+            }
+        end
+
+        local persisted = DungeonEncounterRuntimeState.persist(
+            sessions,
+            session.SessionId,
+            recovery_snapshot
+        )
+        if persisted.ok ~= true then
+            return persisted
+        end
+
+        controller, controller_error =
+            create_encounter_controller(session, base_sequence)
+        if not controller then
+            return {
+                ok = false,
+                reason = controller_error
+                    or "EncounterRuntimeReloadFailed",
+            }
+        end
+    end
+
+    encounter_runtime_controller = controller
+    depth1_bindings = bindings
+    depth1_flow = Depth1EncounterFlow.new(
+        controller,
+        bindings
+    )
+    return {
+        ok = true,
+        reason = nil,
+    }
+end
 
 local function send_objective(text: string, state_name: string?)
     for _, player in ipairs(Players:GetPlayers()) do
@@ -452,6 +596,34 @@ local function advance_checkpoint(checkpoint_id: string): boolean
     return true
 end
 
+-- Starts one physical Depth1 slot only when the generic sequence permits it.
+local function start_depth1_slot(room_slot_id: string): any?
+    if not active_session_id or not depth1_flow then
+        return nil
+    end
+
+    local started = depth1_flow:start_slot(room_slot_id)
+    if started.ok == true then
+        return started.binding
+    end
+
+    if started.reason == "EncounterAlreadyActive"
+        or started.reason == "EncounterAlreadyCleared"
+        or started.reason == "EncounterAlreadySkipped"
+        or started.reason == "EncounterOutOfOrder"
+    then
+        return nil
+    end
+
+    warn(
+        "[Dungeon Runtime] Encounter start rejected for "
+            .. room_slot_id
+            .. ": "
+            .. tostring(started.reason)
+    )
+    return nil
+end
+
 local function connect_enemy(enemy: Model, encounter_id: string)
     local humanoid = enemy:WaitForChild("Humanoid") :: Humanoid
     local fired = false
@@ -466,11 +638,31 @@ local function connect_enemy(enemy: Model, encounter_id: string)
         print_reward_result(result)
         DungeonEnemyCleanup.retire(enemy)
         if result.cleared then
-            room_cleared[encounter_id] = true
+            if not depth1_flow then
+                warn(
+                    "[Dungeon Runtime] Generic encounter flow is missing."
+                )
+                return
+            end
+
+            local flow_clear =
+                depth1_flow:clear_runtime(encounter_id)
+            if flow_clear.ok ~= true then
+                warn(
+                    "[Dungeon Runtime] Generic encounter clear failed: "
+                        .. tostring(flow_clear.reason)
+                )
+                return
+            end
+
             if encounter_id == "CombatRoom1" then
                 environment:set_exit_open("Room1", true)
                 sync_all_character_encounters("")
-                advance_checkpoint("Room2Start")
+                if flow_clear.next_binding then
+                    advance_checkpoint(
+                        flow_clear.next_binding.CheckpointId
+                    )
+                end
                 sessions:set_runtime_progress(
                     active_session_id :: string,
                     "CombatRoom1Clear",
@@ -482,7 +674,11 @@ local function connect_enemy(enemy: Model, encounter_id: string)
             elseif encounter_id == "CombatRoom2" then
                 environment:set_exit_open("Room2", true)
                 sync_all_character_encounters("")
-                advance_checkpoint("BossRoomStart")
+                if flow_clear.next_binding then
+                    advance_checkpoint(
+                        flow_clear.next_binding.CheckpointId
+                    )
+                end
                 sessions:set_runtime_progress(
                     active_session_id :: string,
                     "CombatRoom2Clear",
@@ -492,9 +688,10 @@ local function connect_enemy(enemy: Model, encounter_id: string)
                     "Room 2 cleared. Boss unlocked; checkpoint moved."
                 )
             elseif encounter_id == "MarauderCaptain" then
-                boss_cleared = true
                 sync_all_character_encounters("")
-                if handle_boss_cleared then handle_boss_cleared() end
+                if flow_clear.complete and handle_boss_cleared then
+                    handle_boss_cleared()
+                end
             end
         end
     end)
@@ -514,37 +711,99 @@ local function room_marauder_count(room_id:string):number
 end
 
 local function start_room1()
-    if room_started.CombatRoom1 or not active_session_id then return end
-    room_started.CombatRoom1 = true
-    sync_all_character_encounters("CombatRoom1")
-    sessions:set_runtime_progress(active_session_id, "CombatRoom1", "CombatRoom1")
-    local room1_positions = environment:enemy_spawn_cframes("Room1")
-    local enemies = {}
-    for index = 1, room_marauder_count("CombatRoom1") do
-        table.insert(enemies, spawn_marauder("CombatRoom1", "Room1_Marauder_" .. tostring(index), room1_positions[index], 100 + index))
+    local binding = start_depth1_slot("Room1")
+    if not binding or not active_session_id then
+        return
     end
-    local started = encounter_service:start("CombatRoom1", member_user_ids(), enemies)
-    if not started.ok then error("Room1 encounter failed: " .. tostring(started.reason)) end
+
+    local encounter_id = binding.RuntimeEncounterId
+    sync_all_character_encounters(encounter_id)
+    sessions:set_runtime_progress(
+        active_session_id,
+        encounter_id,
+        encounter_id
+    )
+
+    local positions = environment:enemy_spawn_cframes("Room1")
+    local enemies = {}
+    for index = 1, room_marauder_count(encounter_id) do
+        table.insert(
+            enemies,
+            spawn_marauder(
+                encounter_id,
+                "Room1_Marauder_" .. tostring(index),
+                positions[index],
+                100 + index
+            )
+        )
+    end
+
+    local started = encounter_service:start(
+        encounter_id,
+        member_user_ids(),
+        enemies
+    )
+    if not started.ok then
+        error(
+            "Room1 encounter failed: "
+                .. tostring(started.reason)
+        )
+    end
+
     sync_encounter_members_from_session()
-    for _, enemy in ipairs(enemies) do connect_enemy(enemy, "CombatRoom1") end
+    for _, enemy in ipairs(enemies) do
+        connect_enemy(enemy, encounter_id)
+    end
     send_objective("Combat Room 1: defeat both Marauders.")
 end
 
 local function start_room2()
-    if room_started.CombatRoom2 or not room_cleared.CombatRoom1 or not active_session_id then return end
-    room_started.CombatRoom2 = true
-    sync_all_character_encounters("CombatRoom2")
-    sessions:set_runtime_progress(active_session_id, "CombatRoom2", "CombatRoom2")
-    local room2_positions = environment:enemy_spawn_cframes("Room2")
-    local enemies = {}
-    for index = 1, room_marauder_count("CombatRoom2") do
-        table.insert(enemies, spawn_marauder("CombatRoom2", "Room2_Marauder_" .. tostring(index), room2_positions[index], 200 + index))
+    local binding = start_depth1_slot("Room2")
+    if not binding or not active_session_id then
+        return
     end
-    local started = encounter_service:start("CombatRoom2", member_user_ids(), enemies)
-    if not started.ok then error("Room2 encounter failed: " .. tostring(started.reason)) end
+
+    local encounter_id = binding.RuntimeEncounterId
+    sync_all_character_encounters(encounter_id)
+    sessions:set_runtime_progress(
+        active_session_id,
+        encounter_id,
+        encounter_id
+    )
+
+    local positions = environment:enemy_spawn_cframes("Room2")
+    local enemies = {}
+    for index = 1, room_marauder_count(encounter_id) do
+        table.insert(
+            enemies,
+            spawn_marauder(
+                encounter_id,
+                "Room2_Marauder_" .. tostring(index),
+                positions[index],
+                200 + index
+            )
+        )
+    end
+
+    local started = encounter_service:start(
+        encounter_id,
+        member_user_ids(),
+        enemies
+    )
+    if not started.ok then
+        error(
+            "Room2 encounter failed: "
+                .. tostring(started.reason)
+        )
+    end
+
     sync_encounter_members_from_session()
-    for _, enemy in ipairs(enemies) do connect_enemy(enemy, "CombatRoom2") end
-    send_objective("Combat Room 2: defeat the larger Marauder pack.")
+    for _, enemy in ipairs(enemies) do
+        connect_enemy(enemy, encounter_id)
+    end
+    send_objective(
+        "Combat Room 2: defeat the larger Marauder pack."
+    )
 end
 
 local function send_completion_state(commit_result: any, return_at: number)
@@ -595,14 +854,23 @@ local function commit_and_open_completion()
 end
 
 handle_boss_cleared = function()
-    if not active_session_id or completion_pending or completion_committed then return end
-    local session = current_session()
-    if not session or session.State ~= "Active" then return end
-    if not room_cleared.CombatRoom1
-        or not room_cleared.CombatRoom2
-        or not boss_cleared
+    if not active_session_id
+        or completion_pending
+        or completion_committed
     then
-        warn("[Dungeon Runtime] Boss clear rejected because dungeon progression is incomplete.")
+        return
+    end
+
+    local session = current_session()
+    if not session or session.State ~= "Active" then
+        return
+    end
+
+    if not depth1_flow or not depth1_flow:is_complete() then
+        warn(
+            "[Dungeon Runtime] Boss clear rejected because "
+                .. "required generic encounters are incomplete."
+        )
         return
     end
 
@@ -617,20 +885,20 @@ handle_boss_cleared = function()
 end
 
 local function start_boss()
-    if boss_started
-        or not room_cleared.CombatRoom2
-        or not active_session_id
-    then
+    local binding = start_depth1_slot("Room3")
+    if not binding or not active_session_id then
         return
     end
+
     local session = current_session()
-    if not session or session.State ~= "Active" then return end
+    if not session or session.State ~= "Active" then
+        return
+    end
 
     if not DungeonBossSpawnGuard.claim(
         runtime_root,
         active_session_id
     ) then
-        boss_started = true
         warn(
             "[Dungeon Runtime] Duplicate Captain spawn blocked "
                 .. "for session "
@@ -640,9 +908,14 @@ local function start_boss()
         return
     end
 
-    boss_started = true
-    sync_all_character_encounters("MarauderCaptain")
-    sessions:set_runtime_progress(active_session_id, "MarauderCaptain", "MarauderCaptain")
+    local encounter_id = binding.RuntimeEncounterId
+    sync_all_character_encounters(encounter_id)
+    sessions:set_runtime_progress(
+        active_session_id,
+        encounter_id,
+        encounter_id
+    )
+
     local tuning = active_difficulty_tuning()
     local reward = DungeonDifficultyTuning.scale_monster_reward(
         active_definition.MarauderCaptainReward,
@@ -654,24 +927,43 @@ local function start_boss()
     local captain = boss_factory.create({
         Parent = enemies_folder,
         SpawnCFrame = environment:captain_spawn_cframe(),
-        EncounterId = "MarauderCaptain",
+        EncounterId = encounter_id,
         RewardXP = reward.XP,
         RewardGoldMin = reward.GoldMin,
         RewardGoldMax = reward.GoldMax,
         BestiaryCreatureId = reward.BestiaryCreatureId,
         HealthMultiplier = tuning.EnemyHealthMultiplier,
         DamageMultiplier = tuning.EnemyDamageMultiplier,
-        BossRole = "Boss",
+        BossRole = binding.Kind or "Boss",
     })
     active_captain = captain
-    local started = encounter_service:start("MarauderCaptain", member_user_ids(), {captain})
-    if not started.ok then error("Captain encounter failed: " .. tostring(started.reason)) end
+
+    local started = encounter_service:start(
+        encounter_id,
+        member_user_ids(),
+        {captain}
+    )
+    if not started.ok then
+        error(
+            "Captain encounter failed: "
+                .. tostring(started.reason)
+        )
+    end
+
     sync_encounter_members_from_session()
-    connect_enemy(captain, "MarauderCaptain")
-    send_objective("BOSS: Defeat the " .. active_definition.Boss.DisplayName .. ".", "Boss")
+    connect_enemy(captain, encounter_id)
+    send_objective(
+        "BOSS: Defeat the "
+            .. active_definition.Boss.DisplayName
+            .. ".",
+        "Boss"
+    )
+
     local humanoid = captain:FindFirstChildOfClass("Humanoid")
     if humanoid then
-        humanoid.HealthChanged:Connect(function() send_boss_state(humanoid) end)
+        humanoid.HealthChanged:Connect(function()
+            send_boss_state(humanoid)
+        end)
         send_boss_state(humanoid)
     end
 end
@@ -701,14 +993,9 @@ local function emit_revive_state(user_id: number, payload: any)
 end
 
 local function apply_recovery_plan(session: any): any
-    local checkpoint_id = "Entrance"
-    if type(session.Checkpoint) == "table"
-        and type(session.Checkpoint.Id) == "string"
-    then
-        checkpoint_id = session.Checkpoint.Id
-    end
-
+    local checkpoint_id = persisted_checkpoint_id(session)
     local plan = DungeonRecoveryRules.from_checkpoint(checkpoint_id)
+
     if not plan.valid_checkpoint then
         warn(
             "[Dungeon Runtime] Unknown persisted checkpoint "
@@ -717,15 +1004,14 @@ local function apply_recovery_plan(session: any): any
         )
     end
 
-    room_started.CombatRoom1 = plan.room1_cleared
-    room_cleared.CombatRoom1 = plan.room1_cleared
-    room_started.CombatRoom2 = plan.room2_cleared
-    room_cleared.CombatRoom2 = plan.room2_cleared
-    boss_started = false
-    boss_cleared = false
+    local room1_cleared = depth1_flow ~= nil
+        and depth1_flow:state_for_slot("Room1") == "Cleared"
+    local room2_cleared = depth1_flow ~= nil
+        and depth1_flow:state_for_slot("Room2") == "Cleared"
+
     sync_all_character_encounters("")
-    environment:set_exit_open("Room1", plan.room1_cleared)
-    environment:set_exit_open("Room2", plan.room2_cleared)
+    environment:set_exit_open("Room1", room1_cleared)
+    environment:set_exit_open("Room2", room2_cleared)
 
     if checkpoint_id ~= "Entrance" and active_session_id then
         sessions:set_runtime_progress(
@@ -735,6 +1021,50 @@ local function apply_recovery_plan(session: any): any
         )
     end
     return plan
+end
+
+-- Registers stable encounter checkpoints plus legacy aliases for reconnects.
+local function register_depth1_checkpoints()
+    assert(
+        checkpoint_service ~= nil,
+        "Checkpoint service must exist before registration."
+    )
+    assert(
+        depth1_bindings ~= nil,
+        "Depth1 encounter bindings must exist before registration."
+    )
+
+    checkpoint_service:register(
+        "Entrance",
+        0,
+        environment:checkpoint_cframe("Temple.EntrySpawn")
+    )
+
+    for _, binding in ipairs(depth1_bindings.ordered) do
+        checkpoint_service:register(
+            binding.CheckpointId,
+            binding.CheckpointSequence,
+            environment:checkpoint_cframe(
+                binding.CheckpointAnchor
+            )
+        )
+    end
+
+    local legacy_slots = {
+        Room1Start = "Room1",
+        Room2Start = "Room2",
+        BossRoomStart = "Room3",
+    }
+    for legacy_id, room_slot_id in pairs(legacy_slots) do
+        local binding = depth1_bindings.by_slot[room_slot_id]
+        checkpoint_service:register(
+            legacy_id,
+            binding.CheckpointSequence,
+            environment:checkpoint_cframe(
+                binding.CheckpointAnchor
+            )
+        )
+    end
 end
 
 local function initialize_session_services(session: any): (any?, boolean)
@@ -748,28 +1078,25 @@ local function initialize_session_services(session: any): (any?, boolean)
         session.SessionId,
         session.Modifier and session.Modifier.Id or nil
     )
-    DungeonProgressionBridge.bind({proficiency_service = proficiency, encounter_service = encounter_service})
-    checkpoint_service = CheckpointService.new(sessions, session.SessionId)
-    checkpoint_service:register(
-        "Entrance",
-        0,
-        environment:checkpoint_cframe("Temple.EntrySpawn")
+    DungeonProgressionBridge.bind({
+        proficiency_service = proficiency,
+        encounter_service = encounter_service,
+    })
+
+    local encounter_runtime_result =
+        initialize_depth1_encounter_runtime(session)
+    if encounter_runtime_result.ok ~= true then
+        error(
+            "Generic encounter runtime failed: "
+                .. tostring(encounter_runtime_result.reason)
+        )
+    end
+
+    checkpoint_service = CheckpointService.new(
+        sessions,
+        session.SessionId
     )
-    checkpoint_service:register(
-        "Room1Start",
-        1,
-        environment:checkpoint_cframe("Temple.Room1.Checkpoint")
-    )
-    checkpoint_service:register(
-        "Room2Start",
-        2,
-        environment:checkpoint_cframe("Temple.Room2.Checkpoint")
-    )
-    checkpoint_service:register(
-        "BossRoomStart",
-        3,
-        environment:checkpoint_cframe("Temple.Room3.Checkpoint")
-    )
+    register_depth1_checkpoints()
     if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
     local completion_reward=active_definition.CompletionReward
     if active_definition.Id=="AbandonedMine" and type(session.InstanceState)=="table" then
@@ -1140,8 +1467,15 @@ local function admit_player(player: Player)
     if encounter_service then
         encounter_service:mark_member_connected(player.UserId, true)
     end
-    if not reconnecting and checkpoint_service then
-        local initial_checkpoint = checkpoint_service:activate("Room1Start")
+    if not reconnecting
+        and checkpoint_service
+        and depth1_bindings
+    then
+        local first_binding = depth1_bindings.by_slot.Room1
+        local initial_checkpoint =
+            checkpoint_service:activate(
+                first_binding.CheckpointId
+            )
         if not initial_checkpoint.ok then
             warn(
                 "[Dungeon Runtime] Initial room checkpoint failed: "
