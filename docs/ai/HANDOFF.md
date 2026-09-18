@@ -331,21 +331,53 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Studio Difficulty / Session Parity** gate is locally complete
+and green at:
+
+`d9297f8`
+
+Accepted proof now also includes:
+
+- explicit Studio difficulty propagation into session creation;
+- explicit Studio difficulty propagation into DungeonInstanceDirector;
+- Studio routing data preserving DifficultyId;
+- reused Studio sessions preferring authoritative session difficulty;
+- DungeonRuntime using the environment-resolved DifficultyId;
+- Studio Session Factory: 7 assertions PASS;
+- Layout Environment Contract: 14 assertions PASS;
+- Encounter Bindings: 34 assertions PASS;
+- Runtime Content Readiness: 64 assertions PASS;
+- clean-repeat Training Dummy: 9 assertions PASS;
+- clean-repeat Combat Target Rules: 9 assertions PASS;
+- 514 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base regression green;
+- clean-repeat committed Dungeon regression green;
+- Phase 3 Systems Stress remains green;
+- 3 source/test files from `5fb3491`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-studio-difficulty-parity-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-If backend-only work continues before modelling, audit the remaining
-Depth2-Depth4 dependencies from `405dde5` before creating another abstraction.
+Generic higher-depth framework blockers are now cleared through
+`d9297f8`.
 
 The encounter sequence, execution registry, physical bindings, readiness
 authority, enemy-pack/factory layer, runtime layout selection, environment
-activation, combat spawn-group lookup, exit-barrier progression and environment
-anchor/group resolution are now generic. The next gate should target only a
-concrete remaining dependency or move into deliberate higher-depth content
-definitions.
+activation, combat spawn-group lookup, exit-barrier progression, environment
+anchor/group resolution and Studio difficulty/session routing are now generic.
+
+Continue backend-only work by defining deliberate higher-depth content while
+keeping Depth2-Depth4 release-disabled until physical authored rooms are ready.
 
 Carry forward these readiness rules:
 
@@ -365,13 +397,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 layout-environment-contract worktree:
+Active Phase 4 Studio-difficulty-parity worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_StudioDifficultyParity_v1
 
 Active branch:
 
-wip/phase-4-layout-environment-contract-v1
+wip/phase-4-studio-difficulty-parity-v1
 
 Phase 3 completion worktree:
 

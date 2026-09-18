@@ -505,14 +505,67 @@ Final committed acceptance from `405dde5` includes:
 - source-boundary audit: **9 source/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior layout-environment-contract worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1
 
-Active branch:
+Prior layout-environment-contract branch:
 wip/phase-4-layout-environment-contract-v1
 
 Acceptance evidence:
 docs/testing/phase4-layout-environment-contract-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Studio Difficulty / Session Parity** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`d9297f8`
+
+Accepted local engineering result:
+
+- StudioSessionFactory accepts the selected DifficultyId;
+- Studio dungeon session creation receives that DifficultyId;
+- DungeonInstanceDirector materializes InstanceState for that DifficultyId;
+- Studio routing data preserves DifficultyId;
+- reused Studio sessions prefer authoritative session difficulty;
+- DungeonRuntime passes the difficulty already resolved by environment
+  bootstrap;
+- omitted Studio difficulty still defaults through normal definitions to
+  Depth1;
+- production TeleportCoordinator routing was not changed;
+- Depth2-Depth4 remain release-disabled/content-incomplete;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `d9297f8` includes:
+
+- **514** Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions building;
+- Studio Session Factory: **7 assertions PASS**;
+- Layout Environment Contract: **14 assertions PASS**;
+- Encounter Bindings: **34 assertions PASS**;
+- Combat Pack Encounter Executor: **15 assertions PASS**;
+- Phase2A Failure Path: **24 assertions PASS**;
+- Teleport Coordinator: **19 assertions PASS**;
+- Dungeon Difficulty Teleport: **7 assertions PASS**;
+- Dungeon Difficulty Progression: **19 assertions PASS**;
+- Runtime Content Readiness: **64 assertions PASS**;
+- final committed Base regression green;
+- clean-repeat committed Dungeon regression green;
+- Training Dummy clean repeat: **9 assertions PASS**;
+- Combat Target Rules clean repeat: **9 assertions PASS**;
+- Phase 3 Systems Stress green;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **3 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_StudioDifficultyParity_v1
+
+Active branch:
+wip/phase-4-studio-difficulty-parity-v1
+
+Acceptance evidence:
+docs/testing/phase4-studio-difficulty-parity-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 

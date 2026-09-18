@@ -1996,3 +1996,82 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-layout-environment-contract-acceptance-record.md`.
+
+
+<!-- PHASE4_STUDIO_DIFFICULTY_PARITY_LOCAL_GREEN_20260918 -->
+## Phase 4 - Studio Difficulty / Session Parity
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `5fb3491`
+**RED checkpoint:** `efc6a47`
+**Implementation checkpoint:** `d9297f8`
+
+### Test-first contract
+
+- [x] RED captured before implementation.
+- [x] explicit Studio Depth2 failed to reach session creation.
+
+### Studio parity contract
+
+- [x] StudioSessionFactory accepts optional DifficultyId.
+- [x] session creation receives selected DifficultyId.
+- [x] DungeonInstanceDirector receives selected DifficultyId.
+- [x] Studio routing data preserves DifficultyId.
+- [x] reused Studio sessions prefer authoritative session difficulty.
+- [x] omitted Studio difficulty still defaults through normal definitions.
+- [x] DungeonRuntime passes environment-resolved DifficultyId.
+- [x] production TeleportCoordinator routing unchanged.
+- [x] Studio Session Factory: 7 assertions PASS.
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `d9297f8`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 514 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+### Final committed Dungeon regression
+
+- [x] clean-repeat Studio Session Factory: 7 assertions PASS.
+- [x] Dungeon Layout Environment Contract: 14 assertions PASS.
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Phase2A Failure Path: 24 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Progression: 19 assertions PASS.
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] clean-repeat Training Dummy: 9 assertions PASS.
+- [x] clean-repeat Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain release-disabled/content-incomplete.
+- [x] no higher-depth layout registered.
+- [x] no new enemy/boss content enabled.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 3 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-studio-difficulty-parity-acceptance-record.md`.

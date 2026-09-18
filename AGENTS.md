@@ -47,10 +47,12 @@ modification and reconcile without destructive Git operations.
 - Environment-binding implementation checkpoint: `cfbf2ea`.
 - Layout-derived environment contract gate: LOCAL GREEN.
 - Layout-environment implementation checkpoint: `405dde5`.
+- Studio difficulty/session parity gate: LOCAL GREEN.
+- Studio-parity implementation checkpoint: `d9297f8`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-layout-environment-contract-v1`.
+- Active branch: `wip/phase-4-studio-difficulty-parity-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_StudioDifficultyParity_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -127,11 +129,12 @@ The runtime layout-selection/environment-activation gate is locally green at
 `ccd289b`.
 The environment binding runtime gate is locally green at `cfbf2ea`.
 The layout-derived environment contract gate is locally green at `405dde5`.
+The Studio difficulty/session parity gate is locally green at `d9297f8`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
-content without a deliberate next action from the project owner. Continue
-backend-only work only when a concrete remaining higher-depth blocker is
-demonstrated.
+content without a deliberate next action from the project owner. Generic
+higher-depth framework blockers have been cleared; backend-only work should now
+prefer deliberate higher-depth content definitions over new abstractions.
 
 Locked rules that carry forward:
 
@@ -193,6 +196,8 @@ Locked rules that carry forward:
 - Production environment resolution must derive room exact anchors and spawn
   groups from the selected registered layout, not static Depth1 contracts.
 - Combat slots must own spawn-group name, prefix and minimum anchor count.
+- Studio-created dungeon sessions must preserve the same selected DifficultyId
+  as the environment/runtime selection path.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.
