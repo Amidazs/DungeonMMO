@@ -53,7 +53,7 @@ The follow-on **Generic Dungeon Encounter Runtime** is locally green at
 stable encounter checkpoints and reconnect state. The backend supports
 Combat/MiniBoss/Boss/FinalBoss plus future EventBoss/SecretBoss insertion from
 server-owned conditions. Unbound optional content fails closed, no Event/Secret
-boss content is enabled, and Depth2-Depth4 remain `RuntimeReady = false`.
+boss content is enabled, and Depth2-Depth4 remain fail closed.
 
 The next **Encounter Execution / Spawn Registry** gate is locally green at
 `fe1856e`. Encounter descriptors now select stable CombatPack/Boss executors;
@@ -64,7 +64,7 @@ startup cleans partial spawns and returns the generic sequence to Pending on
 failure. Boss duplicate claims are scoped by session + encounter ID, which
 supports multiple miniboss/boss/event/secret encounters in a single future run.
 Temple and forced Abandoned Mine live execution proofs passed. Depth2-Depth4
-remain `RuntimeReady = false`, and no Event/Secret boss content is enabled.
+remain fail closed, and no Event/Secret boss content is enabled.
 
 The follow-on **Multi-Depth Physical Room-Binding Runtime** is locally green at
 `1aa81b5`. Physical room-slot metadata, triggers, spawn anchors, barriers and
@@ -75,6 +75,16 @@ Both current dungeons explicitly reject unimplemented Depth2-Depth4 physical
 layouts, so higher depths remain fail closed while the runtime is ready for
 future authored room sets and later Event/Secret boss bindings.
 
+The follow-on **Dungeon Runtime Content Readiness Registry** is locally green at
+`2e2420b`. Static layout/pack/boss/executor/factory registrations now live in
+one shared catalogue usable by both Base and Dungeon. The old `RuntimeReady`
+boolean is removed: `RuntimeReleaseEnabled` is only a rollout switch, while
+`DungeonRuntimeContentReadiness` computes content completeness and final
+readiness. Base progression entry and TeleportCoordinator use the computed
+result, so incomplete content is rejected before server reservation. Current
+Depth1 is complete+enabled+ready; Depth2-Depth4 remain
+incomplete+release-disabled+not-ready with explicit diagnostics.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -82,7 +92,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`;
 - `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`;
 - `docs/testing/phase4-encounter-execution-registry-acceptance-record.md`;
-- `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`.
+- `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`;
+- `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

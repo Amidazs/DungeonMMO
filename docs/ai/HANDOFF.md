@@ -171,9 +171,40 @@ Accepted proof now also includes:
 Evidence:
 `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`
 
-Depth2-Depth4 remain `RuntimeReady = false`. Event/Secret boss content remains
-disabled. No modelling, meshes, terrain, authored rooms or presentation work
-was performed.
+Depth2-Depth4 remained fail closed at this checkpoint. Event/Secret boss
+content remains disabled. No modelling, meshes, terrain, authored rooms or
+presentation work was performed.
+
+The follow-on **Dungeon Runtime Content Readiness Registry** is locally
+complete and green at implementation checkpoint:
+
+`2e2420b`
+
+Accepted proof now also includes:
+
+- shared static content catalogue for layouts, packs, bosses, executor IDs and
+  boss-factory IDs;
+- old `RuntimeReady` property removed;
+- explicit rollout switch renamed to `RuntimeReleaseEnabled`;
+- computed `ContentComplete`, `ReleaseEnabled`, `Ready` and issue list;
+- Base progression entry uses computed readiness;
+- TeleportCoordinator uses computed readiness before server reservation;
+- Depth1 is complete+enabled+ready for both current dungeons;
+- Depth2-Depth4 are incomplete+disabled+not-ready for both current dungeons;
+- missing higher-depth layouts/content are reported diagnostically;
+- Dungeon bootstrap verifies shared implemented executor/factory declarations
+  match actual server-side registrations;
+- 504 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- 13 source/test files from `a942f6d`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-runtime-content-readiness-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
 
 ## Exact next action
 
@@ -181,17 +212,23 @@ Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-If backend-only work continues before modelling, the next gate should build on
-the generic execution registry and generic physical room bindings rather than
-adding depth-specific branches to DungeonRuntime. A sensible next backend target
-is a **runtime-content readiness/registration layer** that can validate a
-difficulty's complete physical requirements before `RuntimeReady` may become
-true, while keeping all current higher depths fail closed.
+If backend-only work continues before modelling, the next high-value gate is a
+**generic enemy-archetype + heterogeneous combat-pack registry**.
 
-Depth2-Depth4 must remain `RuntimeReady = false` until their physical
-execution/binding content is deliberately implemented and accepted.
-Event/Secret boss content remains disabled until its own content/binding gate is
-approved.
+The current `CombatPack` executor is still implemented by the
+Marauder-specific pack executor. Generalising that layer will let deeper
+difficulties use stronger/different enemy compositions without adding
+depth-specific runtime branches, while preserving the accepted pack/executor
+contract.
+
+Carry forward these readiness rules:
+
+- `RuntimeReleaseEnabled` is only the explicit rollout switch;
+- production entry may use only computed `DungeonRuntimeContentReadiness`;
+- Depth2-Depth4 must remain release-disabled until their complete content and
+  physical bindings are deliberately implemented and accepted;
+- Event/Secret boss content remains disabled until its own content/binding gate
+  is approved.
 
 No modelling, meshes, terrain, authored rooms, visual polish or difficulty UI
 was performed in this gate.
@@ -202,13 +239,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 multi-depth room runtime worktree:
+Active Phase 4 runtime-readiness worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1
 
 Active branch:
 
-wip/phase-4-multidepth-room-runtime-v1
+wip/phase-4-runtime-content-readiness-v1
 
 Phase 3 completion worktree:
 

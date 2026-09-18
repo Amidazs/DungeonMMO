@@ -144,7 +144,7 @@ Accepted local engineering result:
 - current Depth1 physical bindings fail closed if an activated optional
   encounter lacks an explicit authored room/spawn/checkpoint binding;
 - no Event/Secret boss content is enabled yet;
-- Depth2-Depth4 remain `RuntimeReady = false`;
+- Depth2-Depth4 remained fail closed at this checkpoint;
 - no modelling, meshes, terrain, authored rooms or environment-art work was
   performed.
 
@@ -170,7 +170,7 @@ Accepted local engineering result:
   multiple miniboss/boss/event/secret encounters in one run;
 - missing future packs/boss IDs/factories/bindings fail closed;
 - no Event/Secret boss content is enabled yet;
-- Depth2-Depth4 remain `RuntimeReady = false`;
+- Depth2-Depth4 remained fail closed at this checkpoint;
 - no modelling, meshes, terrain or authored-room work was performed.
 
 Final local evidence includes:
@@ -219,7 +219,7 @@ Accepted local engineering result:
 - forced Abandoned Mine + DeepEchoes + CrystalBloom compatibility passed 23/23;
 - both production dungeons explicitly reject unimplemented Depth2, Depth3 and
   Depth4 physical layouts;
-- Depth2-Depth4 therefore remain `RuntimeReady = false`;
+- Depth2-Depth4 therefore remained fail closed at this checkpoint;
 - future EventBoss/SecretBoss insertion remains supported by the generic
   binding contract but no such content is enabled;
 - no modelling, meshes, terrain or authored-room work was performed.
@@ -239,14 +239,71 @@ Final committed acceptance from `1aa81b5` includes:
 - source-boundary audit from `2deb540`: **12 changed code/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior multi-depth room-runtime worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1
 
-Active branch:
+Prior multi-depth room-runtime branch:
 wip/phase-4-multidepth-room-runtime-v1
 
 Acceptance evidence:
 docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Dungeon Runtime Content Readiness Registry** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`2e2420b`
+
+Accepted local engineering result:
+
+- a shared runtime-content catalogue is now the single static source for
+  physical layouts, combat packs, boss content, executor IDs and boss-factory
+  IDs used by Base/Dungeon readiness decisions;
+- the old `RuntimeReady` difficulty property has been removed;
+- `RuntimeReleaseEnabled` now means only the explicit rollout switch;
+- `DungeonRuntimeContentReadiness` computes `ContentComplete`,
+  `ReleaseEnabled`, `Ready` and machine-readable missing-content issues;
+- Base-side progression entry and TeleportCoordinator use computed readiness
+  rather than reading a release switch directly;
+- not-ready content is rejected before reserved-server creation;
+- Dungeon execution bootstrap cross-checks shared implemented declarations
+  against actual server-side executor/factory registrations;
+- both current Depth1 dungeons report content complete + release enabled +
+  ready;
+- Depth2-Depth4 in both current dungeons report content incomplete + release
+  disabled + not ready, including missing layout/content diagnostics;
+- no Event/Secret boss content is enabled;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `2e2420b` includes:
+
+- **504** Lua/Luau files parsed with 0 failures;
+- clean `git diff --check`;
+- all four Rojo compositions building;
+- Runtime Content Readiness: **64 assertions PASS**;
+- Difficulty Definitions: **114 assertions PASS**;
+- Difficulty Progression: **19 assertions PASS**;
+- Teleport Coordinator: **19 assertions PASS**;
+- final committed Base party/difficulty regressions green;
+- final committed Dungeon binding/execution regressions green;
+- Phase 3 Systems Stress green in both compositions;
+- Training Dummy and Combat Target Rules green in Dungeon;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **13 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1
+
+Active branch:
+wip/phase-4-runtime-content-readiness-v1
+
+Design/spec:
+docs/superpowers/specs/2026-09-18-phase-4-runtime-content-readiness-design.md
+
+Acceptance evidence:
+docs/testing/phase4-runtime-content-readiness-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 

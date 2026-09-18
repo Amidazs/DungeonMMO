@@ -1456,3 +1456,131 @@ Validation-only selection forced `AbandonedMine + DeepEchoes + CrystalBloom`.
 
 Detailed evidence:
 `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`.
+
+
+<!-- PHASE4_RUNTIME_CONTENT_READINESS_LOCAL_GREEN_20260918 -->
+## Phase 4 - Dungeon Runtime Content Readiness Registry
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `a942f6d`
+**RED checkpoint:** `34b2a29`
+**Implementation checkpoint:** `2e2420b`
+
+### Test-first contract
+
+- [x] permanent readiness test authored before implementation.
+- [x] RED observed in Studio because
+      `DungeonRuntimeContentReadiness` was missing.
+- [x] no unrelated failure was required to establish RED.
+
+### Readiness architecture
+
+- [x] shared `DungeonRuntimeContentCatalog`.
+- [x] shared `DungeonRuntimeContentReadiness`.
+- [x] physical layout metadata has one shared static source.
+- [x] combat-pack metadata has one shared static source.
+- [x] boss-content metadata has one shared static source.
+- [x] implemented executor IDs are declared centrally.
+- [x] implemented boss-factory IDs are declared centrally.
+- [x] Dungeon layout wrapper consumes the shared catalogue.
+- [x] Dungeon spawn catalogue consumes the shared catalogue.
+- [x] old `RuntimeReady` property removed.
+- [x] explicit switch renamed to `RuntimeReleaseEnabled`.
+- [x] analyser computes `ContentComplete`.
+- [x] analyser computes `ReleaseEnabled`.
+- [x] analyser computes final `Ready`.
+- [x] analyser returns machine-readable readiness issues.
+- [x] progression entry uses computed readiness.
+- [x] TeleportCoordinator uses computed readiness.
+- [x] not-ready content blocks before server reservation.
+- [x] Dungeon bootstrap cross-checks actual executor/factory registrations.
+
+### Current difficulty readiness
+
+For both TestDungeon and AbandonedMine:
+
+- [x] Depth1 content complete.
+- [x] Depth1 release enabled.
+- [x] Depth1 ready.
+- [x] Depth1 has no readiness issues.
+- [x] Depth2 content incomplete and release disabled.
+- [x] Depth3 content incomplete and release disabled.
+- [x] Depth4 content incomplete and release disabled.
+- [x] higher depths report missing physical layout.
+- [x] higher depths report missing encounter content.
+- [x] Depth2-Depth4 remain fail closed.
+
+### Focused Studio evidence
+
+Base:
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+
+Dungeon:
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Encounter Bindings: 30 assertions PASS.
+- [x] Encounter Spawn Catalog: 10 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Boss Factory Registry: 8 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+### Final committed static/build acceptance
+
+- [x] clean committed implementation checkpoint `2e2420b`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 504 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors observed.
+### Final committed Dungeon regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Encounter Bindings: 30 assertions PASS.
+- [x] Encounter Spawn Catalog: 10 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Boss Factory Registry: 8 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+- [x] no project CreatorErrors observed.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain release-disabled/content-incomplete.
+- [x] no Event/Secret boss content enabled.
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] source-boundary audit: 13 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-runtime-content-readiness-acceptance-record.md`.

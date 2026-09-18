@@ -37,10 +37,12 @@ modification and reconcile without destructive Git operations.
 - Execution-registry implementation checkpoint: `fe1856e`.
 - Multi-depth physical room-binding runtime gate: LOCAL GREEN.
 - Multi-depth room-runtime implementation checkpoint: `1aa81b5`.
+- Runtime content readiness registry gate: LOCAL GREEN.
+- Runtime-readiness implementation checkpoint: `2e2420b`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-multidepth-room-runtime-v1`.
+- Active branch: `wip/phase-4-runtime-content-readiness-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_MultiDepthRoomRuntime_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeReadiness_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -109,13 +111,13 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 ## Selected next-gate discipline
 
 The generic encounter execution/spawn registry is locally green at `fe1856e`.
-The follow-on multi-depth physical room-binding runtime is locally green at
-`1aa81b5`.
+The multi-depth physical room-binding runtime is locally green at `1aa81b5`.
+The runtime content readiness registry is locally green at `2e2420b`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
 content without a deliberate next action from the project owner. If backend-only
-work continues, build on the generic execution registry and room-binding layer
-rather than adding fixed depth/room branches to DungeonRuntime.
+work continues, the next high-value gate is a generic enemy-archetype and
+heterogeneous combat-pack registry rather than depth-specific spawn branches.
 
 Locked rules that carry forward:
 
@@ -157,6 +159,11 @@ Locked rules that carry forward:
 - Boss spawn anchors are binding-specific.
 - Both current dungeons must continue to fail closed for unregistered Depth2,
   Depth3 and Depth4 physical layouts.
+- `RuntimeReleaseEnabled` is only the explicit rollout switch.
+- Production entry must use computed `DungeonRuntimeContentReadiness`; no
+  entry path may treat the release switch alone as runtime readiness.
+- Shared static layout/pack/boss/executor/factory registrations belong in
+  `DungeonRuntimeContentCatalog`; Dungeon wrappers must not duplicate them.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.
