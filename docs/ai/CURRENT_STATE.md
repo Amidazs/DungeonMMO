@@ -403,14 +403,63 @@ Final committed acceptance from `ccd289b` includes:
 - source-boundary audit: **7 source/test files, 0 art/model/mesh/terrain/image
   files**.
 
-Active worktree:
+Prior runtime-layout-selection worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeLayoutSelection_v1
 
-Active branch:
+Prior runtime-layout-selection branch:
 wip/phase-4-runtime-layout-selection-v1
 
 Acceptance evidence:
 docs/testing/phase4-runtime-layout-selection-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Binding-Owned Spawn Groups + Exit Barriers** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`cfbf2ea`
+
+Accepted local engineering result:
+
+- combat-capable physical slots now declare EnemySpawnGroup;
+- encounter bindings expose EnemySpawnGroup and ExitBarrierAnchor;
+- CombatPackEncounterExecutor uses binding-owned environment groups instead of
+  room-ID spawn translation;
+- DungeonRuntime uses binding-owned physical barrier anchors for encounter clear
+  and recovery;
+- readiness rejects combat bindings without spawn groups;
+- the generic runtime no longer depends on Temple/Mine GROUP_BY_ROOM or
+  BARRIER_BY_ROOM maps;
+- existing adapter compatibility helpers remain available for older callers;
+- current Depth1 behavior remains compatible;
+- Depth2-Depth4 remain release-disabled/content-incomplete;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `cfbf2ea` includes:
+
+- **512** Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions building;
+- Dungeon Encounter Bindings: **34 assertions PASS**;
+- Dungeon Encounter Environment Runtime: **8 assertions PASS**;
+- Combat Pack Encounter Executor: **15 assertions PASS**;
+- Encounter Executors: **21 assertions PASS**;
+- Encounter Execution Bootstrap: **4 assertions PASS**;
+- Runtime Content Readiness: **64 assertions PASS**;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress green;
+- Training Dummy and Combat Target Rules green;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **11 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnvironmentBindingRuntime_v1
+
+Active branch:
+wip/phase-4-environment-binding-runtime-v1
+
+Acceptance evidence:
+docs/testing/phase4-environment-binding-runtime-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 

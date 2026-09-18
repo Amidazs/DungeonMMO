@@ -43,10 +43,12 @@ modification and reconcile without destructive Git operations.
 - Enemy-pack implementation checkpoint: `464bd44`.
 - Runtime layout selection + environment activation gate: LOCAL GREEN.
 - Runtime-layout implementation checkpoint: `ccd289b`.
+- Environment binding runtime gate: LOCAL GREEN.
+- Environment-binding implementation checkpoint: `cfbf2ea`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-runtime-layout-selection-v1`.
+- Active branch: `wip/phase-4-environment-binding-runtime-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_RuntimeLayoutSelection_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnvironmentBindingRuntime_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -121,6 +123,7 @@ The generic enemy archetype/combat-pack registry is locally green at
 `464bd44`.
 The runtime layout-selection/environment-activation gate is locally green at
 `ccd289b`.
+The environment binding runtime gate is locally green at `cfbf2ea`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
 content without a deliberate next action from the project owner. Continue
@@ -179,6 +182,11 @@ Locked rules that carry forward:
   registered layout; do not reintroduce dungeon-specific trigger arrays.
 - Production runtime selection must preserve TeleportData DifficultyId and
   validate the selected registered layout.
+- Generic combat spawning must use binding-owned EnemySpawnGroup data; do not
+  translate logical room IDs through dungeon-specific spawn maps.
+- Generic encounter barrier progression must use binding-owned
+  ExitBarrierAnchor data; do not translate logical room IDs through
+  dungeon-specific barrier maps.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

@@ -100,6 +100,13 @@ Encounter triggers and exit barriers are activated from registered layout data,
 not hard-coded Temple/Mine arrays. A synthetic four-slot layout proves arbitrary
 slot-count activation while current Depth1 boot/admission remains compatible.
 
+The follow-on **Binding-Owned Spawn Groups + Exit Barriers** gate is locally
+green at `cfbf2ea`. Combat-capable physical bindings now carry their own
+enemy-spawn groups, while exit-barrier progression uses physical binding
+anchors. Generic encounter spawning and recovery no longer require Temple/Mine
+room-ID translation maps, so future Room4+ combat slots can be registered
+without editing dungeon-specific adapter maps.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -110,7 +117,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-multi-depth-room-runtime-acceptance-record.md`;
 - `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`;
 - `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`;
-- `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`.
+- `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`;
+- `docs/testing/phase4-environment-binding-runtime-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

@@ -1799,3 +1799,102 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`.
+
+
+<!-- PHASE4_ENVIRONMENT_BINDING_RUNTIME_LOCAL_GREEN_20260918 -->
+## Phase 4 - Environment Binding Runtime
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `caf56c5`
+**RED checkpoint:** `5bcd281`
+**Implementation checkpoint:** `cfbf2ea`
+
+### Test-first contract
+
+- [x] RED captured before implementation.
+- [x] missing DungeonEncounterEnvironmentRuntime failed as expected.
+- [x] get_group-only combat environment failed before migration.
+- [x] missing binding-owned spawn groups failed before migration.
+
+### Physical binding contract
+
+- [x] combat-capable slots declare EnemySpawnGroup.
+- [x] bindings expose EnemySpawnGroup.
+- [x] bindings expose ExitBarrierAnchor.
+- [x] readiness rejects CombatPack bindings without EnemySpawnGroup.
+- [x] current Temple/Mine Depth1 binding compatibility preserved.
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+### Generic combat spawning
+
+- [x] CombatPackEncounterExecutor requires binding.EnemySpawnGroup.
+- [x] executor uses environment:get_group(...).
+- [x] ordered group BaseParts are converted to CFrames.
+- [x] missing/empty resolved spawn groups fail closed.
+- [x] mixed-pack factory/reward/scaling behavior preserved.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+
+### Generic exit barriers
+
+- [x] DungeonEncounterEnvironmentRuntime exists.
+- [x] arbitrary binding-owned physical barrier opens.
+- [x] arbitrary binding-owned physical barrier closes.
+- [x] slots without barriers are safe no-ops.
+- [x] missing declared barriers fail closed.
+- [x] invalid environment adapters fail closed.
+- [x] Dungeon Encounter Environment Runtime: 8 assertions PASS.
+- [x] DungeonRuntime clear path uses ExitBarrierAnchor.
+- [x] DungeonRuntime recovery path uses ExitBarrierAnchor.
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `cfbf2ea`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 512 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors observed.
+### Final committed Dungeon regression
+
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+- [x] Dungeon Encounter Environment Runtime: 8 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Dungeon Encounter Executors: 21 assertions PASS.
+- [x] Dungeon Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Runtime Content Readiness: 64 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+- [x] no project CreatorErrors observed.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain release-disabled/content-incomplete.
+- [x] no physical higher-depth rooms or anchors added.
+- [x] no new enemy/boss content enabled.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 11 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-environment-binding-runtime-acceptance-record.md`.
