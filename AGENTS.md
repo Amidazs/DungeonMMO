@@ -11,7 +11,7 @@ Before modifying source:
 2. Read `docs/ai/HANDOFF.md`.
 3. Read `docs/ai/TEST_MATRIX.md`.
 4. Read `docs/ai/AUTOMATION.md`.
-5. Treat `docs/roadmap/DungeonMMO_Roadmap_v1_38.docx` as the canonical
+5. Treat `docs/roadmap/DungeonMMO_Roadmap_v1_43.docx` as the canonical
    long-form roadmap.
 6. Read the active approved design and implementation plan under
    `docs/superpowers/specs/` and `docs/superpowers/plans/`.
@@ -24,19 +24,19 @@ modification and reconcile without destructive Git operations.
 ## Current accepted boundary
 
 - Phase 1: ACCEPTED / functionally complete.
-- Phase 2A: ACCEPTED / functionally complete.
-- Phase 2B.A/B/C: ACCEPTED; Phase 2B functionally complete.
-- Phase 2C.A through Phase 2C.E: ACCEPTED; Phase 2C functionally complete.
-- Starting Base + Temple integration: ACCEPTED.
-- Profession Foundation: ACCEPTED.
-- Second Modular Dungeon + Rare-State/Event Proof: ACCEPTED.
-- Party Formation + 1-4-Player Group Entry: ACCEPTED.
-- Party gameplay checkpoint: `726299322fb31689e5e321878f287cccfcb07d81`.
-- Selected next gate: one targetable rare Skill Book acquisition path,
-  design not yet locked.
+- Phase 2 - Vertical Slice: FORMALLY COMPLETE / ACCEPTED.
+- Phase 3 - Systems Alpha: FORMALLY COMPLETE / ACCEPTED.
+- Phase 3 gameplay release: `84662948127eb1a37c9f184c6abbafe6f2daddb6`.
+- Phase 3 documentation closeout: `a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9`.
+- Phase 4 - Content Alpha: ACTIVE.
+- Current backend-only gate: progressive Dungeon depth + difficulty.
+- Active branch: `wip/phase-4-dungeon-depth-difficulty-v1`.
+- Active worktree:
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1`.
 
-Do not reopen accepted architecture merely for cosmetic polish unless a real
-regression or readability blocker is demonstrated.
+The user has explicitly parked modelling, meshes and Starting Base presentation
+work for now. Do not reopen accepted Phase 1-3 architecture unless a real
+regression or integration defect is demonstrated.
 
 ## Git safety
 
@@ -100,22 +100,28 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 
 ## Selected next-gate discipline
 
-The next gate is a targetable rare Skill Book acquisition proof.
+The active gate is the backend-only progressive Dungeon depth + difficulty
+foundation defined in:
 
-Reuse:
-- `LootTableConfig`;
-- `RewardService`;
-- `InventoryService`;
-- skill-book learning / binding rules;
-- completion eligibility and idempotency;
-- accepted dungeon / rare-state / event definitions where appropriate.
+- `docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md`;
+- `docs/superpowers/plans/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-implementation.md`.
 
-Do not create a client-trusted reward-selection path. Avoid a schema bump unless
-an approved persistent target/pity mechanic genuinely requires it; if it does,
-lock migration/rollback first.
+Locked rules:
 
-Do not broaden the first proof into Bank, Travel, marketplace, public
-matchmaking or a full loot/economy rebalance.
+- Depth1/2/3/4 expose 3/4/5/6 logical encounters respectively.
+- Each deeper difficulty adds content and stronger enemies; it is not merely a
+  stat multiplier.
+- The final depth reuses earlier difficulty bosses as minibosses and ends with a
+  new true final boss.
+- Dungeon modifiers remain an independent session-owned axis.
+- Existing Depth1 behaviour is the compatibility baseline.
+- Depth2-Depth4 are defined in backend data but fail closed until their physical
+  runtime content is explicitly ready.
+- Persistent unlock progression uses a new versioned profile field; legacy
+  `DungeonProgress` remains untouched.
+- No client may supply authoritative difficulty tuning values.
+- No modelling, meshes, terrain, room authoring or visual-content work belongs
+  in this gate.
 
 ## Separate environment-art branch
 

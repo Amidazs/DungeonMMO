@@ -105,26 +105,37 @@ Two roadmap concepts were intentionally not implemented:
 
 These are future work, not missing Phase 3 exit criteria.
 
-## Phase 4 opening boundary
+## Phase 4 active backend gate
 
-Phase 4 - Content Alpha is now active.
+Phase 4 - Content Alpha is active.
 
-The first gate is **Phase 4.A - Starting Base launch-quality
-content/presentation**. Design it before implementation.
+The user has explicitly parked Starting Base presentation, modelling, meshes and
+environment-art work for now. The active engineering gate is:
 
-Preserve:
+**Progressive Dungeon Depth + Difficulty - backend foundation.**
 
-- the compact integrated-town direction;
-- semantic environment anchors as the gameplay/environment contract;
-- existing Travel, Bank, Market, Guild, trainer, party and dungeon-entry
-  authority;
-- the accepted Base -> Dungeon -> Base loop and all persistence contracts;
-- the isolated DungeonMMO_Art workflow and
-  REUSE -> VARIANT -> NEW ASSET discipline.
+Approved direction:
 
-The first pass should improve readability, service presentation, landmark/path
-flow, race-flavour blending, vegetation, lighting and authored environment
-quality without reopening accepted backend architecture.
+- Depth1/2/3/4 represent progressively deeper 3/4/5/6-encounter runs;
+- each depth increases enemy challenge and reward bands;
+- each ordinary depth ends with a new boss;
+- the final depth reuses the previous depth bosses as minibosses before a new
+  true final boss;
+- Fortified, Rich Deposits and Bounty remain independent run modifiers;
+- Depth1 preserves current Temple/Mine gameplay;
+- Depth2-Depth4 are defined in backend data but fail closed until their physical
+  room/boss content is explicitly runtime-ready;
+- legacy DungeonProgress remains untouched; new unlock state is versioned
+  separately.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1
+
+Active branch:
+wip/phase-4-dungeon-depth-difficulty-v1
+
+Design/spec:
+docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md
 
 ## Repository safety
 

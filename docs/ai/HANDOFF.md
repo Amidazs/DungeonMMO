@@ -78,27 +78,26 @@ the roadmap conditions that justified deferral change.
 
 ## Exact next action
 
-Design **Phase 4.A - Starting Base launch-quality content/presentation** before
-source or art integration work.
+Implement the approved **Progressive Dungeon Depth + Difficulty backend
+foundation** in the isolated Phase 4 worktree.
 
-The design should retain one compact connected town and use gradual Human/Elf/
-Orc/Dwarf flavour rather than isolated race quadrants. It should specifically
-lock:
+The locked backend proof is:
 
-- player arrival and first-read sight lines;
-- service visibility and landmark hierarchy;
-- market/social-centre composition;
-- paths/streets and elevation changes;
-- race-flavour transitions;
-- tree/vegetation/flower/bush density;
-- lighting and atmosphere;
-- where accepted reusable assets are reused versus where variants/new assets
-  are genuinely required;
-- semantic-anchor placement and service-range safety;
-- collision/pathing and Base gameplay regression checks.
+- Depth1/2/3/4 = 3/4/5/6 logical encounters;
+- progressively stronger enemies and reward bands;
+- a distinct boss at each ordinary depth;
+- previous depth bosses return as minibosses on the final depth;
+- a new true final boss ends the final depth;
+- difficulty persists with the authoritative dungeon session;
+- completion unlocks the next depth for eligible players;
+- party entry validates every member's unlock;
+- existing run modifiers compose independently;
+- unbuilt higher depths fail closed rather than entering incomplete content;
+- Depth1 current gameplay remains backward compatible.
 
-Do not implement raid/world-boss/castle-siege, broad new class/profession
-systems, catch-up or Transmog as part of Phase 4.A.
+No modelling, meshes, terrain, authored rooms, visual polish or difficulty UI
+belongs in this gate. The approved design and implementation plan are under
+docs/superpowers for 18 September 2026.
 
 ## Safety and repository paths
 
