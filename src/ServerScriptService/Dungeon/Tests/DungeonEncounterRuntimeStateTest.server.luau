@@ -59,8 +59,6 @@ assert(sessions:set_instance_state(session.SessionId, {
     RareStateId = "HiddenCrypt",
     EventActive = true,
 }).ok)
-assert(sessions:mark_active(session.SessionId).ok)
-
 check(
     RuntimeState.checkpoint_id("CombatRoom1")
         == "EncounterStart:CombatRoom1",

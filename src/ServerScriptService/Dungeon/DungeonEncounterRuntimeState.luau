@@ -40,6 +40,50 @@ function DungeonEncounterRuntimeState.checkpoint_sequence(
     return nil
 end
 
+-- Persists the immutable materialized encounter plan exactly once.
+function DungeonEncounterRuntimeState.persist_plan(
+    session_service: any,
+    session_id: string,
+    encounters: {any}
+): any
+    if type(encounters) ~= "table" or #encounters == 0 then
+        return {
+            ok = false,
+            reason = "InvalidEncounterPlan",
+        }
+    end
+
+    return session_service:update_instance_state(
+        session_id,
+        function(instance_state: any): (any, any?)
+            local updated = if type(instance_state) == "table"
+                then instance_state
+                else {}
+
+            if type(updated.EncounterPlan) == "table" then
+                return updated, "EncounterPlanAlreadySet"
+            end
+
+            updated.EncounterPlan = clone_table(encounters)
+            return updated, nil
+        end
+    )
+end
+
+-- Returns a detached immutable materialized encounter plan when present.
+function DungeonEncounterRuntimeState.plan_from_session(
+    session: any
+): {any}?
+    if type(session) ~= "table"
+        or type(session.InstanceState) ~= "table"
+        or type(session.InstanceState.EncounterPlan) ~= "table"
+    then
+        return nil
+    end
+
+    return clone_table(session.InstanceState.EncounterPlan)
+end
+
 -- Persists encounter runtime state without replacing authored instance state.
 function DungeonEncounterRuntimeState.persist(
     session_service: any,
