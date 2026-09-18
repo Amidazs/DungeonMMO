@@ -1059,3 +1059,144 @@ docs/testing/phase3-systems-alpha-acceptance-record.md.
 
 Detailed evidence:
 `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`.
+
+
+<!-- PHASE4_GENERIC_DUNGEON_ENCOUNTER_RUNTIME_LOCAL_GREEN_20260918 -->
+## Phase 4 - Generic Dungeon Encounter Runtime
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT
+**Baseline:** `1e1574c`
+**Implementation checkpoint:** `5ba9f4d`
+
+### Generic runtime contract
+
+- [x] generic materialized encounter plan.
+- [x] arbitrary ordered encounter counts.
+- [x] one active encounter at a time.
+- [x] Pending -> Active -> Cleared/Skipped lifecycle.
+- [x] required versus optional completion semantics.
+- [x] stable encounter-ID checkpoints.
+- [x] persisted immutable materialized run plan.
+- [x] reconnect-safe encounter lifecycle reconstruction.
+- [x] Combat encounter kind.
+- [x] MiniBoss encounter kind.
+- [x] Boss encounter kind.
+- [x] FinalBoss encounter kind.
+- [x] EventBoss encounter kind.
+- [x] SecretBoss encounter kind.
+- [x] optional InsertBeforeId / InsertAfterId.
+- [x] server-owned InstanceFlag activation.
+- [x] server-owned RareState activation.
+- [x] required inserted encounter cannot be bypassed.
+- [x] inactive optional encounter is absent from the materialized plan.
+- [x] active optional encounter remains frozen into the run across reconnect.
+
+### Depth1 compatibility integration
+
+- [x] existing Room1/Room2/Boss physical triggers retained.
+- [x] existing CombatRoom1 EncounterService ID retained.
+- [x] existing CombatRoom2 EncounterService ID retained.
+- [x] existing MarauderCaptain EncounterService ID retained.
+- [x] logical boss ID decoupled as Depth1Boss.
+- [x] Depth1 physical room-slot bindings are explicit.
+- [x] unbound activated optional encounter fails with EncounterBindingMissing.
+- [x] legacy Room1Start checkpoint supported.
+- [x] legacy Room2Start checkpoint supported.
+- [x] legacy BossRoomStart checkpoint supported.
+- [x] stable EncounterStart:CombatRoom1 checkpoint supported.
+- [x] stable EncounterStart:CombatRoom2 checkpoint supported.
+- [x] stable EncounterStart:Depth1Boss checkpoint supported.
+- [x] live Dungeon progression authority no longer uses Room1/Room2/Boss clear
+      booleans.
+- [x] existing doors, rewards, Marauder/Captain/Foreman implementations remain
+      compatible.
+
+### Focused Studio evidence
+
+- [x] Dungeon Encounter Plan: 13 assertions PASS.
+- [x] Dungeon Encounter Sequencer: 22 assertions PASS.
+- [x] Dungeon Encounter Runtime State: 9 assertions PASS.
+- [x] Dungeon Encounter Runtime Controller: 19 assertions PASS.
+- [x] Depth1 Encounter Bindings: 14 assertions PASS.
+- [x] Depth1 Encounter Flow: 14 assertions PASS.
+- [x] Depth1 Encounter Recovery: 11 assertions PASS.
+- [x] Dungeon Recovery Rules: 18 assertions PASS.
+
+### Real live Dungeon acceptance
+
+Temporary validation-only harness, removed before final source checkpoint:
+
+- [x] real Room1 trigger entered.
+- [x] real Room1 enemies spawned and died through live Humanoids.
+- [x] CombatRoom1 persisted Cleared.
+- [x] stable Room2 checkpoint persisted.
+- [x] real Room2 trigger entered.
+- [x] real Room2 enemies spawned and died.
+- [x] CombatRoom2 persisted Cleared.
+- [x] stable Depth1Boss checkpoint persisted.
+- [x] real boss trigger entered.
+- [x] real Marauder Captain spawned and died.
+- [x] logical Depth1Boss persisted Cleared.
+- [x] generic flow reported complete.
+- [x] normal completion/save barrier committed.
+- [x] Generic Encounter Live Acceptance: 13 assertions PASS.
+- [x] temporary inspector/driver absent from final source.
+
+### Repository-wide validation
+
+- [x] `git diff --check`: PASS.
+- [x] repository parse: 481 Lua/Luau files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+- [x] source-boundary audit: 19 changed files, 0
+      art/model/mesh/terrain/image files.
+
+### Final committed Dungeon regression
+
+- [x] Dungeon Difficulty Definitions: 78 assertions PASS.
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Difficulty Session: 7 assertions PASS.
+- [x] Dungeon Difficulty Instance Director: 7 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Tuning: 10 assertions PASS.
+- [x] Dungeon Enemy Difficulty Scaling: 5 assertions PASS.
+- [x] Enemy Damage Multiplier Rules: 3 assertions PASS.
+- [x] Dungeon Difficulty Completion Unlock: 9 assertions PASS.
+- [x] Dungeon Modifier Definitions: 6 assertions PASS.
+- [x] Teleport Coordinator: 16 assertions PASS.
+- [x] Completion Service: 14 assertions PASS.
+- [x] Reward Service: 27 assertions PASS.
+- [x] Dungeon Session: PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors.
+
+### Final committed Base regression
+
+- [x] Dungeon Difficulty v13 Migration: 14 assertions PASS.
+- [x] Dungeon Difficulty Progression: 17 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] no project CreatorErrors.
+
+### Release qualification
+
+- [x] Depth2-Depth4 remain RuntimeReady=false.
+- [x] no Event/Secret boss content enabled.
+- [x] no modelling, meshes, terrain or authored-room work.
+- [x] no TEST/PROD Roblox publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] project-owner closeout decision.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+- [ ] TEST publish, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`.

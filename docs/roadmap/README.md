@@ -41,18 +41,26 @@ explicitly deferred.
 
 Roadmap v1.43 opened Phase 4 with Starting Base presentation as the first
 default gate. On 18 September 2026 the project owner explicitly parked modelling
-and presentation work and selected a backend-only **Progressive Dungeon Depth +
-Difficulty** gate instead.
+and presentation work and moved Phase 4 through backend-only Dungeon gates.
 
-That backend gate is now locally green at implementation checkpoint
+The **Progressive Dungeon Depth + Difficulty** foundation is locally green at
 `1230e6c`: schema v13 progression, 3/4/5/6 logical depths, authoritative
 solo/party/session routing, fail-closed higher depths, combat/reward scaling and
 completion unlock integration all passed the local acceptance matrix.
 
-The canonical DOCX remains v1.43 because this gate has not yet received a
-project-owner release/closeout decision and has not been pushed, merged or
-published. The local acceptance evidence is recorded in
-`docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`.
+The follow-on **Generic Dungeon Encounter Runtime** is locally green at
+`5ba9f4d`. The live Depth1 runtime now uses generic sequencer authority with
+stable encounter checkpoints and reconnect state. The backend supports
+Combat/MiniBoss/Boss/FinalBoss plus future EventBoss/SecretBoss insertion from
+server-owned conditions. Unbound optional content fails closed, no Event/Secret
+boss content is enabled, and Depth2-Depth4 remain `RuntimeReady = false`.
+
+The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
+received a project-owner release/closeout action and have not been pushed,
+merged or published. Local acceptance evidence is recorded in:
+
+- `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`;
+- `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

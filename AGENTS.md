@@ -29,12 +29,14 @@ modification and reconcile without destructive Git operations.
 - Phase 3 gameplay release: `84662948127eb1a37c9f184c6abbafe6f2daddb6`.
 - Phase 3 documentation closeout: `a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9`.
 - Phase 4 - Content Alpha: ACTIVE.
-- Progressive Dungeon depth + difficulty backend gate: LOCAL GREEN.
-- Gate implementation checkpoint: `1230e6c`.
+- Progressive Dungeon depth + difficulty backend foundation: LOCAL GREEN.
+- Progressive-depth checkpoint: `1230e6c`.
+- Generic Dungeon encounter runtime gate: LOCAL GREEN.
+- Generic-runtime implementation checkpoint: `5ba9f4d`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-dungeon-depth-difficulty-v1`.
+- Active branch: `wip/phase-4-generic-encounter-runtime-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterRuntime_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -102,14 +104,14 @@ TEST-only debug hooks must remain rejected or disabled in PROD.
 
 ## Selected next-gate discipline
 
-The progressive Dungeon depth + difficulty backend foundation defined in:
+The generic Dungeon encounter runtime defined in:
 
-- `docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md`;
-- `docs/superpowers/plans/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-implementation.md`.
+- `docs/superpowers/specs/2026-09-18-phase-4-generic-dungeon-encounter-runtime-design.md`;
+- `docs/superpowers/plans/2026-09-18-phase-4-generic-dungeon-encounter-runtime-implementation.md`.
 
-is locally green at `1230e6c`. Do not silently extend it or mark higher depths
-runtime-ready. Await the project owner's closeout/next-gate instruction before
-push, merge, publish or new implementation.
+is locally green at `5ba9f4d`. Do not push, merge, publish, enable higher
+depths, or enable Event/Secret boss content without a deliberate next action
+from the project owner.
 
 Locked rules that carry forward:
 
@@ -127,6 +129,16 @@ Locked rules that carry forward:
 - A completed Depth1 may unlock Depth2 logically while Depth2 entry still fails
   closed until runtime content is deliberately accepted.
 - No client may supply authoritative difficulty tuning values.
+- Live Dungeon progression authority is the generic encounter sequencer, not
+  Room1/Room2/Boss booleans.
+- Supported encounter kinds include Combat, MiniBoss, Boss, FinalBoss,
+  EventBoss and SecretBoss.
+- Optional Event/Secret encounters are inserted only from server-owned
+  instance-state conditions and are frozen into the materialized run plan.
+- Required inserted encounters cannot be bypassed by later room triggers.
+- Current Depth1 physical bindings fail closed when an activated encounter has
+  no authored room/spawn/checkpoint binding.
+- No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.
 

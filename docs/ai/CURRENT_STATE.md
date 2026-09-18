@@ -106,57 +106,72 @@ Two roadmap concepts were intentionally not implemented:
 
 These are future work, not missing Phase 3 exit criteria.
 
-## Phase 4 progressive-depth backend gate
+## Phase 4 backend gates
 
 Phase 4 - Content Alpha remains active.
 
 The user has explicitly parked Starting Base presentation, modelling, meshes and
 environment-art work for now.
 
-The **Progressive Dungeon Depth + Difficulty backend foundation** is now
+The **Progressive Dungeon Depth + Difficulty backend foundation** remains local
+green at `1230e6c`. It provides schema v13 depth progression, authoritative
+difficulty routing, 3/4/5/6 logical-depth definitions, scaling and fail-closed
+Depth2-Depth4 content.
+
+The follow-on **Generic Dungeon Encounter Runtime** gate is now
 **LOCAL GREEN / AWAITING PROJECT-OWNER CLOSEOUT**.
 
 Implementation checkpoint:
 
-`1230e6c`
+`5ba9f4d`
 
 Accepted local engineering result:
 
-- Depth1/2/3/4 expose progressively deeper 3/4/5/6-encounter logical plans;
-- each depth has monotonic server-owned health, damage and reward scaling;
-- the final depth reuses the three earlier bosses as minibosses before a new
-  true final boss;
-- Fortified, Rich Deposits and Bounty remain independent run modifiers;
-- Fortified composes with depth HP and Bounty applies after depth reward
-  scaling;
-- schema v13 stores difficulty progress separately from legacy
-  `DungeonProgress`;
-- completion records sequential, idempotent clears before the save barrier;
-- solo/party/session/reconnect/TeleportData contracts carry and validate
-  difficulty;
-- Depth1 remains the current runtime-ready compatibility baseline;
-- Depth2-Depth4 remain `RuntimeReady = false` and fail closed until their
-  physical/runtime content exists;
-- no modelling, meshes, terrain, authored-room or environment-art work was
+- live Depth1 Room1 -> Room2 -> Boss progression authority is now the generic
+  encounter sequencer rather than hard-coded clear booleans;
+- arbitrary ordered encounter counts are supported by the generic controller;
+- encounter kinds include Combat, MiniBoss, Boss, FinalBoss, EventBoss and
+  SecretBoss;
+- optional encounters support deterministic before/after insertion;
+- Event/Secret activation is evaluated only from server-owned InstanceState;
+- materialized encounter plans are persisted so reconnect cannot reroll an
+  Event/Secret encounter that already exists in the run;
+- required inserted encounters cannot be bypassed by later room triggers;
+- stable encounter-derived checkpoints coexist with legacy Room1/Room2/Boss
+  checkpoint aliases;
+- existing EncounterService IDs, enemy/reward implementations, doors and
+  Captain/Foreman implementations remain compatible;
+- current Depth1 physical bindings fail closed if an activated optional
+  encounter lacks an explicit authored room/spawn/checkpoint binding;
+- no Event/Secret boss content is enabled yet;
+- Depth2-Depth4 remain `RuntimeReady = false`;
+- no modelling, meshes, terrain, authored rooms or environment-art work was
   performed.
 
-Final local evidence includes 467 Luau files parsed with 0 failures, clean
-`git diff --check`, all four Rojo compositions building, final Base/Dungeon
-Studio suites green, and the Phase 3 stress harness still passing.
+Final local evidence includes:
+
+- **481** Lua/Luau files parsed with 0 failures;
+- clean `git diff --check`;
+- all four Rojo compositions building;
+- final committed Dungeon and Base Studio suites green with no project errors;
+- Phase 3 stress harness still passing in both final compositions;
+- temporary real-trigger/live-enemy acceptance PASS with **13 assertions**;
+- source-boundary audit: **19 changed files, 0 art/model/mesh/terrain/image
+  files**.
 
 Active worktree:
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_DungeonDepth_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EncounterRuntime_v1
 
 Active branch:
-wip/phase-4-dungeon-depth-difficulty-v1
+wip/phase-4-generic-encounter-runtime-v1
 
 Design/spec:
-docs/superpowers/specs/2026-09-18-phase-4-progressive-dungeon-depth-difficulty-design.md
+docs/superpowers/specs/2026-09-18-phase-4-generic-dungeon-encounter-runtime-design.md
 
 Acceptance evidence:
-docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md
+docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md
 
-No push, merge or Roblox publish has been performed for this Phase 4 gate.
+No push, merge or Roblox publish has been performed for this gate.
 
 ## Repository safety
 
