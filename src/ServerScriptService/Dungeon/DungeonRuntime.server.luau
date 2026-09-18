@@ -942,6 +942,8 @@ local function admit_player(player: Player)
                     studio_class_id = "Mage"
                 elseif requested_studio_class == "Ranger" then
                     studio_class_id = "Ranger"
+                elseif requested_studio_class == "Rogue" then
+                    studio_class_id = "Rogue"
                 end
 
                 local class_result =
