@@ -107,6 +107,13 @@ anchors. Generic encounter spawning and recovery no longer require Temple/Mine
 room-ID translation maps, so future Room4+ combat slots can be registered
 without editing dungeon-specific adapter maps.
 
+The follow-on **Selected-Layout Environment Contract** gate is locally green at
+`405dde5`. Runtime environment resolution now derives exact room anchors and
+combat spawn groups from the selected physical layout. A synthetic Room4
+contract resolves through the real EnvironmentAnchorResolver, removing the
+remaining static Depth1 contract dependency from production bootstrap/router
+resolution.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -118,7 +125,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-runtime-content-readiness-acceptance-record.md`;
 - `docs/testing/phase4-enemy-archetype-combat-pack-acceptance-record.md`;
 - `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`;
-- `docs/testing/phase4-environment-binding-runtime-acceptance-record.md`.
+- `docs/testing/phase4-environment-binding-runtime-acceptance-record.md`;
+- `docs/testing/phase4-layout-environment-contract-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

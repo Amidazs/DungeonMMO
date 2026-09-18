@@ -45,10 +45,12 @@ modification and reconcile without destructive Git operations.
 - Runtime-layout implementation checkpoint: `ccd289b`.
 - Environment binding runtime gate: LOCAL GREEN.
 - Environment-binding implementation checkpoint: `cfbf2ea`.
+- Layout-derived environment contract gate: LOCAL GREEN.
+- Layout-environment implementation checkpoint: `405dde5`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-environment-binding-runtime-v1`.
+- Active branch: `wip/phase-4-layout-environment-contract-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnvironmentBindingRuntime_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -124,6 +126,7 @@ The generic enemy archetype/combat-pack registry is locally green at
 The runtime layout-selection/environment-activation gate is locally green at
 `ccd289b`.
 The environment binding runtime gate is locally green at `cfbf2ea`.
+The layout-derived environment contract gate is locally green at `405dde5`.
 
 Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
 content without a deliberate next action from the project owner. Continue
@@ -187,6 +190,9 @@ Locked rules that carry forward:
 - Generic encounter barrier progression must use binding-owned
   ExitBarrierAnchor data; do not translate logical room IDs through
   dungeon-specific barrier maps.
+- Production environment resolution must derive room exact anchors and spawn
+  groups from the selected registered layout, not static Depth1 contracts.
+- Combat slots must own spawn-group name, prefix and minimum anchor count.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

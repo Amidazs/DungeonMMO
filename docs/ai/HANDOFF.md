@@ -301,6 +301,36 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Selected-Layout Environment Contract** gate is locally complete
+and green at:
+
+`405dde5`
+
+Accepted proof now also includes:
+
+- production room-anchor resolution derived from the selected physical layout;
+- combat spawn-group prefix/minimum metadata owned by physical slots;
+- runtime base contracts reduced to environment-wide completion/return anchors;
+- bootstrap and router using the same selected-layout contract builder;
+- legacy adapter full-contract compatibility preserved;
+- synthetic Room4 resolution through the real EnvironmentAnchorResolver:
+  14 assertions PASS;
+- Encounter Bindings: 34 assertions PASS;
+- Runtime Content Readiness: 64 assertions PASS;
+- clean-repeat Combat Target Rules: 9 assertions PASS;
+- 514 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base regression green;
+- clean-repeat committed Dungeon regression green;
+- Phase 3 Systems Stress remains green;
+- 9 source/test files from `87a88c1`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-layout-environment-contract-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
@@ -308,13 +338,14 @@ backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
 If backend-only work continues before modelling, audit the remaining
-Depth2-Depth4 dependencies from `cfbf2ea` before creating another abstraction.
+Depth2-Depth4 dependencies from `405dde5` before creating another abstraction.
 
 The encounter sequence, execution registry, physical bindings, readiness
 authority, enemy-pack/factory layer, runtime layout selection, environment
-activation, combat spawn-group lookup and exit-barrier progression are now
-generic. The next gate should target only a concrete remaining dependency that
-would still force depth-specific runtime code.
+activation, combat spawn-group lookup, exit-barrier progression and environment
+anchor/group resolution are now generic. The next gate should target only a
+concrete remaining dependency or move into deliberate higher-depth content
+definitions.
 
 Carry forward these readiness rules:
 
@@ -334,13 +365,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 environment-binding-runtime worktree:
+Active Phase 4 layout-environment-contract worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnvironmentBindingRuntime_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1
 
 Active branch:
 
-wip/phase-4-environment-binding-runtime-v1
+wip/phase-4-layout-environment-contract-v1
 
 Phase 3 completion worktree:
 

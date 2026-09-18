@@ -452,14 +452,67 @@ Final committed acceptance from `cfbf2ea` includes:
 - source-boundary audit: **11 source/test files, 0
   art/model/mesh/terrain/image files**.
 
-Active worktree:
+Prior environment-binding-runtime worktree:
 C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_EnvironmentBindingRuntime_v1
 
-Active branch:
+Prior environment-binding-runtime branch:
 wip/phase-4-environment-binding-runtime-v1
 
 Acceptance evidence:
 docs/testing/phase4-environment-binding-runtime-acceptance-record.md
+
+No push, merge or Roblox publish has been performed for this gate.
+
+The follow-on **Selected-Layout Environment Contract** gate is now
+**LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT** at:
+
+`405dde5`
+
+Accepted local engineering result:
+
+- production environment resolution now derives room exact anchors from the
+  selected physical layout;
+- combat slots own spawn-group name, prefix and minimum anchor count;
+- runtime base contracts contain only environment-wide completion/return
+  anchors;
+- DungeonEnvironmentBootstrap resolves the selected-layout contract;
+- DungeonEnvironmentRouter rebuilds the same selected-layout contract before
+  constructing the gameplay adapter;
+- legacy full Temple/Mine contracts remain available for compatibility callers;
+- a synthetic Room4 contract is visible to the real EnvironmentAnchorResolver;
+- insufficient Room4 spawn anchors fail closed;
+- current Depth1 boot/admission behavior remains compatible;
+- Depth2-Depth4 remain release-disabled/content-incomplete;
+- no modelling, meshes, terrain or authored-room work was performed.
+
+Final committed acceptance from `405dde5` includes:
+
+- **514** Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions building;
+- Layout Environment Contract: **14 assertions PASS**;
+- Encounter Bindings: **34 assertions PASS**;
+- Combat Pack Encounter Executor: **15 assertions PASS**;
+- Phase2A Failure Path: **24 assertions PASS**;
+- Teleport Coordinator: **19 assertions PASS**;
+- Dungeon Difficulty Teleport: **7 assertions PASS**;
+- Dungeon Difficulty Progression: **19 assertions PASS**;
+- Runtime Content Readiness: **64 assertions PASS**;
+- final committed Base regression green;
+- clean-repeat committed Dungeon regression green;
+- Combat Target Rules clean repeat: **9 assertions PASS**;
+- Phase 3 Systems Stress green;
+- live Dungeon Studio player admission succeeded;
+- source-boundary audit: **9 source/test files, 0
+  art/model/mesh/terrain/image files**.
+
+Active worktree:
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_LayoutEnvironmentContract_v1
+
+Active branch:
+wip/phase-4-layout-environment-contract-v1
+
+Acceptance evidence:
+docs/testing/phase4-layout-environment-contract-acceptance-record.md
 
 No push, merge or Roblox publish has been performed for this gate.
 
