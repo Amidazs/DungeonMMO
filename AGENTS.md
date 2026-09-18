@@ -53,10 +53,12 @@ modification and reconcile without destructive Git operations.
 - Depth2-content implementation checkpoint: `b525235`.
 - Depth3 backend combat + boss content gate: LOCAL GREEN.
 - Depth3-content implementation checkpoint: `092bd99`.
+- Depth4 final-difficulty backend content gate: LOCAL GREEN.
+- Depth4-content implementation checkpoint: `8bcb58b`.
 - Gate release state: not pushed, merged or published.
-- Active branch: `wip/phase-4-depth3-content-v1`.
+- Active branch: `wip/phase-4-depth4-content-v1`.
 - Active worktree:
-  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth3Content_v1`.
+  `C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth4Content_v1`.
 
 The user has explicitly parked modelling, meshes and Starting Base presentation
 work for now. Do not reopen accepted Phase 1-3 architecture unless a real
@@ -136,11 +138,12 @@ The layout-derived environment contract gate is locally green at `405dde5`.
 The Studio difficulty/session parity gate is locally green at `d9297f8`.
 The Depth2 backend content gate is locally green at `b525235`.
 The Depth3 backend content gate is locally green at `092bd99`.
+The Depth4 final-difficulty content gate is locally green at `8bcb58b`.
 
-Do not push, merge, publish, enable higher depths, or enable Event/Secret boss
-content without a deliberate next action from the project owner. Continue
-backend-only content work with Depth4 while keeping every unauthored depth
-release-disabled.
+Do not push, merge, publish, enable higher-depth physical layouts, or enable
+Event/Secret boss content without a deliberate next action from the project
+owner. Depth1-Depth4 backend encounter content is now registered; keep every
+unauthored higher-depth physical layout release-disabled.
 
 Locked rules that carry forward:
 
@@ -204,9 +207,11 @@ Locked rules that carry forward:
 - Combat slots must own spawn-group name, prefix and minimum anchor count.
 - Studio-created dungeon sessions must preserve the same selected DifficultyId
   as the environment/runtime selection path.
-- Depth2 and Depth3 encounter content is registered for both current dungeons,
-  but both depths remain physically unregistered and release-disabled.
-- Depth4 remains content-incomplete and release-disabled.
+- Depth2, Depth3 and Depth4 encounter content is registered for both current
+  dungeons, but all three depths remain physically unregistered and
+  release-disabled.
+- Depth4 preserves the locked Depth1 -> Depth2 -> Depth3 miniboss chain before
+  its new true final boss.
 - No Event/Secret boss content is enabled yet.
 - No modelling, meshes, terrain, room authoring or visual-content work belongs
   in this gate.

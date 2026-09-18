@@ -2292,3 +2292,123 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-depth3-content-acceptance-record.md`.
+
+
+<!-- PHASE4_DEPTH4_CONTENT_LOCAL_GREEN_20260918 -->
+## Phase 4 - Depth4 Final-Difficulty Backend Content
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `230f7f5`
+**RED checkpoint:** `8c3b8c2`
+**Implementation checkpoint:** `8bcb58b`
+
+### Test-first content contract
+
+- [x] RED captured before implementation.
+- [x] missing Depth4 combat pack failed as expected.
+- [x] missing TempleDepth4BossFactory failed as expected.
+- [x] Depth4 readiness reported missing encounter content before implementation.
+
+### Depth4 combat content
+
+- [x] TestDungeon Depth4Room1 registered with 5 Marauders.
+- [x] TestDungeon Depth4Room3 registered with 7 Marauders.
+- [x] AbandonedMine Depth4Room1 registered with 5 Marauders.
+- [x] AbandonedMine Depth4Room3 registered with 7 Marauders.
+- [x] Mine Deep Echoes adds one Depth4 Room1 Marauder.
+- [x] Mine Crystal Bloom adds one Depth4 Room3 Marauder.
+- [x] Depth4 Content: 38 assertions PASS.
+### Locked miniboss chain
+
+- [x] Depth4 keeps six logical encounters.
+- [x] Room2 reuses DifficultyBossIds[1] as MiniBoss.
+- [x] Room4 reuses DifficultyBossIds[2] as MiniBoss.
+- [x] Room5 reuses DifficultyBossIds[3] as MiniBoss.
+- [x] Room6 uses DifficultyBossIds[4] as FinalBoss.
+- [x] no replacement miniboss factories introduced.
+
+### Depth4 final-boss content
+
+- [x] TempleDepth4Boss registered.
+- [x] TempleDepth4Boss display identity: Sanctum Ascendant.
+- [x] AbandonedMineDepth4Boss registered.
+- [x] AbandonedMineDepth4Boss display identity: Buried Tyrant.
+- [x] both factories registered in execution bootstrap.
+- [x] both final bosses preserve BossRole = FinalBoss.
+- [x] both retain accepted Captain controller behavior/tag.
+- [x] Depth4 Boss Factory: 10 assertions PASS.
+- [x] Encounter Spawn Catalog: 20 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+### Readiness boundary
+
+- [x] Depth2, Depth3 and Depth4 remain Ready = false.
+- [x] Depth2, Depth3 and Depth4 remain ReleaseEnabled = false.
+- [x] no higher depth reports EncounterContentNotRegistered.
+- [x] Depth2/Depth3/Depth4 each report exactly one issue:
+  DungeonLayoutNotRegistered.
+- [x] all Depth1-Depth4 encounter content is registered.
+- [x] no Depth2/Depth3/Depth4 physical layout registered.
+- [x] Runtime Content Readiness: 70 assertions PASS.
+
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `8bcb58b`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 526 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+### Final committed Base regression
+
+- [x] verified PlayServer/PlayClient run.
+- [x] Runtime Content Readiness: 70 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+
+### Final committed Dungeon regression
+
+- [x] verified PlayServer/PlayClient run.
+- [x] Depth4 Content: 38 assertions PASS.
+- [x] Depth4 Boss Factory: 10 assertions PASS.
+- [x] Depth3 Content: 36 assertions PASS.
+- [x] Depth3 Boss Factory: 8 assertions PASS.
+- [x] Depth2 Content: 32 assertions PASS.
+- [x] Depth2 Boss Factory: 8 assertions PASS.
+- [x] Encounter Spawn Catalog: 20 assertions PASS.
+- [x] Encounter Executors: 21 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Layout Environment Contract: 14 assertions PASS.
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Phase2A Failure Path: 24 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Progression: 19 assertions PASS.
+- [x] Runtime Content Readiness: 70 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+### Release qualification
+
+- [x] Depth2-Depth4 remain release-disabled.
+- [x] Depth2-Depth4 remain physically unregistered.
+- [x] all Depth1-Depth4 backend encounter content registered.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 10 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-depth4-content-acceptance-record.md`.

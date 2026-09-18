@@ -424,6 +424,41 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Depth4 Final-Difficulty Backend Content** gate is locally
+complete and green at:
+
+`8bcb58b`
+
+Accepted proof now also includes:
+
+- two registered Depth4 combat packs per current dungeon;
+- 5/7 Marauder base counts;
+- Mine Deep Echoes and Crystal Bloom Depth4 bonus preservation;
+- the locked Depth1 -> Depth2 -> Depth3 miniboss reuse chain;
+- TempleDepth4Boss / Sanctum Ascendant final-boss identity;
+- AbandonedMineDepth4Boss / Buried Tyrant final-boss identity;
+- both final bosses preserving BossRole = FinalBoss;
+- Depth2, Depth3 and Depth4 readiness failing only on
+  DungeonLayoutNotRegistered;
+- all Depth1-Depth4 encounter content registered;
+- Depth2-Depth4 remaining release-disabled and physically unregistered;
+- Depth4 Content: 38 assertions PASS;
+- Depth4 Boss Factory: 10 assertions PASS;
+- Encounter Spawn Catalog: 20 assertions PASS;
+- Encounter Executors: 21 assertions PASS;
+- Runtime Content Readiness: 70 assertions PASS;
+- 526 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- 10 source/test files from `230f7f5`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-depth4-content-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
@@ -431,13 +466,14 @@ backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
 Generic higher-depth framework blockers remain cleared through
-`d9297f8`; Depth2 content is complete at `b525235` and Depth3 content is
-complete at `092bd99`.
+`d9297f8`; Depth2 content is complete at `b525235`, Depth3 content at
+`092bd99`, and Depth4 final-difficulty content at `8bcb58b`.
 
-Continue backend-only work with Depth4 content. Preserve the locked rule that
-the final depth reuses earlier difficulty bosses as minibosses before the new
-true final boss. Keep Depth2-Depth4 release-disabled and do not register
-physical layouts until authored rooms exist.
+Depth1-Depth4 backend encounter content is now complete for both current
+dungeons. Keep Depth2-Depth4 release-disabled and do not register physical
+layouts until authored rooms exist. The next backend-only dungeon gate may
+cover Event/Secret boss content and insertion policy without authoring models or
+rooms.
 
 Carry forward these readiness rules:
 
@@ -457,13 +493,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 Depth3-content worktree:
+Active Phase 4 Depth4-content worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth3Content_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth4Content_v1
 
 Active branch:
 
-wip/phase-4-depth3-content-v1
+wip/phase-4-depth4-content-v1
 
 Phase 3 completion worktree:
 
