@@ -59,6 +59,9 @@ export type CreateOptions = {
     RewardGoldMin: number?,
     RewardGoldMax: number?,
     BestiaryCreatureId: string?,
+    HealthMultiplier: number?,
+    DamageMultiplier: number?,
+    BossRole: string?,
 }
 
 function MarauderCaptainFactory.create(options: CreateOptions): Model
@@ -81,6 +84,14 @@ function MarauderCaptainFactory.create(options: CreateOptions): Model
 
     captain:SetAttribute("Boss", true)
     captain:SetAttribute("BossId", "MarauderCaptain")
+    captain:SetAttribute(
+        "DungeonBossRole",
+        options.BossRole or "Boss"
+    )
+    captain:SetAttribute(
+        "DungeonDamageMultiplier",
+        math.max(0, tonumber(options.DamageMultiplier) or 1)
+    )
     captain:SetAttribute("AttackTelegraph", false)
     captain:SetAttribute("AttackName", "")
     captain:SetAttribute("MarauderAIState", "Idle")
@@ -88,8 +99,14 @@ function MarauderCaptainFactory.create(options: CreateOptions): Model
 
     local humanoid = captain:FindFirstChildOfClass("Humanoid")
     assert(humanoid ~= nil, "MarauderCaptain requires Humanoid")
-    humanoid.MaxHealth = MarauderCaptainFactory.MAX_HEALTH
-    humanoid.Health = MarauderCaptainFactory.MAX_HEALTH
+    local health_multiplier = math.max(
+        0.01,
+        tonumber(options.HealthMultiplier) or 1
+    )
+    local max_health =
+        MarauderCaptainFactory.MAX_HEALTH * health_multiplier
+    humanoid.MaxHealth = max_health
+    humanoid.Health = max_health
     humanoid.DisplayName = "Marauder Captain"
 
     local body = captain:FindFirstChild("Body")

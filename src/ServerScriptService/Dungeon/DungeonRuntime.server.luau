@@ -25,6 +25,9 @@ local CharacterIdentityRules = require(
 )
 local CombatConfig = require(SharedCombat:WaitForChild("CombatConfig"))
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local DungeonDifficultyTuning = require(
+    Services:WaitForChild("DungeonDifficultyTuning")
+)
 local ProgressionService = require(Services:WaitForChild("ProgressionService"))
 local ProficiencyService = require(Services:WaitForChild("ProficiencyService"))
 local ProfessionRuntime = require(Services:WaitForChild("ProfessionRuntime"))
@@ -301,6 +304,25 @@ local function active_modifier_id(): string?
     return if modifier then modifier.Id else nil
 end
 
+local function active_difficulty_tuning(): any
+    local session = current_session()
+    local difficulty_id = session
+        and session.Difficulty
+        and session.Difficulty.Id
+    local tuning = DungeonDifficultyTuning.resolve(
+        active_definition.Id,
+        if type(difficulty_id) == "string"
+            then difficulty_id
+            else nil,
+        active_modifier_id()
+    )
+    assert(
+        tuning ~= nil,
+        "Active dungeon difficulty tuning could not be resolved."
+    )
+    return tuning
+end
+
 local function member_user_ids(): {number}
     local result = {}
     local session = current_session()
@@ -326,8 +348,12 @@ local function spawn_marauder(
     spawn_cframe: CFrame,
     spawn_index: number
 ): Model
-    local reward = active_definition.StandardMarauderReward
-    local modifier = active_modifier()
+    local tuning = active_difficulty_tuning()
+    local reward = DungeonDifficultyTuning.scale_monster_reward(
+        active_definition.StandardMarauderReward,
+        tuning
+    )
+
     return DungeonMarauderFactory.create({
         Parent = enemies_folder,
         Name = enemy_id,
@@ -342,9 +368,8 @@ local function spawn_marauder(
         RewardGoldMin = reward.GoldMin,
         RewardGoldMax = reward.GoldMax,
         BaseMaxHealth = active_definition.StandardMarauderMaxHealth,
-        HealthMultiplier = if modifier
-            then modifier.EnemyHealthMultiplier
-            else 1,
+        HealthMultiplier = tuning.EnemyHealthMultiplier,
+        DamageMultiplier = tuning.EnemyDamageMultiplier,
         BestiaryCreatureId = reward.BestiaryCreatureId,
     })
 end
@@ -618,9 +643,26 @@ local function start_boss()
     boss_started = true
     sync_all_character_encounters("MarauderCaptain")
     sessions:set_runtime_progress(active_session_id, "MarauderCaptain", "MarauderCaptain")
-    local reward = active_definition.MarauderCaptainReward
-    local boss_factory = if active_definition.Id == "AbandonedMine" then MineForemanFactory else MarauderCaptainFactory
-    local captain = boss_factory.create({Parent=enemies_folder,SpawnCFrame=environment:captain_spawn_cframe(),EncounterId="MarauderCaptain",RewardXP=reward.XP,RewardGoldMin=reward.GoldMin,RewardGoldMax=reward.GoldMax,BestiaryCreatureId=reward.BestiaryCreatureId})
+    local tuning = active_difficulty_tuning()
+    local reward = DungeonDifficultyTuning.scale_monster_reward(
+        active_definition.MarauderCaptainReward,
+        tuning
+    )
+    local boss_factory = if active_definition.Id == "AbandonedMine"
+        then MineForemanFactory
+        else MarauderCaptainFactory
+    local captain = boss_factory.create({
+        Parent = enemies_folder,
+        SpawnCFrame = environment:captain_spawn_cframe(),
+        EncounterId = "MarauderCaptain",
+        RewardXP = reward.XP,
+        RewardGoldMin = reward.GoldMin,
+        RewardGoldMax = reward.GoldMax,
+        BestiaryCreatureId = reward.BestiaryCreatureId,
+        HealthMultiplier = tuning.EnemyHealthMultiplier,
+        DamageMultiplier = tuning.EnemyDamageMultiplier,
+        BossRole = "Boss",
+    })
     active_captain = captain
     local started = encounter_service:start("MarauderCaptain", member_user_ids(), {captain})
     if not started.ok then error("Captain encounter failed: " .. tostring(started.reason)) end
@@ -734,6 +776,13 @@ local function initialize_session_services(session: any): (any?, boolean)
         if session.InstanceState.EventActive==true then completion_reward=active_definition.EventCompletionReward elseif session.InstanceState.RareStateId=="CrystalBloom" then completion_reward=active_definition.RareCompletionReward end
         print(string.format("[Second Dungeon State] %s | Module1=%s | Module2=%s | Rare=%s | Event=%s",active_definition.DisplayName,tostring(session.InstanceState.Module1Id),tostring(session.InstanceState.Module2Id),tostring(session.InstanceState.RareStateId),tostring(session.InstanceState.EventId)))
     end
+    local tuning = active_difficulty_tuning()
+    completion_reward =
+        DungeonDifficultyTuning.scale_completion_reward(
+            completion_reward,
+            tuning
+        )
+
     local recovery_plan = apply_recovery_plan(session)
     completion_service = CompletionService.new(
         sessions,

@@ -8,6 +8,9 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Combat = ServerScriptService:WaitForChild("Combat")
 local Dungeon = ServerScriptService:WaitForChild("Dungeon")
 local DamageService = require(Combat:WaitForChild("DamageService"))
+local EnemyDamageMultiplierRules = require(
+    Combat:WaitForChild("EnemyDamageMultiplierRules")
+)
 local DefenseService = require(Combat:WaitForChild("DefenseService"))
 local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
@@ -107,7 +110,9 @@ local function resolve_hit(runtime: Runtime, player: Player, character: Model, a
             source_id = attack_name,
             attack_id = attack_name,
             base_damage = definition.HEALTH_DAMAGE,
-            multiplier = 1,
+            multiplier = EnemyDamageMultiplierRules.get(
+                runtime.model
+            ),
             sequence_id = runtime.attackSequence,
         })
     end

@@ -25,6 +25,15 @@ function DungeonMarauderFactory.create(options: any): Model
     humanoid.MaxHealth = max_health
     humanoid.Health = max_health
 
+    local damage_multiplier = math.max(
+        0,
+        tonumber(options.DamageMultiplier) or 1
+    )
+    marauder:SetAttribute(
+        "DungeonDamageMultiplier",
+        damage_multiplier
+    )
+
     return marauder
 end
 

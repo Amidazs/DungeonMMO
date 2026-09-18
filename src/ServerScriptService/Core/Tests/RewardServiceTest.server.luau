@@ -17,6 +17,9 @@ local ProfileService = require(Services:WaitForChild("ProfileService"))
 local ProgressionService = require(Services:WaitForChild("ProgressionService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RewardService = require(service_module)
+local DungeonDifficultyTuning = require(
+    Services:WaitForChild("DungeonDifficultyTuning")
+)
 local LootTableConfig = require(Shared:WaitForChild("LootTableConfig"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
 
@@ -73,6 +76,37 @@ local bounty_repeat = rewards:grant_monster_reward(
     "Monster:bounty:1"
 )
 check(bounty_repeat.ok == true and bounty_repeat.already_applied == true, "Bounty replay must remain idempotent.")
+
+local depth4_bounty_tuning = assert(
+    DungeonDifficultyTuning.resolve(
+        "TestDungeon",
+        "Depth4",
+        "Bounty"
+    )
+)
+local depth4_bounty_reward =
+    DungeonDifficultyTuning.scale_monster_reward(
+        {
+            XP = 10,
+            GoldMin = 10,
+            GoldMax = 10,
+        },
+        depth4_bounty_tuning
+    )
+depth4_bounty_reward.DungeonModifierId = "Bounty"
+local composed_bounty = rewards:grant_monster_reward(
+    {3002},
+    depth4_bounty_reward,
+    "Monster:depth4-bounty:1"
+)
+check(
+    composed_bounty.ok == true,
+    "Depth4 plus Bounty monster reward must succeed."
+)
+check(
+    composed_bounty.member_results["3002"].gold_granted == 17,
+    "Depth4 reward scaling must apply before Bounty: 10 -> 15 -> 17."
+)
 
 local reward_definition = {
     Gold = DungeonDefinitions.TEST_DUNGEON.CompletionGold,

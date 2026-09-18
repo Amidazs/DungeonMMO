@@ -12,6 +12,9 @@ local AggroGraceRules = require(
     script.Parent:WaitForChild("AggroGraceRules")
 )
 local DamageService = require(script.Parent:WaitForChild("DamageService"))
+local EnemyDamageMultiplierRules = require(
+    script.Parent:WaitForChild("EnemyDamageMultiplierRules")
+)
 local DefenseService = require(script.Parent:WaitForChild("DefenseService"))
 local CombatValidationService = require(
     script.Parent:WaitForChild("CombatValidationService")
@@ -577,7 +580,9 @@ local function resolve_strike(
             source_id = source_id,
             attack_id = nil,
             base_damage = attack_definition.HEALTH_DAMAGE,
-            multiplier = 1,
+            multiplier = EnemyDamageMultiplierRules.get(
+                runtime.model
+            ),
             sequence_id = runtime.life_sequence,
         })
     end
