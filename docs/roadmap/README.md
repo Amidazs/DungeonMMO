@@ -121,6 +121,12 @@ DungeonInstanceDirector and Studio routing data. This closes the final
 demonstrated generic higher-depth framework mismatch before deliberate
 Depth2-Depth4 content registration.
 
+The follow-on **Depth2 Backend Combat + Boss Content** gate is locally green at
+`b525235`. Both current dungeons now have registered Depth2 combat packs and
+distinct Depth2 boss identities/factories. Depth2 readiness now fails only
+because its physical layout is deliberately absent; the release switch remains
+disabled. No higher-depth room geometry or anchors were authored.
+
 The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
 received a project-owner release/closeout action and have not been pushed,
 merged or published. Local acceptance evidence is recorded in:
@@ -134,7 +140,8 @@ merged or published. Local acceptance evidence is recorded in:
 - `docs/testing/phase4-runtime-layout-selection-acceptance-record.md`;
 - `docs/testing/phase4-environment-binding-runtime-acceptance-record.md`;
 - `docs/testing/phase4-layout-environment-contract-acceptance-record.md`;
-- `docs/testing/phase4-studio-difficulty-parity-acceptance-record.md`.
+- `docs/testing/phase4-studio-difficulty-parity-acceptance-record.md`;
+- `docs/testing/phase4-depth2-content-acceptance-record.md`.
 
 `docs/ai/CURRENT_STATE.md` is the fast engineering-status layer. It does not
 replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.

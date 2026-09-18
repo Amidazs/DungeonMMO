@@ -2075,3 +2075,109 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-studio-difficulty-parity-acceptance-record.md`.
+
+
+<!-- PHASE4_DEPTH2_CONTENT_LOCAL_GREEN_20260918 -->
+## Phase 4 - Depth2 Backend Combat + Boss Content
+
+**Status:** LOCAL GREEN / AWAITING PROJECT-OWNER RELEASE CLOSEOUT
+**Baseline:** `468cf76`
+**RED checkpoint:** `dad8990`
+**Implementation checkpoint:** `b525235`
+
+### Test-first content contract
+
+- [x] RED captured before implementation.
+- [x] missing Depth2 combat packs failed as expected.
+- [x] missing TempleDepth2BossFactory failed as expected.
+- [x] Depth2 readiness reported missing encounter content before implementation.
+
+### Depth2 combat content
+
+- [x] TestDungeon Depth2Room1 registered with 3 Marauders.
+- [x] TestDungeon Depth2Room2 registered with 4 Marauders.
+- [x] TestDungeon Depth2Room3 registered with 5 Marauders.
+- [x] AbandonedMine Depth2Room1 registered with 3 Marauders.
+- [x] AbandonedMine Depth2Room2 registered with 4 Marauders.
+- [x] AbandonedMine Depth2Room3 registered with 5 Marauders.
+- [x] Mine Deep Echoes adds one Depth2 Room1 Marauder.
+- [x] Mine Crystal Bloom adds one Depth2 Room2 Marauder.
+- [x] Depth2 Content: 32 assertions PASS.
+### Depth2 boss content
+
+- [x] TempleDepth2Boss registered.
+- [x] TempleDepth2Boss display identity: Temple Warden.
+- [x] AbandonedMineDepth2Boss registered.
+- [x] AbandonedMineDepth2Boss display identity: Deep Overseer.
+- [x] both factories registered in execution bootstrap.
+- [x] both bosses retain accepted Captain controller tag/behavior.
+- [x] Depth2 Boss Factory: 8 assertions PASS.
+- [x] Encounter Spawn Catalog: 17 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+
+### Readiness boundary
+
+- [x] Depth2 remains Ready = false for both current dungeons.
+- [x] Depth2 remains ReleaseEnabled = false.
+- [x] Depth2 no longer reports EncounterContentNotRegistered.
+- [x] Depth2 reports exactly one issue: DungeonLayoutNotRegistered.
+- [x] no Depth2 physical layout registered.
+- [x] Depth3-Depth4 remain content-incomplete.
+- [x] Runtime Content Readiness: 66 assertions PASS.
+### Final committed static/build acceptance
+
+- [x] clean committed checkpoint `b525235`.
+- [x] `git diff --check`: PASS.
+- [x] repository Luau parse: 518 files, 0 failures.
+- [x] Dungeon Rojo build: PASS.
+- [x] Base Rojo build: PASS.
+- [x] published Dungeon Rojo build: PASS.
+- [x] published Base Rojo build: PASS.
+
+### Final committed Base regression
+
+- [x] Runtime Content Readiness: 66 assertions PASS.
+- [x] Difficulty Definitions: 114 assertions PASS.
+- [x] Difficulty Progression: 19 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Entry Selection Rules: 9 assertions PASS.
+- [x] Party Difficulty: 22 assertions PASS.
+- [x] Party Difficulty Entry: 32 assertions PASS.
+- [x] Party Entry Coordinator: PASS.
+- [x] Party Service: PASS.
+- [x] Phase 3 Systems Stress: PASS.
+### Final committed Dungeon regression
+
+- [x] Depth2 Content: 32 assertions PASS.
+- [x] Depth2 Boss Factory: 8 assertions PASS.
+- [x] Encounter Spawn Catalog: 17 assertions PASS.
+- [x] Encounter Execution Bootstrap: 4 assertions PASS.
+- [x] Studio Session Factory: 7 assertions PASS.
+- [x] Layout Environment Contract: 14 assertions PASS.
+- [x] Dungeon Encounter Bindings: 34 assertions PASS.
+- [x] Combat Pack Encounter Executor: 15 assertions PASS.
+- [x] Phase2A Failure Path: 24 assertions PASS.
+- [x] Teleport Coordinator: 19 assertions PASS.
+- [x] Dungeon Difficulty Teleport: 7 assertions PASS.
+- [x] Dungeon Difficulty Progression: 19 assertions PASS.
+- [x] Runtime Content Readiness: 66 assertions PASS.
+- [x] Training Dummy: 9 assertions PASS.
+- [x] Combat Target Rules: 9 assertions PASS.
+- [x] Phase 3 Systems Stress: PASS.
+- [x] live player admission succeeded.
+
+### Release qualification
+
+- [x] Depth2 remains release-disabled.
+- [x] Depth2 remains physically unregistered.
+- [x] Depth3-Depth4 remain content-incomplete and release-disabled.
+- [x] no Event/Secret boss content enabled.
+- [x] source-boundary audit: 8 source/test files.
+- [x] source-boundary audit: 0 art/model/mesh/terrain/image files.
+- [x] no TEST/PROD publish during this gate.
+- [x] no PROD DataStore / Robux / monetisation action.
+- [ ] feature-branch push, if explicitly approved.
+- [ ] merge to main, if explicitly approved.
+
+Detailed evidence:
+`docs/testing/phase4-depth2-content-acceptance-record.md`.

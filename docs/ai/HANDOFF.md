@@ -362,22 +362,49 @@ Evidence:
 
 No push, merge or Roblox publish has been performed for this gate.
 
+The follow-on **Depth2 Backend Combat + Boss Content** gate is locally complete
+and green at:
+
+`b525235`
+
+Accepted proof now also includes:
+
+- three registered Depth2 combat packs per current dungeon;
+- 3/4/5 Marauder base counts;
+- Mine Deep Echoes and Crystal Bloom Depth2 bonus preservation;
+- TempleDepth2Boss / Temple Warden factory identity;
+- AbandonedMineDepth2Boss / Deep Overseer factory identity;
+- both Depth2 bosses retaining accepted Captain controller behavior;
+- Depth2 readiness failing only on DungeonLayoutNotRegistered;
+- Depth2 remaining release-disabled and physically unregistered;
+- Depth2 Content: 32 assertions PASS;
+- Depth2 Boss Factory: 8 assertions PASS;
+- Encounter Spawn Catalog: 17 assertions PASS;
+- Runtime Content Readiness: 66 assertions PASS;
+- 518 repository Lua/Luau files parsed with 0 failures;
+- all four Rojo compositions build cleanly;
+- final committed Base and Dungeon regressions green;
+- Phase 3 Systems Stress remains green;
+- 8 source/test files from `468cf76`, 0
+  art/model/mesh/terrain/image files.
+
+Evidence:
+`docs/testing/phase4-depth2-content-acceptance-record.md`
+
+No push, merge or Roblox publish has been performed for this gate.
+
 ## Exact next action
 
 Stop at this local-green boundary until the project owner chooses the next
 backend gate or release closeout. Push, merge and Roblox publish each require an
 explicit instruction.
 
-Generic higher-depth framework blockers are now cleared through
-`d9297f8`.
+Generic higher-depth framework blockers remain cleared through
+`d9297f8`, and Depth2 backend content is complete at `b525235`.
 
-The encounter sequence, execution registry, physical bindings, readiness
-authority, enemy-pack/factory layer, runtime layout selection, environment
-activation, combat spawn-group lookup, exit-barrier progression, environment
-anchor/group resolution and Studio difficulty/session routing are now generic.
-
-Continue backend-only work by defining deliberate higher-depth content while
-keeping Depth2-Depth4 release-disabled until physical authored rooms are ready.
+Continue backend-only work with Depth3 content: four combat packs plus the
+Depth3 boss for each current dungeon. Keep Depth2-Depth4 release-disabled and
+do not register physical layouts until authored rooms exist.
 
 Carry forward these readiness rules:
 
@@ -397,13 +424,13 @@ Primary repo:
 
 C:\Users\Remko\Documents\Roblox\DungeonMMO
 
-Active Phase 4 Studio-difficulty-parity worktree:
+Active Phase 4 Depth2-content worktree:
 
-C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_StudioDifficultyParity_v1
+C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_Depth2Content_v1
 
 Active branch:
 
-wip/phase-4-studio-difficulty-parity-v1
+wip/phase-4-depth2-content-v1
 
 Phase 3 completion worktree:
 
