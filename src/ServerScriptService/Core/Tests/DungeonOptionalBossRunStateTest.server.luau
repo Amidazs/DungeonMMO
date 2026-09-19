@@ -93,6 +93,31 @@ check(not Issuer.issue("TestDungeon", 150, 42, {
 }, true).OptionalBossSecretUnlocked,
     "Fractional hidden-route probability must fail closed")
 
+-- Corrupt or non-finite server configuration must never mint content.
+local invalid_number = 0 / 0
+local invalid_cases = {
+    {150, 42, {
+        optional_boss_event_start = invalid_number,
+        optional_boss_event_end = 200,
+    }},
+    {150, 42, {
+        optional_boss_event_start = 100,
+        optional_boss_event_end = invalid_number,
+    }},
+    {invalid_number, 42, options},
+    {math.huge, 42, options},
+    {150, invalid_number, options},
+    {150, math.huge, options},
+}
+for index, invalid_case in ipairs(invalid_cases) do
+    local snapshot = Issuer.issue(
+        "TestDungeon", invalid_case[1], invalid_case[2],
+        invalid_case[3], true
+    )
+    check(not snapshot.OptionalBossEnabled,
+        "Non-finite input case " .. index .. " must fail closed")
+end
+
 print(string.format(
     "[Optional Boss Run State Tests] PASS: %d assertions.",
     assertion_count

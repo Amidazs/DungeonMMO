@@ -13,6 +13,15 @@ local DUNGEONS = table.freeze({
     },
 })
 
+-- Rejects NaN and infinite timestamp, seed, or configuration values.
+-- Args: value (any): Number to validate.
+-- Returns: boolean: True only for a finite numeric value.
+local function finite_number(value: any): boolean
+    return type(value) == "number"
+        and value == value
+        and math.abs(value) < math.huge
+end
+
 -- Returns a disabled snapshot for unsupported or locked content.
 -- Args: None.
 -- Returns: any: Inactive optional boss fields for a new run.
@@ -39,8 +48,8 @@ local function eligible_event(
 ): any?
     local start_at = options.optional_boss_event_start
     local end_at = options.optional_boss_event_end
-    if type(start_at) ~= "number"
-        or type(end_at) ~= "number"
+    if not finite_number(start_at)
+        or not finite_number(end_at)
         or start_at < 1
         or end_at <= start_at
         or entered_at < start_at
@@ -60,7 +69,7 @@ local function hidden_route_selected(
     options: any
 ): boolean
     local chance = options.optional_boss_secret_chance_basis_points
-    return type(chance) == "number"
+    return finite_number(chance)
         and chance >= 1
         and chance <= 10000
         and chance % 1 == 0
@@ -84,8 +93,8 @@ function DungeonOptionalBossRunState.issue(
     local state = disabled_snapshot()
     local dungeon = DUNGEONS[dungeon_id]
     if not dungeon or release_enabled ~= true
-        or type(entered_at) ~= "number"
-        or type(session_seed) ~= "number"
+        or not finite_number(entered_at)
+        or not finite_number(session_seed)
     then
         return state
     end
