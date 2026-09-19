@@ -4,6 +4,23 @@ local DungeonDefinitions = require(
 )
 
 local DungeonDifficultyDefinitions = {}
+local TestRelease = require(script.Parent:WaitForChild(
+    "DungeonTestPlaceholderRelease"
+))
+
+local function scoped_difficulty(dungeon_id: string, definition: any): any
+    if not TestRelease.treat_as_test_temple(dungeon_id)
+        or definition.RuntimeReleaseEnabled == true
+    then
+        return definition
+    end
+    local copy = {}
+    for key, value in pairs(definition) do
+        copy[key] = value
+    end
+    copy.RuntimeReleaseEnabled = true
+    return table.freeze(copy)
+end
 
 local ORDER = table.freeze({
     "Depth1",
@@ -220,7 +237,9 @@ function DungeonDifficultyDefinitions.get(
     if not ladder then
         return nil
     end
-    return ladder[difficulty_id]
+    local definition = ladder[difficulty_id]
+    if not definition then return nil end
+    return scoped_difficulty(dungeon_id, definition)
 end
 
 -- Returns ordered difficulty definitions for one known dungeon.
@@ -234,7 +253,9 @@ function DungeonDifficultyDefinitions.ordered(
 
     local result = {}
     for _, difficulty_id in ipairs(ORDER) do
-        table.insert(result, ladder[difficulty_id])
+        table.insert(result,
+            scoped_difficulty(dungeon_id, ladder[difficulty_id])
+        )
     end
     return result
 end
