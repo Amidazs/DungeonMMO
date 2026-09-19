@@ -5,10 +5,11 @@
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Gameplay backend matrix requires an unpublished TEMP place")
 local SSS = game:GetService("ServerScriptService")
+-- DefensiveCombatIntegrationTest needs a running Play-mode TrainingMarauder;
+-- run it in the live Dungeon regression rather than a stopped edit DataModel.
 local tests = {
     {"Combat", "BasicAttackTimingRulesTest"},
     {"Combat", "DefenseServiceTest"},
-    {"Combat", "DefensiveCombatIntegrationTest"},
     {"Combat", "DodgeDirectionRulesTest"},
     {"Combat", "DodgePriorityStateRulesTest"},
     {"Combat", "DodgeSweptClearanceTest"},
