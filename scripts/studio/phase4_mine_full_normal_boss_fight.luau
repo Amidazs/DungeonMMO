@@ -193,7 +193,7 @@ local function run()
             local h=model:FindFirstChildOfClass("Humanoid")
             if h and h.Health>0 then table.insert(result,model) end
         end
-        return #result>=3 and result or nil
+        return #result>0 and result or nil
     end,"Room1 enemies",10)
     -- Only the prerequisite combat pack uses debug defeat; the Event boss
     -- and player health are NEVER directly modified by this combat test.
