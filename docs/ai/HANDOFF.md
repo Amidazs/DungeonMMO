@@ -1,5 +1,37 @@
 # DungeonMMO Development Handoff
 
+## Current checkpoint — 19 September 2026: four backend steps verified
+
+The following supersedes the earlier Step 2-only status; historical evidence
+remains below. **Gameplay/test source**: 3700dba7c6124e3401b615ce126d80cb7f1edb88.
+**Final normal-regression/static source**: c86a90471cc3c36bbd9437ada685f4377d7e2ebe.
+Branch: wip/phase-4-event-secret-policy-v1, isolated from main, UI and art.
+
+- Recovery: event window, plan, discovery and cleared/skipped encounters survive
+  session/controller reconstruction; interrupted boss returns to Pending;
+  duplicate reward replay is blocked. Live Temple fixture simulated member
+  disconnect/reconnect while the actual Studio player remained connected.
+  **A real network leave/rejoin or cross-place handoff is NOT proven.**
+- Mine: TEMP Play-mode fought-secret and skipped-secret paths both completed.
+  Skipping persisted without secret discovery or secret reward.
+- Four bosses have different server-authoritative two-phase attack patterns
+  using existing Captain pose, telegraph, hit and defence systems. TEMP Temple
+  and Mine combat fixtures passed with test-assisted positioning and defeats;
+  natural battle balance and presentation are not proven.
+- 11/11 focused Studio edit-mode suites passed on 3700dba. At c86a904, all
+  four local Rojo compositions built; 547 Lua/Luau files parsed without error.
+  Fresh unpublished Base/Dungeon Play baselines: respectively 108 and 222
+  test PASS markers, zero Creator errors, and both release locks stayed false.
+  Base Phase 3 stress passed (profiles=250, market=1000, replay=1000,
+  guild=250, sessions=100, race_roundtrips=100).
+- Evidence: docs/testing/phase4-optional-boss-four-backend-steps-closeout-2026-09-19.md.
+  TEMP-only synthetic fixtures do not imply authored side-arena acceptance.
+  OptionalBossRuntimeEnabled remains false; higher-depth physical layouts
+  remain unreleased. Do not merge to main or publish based on these tests.
+- Next release/content gates: genuine client/network reconnect, authored
+  room traversal, unassisted combat and player-facing UI, multiplayer/cross-place
+  admission and final release acceptance.
+
 ## Current checkpoint - 19 September 2026 Step 2 GitHub-first backend proof
 
 This section supersedes the Step 1 status below; its validation details remain
