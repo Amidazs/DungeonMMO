@@ -208,6 +208,15 @@ function DungeonLayoutEnvironmentContract.build(
         layout.EntranceAnchor
     )
 
+    -- An opted-in temporary layout can retain exact legacy anchors used
+    -- by other dungeon services without adding extra encounter slots.
+    for _, anchor_id in ipairs(layout.AuxiliaryAnchors or {}) do
+        if not is_non_empty_string(anchor_id) then
+            return result(false, "InvalidDungeonLayoutAuxiliaryAnchor")
+        end
+        append_unique(required, required_seen, anchor_id)
+    end
+
     for _, slot_id in ipairs(
         sorted_slot_ids(layout.Slots)
     ) do
