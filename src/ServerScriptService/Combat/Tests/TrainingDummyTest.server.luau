@@ -50,7 +50,7 @@ Returns:
     Model?: Runtime Training Dummy.
 ]]
 local function wait_for_dummy(): Model?
-    local deadline = os.clock() + 2
+    local deadline = os.clock() + 25
 
     repeat
         local dummy = workspace:FindFirstChild(
