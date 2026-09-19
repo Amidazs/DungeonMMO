@@ -1,0 +1,77 @@
+{
+  "name": "DungeonMMO_TEST_Lobby_PlaceholderPhase4",
+  "globIgnorePaths": [
+    "**/Tests/**"
+  ],
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$ignoreUnknownInstances": true,
+      "Core": {
+        "$path": "src/ReplicatedStorage/Core"
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$ignoreUnknownInstances": true,
+      "Core": {
+        "$path": "src/ServerScriptService/Core"
+      },
+      "Base": {
+        "$path": "src/ServerScriptService/Base"
+      },
+      "$properties": {
+        "Attributes": {
+          "DungeonMMOEnvironment": {
+            "String": "TEST"
+          },
+          "DungeonMMODungeonPlaceId": {
+            "Float64": 117293035754309
+          }
+        }
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "$ignoreUnknownInstances": true,
+      "$properties": {
+        "EnableMouseLockOption": false
+      },
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$ignoreUnknownInstances": true,
+        "Core": {
+          "$path": "src/StarterPlayerScripts/Core"
+        },
+        "Base": {
+          "$path": "src/StarterPlayerScripts/Base"
+        }
+      }
+    },
+    "TextChatService": {
+      "$className": "TextChatService",
+      "DungeonMMOLevelDebugCommand": {
+        "$className": "TextChatCommand",
+        "$properties": {
+          "PrimaryAlias": "/level",
+          "SecondaryAlias": "!level",
+          "AutocompleteVisible": false,
+          "Enabled": true
+        }
+      },
+      "DungeonMMOProficiencyDebugCommand": {
+        "$className": "TextChatCommand",
+        "$properties": {
+          "PrimaryAlias": "/prof",
+          "SecondaryAlias": "!prof",
+          "AutocompleteVisible": false,
+          "Enabled": true
+        }
+      }
+    }
+  },
+  "servePlaceIds": [
+    134132328219009
+  ]
+}
