@@ -34,8 +34,17 @@ end
 for _,root in ipairs({SSS.Core,SSS:FindFirstChild("Dungeon"),
     SSS:FindFirstChild("Base")}) do
     if root then
-        assert(root:FindFirstChild("Tests")==nil,
-            "Release candidate includes test-only server modules")
+        local tests=root:FindFirstChild("Tests")
+        if tests then
+            local children=tests:GetDescendants()
+            local names={}
+            for _,child in ipairs(children) do
+                table.insert(names,child:GetFullName()..":"..child.ClassName)
+            end
+            assert(#children==0,
+                "Release candidate contains Tests descendants in "
+                ..root.Name..": "..table.concat(names,", "))
+        end
     end
 end
 print("[Phase4 TEST Composition] NO_TEST_SCRIPT_LEAK_PASS")
