@@ -1,5 +1,29 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 19 September 2026 — remaining release gates: local proof, NOT release acceptance
+
+The earlier four-step **backend** checkpoint below remains valid. New
+TEMP-only Play-mode scripts have now additionally verified: real simulated
+client leave and a separate client's arrival in Base, actual Dungeon
+PlayerRemoving persisting a disconnected member while its peer/plan/checkpoint
+remain active (the Studio party session uses a fixture-only override),
+on-foot walking through all five synthetic Temple and Mine encounters without
+per-room teleport, and one standard client basic attack reducing the live
+Temple Event boss from 144 to 134 health. Boss combat and progression other
+than that single attack still used explicit fixture assistance.
+
+- Latest new fixture source: 0c2251633b70f92314abc4d0ec9d4fd50bb1dbe4.
+- Evidence: docs/testing/phase4-remaining-release-gates-local-proof-2026-09-19.md.
+- The departed Studio client's replacement has a **different UserId**; a true
+  same-account rejoin, published cross-place transfer and production group
+  admission have NOT been exercised. Real authored side rooms, an entire
+  unassisted boss fight and visual/UI acceptance also remain unverified.
+- Optional-boss rollout remains disabled; no main merge, TEST/PROD publish
+  or production DataStore change is approved by these local fixture results.
+- Next gated action: obtain explicit permission before using the isolated
+  published TEST environment for same-account reconnect and cross-place tests.
+  Do not mark Phase 4 release accepted on the basis of the local probes.
+
 ## Current checkpoint — 19 September 2026: four backend steps verified
 
 The following supersedes the earlier Step 2-only status; historical evidence
