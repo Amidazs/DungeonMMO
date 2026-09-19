@@ -11,6 +11,10 @@ local DungeonDifficultyDefinitions = require(
         "DungeonDifficultyDefinitions"
     )
 )
+local TestRelease = require(
+    ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
+        :WaitForChild("DungeonTestPlaceholderRelease")
+)
 
 local DungeonOptionalBossRunState = require(
     script.Parent:WaitForChild("DungeonOptionalBossRunState")
@@ -44,6 +48,10 @@ local function copy_encounters(encounters: {any}): {any}
 end
 
 function DungeonInstanceDirector.runtime_options(): any
+    -- Only the exact published TEST Dungeon offers an always-open,
+    -- server-issued Event/Secret practice window for this playtest.
+    local test_dungeon = TestRelease.is_test_dungeon()
+    local now = os.time()
     return {
         force_rare = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceRareState")),
         force_event = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceEvent")),
@@ -55,14 +63,19 @@ function DungeonInstanceDirector.runtime_options(): any
         optional_boss_secret_routes_enabled = ServerScriptService:GetAttribute(
             "DungeonMMOOptionalBossSecretRoutesEnabled"
         ) == true,
-        optional_boss_event_start = ServerScriptService:GetAttribute(
-            "DungeonMMOOptionalBossEventStartUnix"
-        ),
-        optional_boss_event_end = ServerScriptService:GetAttribute(
-            "DungeonMMOOptionalBossEventEndUnix"
-        ),
-        optional_boss_secret_chance_basis_points =
-            ServerScriptService:GetAttribute(
+        optional_boss_event_start = if test_dungeon
+            then now - 60
+            else ServerScriptService:GetAttribute(
+                "DungeonMMOOptionalBossEventStartUnix"
+            ),
+        optional_boss_event_end = if test_dungeon
+            then now + 1800
+            else ServerScriptService:GetAttribute(
+                "DungeonMMOOptionalBossEventEndUnix"
+            ),
+        optional_boss_secret_chance_basis_points = if test_dungeon
+            then 10000
+            else ServerScriptService:GetAttribute(
                 "DungeonMMOOptionalBossSecretChanceBasisPoints"
             ),
     }
