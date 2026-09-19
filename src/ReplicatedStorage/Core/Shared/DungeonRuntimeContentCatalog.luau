@@ -1,5 +1,11 @@
 --!strict
 local DungeonRuntimeContentCatalog = {}
+local TestRelease = require(script.Parent:WaitForChild(
+    "DungeonTestPlaceholderRelease"
+))
+local TestLayouts = require(script.Parent:WaitForChild(
+    "DungeonTestPlaceholderLayouts"
+))
 
 local EXECUTOR_IDS = table.freeze({
     "CombatPack",
@@ -604,7 +610,11 @@ function DungeonRuntimeContentCatalog.get_layout(
     if not dungeon then
         return nil
     end
-    return dungeon[layout_id]
+    local original = dungeon[layout_id]
+    if TestRelease.treat_as_test_temple(dungeon_id) then
+        return TestLayouts.get(dungeon_id, layout_id, original)
+    end
+    return original
 end
 
 -- Returns one registered combat-pack specification.
