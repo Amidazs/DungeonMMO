@@ -37,11 +37,10 @@ local profile=widget("ProfileHud","PlayerPortrait")
 assert(profile:FindFirstChild("StatusCard")
     and profile.StatusCard:FindFirstChild("PlayerPortrait",true),
     "upper-left framed profile card/portrait missing")
-local hotbar=widget("CombatHotbarGui","Slot6")
-local slots=hotbar:FindFirstChild("Slots",true)
-assert(slots and slots:FindFirstChild("Slot1")
-    and slots:FindFirstChild("Slot6"),
-    "six-slot combat hotbar missing")
+-- Both original Base project files intentionally omit the Combat
+-- client folder. The six-slot combat hotbar is verified in Dungeon Play.
+assert(not gui:FindFirstChild("CombatHotbarGui"),
+    "Base unexpectedly loaded Dungeon-only combat controls")
 local menu=widget("HudCommandMenu","GuildCommand")
 for _,name in ipairs({"Inventory","Skills","Guild"}) do
     assert(menu:FindFirstChild(name.."Command",true),
@@ -50,7 +49,7 @@ end
 local base=widget("BaseUi","DifficultyStrip")
 assert(base:FindFirstChild("DungeonContext",true),
     "lobby dungeon selection / difficulty panel missing")
-print("[Phase4 Base HUD] FRAMED_PLAYER_HOTBAR_MENU_AND_DUNGEON_ENTRY_PASS")
+print("[Phase4 Base HUD] FRAMED_PLAYER_MENU_AND_DUNGEON_ENTRY_PASS")
 local inventory=widget("InventoryPanelUi","InventoryPanel")
 local skills=widget("CharacterSkillsMenu","SkillsPanel")
 local guild=widget("GuildPanel","GuildWindow")
