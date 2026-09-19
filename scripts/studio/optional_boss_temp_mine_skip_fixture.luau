@@ -66,7 +66,7 @@ local extra_slots = [[
 catalog.Source = string.sub(value, 1, where - 1)
     .. extra_slots .. string.sub(value, where)
 
-local synthetic = dungeon.MineSyntheticEnvironment
+local synthetic = dungeon.AbandonedMineSyntheticEnvironment
 local original = "    local entries = {"
 local changed = [[    local side = parent:FindFirstChild("DungeonMMOSyntheticMine")
     assert(side, "TEMP Mine side-room parent absent.")
