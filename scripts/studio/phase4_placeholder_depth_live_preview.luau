@@ -18,6 +18,15 @@ W:SetAttribute("DungeonMMOEnvironmentMode","Synthetic")
 W:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled",true)
 W:SetAttribute("DungeonMMOPlaceholderPlayableEnabled",true)
 W:SetAttribute("DungeonMMOPlaceholderOptionalPlayEnabled",false)
+-- Existing in-place editor regression scripts assert Depth2-4 are
+-- unregistered in the default game. They are exercised on normal builds,
+-- not inside this deliberately opted-in temporary depth sandbox.
+for _,group in ipairs({SSS.Core.Tests,SSS.Dungeon.Tests}) do
+    for _,child in ipairs(group:GetDescendants()) do
+        if child:IsA("Script") then child.Enabled=false end
+    end
+end
+
 local source=Instance.new("Script")
 source.Name="Phase4PlayableDepth_TEMP"
 source.Source=[=[
@@ -79,10 +88,10 @@ local function run()
         return player.Character
             and player.Character:FindFirstChild("HumanoidRootPart")
     end,"character",25)
-    local session=wait_for(function()
-        local runtime=W:FindFirstChild("DungeonGameplayRuntime")
-        return runtime and player:GetAttribute("DungeonSessionId")
-    end,"Dungeon runtime and player admission",30)
+    wait_for(function()
+        return W:FindFirstChild("DungeonGameplayRuntime")
+            and player.Character and player.Character.Parent
+    end,"Dungeon runtime and character",30)
     local first=parent:FindFirstChild(
         prefix.."_"..difficulty.."_Room1_Trigger")
     local humanoid=root.Parent:FindFirstChildOfClass("Humanoid")
