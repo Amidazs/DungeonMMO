@@ -641,7 +641,8 @@ local function render(
             then identity.CreationStage
             else "RaceSelection"
 
-    if stage ~= current_stage then
+    local stage_changed = stage ~= current_stage
+    if stage_changed then
         current_stage = stage
         request_pending = false
 
@@ -697,16 +698,28 @@ local function render(
     ) then
         blocker.Visible = true
 
-        show_race_selection(
-            stage == "LegacyRaceSelection"
-        )
+        -- The Profile HUD and other panels may request additional copies of
+        -- the same authoritative snapshot. Rebuilding this panel on every
+        -- copy destroys the clicked race card and clears selected_race.
+        if stage_changed
+            or not content:FindFirstChild("HumanCard")
+        then
+            show_race_selection(
+                stage == "LegacyRaceSelection"
+            )
+        end
 
         return
     end
 
     if stage == "ClassSelection" then
         blocker.Visible = true
-        show_class_selection()
+        -- Keep the current class choice through unrelated snapshot refreshes.
+        if stage_changed
+            or not content:FindFirstChild("FighterCard")
+        then
+            show_class_selection()
+        end
         return
     end
 
