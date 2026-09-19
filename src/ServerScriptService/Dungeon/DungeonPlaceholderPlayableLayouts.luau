@@ -69,6 +69,13 @@ function Layouts.get(dungeon_id: string, layout_id: string,
     return table.freeze({
         Id = layout_id,
         EntranceAnchor = prefix .. "." .. layout_id .. ".EntrySpawn",
+        -- Existing dungeon professions and Mine state presentation still
+        -- consume the original Depth1 resource/checkpoint anchors. Keep
+        -- them resolved as auxiliary anchors during TEMP depth previews.
+        AuxiliaryAnchors = table.freeze({
+            prefix .. ".Room1.Checkpoint",
+            prefix .. ".Room2.Checkpoint",
+        }),
         Slots = table.freeze(slots),
     })
 end
