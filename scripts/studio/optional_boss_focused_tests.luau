@@ -22,7 +22,8 @@ for _, path in ipairs(test_paths) do
 
     local test = Instance.new("ModuleScript")
     test.Name = node.Name .. "EditModeTest"
-    test.Source = node.Source
+    -- A required ModuleScript must return exactly one value after the test.
+    test.Source = node.Source .. "\nreturn true\n"
     test.Parent = ServerScriptService
 
     local ok, err = pcall(require, test)
