@@ -188,6 +188,23 @@ local function build_optional(root: Instance, parent: Instance, theme: any)
         theme.X + 51, -165, 38, 40)
 end
 
+-- Depth preview corridors run along Z; their guardrails must run along
+-- the SIDE edges, not across the path as the optional X-axis bridges do.
+local function depth_corridor(
+    parent: Instance, theme: any, name: string,
+    x: number, z: number
+)
+    local model = room_model(parent, name, theme)
+    part(model, "WalkableFloor", Vector3.new(16, 1, 30),
+        Vector3.new(x, -0.5, z), theme.Floor, theme.Material)
+    for _, side in ipairs({-1, 1}) do
+        part(model, if side == -1 then "LeftRail" else "RightRail",
+            Vector3.new(1, 3, 30),
+            Vector3.new(x + side * 7.5, 1.5, z),
+            theme.Accent, Enum.Material.Slate, 0.1)
+    end
+end
+
 -- Depth2/3/4 blockout is a LOOK-AND-REPLACE preview only. Deliberately no
 -- gameplay anchors or physical layout registration: depth gates stay locked.
 local function build_depth_previews(root: Instance, theme: any)
@@ -227,8 +244,8 @@ local function build_depth_previews(root: Instance, theme: any)
                     Enum.Material.Slate)
             end
             if index > 1 then
-                bridge(group, theme, "Bridge_" .. (index - 1),
-                    center_x, z + 45, 16, 30)
+                depth_corridor(group, theme, "Bridge_" .. (index - 1),
+                    center_x, z + 45)
             end
         end
     end
