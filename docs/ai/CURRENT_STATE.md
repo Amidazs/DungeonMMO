@@ -1,5 +1,42 @@
 # DungeonMMO Current Engineering State
 
+## 19 September 2026 — TEMP playable physical layouts, both dungeons Depth1–4
+
+This checkpoint supersedes the older **geometry-only** placeholder status
+below; the separate editable `.rbxlx` remains geometry-only, while the
+**source-generated, explicitly opted-in unpublished Studio** layouts now have
+real runtime physical bindings. Temple/TestDungeon and AbandonedMine each
+passed all three 4/5/6-room Depth2/3/4 physical encounter sequences, including
+Depth4 three returning minibosses + final boss. Both dungeons' Depth1
+Event/Secret fight, skip and on-foot optional-room traversal cases also
+passed. Combat kills and high-depth player health were assisted in these
+fixtures; these are not unassisted player combat/release acceptance.
+
+- Source up to `e3b3022` passed four Rojo compositions, 549 source and
+  30 Studio runner compilation checks, and all 11 focused edit-mode suites.
+- Base fresh regression passed, 107 PASS markers and zero Creator errors.
+  Two ordinary Dungeon regression attempts failed intermittent pre-existing
+  combat-test startup deadlines despite live baseline success. Only those
+  test waits were extended to 25 seconds. A fresh Dungeon regression at
+  `37cef9b` passed the player and dummy assertions, 221 PASS markers, and
+  zero Creator errors.
+- Explicit unpublished Studio-only opt-in:
+  `DungeonMMOEnvironmentMode=Synthetic`,
+  `DungeonMMOPlaceholderPhysicalContentEnabled=true`,
+  `DungeonMMOPlaceholderPlayableEnabled=true`; Depth1 optional physical
+  slots require the separate `DungeonMMOPlaceholderOptionalPlayEnabled`
+  opt-in. Runtime optional-boss eligibility/release is still separately
+  locked; do not copy TEMP fixture overrides into live source.
+- The shared production content catalogue still only registers Depth1;
+  higher-depth `RuntimeReleaseEnabled` and both
+  `OptionalBossRuntimeEnabled` values remain false. No main merge,
+  production or TEST Roblox publish, or DataStore mutation occurred.
+- Full log receipts, scenario IDs, code paths and remaining limits:
+  `docs/testing/phase4-placeholder-playable-layouts-closeout-2026-09-19.md`.
+  Final authored room geometry, ordinary combat/balance/UI, same-user
+  reconnect and release acceptance remain separate gates.
+
+
 ## 19 September 2026 — replaceable dungeon physical placeholders available
 
 - Editor-ready **geometry-only** Studio scene:
