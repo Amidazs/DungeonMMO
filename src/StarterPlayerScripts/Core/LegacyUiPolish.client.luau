@@ -12,11 +12,13 @@ local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
 
+-- Character creation owns its mandatory full-screen overlay and the
+-- selected race/class card appearance. Auto-styling its buttons on hover
+-- obscures the selection highlight; leave IdentitySelectionUi untouched.
 local TARGET_GUIS = table.freeze({
     BankPanel = true,
     EquipmentPanelUi = true,
     GuildPanel = true,
-    IdentitySelectionUi = true,
     MarketPanel = true,
     ProfessionUi = true,
     ProgressionTrainerUi = true,
