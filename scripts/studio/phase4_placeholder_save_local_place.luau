@@ -34,12 +34,7 @@ end
 W:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled", false)
 print("[Phase4 Placeholder Save] CREATED " .. id
     .. " (nonpublished, code-only blockout).")
--- This is a local SavePlace operation on the TEMP .rbxl passed to --localPlaceFile.
--- It must not be interpreted as a Roblox Publish operation.
-local saved, error_message = pcall(function() game:SavePlace() end)
-if not saved then
-    warn("[Phase4 Placeholder Save] LOCAL_SAVE_UNSUPPORTED "
-        .. tostring(error_message))
-else
-    print("[Phase4 Placeholder Save] SAVED_LOCAL_PREVIEW " .. id)
-end
+-- Unpublished local places cannot use game:SavePlace(); leave Studio open
+-- and save the TEMP file through the ordinary local Ctrl+S operation.
+-- Never use Publish or Save to Roblox for this preview.
+print("[Phase4 Placeholder Save] READY_FOR_LOCAL_CTRL_S_SAVE " .. id)
