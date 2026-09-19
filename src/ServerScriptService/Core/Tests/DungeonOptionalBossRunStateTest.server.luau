@@ -52,6 +52,13 @@ for _, dungeon_id in ipairs({"TestDungeon", "AbandonedMine"}) do
     check(next(available.OptionalBossSecretUnlocks) ~= nil,
         dungeon_id .. " must snapshot its own secret identity")
 
+    local at_start = Issuer.issue(dungeon_id, 100, 42, {
+        optional_boss_event_start = 100,
+        optional_boss_event_end = 200,
+    }, true)
+    check(at_start.OptionalBossEventActive == true,
+        dungeon_id .. " event start boundary must be inclusive")
+
     local outside = Issuer.issue(dungeon_id, 200, 42, {
         optional_boss_event_start = 100,
         optional_boss_event_end = 200,
