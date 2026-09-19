@@ -26,7 +26,23 @@ check(not service:discover(id,99001,eid,13).ok,"distant member rejected")
 check(not service:discover(id,99001,eid,0/0).ok,"NaN distance rejected")
 check(not service:discover(id,99001,eid,-1).ok,"negative distance rejected")
 check(not service:discover(id,99001,eid,0).ok,"preceding combat required")
-assert(sessions:update_instance_state(id,function(s) s.EncounterRuntime.EncounterStates.First="Cleared";return s end).ok)
+assert(sessions:update_instance_state(id,function(state)
+ state.EncounterRuntime.EncounterStates.First="Skipped"
+ return state
+end).ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "required combat cannot be skipped to discover secret")
+assert(sessions:update_instance_state(id,function(state)
+ state.EncounterRuntime.EncounterStates.First="Cleared"
+ state.EncounterRuntime.NextEncounterId="Final"
+ return state
+end).ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "persisted next encounter must match secret descriptor")
+assert(sessions:update_instance_state(id,function(state)
+ state.EncounterRuntime.NextEncounterId=eid
+ return state
+end).ok)
 check(not service:discover(id,99001,"Final",0).ok,"only matching secret descriptor")
 local result=service:discover(id,99001,eid,12)
 check(result.ok and not result.already_discovered,"eligible nearby member discovers route")
