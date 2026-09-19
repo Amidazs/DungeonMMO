@@ -44,6 +44,14 @@ assert(sessions:update_instance_state(id,function(state)
  return state
 end).ok)
 check(not service:discover(id,99001,"Final",0).ok,"only matching secret descriptor")
+assert(sessions:set_member_mode(id,99001,"Dead").ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "dead member cannot discover secret route")
+assert(sessions:set_member_mode(id,99001,"Active").ok)
+assert(sessions:mark_disconnected(id,99001).ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "disconnected member cannot discover secret route")
+assert(sessions:mark_connected(id,99001).ok)
 local result=service:discover(id,99001,eid,12)
 check(result.ok and not result.already_discovered,"eligible nearby member discovers route")
 check(sessions:get(id).InstanceState.OptionalBossSecretDiscoveries.TempleHiddenSanctum==true,"discovery saved")
