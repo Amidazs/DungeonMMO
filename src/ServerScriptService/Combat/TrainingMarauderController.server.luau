@@ -22,6 +22,9 @@ local CombatValidationService = require(
 local MarauderAttackRules = require(
     script.Parent:WaitForChild("MarauderAttackRules")
 )
+local OptionalBossAttackRules = require(
+    script.Parent:WaitForChild("OptionalBossAttackRules")
+)
 local MarauderBehaviorRules = require(
     script.Parent:WaitForChild("MarauderBehaviorRules")
 )
@@ -614,10 +617,21 @@ local function attack(runtime: MarauderRuntime, player: Player)
     end
 
     local life_sequence = runtime.life_sequence
-    local attack_name = MarauderAttackRules.get_attack_name(runtime.pattern_index)
-    local attack_definition = MarauderAttackRules.get_attack_definition(attack_name) :: AttackDefinition
-
-    runtime.pattern_index = MarauderAttackRules.get_next_pattern_index(runtime.pattern_index)
+    local boss_attack = OptionalBossAttackRules.resolve(
+        runtime.model,
+        runtime.pattern_index,
+        runtime.humanoid.Health / math.max(1, runtime.humanoid.MaxHealth)
+    )
+    local attack_name = if boss_attack then boss_attack.AttackName
+        else MarauderAttackRules.get_attack_name(runtime.pattern_index)
+    local attack_definition = if boss_attack then boss_attack.Definition
+        else MarauderAttackRules.get_attack_definition(attack_name)
+    runtime.pattern_index = if boss_attack then boss_attack.NextPatternIndex
+        else MarauderAttackRules.get_next_pattern_index(runtime.pattern_index)
+    if boss_attack then
+        runtime.model:SetAttribute("DungeonBossAbilityId", boss_attack.AbilityId)
+        runtime.model:SetAttribute("DungeonBossPhase", boss_attack.Phase)
+    end
     runtime.attacking = true
     runtime.next_attack_at = os.clock() + attack_definition.ATTACK_INTERVAL_SECONDS
     set_ai_state(runtime, "Attacking")
