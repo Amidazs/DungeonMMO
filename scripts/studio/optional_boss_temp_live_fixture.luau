@@ -183,6 +183,7 @@ local function run()
         return game_root and game_root:FindFirstChild("DungeonEnemies")
     end, "enemy container", 15)
 
+    local skip_secret = W:GetAttribute("DungeonMMOTempSkipSecret") == true
     local targets = {
         {"Room1", "Temple.Room1.Trigger", "CombatRoom1"},
         {"EventArena", "Temple.Event.Trigger", "TempleEventBossEncounter"},
@@ -190,6 +191,9 @@ local function run()
         {"SecretArena", "Temple.Secret.Trigger", "TempleSecretBossEncounter"},
         {"Room3", "Temple.Room3.Trigger", "Depth1Boss"},
     }
+    if skip_secret then
+        table.remove(targets, 4)
+    end
 
     for _, item in ipairs(targets) do
         local slot, trigger_id, encounter_id = item[1], item[2], item[3]
@@ -247,10 +251,49 @@ local function run()
     end
 
     local final = runtime.SessionService:get(session.SessionId)
-    must(final.InstanceState.OptionalBossSecretDiscoveries
-        and final.InstanceState.OptionalBossSecretDiscoveries.TempleHiddenSanctum,
-        "secret discovery did not persist")
-    print("[Optional Boss TEMP Gameplay] SECRET_DISCOVERY_PERSISTED")
+    local snapshot = final.InstanceState.EncounterRuntime.EncounterStates
+    local discoveries = final.InstanceState.OptionalBossSecretDiscoveries
+    if skip_secret then
+        must(snapshot.TempleSecretBossEncounter == "Skipped",
+            "entering the direct successor must persist a secret skip")
+        must(not discoveries or not discoveries.TempleHiddenSanctum,
+            "skipped secret must not be discovered")
+        print("[Optional Boss TEMP Gameplay] SECRET_SKIPPED")
+    else
+        must(discoveries and discoveries.TempleHiddenSanctum,
+            "secret discovery did not persist")
+        print("[Optional Boss TEMP Gameplay] SECRET_DISCOVERY_PERSISTED")
+    end
+
+    local character_data = runtime.ProfileService:get_character(
+        player.UserId, 1
+    )
+    local history = character_data and character_data.RewardHistory
+        and character_data.RewardHistory.Monster
+    must(type(history) == "table", "player reward history missing")
+    local event_paid = false
+    local secret_paid = false
+    local reward_count = 0
+    for transaction_id in pairs(history) do
+        reward_count += 1
+        if string.find(transaction_id,
+            "TempleEventBoss:TempleEventBossEncounter", 1, true)
+        then
+            event_paid = true
+        end
+        if string.find(transaction_id,
+            "TempleSecretBoss:TempleSecretBossEncounter", 1, true)
+        then
+            secret_paid = true
+        end
+    end
+    must(event_paid, "event boss reward was not recorded")
+    must(secret_paid ~= skip_secret,
+        "secret boss reward must occur only when fought")
+    print("[Optional Boss TEMP Gameplay] REWARD_HISTORY "
+        .. reward_count .. " event=" .. tostring(event_paid)
+        .. " secret=" .. tostring(secret_paid))
+    must(final.State == "Complete", "session was not completed")
     print("[Optional Boss TEMP Gameplay] RUN_COMPLETE "
         .. tostring(final.State))
 end
