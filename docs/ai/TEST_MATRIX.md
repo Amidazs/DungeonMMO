@@ -1,5 +1,25 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 19 September 2026 — replaceable dungeon physical placeholders available
+
+- Editor-ready **geometry-only** Studio scene:
+  `content/placeholder/DungeonMMO_PhysicalBlockouts_v1.rbxlx`.
+  It includes separate Temple and Mine EventArena/SecretArena Models, walkable
+  bridges, and unregistered Depth2/3/4 room/corridor previews (330 editable
+  parts in 62 models). Studio static geometry verification passed.
+- The source builder is
+  `src/ServerScriptService/Dungeon/DungeonPlaceholderPhysicalContent.luau`;
+  its opt-in synthetic Studio bootstrap can preview current Depth1 with
+  placeholders while leaving both optional boss flags false and higher-depth
+  physical layouts unregistered.
+- **This is a replaceable blockout, NOT final authored release geometry or
+  playable high-depth content.** The standalone editor scene has no runtime
+  scripts and its visual anchor markers are not registered live bindings.
+  Keep encounter/anchor identities when replacing with meshes/models.
+- Usage/validation and limitations:
+  `docs/testing/phase4-physical-placeholders-2026-09-19.md`.
+  No merge to main, TEST/PROD publish or optional-boss rollout occurred.
+
 ## 19 September 2026 — remaining release gates: local proof, NOT release acceptance
 
 The earlier four-step **backend** checkpoint below remains valid. New
