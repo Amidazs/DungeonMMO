@@ -79,8 +79,9 @@ until_value(function()
         and boss_name.Text=="Eclipse Keeper"
 end,"boss objective and health UI",15)
 local fill=boss_frame.BossTrack.BossFill
-assert(fill and math.abs(fill.Size.X.Scale-0.5)<0.02,
-    "boss 30/60 health bar is not half full")
+until_value(function()
+    return fill and math.abs(fill.Size.X.Scale-0.5)<0.02
+end,"animated boss 30/60 health bar settles at half full",5)
 print("[Phase4 Integrated HUD] BOSS_WIDGET_PASS")
 ack:FireServer("BOSS_PASS")
 until_value(function()
