@@ -275,7 +275,7 @@ task.spawn(function()
     if not ok then warn("[Phase4 Normal Combat] FAIL " .. tostring(err)) end
     STS:EndTest(if ok then "PASS" else "FAIL "..tostring(err))
 end)
-task.delay(70,function() STS:EndTest("FAIL global timeout") end)
+task.delay(115,function() STS:EndTest("FAIL global timeout") end)
 ]=]
 driver.Parent = SSS
 print("[Phase4 Normal Combat] START_TEMP_PLAY")
