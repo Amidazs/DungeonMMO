@@ -2,16 +2,22 @@
 
 The canonical long-form roadmap stored here is:
 
-`DungeonMMO_Roadmap_v1_45.docx`
+`DungeonMMO_Roadmap_v1_46.docx`
 
-Version: **1.45**
+Version: **1.46**
 Last updated: **19 September 2026**
 
 SHA-256:
 
-`349d8a568856091ec2dbdadfde4b7785f608e65d2ac8f2429c838d9a86a943ac`
+`11afe3376510aea308d44851183b16f42cf507baf617025cebb2c7436dd6a5bc`
 
-Roadmap v1.45 adds the four-step Event/Secret Boss **isolated backend**
+**Phase 4 Event/Secret Boss BACKEND milestone: COMPLETE at the isolated development checkpoint** `ba584e4`. Phase 4 Content Alpha **remains active**; these are not physical-content or gameplay-release approvals. Both dungeons' optional-boss rollout flags remain off, higher-depth physical layouts remain unavailable, and nothing has been merged into `main` or published to Roblox.
+
+The v1.46 roadmap updates the *current Phase 4 and next-action sections*, not merely the historical appendix, so past backend tasks are not mistakenly reopened. New isolated TEMP Studio evidence covers actual simulated client departure and peer-session preservation (not same-account rejoin), walkable synthetic Temple/Mine side-room paths, and one normal client attack dealing boss damage (not an unassisted complete fight). Final authored rooms, complete unassisted gameplay, UI, and approved cross-place/multiplayer release testing remain open content/release gates. See `docs/testing/phase4-optional-boss-four-backend-steps-closeout-2026-09-19.md` and `docs/testing/phase4-remaining-release-gates-local-proof-2026-09-19.md`.
+
+The DOCX passed archive and structural integrity checks; a visual page-render QA remains outstanding because the earlier automated Word export stalled.
+
+Historical note: Roadmap v1.45 added the four-step Event/Secret Boss **isolated backend**
 checkpoint: recovery and reward replay, Mine live integration, four distinct
 server-owned two-phase boss attack patterns, and fresh Base/Dungeon Studio
 regressions. Gameplay source was validated at `3700dba`; the final regular
