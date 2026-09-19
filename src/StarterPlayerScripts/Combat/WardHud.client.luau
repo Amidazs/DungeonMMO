@@ -1,35 +1,83 @@
 --!strict
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
-local gui: ScreenGui? = nil
-local fill: Frame? = nil
-local label: TextLabel? = nil
+local shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
+local UiComponents = require(
+    shared:WaitForChild("UiComponents")
+)
+local UiTheme = require(
+    shared:WaitForChild("UiTheme")
+)
+
+local profile_gui = player:WaitForChild(
+    "PlayerGui"
+):WaitForChild("ProfileHud")
+local resource_stack = profile_gui
+    :WaitForChild("StatusCard")
+    :WaitForChild("ResourceStack")
+
+local old = resource_stack:FindFirstChild("WardBar")
+if old then
+    old:Destroy()
+end
+
+local ward_bar = UiComponents.progress_bar(
+    resource_stack,
+    "WardBar",
+    "WARD",
+    UiTheme.PALETTE.Ward,
+    UiTheme.PALETTE.WardDark,
+    20
+)
+ward_bar.Root.LayoutOrder = 3
+ward_bar.Root.Size = UDim2.new(1, 0, 0, 20)
+ward_bar.Track.Position = UDim2.fromOffset(0, 13)
+ward_bar.Track.Size = UDim2.new(1, 0, 0, 6)
+ward_bar.Label.TextSize = 10
+ward_bar.Value.TextSize = 10
+ward_bar.Root.Visible = false
+
 local character_connections: {RBXScriptConnection} = {}
 
+--[[
+Disconnects Ward listeners from the previous character.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
 local function disconnect_character()
-    for _, connection in character_connections do
+    for _, connection in ipairs(character_connections) do
         connection:Disconnect()
     end
     table.clear(character_connections)
 end
 
+--[[
+Updates Ward amount and visibility.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
 local function update_value()
     local character = player.Character
-
-    if not gui or not fill or not label
-        or not character
-    then
-        if gui then
-            gui.Enabled = false
-        end
+    if not character then
+        ward_bar.Root.Visible = false
         return
     end
 
-    local active =
-        character:GetAttribute(
-            "ArcaneWardActive"
-        ) == true
+    local active = character:GetAttribute(
+        "ArcaneWardActive"
+    ) == true
     local current = tonumber(
         character:GetAttribute(
             "ArcaneWardCurrent"
@@ -40,118 +88,59 @@ local function update_value()
             "ArcaneWardMax"
         )
     ) or 0
-
-    gui.Enabled =
-        active
+    local visible = active
         and current > 0
         and maximum > 0
 
-    if not gui.Enabled then
+    ward_bar.Root.Visible = visible
+    if not visible then
         return
     end
 
-    local ratio = math.clamp(
-        current / maximum,
-        0,
-        1
-    )
-    fill.Size = UDim2.fromScale(
-        ratio,
-        1
-    )
-    label.Text = string.format(
-        "WARD  %.0f / %.0f",
+    ward_bar.Value.Text = string.format(
+        "%.0f / %.0f",
         current,
         maximum
     )
+    UiTheme.set_bar_ratio(
+        ward_bar.Fill,
+        current / maximum
+    )
 end
 
-local function create_gui()
-    local player_gui =
-        player:WaitForChild("PlayerGui")
-    local old =
-        player_gui:FindFirstChild(
-            "ArcaneWardGui"
-        )
+--[[
+Binds Ward attributes on a new character.
 
-    if old then
-        old:Destroy()
-    end
+Args:
+    character (Model): New local character.
 
-    local screen = Instance.new("ScreenGui")
-    screen.Name = "ArcaneWardGui"
-    screen.ResetOnSpawn = false
-    screen.Enabled = false
-    screen.Parent = player_gui
-
-    local container =
-        Instance.new("Frame")
-    container.AnchorPoint =
-        Vector2.new(0.5, 1)
-    container.Position =
-        UDim2.new(0.5, 0, 1, -100)
-    container.Size =
-        UDim2.fromOffset(300, 20)
-    container.BackgroundColor3 =
-        Color3.fromRGB(28, 30, 34)
-    container.BackgroundTransparency = 0.2
-    container.Parent = screen
-
-    local value = Instance.new("Frame")
-    value.Size = UDim2.fromScale(1, 1)
-    value.BackgroundColor3 =
-        Color3.fromRGB(115, 185, 255)
-    value.BackgroundTransparency = 0.08
-    value.BorderSizePixel = 0
-    value.Parent = container
-
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.fromScale(1, 1)
-    text.BackgroundTransparency = 1
-    text.Font = Enum.Font.Code
-    text.TextColor3 =
-        Color3.fromRGB(245, 245, 245)
-    text.TextSize = 14
-    text.Parent = container
-
-    gui = screen
-    fill = value
-    label = text
-    update_value()
-end
-
-local function bind_character(
-    character: Model
-)
+Returns:
+    None.
+]]
+local function bind_character(character: Model)
     disconnect_character()
 
-    for _, name in {
+    for _, attribute_name in ipairs({
         "ArcaneWardActive",
         "ArcaneWardCurrent",
         "ArcaneWardMax",
-    } do
+    }) do
         table.insert(
             character_connections,
-            character
-                :GetAttributeChangedSignal(name)
-                :Connect(update_value)
+            character:GetAttributeChangedSignal(
+                attribute_name
+            ):Connect(update_value)
         )
     end
 
     update_value()
 end
 
-create_gui()
-
-player.CharacterAdded:Connect(
-    bind_character
-)
-player.CharacterRemoving:Connect(
-    function()
-        disconnect_character()
-        update_value()
-    end
-)
+player.CharacterAdded:Connect(bind_character)
+player.CharacterRemoving:Connect(function()
+    disconnect_character()
+    ward_bar.Root.Visible = false
+end)
 
 if player.Character then
     bind_character(player.Character)

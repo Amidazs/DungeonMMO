@@ -3,6 +3,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 if not RunService:IsStudio() then
     return
@@ -10,10 +11,18 @@ end
 
 local player = Players.LocalPlayer
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
-local preview_request = remotes:WaitForChild("RaceChangePreviewRequest") :: RemoteEvent
-local preview_remote = remotes:WaitForChild("RaceChangePreview") :: RemoteEvent
-local apply_request = remotes:WaitForChild("RaceChangeApplyRequest") :: RemoteEvent
-local action_result = remotes:WaitForChild("RaceChangeActionResult") :: RemoteEvent
+local preview_request = remotes:WaitForChild(
+    "RaceChangePreviewRequest"
+) :: RemoteEvent
+local preview_remote = remotes:WaitForChild(
+    "RaceChangePreview"
+) :: RemoteEvent
+local apply_request = remotes:WaitForChild(
+    "RaceChangeApplyRequest"
+) :: RemoteEvent
+local action_result = remotes:WaitForChild(
+    "RaceChangeActionResult"
+) :: RemoteEvent
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "RaceChangeProofPanel"
@@ -24,6 +33,7 @@ local frame = Instance.new("Frame")
 frame.Name = "Panel"
 frame.Size = UDim2.fromOffset(360, 260)
 frame.Position = UDim2.new(1, -380, 0, 20)
+frame.Visible = false
 frame.Parent = gui
 
 local title = Instance.new("TextLabel")
@@ -31,6 +41,12 @@ title.Size = UDim2.new(1, -20, 0, 30)
 title.Position = UDim2.fromOffset(10, 8)
 title.Text = "DEV Race Change Proof"
 title.Parent = frame
+
+local close = Instance.new("TextButton")
+close.Size = UDim2.fromOffset(34, 28)
+close.Position = UDim2.new(1, -42, 0, 8)
+close.Text = "X"
+close.Parent = frame
 local status = Instance.new("TextLabel")
 status.Size = UDim2.new(1, -20, 0, 100)
 status.Position = UDim2.fromOffset(10, 45)
@@ -39,7 +55,20 @@ status.TextYAlignment = Enum.TextYAlignment.Top
 status.Text = "Preview a target race."
 status.Parent = frame
 
-local function button(text: string, x: number): TextButton
+--[[
+Creates one compact Studio race-change proof button.
+
+Args:
+    text (string): Visible button label.
+    x (number): Horizontal position in pixels.
+
+Returns:
+    TextButton: Configured proof-panel button.
+]]
+local function button(
+    text: string,
+    x: number
+): TextButton
     local control = Instance.new("TextButton")
     control.Size = UDim2.fromOffset(105, 34)
     control.Position = UDim2.fromOffset(x, 155)
@@ -57,6 +86,45 @@ apply.AutoButtonColor = false
 local last_target: string? = nil
 local last_hash: string? = nil
 
+close.Activated:Connect(function()
+    frame.Visible = false
+end)
+
+UserInputService.InputBegan:Connect(function(
+    input: InputObject,
+    processed: boolean
+)
+    if processed then
+        return
+    end
+
+    local control = UserInputService:IsKeyDown(
+        Enum.KeyCode.LeftControl
+    ) or UserInputService:IsKeyDown(
+        Enum.KeyCode.RightControl
+    )
+    local shift = UserInputService:IsKeyDown(
+        Enum.KeyCode.LeftShift
+    ) or UserInputService:IsKeyDown(
+        Enum.KeyCode.RightShift
+    )
+
+    if control
+        and shift
+        and input.KeyCode == Enum.KeyCode.R then
+        frame.Visible = not frame.Visible
+    end
+end)
+
+--[[
+Requests a Studio-only race-change preview.
+
+Args:
+    target (string): Target race identifier.
+
+Returns:
+    None.
+]]
 local function request_preview(target: string)
     last_target = nil
     last_hash = nil
@@ -74,7 +142,9 @@ elf.Activated:Connect(function()
 end)
 preview_remote.OnClientEvent:Connect(function(payload: any)
     if type(payload) ~= "table" or payload.ok ~= true then
-        local reason = if type(payload) == "table" then payload.reason else "InvalidPreview"
+        local reason = if type(payload) == "table"
+        then payload.reason
+        else "InvalidPreview"
         status.Text = "Preview rejected: " .. tostring(reason)
         last_target = nil
         last_hash = nil

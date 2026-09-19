@@ -1,29 +1,63 @@
 --!strict
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
+local shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
 local ProgressionClientState = require(
     script.Parent.Parent
         :WaitForChild("Core")
         :WaitForChild("ProgressionClientState")
 )
+local UiComponents = require(
+    shared:WaitForChild("UiComponents")
+)
+local UiTheme = require(
+    shared:WaitForChild("UiTheme")
+)
 
-local gui: ScreenGui? = nil
-local fill: Frame? = nil
-local label: TextLabel? = nil
-local mage = false
+local profile_gui = player:WaitForChild(
+    "PlayerGui"
+):WaitForChild("ProfileHud")
+local resource_stack = profile_gui
+    :WaitForChild("StatusCard")
+    :WaitForChild("ResourceStack")
 
-local function update_visibility()
-    if gui then
-        gui.Enabled = mage
-    end
+local old = resource_stack:FindFirstChild("ManaBar")
+if old then
+    old:Destroy()
 end
 
-local function update_value()
-    if not fill or not label then
-        return
-    end
+local mana_bar = UiComponents.progress_bar(
+    resource_stack,
+    "ManaBar",
+    "MANA",
+    UiTheme.PALETTE.Mana,
+    UiTheme.PALETTE.ManaDark,
+    20
+)
+mana_bar.Root.LayoutOrder = 2
+mana_bar.Root.Size = UDim2.new(1, 0, 0, 20)
+mana_bar.Track.Position = UDim2.fromOffset(0, 13)
+mana_bar.Track.Size = UDim2.new(1, 0, 0, 6)
+mana_bar.Label.TextSize = 10
+mana_bar.Value.TextSize = 10
+mana_bar.Root.Visible = false
 
+local mage = false
+
+--[[
+Updates Mana from replicated player attributes.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function update_value()
     local current = tonumber(
         player:GetAttribute("CombatMana")
     ) or 0
@@ -36,108 +70,51 @@ local function update_value()
         )
     ) or 0
     local ratio = if maximum > 0
-        then math.clamp(
-            current / maximum,
-            0,
-            1
-        )
+        then current / maximum
         else 0
 
-    fill.Size = UDim2.fromScale(
-        ratio,
-        1
-    )
-    label.Text = string.format(
-        "MANA  %.0f / %.0f  (+%.1f/s)",
+    mana_bar.Value.Text = string.format(
+        "%.0f / %.0f   +%.1f/s",
         current,
         maximum,
         regen
     )
+    UiTheme.set_bar_ratio(mana_bar.Fill, ratio)
 end
 
-local function create_gui()
-    local player_gui =
-        player:WaitForChild("PlayerGui")
-    local old =
-        player_gui:FindFirstChild(
-            "CombatManaGui"
-        )
+--[[
+Updates Mana visibility from the current identity snapshot.
 
-    if old then
-        old:Destroy()
-    end
+Args:
+    snapshot (any): Current progression snapshot.
 
-    local screen = Instance.new("ScreenGui")
-    screen.Name = "CombatManaGui"
-    screen.ResetOnSpawn = false
-    screen.Parent = player_gui
+Returns:
+    None.
+]]
+local function apply_identity_snapshot(snapshot: any)
+    local identity = if type(snapshot) == "table"
+        then snapshot.Identity
+        else nil
 
-    local container =
-        Instance.new("Frame")
-    container.AnchorPoint =
-        Vector2.new(0.5, 1)
-    container.Position =
-        UDim2.new(0.5, 0, 1, -72)
-    container.Size =
-        UDim2.fromOffset(300, 22)
-    container.BackgroundColor3 =
-        Color3.fromRGB(28, 30, 34)
-    container.BackgroundTransparency = 0.2
-    container.Parent = screen
-
-    local value = Instance.new("Frame")
-    value.Size = UDim2.fromScale(1, 1)
-    value.BackgroundColor3 =
-        Color3.fromRGB(90, 120, 230)
-    value.BackgroundTransparency = 0.08
-    value.BorderSizePixel = 0
-    value.Parent = container
-
-    local text = Instance.new("TextLabel")
-    text.Size = UDim2.fromScale(1, 1)
-    text.BackgroundTransparency = 1
-    text.Font = Enum.Font.Code
-    text.TextColor3 =
-        Color3.fromRGB(245, 245, 245)
-    text.TextSize = 14
-    text.Parent = container
-
-    gui = screen
-    fill = value
-    label = text
-
-    update_value()
-    update_visibility()
-end
-
-local function apply_identity_snapshot(
-    snapshot: any
-)
-    local identity =
-        type(snapshot) == "table"
-        and snapshot.Identity
-        or nil
-
-    mage =
-        type(identity) == "table"
+    mage = type(identity) == "table"
         and identity.BaseClassId == "Mage"
-
-    update_visibility()
+    mana_bar.Root.Visible = mage
+    update_value()
 end
 
-create_gui()
-apply_identity_snapshot(
-    ProgressionClientState.get_snapshot()
-)
 ProgressionClientState.subscribe(
     apply_identity_snapshot
 )
+apply_identity_snapshot(
+    ProgressionClientState.get_snapshot()
+)
 
-for _, name in {
+for _, attribute_name in ipairs({
     "CombatMana",
     "CombatMaxMana",
     "CombatManaRegenPerSecond",
-} do
-    player:GetAttributeChangedSignal(name)
-        :Connect(update_value)
+}) do
+    player:GetAttributeChangedSignal(
+        attribute_name
+    ):Connect(update_value)
 end

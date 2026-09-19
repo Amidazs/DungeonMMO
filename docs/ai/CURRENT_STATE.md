@@ -952,4 +952,15 @@ A separate backend candidate exists in DungeonMMO_Phase4_EventSecretPolicy_v1, b
 Backend closeout (19 September 2026): server-issued optional-boss
 run-state regression passed 28 offline Luau assertions; four
 Rojo builds and diff check passed. Physical arenas, event
-schedules and secret-route release settings remain gated.
+schedules and secret-route release settings remain gated.\r\n\r\n
+## UI/HUD overhaul candidate - 19 September 2026
+
+Active UI worktree: DungeonMMO_Phase4_UIOverhaul_v1.
+Branch: wip/phase-4-ui-overhaul-v1; baseline ff2baa0.
+Shared styling, combat hotbar/status, dungeon HUD, contextual Expedition
+and Auction windows, and refreshed Guild/core menus are implemented.
+531 Luau sources parsed, four Rojo builds passed, Base and repeat Dungeon
+Studio regressions passed; repeat Dungeon log has zero project errors.
+Manual visual and prompt-to-window acceptance remains OPEN.
+No push, merge or Roblox publish. Backend readiness gates unchanged.
+Evidence: docs/testing/phase4-ui-hud-overhaul-candidate-acceptance-record.md.

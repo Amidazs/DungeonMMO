@@ -185,3 +185,13 @@ replace this roadmap's LOCKED/WORKING/LATER/OPEN design decisions.
 When the roadmap is deliberately revised, add the new canonical DOCX, update
 its version/hash here, refresh `CURRENT_STATE.md`, and preserve an acceptance
 or handoff record for the superseded engineering boundary.
+
+
+The Phase 4 UI/HUD overhaul has a locally tested working candidate on
+wip/phase-4-ui-overhaul-v1 (baseline ff2baa0). Shared dark-fantasy styling,
+combat HUD/hotbar, refreshed core windows and entrance-/service-bound
+dungeon/market windows are implemented. Parse, four builds, Base and
+repeat Dungeon regressions passed. Visual/live interaction acceptance
+remains OPEN; no push, merge or publish occurred.
+Evidence: docs/testing/phase4-ui-hud-overhaul-candidate-acceptance-record.md.
+The canonical roadmap DOCX remains v1.43 pending explicit revision.

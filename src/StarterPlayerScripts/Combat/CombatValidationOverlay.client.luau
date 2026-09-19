@@ -34,6 +34,7 @@ panel.Size = UDim2.new(0.42, 0, 0, 205)
 panel.BackgroundColor3 = Color3.fromRGB(12, 14, 18)
 panel.BackgroundTransparency = 0.18
 panel.BorderSizePixel = 0
+panel.Visible = false
 panel.Parent = gui
 
 local size_constraint = Instance.new("UISizeConstraint")
@@ -67,6 +68,15 @@ feed.TextColor3 = Color3.fromRGB(170, 255, 185)
 feed.Text = "Waiting for authoritative combat events..."
 feed.Parent = panel
 
+--[[
+Formats one authoritative combat validation event for the Studio feed.
+
+Args:
+    payload (any): Validation event payload received from the server.
+
+Returns:
+    string: Compact human-readable validation line.
+]]
 local function format_payload(payload: any): string
     local server_time = type(payload.server_time) == "number"
         and payload.server_time
@@ -90,6 +100,15 @@ local function format_payload(payload: any): string
     )
 end
 
+--[[
+Refreshes the Studio validation feed from its retained event lines.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
 local function refresh()
     feed.Text = table.concat(lines, "\n")
 end

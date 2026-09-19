@@ -1,14 +1,68 @@
+--!strict
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local player = Players.LocalPlayer
+local shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
+local UiComponents = require(
+    shared:WaitForChild("UiComponents")
+)
+local UiTheme = require(
+    shared:WaitForChild("UiTheme")
+)
 
-local fill: Frame? = nil
-local value_label: TextLabel? = nil
-local parry_label: TextLabel? = nil
+local profile_gui = player:WaitForChild(
+    "PlayerGui"
+):WaitForChild("ProfileHud")
+local status_card = profile_gui:WaitForChild(
+    "StatusCard"
+)
+local resource_stack = status_card:WaitForChild(
+    "ResourceStack"
+)
 
+local old = resource_stack:FindFirstChild(
+    "StaminaBar"
+)
+if old then
+    old:Destroy()
+end
+
+local stamina_bar = UiComponents.progress_bar(
+    resource_stack,
+    "StaminaBar",
+    "STAMINA",
+    UiTheme.PALETTE.Stamina,
+    UiTheme.PALETTE.StaminaDark,
+    20
+)
+stamina_bar.Root.LayoutOrder = 1
+stamina_bar.Root.Size = UDim2.new(1, 0, 0, 20)
+stamina_bar.Track.Position = UDim2.fromOffset(0, 13)
+stamina_bar.Track.Size = UDim2.new(1, 0, 0, 6)
+stamina_bar.Label.TextSize = 10
+stamina_bar.Value.TextSize = 10
+
+local parry = UiComponents.label(
+    profile_gui,
+    "ParryCue",
+    "PERFECT PARRY",
+    "Heading"
+)
+parry.AnchorPoint = Vector2.new(0.5, 1)
+parry.Position = UDim2.new(0.5, 0, 1, -150)
+parry.Size = UDim2.fromOffset(260, 34)
+parry.TextXAlignment = Enum.TextXAlignment.Center
+parry.TextColor3 = UiTheme.PALETTE.AccentBright
+parry.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+parry.TextStrokeTransparency = 0.25
+parry.TextSize = 22
+parry.Visible = false
 
 --[[
-Updates the prototype Stamina bar from replicated Player attributes.
+Updates Stamina from replicated player attributes.
 
 Args:
     None.
@@ -17,40 +71,29 @@ Returns:
     None.
 ]]
 local function update_stamina()
-    if not fill or not value_label then
-        return
-    end
-
-    local current = player:GetAttribute(
-        "CombatStamina"
+    local current = tonumber(
+        player:GetAttribute("CombatStamina")
     ) or 0
-    local maximum = player:GetAttribute(
-        "CombatMaxStamina"
+    local maximum = tonumber(
+        player:GetAttribute("CombatMaxStamina")
     ) or 100
-    local ratio = 0
+    local ratio = if maximum > 0
+        then current / maximum
+        else 0
 
-    if maximum > 0 then
-        ratio = math.clamp(
-            current / maximum,
-            0,
-            1
-        )
-    end
-
-    fill.Size = UDim2.fromScale(
-        ratio,
-        1
-    )
-    value_label.Text = string.format(
-        "STAMINA  %.0f / %.0f",
+    stamina_bar.Value.Text = string.format(
+        "%.0f / %.0f",
         current,
         maximum
     )
+    UiTheme.set_bar_ratio(
+        stamina_bar.Fill,
+        ratio
+    )
 end
 
-
 --[[
-Shows a short server-confirmed parry cue.
+Shows a brief server-confirmed parry cue.
 
 Args:
     None.
@@ -59,118 +102,23 @@ Returns:
     None.
 ]]
 local function show_parry()
-    local label = parry_label
-
-    if not label then
-        return
-    end
-
-    label.Visible = true
-    label.Text = "PARRY"
-
     local pulse = player:GetAttribute(
         "CombatParryPulse"
     )
 
-    task.delay(0.35, function()
-        if parry_label == label
-            and player:GetAttribute(
-                "CombatParryPulse"
-            ) == pulse then
-            label.Visible = false
+    parry.Visible = true
+    parry.TextTransparency = 0
+
+    task.delay(0.4, function()
+        if player:GetAttribute(
+            "CombatParryPulse"
+        ) == pulse then
+            parry.Visible = false
         end
     end)
 end
 
-
---[[
-Creates the prototype defensive HUD.
-
-Args:
-    None.
-
-Returns:
-    None.
-]]
-local function create_gui()
-    local player_gui = player:WaitForChild(
-        "PlayerGui"
-    )
-    local existing = player_gui:FindFirstChild(
-        "CombatStaminaGui"
-    )
-
-    if existing then
-        existing:Destroy()
-    end
-
-    local gui = Instance.new("ScreenGui")
-
-    gui.Name = "CombatStaminaGui"
-    gui.ResetOnSpawn = false
-    gui.Parent = player_gui
-
-    local container = Instance.new("Frame")
-
-    container.Name = "StaminaContainer"
-    container.AnchorPoint = Vector2.new(0.5, 1)
-    container.Position = UDim2.new(
-        0.5,
-        0,
-        1,
-        -42
-    )
-    container.Size = UDim2.fromOffset(300, 24)
-    container.BackgroundColor3 = Color3.fromRGB(28, 30, 34)
-    container.BackgroundTransparency = 0.2
-    container.Parent = gui
-
-    local bar = Instance.new("Frame")
-
-    bar.Name = "Fill"
-    bar.Size = UDim2.fromScale(1, 1)
-    bar.BackgroundColor3 = Color3.fromRGB(70, 180, 115)
-    bar.BackgroundTransparency = 0.1
-    bar.BorderSizePixel = 0
-    bar.Parent = container
-
-    local label = Instance.new("TextLabel")
-
-    label.Name = "Value"
-    label.Size = UDim2.fromScale(1, 1)
-    label.BackgroundTransparency = 1
-    label.Font = Enum.Font.Code
-    label.TextColor3 = Color3.fromRGB(245, 245, 245)
-    label.TextSize = 15
-    label.Parent = container
-
-    local parry = Instance.new("TextLabel")
-
-    parry.Name = "ParryCue"
-    parry.AnchorPoint = Vector2.new(0.5, 1)
-    parry.Position = UDim2.new(
-        0.5,
-        0,
-        0,
-        -6
-    )
-    parry.Size = UDim2.fromOffset(180, 34)
-    parry.BackgroundTransparency = 1
-    parry.Font = Enum.Font.GothamBold
-    parry.TextColor3 = Color3.fromRGB(255, 230, 120)
-    parry.TextSize = 28
-    parry.Visible = false
-    parry.Parent = container
-
-    fill = bar
-    value_label = label
-    parry_label = parry
-
-    update_stamina()
-end
-
-
-create_gui()
+update_stamina()
 
 player:GetAttributeChangedSignal(
     "CombatStamina"

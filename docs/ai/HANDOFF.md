@@ -709,4 +709,15 @@ A separate backend candidate exists in DungeonMMO_Phase4_EventSecretPolicy_v1, b
 Backend closeout (19 September 2026): server-issued optional-boss
 run-state regression passed 28 offline Luau assertions; four
 Rojo builds and diff check passed. Physical arenas, event
-schedules and secret-route release settings remain gated.
+schedules and secret-route release settings remain gated.\r\n\r\n
+## UI candidate handoff - 19 September 2026
+
+Continue at DungeonMMO_Phase4_UIOverhaul_v1, branch
+wip/phase-4-ui-overhaul-v1. Parser, four builds and Base/Dungeon Studio
+regressions passed; see UI candidate acceptance record.
+Before merging/publishing, visually test normal gameplay at desktop and
+small viewports, player/target/hotbar spacing, Guild/Inventory/Skills close,
+DungeonEntryPrompt and AuctionHousePrompt open/close/distance behaviour,
+party entry and dungeon HUD with active boss/completion.
+Preserve backend, physical depth locks and isolated art worktree.
+No push, merge or Roblox publish has been performed.

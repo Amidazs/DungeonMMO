@@ -56,13 +56,35 @@ local MODE_ATTRIBUTE = "DungeonMMOEnvironmentMode"
 Workspace:SetAttribute(READY_ATTRIBUTE, false)
 Workspace:SetAttribute(ERROR_ATTRIBUTE, nil)
 
+--[[
+Raises a Base bootstrap failure with a consistent error prefix.
+
+Args:
+    reason (string): Failure detail to include in the error.
+
+Returns:
+    never: This helper always raises an error.
+]]
 local function fail(reason: string): never
     Workspace:SetAttribute(ERROR_ATTRIBUTE, reason)
     Workspace:SetAttribute(READY_ATTRIBUTE, false)
     error("[Base Environment] " .. reason)
 end
 
-local function find_unique_named(root: Instance, name: string): Instance?
+--[[
+Finds exactly one descendant with a requested name.
+
+Args:
+    root (Instance): Root instance to search.
+    name (string): Descendant name to find.
+
+Returns:
+    Instance?: Unique matching descendant, or nil when none exists.
+]]
+local function find_unique_named(
+    root: Instance,
+    name: string
+): Instance?
     local found: Instance? = nil
     for _, instance in ipairs(root:GetDescendants()) do
         if instance.Name == name then
@@ -75,6 +97,15 @@ local function find_unique_named(root: Instance, name: string): Instance?
     return found
 end
 
+--[[
+Returns a world pivot for supported environment instances.
+
+Args:
+    instance (Instance): Model or BasePart to inspect.
+
+Returns:
+    CFrame?: World pivot when the instance supports one.
+]]
 local function pivot_of(instance: Instance): CFrame?
     if instance:IsA("BasePart") then
         return instance.CFrame
@@ -84,6 +115,15 @@ local function pivot_of(instance: Instance): CFrame?
     return nil
 end
 
+--[[
+Creates semantic Base anchors from the configured candidate environment.
+
+Args:
+    None.
+
+Returns:
+    any: Resolved candidate-anchor result used by bootstrap.
+]]
 local function create_candidate_anchors()
     for _, entry in ipairs(CandidateProfile.Entries) do
         local selected: any = nil
@@ -164,6 +204,18 @@ local function create_candidate_anchors()
     end
 end
 
+--[[
+Creates or reuses a ProximityPrompt on a Base anchor.
+
+Args:
+    anchor (BasePart): Anchor that owns the prompt.
+    name (string): Prompt instance name.
+    action_text (string): Player-facing action verb.
+    object_text (string): Player-facing object name.
+
+Returns:
+    ProximityPrompt: Existing or newly created prompt.
+]]
 local function ensure_prompt(
     anchor: BasePart,
     name: string,
@@ -186,6 +238,16 @@ local function ensure_prompt(
     return prompt
 end
 
+--[[
+Creates a world-space label when an anchor does not have one.
+
+Args:
+    anchor (BasePart): Anchor that owns the label.
+    text (string): Player-facing label text.
+
+Returns:
+    None.
+]]
 local function ensure_label(
     anchor: BasePart,
     text: string
@@ -308,6 +370,17 @@ ensure_prompt(
     "Temple Dungeon"
 )
 ensure_label(portal, "TEMPLE")
+
+local market = resolved.by_id["Base.Travel.Market"]
+local market_prompt = ensure_prompt(
+    market,
+    "AuctionHousePrompt",
+    "Browse",
+    "Auction House"
+)
+market_prompt.KeyboardKeyCode = Enum.KeyCode.E
+market_prompt.MaxActivationDistance = 12
+ensure_label(market, "AUCTION HOUSE")
 
 local progression = resolved.by_id["Base.Service.Progression"]
 ensure_label(progression, "PROGRESSION")
