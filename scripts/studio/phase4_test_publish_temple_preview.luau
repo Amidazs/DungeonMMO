@@ -118,8 +118,10 @@ local function run()
     local p=wait_for(function()
         return Players:GetPlayers()[1]
     end,"TEST Play player",25)
-    assert(p.Character and p.Character:FindFirstChild("HumanoidRootPart"),
-        "TEST client character missing")
+    wait_for(function()
+        local character=p.Character
+        return character and character:FindFirstChild("HumanoidRootPart")
+    end,"TEST client character",25)
     local options=require(game:GetService("ServerScriptService").Core.Services.DungeonInstanceDirector).runtime_options()
     local snapshot=require(game:GetService("ServerScriptService").Core.Services.DungeonOptionalBossRunState).issue(
         "TestDungeon",os.time(),12,options,true)
