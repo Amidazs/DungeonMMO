@@ -122,12 +122,14 @@ print("[Phase4 Combat Input] STARTED")
 local duration = os.clock() + 90
 local sent = 0
 local dodges = 0
+local last_dodge_at_attack = 0
 while os.clock() < duration and player:GetAttribute("Phase4AttackEventBoss") == true do
     local humanoid = player.Character
         and player.Character:FindFirstChildOfClass("Humanoid")
     if not humanoid or humanoid.Health <= 0 then break end
     if actions.request_attack() then sent += 1 end
-    if sent > 0 and sent % 3 == 0 then
+    if sent >= last_dodge_at_attack + 3 then
+        last_dodge_at_attack = sent
         if actions.request_dodge() then dodges += 1 end
         task.wait(0.34)
     else
