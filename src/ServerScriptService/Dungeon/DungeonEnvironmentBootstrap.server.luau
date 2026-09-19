@@ -11,6 +11,9 @@ local Shared = ReplicatedStorage
 local DungeonDefinitions = require(
     Shared:WaitForChild("DungeonDefinitions")
 )
+local TestRelease = require(
+    Shared:WaitForChild("DungeonTestPlaceholderRelease")
+)
 local DungeonDifficultyDefinitions = require(
     Shared:WaitForChild("DungeonDifficultyDefinitions")
 )
@@ -101,12 +104,20 @@ end
 -- It creates physical preview parts and optional anchor points without
 -- registering encounter bindings or bypassing either production release lock.
 if mode == "Synthetic"
-    and RunService:IsStudio()
-    and Workspace:GetAttribute(
-        "DungeonMMOPlaceholderPhysicalContentEnabled"
-    ) == true
+    and (
+        (TestRelease.is_test_dungeon()
+            and dungeon_id == DungeonDefinitions.TEST_DUNGEON.Id)
+        or (
+            RunService:IsStudio()
+            and Workspace:GetAttribute(
+                "DungeonMMOPlaceholderPhysicalContentEnabled"
+            ) == true
+        )
+    )
 then
-    DungeonPlaceholderPhysicalContent.create(Workspace, dungeon_id)
+    DungeonPlaceholderPhysicalContent.create(
+        Workspace, dungeon_id, difficulty_id
+    )
 end
 
 if mode == "Candidate"
