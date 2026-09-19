@@ -1,0 +1,146 @@
+[Environment Runtime Mode Tests] PASS: 7 assertions.
+[Guild Dungeon Progression Tests] PASS
+[Market Remote Contract Tests] PASS: 6 assertions.
+[Revive Purchase Tests] PASS: 13 assertions.
+[Market Listing Service Tests] PASS: 15 assertions.
+[Bestiary Definitions Tests] PASS: 11 assertions.
+[Dungeon Modifier Definitions Tests] PASS: 6 assertions.
+[Profile Migration Bank v7 Tests] PASS
+[Guild Service Tests] PASS
+[Phase 2C.A Identity Service Tests] PASS: 58 assertions.
+[Equipment Service Effects Tests] PASS: 17 assertions.
+[Phase2A UI State Tests] PASS: 14 assertions.
+[Travel Service Tests] PASS
+[Rare Skill Book Learning Tests] PASS: 8 assertions.
+[Profile Service Tests] PASS: 19 assertions.
+[Quest Definition Tests] PASS: 15 assertions.
+[Recipe Knowledge Definitions Tests] PASS: 15 assertions.
+[Recipe Knowledge Migration Tests] PASS: 12 assertions.
+[Roblox Teleport Adapter Failure Tests] PASS: 2 assertions.
+[Dungeon Difficulty v13 Migration Tests] PASS: 14 assertions.
+[Skill Progression Service Tests] PASS: 17 assertions.
+[Runtime Default Binding Tests] PASS: 2 assertions.
+[Race Change Service Tests] PASS: 23 assertions.
+[Phase 2C.B Equipment Migration Tests] PASS: 20 assertions.
+[Phase 2B Progression Service Tests] PASS: 42 assertions.
+[Phase 2B Profile Migration Tests] PASS: 18 assertions.
+[Mage Identity Tests] PASS: 26 assertions.
+[Progression Snapshot Builder Tests] PASS: 37 assertions.
+[Rogue Progression Tests] PASS: 17 assertions.
+[Reputation Service Tests] PASS: 12 assertions.
+[Recipe Knowledge Service Tests] PASS: 23 assertions.
+[Ranger Identity Tests] PASS: 30 assertions.
+[Phase 2C.A Race Definitions] PASS (35 assertions)
+[Race Change Remote Contract Tests] PASS: 5 assertions.
+[Reward Service Tests] PASS: 27 assertions.
+[Recipe Knowledge Crafting Gate Tests] PASS: 12 assertions.
+[Profile Schema/Migration Tests] PASS: 43 assertions.
+[Profile Migration Market V11 Tests] PASS: 13 assertions.
+[Rare Skill Book Drop] Source=Boss:MarauderCaptain UserId=9701 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Boss:MarauderCaptain UserId=9702 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Boss:CorruptedForeman UserId=9701 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Completion:AbandonedMine UserId=9701 Item=arc_slash_book
+[Rare Skill Book Reward Tests] PASS: 16 assertions.
+[Profession Definition Contract Tests] PASS: 25 assertions.
+[Travel Config/Definitions Tests] PASS
+[Progression Debug Command Transport Tests] PASS: 10 assertions.
+[Phase 3 Systems Stress] PASS: profiles=250 market=1000 replay=1000 guild=250 sessions=100 race_roundtrips=100
+[Progression Service Tests] PASS: 9 assertions.
+[Progression Runtime Equipment Tests] PASS: 14 assertions.
+[Progression Trainer Rules Tests] PASS: 11 assertions.
+[TEST Failure Switch Tests] PASS: 7 assertions.
+[Phase 2C.A Profile Migration Tests] PASS: 38 assertions.
+[Mage Runtime Authority Tests] PASS: 8 assertions.
+[Skill Book Drop Config Tests] PASS: 11 assertions.
+[Travel Access Rules Tests] PASS
+[Quest Service Tests] PASS: 17 assertions.
+[Profession Runtime Rules Tests] PASS: 31 assertions.
+[Market Purchase Recovery Tests] PASS: 17 assertions.
+[Market Cancel Expiry Tests] PASS: 15 assertions.
+[Mage Profile Migration Tests] PASS: 7 assertions.
+[Reputation Definitions Tests] PASS: 3 assertions.
+[Race Change Planner Tests] PASS: 15 assertions.
+[Proficiency Service Tests] PASS: 8 assertions.
+[Loadout Service Tests] PASS: 30 assertions.
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.39, 0.25) RightPos=(1.55, 0.39, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.39, 0.25) RightPos=(1.55, 0.39, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.38, 0.25) RightPos=(1.55, 0.38, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation Service Tests] PASS: 51 assertions.
+[Race Change Migration Tests] PASS: 13 assertions.
+[Inventory Service Tests] PASS: 9 assertions.
+[Inventory Presentation Tests] PASS: 15 assertions.
+[Rate Limit Tests] PASS: 8 assertions.
+[Profession Resource Distribution Tests] PASS
+[Teleport Coordinator Tests] PASS: 19 assertions.
+[Progression HUD Rules Tests] PASS: 2 assertions.
+[Quest Advancement Migration Tests] PASS: 8 assertions.
+[Rogue Advancement Tests] PASS: 12 assertions.
+[Profession Profile Migration Tests] PASS: 17 assertions.
+[Phase 2C.B Remote Contract Tests] PASS: all equipment/trainer remotes exist.
+[Trainer Catalogues Tests] PASS: 10 assertions.
+[Bestiary Reputation Migration Tests] PASS: 18 assertions.
+[Profession Resource Claim Tests] PASS
+[Profession Service Tests] PASS: 37 assertions.
+[Profile Lease Tests] PASS
+[Party Entry Coordinator Tests] PASS
+[Party Difficulty Tests] PASS: 22 assertions.
+[Base Travel Runtime Contract Tests] PASS
+[Equipment Service Tests] PASS: 38 assertions.
+[Base Return Admission Tests] PASS: 5 assertions.
+[Base Reconnect Routing Tests] PASS: 9 assertions.
+[Base Environment] Ready in Synthetic mode.
+[Dungeon Difficulty Session Tests] PASS: 7 assertions.
+[Dungeon Difficulty Tuning Tests] PASS: 10 assertions.
+[Economy Audit Tests] PASS: 6 assertions.
+[Base Progression Controller Tests] PASS: 25 assertions.
+[Bank Runtime Contract Tests] PASS
+[Equipment Slots Tests] PASS: 24 assertions.
+[Dungeon Session Tests] PASS
+[Dungeon Difficulty Definitions Tests] PASS: 114 assertions.
+[Equipment Presentation Rules Tests] PASS: 6 assertions.
+[Guild Hall Service Tests] PASS
+[Second Dungeon Definition Tests] PASS: 9 assertions.
+[Dungeon Difficulty Progression Tests] PASS: 19 assertions.
+[Dungeon Difficulty Instance Director Tests] PASS: 7 assertions.
+[Travel Environment Contract Tests] PASS
+[Class Advancement Tests] PASS: 29 assertions.
+[Dungeon Entry Selection Rules Tests] PASS: 9 assertions.
+[Party Difficulty Entry Tests] PASS: 32 assertions.
+[Base Environment Contract Tests] PASS: 10 assertions.
+[Bestiary Reputation Runtime Composition Tests] PASS: 8 assertions.
+[Guild Membership Authority Tests] PASS: 21 assertions.
+[Entity Adapter Contract Tests] PASS
+[Equipment Stat Resolver Tests] PASS: 18 assertions.
+[Dungeon Instance State Persistence Tests] PASS: 2 assertions.
+[Dungeon Difficulty Teleport Tests] PASS: 7 assertions.
+[Optional Boss Run State Tests] PASS: 34 assertions.
+[Equipment Defense Rules Tests] PASS: 4 assertions.
+[Character Combat Stats Tests] PASS: 32 assertions.
+[Bestiary Service Tests] PASS: 33 assertions.
+[Environment Anchor Resolver Tests] PASS: 9 assertions.
+[Completion Reward Presentation Tests] PASS: 4 assertions.
+[Economy Audit] Reward event failed: ServerScriptService.Core.Tests.EconomyAuditIntegrationTest:144: audit sink unavailable
+[Economy Audit Integration Tests] PASS: 27 assertions.
+[Bank Config/Transfer Tests] PASS
+[Bestiary Reputation Reward Integration Tests] PASS: 25 assertions.
+[Bank Access Rules Tests] PASS
+[Attribute Config Tests] PASS: 14 assertions.
+[Bank Service Tests] PASS
+[Progression Debug] DEV/TEST command bridge ready.
+[EquipmentReservationRulesTest] PASS
+[Equipment Rules Tests] PASS: 9 assertions.
+[Equipment Effect Presentation Tests] PASS: 6 assertions.
+[Core Config Tests] PASS
+[Contribution Config Tests] PASS: 25 assertions.
+[Candidate Anchor Placement Tests] PASS: 4 assertions.
+[Attribute Service Tests] PASS: 30 assertions.
+[Travel Candidate Resolver Tests] PASS
+[Dungeon Runtime Content Readiness Tests] PASS: 70 assertions.
+[Phase 2C.B Trainer Authority Tests] PASS.
+[Party Service Tests] PASS
+[Party Remote Contract Tests] PASS
+[Contribution Service Tests] PASS: 36 assertions.
+[Base Runtime] Profile lifecycle and TestDungeon entry ready.
+[Base Runtime] Slot1 loaded for Ayames (Level 1, XP 0, Gold 0).
+[Base Race Presentation] Applied nil to Ayames (0 ears).
+[Identity Selection] Authoritative stage: RaceSelection

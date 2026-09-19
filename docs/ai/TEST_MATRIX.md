@@ -1,7 +1,52 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## Current checkpoint - 19 September 2026 step 1 validation
+
+This section supersedes older active-branch, no-push and pending-Studio notes
+below. Older gate sections are historical evidence, not current release status.
+
+- Active worktree: C:/Users/Remko/Documents/Roblox/DungeonMMO_Phase4_EventSecretPolicy_v1.
+- Branch: wip/phase-4-event-secret-policy-v1.
+- Validated source: cb29a7c54637e371e1041ab68009c4951b579d00.
+- GitHub feature tip independently verified at the same SHA on 19 September.
+- Main and GitHub main remain a3c2625cfc53dbb1c2bb8d6ce17f5f3749809fa9;
+  this backend branch is not merged into main.
+- v1.44 is now committed on this feature branch. Its statements about the
+  uncommitted issuer/test edits and an unpushed optional-boss branch are
+  superseded by this checkpoint.
+- Step 1 backend regression is VERIFIED on the exact committed source.
+  This is not physical-content acceptance or rollout approval.
+- Fresh Dungeon Studio: issuer 34, extended instance director 23, policy 49,
+  optional flow 9, factories 24, release locks 14, readiness 70 assertions PASS.
+- Dungeon server captured 248 PASS markers and zero errors; live admission passed.
+- Fresh Base Studio: 132 PASS markers, issuer 34, readiness 70, party difficulty
+  22 and party difficulty entry 32 assertions PASS; server/client errors = zero.
+- Phase 3 stress PASS in both compositions: profiles=250, market=1000,
+  replay=1000, guild=250, sessions=100, race_roundtrips=100.
+- 539 source Lua/Luau files parsed with zero failures; four Rojo builds PASS.
+- OptionalBossRuntimeEnabled remains false for both dungeons. Depth2-Depth4
+  remain physically unregistered and release-disabled.
+- No gameplay source changed in this validation step. Documentation/evidence
+  changes remain uncommitted; no commit, push, merge or publish was performed.
+- Known diagnostics: expected audit-sink failure injection in both runs;
+  source-controlled fallback-animation notice in Dungeon. Neither is a test failure.
+- Evidence: docs/testing/phase4-optional-boss-step1-validation-2026-09-19.md.
+
+### Exact next action
+
+At the step-1 user checkpoint, report the completed backend validation.
+Next ordered step is Event and Secret gameplay rules: prepare a bounded design
+for actual server event schedules, secret discovery conditions and reward
+configuration, reusing existing issuance/session/reward authority. Define
+reconnect/idempotency tests before implementation. No concrete schedule,
+secret-discovery mechanic or new reward balance is approved by this record.
+Distinct enemy/boss mechanics follows as the next substantial combat gate.
+Keep physical release locked and the UI/art worktrees separate.
+
+## Historical gate record
+
 **Current phase:** Phase 4 - Content Alpha
-**Canonical roadmap:** docs/roadmap/DungeonMMO_Roadmap_v1_43.docx
+**Canonical roadmap:** docs/roadmap/DungeonMMO_Roadmap_v1_44.docx
 **Phase 3 gameplay release:** 84662948127eb1a37c9f184c6abbafe6f2daddb6
 
 This file records accepted evidence and current gate status. It is not a

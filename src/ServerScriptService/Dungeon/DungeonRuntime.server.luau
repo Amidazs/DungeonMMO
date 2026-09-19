@@ -55,6 +55,9 @@ local DungeonEncounterRuntimeState = require(
 local DungeonEncounterRuntimeController = require(
     Dungeon:WaitForChild("DungeonEncounterRuntimeController")
 )
+local DungeonSecretDiscoveryService = require(
+    Services:WaitForChild("DungeonSecretDiscoveryService")
+)
 local DungeonOptionalBossPolicy = require(
     Dungeon:WaitForChild("DungeonOptionalBossPolicy")
 )
@@ -125,6 +128,7 @@ DungeonContributionBridge.bind_service(
 local profiles = runtime.ProfileService
 local leases = runtime.LeaseService
 local sessions = runtime.SessionService
+local secret_discovery = DungeonSecretDiscoveryService.new(sessions)
 local rewards = runtime.RewardService
 local proficiency = runtime.ProficiencyService
 local inventory = runtime.InventoryService
@@ -1010,6 +1014,24 @@ handle_run_cleared = function()
     commit_and_open_completion()
 end
 
+-- Computes a server-derived distance from a player to a trigger's bounds.
+-- Args: player (Player): Authoritatively resolved active dungeon member.
+--       trigger (BasePart): Authored secret-encounter trigger.
+-- Returns: number: Distance to the bounds, or infinity when unavailable.
+local function trigger_distance(player: Player, trigger: BasePart): number
+    local character = player.Character
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    if not root or not root:IsA("BasePart") then
+        return math.huge
+    end
+    local position = trigger.CFrame:PointToObjectSpace(root.Position)
+    local half = trigger.Size * 0.5
+    local dx = math.max(math.abs(position.X) - half.X, 0)
+    local dy = math.max(math.abs(position.Y) - half.Y, 0)
+    local dz = math.max(math.abs(position.Z) - half.Z, 0)
+    return Vector3.new(dx, dy, dz).Magnitude
+end
+
 -- Connects every resolved physical encounter trigger exactly once.
 local function bind_encounter_triggers()
     if encounter_triggers_bound then
@@ -1030,9 +1052,29 @@ local function bind_encounter_triggers()
 
         local room_slot_id = binding.RoomSlotId
         trigger.Touched:Connect(function(hit)
-            if get_player_from_touch(hit) then
-                start_executed_slot(room_slot_id)
+            local player = get_player_from_touch(hit)
+            if not player then
+                return
             end
+            if binding.Kind == "SecretBoss" then
+                local next_binding = encounter_flow
+                    and encounter_flow:next_binding()
+                if not next_binding
+                    or next_binding.PlanEncounterId ~= binding.PlanEncounterId
+                    or not active_session_id
+                then
+                    return
+                end
+                local discovery = secret_discovery:discover(
+                    active_session_id, player.UserId,
+                    binding.PlanEncounterId,
+                    trigger_distance(player, trigger)
+                )
+                if discovery.ok ~= true then
+                    return
+                end
+            end
+            start_executed_slot(room_slot_id)
         end)
     end
 

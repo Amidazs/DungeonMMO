@@ -49,6 +49,12 @@ function DungeonInstanceDirector.runtime_options(): any
         force_event = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceEvent")),
         event_start = ServerScriptService:GetAttribute("DungeonMMOEventStartUnix"),
         event_end = ServerScriptService:GetAttribute("DungeonMMOEventEndUnix"),
+        optional_boss_schedule_enabled = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossScheduleEnabled"
+        ) == true,
+        optional_boss_secret_routes_enabled = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossSecretRoutesEnabled"
+        ) == true,
         optional_boss_event_start = ServerScriptService:GetAttribute(
             "DungeonMMOOptionalBossEventStartUnix"
         ),

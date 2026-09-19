@@ -1,6 +1,7 @@
 --!strict
 -- Snapshots optional boss availability when a server creates a dungeon run.
 local DungeonOptionalBossRunState = {}
+local Rules = require(script.Parent:WaitForChild("DungeonOptionalBossRules"))
 
 local DUNGEONS = table.freeze({
     TestDungeon = {
@@ -99,7 +100,7 @@ function DungeonOptionalBossRunState.issue(
         return state
     end
 
-    local settings = if type(options) == "table" then options else {}
+    local settings = Rules.resolve(dungeon_id, entered_at, options)
     local window = eligible_event(
         dungeon.EventId, entered_at, settings
     )

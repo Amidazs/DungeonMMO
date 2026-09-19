@@ -1,0 +1,309 @@
+[Recipe Knowledge Crafting Gate Tests] PASS: 12 assertions.
+[Optional Boss Policy Tests] PASS: 49 assertions.
+[Mage Heal Service Tests] PASS: 5 assertions.
+[Block Priority State Tests] PASS: 5 assertions.
+[Completion Service Tests] PASS: 14 assertions.
+[Combat Weapon Tests] PASS: 17 assertions.
+[Dungeon Death/Revive Tests] PASS: 24 assertions.
+[Progression Trainer Rules Tests] PASS: 11 assertions.
+[Dungeon Recovery Rules Tests] PASS: 18 assertions.
+[Teleport Coordinator Tests] PASS: 19 assertions.
+[Automatic Free Revive Tests] PASS: 10 assertions.
+[Marauder Captain] Controller ready.
+[Phase 2C.B Remote Contract Tests] PASS: all equipment/trainer remotes exist.
+[Checkpoint Service Tests] PASS: 7 assertions.
+[Entity Adapter Contract Tests] PASS
+[Dungeon Enemy Factory Registry Tests] PASS: 8 assertions.
+[Inventory Service Tests] PASS: 9 assertions.
+[Equipment Service Effects Tests] PASS: 17 assertions.
+[Dungeon Session Tests] PASS
+[Phase 2C.A Race Definitions] PASS (35 assertions)
+[Mend Presentation Rules Tests] PASS: 6 assertions.
+[Progression Debug Command Transport Tests] PASS: 10 assertions.
+[Profile Migration Bank v7 Tests] PASS
+[Market Listing Service Tests] PASS: 15 assertions.
+[Phase2A UI State Tests] PASS: 14 assertions.
+[Dungeon Encounter Execution Bootstrap Tests] PASS: 4 assertions.
+[Marauder Captain Contract Tests] PASS: 22 assertions.
+[Dungeon Progression Bridge Tests] PASS: 6 assertions.
+[Return Portal Tests] PASS: 9 assertions.
+[Encounter Service Tests] PASS: 16 assertions.
+[Dungeon Presentation Layer Tests] PASS: 3 assertions.
+[Dungeon Runtime Selection Tests] PASS: 7 assertions.
+[Optional Boss Factories Tests] PASS: 24 assertions.
+[Dungeon Marauder Tuning Tests] PASS
+[Dungeon Layout Environment Contract Tests] PASS: 14 assertions.
+[Studio Session Factory Tests] PASS: 7 assertions.
+[Phase2A Failure Path Tests] PASS: 24 assertions.
+[Dungeon Studio Equipment Bootstrap Tests] PASS: 6 assertions.
+[Optional Boss Release Lock Tests] PASS: 14 assertions.
+[Optional Boss Flow Tests] PASS: 9 assertions.
+[Dungeon Instance Director Tests] PASS: 23 assertions.
+[Dungeon Environment Layout Activation Tests] PASS: 12 assertions.
+[Rate Limit Tests] PASS: 8 assertions.
+[Recipe Knowledge Definitions Tests] PASS: 15 assertions.
+[Dungeon Depth3 Content Tests] PASS: 36 assertions.
+[Dungeon Enemy Cleanup Tests] PASS: 6 assertions.
+[TEST Failure Switch Tests] PASS: 7 assertions.
+[Profile Service Tests] PASS: 19 assertions.
+[Rare Skill Book Drop] Source=Boss:MarauderCaptain UserId=9701 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Boss:MarauderCaptain UserId=9702 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Boss:CorruptedForeman UserId=9701 Item=arc_slash_book
+[Rare Skill Book Drop] Source=Completion:AbandonedMine UserId=9701 Item=arc_slash_book
+[Rare Skill Book Reward Tests] PASS: 16 assertions.
+[Rare Skill Book Learning Tests] PASS: 8 assertions.
+[Ranger Identity Tests] PASS: 30 assertions.
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.39, 0.25) RightPos=(1.55, 0.39, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.39, 0.25) RightPos=(1.55, 0.39, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation] Delicate Elf ears applied to RacePresentationTestCharacter. LeftPos=(-1.55, 0.38, 0.25) RightPos=(1.55, 0.38, 0.25) LeftDir=(-0.93, 0.06, 0.36) RightDir=(0.93, 0.06, 0.36)
+[Race Presentation Service Tests] PASS: 51 assertions.
+[Skill Progression Service Tests] PASS: 17 assertions.
+[Race Change Service Tests] PASS: 23 assertions.
+[Completion Quest Bridge Tests] PASS: 8 assertions.
+[Contribution Real Session Persistence Tests] PASS: 10 assertions.
+[Dungeon Encounter Flow Tests] PASS: 24 assertions.
+[Travel Config/Definitions Tests] PASS
+[Depth1 Encounter Recovery Tests] PASS: 11 assertions.
+[Race Change Remote Contract Tests] PASS: 5 assertions.
+[Dungeon Encounter Spawn Catalog Tests] PASS: 20 assertions.
+[Dungeon Encounter Execution Registry Tests] PASS: 16 assertions.
+[Boss Spawn Guard Tests] PASS: 10 assertions.
+[Dungeon Encounter Runtime Controller Tests] PASS: 22 assertions.
+[Dungeon Depth4 Boss Factory Tests] PASS: 10 assertions.
+[Dungeon Boss Factory Registry Tests] PASS: 8 assertions.
+[Race Change Planner Tests] PASS: 15 assertions.
+[Dungeon Encounter Recovery Tests] PASS: 10 assertions.
+[Quest Service Tests] PASS: 17 assertions.
+[Quest Definition Tests] PASS: 15 assertions.
+[Dungeon Death Presentation Tests] PASS
+[Dungeon Depth2 Content Tests] PASS: 32 assertions.
+[Dungeon Depth2 Boss Factory Tests] PASS: 8 assertions.
+[Dungeon Depth3 Boss Factory Tests] PASS: 8 assertions.
+[Depth1 Encounter Flow Tests] PASS: 18 assertions.
+[Combat Pack Encounter Executor Tests] PASS: 15 assertions.
+[Abandoned Mine Environment Contract Tests] PASS: 4 assertions.
+[Dungeon Difficulty Completion Unlock Tests] PASS: 9 assertions.
+[Reward Service Tests] PASS: 27 assertions.
+[Runtime Default Binding Tests] PASS: 2 assertions.
+[Reputation Service Tests] PASS: 12 assertions.
+[Dungeon Enemy Difficulty Scaling Tests] PASS: 5 assertions.
+[Dungeon Encounter Sequencer Tests] PASS: 25 assertions.
+[Dungeon Encounter Execution Controller Tests] PASS: 17 assertions.
+[Dungeon Encounter Environment Runtime Tests] PASS: 8 assertions.
+[Dungeon Encounter Bindings Tests] PASS: 34 assertions.
+[Dungeon Environment] TestDungeon / Depth1 / Depth1 ready in Synthetic mode.
+[Dungeon Runtime] Full Phase 2A dungeon loop ready: room-start checkpoints, Captain, completion and return.
+[Dungeon Encounter Plan Tests] PASS: 13 assertions.
+[Travel Service Tests] PASS
+[Completion Eligibility Tests] PASS: 3 assertions.
+[Trainer Catalogues Tests] PASS: 10 assertions.
+[Rogue Advancement Tests] PASS: 12 assertions.
+[Depth1 Encounter Bindings Tests] PASS: 18 assertions.
+[Contribution Reconnect Persistence Tests] PASS: 5 assertions.
+[Roblox Teleport Adapter Failure Tests] PASS: 2 assertions.
+[Dungeon Depth4 Content Tests] PASS: 38 assertions.
+[Dungeon Admission Tests] PASS: 9 assertions.
+[Dungeon Encounter Runtime State Tests] PASS: 9 assertions.
+[Skill Book Drop Config Tests] PASS: 11 assertions.
+[Rogue Progression Tests] PASS: 17 assertions.
+[Reputation Definitions Tests] PASS: 3 assertions.
+[Dungeon Encounter Executors Tests] PASS: 21 assertions.
+[Temple Environment Contract Tests] PASS: 16 assertions.
+[Revive Purchase Tests] PASS: 13 assertions.
+[Travel Access Rules Tests] PASS
+[Recipe Knowledge Service Tests] PASS: 23 assertions.
+[Recipe Knowledge Migration Tests] PASS: 12 assertions.
+[Progression Service Tests] PASS: 9 assertions.
+[Progression Snapshot Builder Tests] PASS: 37 assertions.
+[Dungeon Difficulty v13 Migration Tests] PASS: 14 assertions.
+[Progression HUD Rules Tests] PASS: 2 assertions.
+[Profile Schema/Migration Tests] PASS: 43 assertions.
+[Profile Migration Market V11 Tests] PASS: 13 assertions.
+[Progression Runtime Equipment Tests] PASS: 14 assertions.
+[Race Change Migration Tests] PASS: 13 assertions.
+[Quest Advancement Migration Tests] PASS: 8 assertions.
+[Bestiary Reputation Migration Tests] PASS: 18 assertions.
+[Equipment Slots Tests] PASS: 24 assertions.
+[Profession Runtime Rules Tests] PASS: 31 assertions.
+[Inventory Presentation Tests] PASS: 15 assertions.
+[Dungeon Difficulty Teleport Tests] PASS: 7 assertions.
+[Core Config Tests] PASS
+[Market Purchase Recovery Tests] PASS: 17 assertions.
+[Contribution Config Tests] PASS: 25 assertions.
+[Dungeon Difficulty Session Tests] PASS: 7 assertions.
+[Equipment Defense Rules Tests] PASS: 4 assertions.
+[Equipment Effect Presentation Tests] PASS: 6 assertions.
+[Phase 2C.B Equipment Migration Tests] PASS: 20 assertions.
+[Mage Profile Migration Tests] PASS: 7 assertions.
+[Equipment Rules Tests] PASS: 9 assertions.
+[Market Remote Contract Tests] PASS: 6 assertions.
+[Economy Audit] Reward event failed: ServerScriptService.Core.Tests.EconomyAuditIntegrationTest:144: audit sink unavailable
+[Economy Audit Integration Tests] PASS: 27 assertions.
+[Profession Profile Migration Tests] PASS: 17 assertions.
+[Profession Definition Contract Tests] PASS: 25 assertions.
+[Dungeon Modifier Definitions Tests] PASS: 6 assertions.
+[Guild Membership Authority Tests] PASS: 21 assertions.
+[Profession Resource Claim Tests] PASS
+[Phase 2B Progression Service Tests] PASS: 42 assertions.
+[Guild Dungeon Progression Tests] PASS
+[Second Dungeon Definition Tests] PASS: 9 assertions.
+[Equipment Presentation Rules Tests] PASS: 6 assertions.
+[Economy Audit Tests] PASS: 6 assertions.
+[Completion Reward Presentation Tests] PASS: 4 assertions.
+[Profession Resource Distribution Tests] PASS
+[Phase 3 Systems Stress] PASS: profiles=250 market=1000 replay=1000 guild=250 sessions=100 race_roundtrips=100
+[Guild Hall Service Tests] PASS
+[Equipment Service Tests] PASS: 38 assertions.
+[Guild Service Tests] PASS
+[Dungeon Runtime Content Readiness Tests] PASS: 70 assertions.
+[Optional Boss Run State Tests] PASS: 34 assertions.
+[Dungeon Difficulty Instance Director Tests] PASS: 7 assertions.
+[Mage Runtime Authority Tests] PASS: 8 assertions.
+[Dungeon Difficulty Definitions Tests] PASS: 114 assertions.
+[Environment Runtime Mode Tests] PASS: 7 assertions.
+[Dungeon Difficulty Tuning Tests] PASS: 10 assertions.
+[Contribution Service Tests] PASS: 36 assertions.
+[Phase 2B Profile Migration Tests] PASS: 18 assertions.
+[Phase 2C.A Identity Service Tests] PASS: 58 assertions.
+[EquipmentReservationRulesTest] PASS
+[Loadout Service Tests] PASS: 30 assertions.
+[Environment Anchor Resolver Tests] PASS: 9 assertions.
+[Profession Service Tests] PASS: 37 assertions.
+[Market Cancel Expiry Tests] PASS: 15 assertions.
+[Phase 2C.A Profile Migration Tests] PASS: 38 assertions.
+[Equipment Stat Resolver Tests] PASS: 18 assertions.
+[Mage Identity Tests] PASS: 26 assertions.
+[Dungeon Difficulty Progression Tests] PASS: 19 assertions.
+[Dungeon Instance State Persistence Tests] PASS: 2 assertions.
+[Shield Arm Coverage Tests] PASS: 6 assertions.
+[Support Target Rules Tests] PASS: 6 assertions.
+[Bestiary Definitions Tests] PASS: 11 assertions.
+[RangerSlowServiceTest] PASS
+[Published Sword Animation Fallback Tests] PASS: 12 assertions.
+[Progression Damage Integration Tests] PASS: 3 assertions.
+[Mobile Control Layout Tests] PASS
+[Mend Progression Integration Tests] PASS: 1 assertions.
+[Rogue Definitions Tests] PASS: 43 assertions.
+[RangerDefinitionsTest] PASS
+[Marauder Spacing Rules Tests] PASS
+[Marauder Steering Commit Tests] PASS
+[Progression Debug] DEV/TEST command bridge ready.
+[Marauder Factory Tests] PASS: 9 assertions.
+[Shield Bash Integration Tests] PASS: 17 assertions.
+[MeleeHit] MeleeTestFront accepted
+[MeleeHit] MeleeTestCleave accepted
+[MeleeHit] MeleeTestEdge accepted
+[MeleeHit] ShieldBashConeInside accepted
+[MeleeHit] ShieldBashReachInside accepted
+[MeleeHit] ShieldBashConeInside accepted
+[MeleeHit] ShieldBashTest sample 1/4
+[MeleeHit] MeleeTestFront accepted
+[MeleeHit] MeleeTestCleave accepted
+[MeleeHit] MeleeTestEdge accepted
+[Bank Service Tests] PASS
+[Combat Prototype] 4 jointed Training Marauders created.
+[Respawn Aggro Grace Tests] PASS
+[Attribute Service Tests] PASS: 30 assertions.
+[MeleeHit] Slash1 sample 1/4
+[MeleeHit] SweptDamageTargetOne accepted
+[MeleeHit] SweptDamageTargetTwo accepted
+[CombatValidation] [49.956] DAMAGE APPLIED Slash1 10.0HP -> SweptDamageTargetOne
+[Damage] SweptDamageTargetOne -10.0 HP
+[CombatValidation] [49.956] DAMAGE APPLIED Slash1 10.0HP -> SweptDamageTargetTwo
+[Damage] SweptDamageTargetTwo -10.0 HP
+[RangerDrawRulesTest] PASS
+[Attribute Config Tests] PASS: 14 assertions.
+[Mana Service Tests] PASS: 8 assertions.
+[Mage Definitions Tests] PASS: 19 assertions.
+[Skill Cooldown Tests] PASS: 9 assertions.
+[Stagger Service Tests] PASS: 8 assertions.
+[Spirit Orb Service Tests] PASS: 5 assertions.
+[Class Advancement Tests] PASS: 29 assertions.
+[Combat Tests] PASS: 16 StateRules assertions.
+[Mend Channel State Tests] PASS: 12 assertions.
+[MeleeHit] ValidationAccepted accepted
+[Bestiary Service Tests] PASS: 33 assertions.
+[Marauder Attack Rules Tests] PASS: 8 assertions.
+[Character Combat Stats Tests] PASS: 32 assertions.
+[Bestiary Reputation Reward Integration Tests] PASS: 25 assertions.
+[Bank Config/Transfer Tests] PASS
+[Combat Prototype] Training targets created.
+[Wind Strike Service Tests] PASS: 7 assertions.
+[Ward Service Tests] PASS: 5 assertions.
+[Equipment Weapon Requirement Tests] PASS: 2 assertions.
+[Hotbar Skill Tests] PASS: 45 assertions.
+[Mend Lifecycle Tests] PASS: 1 assertions.
+[Finisher Hit Shape Tests] PASS: 7 assertions.
+[Bestiary Reputation Runtime Composition Tests] PASS: 8 assertions.
+[Combat Animation Tests] PASS: 34 assertions.
+[Mend Service Tests] PASS: 9 assertions.
+[Combat Prototype] Shield camera visual created.
+[Shield Camera Visual Tests] PASS: 11 assertions.
+[Candidate Anchor Placement Tests] PASS: 4 assertions.
+[Bank Access Rules Tests] PASS
+[Ranger] Marauder slow movement rules passed.
+[Marauder Respawn Contract Tests] PASS: 4 assertions.
+[Combat Prototype] Shield camera visual created.
+[Shield Presentation Binding Tests] PASS: 12 assertions.
+[Marauder Presentation Rules Tests] PASS
+[Marauder Behavior Rules Tests] PASS: 15 assertions.
+[Input Mapping Config Tests] PASS
+[Enemy Damage Multiplier Rules Tests] PASS: 3 assertions.
+[Combat Prototype] Greybox arena created.
+[Defense Animation Tests] PASS: 60 assertions.
+[Basic Attack Timing Rules Tests] PASS: 25 assertions.
+[Combat Validation Dedupe Tests] PASS
+[Dodge Swept Clearance Tests] PASS: 8 assertions.
+[Critical Hit Rules Tests] PASS: 10 assertions.
+[Combat Validation Service Tests] PASS: 9 assertions.
+[Expanded Arena Config Tests] PASS: 7 assertions.
+[Dodge Direction Tests] PASS: 45 assertions.
+[Contribution Damage Bridge Tests] PASS: 9 assertions.
+[Combat Lifecycle State Tests] PASS: 17 assertions.
+[Defensive Combat Integration Tests] PASS: 42 assertions.
+[Dodge Priority State Tests] PASS: 5 assertions.
+[Combat Prototype] AnimSaves folder was not found. Using source-controlled fallback animations.
+[Combat Prototype] Generated 3 fallback attacks and sword carry overlay.
+[Arc Slash Integration Tests] PASS: 10 assertions.
+[Contribution Support Bridge Tests] PASS: 13 assertions.
+[CombatValidation] [49.999] DAMAGE APPLIED Slash2 10.5HP -> DamageServiceTarget
+[Damage] DamageServiceTarget -10.5 HP
+[CombatValidation] [49.999] DAMAGE APPLIED Slash1 16.5HP -> DamageServiceCriticalTarget
+[Damage] DamageServiceCriticalTarget -16.5 HP
+[CombatValidation] [49.999] DAMAGE APPLIED Slash1 10.0HP -> DamageServiceNonCriticalTarget
+[Damage] DamageServiceNonCriticalTarget -10.0 HP
+[CombatValidation] [49.999] DAMAGE APPLIED Slash1 10.0HP -> DamageServiceMissingCritMultiplierTarget
+[Damage] DamageServiceMissingCritMultiplierTarget -10.0 HP
+[Damage Service Tests] PASS: 15 assertions.
+[Profile Lease Tests] PASS
+[Proficiency Service Tests] PASS: 8 assertions.
+[Marauder Rig Contract Tests] PASS
+[One-Handed Sword Tests] PASS: 19 assertions.
+[Sword Carry/Grip Tests] PASS: 7 assertions.
+[Temple Environment Adapter Tests] PASS: 9 assertions.
+[Dungeon Environment Position Tests] PASS: 3 assertions.
+[MeleeHit] ShieldBashTest sample 2/4
+[MeleeHit] Slash1 sample 2/4
+[Marauder Hostile Loop Tests] PASS: 10 assertions.
+[Defense Service Tests] PASS: 18 assertions.
+[MeleeHit] ShieldBashTest sample 3/4
+[MeleeHit] Slash1 sample 3/4
+[Training Dummy Tests] PASS: 9 assertions.
+[MeleeHit] ShieldBashTest sample 4/4
+[Multi Marauder Runtime Tests] PASS: 20 assertions.
+[MeleeHit] Slash1 sample 4/4
+[Melee Hit Service Tests] PASS: 16 assertions.
+[Dungeon Runtime] Studio-only identity bootstrap: Human / Mage for Ayames.
+[MeleeHit] DedupeDiagnostic sample 1/4
+[MeleeHit] ValidationDedupeTarget accepted
+[Melee Cancellation Tests] PASS: 1 assertions.
+[MeleeHit] DedupeDiagnostic sample 2/4
+[MeleeHit] DedupeDiagnostic sample 3/4
+[MeleeHit] DedupeDiagnostic sample 4/4
+[Melee Validation Diagnostics Tests] PASS: 7 assertions.
+[Swept Melee Damage Tests] PASS: 7 assertions.
+[Combat Target Rules Tests] PASS: 9 assertions.
+[CombatValidation] [50.846] #0 LIFECYCLE RESPAWN Locomotion
+[Dungeon Runtime] Enter Room1 to continue the dungeon.
+[Dungeon Runtime] Ayames admitted to 031dd37f-3bb1-49fb-8420-2e290f6c90fb.
+[Stamina Service Tests] PASS: 12 assertions.

@@ -11,6 +11,9 @@ function Factory.create(options: any): Model
     local boss = BaseFactory.create(options)
     boss.Name = "TempleEventBoss"
     boss:SetAttribute("BossId", "TempleEventBoss")
+    boss:SetAttribute("DungeonEnemyId",
+        "TempleEventBoss:" .. tostring(options.EncounterId or "TempleEventBoss")
+    )
     boss:SetAttribute("BossRole", options.BossRole)
 
     local humanoid = boss:FindFirstChildOfClass("Humanoid")

@@ -9,6 +9,10 @@ local ARC_SLASH_POOL = table.freeze({
 })
 
 local BOSS = table.freeze({
+    TempleEventBoss = table.freeze({Chance = 0.02, Pool = ARC_SLASH_POOL}),
+    TempleSecretBoss = table.freeze({Chance = 0.02, Pool = ARC_SLASH_POOL}),
+    AbandonedMineEventBoss = table.freeze({Chance = 0.02, Pool = ARC_SLASH_POOL}),
+    AbandonedMineSecretBoss = table.freeze({Chance = 0.02, Pool = ARC_SLASH_POOL}),
     MarauderCaptain = table.freeze({
         Chance = 0.02,
         Pool = ARC_SLASH_POOL,
