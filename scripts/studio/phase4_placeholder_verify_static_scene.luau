@@ -55,8 +55,16 @@ for _, id in ipairs({"TestDungeon", "AbandonedMine"}) do
     print("[Phase4 Static Blockout] " .. id
         .. " optional rooms plus higher-depth models verified")
 end
-for _, item in ipairs(W:GetDescendants()) do
-    if item:IsA("BasePart") then count += 1 end
+-- Count only our exported blockout scene geometry. Studio can insert
+-- unrelated Workspace parts (e.g. default Baseplate) into an empty place.
+for _, id in ipairs({"TestDungeon", "AbandonedMine"}) do
+    local folder = W:FindFirstChild(id)
+    assert(folder, id .. " scene folder missing during part count")
+    for _, item in ipairs(folder:GetDescendants()) do
+        if item:IsA("BasePart") then count += 1 end
+    end
 end
-assert(count == 330, "Static blockout physical part count differs from source")
+assert(count == 330,
+    "Exported blockout physical part count differs from source: "
+        .. tostring(count))
 print("[Phase4 Static Blockout] PASS 330 editable parts; no live game scripts.")
