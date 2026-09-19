@@ -1,5 +1,49 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 19 September 2026 — combined Phase 4 TEST Temple + restored HUD integration
+
+**Active new worktree/branch:** DungeonMMO_Phase4_HUD_Integration_v1 /
+wip/phase-4-test-hud-integration-v1. The isolated merge
+43e175f4f2ad4fb3140a36a0ae99ccde49d11825 joins the backend parent
+f00e581 and saved UI parent 7fa63fb; both original branches and worktrees
+remain untouched. Pushed immutable source checkpoint tags:
+phase4-before-hud-integration-backend-20260919 and
+phase4-before-hud-integration-ui-20260919. All three documentation
+conflicts retained BOTH historical branches' text.
+
+The original framed profile/portrait, bottom-right menu, six-slot Dungeon
+hotbar, contextual Inventory/Skills/Guild windows and redesigned dungeon
+objective/boss/reward/revive HUD have been restored to the TEST candidate.
+The Base intentionally has no Dungeon combat hotbar. Both TEST Temple and
+sync-only Lobby build compositions contain their matching UI source.
+
+**Fresh proof:** six Rojo compositions and 559 source+41 original Studio
+runner Luau files compiled; 11/11 focused optional suites; Base live
+regression 107 test-pass markers (four Roblox Controls Emulator plugin
+errors); Dungeon live regression 221 test-pass markers and zero Creator
+errors. The restored Dungeon HUD live-client test passed framed/menu/hotbar,
+boss animated bar, rewards and revive with zero Creator errors. The Base
+live-client test passed framed/profile/menu/expedition UI, exclusive
+Inventory/Skills/Guild open and close (same Controls Emulator plugin
+errors). The exact combined TEST Temple composition passed both local
+published-ID simulations for Depth1 optional arenas and Depth4 physical
+bindings; those runs logged a built-in Roblox ChatScript SetCore startup
+error, not a game-code assertion failure. Final visual/playtest acceptance
+is STILL OPEN.
+
+**Cloud release boundary:** no TEST/PROD cloud publish or current cloud
+place rollback backup has been verified. For the restored HUD release
+candidate use scripts/powershell/Start-Phase4TestTempleHUDPublish.ps1 in the
+integration worktree, NOT the old backend-only launcher. Before any TEST
+publish, save/verify the currently published Temple Roblox place
+117293035754309 and note its version history. The Lobby
+134132328219009 is sync-only: never overwrite its authored map with
+the standalone local Rojo sync file. No Mine place exists.
+
+Detailed preserved evidence and remaining manual gates:
+docs/testing/phase4-restored-hud-test-integration-2026-09-19.md.
+
+
 ## 19 September 2026 — TEMP playable physical layouts, both dungeons Depth1–4
 
 This checkpoint supersedes the older **geometry-only** placeholder status
