@@ -27,9 +27,12 @@ return (game.GameId == UNIVERSE_ID and game.PlaceId == TEST_DUNGEON_ID)
 ]=]..string.sub(original,at+#needle)
 -- Disable release-lock assertions only in this disposable TEMP DataModel.
 -- Unmodified published composition does not serialize /Tests modules.
-for _,root in ipairs({SSS.Core.Tests,SSS.Dungeon.Tests}) do
-    for _,s in ipairs(root:GetDescendants()) do
-        if s:IsA("Script") then s.Enabled=false end
+for _,section in ipairs({SSS.Core, SSS.Dungeon}) do
+    local root=section:FindFirstChild("Tests")
+    if root then
+        for _,s in ipairs(root:GetDescendants()) do
+            if s:IsA("Script") then s.Enabled=false end
+        end
     end
 end
 local release=require(test_release)
