@@ -125,6 +125,32 @@ function DungeonEncounterRuntimeController.new(
         ),
     }, DungeonEncounterRuntimeController)
 
+    -- A freshly reconstructed server restarts an interrupted encounter.
+    -- Persist Pending before trigger/discovery validation reads session state.
+    -- An already-running controller is reused by the live Dungeon server;
+    -- this applies only when constructing a new controller from saved state.
+    if type(snapshot) == "table"
+        and type(snapshot.EncounterStates) == "table"
+    then
+        local interrupted = snapshot.ActiveEncounterId ~= nil
+        for _, encounter in ipairs(encounters) do
+            if snapshot.EncounterStates[encounter.Id] == "Active" then
+                interrupted = true
+                break
+            end
+        end
+        if interrupted then
+            local restored = DungeonEncounterRuntimeState.persist(
+                options.session_service, options.session_id,
+                self._sequencer:snapshot()
+            )
+            if restored.ok ~= true then
+                return nil, restored.reason
+                    or "EncounterRecoveryPersistenceFailed"
+            end
+        end
+    end
+
     return self, nil
 end
 
