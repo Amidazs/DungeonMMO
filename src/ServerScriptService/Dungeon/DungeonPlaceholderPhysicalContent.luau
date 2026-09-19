@@ -2,6 +2,9 @@
 -- Blockout geometry only. Every visible part belongs to a replaceable Model.
 -- Never registers dungeon layouts or switches on optional/higher-depth rollout.
 local CollectionService = game:GetService("CollectionService")
+local TestRelease = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonTestPlaceholderRelease"))
 local ServerScriptService = game:GetService("ServerScriptService")
 local AnchorFactory = require(
     ServerScriptService:WaitForChild("Core"):WaitForChild("Environment")
@@ -298,7 +301,9 @@ end
 
 -- Does not mutate the environment catalogue or production release flags.
 -- Intended to run only in an explicit, unpublished Studio preview/build.
-function Placeholder.create(parent: Instance, dungeon_id: string): any
+function Placeholder.create(
+    parent: Instance, dungeon_id: string, selected_difficulty_id: string?
+): any
     local theme = THEMES[dungeon_id]
     assert(theme, "UnknownPlaceholderDungeon")
     local old = parent:FindFirstChild(ROOT_NAME)
@@ -311,13 +316,16 @@ function Placeholder.create(parent: Instance, dungeon_id: string): any
     root.Parent = parent
     build_optional(root, parent, theme)
     build_depth_previews(root, theme)
-    if game:GetService("RunService"):IsStudio()
+    local test_dungeon = TestRelease.is_test_dungeon()
+        and dungeon_id == "TestDungeon"
+    local local_studio_preview = game:GetService("RunService"):IsStudio()
         and game.PlaceId == 0 and game.GameId == 0
         and game:GetService("Workspace"):GetAttribute(
             "DungeonMMOPlaceholderPlayableEnabled") == true
-    then
-        local difficulty_id = game:GetService("Workspace"):GetAttribute(
-            "DungeonMMOStudioDifficultyId")
+    if test_dungeon or local_studio_preview then
+        local difficulty_id = selected_difficulty_id
+            or game:GetService("Workspace"):GetAttribute(
+                "DungeonMMOStudioDifficultyId")
         local depth = if type(difficulty_id) == "string"
             then tonumber(string.match(difficulty_id, "^Depth([234])$"))
             else nil
