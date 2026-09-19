@@ -1,0 +1,76 @@
+--!strict
+-- TEMP Studio physical-layout overlay. Never register these layouts in the
+-- shared production content catalogue or change difficulty release flags.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Catalog = require(ReplicatedStorage:WaitForChild("Core")
+    :WaitForChild("Shared"):WaitForChild("DungeonRuntimeContentCatalog"))
+
+local Layouts = {}
+local PREFIX = {TestDungeon = "Temple", AbandonedMine = "Mine"}
+
+local function slot(trigger: string, checkpoint: string,
+    room_id: string, group: string?, spawn_prefix: string?,
+    min_count: number?, boss_spawn: string?): any
+    return table.freeze({
+        TriggerAnchor = trigger,
+        CheckpointAnchor = checkpoint,
+        EnvironmentRoomId = room_id,
+        EnemySpawnGroup = group,
+        EnemySpawnPrefix = spawn_prefix,
+        EnemySpawnMinCount = min_count,
+        SupportsCombat = group ~= nil,
+        SupportsBoss = boss_spawn ~= nil,
+        ExitBarrierRoomId = nil,
+        ExitBarrierAnchor = nil,
+        BossSpawnAnchor = boss_spawn,
+    })
+end
+
+function Layouts.get(dungeon_id: string, layout_id: string,
+    include_optional: boolean): any?
+    local prefix = PREFIX[dungeon_id]
+    if not prefix then return nil end
+    if layout_id == "Depth1" then
+        local original = Catalog.get_layout(dungeon_id, "Depth1")
+        if not original or not include_optional then return original end
+        local slots = {}
+        for id, definition in pairs(original.Slots) do
+            slots[id] = definition
+        end
+        for _, kind in ipairs({"Event", "Secret"}) do
+            local slot_id = kind .. "Arena"
+            local root = prefix .. "." .. kind .. "."
+            slots[slot_id] = slot(root .. "Trigger",
+                root .. "Checkpoint", slot_id, nil, nil, nil,
+                root .. "BossSpawn")
+        end
+        return table.freeze({
+            Id = "Depth1",
+            EntranceAnchor = original.EntranceAnchor,
+            Slots = table.freeze(slots),
+        })
+    end
+    local depth = tonumber(string.match(layout_id, "^Depth([234])$"))
+    if not depth then return nil end
+    local slots = {}
+    local room_count = depth + 2
+    for number = 1, room_count do
+        local id = "Room" .. number
+        local root = prefix .. "." .. layout_id .. "." .. id .. "."
+        local boss = number == room_count
+            or (depth == 4 and (number == 2 or number == 4 or number == 5))
+        slots[id] = slot(root .. "Trigger",
+            root .. "Checkpoint", id,
+            if boss then nil else layout_id .. id .. "EnemySpawns",
+            if boss then nil else root .. "EnemySpawn.",
+            if boss then nil else 8,
+            if boss then root .. "BossSpawn" else nil)
+    end
+    return table.freeze({
+        Id = layout_id,
+        EntranceAnchor = prefix .. "." .. layout_id .. ".EntrySpawn",
+        Slots = table.freeze(slots),
+    })
+end
+
+return table.freeze(Layouts)
