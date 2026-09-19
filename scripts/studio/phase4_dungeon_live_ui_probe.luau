@@ -66,7 +66,15 @@ until_value(function()
     return boss_frame.Visible==false
         and objective.Text=="Dungeon complete"
         and label("DUNGEON COMPLETE").Parent.Visible
-        and label("Completion Gold: +73")~=nil
+        and (function()
+            for _,item in ipairs(gui:GetDescendants()) do
+                if item:IsA("TextLabel")
+                    and string.find(item.Text, "Completion Gold: +73", 1, true)
+                    and string.find(item.Text, "Personal loot: PlaceholderShard", 1, true)
+                then return true end
+            end
+            return false
+        end)()
 end,"completion reward and result screen",15)
 print("[Phase4 UI Probe] COMPLETION_REWARD_WIDGET_PASS")
 ack:FireServer("COMPLETE_PASS")
