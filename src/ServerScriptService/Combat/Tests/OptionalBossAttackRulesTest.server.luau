@@ -1,7 +1,8 @@
 --!strict
 local Combat = game:GetService("ServerScriptService"):WaitForChild("Combat")
 local Rules = require(Combat:WaitForChild("OptionalBossAttackRules"))
-local MarauderAttackRules = require(Combat:WaitForChild("MarauderAttackRules"))
+local CaptainFactory = require(game:GetService("ServerScriptService")
+    :WaitForChild("Dungeon"):WaitForChild("MarauderCaptainFactory"))
 
 local assertions = 0
 local function check(ok: boolean, reason: string)
@@ -33,7 +34,9 @@ for _, item in ipairs(cases) do
     seen[phase_two.AbilityId] = true
 
     for _, attack in ipairs({first, phase_two, Rules.resolve(boss, 2, 1)}) do
-        check(attack.AttackName == "Normal" or attack.AttackName == "Heavy",
+        check(attack.AttackName == "CaptainSlash"
+            or attack.AttackName == "CaptainHeavy"
+            or attack.AttackName == "CaptainShockwave",
             item[1] .. " must reuse the supported attack poses")
         check(attack.NextPatternIndex >= 1 and attack.NextPatternIndex <= 3,
             item[1] .. " needs a bounded repeated pattern")
@@ -52,8 +55,8 @@ check(Rules.resolve(boss, 1, 1) == nil,
     "ordinary Mine final boss is not silently overridden")
 boss:SetAttribute("BossId", "Unknown")
 check(Rules.resolve(boss, 1, 1) == nil, "unregistered boss has no abilities")
-local baseline = MarauderAttackRules.get_attack_definition("Normal")
-check(baseline.ATTACK_REACH_STUDS == 5.5,
+local baseline = CaptainFactory.ATTACKS.CaptainSlash
+check(baseline.ATTACK_REACH_STUDS == 7,
     "optional attack resolution never mutates default Marauder damage")
 boss:Destroy()
 print(string.format(
