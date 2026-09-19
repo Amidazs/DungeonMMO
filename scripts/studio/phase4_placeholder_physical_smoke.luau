@@ -99,8 +99,10 @@ for _, id in ipairs({"TestDungeon", "AbandonedMine"}) do
     for _, anchor in ipairs(anchors:GetChildren()) do
         check(Tags:HasTag(anchor, "DungeonMMOEnvironmentAnchor")
             and anchor.CanTouch == false
-            and anchor.CanCollide == false,
-            id .. " unused optional anchor must not enable gameplay")
+            and anchor.CanCollide == false
+            and anchor:GetAttribute("EnvironmentId") == id,
+            id .. " optional anchor must match resolver environment"
+                .. " and must not enable gameplay")
     end
     -- Validate that all key walkable locations have terrain underneath.
     local function walkable(x: number, z: number)
