@@ -4,6 +4,7 @@ local AnimationClipProvider = game:GetService(
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 
@@ -68,6 +69,15 @@ local current_carry_weight = 0
 local running_connection: RBXScriptConnection? = nil
 local state_connection: RBXScriptConnection? = nil
 
+--[[
+Returns whether current equipment should show sword presentation.
+
+Args:
+    None.
+
+Returns:
+    boolean: True when the equipped weapon uses sword presentation.
+]]
 local function show_sword_presentation(): boolean
     return EquipmentPresentationRules.show_sword(
         player:GetAttribute(
@@ -86,6 +96,15 @@ local procedural_right_elbow: Instance? = nil
 local procedural_right_wrist: Instance? = nil
 
 
+--[[
+Returns the safe replicated basic-attack playback rate.
+
+Args:
+    None.
+
+Returns:
+    number: Valid attack playback-rate multiplier.
+]]
 local function get_basic_attack_rate(): number
     local character = player.Character
 
@@ -151,6 +170,16 @@ local function clear_animation_tracks()
 end
 
 
+--[[
+Checks whether a presentation joint matches one allowed joint name.
+
+Args:
+    instance (Instance): Candidate animation or motor joint.
+    names ({string}): Accepted joint names.
+
+Returns:
+    boolean: True when the instance name matches the list.
+]]
 local function joint_name_matches(
     instance: Instance,
     names: {string}
@@ -165,6 +194,16 @@ local function joint_name_matches(
 end
 
 
+--[[
+Finds an animation-compatible character joint by accepted names.
+
+Args:
+    character (Model): Character containing presentation joints.
+    names ({string}): Joint names to search for.
+
+Returns:
+    Instance?: Matching AnimationConstraint or Motor6D.
+]]
 local function find_presentation_joint(
     character: Model,
     names: {string}
@@ -187,6 +226,16 @@ local function find_presentation_joint(
 end
 
 
+--[[
+Layers a presentation transform onto one compatible character joint.
+
+Args:
+    joint (Instance?): AnimationConstraint or Motor6D to update.
+    overlay (CFrame): Transform layered over the current joint pose.
+
+Returns:
+    None.
+]]
 local function layer_presentation_joint(
     joint: Instance?,
     overlay: CFrame
@@ -206,6 +255,15 @@ local function layer_presentation_joint(
 end
 
 
+--[[
+Clears cached joints used by published procedural sword presentation.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
 local function clear_published_pose_joints()
     procedural_waist = nil
     procedural_right_shoulder = nil
@@ -217,6 +275,15 @@ local function clear_published_pose_joints()
 end
 
 
+--[[
+Finds and caches joints used by published procedural sword presentation.
+
+Args:
+    character (Model): Character whose joints should be cached.
+
+Returns:
+    None.
+]]
 local function bind_published_pose_joints(
     character: Model
 )
@@ -243,6 +310,15 @@ local function bind_published_pose_joints(
 end
 
 
+--[[
+Renders procedural sword carry and attack pose overlays outside Studio.
+
+Args:
+    _delta_time (number): Frame delta supplied by PreSimulation.
+
+Returns:
+    None.
+]]
 local function render_published_sword(
     _delta_time: number
 )
@@ -742,6 +818,7 @@ local function create_debug_gui()
 
     gui.Name = DebugConfig.STATE_GUI_NAME
     gui.ResetOnSpawn = false
+    gui.Enabled = false
     gui.Parent = player_gui
 
     local frame = Instance.new("Frame")
@@ -985,6 +1062,27 @@ end
 
 if RunService:IsStudio() then
     create_debug_gui()
+
+    UserInputService.InputBegan:Connect(function(
+        input: InputObject,
+        processed: boolean
+    )
+        if processed
+            or input.KeyCode ~= Enum.KeyCode.F7 then
+            return
+        end
+
+        local player_gui = player:FindFirstChild("PlayerGui")
+        local debug_gui = player_gui
+            and player_gui:FindFirstChild(
+                DebugConfig.STATE_GUI_NAME
+            )
+
+        if debug_gui
+            and debug_gui:IsA("ScreenGui") then
+            debug_gui.Enabled = not debug_gui.Enabled
+        end
+    end)
 end
 
 RunService.PreSimulation:Connect(

@@ -12,10 +12,18 @@ local player_gui = player:WaitForChild("PlayerGui")
 local shared_folder = ReplicatedStorage
     :WaitForChild("Combat")
     :WaitForChild("Shared")
+local core_shared = ReplicatedStorage
+    :WaitForChild("Core")
+    :WaitForChild("Shared")
 
+local UiTheme = require(
+    core_shared:WaitForChild("UiTheme")
+)
 local CombatTypes = require(shared_folder:WaitForChild("CombatTypes"))
 local ProgressionClientState = require(
-    script.Parent.Parent:WaitForChild("Core"):WaitForChild("ProgressionClientState")
+    script.Parent.Parent
+        :WaitForChild("Core")
+        :WaitForChild("ProgressionClientState")
 )
 local InputMappingConfig = require(
     shared_folder:WaitForChild("InputMappingConfig")
@@ -39,14 +47,48 @@ local attack_held = false
 local block_held = false
 
 
-local function style_button(button: TextButton, enabled: boolean)
+--[[
+Updates one mobile combat button's enabled presentation.
+
+Args:
+    button (TextButton): Button to update.
+    enabled (boolean): Whether the action is currently available.
+
+Returns:
+    None.
+]]
+local function style_button(
+    button: TextButton,
+    enabled: boolean
+)
     button.Active = enabled
-    button.AutoButtonColor = enabled
-    button.BackgroundTransparency = enabled and 0.15 or 0.55
-    button.TextTransparency = enabled and 0 or 0.45
+    button.AutoButtonColor = false
+    button.BackgroundColor3 = if enabled
+        then UiTheme.PALETTE.SurfaceRaised
+        else UiTheme.PALETTE.Disabled
+    button.BackgroundTransparency = if enabled
+        then 0.06
+        else 0.42
+    button.TextColor3 = if enabled
+        then UiTheme.PALETTE.Text
+        else UiTheme.PALETTE.TextFaint
+    button.TextTransparency = if enabled then 0 else 0.25
 end
 
 
+--[[
+Creates one themed mobile combat control.
+
+Args:
+    parent (Instance): UI parent.
+    name (string): Instance name.
+    label (string): Visible control text.
+    position (UDim2): Screen position.
+    size (UDim2): Control size.
+
+Returns:
+    TextButton: Configured mobile control.
+]]
 local function create_button(
     parent: Instance,
     name: string,
@@ -60,14 +102,23 @@ local function create_button(
     button.Position = position
     button.Size = size
     button.Text = label
-    button.TextScaled = true
+    button.TextScaled = false
+    button.TextSize = 13
     button.TextWrapped = true
-    button.BackgroundTransparency = 0.15
+    button.Font = UiTheme.FONT.Strong
+    button.TextColor3 = UiTheme.PALETTE.Text
+    button.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
+    button.BackgroundTransparency = 0.06
+    button.BorderSizePixel = 0
+    button.AutoButtonColor = false
     button.Parent = parent
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.22, 0)
-    corner.Parent = button
+    UiTheme.add_corner(button, 12)
+    UiTheme.add_stroke(
+        button,
+        UiTheme.PALETTE.Border,
+        0.32
+    )
 
     local padding = Instance.new("UIPadding")
     padding.PaddingLeft = UDim.new(0, 6)
@@ -84,7 +135,7 @@ local screen_gui = Instance.new("ScreenGui")
 screen_gui.Name = Mobile.GUI_NAME
 screen_gui.ResetOnSpawn = false
 screen_gui.IgnoreGuiInset = false
-screen_gui.DisplayOrder = 20
+screen_gui.DisplayOrder = 125
 screen_gui.Parent = player_gui
 
 local action_buttons = {}
@@ -152,6 +203,15 @@ for slot = 1, Mobile.SKILL_SLOT_COUNT do
 end
 
 
+--[[
+Returns whether an input should count as primary touch activation.
+
+Args:
+    input (InputObject): Input event received by a touch control.
+
+Returns:
+    boolean: True for touch or primary mouse input.
+]]
 local function is_primary_touch(input: InputObject): boolean
     return input.UserInputType == Enum.UserInputType.Touch
         or input.UserInputType == Enum.UserInputType.MouseButton1
@@ -200,6 +260,15 @@ action_buttons.Block.InputEnded:Connect(function(input: InputObject)
 end)
 
 
+--[[
+Starts cooldown presentation for the slot containing one skill.
+
+Args:
+    skill_id (string): Skill confirmed by the combat controller.
+
+Returns:
+    None.
+]]
 local function begin_skill_cooldown(skill_id: string)
     for slot = 1, Mobile.SKILL_SLOT_COUNT do
         if ProgressionClientState.get_skill_for_slot(slot) == skill_id then
@@ -216,6 +285,15 @@ local function begin_skill_cooldown(skill_id: string)
 end
 
 
+--[[
+Refreshes mobile action availability, labels and cooldown feedback.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
 local function refresh_controls()
     local state = ClientCombatController.get_state()
     local dead = state == State.DEAD

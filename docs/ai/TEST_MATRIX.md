@@ -2412,3 +2412,19 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-depth4-content-acceptance-record.md`.
+
+
+## UI/HUD candidate - 19 September 2026
+
+- [x] 531 Lua/Luau files parsed and git diff whitespace check clean.
+- [x] Four Rojo builds pass.
+- [x] Base Studio regression and Phase 3 stress pass.
+- [x] Dungeon repeat: Training Dummy 9/9, Combat Target Rules 9/9,
+  Phase 3 stress, player admission, zero project errors.
+- [x] No art/model/mesh/terrain/image files changed.
+- [ ] Player-facing desktop/mobile viewport visual acceptance.
+- [ ] Contextual prompts, modal close, party entry and boss HUD manually
+  exercised by player before release.
+- [ ] Feature branch merge / publish only with explicit approval.
+
+Evidence: docs/testing/phase4-ui-hud-overhaul-candidate-acceptance-record.md.

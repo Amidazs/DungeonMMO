@@ -511,3 +511,16 @@ C:\Users\Remko\Documents\Roblox\DungeonMMO_Art
 
 No hard reset, clean, force-push or history rewrite. Do not use PROD DataStores
 or publish PROD without a separate explicit approval.
+
+
+## UI candidate handoff - 19 September 2026
+
+Continue at DungeonMMO_Phase4_UIOverhaul_v1, branch
+wip/phase-4-ui-overhaul-v1. Parser, four builds and Base/Dungeon Studio
+regressions passed; see UI candidate acceptance record.
+Before merging/publishing, visually test normal gameplay at desktop and
+small viewports, player/target/hotbar spacing, Guild/Inventory/Skills close,
+DungeonEntryPrompt and AuctionHousePrompt open/close/distance behaviour,
+party entry and dungeon HUD with active boss/completion.
+Preserve backend, physical depth locks and isolated art worktree.
+No push, merge or Roblox publish has been performed.

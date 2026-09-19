@@ -754,3 +754,16 @@ Phase 3 completion worktree/branch remains preserved for history:
 
 Do not reset hard, clean, force-push, rewrite history or merge the art worktree
 into gameplay. Validation builds belong in TEMP locations.
+
+
+## UI/HUD overhaul candidate - 19 September 2026
+
+Active UI worktree: DungeonMMO_Phase4_UIOverhaul_v1.
+Branch: wip/phase-4-ui-overhaul-v1; baseline ff2baa0.
+Shared styling, combat hotbar/status, dungeon HUD, contextual Expedition
+and Auction windows, and refreshed Guild/core menus are implemented.
+531 Luau sources parsed, four Rojo builds passed, Base and repeat Dungeon
+Studio regressions passed; repeat Dungeon log has zero project errors.
+Manual visual and prompt-to-window acceptance remains OPEN.
+No push, merge or Roblox publish. Backend readiness gates unchanged.
+Evidence: docs/testing/phase4-ui-hud-overhaul-candidate-acceptance-record.md.
