@@ -1,6 +1,9 @@
 --!strict
 local LootTableConfig = require(script.Parent:WaitForChild("LootTableConfig"))
 local DungeonDefinitions = {}
+local TestRelease = require(script.Parent:WaitForChild(
+    "DungeonTestPlaceholderRelease"
+))
 
 DungeonDefinitions.TEST_DUNGEON = table.freeze({
     Id = "TestDungeon",
@@ -83,7 +86,18 @@ local BY_ID = table.freeze({
 })
 
 function DungeonDefinitions.get(dungeon_id: string): any?
-    return BY_ID[dungeon_id]
+    local definition = BY_ID[dungeon_id]
+    if not definition
+        or not TestRelease.treat_as_test_temple(dungeon_id)
+    then
+        return definition
+    end
+    local copy = {}
+    for key, value in pairs(definition) do
+        copy[key] = value
+    end
+    copy.OptionalBossRuntimeEnabled = true
+    return table.freeze(copy)
 end
 
 function DungeonDefinitions.all(): any
