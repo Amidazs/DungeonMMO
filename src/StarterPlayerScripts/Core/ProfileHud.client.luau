@@ -19,6 +19,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local profile_snapshot = remotes:WaitForChild(
     "ProfileSnapshot"
@@ -50,11 +53,12 @@ gui.Parent = player_gui
 
 local card = Instance.new("Frame")
 card.Name = "StatusCard"
-card.AnchorPoint = Vector2.new(0, 1)
-card.Position = UDim2.new(0, 18, 1, -18)
-card.Size = UDim2.fromOffset(330, 224)
+card.AnchorPoint = Vector2.new(0, 0)
+card.Position = UDim2.new(0, 20, 0, 66)
+card.Size = UDim2.fromOffset(320, 218)
 UiTheme.style_panel(card, false)
 card.Parent = gui
+UiOrnament.frame(card, true)
 UiTheme.bind_responsive_scale(card, 1366, 0.78, 1)
 
 local accent = Instance.new("Frame")
@@ -69,7 +73,7 @@ accent.Parent = card
 local level_badge = Instance.new("Frame")
 level_badge.Name = "LevelBadge"
 level_badge.Position = UDim2.fromOffset(16, 14)
-level_badge.Size = UDim2.fromOffset(48, 48)
+level_badge.Size = UDim2.fromOffset(54, 54)
 level_badge.BackgroundColor3 = UiTheme.PALETTE.AccentDark
 level_badge.BorderSizePixel = 0
 UiTheme.add_corner(level_badge, 8)
@@ -80,14 +84,40 @@ UiTheme.add_stroke(
 )
 level_badge.Parent = card
 
+local portrait = Instance.new("ImageLabel")
+portrait.Name = "PlayerPortrait"
+portrait.Size = UDim2.fromScale(1, 1)
+portrait.BackgroundTransparency = 1
+portrait.ScaleType = Enum.ScaleType.Crop
+portrait.ZIndex = 1
+portrait.Parent = level_badge
+UiTheme.add_corner(portrait, 7)
+
+-- Display the real character headshot without assuming image ownership.
+task.spawn(function()
+    local ok, image = pcall(function()
+        return Players:GetUserThumbnailAsync(
+            player.UserId,
+            Enum.ThumbnailType.HeadShot,
+            Enum.ThumbnailSize.Size150x150
+        )
+    end)
+    if ok then
+        portrait.Image = image
+    end
+end)
+
 local level_caption = UiComponents.label(
     level_badge,
     "LevelCaption",
     "LV",
     "Caption"
 )
-level_caption.Position = UDim2.fromOffset(0, 5)
-level_caption.Size = UDim2.new(1, 0, 0, 12)
+level_caption.Position = UDim2.fromOffset(0, 0)
+level_caption.Size = UDim2.new(0, 19, 0, 12)
+level_caption.BackgroundTransparency = 0.15
+level_caption.BackgroundColor3 = UiTheme.PALETTE.Backdrop
+level_caption.ZIndex = 3
 level_caption.TextXAlignment = Enum.TextXAlignment.Center
 level_caption.TextColor3 = UiTheme.PALETTE.AccentBright
 
@@ -97,10 +127,14 @@ local level_value = UiComponents.label(
     "1",
     "Heading"
 )
-level_value.Position = UDim2.fromOffset(0, 17)
-level_value.Size = UDim2.new(1, 0, 0, 26)
+level_value.AnchorPoint = Vector2.new(1, 1)
+level_value.Position = UDim2.fromScale(1, 1)
+level_value.Size = UDim2.fromOffset(23, 22)
+level_value.BackgroundTransparency = 0.08
+level_value.BackgroundColor3 = UiTheme.PALETTE.Backdrop
+level_value.ZIndex = 3
 level_value.TextXAlignment = Enum.TextXAlignment.Center
-level_value.TextSize = 20
+level_value.TextSize = 17
 
 local class_label = UiComponents.label(
     card,
@@ -108,8 +142,8 @@ local class_label = UiComponents.label(
     last_class,
     "Heading"
 )
-class_label.Position = UDim2.fromOffset(76, 13)
-class_label.Size = UDim2.new(1, -92, 0, 24)
+class_label.Position = UDim2.fromOffset(82, 13)
+class_label.Size = UDim2.new(1, -98, 0, 24)
 
 local currency_label = UiComponents.label(
     card,
@@ -117,8 +151,8 @@ local currency_label = UiComponents.label(
     "0 GOLD   •   0 AP   •   0 SP",
     "Muted"
 )
-currency_label.Position = UDim2.fromOffset(76, 38)
-currency_label.Size = UDim2.new(1, -92, 0, 20)
+currency_label.Position = UDim2.fromOffset(82, 38)
+currency_label.Size = UDim2.new(1, -98, 0, 20)
 
 local health = UiComponents.progress_bar(
     card,

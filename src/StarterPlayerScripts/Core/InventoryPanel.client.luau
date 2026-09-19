@@ -17,6 +17,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local inventory_snapshot = remotes:WaitForChild(
     "InventorySnapshot"
@@ -44,9 +47,11 @@ local toggle = UiComponents.button(
     "INVENTORY   I",
     "Secondary"
 )
-toggle.AnchorPoint = Vector2.new(1, 0)
-toggle.Position = UDim2.new(1, -18, 0, 18)
-toggle.Size = UDim2.fromOffset(152, 38)
+toggle.AnchorPoint = Vector2.new(1, 1)
+toggle.Position = UDim2.new(0.5, 364, 1, -15)
+toggle.Size = UDim2.fromOffset(82, 58)
+toggle.Text = "BAG  I"
+toggle.TextSize = 11
 
 local backdrop = Instance.new("TextButton")
 backdrop.Name = "Backdrop"
@@ -121,8 +126,9 @@ padding.PaddingLeft = UDim.new(0, 8)
 padding.PaddingRight = UDim.new(0, 8)
 padding.Parent = list
 
-local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 7)
+local layout = Instance.new("UIGridLayout")
+layout.CellSize = UDim2.fromOffset(139, 119)
+layout.CellPadding = UDim2.fromOffset(8, 8)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = list
 
@@ -186,7 +192,7 @@ Returns:
 local function add_item_row(row: any)
     local frame = Instance.new("Frame")
     frame.Name = tostring(row.Id or row.Name or "Item")
-    frame.Size = UDim2.new(1, -2, 0, 64)
+    frame.Size = UDim2.fromOffset(139, 119)
     frame.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
     frame.BackgroundTransparency = 0.08
     frame.BorderSizePixel = 0
@@ -201,7 +207,7 @@ local function add_item_row(row: any)
 
     local rarity = Instance.new("Frame")
     rarity.Name = "Rarity"
-    rarity.Size = UDim2.new(0, 4, 1, -14)
+    rarity.Size = UDim2.new(1, -14, 0, 3)
     rarity.Position = UDim2.fromOffset(7, 7)
     rarity.BackgroundColor3 = rarity_color(row.Rarity)
     rarity.BorderSizePixel = 0
@@ -209,14 +215,27 @@ local function add_item_row(row: any)
     UiTheme.add_corner(rarity, 2)
     rarity.Parent = frame
 
+    local icon = UiOrnament.icon(
+        frame,
+        "ItemIcon",
+        string.sub(tostring(row.Name), 1, 1),
+        rarity_color(row.Rarity):Lerp(
+            UiTheme.PALETTE.SurfaceRaised, 0.55
+        ),
+        42
+    )
+    icon.Position = UDim2.fromOffset(48, 12)
+
     local name = UiComponents.label(
         frame,
         "Name",
         tostring(row.Name),
         "Heading"
     )
-    name.Position = UDim2.fromOffset(20, 8)
-    name.Size = UDim2.new(1, -142, 0, 24)
+    name.Position = UDim2.fromOffset(7, 59)
+    name.Size = UDim2.new(1, -14, 0, 25)
+    name.TextSize = 11
+    name.TextXAlignment = Enum.TextXAlignment.Center
     name.ZIndex = 14
 
     local detail = UiComponents.label(
@@ -232,8 +251,10 @@ local function add_item_row(row: any)
         ),
         "Muted"
     )
-    detail.Position = UDim2.fromOffset(20, 34)
-    detail.Size = UDim2.new(1, -142, 0, 20)
+    detail.Position = UDim2.fromOffset(7, 85)
+    detail.Size = UDim2.new(1, -14, 0, 14)
+    detail.TextSize = 9
+    detail.TextXAlignment = Enum.TextXAlignment.Center
     detail.ZIndex = 14
 
     local quantity = UiComponents.label(
@@ -243,8 +264,9 @@ local function add_item_row(row: any)
         "Heading"
     )
     quantity.AnchorPoint = Vector2.new(1, 0.5)
-    quantity.Position = UDim2.new(1, -18, 0.5, 0)
-    quantity.Size = UDim2.fromOffset(100, 32)
+    quantity.Position = UDim2.new(1, -8, 0, 17)
+    quantity.Size = UDim2.fromOffset(31, 20)
+    quantity.TextSize = 11
     quantity.TextXAlignment = Enum.TextXAlignment.Right
     quantity.TextColor3 = UiTheme.PALETTE.AccentBright
     quantity.ZIndex = 14

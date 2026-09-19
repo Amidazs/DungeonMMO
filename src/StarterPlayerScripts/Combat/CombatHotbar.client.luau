@@ -42,6 +42,9 @@ local UiComponents = require(
 local UiTheme = require(
     core_shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    core_shared:WaitForChild("UiOrnament")
+)
 
 local State = CombatTypes.State
 local cooldown_ends: {[number]: number} = {}
@@ -49,6 +52,7 @@ local slot_frames: {[number]: Frame} = {}
 local slot_names: {[number]: TextLabel} = {}
 local slot_cooldowns: {[number]: TextLabel} = {}
 local slot_overlays: {[number]: Frame} = {}
+local slot_sigils: {[number]: TextLabel} = {}
 
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("CombatHotbarGui")
@@ -67,14 +71,21 @@ local root = Instance.new("Frame")
 root.Name = "Hotbar"
 root.AnchorPoint = Vector2.new(0.5, 1)
 root.Position = UDim2.new(0.5, 0, 1, -18)
-root.Size = UDim2.fromOffset(492, 96)
+root.Size = UDim2.fromOffset(492, 112)
 root.BackgroundTransparency = 1
 root.Parent = gui
 UiTheme.bind_responsive_scale(root, 1366, 0.76, 1)
 
+local tray = Instance.new("Frame")
+tray.Name = "ActionBarFrame"
+tray.Size = UDim2.new(1, 0, 0, 91)
+UiTheme.style_panel(tray, true)
+tray.Parent = root
+UiOrnament.frame(tray, true)
+
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
-slots.Size = UDim2.new(1, 0, 0, 68)
+slots.Size = UDim2.new(1, 0, 0, 88)
 slots.BackgroundTransparency = 1
 slots.Parent = root
 
@@ -97,7 +108,7 @@ Returns:
 local function create_slot(slot: number)
     local frame = Instance.new("Frame")
     frame.Name = "Slot" .. tostring(slot)
-    frame.Size = UDim2.fromOffset(74, 66)
+    frame.Size = UDim2.fromOffset(74, 82)
     frame.BackgroundColor3 = UiTheme.PALETTE.Surface
     frame.BorderSizePixel = 0
     UiTheme.add_corner(frame, 8)
@@ -108,11 +119,23 @@ local function create_slot(slot: number)
     )
     frame.Parent = slots
 
+    local icon = UiOrnament.icon(
+        frame,
+        "AbilityIcon",
+        "✦",
+        Color3.fromRGB(59, 76, 94),
+        48
+    )
+    icon.Position = UDim2.fromOffset(13, 4)
+    slot_sigils[slot] = icon:WaitForChild("IconWell")
+        :WaitForChild("Sigil") :: TextLabel
+
     local key = UiComponents.key_hint(
         frame,
         tostring(slot)
     )
-    key.Position = UDim2.fromOffset(5, 5)
+    key.Position = UDim2.fromOffset(2, 2)
+    key.ZIndex = 3
 
     local name = UiComponents.label(
         frame,
@@ -120,11 +143,11 @@ local function create_slot(slot: number)
         "Empty",
         "Body"
     )
-    name.Position = UDim2.fromOffset(7, 31)
-    name.Size = UDim2.new(1, -14, 0, 28)
+    name.Position = UDim2.fromOffset(3, 55)
+    name.Size = UDim2.new(1, -6, 0, 23)
     name.TextXAlignment = Enum.TextXAlignment.Center
     name.TextWrapped = true
-    name.TextSize = 12
+    name.TextSize = 10
 
     local overlay = Instance.new("Frame")
     overlay.Name = "CooldownOverlay"
@@ -221,6 +244,9 @@ local function refresh_loadout()
         label.TextColor3 = if definition
             then UiTheme.PALETTE.Text
             else UiTheme.PALETTE.TextFaint
+        slot_sigils[slot].Text = if definition
+            then string.sub(definition.DISPLAY_NAME, 1, 1)
+            else "·"
     end
 end
 

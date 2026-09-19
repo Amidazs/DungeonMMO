@@ -53,9 +53,11 @@ local open = UiComponents.button(
     "SKILLS   K",
     "Secondary"
 )
-open.AnchorPoint = Vector2.new(1, 0)
-open.Position = UDim2.new(1, -18, 0, 64)
-open.Size = UDim2.fromOffset(152, 38)
+open.AnchorPoint = Vector2.new(1, 1)
+open.Position = UDim2.new(0.5, 274, 1, -15)
+open.Size = UDim2.fromOffset(82, 58)
+open.Text = "SKILLS K"
+open.TextSize = 11
 
 local backdrop = Instance.new("TextButton")
 backdrop.Name = "Backdrop"

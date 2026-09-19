@@ -5,6 +5,7 @@ local shared = ReplicatedStorage
     :WaitForChild("Core")
     :WaitForChild("Shared")
 local UiTheme = require(shared:WaitForChild("UiTheme"))
+local UiOrnament = require(shared:WaitForChild("UiOrnament"))
 
 local UiComponents = {}
 
@@ -185,7 +186,9 @@ function UiComponents.modal(
     root.Position = UDim2.fromScale(0.5, 0.5)
     root.Size = size
     UiTheme.style_panel(root, false)
+    root.BackgroundColor3 = Color3.fromRGB(22, 26, 33)
     root.Parent = parent
+    UiOrnament.frame(root, true)
 
     local header = Instance.new("Frame")
     header.Name = "Header"
@@ -227,7 +230,7 @@ function UiComponents.modal(
     divider.Position = UDim2.fromOffset(18, 78)
     divider.Size = UDim2.new(1, -36, 0, 1)
     divider.BackgroundColor3 = UiTheme.PALETTE.Border
-    divider.BackgroundTransparency = 0.55
+    divider.BackgroundTransparency = 0.1
     divider.BorderSizePixel = 0
     divider.Parent = root
 

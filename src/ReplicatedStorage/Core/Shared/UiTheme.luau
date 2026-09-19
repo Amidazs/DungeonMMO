@@ -33,7 +33,7 @@ local PALETTE = table.freeze({
 })
 
 local FONT = table.freeze({
-    Heading = Enum.Font.GothamBold,
+    Heading = Enum.Font.Garamond,
     Body = Enum.Font.Gotham,
     Strong = Enum.Font.GothamSemibold,
     Mono = Enum.Font.RobotoMono,
