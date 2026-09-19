@@ -1,4 +1,5 @@
 --!strict
+-- Direct GitHub write-access smoke test; no gameplay behavior changed.
 local ServerScriptService = game:GetService("ServerScriptService")
 local Services = ServerScriptService:WaitForChild("Core")
     :WaitForChild("Services")
