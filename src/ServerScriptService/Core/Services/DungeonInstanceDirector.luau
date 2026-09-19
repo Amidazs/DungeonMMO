@@ -125,6 +125,11 @@ function DungeonInstanceDirector.resolve(
         "Unknown dungeon difficulty " .. tostring(difficulty_id)
     )
     local opts = options or {}
+    -- TEST Event/Secret rooms are registered for Depth1 only.
+    -- Higher-depth encounters must not inherit optional eligibility.
+    local allow_optional = definition.OptionalBossRuntimeEnabled == true
+        and (not TestRelease.is_test_dungeon()
+            or difficulty.Id == "Depth1")
 
     if dungeon_id ~= DungeonDefinitions.ABANDONED_MINE.Id then
         return attach_optional_state({
@@ -141,7 +146,7 @@ function DungeonInstanceDirector.resolve(
             EventActive = false,
             CreatedAt = now,
         }, dungeon_id, stable_hash(session_id), now, opts,
-            definition.OptionalBossRuntimeEnabled == true)
+            allow_optional)
     end
 
     local seed = stable_hash(session_id)
@@ -186,7 +191,7 @@ function DungeonInstanceDirector.resolve(
         EventActive = event_active,
         CreatedAt = now,
     }, dungeon_id, seed, now, opts,
-        definition.OptionalBossRuntimeEnabled == true)
+        allow_optional)
 end
 
 return table.freeze(DungeonInstanceDirector)
