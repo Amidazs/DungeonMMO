@@ -28,6 +28,10 @@ local profile_snapshot = remotes:WaitForChild(
     "ProfileSnapshot"
 ) :: RemoteEvent
 
+local WindowController = require(
+    script.Parent:WaitForChild("HudWindowController")
+)
+
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("InventoryPanelUi")
 if old then
@@ -40,18 +44,6 @@ gui.ResetOnSpawn = false
 gui.DisplayOrder = 170
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player_gui
-
-local toggle = UiComponents.button(
-    gui,
-    "InventoryToggle",
-    "INVENTORY   I",
-    "Secondary"
-)
-toggle.AnchorPoint = Vector2.new(1, 1)
-toggle.Position = UDim2.new(0.5, 364, 1, -15)
-toggle.Size = UDim2.fromOffset(82, 58)
-toggle.Text = "BAG  I"
-toggle.TextSize = 11
 
 local backdrop = Instance.new("TextButton")
 backdrop.Name = "Backdrop"
@@ -82,7 +74,7 @@ modal.Body.ZIndex = 12
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.72,
+    0.35,
     1
 )
 
@@ -388,7 +380,7 @@ Args:
 Returns:
     None.
 ]]
-local function set_visible(visible: boolean)
+local function apply_visibility(visible: boolean)
     panel.Visible = visible
     backdrop.Visible = visible
     if visible then
@@ -416,9 +408,12 @@ for index, category in ipairs(
     end)
 end
 
-toggle.Activated:Connect(function()
-    set_visible(not panel.Visible)
-end)
+WindowController.register("Inventory", apply_visibility)
+
+local function set_visible(visible: boolean)
+    WindowController.set_visible("Inventory", visible)
+end
+
 modal.Close.Activated:Connect(function()
     set_visible(false)
 end)

@@ -430,7 +430,10 @@ function UiTheme.bind_responsive_scale(
         end
 
         scale.Scale = math.clamp(
-            camera.ViewportSize.X / reference_width,
+            math.min(
+                camera.ViewportSize.X / reference_width,
+                camera.ViewportSize.Y / 720
+            ),
             minimum,
             maximum
         )

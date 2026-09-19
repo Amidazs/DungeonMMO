@@ -29,6 +29,11 @@ local action_result = remotes:WaitForChild(
     "GuildActionResult"
 ) :: RemoteEvent
 
+local WindowController = require(
+    script.Parent.Parent:WaitForChild("Core")
+        :WaitForChild("HudWindowController")
+)
+
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("GuildPanel")
 if old then
@@ -54,7 +59,7 @@ panel.Visible = false
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.72,
+    0.35,
     1
 )
 
@@ -304,13 +309,19 @@ Args:
 Returns:
     None.
 ]]
-local function set_visible(visible: boolean)
+local function apply_visibility(visible: boolean)
     panel.Visible = visible
 
     if visible then
         status.Text = "Loading guild..."
         snapshot_request:FireServer()
     end
+end
+
+WindowController.register("Guild", apply_visibility)
+
+local function set_visible(visible: boolean)
+    WindowController.set_visible("Guild", visible)
 end
 
 create_button.Activated:Connect(function()

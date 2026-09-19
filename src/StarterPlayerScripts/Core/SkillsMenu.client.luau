@@ -34,6 +34,10 @@ local action_result = remotes:WaitForChild(
     "ProgressionActionResult"
 ) :: RemoteEvent
 
+local WindowController = require(
+    script.Parent:WaitForChild("HudWindowController")
+)
+
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("CharacterSkillsMenu")
 if old then
@@ -46,18 +50,6 @@ gui.ResetOnSpawn = false
 gui.DisplayOrder = 171
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player_gui
-
-local open = UiComponents.button(
-    gui,
-    "OpenSkills",
-    "SKILLS   K",
-    "Secondary"
-)
-open.AnchorPoint = Vector2.new(1, 1)
-open.Position = UDim2.new(0.5, 274, 1, -15)
-open.Size = UDim2.fromOffset(82, 58)
-open.Text = "SKILLS K"
-open.TextSize = 11
 
 local backdrop = Instance.new("TextButton")
 backdrop.Name = "Backdrop"
@@ -88,7 +80,7 @@ modal.Body.ZIndex = 12
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.72,
+    0.35,
     1
 )
 
@@ -445,7 +437,7 @@ Args:
 Returns:
     None.
 ]]
-local function set_visible(visible: boolean)
+local function apply_visibility(visible: boolean)
     panel.Visible = visible
     backdrop.Visible = visible
 
@@ -454,9 +446,12 @@ local function set_visible(visible: boolean)
     end
 end
 
-open.Activated:Connect(function()
-    set_visible(not panel.Visible)
-end)
+WindowController.register("Skills", apply_visibility)
+
+local function set_visible(visible: boolean)
+    WindowController.set_visible("Skills", visible)
+end
+
 modal.Close.Activated:Connect(function()
     set_visible(false)
 end)

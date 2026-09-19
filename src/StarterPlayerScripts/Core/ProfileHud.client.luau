@@ -53,13 +53,49 @@ gui.Parent = player_gui
 
 local card = Instance.new("Frame")
 card.Name = "StatusCard"
-card.AnchorPoint = Vector2.new(0, 0)
-card.Position = UDim2.new(0, 20, 0, 66)
+card.AnchorPoint = Vector2.new(0, 1)
+card.Position = UDim2.new(0, 16, 1, -18)
 card.Size = UDim2.fromOffset(320, 218)
 UiTheme.style_panel(card, false)
 card.Parent = gui
 UiOrnament.frame(card, true)
-UiTheme.bind_responsive_scale(card, 1366, 0.78, 1)
+UiTheme.bind_responsive_scale(card, 1366, 0.5, 1)
+
+-- Keeps status outside the hotbar on narrow Studio viewports.
+local function update_status_position()
+    local camera = workspace.CurrentCamera
+    if not camera then
+        return
+    end
+    local compact = camera.ViewportSize.X < 1180
+    card.AnchorPoint = if compact
+        then Vector2.new(0, 0)
+        else Vector2.new(0, 1)
+    card.Position = if compact
+        then UDim2.fromOffset(12, 58)
+        else UDim2.new(0, 16, 1, -18)
+end
+
+local viewport_connection: RBXScriptConnection? = nil
+
+-- Rebinds viewport updates when Roblox replaces the current camera.
+local function bind_viewport()
+    if viewport_connection then
+        viewport_connection:Disconnect()
+    end
+    local camera = workspace.CurrentCamera
+    if camera then
+        viewport_connection = camera:GetPropertyChangedSignal(
+            "ViewportSize"
+        ):Connect(update_status_position)
+    end
+    update_status_position()
+end
+
+workspace:GetPropertyChangedSignal(
+    "CurrentCamera"
+):Connect(bind_viewport)
+bind_viewport()
 
 local accent = Instance.new("Frame")
 accent.Name = "Accent"
