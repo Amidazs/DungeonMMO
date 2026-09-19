@@ -1,5 +1,33 @@
 # DungeonMMO Development Handoff
 
+## Current checkpoint - 19 September 2026 Step 2 GitHub-first backend proof
+
+This section supersedes the Step 1 status below; its validation details remain
+historical evidence, not a statement about the current source.
+
+- Active backend branch: wip/phase-4-event-secret-policy-v1.
+- Step 2 code and test source validated at ae1ab32be03fe5c2ff9874f95df49a8c56ff069a.
+  The former uncommitted work was preserved and pushed at bd83446. Later
+  gameplay/test changes were committed directly using the Amidazs GitHub
+  connector, then fast-forwarded into the clean isolated backend worktree.
+- Server-only candidate event schedule and secret discovery, independent boss
+  reward identities and optional book drops are implemented. Rollout remains
+  disabled for both dungeons; no physical side arenas or higher-depth physical
+  layouts have been registered.
+- All four local Rojo builds passed; 544 Lua/Luau source files compiled with
+  zero failures at ae1ab32. A fresh TEMP local Studio RunScript session passed
+  eight optional-boss EDIT-MODE suites: RunState, Schedule, SecretDiscovery,
+  Policy, Flow, Factories, ReleaseLock and Reward.
+- Edit-mode tests are not a live Play-mode or physical/gameplay acceptance test.
+  TEMP-only physical trigger/combat/reward/reconnect checks and broad
+  Base/Dungeon Play-mode regressions remain before release consideration.
+- Main, UI/art worktrees, published games and production data were not changed.
+- Source-controlled runner: scripts/studio/optional_boss_focused_tests.luau.
+  Detailed evidence: docs/testing/phase4-optional-boss-step2-backend-checkpoint-2026-09-19.md.
+- Next: complete the live/physical acceptance gate separately; then continue
+  backend-only work on distinct Event/Secret boss combat behaviour. No merge
+  or publish is authorised by this checkpoint.
+
 ## Current checkpoint - 19 September 2026 step 1 validation
 
 This section supersedes older active-branch, no-push and pending-Studio notes
