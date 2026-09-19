@@ -16,6 +16,9 @@ local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
 local PresentationService = require(Combat:WaitForChild("MarauderPresentationService"))
 local Factory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
+local OptionalBossAttackRules = require(
+    Combat:WaitForChild("OptionalBossAttackRules")
+)
 
 local TAG = "DungeonMarauderCaptain"
 local CHASE_SPEED = 17.5
@@ -130,9 +133,21 @@ end
 
 local function perform_attack(runtime: Runtime, target_player: Player, target_character: Model, target_root: BasePart)
     if runtime.attacking or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) then return end
-    local attack_name = ATTACK_ORDER[runtime.patternIndex]
-    runtime.patternIndex = if runtime.patternIndex >= #ATTACK_ORDER then 1 else runtime.patternIndex + 1
-    local definition = Factory.ATTACKS[attack_name]
+    local boss_attack = OptionalBossAttackRules.resolve(
+        runtime.model, runtime.patternIndex,
+        runtime.humanoid.Health / math.max(1, runtime.humanoid.MaxHealth)
+    )
+    local attack_name = if boss_attack then boss_attack.AbilityId
+        else ATTACK_ORDER[runtime.patternIndex]
+    local definition = if boss_attack then boss_attack.Definition
+        else Factory.ATTACKS[attack_name]
+    runtime.patternIndex = if boss_attack then boss_attack.NextPatternIndex
+        else if runtime.patternIndex >= #ATTACK_ORDER then 1
+            else runtime.patternIndex + 1
+    if boss_attack then
+        runtime.model:SetAttribute("DungeonBossAbilityId", boss_attack.AbilityId)
+        runtime.model:SetAttribute("DungeonBossPhase", boss_attack.Phase)
+    end
     runtime.attacking = true
     runtime.attackSequence += 1
     local sequence = runtime.attackSequence
