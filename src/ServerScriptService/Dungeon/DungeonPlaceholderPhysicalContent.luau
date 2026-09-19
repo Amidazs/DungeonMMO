@@ -262,8 +262,10 @@ local function playable_depth_anchors(
     local layout_id = "Depth" .. depth
     local center_x = theme.PreviewX + (depth - 2) * 240
     local prefix = theme.Prefix .. "." .. layout_id .. "."
+    -- Room1 reaches north to Z=112; 118 was outside its floor.
+    -- Keep the entry spawn on solid room floor and away from its trigger.
     anchor(parent, theme.Prefix, prefix .. "EntrySpawn",
-        Vector3.new(center_x, 2, 118), "Spawn")
+        Vector3.new(center_x, 2, 108), "Spawn")
     local count = depth + 2
     for index = 1, count do
         local room_id = "Room" .. index
