@@ -2,14 +2,27 @@
 
 The canonical long-form roadmap stored here is:
 
-`DungeonMMO_Roadmap_v1_43.docx`
+`DungeonMMO_Roadmap_v1_45.docx`
 
-Version: **1.43**
-Last updated: **18 September 2026**
+Version: **1.45**
+Last updated: **19 September 2026**
 
 SHA-256:
 
-`be439c64fd89f2c953b2f73f01c508b1d876ffd24dfe7ccbc597113b356c7403`
+`349d8a568856091ec2dbdadfde4b7785f608e65d2ac8f2429c838d9a86a943ac`
+
+Roadmap v1.45 adds the four-step Event/Secret Boss **isolated backend**
+checkpoint: recovery and reward replay, Mine live integration, four distinct
+server-owned two-phase boss attack patterns, and fresh Base/Dungeon Studio
+regressions. Gameplay source was validated at `3700dba`; the final regular
+Base/Dungeon and static validation ran at `c86a904`.
+
+See `docs/testing/phase4-optional-boss-four-backend-steps-closeout-2026-09-19.md`
+for the exact source/log evidence and outstanding network-reconnect, authored
+physical-arena, unassisted combat, and multiplayer release gates. Optional boss
+rollout remains disabled in both dungeons; **no merge to main or game publish**
+is implied by this roadmap update. The v1.45 DOCX passed zip/structure checks;
+a visual PDF/page-render review is still pending after the Word export stalled.
 
 Version 1.43 formally closes **Phase 3 - Systems Alpha** and opens
 **Phase 4 - Content Alpha**.
@@ -141,9 +154,10 @@ Depth1 miniboss, combat, Depth2 miniboss, Depth3 miniboss, then a new true final
 boss. Depth2-Depth4 readiness now fails only on deliberately absent physical
 layouts; all release switches remain disabled.
 
-The canonical DOCX remains v1.43 because these Phase 4 backend gates have not
-received a project-owner release/closeout action and have not been pushed,
-merged or published. Local acceptance evidence is recorded in:
+The following early Phase 4 evidence records remain historical; the latest
+isolated optional-boss candidate has been committed and pushed to its feature
+branch, but **has not been merged to main or published to Roblox**. Earlier
+backend gates had separate local acceptance at the checkpoints listed below:
 
 - `docs/testing/phase4-progressive-dungeon-depth-backend-acceptance-record.md`;
 - `docs/testing/phase4-generic-dungeon-encounter-runtime-acceptance-record.md`;
