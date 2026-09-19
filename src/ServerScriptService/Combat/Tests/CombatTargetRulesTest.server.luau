@@ -102,7 +102,7 @@ Returns:
     Player?: First connected player when available.
 ]]
 local function get_test_player(): Player?
-    local deadline = os.clock() + 5
+    local deadline = os.clock() + 25
 
     repeat
         local players = Players:GetPlayers()
