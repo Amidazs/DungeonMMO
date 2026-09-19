@@ -1,0 +1,256 @@
+--!strict
+-- RunScript against a newly built TEMP local Dungeon place only.
+-- This deliberately alters ONLY the loaded temporary Studio DataModel.
+assert(game.PlaceId == 0 and game.GameId == 0,
+    "Fixture cannot run against a published place.")
+
+local SSS = game:GetService("ServerScriptService")
+local RS = game:GetService("ReplicatedStorage")
+local W = game:GetService("Workspace")
+local STS = game:GetService("StudioTestService")
+local dungeon = SSS:WaitForChild("Dungeon")
+local shared = RS.Core.Shared
+
+local function replace_once(source: LuaSourceContainer, old: string, new: string)
+    local value = source.Source
+    local index = string.find(value, old, 1, true)
+    assert(index and not string.find(value, old, index + #old, true),
+        "TEMP fixture source anchor missing or duplicated: " .. source.Name)
+    source.Source = string.sub(value, 1, index - 1)
+        .. new .. string.sub(value, index + #old)
+end
+
+-- Do not run the production-lock assertions against the intentionally
+-- unlocked temporary fixture; they were exercised in the unchanged build.
+for _, group in ipairs({SSS.Core.Tests, dungeon.Tests}) do
+    for _, child in ipairs(group:GetDescendants()) do
+        if child:IsA("Script") then
+            child.Enabled = false
+        end
+    end
+end
+
+local definitions = shared.DungeonDefinitions
+local definition_source = definitions.Source
+local lock_text = "OptionalBossRuntimeEnabled = false,"
+local first_lock = assert(string.find(definition_source, lock_text, 1, true),
+    "Temple rollout flag was not found.")
+assert(string.find(definition_source, lock_text,
+    first_lock + #lock_text, true), "Mine rollout flag must remain untouched.")
+definitions.Source = string.sub(definition_source, 1, first_lock - 1)
+    .. "OptionalBossRuntimeEnabled = true, -- TEMP Studio fixture only"
+    .. string.sub(definition_source, first_lock + #lock_text)
+
+local catalog = shared.DungeonRuntimeContentCatalog
+local marker = "                Room3 = slot("
+local value = catalog.Source
+local start = assert(string.find(value, "TestDungeon = table.freeze({", 1, true))
+local where = assert(string.find(value, marker, start, true))
+assert(where < assert(string.find(value, "    AbandonedMine = table.freeze({", start, true)),
+    "TEMP slot insertion must target Temple Depth1.")
+local extra_slots = [[
+                EventArena = slot(
+                    "Temple.Event.Trigger",
+                    "Temple.Event.Checkpoint",
+                    "EventArena", nil, nil, nil, false, true,
+                    nil, nil, "Temple.Event.BossSpawn"
+                ),
+                SecretArena = slot(
+                    "Temple.Secret.Trigger",
+                    "Temple.Secret.Checkpoint",
+                    "SecretArena", nil, nil, nil, false, true,
+                    nil, nil, "Temple.Secret.BossSpawn"
+                ),
+]]
+catalog.Source = string.sub(value, 1, where - 1)
+    .. extra_slots .. string.sub(value, where)
+
+local synthetic = dungeon.TempleSyntheticEnvironment
+local original = "    create_route(parent)\n\n    local entries = {"
+local changed = [[    create_route(parent)
+    local side = parent:FindFirstChild("DungeonMMOSyntheticTemple")
+    assert(side, "TEMP side-room parent absent.")
+    make_part(side, "TEMP_EventFloor", Vector3.new(80, 1, 90),
+        CFrame.new(355, 0, -54))
+    make_part(side, "TEMP_EventBridge", Vector3.new(38, 1, 20),
+        CFrame.new(301, 0, -45))
+    make_part(side, "TEMP_SecretFloor", Vector3.new(80, 1, 100),
+        CFrame.new(355, 0, -215))
+    make_part(side, "TEMP_SecretBridge", Vector3.new(38, 1, 40),
+        CFrame.new(301, 0, -165))
+
+    local entries = {
+        {"Temple.Event.Checkpoint", CFrame.new(355, 1, -30),
+            "Checkpoint", Vector3.new(6, 2, 6), false, false},
+        {"Temple.Event.Trigger", CFrame.new(355, 3, -38),
+            "EncounterTrigger", Vector3.new(60, 6, 5), true, false},
+        {"Temple.Event.BossSpawn", CFrame.new(355, 2, -80),
+            "BossSpawn", Vector3.new(4, 2, 4), false, false},
+        {"Temple.Secret.Checkpoint", CFrame.new(355, 1, -185),
+            "Checkpoint", Vector3.new(6, 2, 6), false, false},
+        {"Temple.Secret.Trigger", CFrame.new(355, 3, -190),
+            "EncounterTrigger", Vector3.new(60, 6, 5), true, false},
+        {"Temple.Secret.BossSpawn", CFrame.new(355, 2, -255),
+            "BossSpawn", Vector3.new(4, 2, 4), false, false},
+]]
+replace_once(synthetic, original, changed)
+
+replace_once(dungeon.DungeonRuntime,
+    'local runtime = RuntimeServices.new("Dungeon")',
+    'local runtime = RuntimeServices.new("Dungeon")\n'
+        .. '_G.DungeonMMOTempFixtureRuntime = runtime')
+
+SSS:SetAttribute("DungeonMMOOptionalBossEventStartUnix", os.time() - 60)
+SSS:SetAttribute("DungeonMMOOptionalBossEventEndUnix", os.time() + 600)
+SSS:SetAttribute("DungeonMMOOptionalBossSecretChanceBasisPoints", 10000)
+W:SetAttribute("DungeonMMOStudioDungeonId", "TestDungeon")
+W:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
+
+local client = Instance.new("LocalScript")
+client.Name = "Phase4NormalCombatInput_TEMP"
+client.Source = [=[
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local actions = require(script.Parent:WaitForChild("Combat")
+    :WaitForChild("CombatInputActions"))
+while player:GetAttribute("Phase4AttackEventBoss") ~= true do
+    player:GetAttributeChangedSignal("Phase4AttackEventBoss"):Wait()
+end
+print("[Phase4 Combat Input] STARTED")
+local duration = os.clock() + 20
+local sent = 0
+while os.clock() < duration and player:GetAttribute("Phase4AttackEventBoss") == true do
+    local humanoid = player.Character
+        and player.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then break end
+    if actions.request_attack() then sent += 1 end
+    task.wait(0.43)
+end
+print("[Phase4 Combat Input] CLIENT_ATTACK_REQUESTS " .. sent)
+]=]
+client.Parent = game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts")
+
+local driver = Instance.new("Script")
+driver.Name = "Phase4NormalCombatDriver_TEMP"
+driver.Source = [=[
+local Players = game:GetService("Players")
+local STS = game:GetService("StudioTestService")
+local RS = game:GetService("ReplicatedStorage")
+local W = game:GetService("Workspace")
+local CS = game:GetService("CollectionService")
+local SSS = game:GetService("ServerScriptService")
+local function wait_for(predicate, label, sec)
+    local deadline = os.clock() + sec
+    repeat
+        local x = predicate()
+        if x then return x end
+        task.wait(0.12)
+    until os.clock() >= deadline
+    error("[Phase4 Normal Combat] TIMEOUT " .. label)
+end
+local function anchor(id)
+    return wait_for(function()
+        for _, part in ipairs(CS:GetTagged("DungeonMMOEnvironmentAnchor")) do
+            if part:GetAttribute("AnchorId") == id then return part end
+        end
+    end,id,15)
+end
+local function run()
+    local player = wait_for(function() return Players:GetPlayers()[1] end,"player",20)
+    local runtime = wait_for(function()
+        return _G.DungeonMMOTempFixtureRuntime
+    end,"runtime",20)
+    local session = wait_for(function()
+        local s=runtime.SessionService:get_for_user(player.UserId)
+        return s and s.InstanceState and s.InstanceState.EncounterPlan and s
+    end,"session",25)
+    assert(session.InstanceState.OptionalBossEventActive == true,
+        "TEMP event must be eligible")
+    local char=wait_for(function()
+        return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            and player.Character
+    end,"character",18)
+    local root=char.HumanoidRootPart
+    local player_health=char:FindFirstChildOfClass("Humanoid")
+    assert(player_health and player_health.Health>0,"normal player must be alive")
+    local initial_player_health=player_health.Health
+    local enemies=W:WaitForChild("DungeonGameplayRuntime"):WaitForChild("DungeonEnemies")
+    local room1=anchor("Temple.Room1.Trigger")
+    root.CFrame=room1.CFrame * CFrame.new(0,0,9)
+    task.wait(0.2)
+    player_health:MoveTo(room1.Position+Vector3.new(0,0,-2))
+    local function encounter_state(id)
+        local s=runtime.SessionService:get(session.SessionId)
+        return s and s.InstanceState and s.InstanceState.EncounterRuntime
+            and s.InstanceState.EncounterRuntime.EncounterStates[id]
+    end
+    wait_for(function() return encounter_state("CombatRoom1")=="Active" end,"Room1 trigger",10)
+    local ordinary = wait_for(function()
+        local result={}
+        for _, model in ipairs(enemies:GetChildren()) do
+            local h=model:FindFirstChildOfClass("Humanoid")
+            if h and h.Health>0 then table.insert(result,model) end
+        end
+        return #result>=2 and result or nil
+    end,"Room1 enemies",10)
+    -- Only the prerequisite combat pack uses debug defeat; the Event boss
+    -- and player health are NEVER directly modified by this combat test.
+    for _,model in ipairs(ordinary) do
+        model:FindFirstChildOfClass("Humanoid").Health=0
+    end
+    wait_for(function() return encounter_state("CombatRoom1")=="Cleared" end,"Room1 cleared",10)
+    local trigger=anchor("Temple.Event.Trigger")
+    root.CFrame=trigger.CFrame * CFrame.new(0,0,9)
+    task.wait(0.2)
+    player_health:MoveTo(trigger.Position+Vector3.new(0,0,-2))
+    wait_for(function()
+        return encounter_state("TempleEventBossEncounter")=="Active"
+    end,"Event encounter active",10)
+    local boss=wait_for(function()
+        for _,model in ipairs(enemies:GetChildren()) do
+            if model:GetAttribute("BossId")=="TempleEventBoss" then
+                local h=model:FindFirstChildOfClass("Humanoid")
+                if h and h.Health>0 then return model end
+            end
+        end
+    end,"Event boss spawned",10)
+    local boss_humanoid=boss:FindFirstChildOfClass("Humanoid")
+    local boss_root=boss:FindFirstChild("HumanoidRootPart")
+    assert(boss_humanoid and boss_root,"Boss must have humanoid and root")
+    local max_boss=boss_humanoid.Health
+    -- Stage in melee range; after this only normal client attack requests
+    -- via CombatInputActions are sent. Do not modify boss/player HP.
+    root.CFrame=CFrame.lookAt(boss_root.Position+Vector3.new(0,0,4.8),
+        boss_root.Position)
+    player:SetAttribute("Phase4AttackEventBoss",true)
+    print("[Phase4 Normal Combat] START normal player HP=" .. initial_player_health
+        .. " boss HP=" .. max_boss)
+    wait_for(function()
+        return boss_humanoid.Health < max_boss
+    end,"normal client attack damages boss",18)
+    player:SetAttribute("Phase4AttackEventBoss",false)
+    local health_after=boss_humanoid.Health
+    assert(health_after < max_boss and health_after >= 0,
+        "server combat must lower real boss health")
+    print("[Phase4 Normal Combat] SERVER_DAMAGE_CONFIRMED "
+        .. max_boss .. "->" .. health_after
+        .. " player=" .. player_health.Health .. "/" .. initial_player_health)
+    print("[Phase4 Normal Combat] PARTIAL_COMBAT_PASS_NO_DEBUG_BOSS_DEFEAT")
+end
+task.spawn(function()
+    local ok,err=pcall(run)
+    if not ok then warn("[Phase4 Normal Combat] FAIL " .. tostring(err)) end
+    STS:EndTest(if ok then "PASS" else "FAIL "..tostring(err))
+end)
+task.delay(70,function() STS:EndTest("FAIL global timeout") end)
+]=]
+driver.Parent = SSS
+print("[Phase4 Normal Combat] START_TEMP_PLAY")
+local ok,result=pcall(function()
+    return STS:ExecutePlayModeAsync("Phase4NormalEventCombat_TEMP")
+end)
+driver:Destroy()
+client:Destroy()
+assert(ok and result=="PASS","Normal combat live test failed: "..tostring(result))
+print("[Phase4 Normal Combat] NORMAL_CLIENT_ATTACK_LIVE_PASS")
