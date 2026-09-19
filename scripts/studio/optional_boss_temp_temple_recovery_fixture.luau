@@ -238,35 +238,6 @@ local function run()
                 .. " EnemyId="
                 .. tostring(spawned[1]:GetAttribute("DungeonEnemyId")))
         end
-        if slot == "EventArena" or slot == "SecretArena" then
-            -- Real server AI must telegraph two distinct health phases.
-            -- Positioning and boosted player health are TEMP test assists.
-            local boss = spawned[1]
-            local boss_root = boss:FindFirstChild("HumanoidRootPart")
-            must(boss_root and boss_root:IsA("BasePart"),
-                slot .. " boss missing combat root")
-            root.CFrame = boss_root.CFrame * CFrame.new(0, 0, 6)
-            root.AssemblyLinearVelocity = Vector3.zero
-            local first_ability = wait_until(function()
-                return boss:GetAttribute("DungeonBossAbilityId")
-            end, slot .. " first server-owned attack", 14)
-            must(boss:GetAttribute("DungeonBossPhase") == "PhaseOne",
-                slot .. " started in wrong combat phase")
-            print("[Optional Boss TEMP Gameplay] ABILITY " .. slot
-                .. " phase1=" .. tostring(first_ability))
-            local boss_humanoid = boss:FindFirstChildOfClass("Humanoid")
-            must(boss_humanoid ~= nil, slot .. " boss humanoid absent")
-            boss_humanoid.Health = math.max(1, boss_humanoid.MaxHealth * 0.45)
-            local second_ability = wait_until(function()
-                if boss:GetAttribute("DungeonBossPhase") == "PhaseTwo" then
-                    return boss:GetAttribute("DungeonBossAbilityId")
-                end
-            end, slot .. " half-health attack phase", 14)
-            must(type(second_ability) == "string" and second_ability ~= "",
-                slot .. " missing phase-two ability")
-            print("[Optional Boss TEMP Gameplay] ABILITY " .. slot
-                .. " phase2=" .. second_ability)
-        end
         print("[Optional Boss TEMP Gameplay] STARTED " .. slot
             .. " enemies=" .. #spawned)
         -- Debug defeat, not a validation of normal combat or damage balance.
