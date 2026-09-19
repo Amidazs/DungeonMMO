@@ -20,16 +20,6 @@
       },
       "Base": {
         "$path": "src/ServerScriptService/Base"
-      },
-      "$properties": {
-        "Attributes": {
-          "DungeonMMOEnvironment": {
-            "String": "TEST"
-          },
-          "DungeonMMODungeonPlaceId": {
-            "Float64": 117293035754309
-          }
-        }
       }
     },
     "StarterPlayer": {
