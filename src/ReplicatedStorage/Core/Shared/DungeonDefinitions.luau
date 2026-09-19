@@ -30,6 +30,7 @@ DungeonDefinitions.TEST_DUNGEON = table.freeze({
         "TempleDepth4Boss",
     }),
     DefaultDifficultyId = "Depth1",
+    OptionalBossRuntimeEnabled = false,
     MarauderCaptain = table.freeze({MaxHealth = 120}),
     CompletionReward = table.freeze({Gold = 50, LootTable = LootTableConfig.TEST_DUNGEON}),
 })
@@ -69,6 +70,7 @@ DungeonDefinitions.ABANDONED_MINE = table.freeze({
         "AbandonedMineDepth4Boss",
     }),
     DefaultDifficultyId = "Depth1",
+    OptionalBossRuntimeEnabled = false,
     MarauderCaptain = table.freeze({MaxHealth = 120}),
     CompletionReward = table.freeze({Gold = 55, LootTable = LootTableConfig.ABANDONED_MINE_NORMAL}),
     RareCompletionReward = table.freeze({Gold = 70, LootTable = LootTableConfig.ABANDONED_MINE_RARE}),

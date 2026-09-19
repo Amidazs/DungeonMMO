@@ -15,6 +15,10 @@ local BOSS_FACTORY_IDS = table.freeze({
     "AbandonedMineDepth3Boss",
     "TempleDepth4Boss",
     "AbandonedMineDepth4Boss",
+    "TempleEventBoss",
+    "TempleSecretBoss",
+    "AbandonedMineEventBoss",
+    "AbandonedMineSecretBoss",
 })
 
 local ENEMY_FACTORY_IDS = table.freeze({
@@ -549,6 +553,26 @@ local BOSSES = table.freeze({
         RewardKey = "MarauderCaptainReward",
         DisplayName = "Buried Tyrant",
     }),
+    TempleEventBoss = table.freeze({
+        FactoryId = "TempleEventBoss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Eclipse Herald",
+    }),
+    TempleSecretBoss = table.freeze({
+        FactoryId = "TempleSecretBoss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Veiled Sentinel",
+    }),
+    AbandonedMineEventBoss = table.freeze({
+        FactoryId = "AbandonedMineEventBoss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Echo Ravager",
+    }),
+    AbandonedMineSecretBoss = table.freeze({
+        FactoryId = "AbandonedMineSecretBoss",
+        RewardKey = "MarauderCaptainReward",
+        DisplayName = "Buried Archivist",
+    }),
 })
 
 local EXECUTORS = table.freeze({
@@ -565,6 +589,10 @@ local BOSS_FACTORIES = table.freeze({
     AbandonedMineDepth3Boss = true,
     TempleDepth4Boss = true,
     AbandonedMineDepth4Boss = true,
+    TempleEventBoss = true,
+    TempleSecretBoss = true,
+    AbandonedMineEventBoss = true,
+    AbandonedMineSecretBoss = true,
 })
 
 -- Returns one registered physical layout.

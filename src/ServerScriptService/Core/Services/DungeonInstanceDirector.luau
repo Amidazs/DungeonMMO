@@ -12,6 +12,10 @@ local DungeonDifficultyDefinitions = require(
     )
 )
 
+local DungeonOptionalBossRunState = require(
+    script.Parent:WaitForChild("DungeonOptionalBossRunState")
+)
+
 local DungeonInstanceDirector = {}
 
 local function stable_hash(text: string): number
@@ -45,7 +49,42 @@ function DungeonInstanceDirector.runtime_options(): any
         force_event = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceEvent")),
         event_start = ServerScriptService:GetAttribute("DungeonMMOEventStartUnix"),
         event_end = ServerScriptService:GetAttribute("DungeonMMOEventEndUnix"),
+        optional_boss_event_start = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossEventStartUnix"
+        ),
+        optional_boss_event_end = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossEventEndUnix"
+        ),
+        optional_boss_secret_chance_basis_points =
+            ServerScriptService:GetAttribute(
+                "DungeonMMOOptionalBossSecretChanceBasisPoints"
+            ),
     }
+end
+
+-- Adds only server-issued optional eligibility to the new run snapshot.
+-- Args: state (any): Existing authoritative dungeon run state.
+--       dungeon_id (string): Selected dungeon.
+--       seed (number): Server-computed session hash.
+--       now (number): Server timestamp at run creation.
+--       options (any): Server runtime scheduling options.
+--       enabled (boolean): Dungeon optional-boss release switch.
+-- Returns: any: Same run state with separate optional-boss fields.
+local function attach_optional_state(
+    state: any,
+    dungeon_id: string,
+    seed: number,
+    now: number,
+    options: any,
+    enabled: boolean
+): any
+    local issued = DungeonOptionalBossRunState.issue(
+        dungeon_id, now, seed, options, enabled
+    )
+    for key, value in pairs(issued) do
+        state[key] = value
+    end
+    return state
 end
 
 function DungeonInstanceDirector.resolve(
@@ -69,7 +108,7 @@ function DungeonInstanceDirector.resolve(
     local opts = options or {}
 
     if dungeon_id ~= DungeonDefinitions.ABANDONED_MINE.Id then
-        return {
+        return attach_optional_state({
             DungeonId = dungeon_id,
             DifficultyId = difficulty.Id,
             DifficultyOrder = difficulty.Order,
@@ -82,7 +121,8 @@ function DungeonInstanceDirector.resolve(
             EventId = nil,
             EventActive = false,
             CreatedAt = now,
-        }
+        }, dungeon_id, stable_hash(session_id), now, opts,
+            definition.OptionalBossRuntimeEnabled == true)
     end
 
     local seed = stable_hash(session_id)
@@ -113,7 +153,7 @@ function DungeonInstanceDirector.resolve(
             and now < end_at
     end
 
-    return {
+    return attach_optional_state({
         DungeonId = dungeon_id,
         DifficultyId = difficulty.Id,
         DifficultyOrder = difficulty.Order,
@@ -126,7 +166,8 @@ function DungeonInstanceDirector.resolve(
         EventId = if event_active then "DeepEchoes" else nil,
         EventActive = event_active,
         CreatedAt = now,
-    }
+    }, dungeon_id, seed, now, opts,
+        definition.OptionalBossRuntimeEnabled == true)
 end
 
 return table.freeze(DungeonInstanceDirector)

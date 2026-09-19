@@ -83,6 +83,42 @@ function DungeonEncounterFlow:clear_runtime(
     return cleared
 end
 
+-- Skips only an optional Secret boss when its direct successor is entered.
+-- Args: room_slot_id (string): Physical slot the player entered.
+-- Returns: any: Persisted skip result or a fail-closed rejection.
+function DungeonEncounterFlow:skip_secret_before(
+    room_slot_id: string
+): any
+    local current = self:next_binding()
+    if not current or current.Kind ~= "SecretBoss" then
+        return operation(false, "NoOptionalSecretToSkip")
+    end
+    local encounter = self._controller:get(current.PlanEncounterId)
+    if not encounter or encounter.CompletionRequired ~= false then
+        return operation(false, "SecretEncounterRequired")
+    end
+
+    local successor = nil
+    for index, binding in ipairs(self._bindings.ordered) do
+        if binding.PlanEncounterId == current.PlanEncounterId then
+            successor = self._bindings.ordered[index + 1]
+            break
+        end
+    end
+    if not successor or successor.RoomSlotId ~= room_slot_id then
+        return operation(false, "SecretSuccessorMismatch")
+    end
+
+    local skipped = self._controller:skip(current.PlanEncounterId)
+    if skipped.ok ~= true then
+        return skipped
+    end
+    return operation(true, nil, {
+        skipped_binding = current,
+        next_binding = successor,
+    })
+end
+
 function DungeonEncounterFlow:cancel_slot(
     room_slot_id: string
 ): any

@@ -511,3 +511,12 @@ C:\Users\Remko\Documents\Roblox\DungeonMMO_Art
 
 No hard reset, clean, force-push or history rewrite. Do not use PROD DataStores
 or publish PROD without a separate explicit approval.
+
+## Event/Secret Boss backend candidate (19 September 2026)
+
+A separate backend candidate exists in DungeonMMO_Phase4_EventSecretPolicy_v1, based on ff2baa0. The four distinct optional-boss identities and their server-only event-window/secret-unlock triggers are implemented. Secret-boss direct-successor skip is persisted through the existing generic encounter controller. Dungeon Studio: policy 49, flow 9, factories 24 and release locks 14 assertions PASS; 537 Lua/Luau files parse; four Rojo builds PASS. The Base gameplay regressions also passed. Both current dungeons remain rollout-disabled, with no optional arenas; Depth2-4 physical layouts remain unregistered. This is CODE-ONLY BACKEND VERIFIED and NOT RELEASED. Authored arenas, authoritative boss-event schedule/secret-unlock issuers and physical gameplay acceptance are future gates. No push, merge, publish or UI changes. Evidence: docs/testing/phase4-optional-boss-policy-progress.md.
+
+Backend closeout (19 September 2026): server-issued optional-boss
+run-state regression passed 28 offline Luau assertions; four
+Rojo builds and diff check passed. Physical arenas, event
+schedules and secret-route release settings remain gated.

@@ -52,4 +52,26 @@ local outside = Director.resolve("AbandonedMine", "outside-session", 250, {
 })
 check(outside.EventActive == false, "session outside event window does not receive event")
 
+local optional_settings = {
+    optional_boss_event_start = 100,
+    optional_boss_event_end = 200,
+    optional_boss_secret_chance_basis_points = 10000,
+}
+for _, dungeon_id in ipairs({"TestDungeon", "AbandonedMine"}) do
+    local locked = Director.resolve(
+        dungeon_id, "optional-locked", 150, optional_settings
+    )
+    check(locked.OptionalBossEnabled == false,
+        dungeon_id .. " must not enable optional bosses before rollout")
+    check(locked.OptionalBossEventActive == false,
+        dungeon_id .. " must not mint a locked event")
+    check(locked.OptionalBossSecretUnlocked == false,
+        dungeon_id .. " must not mint a locked secret")
+    check(locked.CreatedAt == 150,
+        dungeon_id .. " must keep the authoritative entry timestamp")
+    check(locked.EventActive == (dungeon_id == "AbandonedMine"
+        and locked.EventId == "DeepEchoes"),
+        dungeon_id .. " existing event must remain separate")
+end
+
 print(string.format("[Dungeon Instance Director Tests] PASS: %d assertions.", assertions))

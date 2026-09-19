@@ -55,6 +55,15 @@ local DungeonEncounterRuntimeState = require(
 local DungeonEncounterRuntimeController = require(
     Dungeon:WaitForChild("DungeonEncounterRuntimeController")
 )
+local DungeonOptionalBossPolicy = require(
+    Dungeon:WaitForChild("DungeonOptionalBossPolicy")
+)
+local DungeonOptionalBossContent = require(
+    Dungeon:WaitForChild("DungeonOptionalBossContent")
+)
+local DungeonRoomLayoutDefinitions = require(
+    Dungeon:WaitForChild("DungeonRoomLayoutDefinitions")
+)
 local DungeonEncounterBindings = require(
     Dungeon:WaitForChild("DungeonEncounterBindings")
 )
@@ -222,10 +231,49 @@ local function base_encounter_sequence(session: any): {any}?
     return difficulty and difficulty.EncounterSequence or nil
 end
 
--- Returns server-owned optional encounter definitions when configured.
-local function optional_encounter_definitions(): {any}
-    local optional = active_definition.OptionalEncounters
-    return if type(optional) == "table" then optional else {}
+-- Admits only explicitly enabled, physically registered optional bosses.
+local function optional_encounter_definitions(session: any): any
+    local state = session.InstanceState
+    local enabled = active_definition.OptionalBossRuntimeEnabled == true
+        and type(state) == "table"
+        and state.OptionalBossEnabled == true
+
+    if not enabled then
+        return DungeonOptionalBossPolicy.evaluate(
+            active_definition, "", nil, false
+        )
+    end
+
+    local difficulty_id = session.Difficulty
+        and session.Difficulty.Id
+    if type(difficulty_id) ~= "string"
+        and type(state.DifficultyId) == "string"
+    then
+        difficulty_id = state.DifficultyId
+    end
+    local difficulty = DungeonDifficultyDefinitions.resolve(
+        active_definition.Id, difficulty_id
+    )
+    local layout = difficulty
+        and DungeonRoomLayoutDefinitions.get(
+            active_definition.Id, difficulty.LayoutId
+        )
+    local allowed_slots = {}
+    if layout and type(layout.Slots) == "table" then
+        for slot_id, slot in pairs(layout.Slots) do
+            allowed_slots[slot_id] = slot
+        end
+    end
+    local optional = DungeonOptionalBossContent.for_difficulty(
+        active_definition.Id, difficulty_id
+    )
+    return DungeonOptionalBossPolicy.evaluate(
+        {OptionalEncounters = optional},
+        difficulty_id,
+        allowed_slots,
+        enabled,
+        state
+    )
 end
 
 local LEGACY_CHECKPOINT_SLOTS = table.freeze({
@@ -272,11 +320,15 @@ local function create_encounter_controller(
     session: any,
     base_sequence: {any}
 ): (any?, string?)
+    local optional = optional_encounter_definitions(session)
+    if optional.ok ~= true then
+        return nil, optional.reason or "OptionalBossPolicyRejected"
+    end
     return DungeonEncounterRuntimeController.new({
         session_service = sessions,
         session_id = session.SessionId,
         base_sequence = base_sequence,
-        optional_encounters = optional_encounter_definitions(),
+        optional_encounters = optional.encounters,
     })
 end
 
@@ -746,6 +798,28 @@ local function start_executed_slot(room_slot_id: string): any?
         or not encounter_service
     then
         return nil
+    end
+
+    local next_binding = encounter_flow
+        and encounter_flow:next_binding()
+    if next_binding
+        and next_binding.Kind == "SecretBoss"
+        and next_binding.RoomSlotId ~= room_slot_id
+    then
+        local skipped = encounter_flow:skip_secret_before(
+            room_slot_id
+        )
+        if skipped.ok ~= true then
+            return nil
+        end
+        if skipped.next_binding
+            and not advance_checkpoint(
+                skipped.next_binding.CheckpointId
+            )
+        then
+            warn("[Dungeon Runtime] Secret skip checkpoint failed.")
+            return nil
+        end
     end
 
     local context = encounter_execution_context()

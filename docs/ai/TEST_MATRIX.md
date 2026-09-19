@@ -2412,3 +2412,22 @@ Detailed evidence:
 
 Detailed evidence:
 `docs/testing/phase4-depth4-content-acceptance-record.md`.
+
+### Optional Boss candidate: 19 September 2026
+- [x] Policy: 49 assertions PASS in Dungeon Studio.
+- [x] Optional Secret flow: 9 assertions PASS.
+- [x] Four boss factories: 24 assertions PASS.
+- [x] Release locks: 14 assertions PASS.
+- [x] 537 Luau parse; four Rojo builds PASS.
+- [x] Base/Dungeon gameplay regression suites PASS.
+- [ ] Optional physical boss arenas and event/secret unlock issuers remain unimplemented.
+- [ ] Commit/push/merge/publish not performed.
+
+### Optional-boss code-only backend closeout
+
+- [x] Run-state issuer: 28 offline Luau assertions PASS.
+- [x] Instance director: 10 additional rollout-lock checks authored.
+- [x] All four final candidate Rojo builds and git diff check PASS.
+- [ ] Extended director/run-state Studio tests not rerun.
+- [ ] Physical arenas and full gameplay acceptance not started.
+- [ ] Production release remains disabled.
