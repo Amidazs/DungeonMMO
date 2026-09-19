@@ -22,6 +22,8 @@ local function eligible_unlock(state: any, encounter_id: string): string?
     local runtime = state.EncounterRuntime
     if type(plan) ~= "table" or type(runtime) ~= "table"
         or type(runtime.EncounterStates) ~= "table"
+        or (runtime.NextEncounterId ~= nil
+            and runtime.NextEncounterId ~= encounter_id)
     then
         return nil
     end
@@ -42,7 +44,10 @@ local function eligible_unlock(state: any, encounter_id: string): string?
             end
             return nil
         end
-        if progress ~= "Cleared" and progress ~= "Skipped" then
+        if progress ~= "Cleared"
+            and (progress ~= "Skipped"
+                or encounter.CompletionRequired ~= false)
+        then
             return nil
         end
     end
