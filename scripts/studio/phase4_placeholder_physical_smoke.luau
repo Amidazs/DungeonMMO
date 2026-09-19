@@ -20,8 +20,8 @@ local container = Instance.new("Folder")
 container.Name = "Phase4PhysicalBlockoutPreview"
 container.Parent = Workspace
 local expected = {
-    TestDungeon = {"Temple", 250},
-    AbandonedMine = {"Mine", 450},
+    TestDungeon = {"Temple", 250, 780},
+    AbandonedMine = {"Mine", 450, 1760},
 }
 local summary = {}
 for _, id in ipairs({"TestDungeon", "AbandonedMine"}) do
@@ -80,6 +80,18 @@ for _, id in ipairs({"TestDungeon", "AbandonedMine"}) do
         end
         check(rooms == depth + 2, id .. " Depth" .. depth
             .. " expected " .. (depth + 2) .. " physical rooms")
+        for index = 1, rooms - 1 do
+            local bridge = group:FindFirstChild("Bridge_" .. index)
+            check(bridge ~= nil and bridge:IsA("Model"),
+                id .. " depth " .. depth .. " missing corridor " .. index)
+            local floor = bridge:FindFirstChild("WalkableFloor")
+            local rail = bridge:FindFirstChild("LeftRail")
+            check(floor ~= nil and floor.Size.Z == 30
+                and rail ~= nil and rail.Size.Z == 30
+                and rail.Size.X == 1,
+                id .. " depth " .. depth
+                    .. " corridor rails must run ALONG its Z-axis path")
+        end
     end
     local anchors = folder:FindFirstChild("DungeonMMOEnvironmentAnchors")
     check(anchors ~= nil and #anchors:GetChildren() == 6,
