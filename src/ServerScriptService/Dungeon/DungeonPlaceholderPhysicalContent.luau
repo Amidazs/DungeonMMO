@@ -142,8 +142,10 @@ local function anchor(
     end
     local size = if role == "EncounterTrigger"
         then Vector3.new(60, 6, 5) else Vector3.new(6, 2, 6)
+    local environment_id =
+        if prefix == "Temple" then "Temple" else "AbandonedMine"
     local created = AnchorFactory.create(
-        parent, prefix, id, CFrame.new(position), size, role
+        parent, environment_id, id, CFrame.new(position), size, role
     )
     -- Optional triggers are *not* activated by creating placeholder rooms.
     created.CanTouch = false
