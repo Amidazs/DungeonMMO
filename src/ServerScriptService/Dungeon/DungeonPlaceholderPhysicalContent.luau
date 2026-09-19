@@ -253,6 +253,47 @@ local function build_depth_previews(root: Instance, theme: any)
     end
 end
 
+-- Populate the same physical preview floors with gameplay anchors only
+-- inside a TEMP, explicitly opted-in Studio place. No production layout
+-- definition or shared release flag is changed by this operation.
+local function playable_depth_anchors(
+    root: Instance, parent: Instance, theme: any, depth: number
+)
+    local layout_id = "Depth" .. depth
+    local center_x = theme.PreviewX + (depth - 2) * 240
+    local prefix = theme.Prefix .. "." .. layout_id .. "."
+    anchor(parent, theme.Prefix, prefix .. "EntrySpawn",
+        Vector3.new(center_x, 2, 118), "Spawn")
+    local count = depth + 2
+    for index = 1, count do
+        local room_id = "Room" .. index
+        local z = 80 - (index - 1) * 90
+        local base = prefix .. room_id .. "."
+        anchor(parent, theme.Prefix, base .. "Checkpoint",
+            Vector3.new(center_x, 2, z + 23), "Checkpoint")
+        anchor(parent, theme.Prefix, base .. "Trigger",
+            Vector3.new(center_x, 3, z + 20), "EncounterTrigger")
+        local boss = index == count
+            or (depth == 4
+                and (index == 2 or index == 4 or index == 5))
+        if boss then
+            anchor(parent, theme.Prefix, base .. "BossSpawn",
+                Vector3.new(center_x, 2, z - 12), "BossSpawn")
+        else
+            for spawn = 1, 8 do
+                local x_offset = if spawn % 2 == 0 then 17 else -17
+                local z_offset = if spawn <= 4 then -13 else 0
+                local spread = if spawn % 4 < 2 then -5 else 5
+                anchor(parent, theme.Prefix,
+                    base .. "EnemySpawn." .. string.format("%02d", spawn),
+                    Vector3.new(center_x + x_offset, 2,
+                        z + z_offset + spread),
+                    "EnemySpawn")
+            end
+        end
+    end
+end
+
 -- Does not mutate the environment catalogue or production release flags.
 -- Intended to run only in an explicit, unpublished Studio preview/build.
 function Placeholder.create(parent: Instance, dungeon_id: string): any
@@ -268,6 +309,20 @@ function Placeholder.create(parent: Instance, dungeon_id: string): any
     root.Parent = parent
     build_optional(root, parent, theme)
     build_depth_previews(root, theme)
+    if game:GetService("RunService"):IsStudio()
+        and game.PlaceId == 0 and game.GameId == 0
+        and game:GetService("Workspace"):GetAttribute(
+            "DungeonMMOPlaceholderPlayableEnabled") == true
+    then
+        local difficulty_id = game:GetService("Workspace"):GetAttribute(
+            "DungeonMMOStudioDifficultyId")
+        local depth = if type(difficulty_id) == "string"
+            then tonumber(string.match(difficulty_id, "^Depth([234])$"))
+            else nil
+        if depth then
+            playable_depth_anchors(root, parent, theme, depth)
+        end
+    end
     return root
 end
 
