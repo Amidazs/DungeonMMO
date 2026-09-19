@@ -68,7 +68,7 @@ local needle='local runtime = RuntimeServices.new("Dungeon")'
 local pos=assert(string.find(source,needle,1,true),
     "Runtime service initialization source changed")
 dungeon_runtime.Source=string.sub(source,1,pos-1)
-    ..needle.."\\n_G.Phase4TEMPTestDungeonRuntime=runtime"
+    ..needle.."\n_G.Phase4TEMPTestDungeonRuntime=runtime"
     ..string.sub(source,pos+#needle)
 local driver=Instance.new("Script")
 driver.Name="Phase4TestTempleDepth1Driver_TEMP"
