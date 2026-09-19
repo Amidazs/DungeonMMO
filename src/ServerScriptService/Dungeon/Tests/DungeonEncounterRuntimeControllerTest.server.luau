@@ -198,6 +198,13 @@ check(
     reconnect:state_of("FestivalChampion") == "Pending",
     "Interrupted active encounter must restart as pending."
 )
+local persisted_recovery = assert(sessions:get(session.SessionId))
+check(
+    persisted_recovery.InstanceState.EncounterRuntime.EncounterStates.FestivalChampion
+        == "Pending"
+        and persisted_recovery.InstanceState.EncounterRuntime.ActiveEncounterId == nil,
+    "Interrupted encounter rollback must be saved before trigger checks."
+)
 
 check(
     reconnect:start("FestivalChampion").ok == true,
