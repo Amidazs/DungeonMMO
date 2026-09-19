@@ -121,7 +121,7 @@ local function bridge(
         part(model, if side == -1 then "LeftRail" else "RightRail",
             Vector3.new(length_x, 3, 1),
             Vector3.new(x, 1.5, z + side * (width_z / 2 - 0.5)),
-            theme.Accent, Enum.Material.Stone, 0.1)
+            theme.Accent, Enum.Material.Slate, 0.1)
     end
     return model
 end
