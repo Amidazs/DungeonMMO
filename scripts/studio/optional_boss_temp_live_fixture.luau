@@ -30,9 +30,16 @@ for _, group in ipairs({SSS.Core.Tests, dungeon.Tests}) do
     end
 end
 
-replace_once(shared.DungeonDefinitions,
-    "OptionalBossRuntimeEnabled = false,",
-    "OptionalBossRuntimeEnabled = true, -- TEMP Studio fixture only")
+local definitions = shared.DungeonDefinitions
+local definition_source = definitions.Source
+local lock_text = "OptionalBossRuntimeEnabled = false,"
+local first_lock = assert(string.find(definition_source, lock_text, 1, true),
+    "Temple rollout flag was not found.")
+assert(string.find(definition_source, lock_text,
+    first_lock + #lock_text, true), "Mine rollout flag must remain untouched.")
+definitions.Source = string.sub(definition_source, 1, first_lock - 1)
+    .. "OptionalBossRuntimeEnabled = true, -- TEMP Studio fixture only"
+    .. string.sub(definition_source, first_lock + #lock_text)
 
 local catalog = shared.DungeonRuntimeContentCatalog
 local marker = "                Room3 = slot("
