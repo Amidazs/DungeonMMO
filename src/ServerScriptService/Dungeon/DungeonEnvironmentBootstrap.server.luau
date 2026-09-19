@@ -38,6 +38,9 @@ local TempleSyntheticEnvironment = require(
 local AbandonedMineSyntheticEnvironment = require(
     Dungeon:WaitForChild("AbandonedMineSyntheticEnvironment")
 )
+local DungeonPlaceholderPhysicalContent = require(
+    Dungeon:WaitForChild("DungeonPlaceholderPhysicalContent")
+)
 local DungeonRuntimeSelection = require(
     Dungeon:WaitForChild("DungeonRuntimeSelection")
 )
@@ -92,6 +95,18 @@ if mode == "Synthetic" then
     else
         AbandonedMineSyntheticEnvironment.create(Workspace)
     end
+end
+
+-- Authorable blockout geometry is an explicit Studio-only opt-in.
+-- It creates physical preview parts and optional anchor points without
+-- registering encounter bindings or bypassing either production release lock.
+if mode == "Synthetic"
+    and RunService:IsStudio()
+    and Workspace:GetAttribute(
+        "DungeonMMOPlaceholderPhysicalContentEnabled"
+    ) == true
+then
+    DungeonPlaceholderPhysicalContent.create(Workspace, dungeon_id)
 end
 
 if mode == "Candidate"
