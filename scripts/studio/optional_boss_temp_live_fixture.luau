@@ -309,11 +309,24 @@ end
 ]]
 driver.Parent = SSS
 
-print("[Optional Boss TEMP Gameplay] START_PLAY")
+print("[Optional Boss TEMP Gameplay] START_PLAY fight-secret")
 local ok, result = pcall(function()
-    return STS:ExecutePlayModeAsync("OptionalBoss_TEMP_PhysicalFixture")
+    return STS:ExecutePlayModeAsync("OptionalBoss_TEMP_FightSecret")
+end)
+assert(ok, "TEMP fight Play failed: " .. tostring(result))
+print("[Optional Boss TEMP Gameplay] FIGHT_RESULT " .. tostring(result))
+assert(result == "PASS", "TEMP fight proof failed: " .. tostring(result))
+
+task.wait(1)
+W:SetAttribute("DungeonMMOTempSkipSecret", true)
+print("[Optional Boss TEMP Gameplay] START_PLAY skip-secret")
+local skip_ok, skip_result = pcall(function()
+    return STS:ExecutePlayModeAsync("OptionalBoss_TEMP_SkipSecret")
 end)
 driver:Destroy()
-assert(ok, "TEMP fixture Play failed: " .. tostring(result))
-print("[Optional Boss TEMP Gameplay] PLAY_RESULT " .. tostring(result))
-assert(result == "PASS", "TEMP gameplay proof failed: " .. tostring(result))
+W:SetAttribute("DungeonMMOTempSkipSecret", nil)
+assert(skip_ok, "TEMP skip Play failed: " .. tostring(skip_result))
+print("[Optional Boss TEMP Gameplay] SKIP_RESULT " .. tostring(skip_result))
+assert(skip_result == "PASS", "TEMP skip proof failed: "
+    .. tostring(skip_result))
+print("[Optional Boss TEMP Gameplay] TWO_PLAY_MODES_PASS")
