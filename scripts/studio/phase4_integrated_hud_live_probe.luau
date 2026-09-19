@@ -40,25 +40,27 @@ local function label(text)
 end
 local player_gui=me:WaitForChild("PlayerGui")
 local profile=until_value(function()
-    return player_gui:FindFirstChild("ProfileHud")
-end,"new ProfileHud",28)
-assert(profile:FindFirstChild("StatusCard")
-    and profile.StatusCard:FindFirstChild("PlayerPortrait"),
+    local widget=player_gui:FindFirstChild("ProfileHud")
+    if widget and widget:FindFirstChild("StatusCard")
+        and widget.StatusCard:FindFirstChild("PlayerPortrait", true)
+    then return widget end
+end,"framed portrait and resource HUD",28)
+assert(profile.StatusCard:FindFirstChild("PlayerPortrait",true),
     "framed portrait and resource HUD missing")
 local menu=until_value(function()
-    return player_gui:FindFirstChild("HudCommandMenu")
-end,"new HudCommandMenu",28)
-assert(menu:FindFirstChild("CommandBar")
-    and menu.CommandBar:FindFirstChild("InventoryCommand",true)
-    and menu.CommandBar:FindFirstChild("SkillsCommand",true),
-    "bottom command menu missing")
+    local widget=player_gui:FindFirstChild("HudCommandMenu")
+    if widget and widget:FindFirstChild("CommandBar")
+        and widget.CommandBar:FindFirstChild("InventoryCommand",true)
+        and widget.CommandBar:FindFirstChild("SkillsCommand",true)
+    then return widget end
+end,"completed bottom command menu",28)
 local hotbar=until_value(function()
-    return player_gui:FindFirstChild("CombatHotbarGui")
-end,"new CombatHotbarGui",28)
-local slots=hotbar:FindFirstChild("Slots",true)
-assert(slots and slots:FindFirstChild("Slot1")
-    and slots:FindFirstChild("Slot6"),
-    "six-slot framed combat hotbar missing")
+    local widget=player_gui:FindFirstChild("CombatHotbarGui")
+    local frames=widget and widget:FindFirstChild("Slots",true)
+    if frames and frames:FindFirstChild("Slot1")
+        and frames:FindFirstChild("Slot6")
+    then return widget end
+end,"completed six-slot framed combat hotbar",28)
 print("[Phase4 Integrated HUD] NEW_HUD_FRAMES_AND_MENU_PASS")
 local boss_frame=gui:WaitForChild("BossFrame")
 local boss_name=boss_frame:WaitForChild("BossName")
