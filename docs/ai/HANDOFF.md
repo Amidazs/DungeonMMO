@@ -25,6 +25,10 @@ Branch: wip/phase-4-event-secret-policy-v1, isolated from main, UI and art.
   Base Phase 3 stress passed (profiles=250, market=1000, replay=1000,
   guild=250, sessions=100, race_roundtrips=100).
 - Evidence: docs/testing/phase4-optional-boss-four-backend-steps-closeout-2026-09-19.md.
+- Canonical working roadmap is docs/roadmap/DungeonMMO_Roadmap_v1_45.docx
+  (SHA-256 349d8a568856091ec2dbdadfde4b7785f608e65d2ac8f2429c838d9a86a943ac);
+  roadmap index docs/roadmap/README.md. DOCX structural validation passed;
+  visual page-render QA is still pending following a stalled Word export.
   TEMP-only synthetic fixtures do not imply authored side-arena acceptance.
   OptionalBossRuntimeEnabled remains false; higher-depth physical layouts
   remain unreleased. Do not merge to main or publish based on these tests.
