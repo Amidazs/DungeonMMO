@@ -12,9 +12,6 @@ local ProfileMap = require(Core.Adapters.InMemoryProfileAdapter)
 local Sessions = require(Core.Services.DungeonSessionService)
 local Profiles = require(Core.Services.ProfileService)
 local Progression = require(Core.Services.DungeonDifficultyProgressionService)
-local RewardService = require(Core.Services.RewardService)
-local XPService = require(Core.Services.ProgressionService)
-local Inventory = require(Core.Services.InventoryService)
 local Controller = require(Dungeon.DungeonEncounterRuntimeController)
 
 local assertions = 0
@@ -160,6 +157,8 @@ local function verify_ladder(
         check(sessions:mark_connected(created.SessionId, user_id).ok,
             "dungeon session must become active")
         clear_run(sessions, created.SessionId, difficulty.EncounterSequence)
+        check(sessions:mark_complete(created.SessionId).ok,
+            "completed session must release the member for the next depth")
         local recorded = progression:record_clear(
             user_id, dungeon_id, depth_id
         )
