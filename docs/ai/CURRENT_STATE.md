@@ -1,5 +1,21 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — four-depth progression backend verification
+
+On the existing integration branch, a GitHub-first test-only update
+validated both Temple and Mine Depth1–4 ladders with 454 assertions and
+five focused Studio suites PASS. Tests cover 3/4/5/6 ordered rooms,
+Depth4 returning miniboss identities, persistent sequential unlocks,
+checkpoint/miniboss recovery, one-time completion rewards and separate
+dungeon progression. Four Rojo builds, the 30/30 backend matrix and
+Base Play-mode regression passed. One fresh assisted Temple Depth2
+physical-route fixture passed; the other five higher-depth physical
+routes retain their documented 19 September individual passes.
+Actual high-depth entry remains release-locked: the test uses an
+injected readiness provider ONLY for logical unlock simulation.
+No production runtime or cloud/DataStore state was changed. See
+docs/testing/phase4-depth1-4-progression-integration-2026-09-20.md.
+
 ## 20 September 2026 — full optional-session recovery regression
 
 A GitHub-first test-only continuation added comprehensive two-member
