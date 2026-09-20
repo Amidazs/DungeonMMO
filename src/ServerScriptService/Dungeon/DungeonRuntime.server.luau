@@ -272,7 +272,7 @@ local function optional_encounter_definitions(session: any): any
         end
     end
     local optional = DungeonOptionalBossContent.for_difficulty(
-        active_definition.Id, difficulty_id
+        active_definition.Id, difficulty_id, state
     )
     return DungeonOptionalBossPolicy.evaluate(
         {OptionalEncounters = optional},
