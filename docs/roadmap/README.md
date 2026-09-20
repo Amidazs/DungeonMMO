@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.48 (Phase 4 backend supplement, 20 September 2026).**
+Read [the v1.48 Phase 4 backend roadmap update](DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md)
+for completed higher-depth optional physical playtesting, precise
+local-vs-cloud acceptance boundaries, and the next backend milestone:
+multiplayer lifecycle at Depth 2–4. This is a *versioned supplement*,
+not a replacement for the retained historical long-form
+`DungeonMMO_Roadmap_v1_47.docx`. The new update was prepared in ChatGPT,
+not edited through Remote Desktop Commander. A separately generated
+Word-format copy can be opened from its ChatGPT artifact link.
+
+**Current engineering checkpoint:** Integration branch
+`wip/phase-4-test-hud-integration-v1`; pre-roadmap-update accepted
+physical-playtest commit `cfb35d0c98c8701ec34388be8dad4ce72a57e3f9`.
+The v1.48 update does not imply a merge to main, production release,
+Roblox publish or real user DataStore mutation.
+
 **20 September Depth2–4 optional physical checkpoint (after v1.47):**
 GitHub-first edits added separate, opt-in TEMP Event/Secret side rooms,
 bridges, physical gates and unique anchors to Temple and Mine Depth2,
