@@ -109,6 +109,7 @@ function DungeonOptionalBossContent.for_difficulty(
     return {
         {
             Encounter = event_encounter,
+            DungeonId = dungeon_id,
             InsertAfterId = event_template.InsertAfterId,
             RequiresPlacementContract =
                 event_template.RequiresPlacementContract,
