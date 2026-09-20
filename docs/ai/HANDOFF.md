@@ -1,5 +1,20 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — optional Event/Secret consecutive gameplay
+
+The old no-healing injured-solo test remains FAILED. Do not conflate it
+with two newly passing two-client cases: both players fought Event then
+Secret using normal client combat without forced health changes; a
+separate run used an equipped heal (+32 party HP) and server-confirmed
+Dodge between those encounters, then cleared Secret and the final route.
+Room1/Room2 and the final boss were assisted in these disposable local
+Studio tests. All new fixtures and notes were committed on GitHub first
+and pulled into the existing Windows integration worktree. See
+docs/testing/phase4-optional-boss-consecutive-skill-defense-2026-09-20.md.
+Next: if desired, verify solo survivability via legitimate defense/
+healing, unassisted required rooms, true same-account rejoin. Cloud
+verification and art remain intentionally deferred.
+
 ## 20 September 2026 — normal combat follow-up
 
 GitHub-first source changes were fast-forward pulled for local Studio
