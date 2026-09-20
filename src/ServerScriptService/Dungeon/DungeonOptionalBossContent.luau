@@ -4,6 +4,9 @@ local DungeonOptionalBossContent = {}
 local Catalog = require(game:GetService("ReplicatedStorage")
     :WaitForChild("Core"):WaitForChild("Shared")
     :WaitForChild("DungeonOptionalBossVariantCatalog"))
+local Templates = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalEncounterTemplateCatalog"))
 
 local ANCHORS = table.freeze({
     Depth1 = {"CombatRoom1", "Depth1Boss"},
@@ -70,22 +73,33 @@ function DungeonOptionalBossContent.for_difficulty(
     difficulty_id: string,
     instance_state: any?
 ): {any}?
-    local anchors = ANCHORS[difficulty_id]
     local event = selected(dungeon_id, "Event", instance_state)
     local secret = selected(dungeon_id, "Secret", instance_state)
-    if not event or not secret or not anchors then
+    local selected_template = if type(instance_state) == "table"
+        and instance_state.OptionalBossEventTemplateId ~= nil
+        then instance_state.OptionalBossEventTemplateId
+        else "EventAfterRoom1"
+    local event_template = Templates.get(
+        dungeon_id, difficulty_id, "Event", selected_template)
+    local secret_template = Templates.get(
+        dungeon_id, difficulty_id, "Secret", "SecretBeforeFinal")
+    if not event or not secret or not event_template
+        or not secret_template
+    then
         return nil
     end
 
     return {
         {
             Encounter = encounter(
-                event.BossId .. "Encounter",
+                event.BossId .. event_template.EncounterSuffix,
                 "EventBoss",
                 event.BossId,
-                "EventArena"
+                event_template.RoomSlotId
             ),
-            InsertAfterId = anchors[1],
+            InsertAfterId = event_template.InsertAfterId,
+            RequiresPlacementContract =
+                event_template.RequiresPlacementContract,
             CompletionRequired = true,
             AllowedDifficulties = {[difficulty_id] = true},
             Activation = {
@@ -100,12 +114,12 @@ function DungeonOptionalBossContent.for_difficulty(
         },
         {
             Encounter = encounter(
-                secret.BossId .. "Encounter",
+                secret.BossId .. secret_template.EncounterSuffix,
                 "SecretBoss",
                 secret.BossId,
-                "SecretArena"
+                secret_template.RoomSlotId
             ),
-            InsertBeforeId = anchors[2],
+            InsertBeforeId = secret_template.InsertBeforeId,
             CompletionRequired = false,
             AllowedDifficulties = {[difficulty_id] = true},
             Activation = {
