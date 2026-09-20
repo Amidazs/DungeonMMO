@@ -1,5 +1,20 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — consecutive optional combat and real recovery verified
+
+Two real Studio clients defeated Event and then Secret using normal client
+attacks and ordinary character HP in a single temporary Temple run.
+A second two-client run additionally verified server-accepted Dodge and
+an equipped healing skill restoring approximately 32 HP between fights;
+Secret and assisted final-room progression completed afterward.
+The earlier injured single-survivor solo attempt remains a failure:
+this is co-op acceptance, not solo balancing acceptance. New fixture
+scripts: phase4_event_secret_consecutive_coop_combat.luau and
+phase4_optional_boss_skill_defense_coop_combat.luau. Full parent/child
+logs, limitations and receipts:
+docs/testing/phase4-optional-boss-consecutive-skill-defense-2026-09-20.md.
+No published experience, PROD, DataStore or models were changed.
+
 ## 20 September 2026 — normal optional-boss combat evidence
 
 Two separate local two-client Studio fixtures defeated TempleEventBoss
