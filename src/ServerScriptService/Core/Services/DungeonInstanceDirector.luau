@@ -89,6 +89,10 @@ function DungeonInstanceDirector.runtime_options(): any
         optional_boss_templates_enabled = ServerScriptService:GetAttribute(
             "DungeonMMOOptionalBossTemplatesEnabled"
         ) == true,
+        -- Entirely independent non-boss mechanic opt-in. OFF by default.
+        optional_event_combat_enabled = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalEventCombatEnabled"
+        ) == true,
     }
 end
 
