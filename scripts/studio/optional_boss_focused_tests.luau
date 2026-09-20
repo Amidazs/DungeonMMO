@@ -7,6 +7,7 @@ local test_paths = {
     {"Core", "Tests", "DungeonOptionalBossRunStateTest"},
     {"Core", "Tests", "DungeonOptionalBossScheduleTest"},
     {"Core", "Tests", "DungeonSecretDiscoveryTest"},
+    {"Core", "Tests", "DungeonOptionalDynamicSecretDiscoveryTest"},
     {"Core", "Tests", "DungeonOptionalBossRecoveryTest"},
     {"Combat", "Tests", "OptionalBossAttackRulesTest"},
     {"Dungeon", "Tests", "DungeonEncounterRuntimeControllerTest"},
