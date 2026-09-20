@@ -63,6 +63,21 @@ local NODE_DEFINITIONS = table.freeze({
             VisualKind = "Herb",
             EmbedDepth = 0.12,
         }),
+        -- Placeholder hide cache until creature harvesting is authored.
+        -- Gather claims still use the existing server-owned node path.
+        table.freeze({
+            Id = "Base.RawHideCache",
+            Name = "Raw Hide Cache",
+            ProfessionId = "Skinning",
+            ItemId = "raw_hide",
+            Quantity = 1,
+            XP = 8,
+            AnchorId = "Base.Profession.BlacksmithingPlaceholder",
+            Offset = CFrame.new(17, -3, -5),
+            ActionText = "Collect Hide",
+            VisualKind = "Hide",
+            EmbedDepth = 0.12,
+        }),
     }),
     Dungeon = table.freeze({
         table.freeze({
@@ -201,6 +216,15 @@ local NODE_DEFINITIONS = table.freeze({
 local STATION_ANCHORS = table.freeze({
     Blacksmithing = "Base.Profession.BlacksmithingPlaceholder",
     Alchemy = "Base.Profession.AlchemyPlaceholder",
+    -- Distinct temporary station roots near existing authored Base anchors.
+    -- No new Base anchor, mesh or shop NPC is required for backend testing.
+    Leatherworking = "Base.Profession.BlacksmithingPlaceholder",
+    Enchanting = "Base.Profession.AlchemyPlaceholder",
+})
+
+local STATION_PLACEHOLDER_OFFSETS = table.freeze({
+    Leatherworking = CFrame.new(10, 0, -6),
+    Enchanting = CFrame.new(-10, 0, -6),
 })
 
 local function make_part(
@@ -327,6 +351,27 @@ local function create_herb(parent: Instance, node: any, cframe: CFrame): BasePar
     end
 
     return root
+end
+
+local function create_hide_cache(
+    parent: Instance, node: any, cframe: CFrame
+): BasePart
+    local model = Instance.new("Model")
+    model.Name = node.Id
+    mark_node_model(model, node)
+    model.Parent = parent
+    local prompt_root = make_part(
+        model, "PromptRoot", Vector3.new(3, 0.45, 2.5),
+        cframe * CFrame.new(0, 0.23, 0),
+        Color3.fromRGB(128, 82, 54), Enum.Material.Fabric
+    )
+    -- Deliberately plain temporary source, not a skinnable creature.
+    make_part(
+        model, "HideFold", Vector3.new(2.2, 0.3, 1.7),
+        cframe * CFrame.new(0, 0.55, 0),
+        Color3.fromRGB(151, 105, 66), Enum.Material.Fabric
+    )
+    return prompt_root
 end
 
 local function create_alchemy_station(parent: Instance, anchor: BasePart)
@@ -733,6 +778,8 @@ function ProfessionRuntime.attach(config: any): any
 
         local prompt_root = if node.VisualKind == "Ore"
             then create_ore(root_folder, node, cframe)
+            elseif node.VisualKind == "Hide"
+            then create_hide_cache(root_folder, node, cframe)
             else create_herb(root_folder, node, cframe)
         local model = prompt_root.Parent
         if model and model:IsA("Model") then
@@ -784,14 +831,26 @@ function ProfessionRuntime.attach(config: any): any
         for station_id, anchor_id in pairs(STATION_ANCHORS) do
             local anchor = environment:get(anchor_id)
             assert(anchor, "Profession station anchor missing: " .. anchor_id)
-            station_anchors[station_id] = anchor
+
+            local prompt_anchor = anchor
+            local offset = STATION_PLACEHOLDER_OFFSETS[station_id]
+            if offset then
+                -- Keep new prompts and range checks independent of the
+                -- original Blacksmithing/Alchemy stations.
+                prompt_anchor = make_part(
+                    root_folder, station_id .. "StationPlaceholder",
+                    Vector3.new(3, 2, 3), anchor.CFrame * offset,
+                    Color3.fromRGB(95, 83, 66), Enum.Material.WoodPlanks
+                )
+            end
+            station_anchors[station_id] = prompt_anchor
 
             if station_id == "Alchemy" then
                 create_alchemy_station(root_folder, anchor)
             end
 
             local prompt = add_prompt(
-                anchor,
+                prompt_anchor,
                 "ProfessionStationPrompt",
                 "Craft",
                 station_id,
