@@ -42,6 +42,11 @@ else
         "TEST Base lost expedition, guild or market UI")
     assert(not SPS:FindFirstChild("Combat"),
         "Lobby sync must not inject Dungeon-only combat client scripts")
+    local skill_data=RS:FindFirstChild("Combat")
+    skill_data=skill_data and skill_data:FindFirstChild("Shared")
+    assert(skill_data and skill_data:FindFirstChild("SkillDefinitions"),
+        "Lobby sync lacks Combat.Shared.SkillDefinitions for SkillsMenu")
+    print("[Phase4 Restored HUD Composition] LOBBY_COMBAT_SKILL_DEFINITIONS_PASS")
     print("[Phase4 Restored HUD Composition] LOBBY_HUD_SYNC_ONLY_PASS")
 end
 print("[Phase4 Restored HUD Composition] RESTORED_HUD_SOURCE_PASS")
