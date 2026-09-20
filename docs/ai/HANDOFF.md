@@ -1,5 +1,42 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — v1.51 late Event physical/multiplayer closeout
+
+Read the latest
+docs/roadmap/DungeonMMO_Roadmap_v1_51_Late_Event_Physical_Acceptance.md
+and docs/testing/
+phase4-late-event-physical-multiplayer-2026-09-20.md.
+The previous v1.50 backend-only EventAfterRoom2 insertion now has a
+**dedicated, replaceable, physical TEMP side route** for Temple/Mine
+Depth2–4. The original EventAfterRoom1 and SecretBeforeFinal
+routes still work. Workspace DungeonMMOPlaceholderLateEventPlayEnabled
+opts in to the placeholder geometry/layout; independent
+ServerScriptService DungeonMMOOptionalBossTemplatesEnabled opts
+in to server issuance. Both default OFF, alongside existing
+optional/higher-depth release locks. An unissued or uncleared
+late Event cannot open its gate; no production release was enabled.
+
+Accepted local receipts: six structural dungeon/depth route
+combinations, 85 physical assertions, 24/24 optional-focused
+and 30/30 broad backend suites, four Rojo compositions,
+assisted Temple Depth2 and Mine Depth4 actual late-bridge
+walking Play-mode passes, separate two-client Temple Depth2
+and four-client Mine Depth4 shared-run boss/disconnect/
+checkpoint/reward lifecycle passes, plus original optional
+and optional-disabled Temple Depth2 physical regressions.
+True same-account cross-server rejoin, published TEST and
+PROD verification, full-party unassisted combat and
+finished meshes remain independent future gates.
+
+Do not repeat the accepted fixed-side-room backend. If staying
+within dungeon development, add **a genuinely new non-boss event
+mechanic** through the existing encounter/executor system, with
+explicit room capabilities, run frequency and recovery. Otherwise
+prioritise remaining larger MMORPG backends (crafting professions,
+raids/world bosses, guild competition/economy) after reading
+the roadmap and accepted test matrix. Continue GitHub-first
+script changes and local Studio only; no forced merges/publish.
+
 ## 20 September 2026 — v1.50 optional placement handoff
 
 Current branch: wip/phase-4-test-hud-integration-v1. Read
