@@ -7,6 +7,9 @@ local Catalog = require(game:GetService("ReplicatedStorage")
 local Templates = require(game:GetService("ReplicatedStorage")
     :WaitForChild("Core"):WaitForChild("Shared")
     :WaitForChild("DungeonOptionalEncounterTemplateCatalog"))
+local CombatEvents = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalEventCombatCatalog"))
 
 -- An unknown ID in an authoritative saved snapshot fails closed;
 -- absent fields retain index-1 legacy descriptors for old callers.
@@ -81,15 +84,31 @@ function DungeonOptionalBossContent.for_difficulty(
     then
         return nil
     end
-
+    local mechanic_id = type(instance_state) == "table"
+        and instance_state.OptionalBossEventMechanicId or nil
+    local combat = nil
+    if mechanic_id ~= nil then
+        -- A corrupted/unregistered run choice or a combat event selected
+        -- for the original boss-only EventArena is rejected, not rerolled.
+        if type(mechanic_id) ~= "string"
+            or selected_template ~= "EventAfterRoom2"
+        then return nil end
+        combat = CombatEvents.get(dungeon_id, mechanic_id)
+        if combat == nil then return nil end
+    end
+    local event_encounter = if combat then {
+        Id = combat.Id .. "Encounter",
+        RoomSlotId = event_template.RoomSlotId,
+        RuntimeEncounterId = combat.Id .. "Encounter",
+        Kind = "EventCombat",
+        ExecutorId = "CombatPack",
+        PackId = combat.PackId,
+    } else encounter(
+        event.BossId .. event_template.EncounterSuffix,
+        "EventBoss", event.BossId, event_template.RoomSlotId)
     return {
         {
-            Encounter = encounter(
-                event.BossId .. event_template.EncounterSuffix,
-                "EventBoss",
-                event.BossId,
-                event_template.RoomSlotId
-            ),
+            Encounter = event_encounter,
             InsertAfterId = event_template.InsertAfterId,
             RequiresPlacementContract =
                 event_template.RequiresPlacementContract,
