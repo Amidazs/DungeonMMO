@@ -82,6 +82,15 @@ W:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
 W:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled", true)
 W:SetAttribute("DungeonMMOPlaceholderPlayableEnabled", true)
 W:SetAttribute("DungeonMMOPlaceholderOptionalPlayEnabled", true)
+if W:GetAttribute("DungeonMMOTempVariantParty") == true then
+    -- Exercise both alternates using the existing real party runtime,
+    -- with no source changes outside this disposable loaded DataModel.
+    SSS:SetAttribute("DungeonMMOOptionalBossVariantsEnabled", true)
+    local director = SSS.Core.Services.DungeonInstanceDirector
+    local original = '        dungeon_id, now, seed, options, enabled\n    )'
+    replace_once(director, original,
+        '        dungeon_id, now, 7, options, enabled\n    )')
+end
 
 local driver = Instance.new("Script")
 driver.Name = "Phase4DepthPartyOptional_TEMP"
@@ -295,6 +304,23 @@ local function run()
 
     local event = assert(plan[2])
     local first = assert(plan[1])
+    if W:GetAttribute("DungeonMMOTempVariantParty") == true then
+        local Variants = require(
+            RS.Core.Shared.DungeonOptionalBossVariantCatalog)
+        local chosen_event = assert(Variants.get(
+            dungeon_id, "Event", 2))
+        local chosen_secret = assert(Variants.get(
+            dungeon_id, "Secret", 2))
+        check(party_session.InstanceState.OptionalBossEventId
+                == chosen_event.Id
+            and party_session.InstanceState.OptionalBossSecretUnlocks[
+                chosen_secret.Id] == true
+            and event.BossId == chosen_event.BossId
+            and plan[#plan - 1].BossId == chosen_secret.BossId,
+            "one frozen shared party plan must contain both alternates")
+        print("[Depth Party Optional] ALTERNATE_PARTY_PLAN_PASS "
+            .. chosen_event.Id .. "/" .. chosen_secret.Id)
+    end
     clear(first, start(first, {departed}))
     until_value(function() return not event_gate.CanCollide end,
         "Event gate opens after Room1", 8)
@@ -392,6 +418,26 @@ local function run()
         end
     end
     check(secret ~= nil, "run must include a selected Secret boss")
+    if W:GetAttribute("DungeonMMOTempVariantParty") == true then
+        for _, player in ipairs(remaining) do
+            local records = history(runtime, player.UserId)
+            local event_reward = transaction(
+                records, event.BossId .. ":" .. event.Id)
+            local mini_reward = transaction(
+                records, event.BossId .. ":Depth4MiniBoss2")
+            local secret_reward = transaction(
+                records, secret.BossId .. ":" .. secret.Id)
+            local later_mini = transaction(
+                records, secret.BossId .. ":Depth4MiniBoss3")
+            check(event_reward and mini_reward
+                and secret_reward and later_mini
+                and event_reward ~= mini_reward
+                and secret_reward ~= later_mini,
+                "returning miniboss and optional variant must each reward "
+                .. player.Name .. " independently")
+        end
+        print("[Depth Party Optional] RETURNING_BOSS_REWARDS_DISTINCT_PASS")
+    end
     local completed = until_value(function()
         local s = runtime.SessionService:get(id)
         return s and s.State == "Complete" and s
