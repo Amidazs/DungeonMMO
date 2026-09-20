@@ -9,6 +9,36 @@
 
 This update supersedes earlier *next-step* notes about adding Depth 2–4 optional placeholder side rooms. It does not change the accepted historical record or imply that the integration branch has been merged to main or published to Roblox.
 
+## 20 September 2026 — local higher-depth party milestone update
+
+The planned party-lifecycle work in Section 3 has now passed its
+**local backend and assisted Studio multiplayer** acceptance subset:
+two- and four-client Temple/Mine Depth2/4 runs with a shared frozen
+Event/Secret plan; concurrent entry without duplicate bosses; one real
+Studio-client disconnect during Event or Secret; continued progress
+and completion by the remaining one or three members; and member-level
+completion reward replay protection. The stricter completion test initially
+correctly rejected fresh Depth2 profiles missing Depth1; the fixture now
+grants only disposable prior clears through the existing progression
+service. Service-level automatic revive and all-member wipe/checkpoint
+tests passed 392 assertions across Temple/Mine Depth2/4 and 1/2/4
+members. The focused optional suite passed 19/19, the broad backend
+matrix 30/30, and all four local Rojo compositions built.
+
+These are **not** live same-account rejoin/new reserved-server tests,
+unassisted whole-party combat or an in-Play full-party wipe. All existing
+release switches remain off. The next backend task is to extend the
+server-owned dynamic Event/Secret catalogue, insertion policy and reward
+rules using the already accepted generic dungeon machinery. Preserve
+actual network rejoin, physical party wipe, cloud TEST approval and
+authored art as independent future gates.
+
+Full receipts:
+`docs/testing/phase4-higher-depth-multiplayer-lifecycle-2026-09-20.md`.
+Original pre-checkpoint source:
+`cfb35d0c98c8701ec34388be8dad4ce72a57e3f9`.
+No original historical v1.47 long-form DOCX was overwritten.
+
 ## 1. Completed backend and local gameplay milestones
 
 **Progressive dungeon depth:** Temple and Abandoned Mine retain 3, 4, 5 and 6 required encounters at Depths 1–4. The final difficulty retains its distinct final boss and its earlier-depth bosses in miniboss positions. Two separate dungeon ladders, persistent unlocks, ordered encounters, interrupted-miniboss recovery and exactly-once completion rewards passed the existing 454-assertion local integration test.
@@ -31,9 +61,9 @@ This update supersedes earlier *next-step* notes about adding Depth 2–4 option
 
 **Guardrails retained:** Reuse accepted systems and placeholders. Do not reset or rewrite existing HUD, combat, party, Dungeon/Starting Base or historical roadmap work. Keep higher-depth and optional rollout flags disabled outside disposable tests. Develop code through GitHub first; run local builds and playtests in the existing Windows worktree. Preserve the pre-change rollback tag, accepted documentation and independently verified checkpoints.
 
-## 3. Next backend milestone — party lifecycle at higher depths
+## 3. Higher-depth party lifecycle — local acceptance and remaining gates
 
-**Goal:** Extend existing multiplayer, disconnect, checkpoint and reward protections across the fully integrated optional Depth 2–4 routes, without creating a second encounter or event system.
+**Goal (local milestone accepted; external acceptance outstanding):** Extend existing multiplayer, disconnect, checkpoint and reward protections across fully integrated optional Depth 2–4 routes without creating a second encounter or event system. The local subset was completed in the dated evidence above; any actual same-account network rejoin or in-Play full-party wipe remains unverified.
 
 1. **Admission and authoritative selection.** Prove 1-, 2- and 4-player session admission for selected Temple/Mine Depth 2 and Depth 4 cases. Confirm all members share one frozen run plan, difficulty, eligible Event/Secret selections, checkpoint and room state. Test Event-only, Secret-only, both selected and neither selected without rerolling on re-entry.
 2. **Concurrent boss entry.** In Play mode, have two members approach the same Event/Secret trigger at nearly the same time. Assert exactly one server-owned boss encounter starts, a second touch cannot duplicate its spawn, the unrelated side gate remains correctly sealed, and skipping Secret never bypasses a required room.
@@ -45,7 +75,7 @@ This update supersedes earlier *next-step* notes about adding Depth 2–4 option
 
 ## 4. Subsequent backend and release sequence
 
-**After party lifecycle:** Extend dynamic dungeon event variety and secret-boss insertion points through the existing server-owned issuance, catalog and encounter plan. Allow future event bosses and secrets without changing authored required-room chains; define eligibility windows, spawn/room slot capabilities, independent rewards, per-run frequency and recovery semantics, then test all combinations with disposable Studio runs.
+**Next backend milestone:** Extend dynamic dungeon event variety and secret-boss insertion points through the existing server-owned issuance, catalog and encounter plan. Allow future event bosses and secrets without changing authored required-room chains; define eligibility windows, spawn/room slot capabilities, independent rewards, per-run frequency and recovery semantics, then test all combinations with disposable Studio runs.
 
 **Later, when authorized:** Real same-account network reconnect and TEST cloud release verification; genuinely unassisted end-to-end party combat at representative depths; player-facing navigation/UX; authored environment modelling, meshes, animations, audio and final performance/low-end-device testing. None of these tasks should block the current backend-first workflow or be marked complete from the synthetic fixtures.
 
