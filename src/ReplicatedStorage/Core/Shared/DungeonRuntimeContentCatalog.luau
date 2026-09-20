@@ -189,6 +189,20 @@ end
 
 local PACKS = table.freeze({
     TestDungeon = table.freeze({
+        TempleRelicAmbush = table.freeze({
+            Entries = table.freeze({
+                pack_entry("Ambush", "Marauder", 4,
+                    "TempleLateAmbush_", 8100),
+            }),
+            BonusRules = table.freeze({}),
+        }),
+        TempleGuardianSurge = table.freeze({
+            Entries = table.freeze({
+                pack_entry("Surge", "Marauder", 8,
+                    "TempleLateSurge_", 8200),
+            }),
+            BonusRules = table.freeze({}),
+        }),
         StandardRoom1 = table.freeze({
             Entries = table.freeze({
                 pack_entry(
@@ -323,6 +337,20 @@ local PACKS = table.freeze({
         }),
     }),
     AbandonedMine = table.freeze({
+        MineTunnelAmbush = table.freeze({
+            Entries = table.freeze({
+                pack_entry("Ambush", "Marauder", 4,
+                    "MineLateAmbush_", 8100),
+            }),
+            BonusRules = table.freeze({}),
+        }),
+        MineDeepSurge = table.freeze({
+            Entries = table.freeze({
+                pack_entry("Surge", "Marauder", 8,
+                    "MineLateSurge_", 8200),
+            }),
+            BonusRules = table.freeze({}),
+        }),
         StandardRoom1 = table.freeze({
             Entries = table.freeze({
                 pack_entry(
