@@ -1,6 +1,9 @@
 --!strict
 -- Dormant optional-boss descriptors: no physical layouts are registered.
 local DungeonOptionalBossContent = {}
+local Catalog = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalBossVariantCatalog"))
 
 local ANCHORS = table.freeze({
     Depth1 = {"CombatRoom1", "Depth1Boss"},
@@ -9,20 +12,32 @@ local ANCHORS = table.freeze({
     Depth4 = {"Depth4Combat1", "Depth4FinalBoss"},
 })
 
-local DUNGEONS = table.freeze({
-    TestDungeon = {
-        EventBossId = "TempleEventBoss",
-        SecretBossId = "TempleSecretBoss",
-        EventId = "TempleEclipse",
-        UnlockId = "TempleHiddenSanctum",
-    },
-    AbandonedMine = {
-        EventBossId = "AbandonedMineEventBoss",
-        SecretBossId = "AbandonedMineSecretBoss",
-        EventId = "MineEchoSurge",
-        UnlockId = "MineSealedGallery",
-    },
-})
+-- An unknown ID in an authoritative saved snapshot fails closed;
+-- absent fields retain index-1 legacy descriptors for old callers.
+local function selected(
+    dungeon_id: string, kind: string, state: any?
+): any?
+    local identity = nil
+    if type(state) == "table" then
+        if kind == "Event" then
+            identity = state.OptionalBossEventId
+        elseif state.OptionalBossSecretUnlocked == true then
+            for id, unlocked in pairs(
+                state.OptionalBossSecretUnlocks or {}
+            ) do
+                if unlocked == true then
+                    if identity ~= nil then return nil end
+                    identity = id
+                end
+            end
+            if identity == nil then return nil end
+        end
+    end
+    if identity == nil then
+        return Catalog.get(dungeon_id, kind, 1)
+    end
+    return Catalog.find(dungeon_id, kind, identity)
+end
 
 -- Builds one optional encounter with a distinct, persistent identity.
 -- Args: id (string): Stable encounter ID.
@@ -52,20 +67,22 @@ end
 -- Returns: {any}?: Separate optional definitions, or nil if unknown.
 function DungeonOptionalBossContent.for_difficulty(
     dungeon_id: string,
-    difficulty_id: string
+    difficulty_id: string,
+    instance_state: any?
 ): {any}?
-    local dungeon = DUNGEONS[dungeon_id]
     local anchors = ANCHORS[difficulty_id]
-    if not dungeon or not anchors then
+    local event = selected(dungeon_id, "Event", instance_state)
+    local secret = selected(dungeon_id, "Secret", instance_state)
+    if not event or not secret or not anchors then
         return nil
     end
 
     return {
         {
             Encounter = encounter(
-                dungeon.EventBossId .. "Encounter",
+                event.BossId .. "Encounter",
                 "EventBoss",
-                dungeon.EventBossId,
+                event.BossId,
                 "EventArena"
             ),
             InsertAfterId = anchors[1],
@@ -78,14 +95,14 @@ function DungeonOptionalBossContent.for_difficulty(
             },
             Trigger = {
                 Type = "TimedEvent",
-                EventId = dungeon.EventId,
+                EventId = event.Id,
             },
         },
         {
             Encounter = encounter(
-                dungeon.SecretBossId .. "Encounter",
+                secret.BossId .. "Encounter",
                 "SecretBoss",
-                dungeon.SecretBossId,
+                secret.BossId,
                 "SecretArena"
             ),
             InsertBeforeId = anchors[2],
@@ -98,7 +115,7 @@ function DungeonOptionalBossContent.for_difficulty(
             },
             Trigger = {
                 Type = "SecretUnlock",
-                UnlockId = dungeon.UnlockId,
+                UnlockId = secret.Id,
             },
         },
     }
