@@ -1,5 +1,25 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — Depth1–4 integration handoff
+
+Current branch: wip/phase-4-test-hud-integration-v1, worktree:
+DungeonMMO_Phase4_HUD_Integration_v1. New GitHub-first
+DungeonDepthLadderIntegrationTest (and focused Studio runner) passed
+454 assertions / 5 suites on Temple+Mine Depth1–4. It uses the actual
+CompletionService for persisted profile unlock and reward replay
+rather than recording depth clears directly. Checks increasing 3/4/5/6
+rooms, ordered miniboss lineage, recovered checkpoints and single
+spawn/clear protection. 30/30 gameplay backend suites, Base Play mode
+and all four local Rojo compositions passed. A fresh assisted Temple
+Depth2 physical case passed; individual higher-depth Temple/Mine cases
+are documented historically. One attempted multi-Play Studio runner
+stopped after the first case and was removed (never count all six
+as fresh). Full evidence:
+docs/testing/phase4-depth1-4-progression-integration-2026-09-20.md.
+Depth2–4 and optional release switches remain unchanged. Continue
+using placeholders and GitHub-first edits; cloud, same-user rejoin,
+PROD, player DataStores and art remain out of scope.
+
 ## 20 September 2026 — persisted session recovery follow-up
 
 Current integration branch wip/phase-4-test-hud-integration-v1.
