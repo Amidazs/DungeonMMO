@@ -1,5 +1,21 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — consecutive optional-boss gameplay
+
+- [x] Two ordinary-health Studio players defeat Event followed by Secret
+  using normal client combat, with surviving party members.
+- [x] A separate two-player run confirms server-accepted Dodge and
+  equipped healing skill (+32 total HP) between the two boss encounters.
+- [x] The defensive/healing run defeats Secret and passes the assisted
+  final-room completion check.
+- [ ] Single injured survivor defeating Event then Secret remains
+  unproven: the earlier no-recovery solo attempt FAILED.
+- [ ] All-room unassisted combat, manual navigation, same-account rejoin
+  and cloud TEST acceptance remain separate.
+
+Receipts: docs/testing/
+phase4-optional-boss-consecutive-skill-defense-2026-09-20.md.
+
 ## 20 September 2026 — optional boss normal-combat acceptance
 
 - [x] Real client combat defeats Temple Event at ordinary player HP.
