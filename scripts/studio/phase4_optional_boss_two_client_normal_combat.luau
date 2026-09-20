@@ -148,8 +148,6 @@ local function approach(player, identifier)
     end, player.Name .. " character", 20)
     local root = character.HumanoidRootPart
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-    humanoid.MaxHealth = 100000
-    humanoid.Health = 100000
     root.CFrame = trigger.CFrame * CFrame.new(0, 0, 9)
     root.AssemblyLinearVelocity = Vector3.zero
     task.wait(0.2)
