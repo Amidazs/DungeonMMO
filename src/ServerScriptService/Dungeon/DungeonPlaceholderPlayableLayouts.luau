@@ -66,6 +66,18 @@ function Layouts.get(dungeon_id: string, layout_id: string,
             if boss then nil else 8,
             if boss then root .. "BossSpawn" else nil)
     end
+    -- Only the explicitly opted-in unpublished Studio layout receives
+    -- higher-depth side arenas. The production catalogue stays unchanged.
+    if include_optional then
+        for _, kind in ipairs({"Event", "Secret"}) do
+            local room_slot_id = kind .. "Arena"
+            local root = prefix .. "." .. layout_id .. "." .. kind .. "."
+            slots[room_slot_id] = slot(
+                root .. "Trigger", root .. "Checkpoint",
+                room_slot_id, nil, nil, nil, root .. "BossSpawn"
+            )
+        end
+    end
     return table.freeze({
         Id = layout_id,
         EntranceAnchor = prefix .. "." .. layout_id .. ".EntrySpawn",
