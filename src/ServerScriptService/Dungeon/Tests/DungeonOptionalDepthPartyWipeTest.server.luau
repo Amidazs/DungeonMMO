@@ -51,6 +51,7 @@ local function check_party(dungeon_id: string, depth_id: string,
         optional_boss_secret_chance_basis_points = 10000,
     }
     local entry = Issuer.issue(dungeon_id, now, 44, opts, true)
+    entry.RunEnteredAtUnix = now
     check(sessions:set_instance_state(id, entry).ok,
         "frozen optional eligibility saves before Event")
     local selected = Policy.evaluate({
