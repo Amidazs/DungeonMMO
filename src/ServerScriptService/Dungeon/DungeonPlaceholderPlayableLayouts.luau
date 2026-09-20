@@ -89,8 +89,10 @@ function Layouts.get(dungeon_id: string, layout_id: string,
             local root = prefix .. "." .. layout_id .. ".EventLate."
             slots.EventArenaLate = slot(
                 root .. "Trigger", root .. "Checkpoint",
-                "EventArenaLate", nil, nil, nil, root .. "BossSpawn",
-                LATE_INSERT[layout_id]
+                "EventArenaLate",
+                layout_id .. "LateEventEnemySpawns",
+                root .. "EnemySpawn.", 8,
+                root .. "BossSpawn", LATE_INSERT[layout_id]
             )
         end
     end
