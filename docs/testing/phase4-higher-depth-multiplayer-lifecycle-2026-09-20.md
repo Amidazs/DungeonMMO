@@ -1,7 +1,7 @@
 # Phase 4 — higher-depth optional-boss multiplayer lifecycle acceptance
 
-**Date:** 20 September 2026.  
-**Branch:** `wip/phase-4-test-hud-integration-v1`.  
+**Date:** 20 September 2026.
+**Branch:** `wip/phase-4-test-hud-integration-v1`.
 **Starting checkpoint:** `cfb35d0c98c8701ec34388be8dad4ce72a57e3f9`.
 
 ## Implementation and safety
