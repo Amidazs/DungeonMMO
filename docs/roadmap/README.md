@@ -1,5 +1,24 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.50 (configurable optional Event placement, 20 September 2026).**
+Read [the v1.50 optional Event placement roadmap](DungeonMMO_Roadmap_v1_50_Optional_Event_Placement.md)
+and [its verified local test report](../testing/phase4-optional-event-placement-templates-2026-09-20.md).
+The accepted after-Room1 Event and before-Final Secret routes remain
+the defaults. An independent server-only, default-OFF opt-in now
+issues a run-frozen `EventAfterRoom2` template at Depth2–4, with its
+own `EventArenaLate` slot/encounter identity, per-run Event/Secret
+frequency caps, room-slot conflict rejection and fail-closed physical
+readiness. **The late room and its bridge/gate are not yet registered
+or physically playable.** The new backend template is not a published
+event, a cave-in effect or an additional mob-pack mechanic.
+Local tests: 274 template assertions, 23/23 optional-focused suites,
+30/30 broader gameplay backend suites, four Rojo builds, original
+Temple Depth2 assisted physical route and previous alternate-boss
+Temple Depth2 assisted physical route with reward replay all PASS.
+Release switches remain OFF, and no cloud place or player DataStore
+was modified. The historical v1.47 Word roadmap and v1.48/v1.49
+supplements remain intact.
+
 **Latest ChatGPT-authored roadmap update: v1.49 (dynamic optional boss variants, 20 September 2026).**
 Read [the v1.49 dynamic optional boss roadmap update](DungeonMMO_Roadmap_v1_49_Phase4_Dynamic_Optional_Variants.md)
 and its [verified multiplayer/physical test report](../testing/phase4-dynamic-optional-boss-variants-2026-09-20.md).
