@@ -16,12 +16,20 @@ end
 
 local ENTRANCES = table.freeze({
     EventArena = table.freeze({Bridge = "EventBridge", Prerequisite = "Room1"}),
+    EventArenaLate = table.freeze({
+        Bridge = "EventBridgeLate", Prerequisite = "Room2",
+    }),
     SecretArena = table.freeze({Bridge = "SecretBridge", Prerequisite = "Room2"}),
 })
 
 function Gates.get(root: Instance?, slot_id: string): BasePart?
     local spec = ENTRANCES[slot_id]
     if not spec or not is_placeholder(root) then
+        return nil
+    end
+    if slot_id == "EventArenaLate"
+        and root:GetAttribute("DungeonMMOPlaceholderLateEventRoute") ~= true
+    then
         return nil
     end
     local bridge_root = root
@@ -88,6 +96,7 @@ function Gates.status(slot_id: string, bindings: any, flow: any): (boolean, stri
     end
     if not bindings.by_slot or not bindings.by_slot[slot_id] then
         return false, if slot_id == "EventArena"
+            or slot_id == "EventArenaLate"
             then "Event unavailable this run."
             else "Secret route unavailable this run."
     end
@@ -133,7 +142,11 @@ function Gates.sync(root: Instance?, bindings: any, flow: any): any
             return {ok = true, gates_present = false}
         end
     end
-    for _, slot_id in ipairs({"EventArena", "SecretArena"}) do
+    local gates_to_sync = {"EventArena", "SecretArena"}
+    if root:GetAttribute("DungeonMMOPlaceholderLateEventRoute") == true then
+        table.insert(gates_to_sync, "EventArenaLate")
+    end
+    for _, slot_id in ipairs(gates_to_sync) do
         local gate = Gates.get(root, slot_id)
         if not gate then
             return {ok = false, reason = "OptionalEntranceGateMissing",
