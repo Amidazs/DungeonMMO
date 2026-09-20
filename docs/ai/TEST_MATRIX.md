@@ -1,5 +1,28 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — higher-depth optional physical integration
+
+- [x] Temple and Mine Depth2/3/4 TEMP geometry: level side bridge
+  floors, open main-room wall, depth-specific checkpoint, trigger and
+  boss spawn; original required rooms remain intact.
+- [x] Active-depth entrance gating: 139 assertions; unused Depth1
+  side bridges remain sealed while opted-in Depth2–4 routes play.
+- [x] 18/18 optional-focused suites; 30/30 gameplay backend suites.
+- [x] Six separate physical walking Play-mode scenarios pass both
+  optional bosses and dungeon completion: Temple/Mine 2/3/4, with
+  six/eight? See report for exact six/seven/eight encounters by depth.
+- [x] Mine Depth4 physically bypasses Secret, backtracks to clear it,
+  then completes the pending Final using TEMP-only spawn deferral.
+- [x] Optional-disabled Temple Depth2 original four-room route PASS.
+- [x] All four local Rojo build compositions succeed.
+- [ ] Unassisted manual combat, true cross-server same-account rejoin
+  and cloud release verification remain separate.
+- [ ] Higher-depth production release flags remain OFF; TEMP test
+  layout registration is not published.
+
+Evidence:
+docs/testing/phase4-depth2-4-optional-physical-playtest-2026-09-20.md.
+
 ## 20 September 2026 — per-depth Event/Secret integration
 
 - [x] RED → GREEN: Secret gate prerequisite uses the actual preceding
