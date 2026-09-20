@@ -37,6 +37,26 @@ local DEFINITIONS = table.freeze({
         Pair = "Herbalism",
         CraftingMinigameId = "AlchemyBrewing",
     }),
+    Skinning = table.freeze({
+        Id = "Skinning",
+        Name = "Skinning",
+        Kind = "Gathering",
+        Pair = "Leatherworking",
+    }),
+    Leatherworking = table.freeze({
+        Id = "Leatherworking",
+        Name = "Leatherworking",
+        Kind = "Creation",
+        Pair = "Skinning",
+        CraftingMinigameId = "LeatherworkingStitching",
+    }),
+    Enchanting = table.freeze({
+        Id = "Enchanting",
+        Name = "Enchanting",
+        Kind = "Creation",
+        Pair = "Alchemy",
+        CraftingMinigameId = "EnchantingImbuing",
+    }),
 })
 
 local ORDER = table.freeze({
@@ -44,6 +64,9 @@ local ORDER = table.freeze({
     "Blacksmithing",
     "Herbalism",
     "Alchemy",
+    "Skinning",
+    "Leatherworking",
+    "Enchanting",
 })
 
 function ProfessionDefinitions.get(profession_id: string): any?
