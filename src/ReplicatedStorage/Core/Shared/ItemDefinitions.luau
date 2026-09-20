@@ -161,6 +161,16 @@ local DEFINITIONS = table.freeze({
         Stackable = true,
     }),
 
+    forging_flux = table.freeze({
+        Id = "forging_flux",
+        Name = "Forging Flux",
+        Kind = "Material",
+        Category = "Reagent",
+        InventoryCategory = "Reagents",
+        Rarity = "Uncommon",
+        Stackable = true,
+    }),
+
     tempering_oil = table.freeze({
         Id = "tempering_oil",
         Name = "Tempering Oil",
@@ -183,6 +193,22 @@ local DEFINITIONS = table.freeze({
         Stackable = false,
         CombatModifiers = table.freeze({
             MaxHealthFlat = 5,
+        }),
+    }),
+
+    runic_ironbound_gloves = table.freeze({
+        Id = "runic_ironbound_gloves",
+        Name = "Runic Ironbound Gloves",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Gloves",
+        Category = "CraftedArmor",
+        AllowedBaseClasses = ALL_CLASSES,
+        Rarity = "Rare",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 7,
+            CriticalChanceBonus = 0.03,
         }),
     }),
 
