@@ -1,5 +1,20 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — optional-boss lifecycle local hardening
+
+On wip/phase-4-test-hud-integration-v1, a failed persisted normal/Event
+encounter start now rolls back to Pending; a failed persisted optional
+Secret skip restores the saved pre-skip sequence snapshot. Both defects
+were reproduced with RED Studio tests before the fixes. Fresh local
+Studio focused tests: 14/14 suites PASS (11 failure-recovery, 24
+two-member recovery, 28 optional gate assertions). Five Rojo builds,
+assisted physical Temple Secret-backtrack/final-completion Play mode,
+normal Dungeon baseline, and a two-client real PlayerRemoving
+disconnect fixture all PASS. Evidence:
+docs/testing/phase4-optional-boss-lifecycle-hardening-2026-09-20.md.
+The two-client fixture did not run optional combat or same-user rejoin.
+Phase 4 remains ACTIVE; no cloud publish, DataStore update or art work.
+
 ## 20 September 2026 — TEST Temple optional gate recovery verification
 
 Active integration branch: wip/phase-4-test-hud-integration-v1. Optional

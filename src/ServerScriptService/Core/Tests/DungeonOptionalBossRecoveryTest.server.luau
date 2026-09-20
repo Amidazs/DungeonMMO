@@ -18,10 +18,12 @@ local now = 1000
 local map = Map.new(function() return now end)
 local original = Sessions.new(map, function() return now end)
 local user_id = 99234
-local created = assert(original:create("TestDungeon", {user_id}, 0,
+local peer_id = 99235
+local created = assert(original:create("TestDungeon", {user_id, peer_id}, 0,
     "optional-recovery-test", "Depth1"))
 local id = created.SessionId
 assert(original:mark_connected(id, user_id).ok)
+assert(original:mark_connected(id, peer_id).ok)
 
 local encounters = {
     {Id = "First", Kind = "Combat", RoomSlotId = "Room1"},
@@ -61,6 +63,13 @@ check(before.InstanceState.EncounterRuntime.EncounterStates.Secret == "Active",
     "active encounter is persisted before disconnection")
 check(original:mark_disconnected(id, user_id).ok,
     "member is marked disconnected in saved session")
+local peer_session = assert(original:get(id))
+check(peer_session.Members[tostring(peer_id)].Connected == true
+    and peer_session.InstanceState.EncounterRuntime.ActiveEncounterId
+        == "Secret",
+    "disconnect retains connected peer and active optional encounter")
+check(not service:discover(id, peer_id, "Secret", 0).ok,
+    "peer cannot restart the active optional boss")
 check(not service:discover(id, user_id, "Secret", 0).ok,
     "disconnected player cannot retrigger secret")
 
@@ -74,6 +83,9 @@ check(state.OptionalBossSecretDiscoveries.TempleHiddenSanctum == true,
     "discovery is persisted across service reconstruction")
 check(state.EncounterPlan[4].BossId == "TempleSecretBoss",
     "same immutable secret boss encounter is restored")
+check(recovered.Members[tostring(peer_id)].Connected == true
+    and recovered.Members[tostring(user_id)].Connected == false,
+    "recovery preserves independent party connection states")
 local resumed = assert(Controller.new({
     session_service = recovered_sessions, session_id = id,
     base_sequence = encounters, optional_encounters = {},
@@ -85,6 +97,12 @@ check(resumed:state_of("Event") == "Cleared"
     and resumed:state_of("Second") == "Cleared",
     "previously cleared encounters must not be replayed")
 assert(recovered_sessions:mark_connected(id, user_id).ok)
+check(recovered_sessions:get(id).Members[tostring(peer_id)].Connected,
+    "rejoining member must not disconnect the active party member")
+check(Discovery.new(recovered_sessions):discover(
+    id, peer_id, "Secret", 0
+).already_discovered == true,
+    "peer shares the once-only persisted secret discovery")
 check(Discovery.new(recovered_sessions):discover(
     id, user_id, "Secret", 0
 ).already_discovered == true, "reconnect cannot discover twice")

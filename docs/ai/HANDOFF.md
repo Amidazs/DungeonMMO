@@ -1,5 +1,20 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — optional lifecycle continuation
+
+Active worktree: DungeonMMO_Phase4_HUD_Integration_v1; branch:
+wip/phase-4-test-hud-integration-v1. Starting checkpoint: 92b31be.
+The shared encounter runtime now reverts unsaved Event/required startup
+and unsaved optional Secret skip, preserving retry and normal-route
+progression. New failure regression and expanded two-member/gate tests
+PASS; five Rojo builds, local Temple physical backtracking, normal
+Dungeon and two-client disconnect PASS. Full logs and qualifications:
+docs/testing/phase4-optional-boss-lifecycle-hardening-2026-09-20.md.
+Next gameplay gate: exercise Event/Secret side fights with two real
+Studio clients, including interrupted boss recovery and repeat rewards;
+same-account reconnection still needs separate evidence. Continue using
+TEMP placeholders. Cloud verification/publishing is deliberately deferred.
+
 ## 20 September 2026 — side-gate recovery handoff
 
 Continue on DungeonMMO_Phase4_HUD_Integration_v1,

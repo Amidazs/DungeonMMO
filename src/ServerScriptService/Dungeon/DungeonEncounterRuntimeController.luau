@@ -235,6 +235,9 @@ function DungeonEncounterRuntimeController:start(
 
     local persisted = self:_persist()
     if persisted.ok ~= true then
+        -- An unsaved Event or required encounter must remain retryable.
+        -- No enemy has spawned when the start transaction fails here.
+        self._sequencer:cancel_active(encounter_id)
         return persisted
     end
     return started
@@ -277,6 +280,7 @@ end
 function DungeonEncounterRuntimeController:skip(
     encounter_id: string
 ): any
+    local before_skip = self._sequencer:snapshot()
     local skipped = self._sequencer:skip(encounter_id)
     if skipped.ok ~= true then
         return skipped
@@ -284,6 +288,10 @@ function DungeonEncounterRuntimeController:skip(
 
     local persisted = self:_persist()
     if persisted.ok ~= true then
+        -- Never advance the required route from an unsaved optional skip.
+        self._sequencer = DungeonEncounterSequencer.new(
+            self._encounters, before_skip
+        )
         return persisted
     end
     return skipped

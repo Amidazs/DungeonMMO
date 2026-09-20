@@ -69,6 +69,26 @@ check(Gates.sync(root, bindings, flow).ok
     and not secret_gate.CanCollide,
     "restored Room2 clear reopens Secret for backtracking")
 
+-- Independently selected side bosses must never unlock one another.
+local combinations = {
+    {event = false, secret = false},
+    {event = true, secret = false},
+    {event = false, secret = true},
+    {event = true, secret = true},
+}
+for _, selection in ipairs(combinations) do
+    bindings.by_slot.EventArena = if selection.event then {} else nil
+    bindings.by_slot.SecretArena = if selection.secret then {} else nil
+    check(Gates.sync(root, bindings, flow).ok,
+        "eligibility combination synchronizes without a missing gate")
+    check((not event_gate.CanCollide) == selection.event,
+        "Event opening depends only on this run's Event selection")
+    check((not secret_gate.CanCollide) == selection.secret,
+        "Secret opening depends only on this run's Secret selection")
+end
+bindings.by_slot.EventArena = {}
+bindings.by_slot.SecretArena = {}
+
 bindings.by_slot.SecretArena = nil
 check(Gates.sync(root, bindings, flow).ok and secret_gate.CanCollide,
     "secret never selected for this run remains physically sealed")

@@ -96,6 +96,14 @@ local function run()
     assert(type(plan)=="table" and #plan>=3,"dungeon plan missing")
     print("[Phase4 Dungeon Real Leave] ADMITTED_TWO_REAL_CLIENTS "..id)
     departing:SetAttribute("Phase4DungeonLeave",true)
+    -- Studio occasionally acknowledges LeaveTest without disconnecting.
+    -- A server kick still exercises real PlayerRemoving in this TEMP run.
+    task.delay(4, function()
+        if Players:GetPlayerByUserId(departing.UserId) then
+            print("[Phase4 Dungeon Real Leave] FALLBACK_SERVER_KICK")
+            departing:Kick("TEMP dungeon disconnect fixture")
+        end
+    end)
     until_value(function()
         return Players:GetPlayerByUserId(departing.UserId)==nil
     end,"client actually leaves multiplayer test",25)

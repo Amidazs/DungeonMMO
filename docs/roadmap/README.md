@@ -13,6 +13,18 @@ SHA-256:
 
 **Current phase: Phase 4 Content Alpha remains ACTIVE.** Phases 2 and 3 remain accepted. The 19 September Event/Secret backend milestone is complete historically and is not a reason to repeat the closed backend work.
 
+**20 September local backend follow-up (after v1.47):** Normal/Event start
+and optional Secret-skip persistence failures now roll back in-memory
+progression so players can retry without bypassing a required encounter.
+Focused Studio tests, all five local Rojo compositions, assisted Temple
+placeholder backtracking, normal Dungeon Play mode, and a two-client
+session-disconnect fixture passed. The remaining multiplayer gameplay
+gate is a real two-client optional-boss fight with interrupted-boss and
+reward-replay checks; same-account rejoin is unproven. See
+`docs/testing/phase4-optional-boss-lifecycle-hardening-2026-09-20.md`.
+This is a working engineering update, not a new canonical DOCX version
+or cloud release. Finished models and cloud verification remain deferred.
+
 **20 September TEST evidence and scope:** The published TEST Lobby race/class flow worked after repairing seven semantic environment anchors and restoring the TEST profile DataStore, and the player entered/cleared normal TEST Temple rooms. One observed Secret objective stated that the secret route was not unlocked for that run; the visible branches are **EventArena after Room 1** and **SecretArena after Room 2**, not two guaranteed Secret rooms. A distinct Base-origin eligibility source correction was made; it must be verified on a *new cloud session*, not assumed to change old persisted runs.
 
 On the combined integration branch `wip/phase-4-test-hud-integration-v1`, source `52222db` supports eligible Secret backtracking before dungeon completion; `f6d6401` adds **server-controlled placeholder side-entry gates** so Event opens after Room 1 and Secret after Room 2 only when that run is eligible. Local physical/regression and TEST-style composition tests passed. Final authored room art, normal-player unassisted optional boss fights and real multiplayer/recovery acceptance remain open.

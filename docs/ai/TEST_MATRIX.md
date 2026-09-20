@@ -1,5 +1,21 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — optional-boss lifecycle local follow-up
+
+- [x] RED then GREEN: unsaved normal/Event startup must reset Pending.
+- [x] RED then GREEN: unsaved Secret skip must not advance main route.
+- [x] 14/14 focused Studio suites; 11 fault, 24 two-member recovery,
+  28 four-way eligibility/physical-gate assertions PASS.
+- [x] Five temporary Rojo build compositions succeed.
+- [x] Local Temple: gate prerequisites, deferred Secret, final room PASS.
+- [x] Optional rollout-locked normal Dungeon Play-mode baseline PASS.
+- [x] Studio two-client disconnect: session, checkpoint and peer preserved.
+- [ ] Two-client Event/Secret boss fight, reward replay and rejoin test.
+- [ ] Same-account real network reconnect or cloud TEST release verification.
+
+Detailed receipts: docs/testing/
+phase4-optional-boss-lifecycle-hardening-2026-09-20.md.
+
 ## 20 September 2026 — optional gate recovery follow-up
 
 - [x] Existing server-owned Event/Secret gates present on integration branch.
