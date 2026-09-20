@@ -30,13 +30,13 @@ local function valid_identity(
         and encounter.Id ~= ""
         and not seen[encounter.Id]
         and OPTIONAL_KINDS[encounter.Kind] ~= nil
-        and ((encounter.ExecutorId == "Boss"
+        and (if encounter.Kind == "EventCombat"
+            then encounter.ExecutorId == "CombatPack"
+                and type(encounter.PackId) == "string"
+                and encounter.PackId ~= ""
+            else encounter.ExecutorId == "Boss"
                 and type(encounter.BossId) == "string"
                 and encounter.BossId ~= "")
-            or (encounter.Kind == "EventCombat"
-                and encounter.ExecutorId == "CombatPack"
-                and type(encounter.PackId) == "string"
-                and encounter.PackId ~= ""))
         and type(encounter.RoomSlotId) == "string"
         and encounter.RoomSlotId ~= ""
 end
