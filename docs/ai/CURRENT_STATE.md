@@ -1,5 +1,28 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — Depth2–4 optional physical playtest complete
+
+TEMP-only higher-depth Temple and Mine blockouts now provide real
+walkable, gated Event/Secret side rooms attached to Room1 and the
+selected depth's penultimate required room. Higher-depth optional
+layout registration is restricted to the explicitly opted-in,
+unpublished local Studio placeholder; release switches remain OFF.
+The shared entrance-gate controller targets the active depth's bridge
+and keeps unused Depth1 bridges sealed. GitHub-first source/test changes
+were fast-forward pulled into the existing Windows integration worktree.
+Both dungeons × Depth2/3/4 passed six independent assisted walking
+Play-mode routes (6/7/8 encounters respectively), including actual side
+bridge traversal, boss trigger/spawn identities and final completion.
+A seventh Mine Depth4 Play-mode run physically bypassed Secret, returned,
+cleared the deferred boss and then completed Final using a TEMP-only
+final-spawn deferral. Structural regression: 139 assertions; 18/18
+optional-focused suites and 30/30 backend matrix PASS. Original
+optional-disabled Temple Depth2 four-room Play mode PASS; all four
+local Rojo compositions built. Detailed dated logs and caveats:
+docs/testing/phase4-depth2-4-optional-physical-playtest-2026-09-20.md.
+No published Roblox cloud place, PROD, player DataStore, meshes or
+canonical roadmap DOCX were changed.
+
 ## 20 September 2026 — depth-specific optional events and shared side gates
 
 GitHub-first continuation on wip/phase-4-test-hud-integration-v1.
