@@ -36,3 +36,17 @@ The cloud version is still unverified after the documented 429 rate-limit
 publish attempt. No Roblox publish or DataStore mutation was performed during
 this follow-up. Confirm the existing TEST Dungeon's current version and back
 it up before any future authenticated publish; leave Lobby and PROD untouched.
+
+## Fresh physical rerun after gate recovery assertions (20 September 2026)
+
+The TEMP unpublished Dungeon test composition was rerun with
+scripts/studio/phase4_placeholder_temple_secret_backtrack.luau.
+Studio log 20260920T151909Z_Studio_C434B_last.log records
+BOTH_SIDE_GATES_CLOSED_BEFORE_ROOM1, ROOM1_EVENT_OPEN_SECRET_CLOSED,
+ROOM2_SECRET_GATE_OPEN, BACKTRACK_SECRET_CLEARED_MAIN_ROUTE_INTACT,
+RUN_COMPLETE Complete, and TEMPLE_FIGHT_PLACEHOLDER_PLAY_PASS.
+The fixture assists combat and temporarily defers final-boss spawning
+inside its disposable DataModel to exercise backtracking. It does not
+modify the source/runtime release flags, published place or DataStores.
+This fresh physical rerun supersedes the earlier follow-up note saying
+physical gameplay was not repeated during this continuation.

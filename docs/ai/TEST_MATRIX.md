@@ -7,8 +7,10 @@
 - [x] Focused Studio optional tests: 13/13 suites PASS.
 - [x] Entrance gate unit regression: 16 assertions PASS, including
   recovery reopen, incomplete Room2 fail-closed and restored Secret access.
-- [ ] Fresh physical route re-run at this follow-up checkpoint (earlier
-  physical fixture PASS evidence is retained, not reclassified as fresh).
+- [x] Fresh TEMP physical Temple route rerun: both gates initially closed,
+  Room1/Event and Room2/Secret prerequisites, Secret backtrack and final
+  room completion PASS (assisted fixture). Log:
+  20260920T151909Z_Studio_C434B_last.log.
 - [ ] Cloud TEST Dungeon gate version verified after HTTP 429 attempt.
 - [ ] Current cloud TEST Dungeon saved and version noted before republish.
 

@@ -8,8 +8,10 @@ gates already exist at f6d6401; roadmap v1.47 at 1083c01 documents
 release status. This follow-up adds three isolated recovery assertions in
 DungeonOptionalEntranceGatesTest; fresh Studio focused suite 13/13 and
 all 16 gate assertions PASS. Log:
-20260920T151636Z_Studio_1BE9F_last.log. Existing physical Temple route
-and skipped-Secret backtracking evidence is in
+20260920T151636Z_Studio_1BE9F_last.log. Fresh TEMP physical Temple traversal and skipped-Secret backtracking
+also passed in Studio log 20260920T151909Z_Studio_C434B_last.log,
+including both gates initially closed, prerequisite unlocks and final
+room completion. Full evidence is in
 phase4-test-temple-optional-entrance-gates-2026-09-20.md.
 The attempted cloud TEST Dungeon publish has unverified script/whole-place
 state due to HTTP 429. Do NOT assume gates are live or retry publish
