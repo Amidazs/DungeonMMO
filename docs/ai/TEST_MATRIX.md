@@ -1,5 +1,20 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — optional gate recovery follow-up
+
+- [x] Existing server-owned Event/Secret gates present on integration branch.
+- [x] Fresh TEMP TEST Temple and Dungeon test Rojo builds completed.
+- [x] Focused Studio optional tests: 13/13 suites PASS.
+- [x] Entrance gate unit regression: 16 assertions PASS, including
+  recovery reopen, incomplete Room2 fail-closed and restored Secret access.
+- [ ] Fresh physical route re-run at this follow-up checkpoint (earlier
+  physical fixture PASS evidence is retained, not reclassified as fresh).
+- [ ] Cloud TEST Dungeon gate version verified after HTTP 429 attempt.
+- [ ] Current cloud TEST Dungeon saved and version noted before republish.
+
+Evidence: 20260920T151636Z_Studio_1BE9F_last.log and
+phase4-test-temple-optional-entrance-gates-2026-09-20.md.
+
 ## 19 September 2026 — combined Phase 4 TEST Temple + restored HUD integration
 
 **Active new worktree/branch:** DungeonMMO_Phase4_HUD_Integration_v1 /

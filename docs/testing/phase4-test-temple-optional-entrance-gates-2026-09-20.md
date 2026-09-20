@@ -18,3 +18,21 @@ After publishing the previous Secret-backtracking candidate, the player saw "Sec
 
 ## Deployment status and safety
 The gated candidate was prepared and passed local tests; an authenticated Studio Publish As attempt on 20 September 2026 at about 14:15 local targeted the existing TEST Dungeon place 117293035754309 / universe 10765241947 (log 20260920T121504Z_Studio_BF4A3_last.log, publishAs target and PublishPlaceTime). However, after the place publish timing marker, Studio logged repeated HTTP 429 Too Many Requests responses for https://apis.roblox.com/publish/v1/Scripts while committing script assets to Version History (205 Commit Failure lines). These may affect the script version-history commit independently of place upload; the log does NOT verify the complete new place/script version is playable. The latest available Player log contains no fresh TEST Dungeon join after the attempted publish. **Treat the live gate version as unverified; do not automatically republish/retry during possible rate-limiting.** Check the current cloud TEST Dungeon Version History, join a genuinely fresh TEST Dungeon server, verify the new visible gates and prerequisite behaviour, and capture F9 server errors before declaring the new candidate live. The previous FIVE-script hotfix project is obsolete for this revision: the runtime now also needs the new DungeonOptionalEntranceGates module AND revised DungeonPlaceholderPhysicalContent builder. Do not run the old hotfix launcher or publish its scripts-only rbxl. For full placeholder release, back up the current cloud TEST Temple and note its Roblox version history before overwriting the existing TEST Dungeon place 117293035754309 in universe 10765241947. Do not publish over Lobby 134132328219009 or PROD, and do not reset player profiles or DataStores. Source-only Git checkpoints are not cloud place backups.
+
+## 20 September 2026 — gate-recovery regression follow-up
+
+The current integration branch already includes the implemented TEST Temple
+optional entrance barriers at f6d6401 and the v1.47 roadmap closeout at
+1083c01. A fresh local TEST placeholder Rojo build and separate Dungeon
+edit-mode test build succeeded. The focused Studio runner passed 13/13 suites;
+DungeonOptionalEntranceGatesTest passed 16 assertions, including three new
+recovery/resynchronization checks. Studio log:
+20260920T151636Z_Studio_1BE9F_last.log. Studio emitted unrelated shutdown
+plugin errors after the runner PASS; the gameplay tests themselves passed.
+The earlier full physical-route and backtracking tests remain the latest
+physical gameplay evidence; this follow-up did not rerun those play fixtures.
+
+The cloud version is still unverified after the documented 429 rate-limit
+publish attempt. No Roblox publish or DataStore mutation was performed during
+this follow-up. Confirm the existing TEST Dungeon's current version and back
+it up before any future authenticated publish; leave Lobby and PROD untouched.

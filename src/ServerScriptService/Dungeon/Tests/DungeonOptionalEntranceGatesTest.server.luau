@@ -54,6 +54,21 @@ check(not secret_gate.CanCollide and not secret_gate.CanTouch,
 check(Gates.status("SecretArena", bindings, flow) == true,
     "skipping secret on next-room approach does not re-lock bridge")
 
+-- Reconstructing the gate state must use persisted prerequisite states.
+event_gate.CanCollide = true
+secret_gate.CanCollide = true
+check(Gates.sync(root, bindings, flow).ok
+    and not event_gate.CanCollide and not secret_gate.CanCollide,
+    "recovery reopens both eligible entrances after cleared prerequisites")
+states.Room2 = "Pending"
+check(Gates.sync(root, bindings, flow).ok
+    and not event_gate.CanCollide and secret_gate.CanCollide,
+    "recovery does not open Secret before its persisted prerequisite clears")
+states.Room2 = "Cleared"
+check(Gates.sync(root, bindings, flow).ok
+    and not secret_gate.CanCollide,
+    "restored Room2 clear reopens Secret for backtracking")
+
 bindings.by_slot.SecretArena = nil
 check(Gates.sync(root, bindings, flow).ok and secret_gate.CanCollide,
     "secret never selected for this run remains physically sealed")

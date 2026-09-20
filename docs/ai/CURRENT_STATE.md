@@ -1,5 +1,20 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — TEST Temple optional gate recovery verification
+
+Active integration branch: wip/phase-4-test-hud-integration-v1. Optional
+entrance gate runtime/placeholder implementation is already committed at
+f6d6401; roadmap v1.47 is committed at 1083c01. Fresh TEMP TEST Temple
+and Dungeon test-composition Rojo builds succeeded. Focused Studio tests:
+13/13 suites PASS; entrance gate tests: 16 assertions PASS after adding
+three persisted-state recovery/resynchronization checks. Studio log:
+20260920T151636Z_Studio_1BE9F_last.log. Full physical-route gameplay
+was previously tested and was not repeated for this test-only follow-up.
+The TEST cloud gate version is UNVERIFIED after an HTTP 429 script commit
+attempt; no new cloud publish or DataStore mutation occurred. Before a new
+publish, confirm and back up existing TEST Dungeon 117293035754309 and
+verify fresh cloud gameplay. Next backend work remains Phase 4 Content Alpha.
+
 ## 19 September 2026 — combined Phase 4 TEST Temple + restored HUD integration
 
 **Active new worktree/branch:** DungeonMMO_Phase4_HUD_Integration_v1 /

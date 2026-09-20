@@ -1,5 +1,22 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — side-gate recovery handoff
+
+Continue on DungeonMMO_Phase4_HUD_Integration_v1,
+wip/phase-4-test-hud-integration-v1. The optional Event/Secret side-bridge
+gates already exist at f6d6401; roadmap v1.47 at 1083c01 documents
+release status. This follow-up adds three isolated recovery assertions in
+DungeonOptionalEntranceGatesTest; fresh Studio focused suite 13/13 and
+all 16 gate assertions PASS. Log:
+20260920T151636Z_Studio_1BE9F_last.log. Existing physical Temple route
+and skipped-Secret backtracking evidence is in
+phase4-test-temple-optional-entrance-gates-2026-09-20.md.
+The attempted cloud TEST Dungeon publish has unverified script/whole-place
+state due to HTTP 429. Do NOT assume gates are live or retry publish
+blindly. Confirm cloud version, back up existing TEST Dungeon, then verify
+fresh cloud server before declaring release; preserve Lobby, PROD,
+DataStores, authored branches and the existing rollback tag.
+
 ## 19 September 2026 — combined Phase 4 TEST Temple + restored HUD integration
 
 **Active new worktree/branch:** DungeonMMO_Phase4_HUD_Integration_v1 /
