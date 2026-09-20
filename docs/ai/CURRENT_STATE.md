@@ -1,5 +1,19 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — roadmap v1.48 supplement (ChatGPT-authored)
+
+The repository roadmap index now points to
+`docs/roadmap/DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md`.
+It records the accepted six Depth2–4 Temple/Mine assisted walking routes,
+one Mine Depth4 deferred Secret backtrack, and the next backend milestone:
+1/2/4-member optional encounter lifecycle, concurrent trigger protection,
+disconnect/wipe/checkpoint recovery and per-member one-time rewards.
+The historical canonical long-form `DungeonMMO_Roadmap_v1_47.docx`
+is preserved; the v1.48 update is a separate versioned supplement.
+Cloud TEST acceptance, real same-account cross-server rejoin, unassisted
+all-room combat, authored art and PROD remain independent future gates.
+No Roblox publish or DataStore change was performed by this roadmap update.
+
 ## 20 September 2026 — Depth2–4 optional physical playtest complete
 
 TEMP-only higher-depth Temple and Mine blockouts now provide real
