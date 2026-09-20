@@ -197,6 +197,27 @@ local function run()
         return s
     end, "all party members admitted into the same session", 50)
     local id = party_session.SessionId
+    -- These unpublished higher-depth fixtures bypass the ordinary Base
+    -- selection gate to enter directly. Give each disposable Studio profile
+    -- its actual earlier-depth progression via the real progression service,
+    -- rather than disabling the completion save barrier.
+    local Progression = require(
+        SSS.Core.Services.DungeonDifficultyProgressionService
+    )
+    local progression = Progression.new(runtime.ProfileService)
+    local depth_number = assert(tonumber(depth_id:match("^Depth([234])$")))
+    for _, member in ipairs(party) do
+        for order = 1, depth_number - 1 do
+            local prior = progression:record_clear(
+                member.UserId, dungeon_id, "Depth" .. order)
+            check(prior.ok, "TEMP prerequisite depth bootstrap failed")
+        end
+        check(progression:is_unlocked(
+            member.UserId, dungeon_id, depth_id),
+            "member needs legitimate earlier-depth clears for completion")
+    end
+    print("[Depth Party Optional] TEMP_PRIOR_DEPTH_PROGRESS_READY "
+        .. tostring(depth_number) .. " members=" .. tostring(#party))
     local definition = assert(require(
         RS.Core.Shared.DungeonDifficultyDefinitions
     ).get(dungeon_id, depth_id))
