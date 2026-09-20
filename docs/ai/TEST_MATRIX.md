@@ -1,5 +1,21 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — full saved-session recovery
+
+- [x] Fresh 15/15 focused optional-boss Studio suites PASS.
+- [x] New 42-assertion two-member, multi-restart service-level
+  recovery suite PASS: frozen eligibility, checkpoint, interrupted Event,
+  Final and deferred Secret, physical entrance gates, idempotent reward.
+- [x] Fresh assisted Temple physical backtracking regression PASS.
+- [x] User reports manually defeating both optional bosses solo;
+  the earlier failed automated injured-solo case is historical.
+- [ ] Actual same-account Roblox network rejoin and reserved-server
+  reconstruction are not proven by service-level emulation.
+- [ ] Cloud TEST release verification remains intentionally deferred.
+
+Detailed evidence:
+docs/testing/phase4-optional-full-session-recovery-2026-09-20.md.
+
 ## 20 September 2026 — consecutive optional-boss gameplay
 
 - [x] Two ordinary-health Studio players defeat Event followed by Secret
