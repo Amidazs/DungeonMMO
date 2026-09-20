@@ -128,6 +128,16 @@ local function run()
         "Room1,EventArena,Room2,SecretArena,Room3",
         "unexpected optional encounter order")
 
+    local side_root = wait_until(function()
+        return W:FindFirstChild("DungeonMMOPlaceholderPhysicalContent")
+    end, "replaceable optional physical content", 15)
+    local event_gate = side_root.EventBridge:FindFirstChild("EntranceGate")
+    local secret_gate = side_root.SecretBridge:FindFirstChild("EntranceGate")
+    must(event_gate and secret_gate
+        and event_gate.CanCollide and secret_gate.CanCollide,
+        "Event and Secret side bridges must start physically closed")
+    print("[Optional Boss TEMP Gameplay] BOTH_SIDE_GATES_CLOSED_BEFORE_ROOM1")
+
     local character = wait_until(function()
         return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
             and player.Character
@@ -223,6 +233,17 @@ local function run()
             return state_of() == "Cleared"
         end, slot .. " reward/progression clear", 12)
         print("[Optional Boss TEMP Gameplay] CLEARED " .. slot)
+        if slot == "Room1" then
+            wait_until(function() return not event_gate.CanCollide end,
+                "eligible Event bridge opens after Room1", 5)
+            must(secret_gate.CanCollide,
+                "Secret bridge remains blocked until Room2")
+            print("[Optional Boss TEMP Gameplay] ROOM1_EVENT_OPEN_SECRET_CLOSED")
+        elseif slot == "Room2" then
+            wait_until(function() return not secret_gate.CanCollide end,
+                "eligible Secret bridge opens after Room2", 5)
+            print("[Optional Boss TEMP Gameplay] ROOM2_SECRET_GATE_OPEN")
+        end
         if slot == "SecretArena" then
             W:SetAttribute("DungeonMMOTempBacktrackGate", false)
             must(state_of() == "Cleared",

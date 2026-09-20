@@ -106,6 +106,9 @@ local DungeonEnvironmentRouter = require(
 local DungeonEncounterEnvironmentRuntime = require(
     Dungeon:WaitForChild("DungeonEncounterEnvironmentRuntime")
 )
+local DungeonOptionalEntranceGates = require(
+    Dungeon:WaitForChild("DungeonOptionalEntranceGates")
+)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -764,6 +767,15 @@ local function connect_enemy(enemy: Model, encounter_id: string)
                 end
             end
 
+            local updated_gates = DungeonOptionalEntranceGates.sync(
+                Workspace:FindFirstChild("DungeonMMOPlaceholderPhysicalContent"),
+                encounter_bindings, encounter_flow
+            )
+            if updated_gates.ok ~= true then
+                warn("[Dungeon Runtime] Side-room gate update failed: "
+                    .. tostring(updated_gates.reason))
+            end
+
             sync_all_character_encounters("")
 
             if flow_clear.next_binding then
@@ -1097,14 +1109,12 @@ local function bind_encounter_triggers()
             {
                 Slot = "EventArena",
                 Anchor = "Temple.Event.Trigger",
-                Message = "Event arena inactive for this run. "
-                    .. "An event must be active when you enter the dungeon.",
+                Message = "Event unavailable this run.",
             },
             {
                 Slot = "SecretArena",
                 Anchor = "Temple.Secret.Trigger",
-                Message = "Secret arena sealed for this run. "
-                    .. "The secret route was not unlocked at dungeon entry.",
+                Message = "Secret route unavailable this run.",
             },
         }) do
             if encounter_bindings.by_slot[inactive.Slot] == nil then
@@ -1131,6 +1141,44 @@ local function bind_encounter_triggers()
                         })
                     end)
                 end
+            end
+        end
+    end
+
+    -- Visible entrances are blocked independently of the invisible boss
+    -- trigger. Tell the player WHY the gate is still closed when approached.
+    local placeholder_root =
+        Workspace:FindFirstChild("DungeonMMOPlaceholderPhysicalContent")
+    if active_definition.Id == "TestDungeon" and placeholder_root then
+        for _, slot_id in ipairs({"EventArena", "SecretArena"}) do
+            local gate = DungeonOptionalEntranceGates.get(
+                placeholder_root, slot_id
+            )
+            if gate then
+                local last_notice: {[number]: number} = {}
+                gate.Touched:Connect(function(hit)
+                    if not gate.CanCollide or completion_pending
+                        or not active_session_id
+                    then
+                        return
+                    end
+                    local player = get_player_from_touch(hit)
+                    if not player then return end
+                    local now = os.clock()
+                    if now - (last_notice[player.UserId] or -100) < 8 then
+                        return
+                    end
+                    local open, message = DungeonOptionalEntranceGates.status(
+                        slot_id, encounter_bindings, encounter_flow
+                    )
+                    if open then return end
+                    last_notice[player.UserId] = now
+                    dungeon_state:FireClient(player, {
+                        state = "Active",
+                        objective = message,
+                        session_id = active_session_id,
+                    })
+                end)
             end
         end
     end
@@ -1233,8 +1281,15 @@ local function apply_recovery_plan(session: any): any
         end
     end
 
+    local recovered_gates = DungeonOptionalEntranceGates.sync(
+        Workspace:FindFirstChild("DungeonMMOPlaceholderPhysicalContent"),
+        encounter_bindings, encounter_flow
+    )
+    if recovered_gates.ok ~= true then
+        warn("[Dungeon Runtime] Side-room gate recovery failed: "
+            .. tostring(recovered_gates.reason))
+    end
     sync_all_character_encounters("")
-
     local next_binding = encounter_flow
         and encounter_flow:next_binding()
         or nil

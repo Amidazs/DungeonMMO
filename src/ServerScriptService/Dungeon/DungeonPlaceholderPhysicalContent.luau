@@ -126,6 +126,20 @@ local function bridge(
             Vector3.new(x, 1.5, z + side * (width_z / 2 - 0.5)),
             theme.Accent, Enum.Material.Slate, 0.1)
     end
+    -- An actual server-controlled entrance, not an encounter trigger.
+    -- Both optional paths are blocked until their prerequisite room clears;
+    -- an optional boss not selected for this run stays physically sealed.
+    -- Placed just outside the main room, across the whole bridge width.
+    local gate = part(model, "EntranceGate",
+        Vector3.new(2, 20, width_z + 1),
+        Vector3.new(theme.X + 37, 10, z),
+        theme.Accent, Enum.Material.Neon, 0.2)
+    gate.CanCollide = true
+    gate.CanTouch = true
+    gate.CastShadow = false
+    gate:SetAttribute("DungeonMMOOptionalEntranceGate", true)
+    gate:SetAttribute("DungeonMMOOptionalArena",
+        if name == "EventBridge" then "EventArena" else "SecretArena")
     return model
 end
 
