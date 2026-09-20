@@ -407,10 +407,19 @@ local function test()
     local health_before = remaining_health.Health
         + ally_health.Health
     remaining:SetAttribute("Phase4OptionalHealNow", true)
-    until_value(function()
+    local accepted_skill = until_value(function()
+        local character = remaining.Character
+        local skill = character
+            and character:GetAttribute("CurrentSkillId")
+        return skill == "MageHeal" or skill == "Mend"
+    end, "server accepted equipped healing skill", 4)
+    local healed_total = until_value(function()
         local total = remaining_health.Health + ally_health.Health
-        return total > health_before + 0.5 and total
-    end, "health restored by server-authoritative equipped skill", 9)
+        return total >= health_before + 12 and total
+    end, "substantial health restoration from equipped skill", 9)
+    print("[Two Client Defense] HEAL_SERVER_ACCEPTED "
+        .. tostring(accepted_skill) .. " gained="
+        .. tostring(healed_total - health_before))
     remaining:SetAttribute("Phase4OptionalHealNow", false)
     print("[Two Client Defense] REAL_SKILL_HEAL_PASS "
         .. remaining_health.Health .. "/" .. remaining_health.MaxHealth
