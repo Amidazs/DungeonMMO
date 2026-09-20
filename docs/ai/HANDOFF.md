@@ -1,5 +1,26 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — optional depth/event backend continuation
+
+Active integration branch: wip/phase-4-test-hud-integration-v1.
+The existing generic optional encounter catalogue already defines
+Event/Secret positions for Temple/Mine Depth1–4. Added focused
+per-depth plan/eligibility and timed-entry expiry/recovery regressions.
+RED tests exposed a hard-coded Room2 Secret gate that would open before
+higher-depth prerequisites, and Mine placeholder gates that remained
+closed forever. Fixed the shared gate prerequisite using frozen ordered
+bindings, and enabled the existing server-owned gate lifecycle and
+short blocked-entrance messaging for both named placeholder dungeons.
+Fresh 17/17 Studio focused suites PASS (712 optional depth, 116 event
+recovery, 32 gate assertions); assisted Temple/Mine Depth1 optional
+physical routes, 30/30 broad gameplay suites and four local Rojo builds
+PASS. See docs/testing/
+phase4-optional-depth-events-and-side-gates-2026-09-20.md.
+No Depth2–4 optional physical layout/bridge integration or higher-depth
+release switch has been done. Work next on explicitly opted-in TEMP
+higher-depth side-room physical layouts and route/recovery playtests,
+without touching finished art, TEST/PROD cloud places or DataStores.
+
 ## 20 September 2026 — Depth1–4 integration handoff
 
 Current branch: wip/phase-4-test-hud-integration-v1, worktree:
