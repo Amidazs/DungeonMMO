@@ -380,6 +380,53 @@ local function run()
         "all required rooms and final boss must remain cleared")
     check(#remaining == members_expected - 1,
         "party size must shrink by exactly one Studio disconnection")
+    local reward_commit = until_value(function()
+        local s = runtime.SessionService:get(id)
+        return s and s.State == "Complete"
+            and s.CompletionRewardsCommitted == true and s
+    end, "party completion rewards persisted", 20)
+    local recipient_ids = reward_commit.CompletionRecipients or {}
+    check(#recipient_ids == #remaining,
+        "completed dungeon must reward only connected surviving members")
+    local expected = {}
+    for _, player in ipairs(remaining) do
+        expected[player.UserId] = true
+    end
+    local old_gold = {}
+    local old_completion_counts = {}
+    for _, user_id in ipairs(recipient_ids) do
+        check(expected[user_id] == true,
+            "completion recipient must be a connected surviving member")
+        local member_result = reward_commit.CompletionRewardSummary
+            and reward_commit.CompletionRewardSummary[tostring(user_id)]
+        check(member_result and member_result.ok,
+            "persisted per-member completion reward must succeed")
+        local character = assert(
+            runtime.ProfileService:get_character(user_id, 1))
+        old_gold[user_id] = character.Gold
+        old_completion_counts[user_id] = history_count(
+            character.RewardHistory.Completion or {})
+    end
+    check(not expected[departed.UserId],
+        "departed player cannot re-enter completion recipient set")
+    local CompletionService = require(Dungeon.CompletionService)
+    local duplicate = CompletionService.new(
+        runtime.SessionService, runtime.RewardService,
+        runtime.ProfileService,
+        {XP = 1, GoldMin = 0, GoldMax = 0}
+    ):commit(id)
+    check(duplicate.ok and duplicate.already_applied,
+        "replaying party completion cannot grant the dungeon twice")
+    for _, user_id in ipairs(recipient_ids) do
+        local character = assert(
+            runtime.ProfileService:get_character(user_id, 1))
+        check(character.Gold == old_gold[user_id]
+            and history_count(character.RewardHistory.Completion or {})
+                == old_completion_counts[user_id],
+            "completion replay must preserve each member's rewards")
+    end
+    print("[Depth Party Optional] PER_MEMBER_COMPLETION_REPLAY_PASS "
+        .. tostring(#recipient_ids))
     print("[Depth Party Optional] MULTIPLAYER_DEPTH_PASS "
         .. dungeon_id .. " " .. depth_id
         .. " initial=" .. members_expected
