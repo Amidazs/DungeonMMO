@@ -1,5 +1,24 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — depth-specific optional events and shared side gates
+
+GitHub-first continuation on wip/phase-4-test-hud-integration-v1.
+Reproduced and fixed two defects: the Secret entrance had a hard-coded
+Room2 prerequisite (wrong for Depth2–4), and Mine placeholder Event/
+Secret gates were never synchronized because the controller recognized
+only Temple. Gate prerequisites now come from the frozen encounter
+binding order; both named synthetic dungeon roots use the same controller.
+Synthetic backend tests cover two dungeons × four depths × all four
+Event/Secret eligibility combinations and timed-event snapshot recovery.
+Fresh Studio: 712 depth/eligibility, 116 expiry/recovery, 32 gate
+assertions and 17/17 focused suites PASS. Assisted Temple and Mine
+Depth1 optional route fixtures PASS; 30/30 backend suites and four
+local Rojo compositions PASS. Evidence:
+docs/testing/phase4-optional-depth-events-and-side-gates-2026-09-20.md.
+Depth2–4 optional physical side-room layouts are NOT registered or
+playtested and their release switches remain unchanged. No cloud publish,
+DataStore, authored mesh or PROD changes.
+
 ## 20 September 2026 — four-depth progression backend verification
 
 On the existing integration branch, a GitHub-first test-only update
