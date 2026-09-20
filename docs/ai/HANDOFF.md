@@ -1,5 +1,18 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — ChatGPT-authored roadmap v1.48 handoff
+
+Read `docs/roadmap/DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md`
+after the unchanged historical v1.47 long-form roadmap. Local
+Depth2–4 optional geometry and six assisted walking routes have passed.
+The next backend gate is higher-depth party lifecycle across the existing
+Temple/Mine Event/Secret systems: 1/2/4-member frozen shared runs, duplicate
+spawn rejection on simultaneous touches, interrupted encounter/wipe/
+checkpoint recovery, and exactly-once per-member boss/completion rewards.
+Keep higher-depth and optional release locks OFF. Continue GitHub-first
+source edits and local Studio tests, but do not assume main merge, cloud
+publish, real same-account server rejoin or user DataStore acceptance.
+
 ## 20 September 2026 — six higher-depth optional physical routes
 
 Current integration branch: wip/phase-4-test-hud-integration-v1.
