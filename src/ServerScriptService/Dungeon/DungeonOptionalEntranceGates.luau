@@ -27,19 +27,53 @@ function Gates.get(root: Instance?, slot_id: string): BasePart?
     return nil
 end
 
+-- Finds the preceding required room in the frozen encounter plan.
+-- Args: slot_id (string): EventArena or SecretArena side entrance.
+--       bindings (any): Server-authoritative ordered encounter bindings.
+-- Returns: string?: Required room slot, or nil for a malformed plan.
+local function prerequisite_for(slot_id: string, bindings: any): string?
+    if type(bindings.ordered) ~= "table" then
+        -- Legacy Depth1 detached tests have no ordered binding array.
+        return ENTRANCES[slot_id].Prerequisite
+    end
+    for index, binding in ipairs(bindings.ordered) do
+        if binding.RoomSlotId == slot_id then
+            local preceding = bindings.ordered[index - 1]
+            if type(preceding) == "table"
+                and type(preceding.RoomSlotId) == "string"
+                and preceding.RoomSlotId:match("^Room%d+$")
+            then
+                return preceding.RoomSlotId
+            end
+            return nil
+        end
+    end
+    return nil
+end
+
+-- Reads entrance eligibility from the same frozen plan as the encounter.
+-- Args: slot_id (string): Optional arena to open or keep sealed.
+--       bindings (any): Saved run's resolved encounter bindings.
+--       flow (any): Current server-owned encounter lifecycle.
+-- Returns: boolean, string: Whether the gate opens and a short objective.
 function Gates.status(slot_id: string, bindings: any, flow: any): (boolean, string)
     local spec = ENTRANCES[slot_id]
     if not spec or not bindings or not flow then
         return false, "Entrance unavailable."
     end
-    if flow:state_for_slot(spec.Prerequisite) ~= "Cleared" then
-        return false, if slot_id == "EventArena"
-            then "Clear Room 1 first." else "Clear Room 2 first."
-    end
     if not bindings.by_slot or not bindings.by_slot[slot_id] then
         return false, if slot_id == "EventArena"
             then "Event unavailable this run."
             else "Secret route unavailable this run."
+    end
+    local prerequisite = prerequisite_for(slot_id, bindings)
+    if not prerequisite then
+        return false, "Entrance unavailable."
+    end
+    if flow:state_for_slot(prerequisite) ~= "Cleared" then
+        local number = prerequisite:match("^Room(%d+)$")
+        return false, if number then "Clear Room " .. number .. " first."
+            else "Clear preceding room first."
     end
     return true, ""
 end
