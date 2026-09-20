@@ -1,5 +1,20 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — optional boss normal-combat acceptance
+
+- [x] Real client combat defeats Temple Event at ordinary player HP.
+- [x] Real client combat defeats Temple Secret in a separate healthy
+  two-client run with no direct boss HP manipulation.
+- [x] Secret normal-combat fixture completed final dungeon progression
+  with assisted prerequisite/final-room combat and reward replay checks.
+- [ ] Same injured survivor beating Event then Secret without recovery:
+  local attempt FAILED; player died before Secret was defeated.
+- [ ] Complete ordinary-health unassisted combat across every room,
+  normal healing/dodge use, manual player navigation and true rejoin.
+
+Evidence: docs/testing/
+phase4-optional-boss-normal-combat-playtest-2026-09-20.md.
+
 ## 20 September 2026 — optional boss real two-client local fixture
 
 - [x] Two distinct local Studio clients in a shared eligible Temple run.
