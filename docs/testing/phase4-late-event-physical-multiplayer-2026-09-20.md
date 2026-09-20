@@ -130,8 +130,23 @@ physical walking playtest:
 `0.739.0.7390687_20260920T203830Z_Studio_17506_last.log`,
 `VERIFIED_PLAY_MODE_PASS TestDungeon Depth2`.
 
-Additional optional-disabled, broad-backend and four local Rojo
-composition results are recorded in the roadmap/test-matrix closeout.
+Fresh **optional-disabled** original four-room Temple Depth2
+Play-mode run:
+`0.739.0.7390687_20260920T203935Z_Studio_6EEBF_last.log`,
+`VERIFIED_PLAY_MODE_PASS TestDungeon Depth2`.
+The preexisting optional-enabled, after-Room1 six-encounter Temple
+Depth2 route also passed in the separate log immediately above.
+
+Fresh final local regression receipts:
+- `0.739.0.7390687_20260920T204125Z_Studio_FAFEE_last.log`:
+  `Late Event Physical Tests PASS: 85 assertions`,
+  `Optional Boss Studio Focus PASS: 24 edit-mode suites`.
+- `0.739.0.7390687_20260920T204057Z_Studio_F7283_last.log`:
+  `Phase4 Gameplay Matrix RESULT passed=30 total=30 failed=0`.
+- All **four local Rojo build compositions** passed:
+  Dungeon, Base, published-style Dungeon and published-style Base,
+  under TEMP `DungeonMMO_LateEvent_Final_*.rbxl`. These were local
+  build products, not cloud publishing.
 Do not treat a standalone planning test, a simulator's disconnected
 member or a detached recovered sequencer as proof of same-account
 network rejoin to a recreated reserved server.
