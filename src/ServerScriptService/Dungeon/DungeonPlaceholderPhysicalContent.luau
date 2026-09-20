@@ -339,6 +339,19 @@ local function playable_depth_optional(
             Vector3.new(room_x, 3, z + 6), "EncounterTrigger")
         anchor(parent, theme.Prefix, prefix .. "BossSpawn",
             Vector3.new(room_x, 2, z - 12), "BossSpawn")
+        if entry.Kind == "EventLate" then
+            -- Existing side room accepts two non-boss pack sizes as well.
+            -- Every spawn is within the independent 80 x 72 floor.
+            for index = 1, 8 do
+                local col = (index - 1) % 4
+                local row = math.floor((index - 1) / 4)
+                anchor(parent, theme.Prefix,
+                    prefix .. "EnemySpawn."
+                        .. string.format("%02d", index),
+                    Vector3.new(room_x - 21 + col * 14, 2,
+                        z - 12 + row * 15), "EnemySpawn")
+            end
+        end
     end
 end
 
