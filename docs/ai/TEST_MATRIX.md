@@ -1,5 +1,47 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — v1.52 combat Event variety / cross-profession backend
+
+- [x] Independently default-OFF new combat variation
+  selects exactly one frozen after-Room2 Ambush (4) or
+  Surge (8), Temple/Mine Depth2–4, using the generic
+  CombatPack executor, saved plan and existing timed event.
+- [x] 144 variation assertions: both seeds, both dungeons,
+  all higher depths, legacy defaults, one Event/one Secret,
+  spawn capacity, mismatched/unknown mechanic and boss
+  executor rejection, stable interrupted-run recovery.
+- [x] Actual assisted physical Temple Depth2 Ambush and
+  Mine Depth4 Surge runs: walk new side bridge in/out,
+  correct 4/8 count, per-enemy/Secret reward replay denial,
+  full dungeon completion.
+- [x] Two-client Temple and four-client Mine: concurrent
+  entrance starts exactly one pack, actual mid-fight Studio
+  disconnect preserves survivors and checkpoint,
+  detached interrupted encounter recovers Pending,
+  per-member combat and completion rewards persist once.
+- [x] Fresh original optional-enabled Temple Depth2 six
+  encounters and optional-disabled Temple Depth2 four
+  required encounters physically pass unchanged.
+- [x] 25/25 optional-focused, 30/30 general backend suites,
+  four local Rojo build compositions PASS.
+- [x] Bidirectional Blacksmithing/Alchemy recipe chain:
+  46 new assertions for real material inventory mutation,
+  correct minigame, equipped-item safety, missing material/
+  dupe prevention and save/reload output. 7/7 profession
+  focused suites PASS independently in local Base and
+  Dungeon compositions.
+- [ ] New Event mechanics remain default-OFF/local only;
+  truly staggered waves, cave-in, enemy AI/environment
+  hazards, Leatherworking and Enchanting, real secured
+  station interaction, actual user DataStore migration,
+  same-account cross-server reconnect, unassisted party
+  balance and cloud TEST/PROD remain unaccepted.
+
+Evidence: docs/testing/
+phase4-nonboss-event-profession-chain-2026-09-20.md.
+Roadmap: docs/roadmap/
+DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md.
+
 ## 20 September 2026 — physical after-Room2 Event v1.51
 
 - [x] Explicit, local-only Temple and Mine Depth2/3/4
