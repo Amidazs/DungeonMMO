@@ -89,6 +89,9 @@ function ProfileSchema.create_default(_user_id: number): any
                     Blacksmithing = {Level = 1, XP = 0},
                     Herbalism = {Level = 1, XP = 0},
                     Alchemy = {Level = 1, XP = 0},
+                    Skinning = {Level = 1, XP = 0},
+                    Leatherworking = {Level = 1, XP = 0},
+                    Enchanting = {Level = 1, XP = 0},
                 },
                 Quests = {
                     Version = 1,
