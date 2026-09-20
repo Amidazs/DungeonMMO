@@ -1,5 +1,40 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — v1.52 Event variation / profession backend handoff
+
+Read docs/roadmap/
+DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md
+and docs/testing/
+phase4-nonboss-event-profession-chain-2026-09-20.md.
+Previous after-Room2 side room now has eight spawn anchors and
+supports one independently opted-in 4-enemy Ambush or 8-enemy
+Surge per run via the existing CombatPack executor. Temple/Mine
+Depth2–4 supported. Saved run mechanic ID, encounter ID and
+pack ID prevent rerolls or reward identity collisions.
+Both normal Event-boss paths, optional Secret and original
+Depth1/Depth2 default routes remain compatible. No actual
+timed staggered wave, cave-in or novel enemy AI is included.
+
+The existing two profession services also gained a two-way
+Blacksmithing/Alchemy recipe dependency using two registered
+items: forging_flux and runic_ironbound_gloves. No new
+crafting service or new UI. New 46-assertion recipe chain
+and seven service/regression suites passed in both local
+Dungeon and Base places. All four Rojo builds, 25/25
+optional-focused and 30/30 broad backend suites passed.
+Independent assisted physical and actual party/disconnect
+runs passed for both combat pack sizes; see dated receipts.
+
+Continue backend-first with additional professions:
+Leatherworking and Enchanting definitions, acquisition,
+recipes, saved progression and anti-dupe/real station
+interaction tests. Reuse ProfessionService/Runtime,
+ProfessionDefinitions/Recipes, InventoryService and
+RecipeKnowledgeService, and avoid model/presentation changes.
+Only local test variants enabled new independently default-OFF
+Event switches; no TEST/PROD, actual DataStore, main
+merge or same-account network reconnect was performed.
+
 ## 20 September 2026 — v1.51 late Event physical/multiplayer closeout
 
 Read the latest
