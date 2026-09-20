@@ -15,9 +15,11 @@ local call="    identity_selection:FireServer(kind, selection_id)"
 assert(string.find(source,call,1,true),"Manual race request implementation changed")
 assert(not string.find(source,call,string.find(source,call,1,true)+#call,true),
     "Unexpected duplicate manual race request")
-original.Source=string.gsub(source,call,
-    '    -- TEMP: simulate a dropped server acknowledgement; no data change',1)
-    ..[=[
+local suppressed,count=string.gsub(source,
+    "identity_selection:FireServer%(kind, selection_id%)",
+    '    -- TEMP: suppress the race request; no profile write',1)
+assert(count==1,"TEMP fixture did not suppress the race request")
+original.Source=suppressed..[=[
 
 -- TEMP: exercise the real manual confirmation code without synthetic clicks.
 task.delay(4,function()
