@@ -13,6 +13,11 @@ local Sessions = require(Core.Services.DungeonSessionService)
 local Profiles = require(Core.Services.ProfileService)
 local Progression = require(Core.Services.DungeonDifficultyProgressionService)
 local Controller = require(Dungeon.DungeonEncounterRuntimeController)
+local Completion = require(Dungeon.CompletionService)
+local Rewards = require(Core.Services.RewardService)
+local Experience = require(Core.Services.ProgressionService)
+local Inventory = require(Core.Services.InventoryService)
+local Tuning = require(Core.Services.DungeonDifficultyTuning)
 
 local assertions = 0
 
@@ -101,6 +106,47 @@ local function clear_run(sessions: any, session_id: string, plan: {any})
     check(controller:is_complete(), "all required rooms must be complete")
 end
 
+-- Commits the actual completion reward and depth unlock for one run.
+-- Args: sessions (any): The saved session service for this run.
+--       session_id (string): Completed dungeon run.
+--       profiles (any): Current loaded player profiles.
+--       progression (any): Real difficulty progression service.
+--       dungeon_id (string): Dungeon whose completion reward is scaled.
+--       depth_id (string): Selected difficulty of the completed run.
+-- Returns: any: First successful committed completion result.
+local function commit_depth(
+    sessions: any,
+    session_id: string,
+    profiles: any,
+    progression: any,
+    dungeon_id: string,
+    depth_id: string
+): any
+    local definition = assert(Definitions.get(dungeon_id))
+    local tuning = assert(Tuning.resolve(dungeon_id, depth_id, nil))
+    local reward = Tuning.scale_completion_reward(
+        definition.CompletionReward, tuning
+    )
+    local rng = {
+        NextInteger = function(_, low: number) return low end,
+        NextNumber = function(_, low: number) return low end,
+    }
+    local rewards = Rewards.new(profiles, Experience.new(profiles),
+        Inventory.new(profiles), sessions, rng, function() return 1000 end)
+    local completion = Completion.new(
+        sessions, rewards, profiles, reward, nil, nil, nil, progression
+    )
+    local first = completion:commit(session_id)
+    check(first.ok and not first.already_applied,
+        "first completion commits rewards and difficulty unlock")
+    local replay = completion:commit(session_id)
+    check(replay.ok and replay.already_applied,
+        "same session cannot grant completion rewards again")
+    check(sessions:get(session_id).CompletionRewardsCommitted == true,
+        "session commits only after profile completion save")
+    return first
+end
+
 -- Exercises logical unlocks while preserving actual release/content locks.
 -- Args: dungeon_id (string): One independently tracked dungeon ladder.
 --       user_id (number): Disposable in-memory test profile identity.
@@ -157,13 +203,21 @@ local function verify_ladder(
         check(sessions:mark_connected(created.SessionId, user_id).ok,
             "dungeon session must become active")
         clear_run(sessions, created.SessionId, difficulty.EncounterSequence)
-        check(sessions:mark_complete(created.SessionId).ok,
-            "completed session must release the member for the next depth")
-        local recorded = progression:record_clear(
-            user_id, dungeon_id, depth_id
+        check(sessions:mark_complete(
+            created.SessionId, {user_id}
+        ).ok, "completed session must persist the reward recipient")
+        local initial_gold = profiles:get_character(user_id, 1).Gold
+        local first_clear = commit_depth(
+            sessions, created.SessionId, profiles, progression,
+            dungeon_id, depth_id
         )
-        check(recorded.ok and not recorded.already_completed,
-            "first clear must unlock this difficulty exactly once")
+        local recorded = first_clear.member_results[tostring(user_id)]
+            .difficulty_progress
+        check(recorded.ok and not recorded.already_completed
+            and recorded.completed_difficulty_id == depth_id,
+            "completion must unlock the correct depth exactly once")
+        check(profiles:get_character(user_id, 1).Gold > initial_gold,
+            "completion must grant scaled gold once before saving")
         check(progression:record_clear(
             user_id, dungeon_id, depth_id
         ).already_completed, "repeat clear must not unlock twice")
