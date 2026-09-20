@@ -1,5 +1,21 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — persisted session recovery follow-up
+
+Current integration branch wip/phase-4-test-hud-integration-v1.
+Added DungeonOptionalFullSessionRecoveryTest to the focused Studio
+runner; 42 checks pass for interrupted Event/Final/deferred Secret,
+checkpoint, two-member reconnect flags, original frozen eligibility,
+optional entrance barriers and persisted reward replay protection.
+15/15 focused suites and the existing assisted Temple backtracking
+physical fixture passed. Evidence and exact Studio logs:
+docs/testing/phase4-optional-full-session-recovery-2026-09-20.md.
+There were no production runtime changes or cloud/DataStore mutations.
+True same-account admission and a recreated live reserved Roblox server
+still require separate acceptance; cloud verification is deferred.
+The user explicitly confirmed a successful manual solo optional-boss
+playtest; do not repeat that test as an outstanding gameplay blocker.
+
 ## 20 September 2026 — optional Event/Secret consecutive gameplay
 
 The old no-healing injured-solo test remains FAILED. Do not conflate it
