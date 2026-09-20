@@ -1,5 +1,46 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — v1.52 Event combat variations and first broader profession backend
+
+The existing, server-frozen after-Room2 late Event slot now accepts
+one **non-boss** CombatPack instead of its previous boss where a
+disposable run explicitly enables the independent
+ServerScriptService DungeonMMOOptionalEventCombatEnabled switch.
+A deterministic saved Ambush (4 enemies) or Surge (8 enemies)
+is supported in both Temple and Mine Depth2–4; the late
+placeholder has eight dedicated spawn anchors. A shared
+Event/Secret frequency cap, verified placement, timed window,
+physical gate, checkpoint, generic executor and per-enemy
+idempotent reward service are reused. No additional Event,
+wave scheduler or environmental hazard was added. Old early/
+late optional bosses stay the defaults with new switches OFF.
+
+Fresh final 144 variation assertions, 25/25 optional-focused
+and 30/30 broad backend suites, four Rojo compositions PASS.
+Temple Depth2 Ambush (4) and Mine Depth4 Surge (8) assisted
+physical walking runs, actual two-/four-client concurrent
+pack trigger, mid-Event real Studio client disconnect, recovery
+and replay-proof completion PASS. The old optional-enabled
+after-Room1 and optional-disabled Temple Depth2 physical
+routes also passed.
+
+Broader backend milestone started: a bidirectional material
+recipe chain uses existing Mining, Blacksmithing, Herbalism,
+Alchemy, inventory, station catalogue, minigame contract and
+atomic profile mutation: iron bar → forging flux →
+runic ironbound gloves. 46 new atomic crafting/reload
+assertions and 7/7 profession suites passed in both local
+Dungeon and Base compositions. This is not completion
+of Leatherworking, Enchanting or secure live station/minigame
+interactions. No cloud publish, actual player DataStore,
+authored art or main merge occurred.
+
+Latest ChatGPT-authored roadmap:
+docs/roadmap/DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md.
+Test report:
+docs/testing/phase4-nonboss-event-profession-chain-2026-09-20.md.
+Historical canonical v1.47 DOCX is unchanged.
+
 ## 20 September 2026 — v1.51 after-Room2 late Event is physically playable in unpublished Studio
 
 GitHub-first implementation registered a distinct EventArenaLate side
