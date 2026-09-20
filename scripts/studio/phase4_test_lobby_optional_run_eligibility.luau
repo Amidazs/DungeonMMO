@@ -67,17 +67,19 @@ local function verify(origin: string, enabled: boolean)
         local evaluated=policy.evaluate(
             {OptionalEncounters=content.for_difficulty("TestDungeon","Depth1")},
             "Depth1",layout.Slots,true,run)
+        local count=if type(evaluated.encounters)=="table"
+            then #evaluated.encounters else -1
         print("[Phase4 Optional Origin] POLICY "..origin
             .." ok="..tostring(evaluated.ok)
-            .." count="..tostring(#evaluated.encounters)
+            .." count="..tostring(count)
             .." reason="..tostring(evaluated.reason)
             .." event="..tostring(run.OptionalBossEventActive)
             .." secret="..tostring(run.OptionalBossSecretUnlocked)
             .." eventSlot="..tostring(layout.Slots.EventArena~=nil)
             .." secretSlot="..tostring(layout.Slots.SecretArena~=nil))
-        assert(evaluated.ok and #evaluated.encounters==2,
+        assert(evaluated.ok and count==2,
             "Event/Secret boss omitted from "..origin.." frozen plan: "
-            ..tostring(evaluated.reason).." count="..#evaluated.encounters)
+            ..tostring(evaluated.reason).." count="..count)
         print("[Phase4 Optional Origin] "..string.upper(origin)
             .."_EVENT_AND_SECRET_FROZEN_AT_ENTRY_PASS")
     else
