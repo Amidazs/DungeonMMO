@@ -1,5 +1,43 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — v1.51 after-Room2 late Event is physically playable in unpublished Studio
+
+GitHub-first implementation registered a distinct EventArenaLate side
+room/bridge/gate, depth-specific trigger, checkpoint and boss spawn in
+the replaceable Temple and Mine Depth2/3/4 Studio blockouts. The
+independent Workspace DungeonMMOPlaceholderLateEventPlayEnabled
+and ServerScriptService DungeonMMOOptionalBossTemplatesEnabled
+opt-ins remain OFF in ordinary source; higher-depth and original
+optional release switches are unchanged. One Event and one Secret
+maximum per run. The existing server-owned gate controller opens
+the selected late entrance only after required Room2 is Cleared,
+leaving the original early Event and Depth1 bridges sealed. A
+reconstructed encounter retains the late boss, slot, checkpoint
+and stable encounter-scoped reward identity.
+
+Fresh local acceptance: 85 physical/gate assertions across both
+dungeons and Depth2–4, 24/24 optional-focused suites, 30/30
+broader gameplay backend suites, four local Rojo builds PASS.
+Actual assisted Humanoid:MoveTo physical runs traversed the late
+side bridge and completed Temple Depth2 (six encounters) and
+Mine Depth4 (eight encounters). Independent two-client Temple
+Depth2 and four-client Mine Depth4 Studio runs verified one
+boss under concurrent approach, real mid-late-Event client
+disconnection, surviving party progression, restored Pending
+late Event without resetting Rooms1/2, distinct reused-boss
+rewards and replay-proof per-member completion. The old
+after-Room1 optional-enabled and fully optional-disabled
+Temple Depth2 walking routes passed unchanged.
+
+Detailed receipts and previous one-line fixture test correction:
+docs/testing/phase4-late-event-physical-multiplayer-2026-09-20.md.
+Latest ChatGPT-authored roadmap:
+docs/roadmap/DungeonMMO_Roadmap_v1_51_Late_Event_Physical_Acceptance.md.
+The unmodified canonical v1.47 DOCX, v1.48–v1.50 supplements,
+real player DataStores, PROD/TEST cloud place and authored models
+remain preserved. Real same-account network reconnect and
+unassisted whole-party combat are unverified.
+
 ## 20 September 2026 — configurable optional Event placement v1.50
 
 GitHub-first code added one authoritative optional placement catalogue,
