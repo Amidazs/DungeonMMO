@@ -77,6 +77,14 @@ local function restore_states(
             snapshot.EncounterStates[encounter.Id]
         if state == "Cleared" or state == "Skipped" then
             states[encounter.Id] = state
+        elseif state == "Active"
+            and snapshot.DeferredSecretActiveEncounterId == encounter.Id
+            and encounter.Kind == "SecretBoss"
+            and encounter.CompletionRequired == false
+        then
+            -- Recover an interrupted backtracked side fight as still available,
+            -- without moving the required encounter cursor backwards.
+            states[encounter.Id] = "Skipped"
         end
     end
 
@@ -104,6 +112,7 @@ function DungeonEncounterSequencer.new(
             snapshot
         ),
         _active_id = nil,
+        _deferred_secret_active_id = nil,
     }, DungeonEncounterSequencer)
 end
 local function resolved_state(state: string?): boolean
@@ -160,6 +169,37 @@ function DungeonEncounterSequencer:start(
         encounter_id = encounter_id,
     })
 end
+
+-- Runs an already-bypassed optional Secret as a side encounter without
+-- rewinding the required route or allowing other optional/required bosses.
+function DungeonEncounterSequencer:start_skipped_secret(encounter_id: string): any
+    local index = self._index_by_id[encounter_id]
+    local encounter = index and self._encounters[index]
+    if not encounter or encounter.Kind ~= "SecretBoss"
+        or encounter.CompletionRequired ~= false
+    then
+        return operation(false, "NotDeferredSecretBoss")
+    end
+    if self._active_id ~= nil then
+        return operation(false, "AnotherEncounterActive")
+    end
+    if self._states[encounter_id] ~= "Skipped" then
+        return operation(false, "SecretNotDeferred")
+    end
+    -- After the final required room is cleared the run is closed to side
+    -- fights. The remaining main encounter must exist and be Pending.
+    local next_id = self:next_id()
+    if self:is_complete() or next_id == nil
+        or self._states[next_id] ~= "Pending"
+    then
+        return operation(false, "DeferredSecretRunNotActive")
+    end
+    self._states[encounter_id] = "Active"
+    self._active_id = encounter_id
+    self._deferred_secret_active_id = encounter_id
+    return operation(true, nil, {encounter_id = encounter_id})
+end
+
 -- Returns one active encounter to Pending after execution setup fails.
 function DungeonEncounterSequencer:cancel_active(
     encounter_id: string
@@ -175,8 +215,11 @@ function DungeonEncounterSequencer:cancel_active(
         return operation(false, "EncounterNotActive")
     end
 
-    self._states[encounter_id] = "Pending"
+    self._states[encounter_id] =
+        if self._deferred_secret_active_id == encounter_id
+            then "Skipped" else "Pending"
     self._active_id = nil
+    self._deferred_secret_active_id = nil
 
     return operation(true, nil, {
         encounter_id = encounter_id,
@@ -207,6 +250,7 @@ function DungeonEncounterSequencer:clear(
 
     self._states[encounter_id] = "Cleared"
     self._active_id = nil
+    self._deferred_secret_active_id = nil
 
     return operation(true, nil, {
         already_cleared = false,
@@ -275,6 +319,7 @@ function DungeonEncounterSequencer:snapshot(): any
         Version = 1,
         EncounterStates = encounter_states,
         ActiveEncounterId = self._active_id,
+        DeferredSecretActiveEncounterId = self._deferred_secret_active_id,
         NextEncounterId = self:next_id(),
     }
 end

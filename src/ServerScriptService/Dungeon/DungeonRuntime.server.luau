@@ -798,6 +798,7 @@ end
 -- Starts, spawns and registers one physical slot as a single transaction.
 local function start_executed_slot(room_slot_id: string): any?
     if not active_session_id
+        or completion_pending
         or not encounter_execution_controller
         or not encounter_service
     then
@@ -1059,9 +1060,13 @@ local function bind_encounter_triggers()
             if binding.Kind == "SecretBoss" then
                 local next_binding = encounter_flow
                     and encounter_flow:next_binding()
-                if not next_binding
-                    or next_binding.PlanEncounterId ~= binding.PlanEncounterId
-                    or not active_session_id
+                local deferred = encounter_flow
+                    and encounter_flow:state_for_slot(room_slot_id) == "Skipped"
+                    and next_binding ~= nil
+                    and not encounter_flow:is_complete()
+                if not active_session_id or completion_pending
+                    or (not deferred and (not next_binding
+                        or next_binding.PlanEncounterId ~= binding.PlanEncounterId))
                 then
                     return
                 end
@@ -1076,6 +1081,58 @@ local function bind_encounter_triggers()
             end
             start_executed_slot(room_slot_id)
         end)
+    end
+
+    -- Optional side arenas can be physically present even when the
+    -- server-authoritative encounter plan did not select their boss.
+    -- Provide a targeted, throttled explanation instead of a silent door;
+    -- do not insert an encounter, enable an event, or reveal hidden rewards.
+    local session = current_session()
+    if active_definition.Id == "TestDungeon"
+        and session and session.Difficulty
+        and session.Difficulty.Id == "Depth1"
+        and active_definition.OptionalBossRuntimeEnabled == true
+    then
+        for _, inactive in ipairs({
+            {
+                Slot = "EventArena",
+                Anchor = "Temple.Event.Trigger",
+                Message = "Event arena inactive for this run. "
+                    .. "An event must be active when you enter the dungeon.",
+            },
+            {
+                Slot = "SecretArena",
+                Anchor = "Temple.Secret.Trigger",
+                Message = "Secret arena sealed for this run. "
+                    .. "The secret route was not unlocked at dungeon entry.",
+            },
+        }) do
+            if encounter_bindings.by_slot[inactive.Slot] == nil then
+                local marker = environment:get(inactive.Anchor)
+                if marker and marker:IsA("BasePart") then
+                    marker.CanTouch = true
+                    marker.CanCollide = false
+                    local last_notice: {[number]: number} = {}
+                    marker.Touched:Connect(function(hit)
+                        if completion_pending or not active_session_id then
+                            return
+                        end
+                        local player = get_player_from_touch(hit)
+                        if not player then return end
+                        local now = os.clock()
+                        if now - (last_notice[player.UserId] or -100) < 8 then
+                            return
+                        end
+                        last_notice[player.UserId] = now
+                        dungeon_state:FireClient(player, {
+                            state = "Active",
+                            objective = inactive.Message,
+                            session_id = active_session_id,
+                        })
+                    end)
+                end
+            end
+        end
     end
 
     encounter_triggers_bound = true

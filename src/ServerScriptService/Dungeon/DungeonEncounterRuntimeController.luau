@@ -185,6 +185,22 @@ function DungeonEncounterRuntimeController:find_by_room_slot(
     return nil
 end
 
+-- Starts a previously bypassed Secret without rewinding the main path.
+function DungeonEncounterRuntimeController:start_skipped_secret(encounter_id: string): any
+    local started = self._sequencer:start_skipped_secret(encounter_id)
+    if started.ok ~= true then
+        return started
+    end
+    local persisted = self:_persist()
+    if persisted.ok ~= true then
+        -- Failed storage must never leave an active in-memory side boss
+        -- preventing the player from continuing the normal dungeon route.
+        self._sequencer:cancel_active(encounter_id)
+        return persisted
+    end
+    return started
+end
+
 -- Returns one encounter descriptor by stable encounter ID.
 function DungeonEncounterRuntimeController:get(
     encounter_id: string

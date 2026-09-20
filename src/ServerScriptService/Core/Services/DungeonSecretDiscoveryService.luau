@@ -22,16 +22,19 @@ local function eligible_unlock(state: any, encounter_id: string): string?
     local runtime = state.EncounterRuntime
     if type(plan) ~= "table" or type(runtime) ~= "table"
         or type(runtime.EncounterStates) ~= "table"
-        or (runtime.NextEncounterId ~= nil
-            and runtime.NextEncounterId ~= encounter_id)
+        or runtime.ActiveEncounterId ~= nil
     then
         return nil
     end
     for _, encounter in ipairs(plan) do
         local progress = runtime.EncounterStates[encounter.Id]
         if encounter.Id == encounter_id then
-            if encounter.Kind ~= "SecretBoss" or progress ~= "Pending"
+            if encounter.Kind ~= "SecretBoss"
+                or (progress ~= "Pending" and progress ~= "Skipped")
                 or type(state.OptionalBossSecretUnlocks) ~= "table"
+                or (progress == "Pending"
+                    and runtime.NextEncounterId ~= nil
+                    and runtime.NextEncounterId ~= encounter_id)
             then
                 return nil
             end
@@ -40,6 +43,29 @@ local function eligible_unlock(state: any, encounter_id: string): string?
                 elseif encounter.BossId == "AbandonedMineSecretBoss"
                 then "MineSealedGallery" else nil
             if unlock_id and state.OptionalBossSecretUnlocks[unlock_id] == true then
+                if progress == "Skipped" then
+                    -- A side encounter is only available before the final
+                    -- required encounter is cleared. The main route must
+                    -- remain Pending after the bypassed Secret.
+                    local next_id = runtime.NextEncounterId
+                    if type(next_id) ~= "string" or next_id == "" then
+                        return nil
+                    end
+                    local later = false
+                    for _, other in ipairs(plan) do
+                        if other.Id == encounter_id then
+                            later = true
+                        elseif later and other.Id == next_id then
+                            if other.CompletionRequired ~= false
+                                and runtime.EncounterStates[next_id] == "Pending"
+                            then
+                                return unlock_id
+                            end
+                            return nil
+                        end
+                    end
+                    return nil
+                end
                 return unlock_id
             end
             return nil

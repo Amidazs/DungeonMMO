@@ -58,9 +58,30 @@ check(sessions:get(id).InstanceState.OptionalBossSecretDiscoveries.TempleHiddenS
 check(service:discover(id,99001,eid,1).already_discovered==true,"discovery replay idempotent")
 local restored=Discovery.new(Sessions.new(map,function() return 100 end))
 check(restored:discover(id,99001,eid,0).already_discovered==true,"new service recovers discovery")
-assert(sessions:update_instance_state(id,function(s) s.EncounterRuntime.EncounterStates[eid]="Skipped";return s end).ok)
-check(not service:discover(id,99001,eid,0).ok,"skipped route cannot be reopened")
-assert(sessions:update_instance_state(id,function(s) s.EncounterRuntime.EncounterStates[eid]="Pending";s.OptionalBossSecretUnlocks={};return s end).ok)
+assert(sessions:update_instance_state(id,function(s) s.EncounterRuntime.EncounterStates[eid]="Skipped";s.EncounterRuntime.NextEncounterId="Final";return s end).ok)
+check(service:discover(id,99001,eid,0).ok,
+ "previously bypassed secret may be discovered after clearing room 2")
+assert(sessions:update_instance_state(id,function(s)
+ s.EncounterRuntime.ActiveEncounterId="Final"
+ return s
+end).ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "cannot begin deferred secret while another encounter is active")
+assert(sessions:update_instance_state(id,function(s)
+ s.EncounterRuntime.ActiveEncounterId=nil
+ s.EncounterRuntime.EncounterStates.Final="Cleared"
+ s.EncounterRuntime.NextEncounterId=nil
+ return s
+end).ok)
+check(not service:discover(id,99001,eid,0).ok,
+ "cannot begin deferred secret after final room")
+assert(sessions:update_instance_state(id,function(s)
+ s.EncounterRuntime.EncounterStates.Final="Pending"
+ s.EncounterRuntime.NextEncounterId="Final"
+ s.EncounterRuntime.EncounterStates[eid]="Pending"
+ s.OptionalBossSecretUnlocks={}
+ return s
+end).ok)
 check(not service:discover(id,99001,eid,0).ok,"discovery requires run eligibility even on replay")
 local failSessions={get=function() return sessions:get(id) end,update_instance_state=function() return {ok=false,reason="StoreFailed"} end}
 assert(sessions:update_instance_state(id,function(s) s.OptionalBossSecretUnlocks.TempleHiddenSanctum=true;return s end).ok)

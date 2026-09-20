@@ -45,9 +45,11 @@ function DungeonEncounterFlow:start_slot(
         return operation(false, "UnknownRoomSlot")
     end
 
-    local started = self._controller:start(
-        binding.PlanEncounterId
-    )
+    local deferred = binding.Kind == "SecretBoss"
+        and self._controller:state_of(binding.PlanEncounterId) == "Skipped"
+    local started = if deferred
+        then self._controller:start_skipped_secret(binding.PlanEncounterId)
+        else self._controller:start(binding.PlanEncounterId)
     if started.ok ~= true then
         return started
     end
