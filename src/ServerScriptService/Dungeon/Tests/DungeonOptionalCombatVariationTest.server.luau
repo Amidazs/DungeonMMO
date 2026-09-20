@@ -73,6 +73,15 @@ for _, dungeon_id in ipairs({"TestDungeon", "AbandonedMine"}) do
                 depth_id, slots, true, state)
             check(chosen.ok and #chosen.encounters == 2,
                 "exactly one combat Event and one optional Secret are selected")
+            local invalid_event = table.clone(entries[1])
+            invalid_event.Encounter = table.clone(event)
+            invalid_event.Encounter.ExecutorId = "Boss"
+            invalid_event.Encounter.BossId = "TempleEventBoss"
+            check(Policy.evaluate({
+                OptionalEncounters = {invalid_event, entries[2]},
+            }, depth_id, slots, true, state).reason
+                == "OptionalBossIdentityInvalid",
+                "combat-kind event cannot smuggle a boss executor")
             local materialized = Plan.materialize(
                 difficulty.EncounterSequence, chosen.encounters, state)
             check(materialized.ok
