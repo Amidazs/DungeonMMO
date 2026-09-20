@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**20 September Depth2–4 optional physical checkpoint (after v1.47):**
+GitHub-first edits added separate, opt-in TEMP Event/Secret side rooms,
+bridges, physical gates and unique anchors to Temple and Mine Depth2,
+Depth3 and Depth4. All six independent local Studio Play-mode routes
+passed actual walking traversal into/out of both optional rooms,
+server encounter activation/spawn identity and final dungeon
+completion with assisted combat (6/7/8 encounters by difficulty).
+A seventh Mine Depth4 run physically skipped Secret, returned to
+clear it and then defeated Final, using a TEMP-only final-spawn hold.
+New structural test: 139 assertions; optional focused suites 18/18;
+broad backend matrix 30/30. The original optional-disabled Temple
+Depth2 four-room route passed and all four local Rojo compositions
+built. High-depth release flags, authored models, Roblox cloud places,
+user DataStores and the canonical DOCX remain untouched. Evidence:
+`docs/testing/phase4-depth2-4-optional-physical-playtest-2026-09-20.md`.
+
 **20 September depth-specific optional event backend checkpoint
 (after v1.47):** Existing Temple/Mine Event/Secret encounter definitions
 were validated across Depth1–4 and all independent eligibility
