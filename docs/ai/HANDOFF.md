@@ -1,5 +1,19 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — normal combat follow-up
+
+GitHub-first source changes were fast-forward pulled for local Studio
+combat fixtures. Real client attacks defeated Event independently
+and Secret independently with normal player health. The same injured
+surviving player died attempting Secret immediately after Event; do NOT
+claim the combined sequence passed. Secret succeeded in a separate
+healthy two-player run; all optional boss defeats used normal server
+combat damage. Prerequisite packs and final room were assisted, and
+player positioning was scripted. See docs/testing/
+phase4-optional-boss-normal-combat-playtest-2026-09-20.md.
+Next: legit healing/defense and consecutive optional boss survivability;
+manual end-to-end and true rejoin remain separate acceptance gates.
+
 ## 20 September 2026 — two-client optional-boss gameplay tested
 
 Current integration branch wip/phase-4-test-hud-integration-v1;
