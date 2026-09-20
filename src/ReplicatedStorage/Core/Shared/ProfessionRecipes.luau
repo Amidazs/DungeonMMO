@@ -79,6 +79,39 @@ local RECIPES = table.freeze({
         }),
         XP = 20,
     }),
+    distill_forging_flux = table.freeze({
+        Id = "distill_forging_flux",
+        Name = "Distill Forging Flux",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+            -- The alchemist needs a bar made by a blacksmith.
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        XP = 25,
+    }),
+    forge_runic_ironbound_gloves = table.freeze({
+        Id = "forge_runic_ironbound_gloves",
+        Name = "Forge Runic Ironbound Gloves",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "ironbound_gloves", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            -- The smith cannot finish these without Alchemy's flux.
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "runic_ironbound_gloves", Quantity = 1,
+        }),
+        XP = 35,
+    }),
     temper_ironbound_gloves = table.freeze({
         Id = "temper_ironbound_gloves",
         Name = "Temper Ironbound Gloves",
@@ -102,10 +135,12 @@ local STATION_ORDER = table.freeze({
         "forge_ironbound_gloves",
         "forge_blueprinted_ironbound_gloves",
         "temper_ironbound_gloves",
+        "forge_runic_ironbound_gloves",
     }),
     Alchemy = table.freeze({
         "distill_tempering_oil",
         "distill_blueprinted_tempering_oil",
+        "distill_forging_flux",
     }),
 })
 
