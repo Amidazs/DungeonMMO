@@ -5,6 +5,9 @@ local Rules = require(script.Parent:WaitForChild("DungeonOptionalBossRules"))
 local Catalog = require(game:GetService("ReplicatedStorage")
     :WaitForChild("Core"):WaitForChild("Shared")
     :WaitForChild("DungeonOptionalBossVariantCatalog"))
+local Templates = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalEncounterTemplateCatalog"))
 
 -- Legacy default identities are catalog index 1; the opt-in path only
 -- changes a newly issued run, never an existing saved snapshot.
@@ -37,6 +40,7 @@ local function disabled_snapshot(): any
         OptionalBossEnabled = false,
         OptionalBossEventActive = false,
         OptionalBossEventId = nil,
+        OptionalBossEventTemplateId = nil,
         OptionalBossEventWindows = {},
         OptionalBossSecretUnlocked = false,
         OptionalBossSecretUnlocks = {},
@@ -95,7 +99,8 @@ function DungeonOptionalBossRunState.issue(
     entered_at: number,
     session_seed: number,
     options: any?,
-    release_enabled: boolean
+    release_enabled: boolean,
+    difficulty_id: string?
 ): any
     local state = disabled_snapshot()
     if Catalog.count(dungeon_id, "Event") == 0
@@ -123,6 +128,21 @@ function DungeonOptionalBossRunState.issue(
     state.OptionalBossEventId = if window
         then event_variant.Id else nil
     if window then
+        -- Choose a late placement only for a depth that has a registered
+        -- template. A physical late arena is separately required by policy.
+        -- Default and legacy saved runs retain the original Event room.
+        local template_id = "EventAfterRoom1"
+        local template_opt_in = type(options) == "table"
+            and options.optional_boss_templates_enabled == true
+        if template_opt_in and session_seed % 2 == 1
+            and Templates.get(dungeon_id, difficulty_id or "",
+                "Event", "EventAfterRoom2")
+        then
+            template_id = "EventAfterRoom2"
+        end
+        if template_opt_in then
+            state.OptionalBossEventTemplateId = template_id
+        end
         state.OptionalBossEventWindows[event_variant.Id] = window
     end
     state.OptionalBossSecretUnlocked = secret
