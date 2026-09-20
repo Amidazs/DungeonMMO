@@ -161,6 +161,44 @@ local DEFINITIONS = table.freeze({
         Stackable = true,
     }),
 
+    raw_hide = table.freeze({
+        Id = "raw_hide",
+        Name = "Raw Hide",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+    }),
+
+    cured_leather = table.freeze({
+        Id = "cured_leather",
+        Name = "Cured Leather",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+    }),
+
+    warding_essence = table.freeze({
+        Id = "warding_essence",
+        Name = "Warding Essence",
+        Kind = "Material",
+        Category = "Reagent",
+        InventoryCategory = "Reagents",
+        Rarity = "Uncommon",
+        Stackable = true,
+    }),
+
+    warding_rune = table.freeze({
+        Id = "warding_rune",
+        Name = "Warding Rune",
+        Kind = "Material",
+        Category = "Reagent",
+        InventoryCategory = "Reagents",
+        Rarity = "Uncommon",
+        Stackable = true,
+    }),
+
     forging_flux = table.freeze({
         Id = "forging_flux",
         Name = "Forging Flux",
@@ -193,6 +231,38 @@ local DEFINITIONS = table.freeze({
         Stackable = false,
         CombatModifiers = table.freeze({
             MaxHealthFlat = 5,
+        }),
+    }),
+
+    leatherbound_gloves = table.freeze({
+        Id = "leatherbound_gloves",
+        Name = "Leatherbound Gloves",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Gloves",
+        Category = "CraftedArmor",
+        AllowedBaseClasses = ALL_CLASSES,
+        Rarity = "Basic",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 4,
+            CriticalChanceBonus = 0.01,
+        }),
+    }),
+
+    warded_leatherbound_gloves = table.freeze({
+        Id = "warded_leatherbound_gloves",
+        Name = "Warded Leatherbound Gloves",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Gloves",
+        Category = "CraftedArmor",
+        AllowedBaseClasses = ALL_CLASSES,
+        Rarity = "Rare",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 7,
+            CriticalChanceBonus = 0.03,
         }),
     }),
 
