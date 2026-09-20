@@ -1,5 +1,20 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — normal optional-boss combat evidence
+
+Two separate local two-client Studio fixtures defeated TempleEventBoss
+and TempleSecretBoss using real client attack inputs at ordinary character
+health; optional boss HP was never directly changed by the test harness.
+The combined back-to-back solo-survivor attempt FAILED: after beating
+Event with 34/113 HP remaining, the player died against Secret at
+56.7/120 HP. A separate two-client Secret fight PASSED with a healthy
+party (survivor 70.6/113 HP). The test driver positioned combatants and
+assisted prerequisite rooms/final boss. Continue testing legitimate
+healing/defense/party play before accepting the consecutive encounter
+route. Evidence: docs/testing/
+phase4-optional-boss-normal-combat-playtest-2026-09-20.md.
+No cloud publish or player DataStore changes occurred.
+
 ## 20 September 2026 — real local Studio two-client optional-boss pass
 
 On integration source c571552, two simulated Studio clients were admitted
