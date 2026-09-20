@@ -1,10 +1,10 @@
 # DungeonMMO Roadmap v1.48 — Phase 4 backend milestone update
 
-**Date:** 20 September 2026  
-**Status:** Versioned supplement to the canonical long-form `DungeonMMO_Roadmap_v1_47.docx`. Historical v1.47 content is preserved.  
-**Active phase:** Phase 4 — Content Alpha (backend-first).  
-**Source branch:** `wip/phase-4-test-hud-integration-v1`.  
-**Verified GitHub and Windows worktree checkpoint:** `cfb35d0c98c8701ec34388be8dad4ce72a57e3f9`.  
+**Date:** 20 September 2026
+**Status:** Versioned supplement to the canonical long-form `DungeonMMO_Roadmap_v1_47.docx`. Historical v1.47 content is preserved.
+**Active phase:** Phase 4 — Content Alpha (backend-first).
+**Source branch:** `wip/phase-4-test-hud-integration-v1`.
+**Verified GitHub and Windows worktree checkpoint:** `cfb35d0c98c8701ec34388be8dad4ce72a57e3f9`.
 **Pre-higher-depth-optional rollback tag:** `phase4-before-depth-optional-physical-20260920` at `924bcbe15802bcafe56c938564f2210dc28f466c`.
 
 This update supersedes earlier *next-step* notes about adding Depth 2–4 optional placeholder side rooms. It does not change the accepted historical record or imply that the integration branch has been merged to main or published to Roblox.
