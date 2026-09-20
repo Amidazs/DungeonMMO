@@ -971,6 +971,14 @@ identity_selection_request.OnServerEvent:Connect(
         selection_id: any
     )
         if loaded_users[player.UserId] ~= true then
+            -- Do not silently strand the player on the race/class screen.
+            -- This does not create, reset or modify any player profile.
+            warn("[Base Identity] Selection blocked: profile is not loaded.")
+            progression_action_result:FireClient(player, {
+                action = "IdentitySelection",
+                ok = false,
+                reason = "ProfileNotLoaded",
+            })
             return
         end
 
