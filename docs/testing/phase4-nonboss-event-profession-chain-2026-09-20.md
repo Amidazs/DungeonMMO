@@ -139,9 +139,27 @@ All four local Rojo compositions (Dungeon, Base, published-
 style Dungeon, published-style Base) built successfully,
 with no cloud publish.
 
-The original optional-boss/default after-Room1 route remains
-unchanged in source; see its final Play-mode regression
-receipt in the latest roadmap/test-matrix closeout.
+**Fresh normal-route Play-mode regressions after adding both mechanics:**
+
+- `0.739.0.7390687_20260920T211303Z_Studio_D8216_last.log`:
+  `[Depth Optional Physical] PLAY_PASS TestDungeon Depth2 rooms=6`
+  and `VERIFIED_PLAY_MODE_PASS TestDungeon Depth2`. This is the
+  original after-Room1 Event and before-final Secret with the
+  new non-boss and late-template switches **OFF**.
+- `0.739.0.7390687_20260920T211912Z_Studio_586AE_last.log`:
+  `[Phase4 Depth Full] PASS TestDungeon Depth2 rooms=4`
+  and `VERIFIED_PLAY_MODE_PASS TestDungeon Depth2`. Here all
+  optional content remains **OFF** and the original four
+  required rooms are traversed with test-assisted defeats.
+
+**Separate Base composition profession regression:**
+`0.739.0.7390687_20260920T211926Z_Studio_EFDA9_last.log`:
+`[Profession Backend Focus] RESULT passed=7 total=7 failed=0`.
+This second, independent Base-local run includes the same
+46-assertion atomic crafting test with in-memory profiles.
+
+All this evidence comes from local, unpublished Rojo builds, not
+cloud TEST/PROD publishing or an actual account DataStore.
 
 ## Next *larger backend* increment
 
