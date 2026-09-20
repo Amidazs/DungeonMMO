@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.49 (dynamic optional boss variants, 20 September 2026).**
+Read [the v1.49 dynamic optional boss roadmap update](DungeonMMO_Roadmap_v1_49_Phase4_Dynamic_Optional_Variants.md)
+and its [verified multiplayer/physical test report](../testing/phase4-dynamic-optional-boss-variants-2026-09-20.md).
+Two server-issued Event/Secret variants per Temple/Mine dungeon are
+now supported behind a new independent server-only opt-in, using
+already implemented boss factories as placeholders. Their identities
+are frozen per run; the previous two hard-coded Secret identities
+were generalized in the existing discovery service, and reused
+optional/miniboss factories now earn separate encounter-scoped rewards.
+A 2,205-assertion variant matrix, 232 discovery assertions, 80 distinct
+reward assertions, 22/22 focused suites, 30/30 broader backend suites,
+two assisted alternate-boss physical routes, one variant-disabled
+baseline and a 4-client Mine Depth4 alternate party run all passed
+locally. No TEST/PROD publish, DataStore change, authored art,
+released depth or historical canonical DOCX modification occurred.
+
 **20 September higher-depth multiplayer lifecycle checkpoint (after v1.48):**
 Two- and four-client local Temple/Mine Depth2/4 runs passed shared
 frozen optional-boss plans, one boss for concurrent Event/Secret
@@ -18,15 +34,14 @@ optional release locks remain OFF. Full dated evidence:
 The ChatGPT-authored v1.48 roadmap supplement records the new status;
 historical canonical v1.47 DOCX is preserved.
 
-**Latest ChatGPT-authored roadmap update: v1.48 (Phase 4 backend supplement, 20 September 2026).**
+**Historical v1.48 Phase 4 backend supplement (20 September 2026).**
 Read [the v1.48 Phase 4 backend roadmap update](DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md)
 for completed higher-depth optional physical playtesting, precise
-local-vs-cloud acceptance boundaries, and the next backend milestone:
-multiplayer lifecycle at Depth 2–4. This is a *versioned supplement*,
+local-vs-cloud acceptance boundaries, and the former next milestone, multiplayer lifecycle at Depth 2–4,
+which is now accepted locally as recorded above. This is a *versioned supplement*,
 not a replacement for the retained historical long-form
-`DungeonMMO_Roadmap_v1_47.docx`. The new update was prepared in ChatGPT,
-not edited through Remote Desktop Commander. A separately generated
-Word-format copy can be opened from its ChatGPT artifact link.
+`DungeonMMO_Roadmap_v1_47.docx`. The v1.48 supplement was authored in ChatGPT and the historical
+long-form Word roadmap remains preserved.
 
 **Current engineering checkpoint:** Integration branch
 `wip/phase-4-test-hud-integration-v1`; pre-roadmap-update accepted
