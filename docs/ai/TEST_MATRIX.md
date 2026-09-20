@@ -1,5 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — physical after-Room2 Event v1.51
+
+- [x] Explicit, local-only Temple and Mine Depth2/3/4
+  EventArenaLate/bridge/gate plus independent trigger,
+  checkpoint and boss-spawn anchors; first Event and
+  Secret physical slots retained. 85 structural/gate
+  assertions PASS across all six combinations.
+- [x] Late-Event gate remains closed after Room1; opens
+  after the *saved* Room2 clear; unselected first Event
+  and old Depth1 entrances remain sealed; recovery closes
+  late gate if Room2 not Cleared.
+- [x] Assisted actual walking Play mode: Temple Depth2 and
+  Mine Depth4 physically enter/exit late arena, trigger
+  Event and Secret, and clear full six/eight encounters
+  with alternate boss/transaction replay receipts.
+- [x] Two-client Temple Depth2 and four-client Mine Depth4
+  independent Studio multiplayer runs: concurrent late
+  trigger = one boss; real PlayerRemoving mid-boss keeps
+  survivors and checkpoint; detached reconstruction
+  retains Rooms1/2 and resets interrupted late boss
+  Pending; connected members receive distinct optional
+  and completion rewards exactly once.
+- [x] Original after-Room1 optional-enabled six-encounter
+  Temple Depth2 walking route and fully optional-disabled
+  original four-room Depth2 route pass unchanged.
+- [x] Fresh 24/24 optional-focused suites, 30/30 broad
+  gameplay backend suites and four local Rojo builds PASS.
+- [ ] New gate/geometry and template switches remain OFF
+  in ordinary source. True network same-account reconnect,
+  cloud TEST/PROD publish, unassisted party combat and
+  new non-boss environmental events are not accepted here.
+
+Dated parent/child log receipts and strict limitations:
+docs/testing/phase4-late-event-physical-multiplayer-2026-09-20.md.
+Latest roadmap:
+docs/roadmap/DungeonMMO_Roadmap_v1_51_Late_Event_Physical_Acceptance.md.
+
 ## 20 September 2026 — configurable Event placement v1.50
 
 - [x] Legacy EventAfterRoom1/SecretBeforeFinal remain the default,
