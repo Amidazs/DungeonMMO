@@ -1,5 +1,37 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — dynamic optional variant backend closeout
+
+Start from docs/roadmap/
+DungeonMMO_Roadmap_v1_49_Phase4_Dynamic_Optional_Variants.md
+and docs/testing/phase4-dynamic-optional-boss-variants-2026-09-20.md.
+GitHub-first changes reuse DungeonOptionalBossRunState,
+DungeonOptionalBossContent, existing boss factories/arena slots and
+DungeonSecretDiscoveryService. When
+DungeonMMOOptionalBossVariantsEnabled is set by the server only,
+a new eligible run chooses one of two event/secret identities from
+its deterministic seed and saves that choice; default is OFF.
+After an initial physical Secret timeout, the legacy-only discovery
+check was repaired to validate the matching saved dungeon-specific
+Secret identity. A strict reward test also caught shared inherited
+MarauderCaptain IDs between an alternate boss and a returning miniboss:
+EventBoss/SecretBoss/MiniBoss/FinalBoss rewards are now scoped to
+BossId + runtime encounter ID; Depth1 legacy Boss remains unchanged.
+
+Final acceptance: dynamic variant matrix 2,205; discovery 232;
+reward 80; focused 22/22; broader backend 30/30; all four local
+Rojo compositions PASS. Temple Depth2 and Mine Depth4 alternate
+physical runs, normal variant-disabled Temple Depth2 baseline and
+4-client Mine Depth4 alternate multiplayer with one real disconnect,
+separate reused-factory rewards and exactly-once three-member final
+completion PASS. These are local Studio assisted-combat fixtures:
+same-account network reconnect, new reserved-server reconstruction,
+real player DataStore, cloud TEST/PROD and unassisted balance remain
+outside current acceptance. Do not replace existing dungeon planner
+or create a second event scheduler. Next backend step: add more
+configurable event templates/explicit insertion capabilities under
+the existing fail-closed authority and test each on Depth1–4.
+
 ## 20 September 2026 — higher-depth multiplayer backend closeout
 
 Current integration branch wip/phase-4-test-hud-integration-v1.
