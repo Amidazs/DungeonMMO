@@ -15,7 +15,12 @@ end
 
 local base_nodes = ProfessionRuntime.node_definitions("Base")
 local dungeon_nodes = ProfessionRuntime.node_definitions("Dungeon")
-check(#base_nodes == 2, "Base must retain the two foundation teaching nodes.")
+check(#base_nodes == 3,
+    "Base must keep its two foundation gathering nodes plus the new hide cache.")
+check(base_nodes[3].Id == "Base.RawHideCache"
+    and base_nodes[3].ProfessionId == "Skinning"
+    and base_nodes[3].ItemId == "raw_hide",
+    "Skinning must receive a distinct authoritative Base resource node.")
 check(#dungeon_nodes >= 6, "Temple must support multiple independent resource nodes per room.")
 
 local room1_count = 0
