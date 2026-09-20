@@ -1,5 +1,33 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — configurable Event placement v1.50
+
+- [x] Legacy EventAfterRoom1/SecretBeforeFinal remain the default,
+  even for old run-state snapshots without the new template field.
+- [x] Independently opted-in, eligible Depth2–4 runs freeze a
+  deterministic EventAfterRoom2 placement with a unique encounter
+  and separate EventArenaLate physical-room identity.
+- [x] 274 assertions: late Event follows two required encounters;
+  invalid/unsupported templates fail closed; one Event and one Secret
+  per run; duplicate optional physical slots are rejected; interrupted
+  late Event reconstructs Pending without changing the saved room.
+- [x] Missing, mismatched or unverified late placement is refused
+  with OptionalBossContentUnavailable, not silently remapped to
+  the old EventArena.
+- [x] 23/23 optional-focused suites and 30/30 broad gameplay backend
+  suites PASS; all four local Rojo compositions built successfully.
+- [x] Fresh original Temple Depth2 Event/Secret assisted walking
+  Play mode PASS; fresh alternate-boss Temple Depth2 route and two
+  encounter-scoped reward replay checks PASS.
+- [ ] EventArenaLate still lacks a registered physical arena,
+  gate/bridge, trigger and spawn. Its synthetic planner tests are
+  NOT a physical/party Play-mode acceptance for the late route.
+- [ ] Environmental event types, normal-health combat, true same-user
+  network reconnect and TEST/PROD cloud release remain separate.
+
+Evidence: docs/testing/
+phase4-optional-event-placement-templates-2026-09-20.md.
+
 ## 20 September 2026 — dynamic optional boss variants
 
 - [x] Server-only opt-in OFF by default; Depth2–4 and original optional
