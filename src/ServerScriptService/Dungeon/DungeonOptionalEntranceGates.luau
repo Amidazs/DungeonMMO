@@ -1,7 +1,18 @@
 --!strict
--- Physical gates for the replaceable TEST Temple placeholder side bridges.
--- Purely server-owned collision; the encounter plan still decides eligibility.
+-- Server-owned gates for the replaceable Temple and Mine side bridges.
+-- A saved encounter plan, never a client, determines optional eligibility.
 local Gates = {}
+
+-- Accepts only recognized replaceable placeholder dungeon roots.
+-- Args: root (Instance?): Possible physical placeholder content folder.
+-- Returns: boolean: True only for a registered synthetic dungeon root.
+local function is_placeholder(root: Instance?): boolean
+    if not root or root.Name ~= "DungeonMMOPlaceholderPhysicalContent" then
+        return false
+    end
+    local dungeon_id = root:GetAttribute("DungeonMMODungeonId")
+    return dungeon_id == "TestDungeon" or dungeon_id == "AbandonedMine"
+end
 
 local ENTRANCES = table.freeze({
     EventArena = table.freeze({Bridge = "EventBridge", Prerequisite = "Room1"}),
@@ -10,10 +21,7 @@ local ENTRANCES = table.freeze({
 
 function Gates.get(root: Instance?, slot_id: string): BasePart?
     local spec = ENTRANCES[slot_id]
-    if not spec or not root
-        or root.Name ~= "DungeonMMOPlaceholderPhysicalContent"
-        or root:GetAttribute("DungeonMMODungeonId") ~= "TestDungeon"
-    then
+    if not spec or not is_placeholder(root) then
         return nil
     end
     local bridge = root:FindFirstChild(spec.Bridge)
@@ -79,9 +87,7 @@ function Gates.status(slot_id: string, bindings: any, flow: any): (boolean, stri
 end
 
 function Gates.sync(root: Instance?, bindings: any, flow: any): any
-    if not root or root.Name ~= "DungeonMMOPlaceholderPhysicalContent"
-        or root:GetAttribute("DungeonMMODungeonId") ~= "TestDungeon"
-    then
+    if not is_placeholder(root) then
         return {ok = true, gates_present = false}
     end
     for _, slot_id in ipairs({"EventArena", "SecretArena"}) do
