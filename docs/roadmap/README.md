@@ -1,5 +1,23 @@
 # Canonical Roadmap
 
+**20 September higher-depth multiplayer lifecycle checkpoint (after v1.48):**
+Two- and four-client local Temple/Mine Depth2/4 runs passed shared
+frozen optional-boss plans, one boss for concurrent Event/Secret
+trigger entry, actual member disconnect during either boss, survival
+of the other 1/3 players and dungeon completion. Strict Temple
+Depth2 2→1 and Mine Depth4 4→3 reruns verified persisted per-member
+completion and exactly-once reward replay. Disposable earlier-depth
+profile clears were required by the existing progression service;
+the real save barrier was not weakened. New service-level 1/2/4-member
+party-wipe/auto-revive tests: 392 assertions; 19/19 optional-focused,
+30/30 broad backend suites and four local Rojo builds PASS. These
+tests do **not** prove real same-account network rejoin, new reserved
+server recreation or unassisted party combat. Existing Depth2–4 and
+optional release locks remain OFF. Full dated evidence:
+`docs/testing/phase4-higher-depth-multiplayer-lifecycle-2026-09-20.md`.
+The ChatGPT-authored v1.48 roadmap supplement records the new status;
+historical canonical v1.47 DOCX is preserved.
+
 **Latest ChatGPT-authored roadmap update: v1.48 (Phase 4 backend supplement, 20 September 2026).**
 Read [the v1.48 Phase 4 backend roadmap update](DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md)
 for completed higher-depth optional physical playtesting, precise
