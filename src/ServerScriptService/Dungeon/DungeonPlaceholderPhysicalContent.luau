@@ -115,7 +115,8 @@ end
 
 local function bridge(
     root: Instance, theme: any, name: string,
-    x: number, z: number, length_x: number, width_z: number
+    x: number, z: number, length_x: number, width_z: number,
+    gate_x: number?
 ): Model
     local model = room_model(root, name, theme)
     part(model, "WalkableFloor", Vector3.new(length_x, 1, width_z),
@@ -132,7 +133,7 @@ local function bridge(
     -- Placed just outside the main room, across the whole bridge width.
     local gate = part(model, "EntranceGate",
         Vector3.new(2, 20, width_z + 1),
-        Vector3.new(theme.X + 37, 10, z),
+        Vector3.new(gate_x or theme.X + 37, 10, z),
         theme.Accent, Enum.Material.Neon, 0.2)
     gate.CanCollide = true
     gate.CanTouch = true
@@ -226,13 +227,20 @@ end
 
 -- Depth2/3/4 blockout is a LOOK-AND-REPLACE preview only. Deliberately no
 -- gameplay anchors or physical layout registration: depth gates stay locked.
-local function build_depth_previews(root: Instance, theme: any)
+local function build_depth_previews(
+    root: Instance, theme: any, optional_depth: number?
+)
     for depth = 2, 4 do
         local group = Instance.new("Folder")
         group.Name = "Depth" .. depth .. "_UNREGISTERED_PREVIEW"
         group:SetAttribute("DungeonMMOPlaceholderDepth", "Depth" .. depth)
         group:SetAttribute("DungeonMMOPhysicalLayoutRegistered", false)
         group.Parent = root
+        local selected_optional = optional_depth == depth
+        if selected_optional then
+            group:SetAttribute("DungeonMMOPhysicalLayoutRegistered", true)
+            group.Name = "Depth" .. depth .. "_TEMP_PLAYABLE"
+        end
         local center_x = theme.PreviewX + (depth - 2) * 240
         local count = depth + 2 -- 4, 5, 6 encounter rooms.
         for index = 1, count do
@@ -245,10 +253,24 @@ local function build_depth_previews(root: Instance, theme: any)
                 Vector3.new(center_x, 22, z), theme.Wall,
                 theme.Material, 0.3)
             for _, side in ipairs({-1, 1}) do
-                part(room, if side == -1 then "WestWall" else "EastWall",
-                    Vector3.new(2, 21, 64),
-                    Vector3.new(center_x + side * 32, 10.5, z),
-                    theme.Wall, theme.Material)
+                local wall_x = center_x + side * 32
+                local side_route = selected_optional and side == 1
+                    and (index == 1 or index == count - 1)
+                if side_route then
+                    for _, offset in ipairs({-1, 1}) do
+                        part(room, if offset < 0 then "EastWallSouth"
+                            else "EastWallNorth",
+                            Vector3.new(2, 21, 22),
+                            Vector3.new(wall_x, 10.5, z + offset * 21),
+                            theme.Wall, theme.Material)
+                    end
+                else
+                    part(room, if side == -1 then "WestWall"
+                        else "EastWall",
+                        Vector3.new(2, 21, 64),
+                        Vector3.new(wall_x, 10.5, z),
+                        theme.Wall, theme.Material)
+                end
             end
             room:SetAttribute("DungeonMMOPreviewRole",
                 if index == count then "FinalBoss"
@@ -267,6 +289,44 @@ local function build_depth_previews(root: Instance, theme: any)
                     center_x, z + 45)
             end
         end
+    end
+end
+
+-- Connect optional side rooms to the first and penultimate required rooms
+-- of the selected unpublished Depth2–4 placeholder layout.
+-- Args: group (Instance): One active depth preview's replaceable geometry.
+--       parent (Instance): Environment anchor parent used by main rooms.
+--       theme (any): Existing Temple or Mine blockout material palette.
+--       depth (number): Selected higher difficulty, 2 through 4.
+-- Returns: nil: Creates both side rooms, walkable bridges and gated anchors.
+local function playable_depth_optional(
+    group: Instance, parent: Instance, theme: any, depth: number
+)
+    local center_x = theme.PreviewX + (depth - 2) * 240
+    local last_required = depth + 1
+    for _, entry in ipairs({
+        {Kind = "Event", Room = 1},
+        {Kind = "Secret", Room = last_required},
+    }) do
+        local z = 80 - (entry.Room - 1) * 90
+        local name = entry.Kind .. "Arena"
+        local room_x = center_x + 112
+        local room = room_model(group, name, theme)
+        room:SetAttribute("DungeonMMOPlaceholderRoomSlotId", name)
+        roof_and_walls(room, theme, room_x, z, 80, 72, z)
+        part(room, "BossPedestal", Vector3.new(16, 1, 16),
+            Vector3.new(room_x, 0.5, z - 12),
+            theme.Accent, Enum.Material.Slate)
+        bridge(group, theme, entry.Kind .. "Bridge",
+            center_x + 52, z, 40, 20, center_x + 34)
+        local prefix = theme.Prefix .. ".Depth" .. depth
+            .. "." .. entry.Kind .. "."
+        anchor(parent, theme.Prefix, prefix .. "Checkpoint",
+            Vector3.new(room_x, 2, z + 9), "Checkpoint")
+        anchor(parent, theme.Prefix, prefix .. "Trigger",
+            Vector3.new(room_x, 3, z + 6), "EncounterTrigger")
+        anchor(parent, theme.Prefix, prefix .. "BossSpawn",
+            Vector3.new(room_x, 2, z - 12), "BossSpawn")
     end
 end
 
@@ -328,23 +388,38 @@ function Placeholder.create(
     root:SetAttribute("DungeonMMOReplaceWithAuthoredModels", true)
     root:SetAttribute("DungeonMMODungeonId", dungeon_id)
     root.Parent = parent
-    build_optional(root, parent, theme)
-    build_depth_previews(root, theme)
-    local test_dungeon = TestRelease.is_test_dungeon()
-        and dungeon_id == "TestDungeon"
+    local selected = selected_difficulty_id
+        or game:GetService("Workspace"):GetAttribute(
+            "DungeonMMOStudioDifficultyId")
+    local selected_depth = if type(selected) == "string"
+        then tonumber(string.match(selected, "^Depth([234])$")) else nil
     local local_studio_preview = game:GetService("RunService"):IsStudio()
         and game.PlaceId == 0 and game.GameId == 0
         and game:GetService("Workspace"):GetAttribute(
             "DungeonMMOPlaceholderPlayableEnabled") == true
+    local optional_depth = if local_studio_preview
+        and game:GetService("Workspace"):GetAttribute(
+            "DungeonMMOPlaceholderOptionalPlayEnabled") == true
+        then selected_depth else nil
+    root:SetAttribute("DungeonMMOPlaceholderActiveDifficulty",
+        selected or "Depth1")
+    root:SetAttribute("DungeonMMOPlaceholderOptionalDepthRoutes",
+        optional_depth ~= nil)
+    build_optional(root, parent, theme)
+    build_depth_previews(root, theme, optional_depth)
+    local test_dungeon = TestRelease.is_test_dungeon()
+        and dungeon_id == "TestDungeon"
     if test_dungeon or local_studio_preview then
-        local difficulty_id = selected_difficulty_id
-            or game:GetService("Workspace"):GetAttribute(
-                "DungeonMMOStudioDifficultyId")
-        local depth = if type(difficulty_id) == "string"
-            then tonumber(string.match(difficulty_id, "^Depth([234])$"))
-            else nil
-        if depth then
-            playable_depth_anchors(root, parent, theme, depth)
+        if selected_depth then
+            playable_depth_anchors(root, parent, theme, selected_depth)
+            if optional_depth then
+                local group = root:FindFirstChild(
+                    "Depth" .. selected_depth .. "_TEMP_PLAYABLE")
+                assert(group, "OptionalDepthPreviewMissing")
+                playable_depth_optional(
+                    group, parent, theme, selected_depth
+                )
+            end
         end
     end
     return root
