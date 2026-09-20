@@ -1153,7 +1153,9 @@ local function bind_encounter_triggers()
         or active_definition.Id == "AbandonedMine")
         and placeholder_root
     then
-        for _, slot_id in ipairs({"EventArena", "SecretArena"}) do
+        for _, slot_id in ipairs({
+            "EventArena", "EventArenaLate", "SecretArena"
+        }) do
             local gate = DungeonOptionalEntranceGates.get(
                 placeholder_root, slot_id
             )
