@@ -56,6 +56,7 @@ end
 -- Returns: boolean: True only for implemented, physically supported content.
 local function content_ready(
     encounter: any,
+    entry: any,
     allowed_slots: {[string]: any}
 ): boolean
     local slot = allowed_slots[encounter.RoomSlotId]
@@ -66,6 +67,10 @@ local function content_ready(
         and slot.SupportsBoss == true
         and type(slot.BossSpawnAnchor) == "string"
         and slot.BossSpawnAnchor ~= ""
+        and (entry.RequiresPlacementContract ~= true
+            or (type(entry.InsertAfterId) == "string"
+                and slot.OptionalInsertAfterId == entry.InsertAfterId
+                and slot.OptionalPlacementVerified == true))
 end
 
 -- Filters server-configured optional bosses by run trigger and layout.
@@ -95,6 +100,8 @@ function DungeonOptionalBossPolicy.evaluate(
 
     local accepted = {}
     local seen: {[string]: boolean} = {}
+    local accepted_kinds: {[string]: boolean} = {}
+    local accepted_slots: {[string]: boolean} = {}
     for _, entry in ipairs(definition.OptionalEncounters) do
         local encounter = type(entry) == "table"
             and entry.Encounter
@@ -113,15 +120,28 @@ function DungeonOptionalBossPolicy.evaluate(
         end
 
         if triggered.active then
+            -- The existing runtime has one Event entrance and one Secret
+            -- route per run. Two templates may never claim either kind
+            -- or the same physical room in a single materialized plan.
+            if accepted_kinds[encounter.Kind] then
+                return {ok = false,
+                    reason = "OptionalBossFrequencyExceeded"}
+            end
+            if accepted_slots[encounter.RoomSlotId] then
+                return {ok = false,
+                    reason = "OptionalBossRoomSlotConflict"}
+            end
             if not valid_insertion(entry, difficulty_id) then
                 return {ok = false, reason = "OptionalBossEligibilityMissing"}
             end
-            if not content_ready(encounter, allowed_slots) then
+            if not content_ready(encounter, entry, allowed_slots) then
                 return {
                     ok = false,
                     reason = "OptionalBossContentUnavailable",
                 }
             end
+            accepted_kinds[encounter.Kind] = true
+            accepted_slots[encounter.RoomSlotId] = true
             table.insert(accepted, entry)
         end
     end
