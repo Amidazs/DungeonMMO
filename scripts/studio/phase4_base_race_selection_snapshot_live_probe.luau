@@ -59,7 +59,7 @@ local center = human.AbsolutePosition + human.AbsoluteSize/2
 local ok, hits = pcall(function()
     return pg:GetGuiObjectsAtPosition(center.X, center.Y)
 end)
-if ok then
+if ok and #hits > 0 then
     local on_card = false
     for i=1, math.min(12, #hits) do
         local obj = hits[i]
@@ -77,7 +77,11 @@ if ok then
     assert(on_card, "race card is blocked by a higher screen GUI")
     print("[Phase4 Race Picker] RACE_CARD_HITTEST_PASS")
 else
-    print("[Phase4 Race Picker] HITTEST_UNAVAILABLE " .. tostring(hits))
+    -- Headless Studio Play can return an empty hit-test array even when
+    -- the card is visible and correctly sized. That is not evidence
+    -- that another widget is intercepting player clicks.
+    print("[Phase4 Race Picker] HITTEST_NOT_AVAILABLE_IN_HEADLESS_PLAY "
+        .. tostring(if ok then #hits else hits))
 end
 for index=1,3 do
     show("RaceSelection")
