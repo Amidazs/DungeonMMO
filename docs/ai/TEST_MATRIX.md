@@ -1,5 +1,27 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — per-depth Event/Secret integration
+
+- [x] RED → GREEN: Secret gate prerequisite uses the actual preceding
+  required room in the frozen encounter order, not always Room2.
+- [x] RED → GREEN: both Temple and Mine placeholder side bridges are
+  managed by the existing server-owned gate controller.
+- [x] Two dungeons × four depths × four Event/Secret selection cases:
+  712 assertions PASS using synthetic higher-depth slot bindings.
+- [x] Per-depth saved entry-time Event-window expiry and Secret
+  independence after new server-controller construction: 116 PASS.
+- [x] Shared side-gate and recovery test: 32 assertions PASS.
+- [x] 17/17 optional-focused suites; 30/30 gameplay-backend suites PASS.
+- [x] Fresh assisted Temple/Mine Depth1 optional physical route PASS.
+- [x] All four local Rojo compositions built successfully.
+- [ ] Higher-depth optional physical routes and bridge geometry remain
+  unregistered; the synthetic tests do not establish physical play.
+- [ ] Cloud TEST verification, true same-user reconnect and PROD
+  remain intentionally deferred.
+
+Evidence: docs/testing/
+phase4-optional-depth-events-and-side-gates-2026-09-20.md.
+
 ## 20 September 2026 — full depth-ladder progression
 
 - [x] Temple/Mine Depth1–4 3/4/5/6 encounter plans, Depth4 previous
