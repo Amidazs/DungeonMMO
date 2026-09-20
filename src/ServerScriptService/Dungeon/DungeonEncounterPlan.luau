@@ -7,6 +7,7 @@ local VALID_KINDS = table.freeze({
     Boss = true,
     FinalBoss = true,
     EventBoss = true,
+    EventCombat = true,
     SecretBoss = true,
 })
 
