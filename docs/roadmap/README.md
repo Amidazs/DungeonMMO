@@ -2,20 +2,24 @@
 
 The canonical long-form roadmap stored here is:
 
-`DungeonMMO_Roadmap_v1_46.docx`
+`DungeonMMO_Roadmap_v1_47.docx`
 
-Version: **1.46**
-Last updated: **19 September 2026**
+Version: **1.47**
+Last updated: **20 September 2026**
 
 SHA-256:
 
-`11afe3376510aea308d44851183b16f42cf507baf617025cebb2c7436dd6a5bc`
+`f5ebe50872510067a671a67d7844d521adc512e6683322b8a99f37c811d13abf`
 
-**Phase 4 Event/Secret Boss BACKEND milestone: COMPLETE at the isolated development checkpoint** `ba584e4`. Phase 4 Content Alpha **remains active**; these are not physical-content or gameplay-release approvals. Both dungeons' optional-boss rollout flags remain off, higher-depth physical layouts remain unavailable, and nothing has been merged into `main` or published to Roblox.
+**Current phase: Phase 4 Content Alpha remains ACTIVE.** Phases 2 and 3 remain accepted. The 19 September Event/Secret backend milestone is complete historically and is not a reason to repeat the closed backend work.
 
-The v1.46 roadmap updates the *current Phase 4 and next-action sections*, not merely the historical appendix, so past backend tasks are not mistakenly reopened. New isolated TEMP Studio evidence covers actual simulated client departure and peer-session preservation (not same-account rejoin), walkable synthetic Temple/Mine side-room paths, and one normal client attack dealing boss damage (not an unassisted complete fight). Final authored rooms, complete unassisted gameplay, UI, and approved cross-place/multiplayer release testing remain open content/release gates. See `docs/testing/phase4-optional-boss-four-backend-steps-closeout-2026-09-19.md` and `docs/testing/phase4-remaining-release-gates-local-proof-2026-09-19.md`.
+**20 September TEST evidence and scope:** The published TEST Lobby race/class flow worked after repairing seven semantic environment anchors and restoring the TEST profile DataStore, and the player entered/cleared normal TEST Temple rooms. One observed Secret objective stated that the secret route was not unlocked for that run; the visible branches are **EventArena after Room 1** and **SecretArena after Room 2**, not two guaranteed Secret rooms. A distinct Base-origin eligibility source correction was made; it must be verified on a *new cloud session*, not assumed to change old persisted runs.
 
-The DOCX passed archive and structural integrity checks; a visual page-render QA remains outstanding because the earlier automated Word export stalled.
+On the combined integration branch `wip/phase-4-test-hud-integration-v1`, source `52222db` supports eligible Secret backtracking before dungeon completion; `f6d6401` adds **server-controlled placeholder side-entry gates** so Event opens after Room 1 and Secret after Room 2 only when that run is eligible. Local physical/regression and TEST-style composition tests passed. Final authored room art, normal-player unassisted optional boss fights and real multiplayer/recovery acceptance remain open.
+
+**TEST Temple publish status is UNVERIFIED:** The latest gated-placeholder Publish As attempt on 20 September targeted the existing TEST Dungeon place `117293035754309` but Roblox Scripts publishing/version-history calls returned HTTP 429 rate limits. A publish timing marker and local tests do not prove that this newest gate/script version is playable in Roblox. Before any repeat publish, inspect the current TEST Temple Version History and join a genuinely fresh TEST Dungeon server; avoid rapid retries, preserve a current cloud rollback, and never overwrite the authored Lobby `134132328219009`, PROD or player DataStores.
+
+Detailed evidence: `docs/testing/phase4-test-temple-optional-entrance-gates-2026-09-20.md`, `docs/testing/phase4-deferred-secret-backtracking-2026-09-20.md` and `docs/testing/phase4-test-lobby-optional-boss-origin-fix-2026-09-20.md`. Historical 19 September release-lock and unpublished-status entries below describe their **dated source checkpoints**, not the current TEST-only integration or uncertain 20 September publish attempt. The definitive updated status, next actions and restart brief are in v1.47 Sections 10 and Appendix J.
 
 Historical note: Roadmap v1.45 added the four-step Event/Secret Boss **isolated backend**
 checkpoint: recovery and reward replay, Mine live integration, four distinct
