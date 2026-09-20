@@ -100,5 +100,25 @@ check(Gates.sync(root, bindings, flow).ok and event_gate.CanCollide,
     "inactive timed event stays physically gated")
 check(Gates.sync(nil, bindings, flow).ok,
     "non-placeholder authored world is never modified")
+
+-- Mine uses the same replaceable side-bridge gate structure as Temple.
+-- The shared server gate lifecycle must not leave Mine permanently sealed.
+bindings.by_slot.EventArena = {}
+bindings.by_slot.SecretArena = {}
+root:SetAttribute("DungeonMMODungeonId", "AbandonedMine")
+check(Gates.get(root, "EventArena") == event_gate
+    and Gates.get(root, "SecretArena") == secret_gate,
+    "Mine must resolve its own placeholder optional-entrance parts")
+check(Gates.sync(root, bindings, flow).gates_present
+    and not event_gate.CanCollide and not secret_gate.CanCollide,
+    "eligible Mine side bridges must open after prerequisite clears")
+states.Room2 = "Pending"
+check(Gates.sync(root, bindings, flow).ok
+    and event_gate.CanCollide == false and secret_gate.CanCollide,
+    "Mine recovery must close Secret if Room2 was not cleared")
+root:SetAttribute("DungeonMMODungeonId", "UnsupportedDungeon")
+check(Gates.sync(root, bindings, flow).gates_present == false,
+    "unrecognized placeholder dungeon cannot gain optional access")
+
 root:Destroy()
 print(string.format("[Optional Entrance Gates Tests] PASS: %d assertions.", count))
