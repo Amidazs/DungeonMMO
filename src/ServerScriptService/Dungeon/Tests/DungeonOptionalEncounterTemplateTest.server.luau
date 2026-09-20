@@ -12,7 +12,6 @@ local Content = require(Dungeon.DungeonOptionalBossContent)
 local Policy = require(Dungeon.DungeonOptionalBossPolicy)
 local Plan = require(Dungeon.DungeonEncounterPlan)
 local Difficulty = require(Shared.DungeonDifficultyDefinitions)
-local Sequencer = require(Dungeon.DungeonEncounterSequencer)
 local Sessions = require(Core.Services.DungeonSessionService)
 local Map = require(Core.Adapters.InMemoryMapAdapter)
 local Controller = require(Dungeon.DungeonEncounterRuntimeController)
@@ -106,7 +105,7 @@ local function check_late(dungeon_id: string, depth_id: string, seed: number)
     for i, encounter in ipairs(plan.encounters) do
         if encounter.Kind == "EventBoss" then
             event_count += 1
-            check(i == 4 and encounter.RoomSlotId == "EventArenaLate",
+            check(i == 3 and encounter.RoomSlotId == "EventArenaLate",
                 "late Event follows two required rooms at every depth")
         elseif encounter.Kind == "SecretBoss" then
             secret_count += 1
@@ -154,14 +153,14 @@ local function check_late(dungeon_id: string, depth_id: string, seed: number)
     }))
     local frozen = sessions:get(session.SessionId)
         .InstanceState.EncounterPlan
-    local event = frozen[4]
+    local event = frozen[3]
     check(event.Id == descriptors[1].Encounter.Id
         and event.RoomSlotId == "EventArenaLate",
         "saved physical slot and encounter IDs must remain unchanged")
-    for i = 1, 3 do
+    for i = 1, 2 do
         check(controller:start(frozen[i].Id).ok
             and controller:clear(frozen[i].Id).ok,
-            "two required rooms and their normal predecessor clear once")
+            "both required predecessor rooms clear once")
     end
     check(controller:start(event.Id).ok
         and not controller:start(event.Id).ok,
