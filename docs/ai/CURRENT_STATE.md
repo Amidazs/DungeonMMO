@@ -1,5 +1,21 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — full optional-session recovery regression
+
+A GitHub-first test-only continuation added comprehensive two-member
+persisted-session reconstruction over the existing recovery controller,
+session service, optional barrier flow and reward service. A fresh TEMP
+Dungeon Rojo build and Studio focused suite passed 15/15 modules;
+DungeonOptionalFullSessionRecoveryTest passed 42 assertions. The
+assisted physical Temple Secret-backtracking route passed again.
+Server reconstruction was emulated with new service/controller instances
+and shared in-memory persistence; this is NOT a same-account Roblox network
+rejoin or a cloud deployment. No production source or DataStores changed.
+See docs/testing/phase4-optional-full-session-recovery-2026-09-20.md.
+The user also reported successfully soloing both optional bosses
+manually; the earlier failed automated injured-solo fixture remains
+a separate historical result.
+
 ## 20 September 2026 — consecutive optional combat and real recovery verified
 
 Two real Studio clients defeated Event and then Secret using normal client
