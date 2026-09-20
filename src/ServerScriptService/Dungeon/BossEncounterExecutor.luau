@@ -179,6 +179,19 @@ function BossEncounterExecutor:execute(
     end
 
     local boss = boss_or_error :: Model
+    -- Reused depth-boss factories inherit the legacy MarauderCaptain
+    -- enemy ID. A dynamic optional boss and its later returning miniboss
+    -- must not share one reward transaction within the same session.
+    -- Preserve the original Depth1 Boss reward ID for saved compatibility;
+    -- the optional and unreleased miniboss/final roles are always scoped.
+    if encounter.Kind == "EventBoss"
+        or encounter.Kind == "SecretBoss"
+        or encounter.Kind == "MiniBoss"
+        or encounter.Kind == "FinalBoss"
+    then
+        boss:SetAttribute("DungeonEnemyId",
+            encounter.BossId .. ":" .. binding.RuntimeEncounterId)
+    end
     local humanoid = boss:FindFirstChildOfClass("Humanoid")
     if not humanoid then
         boss:Destroy()
