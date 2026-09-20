@@ -84,6 +84,11 @@ function DungeonInstanceDirector.runtime_options(): any
         optional_boss_variants_enabled = ServerScriptService:GetAttribute(
             "DungeonMMOOptionalBossVariantsEnabled"
         ) == true,
+        -- Independent opt-in, disabled unless the server explicitly asks.
+        -- Missing physical late-event bindings still fail closed at entry.
+        optional_boss_templates_enabled = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossTemplatesEnabled"
+        ) == true,
     }
 end
 
@@ -101,10 +106,11 @@ local function attach_optional_state(
     seed: number,
     now: number,
     options: any,
-    enabled: boolean
+    enabled: boolean,
+    difficulty_id: string
 ): any
     local issued = DungeonOptionalBossRunState.issue(
-        dungeon_id, now, seed, options, enabled
+        dungeon_id, now, seed, options, enabled, difficulty_id
     )
     for key, value in pairs(issued) do
         state[key] = value
@@ -152,7 +158,7 @@ function DungeonInstanceDirector.resolve(
             EventActive = false,
             CreatedAt = now,
         }, dungeon_id, stable_hash(session_id), now, opts,
-            allow_optional)
+            allow_optional, difficulty.Id)
     end
 
     local seed = stable_hash(session_id)
@@ -197,7 +203,7 @@ function DungeonInstanceDirector.resolve(
         EventActive = event_active,
         CreatedAt = now,
     }, dungeon_id, seed, now, opts,
-        allow_optional)
+        allow_optional, difficulty.Id)
 end
 
 return table.freeze(DungeonInstanceDirector)
