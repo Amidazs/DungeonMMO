@@ -1149,7 +1149,10 @@ local function bind_encounter_triggers()
     -- trigger. Tell the player WHY the gate is still closed when approached.
     local placeholder_root =
         Workspace:FindFirstChild("DungeonMMOPlaceholderPhysicalContent")
-    if active_definition.Id == "TestDungeon" and placeholder_root then
+    if (active_definition.Id == "TestDungeon"
+        or active_definition.Id == "AbandonedMine")
+        and placeholder_root
+    then
         for _, slot_id in ipairs({"EventArena", "SecretArena"}) do
             local gate = DungeonOptionalEntranceGates.get(
                 placeholder_root, slot_id
