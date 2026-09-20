@@ -55,8 +55,16 @@ end
 -- Args: sessions (any): Service backed by disposable shared session storage.
 --       session_id (string): Newly created instance of one depth.
 --       plan ({any}): That depth's authoritative encounter descriptors.
+--       map (any): Disposable storage shared across reconstructed services.
+--       clock (() -> number): Stable test clock for session services.
 -- Returns: nil: Checks ordering, checkpoint and interrupted-boss recovery.
-local function clear_run(sessions: any, session_id: string, plan: {any})
+local function clear_run(
+    sessions: any,
+    session_id: string,
+    plan: {any},
+    map: any,
+    clock: () -> number
+)
     local controller = assert(Controller.new({
         session_service = sessions,
         session_id = session_id,
@@ -79,7 +87,7 @@ local function clear_run(sessions: any, session_id: string, plan: {any})
         check(not controller:start(encounter_id).ok,
             "an active encounter cannot spawn a second copy")
         if encounter.Kind == "MiniBoss" then
-            local rebuilt = Sessions.new(sessions._map, sessions._clock)
+            local rebuilt = Sessions.new(map, clock)
             controller = assert(Controller.new({
                 session_service = rebuilt,
                 session_id = session_id,
@@ -166,8 +174,11 @@ local function verify_ladder(
     }
     local progression = Progression.new(profiles, ready)
     local release = Progression.new(profiles)
-    local map = Map.new(function() return 1000 end)
-    local sessions = Sessions.new(map, function() return 1000 end)
+    local function clock(): number
+        return 1000
+    end
+    local map = Map.new(clock)
+    local sessions = Sessions.new(map, clock)
     local order = Difficulties.order()
     for index, depth_id in ipairs(order) do
         local difficulty = assert(Difficulties.get(dungeon_id, depth_id))
@@ -202,7 +213,10 @@ local function verify_ladder(
             "session must store the selected difficulty")
         check(sessions:mark_connected(created.SessionId, user_id).ok,
             "dungeon session must become active")
-        clear_run(sessions, created.SessionId, difficulty.EncounterSequence)
+        clear_run(
+            sessions, created.SessionId, difficulty.EncounterSequence,
+            map, clock
+        )
         check(sessions:mark_complete(
             created.SessionId, {user_id}
         ).ok, "completed session must persist the reward recipient")
