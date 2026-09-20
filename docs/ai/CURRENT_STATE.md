@@ -1,5 +1,27 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — higher-depth optional multiplayer lifecycle checkpoint
+
+GitHub-first, disposable local Studio Play-mode fixtures passed Temple and
+Mine Depth2/4 two- and four-client shared party runs. Two clients entering
+Event or Secret spawn one boss. Real Studio PlayerRemoving during Event
+or Secret preserves the surviving 1/3 members, frozen plan, checkpoint and
+ongoing encounter; the survivors complete their higher-depth route.
+The actual per-member completion save/replay check passed for a 2→1
+Temple Depth2 Event disconnect and a 4→3 Mine Depth4 Secret disconnect.
+The strict test initially exposed proper DifficultyProgressionFailed
+protection on newly created higher-depth profiles; the fixture now gives
+disposable members prior depth clears through the normal progression
+service rather than disabling the completion barrier. Service-level
+1/2/4-member optional boss wipe/automatic revive tests passed 392
+assertions across both dungeons and Depth2/4; 19/19 optional focused
+and 30/30 broader gameplay backend suites plus all four local Rojo builds
+passed. Report: docs/testing/
+phase4-higher-depth-multiplayer-lifecycle-2026-09-20.md.
+True same-account network rejoin/new reserved-server restart, in-Play
+whole-party wipe and cloud release remain unverified; higher-depth and
+optional release flags remain OFF, with no real player DataStores touched.
+
 ## 20 September 2026 — roadmap v1.48 supplement (ChatGPT-authored)
 
 The repository roadmap index now points to
