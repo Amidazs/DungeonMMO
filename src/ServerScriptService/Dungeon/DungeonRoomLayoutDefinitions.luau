@@ -32,7 +32,8 @@ function DungeonRoomLayoutDefinitions.get(
     if studio_placeholder_enabled() then
         return PlaceholderLayouts.get(
             dungeon_id, layout_id,
-            Workspace:GetAttribute("DungeonMMOPlaceholderOptionalPlayEnabled") == true
+            Workspace:GetAttribute("DungeonMMOPlaceholderOptionalPlayEnabled") == true,
+            Workspace:GetAttribute("DungeonMMOPlaceholderLateEventPlayEnabled") == true
         )
     end
     return DungeonRuntimeContentCatalog.get_layout(
