@@ -80,6 +80,10 @@ function DungeonInstanceDirector.runtime_options(): any
             else ServerScriptService:GetAttribute(
                 "DungeonMMOOptionalBossSecretChanceBasisPoints"
             ),
+        -- Independent opt-in. Never unlocks optional bosses or depths.
+        optional_boss_variants_enabled = ServerScriptService:GetAttribute(
+            "DungeonMMOOptionalBossVariantsEnabled"
+        ) == true,
     }
 end
 
