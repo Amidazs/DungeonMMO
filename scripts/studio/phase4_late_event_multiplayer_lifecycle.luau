@@ -435,7 +435,9 @@ local function run()
         end
     end
     check(secret ~= nil, "run must include a selected Secret boss")
-    if W:GetAttribute("DungeonMMOTempVariantParty") == true then
+    if depth_id == "Depth4"
+        and W:GetAttribute("DungeonMMOTempVariantParty") == true
+    then
         for _, player in ipairs(remaining) do
             local records = history(runtime, player.UserId)
             local event_reward = transaction(
