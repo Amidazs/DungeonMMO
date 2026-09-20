@@ -49,7 +49,7 @@ local function check_depth(dungeon_id: string, depth: number)
         == depth_id and root:GetAttribute(
             "DungeonMMOPlaceholderOptionalDepthRoutes") == true,
         "selected difficulty must remain explicit on physical root")
-    local layout = assert(Layouts.get(dungeon_id, depth_id))
+    local layout = assert(Layouts.get(dungeon_id, depth_id, true))
     local bindings = {by_slot = {}, ordered = {}}
     for index = 1, depth + 2 do
         local slot = "Room" .. index
@@ -132,13 +132,14 @@ local function check_depth(dungeon_id: string, depth: number)
 end
 
 local previous = {}
-for _, name in ipairs({
+local keys = {
     "DungeonMMOStudioDifficultyId",
     "DungeonMMOEnvironmentMode",
     "DungeonMMOPlaceholderPhysicalContentEnabled",
     "DungeonMMOPlaceholderPlayableEnabled",
     "DungeonMMOPlaceholderOptionalPlayEnabled",
-}) do
+}
+for _, name in ipairs(keys) do
     previous[name] = W:GetAttribute(name)
 end
 W:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
@@ -153,8 +154,8 @@ local passed, failure = pcall(function()
         end
     end
 end)
-for name, value in pairs(previous) do
-    W:SetAttribute(name, value)
+for _, name in ipairs(keys) do
+    W:SetAttribute(name, previous[name])
 end
 check(passed, tostring(failure))
 print(string.format(
