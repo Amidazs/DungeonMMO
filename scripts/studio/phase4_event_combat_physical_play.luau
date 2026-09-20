@@ -377,7 +377,8 @@ local function run()
             check(after_count == before_count,
                 "reward replay must preserve player monster history")
             print("[Event Combat Physical] REWARD_REPLAY_PASS "
-                .. stage .. " " .. encounter.BossId
+                .. stage .. " "
+                .. (encounter.BossId or encounter.PackId)
                 .. " encounter=" .. encounter.Id)
             cross_side(stage, false)
         end
