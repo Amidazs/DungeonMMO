@@ -1,5 +1,37 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — configurable optional Event placement v1.50
+
+GitHub-first code added one authoritative optional placement catalogue,
+with unchanged default EventAfterRoom1 and SecretBeforeFinal and an
+opt-in EventAfterRoom2 template for Temple/Mine Depth2–4. Issuance
+saves the selected Event template once per eligible run; the new
+ServerScriptService DungeonMMOOptionalBossTemplatesEnabled flag is
+OFF by default and independent of the boss-variant, original optional
+and high-depth release switches. Late Event has a distinct
+EventArenaLate physical slot and stable encounter/reward identity.
+The existing policy now enforces no more than one Event and one Secret
+per run, rejects slot conflicts, and requires matching explicitly
+verified placement metadata for the late slot. That late arena,
+bridge and gate do NOT exist in registered physical content yet:
+late selection fails closed as OptionalBossContentUnavailable;
+do not present it as physically playable. Existing layout/default
+variant routes are unchanged.
+
+New template tests passed 274 assertions; 23/23 optional-focused,
+30/30 broad backend suites and four local Rojo builds passed. Fresh
+original Temple Depth2 six-encounter assisted physical Play mode PASS;
+fresh alternate Event/Secret Temple Depth2 six-encounter assisted
+physical Play mode and each reward replay PASS. Its initial fixture
+retry failed at RunScript:66 because the TEMP seed-override search
+expected the old issuance signature; the fixture was updated through
+GitHub and the fresh rerun passed. Report:
+docs/testing/phase4-optional-event-placement-templates-2026-09-20.md.
+Roadmap update:
+docs/roadmap/DungeonMMO_Roadmap_v1_50_Optional_Event_Placement.md.
+No TEST/PROD publish, DataStore, authored geometry, main merge or
+user account work was performed.
+
 ## 20 September 2026 — dynamic optional Event/Secret variants ACCEPTED locally
 
 New server-only DungeonMMOOptionalBossVariantsEnabled (default false)
