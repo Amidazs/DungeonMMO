@@ -8,6 +8,9 @@ local Catalog = require(game:GetService("ReplicatedStorage")
 local Templates = require(game:GetService("ReplicatedStorage")
     :WaitForChild("Core"):WaitForChild("Shared")
     :WaitForChild("DungeonOptionalEncounterTemplateCatalog"))
+local CombatEvents = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalEventCombatCatalog"))
 
 -- Legacy default identities are catalog index 1; the opt-in path only
 -- changes a newly issued run, never an existing saved snapshot.
@@ -41,6 +44,7 @@ local function disabled_snapshot(): any
         OptionalBossEventActive = false,
         OptionalBossEventId = nil,
         OptionalBossEventTemplateId = nil,
+        OptionalBossEventMechanicId = nil,
         OptionalBossEventWindows = {},
         OptionalBossSecretUnlocked = false,
         OptionalBossSecretUnlocks = {},
@@ -142,6 +146,18 @@ function DungeonOptionalBossRunState.issue(
         end
         if template_opt_in then
             state.OptionalBossEventTemplateId = template_id
+        end
+        -- Non-boss mechanics only use the physically verified late room.
+        -- Do not change the original Event boss or reselect on recovery.
+        if template_id == "EventAfterRoom2"
+            and type(options) == "table"
+            and options.optional_event_combat_enabled == true
+        then
+            local mechanic_id, mechanic = CombatEvents.select(
+                dungeon_id, session_seed)
+            if mechanic ~= nil then
+                state.OptionalBossEventMechanicId = mechanic_id
+            end
         end
         state.OptionalBossEventWindows[event_variant.Id] = window
     end
