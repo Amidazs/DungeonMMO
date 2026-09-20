@@ -60,8 +60,8 @@ runtime_script.Source = string.sub(source, 1, position - 1)
 -- both alternate Event and Secret identities deterministically.
 SSS:SetAttribute("DungeonMMOOptionalBossVariantsEnabled", true)
 local director = SSS.Core.Services.DungeonInstanceDirector
-local original_seed = '        dungeon_id, now, seed, options, enabled\n    )'
-local chosen_seed = '        dungeon_id, now, 7, options, enabled\n    )'
+local original_seed = '        dungeon_id, now, seed, options, enabled, difficulty_id\n    )'
+local chosen_seed = '        dungeon_id, now, 7, options, enabled, difficulty_id\n    )'
 local director_source = director.Source
 local match_start = assert(string.find(
     director_source, original_seed, 1, true))
