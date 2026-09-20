@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**20 September normal-combat follow-up (after v1.47):** Local
+GitHub-first normal-combat fixtures independently defeated Temple
+Event and Secret bosses with real client attacks and normal player HP.
+The consecutive attempt FAILED: the solo survivor entered Secret
+injured after Event and died before defeating Secret. In a separate
+healthy two-client run, Secret was defeated and the final route
+completed (other rooms assisted). Both isolated boss wins are accepted
+as local evidence; combined unassisted gameplay, legitimate recovery,
+manual navigation and true same-account rejoin are not accepted.
+See `docs/testing/phase4-optional-boss-normal-combat-playtest-2026-09-20.md`.
+Cloud verification and art remain deferred.
+
 The canonical long-form roadmap stored here is:
 
 `DungeonMMO_Roadmap_v1_47.docx`
