@@ -1,5 +1,22 @@
 # Canonical Roadmap
 
+**20 September depth-specific optional event backend checkpoint
+(after v1.47):** Existing Temple/Mine Event/Secret encounter definitions
+were validated across Depth1–4 and all independent eligibility
+combinations, including expired global event windows preserving a
+previously eligible saved run. Two issues were reproduced RED and fixed:
+Secret side gates now use the preceding required room from the frozen
+plan (rather than opening at Room2 for all depths), and Mine placeholder
+side entrances are now synchronized by the existing server gate
+controller. Local Studio: 712/116/32 assertions in new depth, timed-event
+and gate suites; 17/17 optional suites; 30/30 broader backend suites;
+assisted Temple and Mine Depth1 physical optional routes PASS. All four
+local Rojo compositions built. Depth2–4 optional physical side arenas
+and bridge routes are **not** registered or playable from this change,
+and high-depth release flags remain OFF. No TEST/PROD cloud, player
+DataStore, authored art or canonical DOCX modification. Evidence:
+`docs/testing/phase4-optional-depth-events-and-side-gates-2026-09-20.md`.
+
 **20 September four-depth integration checkpoint (after v1.47):**
 Both Temple and Abandoned Mine Depth1–4 ladders passed a new
 454-assertion profile/session/encounter integration test, including
