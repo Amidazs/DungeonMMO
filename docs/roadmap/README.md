@@ -1,5 +1,27 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.51 (late Event physical and multiplayer acceptance, 20 September 2026).**
+Read [the v1.51 late Event acceptance roadmap](DungeonMMO_Roadmap_v1_51_Late_Event_Physical_Acceptance.md)
+and [its verified physical/multiplayer test report](../testing/phase4-late-event-physical-multiplayer-2026-09-20.md).
+The after-Room2 Event now has its own **replaceable, walkable,
+independently gated TEMP Studio side room** in Temple and Mine
+at Depth2–4, with dedicated trigger, checkpoint and boss spawn.
+The old after-Room1 Event/Secret routes are preserved. Room2
+must be cleared before the late gate opens; unselected Event
+gates remain closed. Local tests: 85 physical/gate assertions;
+24/24 optional-focused and 30/30 broader backend suites; four
+Rojo builds; assisted Temple Depth2/Mine Depth4 late-Event walking
+playtests; two-client Temple and four-client Mine actual Studio
+disconnect/recovery and replay-proof party completion tests;
+original optional-enabled and optional-disabled Temple Depth2
+routes all PASS. The new after-Room2 path is **not published**:
+its server/workspace opt-ins and higher-depth release flags
+remain OFF in source. No real player DataStore, authored art
+or canonical v1.47 Word roadmap was modified. Earlier v1.48,
+v1.49 and v1.50 updates remain available as historical
+checkpoints; v1.51 supersedes v1.50's now-outdated statement
+that the late route has no physical placeholder.
+
 **Latest ChatGPT-authored roadmap update: v1.50 (configurable optional Event placement, 20 September 2026).**
 Read [the v1.50 optional Event placement roadmap](DungeonMMO_Roadmap_v1_50_Optional_Event_Placement.md)
 and [its verified local test report](../testing/phase4-optional-event-placement-templates-2026-09-20.md).
