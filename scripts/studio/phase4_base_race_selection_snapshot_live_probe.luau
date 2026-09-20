@@ -61,9 +61,16 @@ local ok, hits = pcall(function()
 end)
 if ok then
     local on_card = false
-    for i=1, math.min(3, #hits) do
-        if hits[i] == human or hits[i]:IsDescendantOf(human) then
-            on_card = true
+    for i=1, math.min(12, #hits) do
+        local obj = hits[i]
+        local screen = obj:FindFirstAncestorOfClass("ScreenGui")
+        print("[Phase4 Race Picker] HIT "..i.." "
+            ..obj:GetFullName()
+            .." screen="..tostring(screen and screen.Name)
+            .." active="..tostring(obj.Active)
+            .." visible="..tostring(obj.Visible))
+        if obj == human or obj:IsDescendantOf(human) then
+            if i <= 3 then on_card = true end
             break
         end
     end
