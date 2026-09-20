@@ -192,6 +192,7 @@ local current_stage = ""
 local selected_race: string? = nil
 local selected_class: string? = nil
 local request_pending = false
+local pending_generation = 0
 local studio_party_test_auto_identity =
     RunService:IsStudio()
     and string.match(
@@ -645,6 +646,7 @@ local function render(
     if stage_changed then
         current_stage = stage
         request_pending = false
+        pending_generation += 1
 
         print(
             "[Identity Selection] Authoritative stage: "
@@ -751,6 +753,33 @@ local function render(
         "Stage: " .. tostring(stage)
 end
 
+local function send_manual_selection(kind: string, selection_id: string)
+    request_pending = true
+    pending_generation += 1
+    local generation = pending_generation
+    confirm.Active = false
+    confirm.AutoButtonColor = false
+    status.Text = "Saving " .. string.lower(kind) .. " choice..."
+    print("[Identity Selection] Confirm " .. kind .. " request sent.")
+    identity_selection:FireServer(kind, selection_id)
+
+    -- A dropped response or stale cloud server must not permanently disable
+    -- character creation. Never change the saved identity on the client.
+    task.delay(12, function()
+        if not request_pending or pending_generation ~= generation then
+            return
+        end
+        request_pending = false
+        pending_generation += 1
+        confirm.Active = true
+        confirm.AutoButtonColor = true
+        status.Text = "No response from server. Press Confirm to retry."
+        warn("[Identity Selection] No response to " .. kind
+            .. " confirmation; allowing retry.")
+        progression_snapshot:FireServer("Request")
+    end)
+end
+
 confirm.Activated:Connect(
     function()
         if request_pending then
@@ -776,17 +805,7 @@ confirm.Activated:Connect(
                 return
             end
 
-            request_pending = true
-            confirm.Active = false
-            confirm.AutoButtonColor = false
-
-            status.Text =
-                "Saving race choice..."
-
-            identity_selection:FireServer(
-                "Race",
-                selected_race
-            )
+            send_manual_selection("Race", selected_race)
 
             return
         end
@@ -797,15 +816,7 @@ confirm.Activated:Connect(
                 return
             end
 
-            request_pending = true
-            confirm.Active = false
-            confirm.AutoButtonColor = false
-            status.Text =
-                "Saving " .. selected_class .. " class..."
-            identity_selection:FireServer(
-                "Class",
-                selected_class
-            )
+            send_manual_selection("Class", selected_class)
         end
     end
 )
@@ -843,6 +854,7 @@ action_result.OnClientEvent:Connect(
         end
 
         request_pending = false
+        pending_generation += 1
         confirm.Active = true
         confirm.AutoButtonColor = true
 
