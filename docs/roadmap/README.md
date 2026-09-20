@@ -18,10 +18,13 @@ and optional Secret-skip persistence failures now roll back in-memory
 progression so players can retry without bypassing a required encounter.
 Focused Studio tests, all five local Rojo compositions, assisted Temple
 placeholder backtracking, normal Dungeon Play mode, and a two-client
-session-disconnect fixture passed. The remaining multiplayer gameplay
-gate is a real two-client optional-boss fight with interrupted-boss and
-reward-replay checks; same-account rejoin is unproven. See
-`docs/testing/phase4-optional-boss-lifecycle-hardening-2026-09-20.md`.
+session-disconnect fixture passed. The local two-client optional-boss fight has since passed: one Event
+boss despite simultaneous entry, a real mid-Event disconnect with the
+other player continuing, isolated interrupted-boss state recovery,
+Event reward replay protection and Secret/final boss completion.
+Same-account network rejoin is still unproven. Evidence:
+`docs/testing/phase4-optional-boss-two-client-playtest-2026-09-20.md`
+and `docs/testing/phase4-optional-boss-lifecycle-hardening-2026-09-20.md`.
 This is a working engineering update, not a new canonical DOCX version
 or cloud release. Finished models and cloud verification remain deferred.
 

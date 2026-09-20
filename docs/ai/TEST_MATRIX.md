@@ -1,5 +1,23 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — optional boss real two-client local fixture
+
+- [x] Two distinct local Studio clients in a shared eligible Temple run.
+- [x] Simultaneous Event entry spawns one boss, not two.
+- [x] Real mid-Event PlayerRemoving retains connected peer, active Event,
+  checkpoint and frozen plan.
+- [x] Detached interrupted-Event reconstruction returns Event Pending;
+  prior Room1 stays Cleared.
+- [x] Survivor clears Event then Room2, Secret boss and final boss.
+- [x] Event reward replay returns already_applied; Secret reward recorded.
+- [x] Fresh test re-run parent+child Studio logs report PASS.
+- [ ] Actual same-account reconnect or reconstructed live server after
+  interrupted boss remains untested.
+- [ ] Unassisted combat/balance and any published-cloud acceptance deferred.
+
+Evidence: docs/testing/
+phase4-optional-boss-two-client-playtest-2026-09-20.md.
+
 ## 20 September 2026 — optional-boss lifecycle local follow-up
 
 - [x] RED then GREEN: unsaved normal/Event startup must reset Pending.

@@ -1,5 +1,20 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — real local Studio two-client optional-boss pass
+
+On integration source c571552, two simulated Studio clients were admitted
+into the same eligible Temple optional-boss run. A second player entering
+Event did not duplicate its boss; one client disconnected mid-fight while
+the peer retained the run, checkpoint and Active boss. The peer then
+cleared Event, Room2, Secret and the final boss; reward replay was
+idempotent. A detached sequencer verified interrupted Event would
+reconstruct as Pending without replaying Room1. Two fresh local runs
+passed, including 20260920T161203Z_Studio_B6E09_last.log and
+child 20260920T161212Z_Studio_F969B_last.log. Details:
+docs/testing/phase4-optional-boss-two-client-playtest-2026-09-20.md.
+Still not proven: same-account network rejoin/new-server recovery and
+normal unassisted combat. No published place or DataStore modified.
+
 ## 20 September 2026 — optional-boss lifecycle local hardening
 
 On wip/phase-4-test-hud-integration-v1, a failed persisted normal/Event

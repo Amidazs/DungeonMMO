@@ -1,5 +1,21 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — two-client optional-boss gameplay tested
+
+Current integration branch wip/phase-4-test-hud-integration-v1;
+starting implementation c571552. TEMP local Studio two-client fight
+passed: shared frozen eligible run; one Event boss for two simultaneous
+clients; one player leaves during Active Event; peer preserves session
+and checkpoint, defeats Event and Secret, blocks Event reward replay
+and clears final boss. A saved-state detached sequencer validates
+interrupted Event returns Pending; it does not reconnect the original
+account or restart the actual live Dungeon server. Fixture:
+scripts/studio/phase4_optional_boss_two_client_fight.luau.
+Receipts and limits:
+docs/testing/phase4-optional-boss-two-client-playtest-2026-09-20.md.
+Continue backend with server-recreation/true rejoin validation when
+possible, without cloud publication or any modelling work.
+
 ## 20 September 2026 — optional lifecycle continuation
 
 Active worktree: DungeonMMO_Phase4_HUD_Integration_v1; branch:
