@@ -1,5 +1,27 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — full depth-ladder progression
+
+- [x] Temple/Mine Depth1–4 3/4/5/6 encounter plans, Depth4 previous
+  bosses as minibosses and distinct final boss identity.
+- [x] Fresh 454-assertion saved-profile/session ladder integration PASS;
+  five focused Studio suites PASS.
+- [x] Actual completion service commits one reward/unlock per depth;
+  repeated commit does not duplicate rewards or progress.
+- [x] Reconstructed Depth4 interrupted miniboss returns Pending with
+  prior clear and persisted checkpoint intact.
+- [x] Four local Rojo compositions, 30/30 gameplay backend suites and
+  Base Play-mode regression PASS.
+- [x] One fresh assisted Temple Depth2 physical route PASS; older six
+  individual higher-depth Temple/Mine physical cases remain documented.
+- [ ] Remaining five physical routes were NOT revalidated as fresh by
+  the stopped multi-Play runner; the unsupported runner was removed.
+- [ ] Unreleased Depth2–4 entry still fails actual content-readiness
+  checks; no cloud/production enablement or unassisted combat acceptance.
+
+Evidence:
+docs/testing/phase4-depth1-4-progression-integration-2026-09-20.md.
+
 ## 20 September 2026 — full saved-session recovery
 
 - [x] Fresh 15/15 focused optional-boss Studio suites PASS.
