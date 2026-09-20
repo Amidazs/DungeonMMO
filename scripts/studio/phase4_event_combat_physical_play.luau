@@ -153,7 +153,9 @@ local function run()
         game:GetService("ReplicatedStorage").Core.Shared
             .DungeonOptionalBossVariantCatalog)
     local chosen_event = assert(VariantCatalog.get(dungeon_id, "Event", 2))
-    local chosen_secret = assert(VariantCatalog.get(dungeon_id, "Secret", 2))
+    local selected_seed = W:GetAttribute("DungeonMMOTempCombatSeed")
+    local chosen_secret = assert(VariantCatalog.get(
+        dungeon_id, "Secret", (math.floor(selected_seed / 7) % 2) + 1))
     local Combat = require(
         game:GetService("ReplicatedStorage").Core.Shared
             .DungeonOptionalEventCombatCatalog)
