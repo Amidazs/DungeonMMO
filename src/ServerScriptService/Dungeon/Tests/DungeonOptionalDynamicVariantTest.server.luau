@@ -72,12 +72,16 @@ local function check_variant(dungeon_id: string, depth_id: string,
     end
     local descriptors = assert(Content.for_difficulty(
         dungeon_id, depth_id, state))
+    local expected_event = if event_on then event_variant
+        else assert(Catalog.get(dungeon_id, "Event", 1))
+    local expected_secret = if secret_on then secret_variant
+        else assert(Catalog.get(dungeon_id, "Secret", 1))
     check(#descriptors == 2
-        and descriptors[1].Encounter.BossId == event_variant.BossId
-        and descriptors[2].Encounter.BossId == secret_variant.BossId,
-        "one Event/Secret descriptor must resolve from saved identities")
-    check(descriptors[1].Trigger.EventId == event_variant.Id
-        and descriptors[2].Trigger.UnlockId == secret_variant.Id,
+        and descriptors[1].Encounter.BossId == expected_event.BossId
+        and descriptors[2].Encounter.BossId == expected_secret.BossId,
+        "eligible descriptor resolves saved variant; inactive fallback is dormant")
+    check(descriptors[1].Trigger.EventId == expected_event.Id
+        and descriptors[2].Trigger.UnlockId == expected_secret.Id,
         "saved trigger identity must match selected placeholder boss")
     local selected = Policy.evaluate(
         {OptionalEncounters = descriptors},
