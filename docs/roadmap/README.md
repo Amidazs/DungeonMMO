@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**20 September four-depth integration checkpoint (after v1.47):**
+Both Temple and Abandoned Mine Depth1–4 ladders passed a new
+454-assertion profile/session/encounter integration test, including
+3/4/5/6 required rooms, Depth4 returning miniboss identities,
+ordered unlocks, interrupted miniboss checkpoints, and actual
+CompletionService one-time rewards. Five focused Studio suites,
+30/30 broad backend suites, four local Rojo builds, Base Play mode,
+and a fresh assisted Temple Depth2 physical route passed. The
+previous six separate Temple/Mine Depth2–4 physical tests retain
+their dated evidence; an attempted all-six-in-one Studio runner
+stopped after its first case and was removed. Higher-depth release
+locks remain unchanged, with injected readiness used only inside
+test storage. No production-code, authored model, Roblox cloud,
+DataStore, main branch or canonical DOCX change. See
+`docs/testing/phase4-depth1-4-progression-integration-2026-09-20.md`.
+
 **20 September full session-recovery checkpoint (after v1.47):**
 The existing session/encounter backend has passed a new 42-assertion
 persisted two-member recovery regression and all 15 local optional
