@@ -3,6 +3,12 @@
 local DungeonSecretDiscoveryService = {}
 DungeonSecretDiscoveryService.__index = DungeonSecretDiscoveryService
 
+local VariantCatalog = require(
+    game:GetService("ReplicatedStorage"):WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("DungeonOptionalBossVariantCatalog")
+)
+
 local MAX_TRIGGER_DISTANCE = 12
 
 -- Returns a standard discovery result without mutating the session.
@@ -17,7 +23,9 @@ end
 -- Args: state (any): Authoritative saved run state.
 --       encounter_id (string): Secret encounter identity.
 -- Returns: string?: Secret unlock identity when discovery is permitted.
-local function eligible_unlock(state: any, encounter_id: string): string?
+local function eligible_unlock(
+    state: any, encounter_id: string, dungeon_id: string
+): string?
     local plan = state.EncounterPlan
     local runtime = state.EncounterRuntime
     if type(plan) ~= "table" or type(runtime) ~= "table"
@@ -38,11 +46,18 @@ local function eligible_unlock(state: any, encounter_id: string): string?
             then
                 return nil
             end
-            local unlock_id = if encounter.BossId == "TempleSecretBoss"
-                then "TempleHiddenSanctum"
-                elseif encounter.BossId == "AbandonedMineSecretBoss"
-                then "MineSealedGallery" else nil
-            if unlock_id and state.OptionalBossSecretUnlocks[unlock_id] == true then
+            local unlock_id = nil
+            for index = 1, VariantCatalog.count(dungeon_id, "Secret") do
+                local variant = VariantCatalog.get(
+                    dungeon_id, "Secret", index)
+                if variant.BossId == encounter.BossId
+                    and state.OptionalBossSecretUnlocks[variant.Id] == true
+                then
+                    unlock_id = variant.Id
+                    break
+                end
+            end
+            if unlock_id then
                 if progress == "Skipped" then
                     -- A side encounter is only available before the final
                     -- required encounter is cleared. The main route must
@@ -114,13 +129,15 @@ function DungeonSecretDiscoveryService:discover(
     then
         return result(false, "SecretDiscoveryMemberOrRunIneligible")
     end
-    local unlock_id = eligible_unlock(session.InstanceState, encounter_id)
+    local unlock_id = eligible_unlock(
+        session.InstanceState, encounter_id, session.DungeonId)
     if not unlock_id then
         return result(false, "SecretDiscoveryEncounterIneligible")
     end
     local updated = self._sessions:update_instance_state(
         session_id, function(state: any): (any, any?)
-            local current_unlock = eligible_unlock(state, encounter_id)
+            local current_unlock = eligible_unlock(
+                state, encounter_id, session.DungeonId)
             if not current_unlock or current_unlock ~= unlock_id
                 or state.OptionalBossEnabled ~= true
                 or state.OptionalBossSecretUnlocked ~= true
