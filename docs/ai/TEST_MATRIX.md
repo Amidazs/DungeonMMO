@@ -1,5 +1,35 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — dynamic optional boss variants
+
+- [x] Server-only opt-in OFF by default; Depth2–4 and original optional
+  runtime release flags untouched; old Event/Secret selected without opt-in.
+- [x] 2,205 assertions for frozen variant/eligibility combinations
+  in Temple and Mine, Depth1–4; invalid saved identities fail closed,
+  recovered interrupted encounter retains original variant.
+- [x] 232 exact Secret discovery, replay, window-expiry and deferred
+  backtrack assertions for original and alternate identities.
+- [x] 80 same-factory Event/Secret/returning-miniboss independent
+  reward assertions, including persisted monster-history replay.
+- [x] 22/22 optional-focused, 30/30 broader backend suites and four
+  local Rojo compositions PASS.
+- [x] Assisted physical alternate-boss route and reward replay PASS:
+  Temple Depth2 (6 encounters) and Mine Depth4 (8 encounters).
+- [x] Existing variant-disabled Temple Depth2 physical route PASS.
+- [x] Four-client Mine Depth4 alternate-boss Play mode PASS:
+  duplicate concurrent Event spawn blocked; real mid-Event disconnect
+  preserves other 3; optional and later miniboss with same factory
+  earn different receipts for each survivor; final completion replay
+  blocked for all three recipients.
+- [ ] Dynamic variants use implemented boss placeholders, not new art,
+  an arbitrary number of Event slots or a new weekly scheduler.
+- [ ] True same-user network reconnect, real cloud TEST/PROD release,
+  unassisted higher-depth combat and actual player DataStore writes
+  remain unverified and intentionally deferred.
+
+Logs: docs/testing/
+phase4-dynamic-optional-boss-variants-2026-09-20.md.
+
 ## 20 September 2026 — higher-depth multiplayer lifecycle
 
 - [x] Two-client Temple Depth2 and four-client Mine/Temple Depth4 shared
