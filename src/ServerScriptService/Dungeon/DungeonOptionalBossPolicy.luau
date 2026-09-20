@@ -13,6 +13,7 @@ local Triggers = require(
 local DungeonOptionalBossPolicy = {}
 local OPTIONAL_KINDS = table.freeze({
     EventBoss = "TimedEvent",
+    EventCombat = "TimedEvent",
     SecretBoss = "SecretUnlock",
 })
 
@@ -29,9 +30,13 @@ local function valid_identity(
         and encounter.Id ~= ""
         and not seen[encounter.Id]
         and OPTIONAL_KINDS[encounter.Kind] ~= nil
-        and encounter.ExecutorId == "Boss"
-        and type(encounter.BossId) == "string"
-        and encounter.BossId ~= ""
+        and ((encounter.ExecutorId == "Boss"
+                and type(encounter.BossId) == "string"
+                and encounter.BossId ~= "")
+            or (encounter.Kind == "EventCombat"
+                and encounter.ExecutorId == "CombatPack"
+                and type(encounter.PackId) == "string"
+                and encounter.PackId ~= ""))
         and type(encounter.RoomSlotId) == "string"
         and encounter.RoomSlotId ~= ""
 end
@@ -60,13 +65,36 @@ local function content_ready(
     allowed_slots: {[string]: any}
 ): boolean
     local slot = allowed_slots[encounter.RoomSlotId]
-    local boss = ContentCatalog.get_boss(encounter.BossId)
-    return type(boss) == "table"
-        and ContentCatalog.is_boss_factory_implemented(boss.FactoryId)
-        and type(slot) == "table"
-        and slot.SupportsBoss == true
-        and type(slot.BossSpawnAnchor) == "string"
-        and slot.BossSpawnAnchor ~= ""
+    if type(slot) ~= "table" then return false end
+    local physically_ready = false
+    if encounter.Kind == "EventCombat" then
+        local pack = ContentCatalog.get_pack(
+            entry.DungeonId, encounter.PackId)
+        local count = 0
+        if type(pack) ~= "table"
+            or type(pack.Entries) ~= "table"
+            or #pack.Entries == 0
+        then return false end
+        for _, spawn in ipairs(pack.Entries) do
+            if type(spawn.BaseCount) ~= "number"
+                or spawn.BaseCount < 1
+            then return false end
+            count += spawn.BaseCount
+        end
+        physically_ready = slot.SupportsCombat == true
+            and type(slot.EnemySpawnGroup) == "string"
+            and slot.EnemySpawnGroup ~= ""
+            and type(slot.EnemySpawnMinCount) == "number"
+            and slot.EnemySpawnMinCount >= count
+    else
+        local boss = ContentCatalog.get_boss(encounter.BossId)
+        physically_ready = type(boss) == "table"
+            and ContentCatalog.is_boss_factory_implemented(boss.FactoryId)
+            and slot.SupportsBoss == true
+            and type(slot.BossSpawnAnchor) == "string"
+            and slot.BossSpawnAnchor ~= ""
+    end
+    return physically_ready
         and (entry.RequiresPlacementContract ~= true
             or (type(entry.InsertAfterId) == "string"
                 and slot.OptionalInsertAfterId == entry.InsertAfterId
@@ -123,7 +151,9 @@ function DungeonOptionalBossPolicy.evaluate(
             -- The existing runtime has one Event entrance and one Secret
             -- route per run. Two templates may never claim either kind
             -- or the same physical room in a single materialized plan.
-            if accepted_kinds[encounter.Kind] then
+            local frequency_kind = if encounter.Kind == "EventCombat"
+                then "EventBoss" else encounter.Kind
+            if accepted_kinds[frequency_kind] then
                 return {ok = false,
                     reason = "OptionalBossFrequencyExceeded"}
             end
@@ -140,7 +170,7 @@ function DungeonOptionalBossPolicy.evaluate(
                     reason = "OptionalBossContentUnavailable",
                 }
             end
-            accepted_kinds[encounter.Kind] = true
+            accepted_kinds[frequency_kind] = true
             accepted_slots[encounter.RoomSlotId] = true
             table.insert(accepted, entry)
         end
