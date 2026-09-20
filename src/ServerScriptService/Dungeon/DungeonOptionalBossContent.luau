@@ -8,13 +8,6 @@ local Templates = require(game:GetService("ReplicatedStorage")
     :WaitForChild("Core"):WaitForChild("Shared")
     :WaitForChild("DungeonOptionalEncounterTemplateCatalog"))
 
-local ANCHORS = table.freeze({
-    Depth1 = {"CombatRoom1", "Depth1Boss"},
-    Depth2 = {"Depth2Combat1", "Depth2Boss"},
-    Depth3 = {"Depth3Combat1", "Depth3Boss"},
-    Depth4 = {"Depth4Combat1", "Depth4FinalBoss"},
-})
-
 -- An unknown ID in an authoritative saved snapshot fails closed;
 -- absent fields retain index-1 legacy descriptors for old callers.
 local function selected(
