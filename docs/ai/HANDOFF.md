@@ -1,5 +1,34 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — v1.50 optional placement handoff
+
+Current branch: wip/phase-4-test-hud-integration-v1. Read
+docs/roadmap/DungeonMMO_Roadmap_v1_50_Optional_Event_Placement.md
+and docs/testing/
+phase4-optional-event-placement-templates-2026-09-20.md.
+This GitHub-first checkpoint adds an independent default-OFF
+DungeonMMOOptionalBossTemplatesEnabled server switch and a shared
+EventAfterRoom1/EventAfterRoom2/SecretBeforeFinal catalogue.
+The second Event placement is available only at Depth2–4, is saved
+at run creation and uses a new EventArenaLate physical room identity.
+Existing two original optional routes and selected boss variants
+are unchanged. Policy enforces one Event and Secret per run,
+rejects duplicate room claims and fails closed if the late slot
+lacks an explicitly verified matching after-Room2 placement.
+
+**Do not enable late placement:** No physical EventArenaLate room,
+gate, bridge, trigger or spawn is registered. The new template has
+only synthetic planning/recovery tests, not a walking playtest or
+released boss. Before opening it, register actual replaceable
+physical content and synchronize its gate using the saved plan;
+validate physical traversal, concurrent party trigger/disconnect
+and per-member rewards. Baseline Temple Depth2 normal/variant
+routes, 274 template assertions, 23/23 focused suites, 30/30 broad
+backend suites and four local Rojo compositions passed. Revisit
+other MMORPG backends after this event-location capability is
+accepted; do not keep remaking the completed dungeon runtime.
+No cloud publish, real account DataStore or authored art changes.
+
 ## 20 September 2026 — dynamic optional variant backend closeout
 
 Start from docs/roadmap/
