@@ -1,5 +1,35 @@
 # DungeonMMO Current Engineering State
 
+## 20 September 2026 — dynamic optional Event/Secret variants ACCEPTED locally
+
+New server-only DungeonMMOOptionalBossVariantsEnabled (default false)
+enables a deterministic, run-frozen choice of one of two registered
+implemented boss placeholders per optional kind in Temple/Mine.
+The existing Event window, Secret probability, session save, plan
+insertion, optional gate and dungeon release locks are unchanged.
+The Secret discovery service now validates the saved dungeon-scoped
+variant identity instead of only legacy boss IDs. BossEncounterExecutor
+uses encounter-scoped DungeonEnemyId for EventBoss/SecretBoss/
+MiniBoss/FinalBoss, preventing reused factories in a single run from
+sharing reward receipts; legacy Depth1 Boss identity is unchanged.
+
+GitHub-first tests: 2,205 dynamic selection/reconstruction assertions,
+232 original/alternate Secret discovery assertions, 80 reward
+identity/replay assertions, 22/22 optional-focused suites and 30/30
+broad backend suites PASS; four local Rojo compositions built.
+TEMP assisted Temple Depth2 and Mine Depth4 physical alternate-boss
+routes and the variant-disabled Temple Depth2 route PASS.
+Four-client Mine Depth4 alternate Event/Secret Play mode PASS:
+one Event boss on concurrent approach, one real member disconnects
+during Event, three finish the run, each receives independent rewards
+for an alternate boss and its returning miniboss appearance, and
+per-member final completion replay remains blocked.
+Full logs, prior failed tests, fixes and caveats:
+docs/testing/phase4-dynamic-optional-boss-variants-2026-09-20.md.
+Roadmap: docs/roadmap/
+DungeonMMO_Roadmap_v1_49_Phase4_Dynamic_Optional_Variants.md.
+No cloud publish, DataStore mutation, meshes or PROD change.
+
 ## 20 September 2026 — higher-depth optional multiplayer lifecycle checkpoint
 
 GitHub-first, disposable local Studio Play-mode fixtures passed Temple and
