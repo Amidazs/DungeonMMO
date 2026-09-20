@@ -9,8 +9,8 @@
   side bridges remain sealed while opted-in Depth2–4 routes play.
 - [x] 18/18 optional-focused suites; 30/30 gameplay backend suites.
 - [x] Six separate physical walking Play-mode scenarios pass both
-  optional bosses and dungeon completion: Temple/Mine 2/3/4, with
-  six/eight? See report for exact six/seven/eight encounters by depth.
+  optional bosses and dungeon completion: Temple/Mine Depth2/3/4,
+  with six/seven/eight encounters respectively.
 - [x] Mine Depth4 physically bypasses Secret, backtracks to clear it,
   then completes the pending Final using TEMP-only spawn deferral.
 - [x] Optional-disabled Temple Depth2 original four-room route PASS.
