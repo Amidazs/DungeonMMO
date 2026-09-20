@@ -155,12 +155,96 @@ local function commit_depth(
     return first
 end
 
--- Exercises logical unlocks while preserving actual release/content locks.
+-- Checks entry prerequisites without enabling unreleased content.
+-- Args: context (any): Current profile, progression and dungeon services.
+--       depth_id (string): Authoritative difficulty identifier.
+--       index (number): One-based position in the four-depth ladder.
+--       order ({string}): Immutable progression order for this dungeon.
+-- Returns: any: Existing difficulty definition and encounter sequence.
+local function validate_depth(
+    context: any, depth_id: string, index: number, order: {string}
+): any
+    local difficulty = assert(Difficulties.get(context.dungeon_id, depth_id))
+    check(#difficulty.EncounterSequence == index + 2,
+        context.dungeon_id .. " has the expected room count")
+    check(context.progression:is_unlocked(
+        context.user_id, context.dungeon_id, depth_id
+    ), "current depth must be logically unlocked")
+    if index < #order then
+        local next_id = order[index + 1]
+        check(not context.progression:is_unlocked(
+            context.user_id, context.dungeon_id, next_id
+        ), "later depth cannot skip an uncleared prerequisite")
+        check(context.progression:record_clear(
+            context.user_id, context.dungeon_id, next_id
+        ).reason == "PreviousDifficultyNotCleared",
+            "premature higher-depth completion must be rejected")
+    end
+    check(context.progression:validate_entry(
+        context.user_id, context.dungeon_id, depth_id
+    ).ok, "logical entry passes only the isolated readiness contract")
+    if index > 1 then
+        check(not difficulty.RuntimeReleaseEnabled
+            and context.release:validate_entry(
+                context.user_id, context.dungeon_id, depth_id
+            ).reason == "DifficultyContentNotReady",
+            "normal unreleased high-depth entry stays blocked")
+    end
+    return difficulty
+end
+
+-- Runs and commits one depth using the existing dungeon authorities.
+-- Args: context (any): Current disposable session/profile services.
+--       depth_id (string): Selected depth for the simulated session.
+--       difficulty (any): Frozen authoritative encounter definition.
+-- Returns: nil: Checks completion, reward idempotency and saved unlock.
+local function complete_depth(
+    context: any, depth_id: string, difficulty: any
+)
+    local created = assert(context.sessions:create(
+        context.dungeon_id, {context.user_id}, 0,
+        "depth-ladder-" .. context.dungeon_id, depth_id
+    ))
+    check(created.Difficulty.Id == depth_id,
+        "session must store the selected difficulty")
+    check(context.sessions:mark_connected(
+        created.SessionId, context.user_id
+    ).ok, "dungeon session becomes active")
+    clear_run(context.sessions, created.SessionId,
+        difficulty.EncounterSequence, context.map, context.clock)
+    check(context.sessions:mark_complete(
+        created.SessionId, {context.user_id}
+    ).ok, "completed run saves its reward recipient")
+    local initial_gold = context.profiles:get_character(
+        context.user_id, 1
+    ).Gold
+    local first_clear = commit_depth(
+        context.sessions, created.SessionId, context.profiles,
+        context.progression, context.dungeon_id, depth_id
+    )
+    local recorded = first_clear.member_results[
+        tostring(context.user_id)
+    ].difficulty_progress
+    check(recorded.ok and not recorded.already_completed
+        and recorded.completed_difficulty_id == depth_id,
+        "actual completion records the correct depth exactly once")
+    check(context.profiles:get_character(
+        context.user_id, 1
+    ).Gold > initial_gold, "completion rewards are granted once")
+    check(context.progression:record_clear(
+        context.user_id, context.dungeon_id, depth_id
+    ).already_completed, "repeat clear must remain idempotent")
+    check(context.profiles:save(
+        context.user_id, "DepthLadderTest"
+    ), "difficulty unlock must be stored in the profile")
+end
+
+-- Exercises the four-depth unlock ladder and cross-session persistence.
 -- Args: dungeon_id (string): One independently tracked dungeon ladder.
---       user_id (number): Disposable in-memory test profile identity.
+--       user_id (number): Disposable in-memory player identity.
 --       profiles (any): Loaded profile service shared across both ladders.
---       profile_store (any): Persistent in-memory test profile adapter.
--- Returns: nil: Checks all depth unlocks, clears and profile reloads.
+--       profile_store (any): Disposable persistent profile adapter.
+-- Returns: nil: Checks all depth clears after independent reloads.
 local function verify_ladder(
     dungeon_id: string,
     user_id: number,
@@ -172,82 +256,37 @@ local function verify_ladder(
             return {ok = true, Ready = true}
         end,
     }
-    local progression = Progression.new(profiles, ready)
-    local release = Progression.new(profiles)
     local function clock(): number
         return 1000
     end
-    local map = Map.new(clock)
-    local sessions = Sessions.new(map, clock)
+    local context = {
+        dungeon_id = dungeon_id,
+        user_id = user_id,
+        profile_store = profile_store,
+        profiles = profiles,
+        ready = ready,
+        clock = clock,
+        map = Map.new(clock),
+    }
+    context.sessions = Sessions.new(context.map, clock)
+    context.progression = Progression.new(profiles, ready)
+    context.release = Progression.new(profiles)
+
     local order = Difficulties.order()
     for index, depth_id in ipairs(order) do
-        local difficulty = assert(Difficulties.get(dungeon_id, depth_id))
-        check(#difficulty.EncounterSequence == index + 2,
-            dungeon_id .. " has the expected depth-specific room count")
-        check(progression:is_unlocked(user_id, dungeon_id, depth_id),
-            dungeon_id .. " current depth must be logically unlocked")
-        if index < #order then
-            local next_id = order[index + 1]
-            check(not progression:is_unlocked(user_id, dungeon_id, next_id),
-                dungeon_id .. " cannot skip an uncleared depth")
-            check(progression:record_clear(
-                user_id, dungeon_id, next_id
-            ).reason == "PreviousDifficultyNotCleared",
-                "higher depth clear must reject missing prerequisite")
-        end
-        check(progression:validate_entry(
-            user_id, dungeon_id, depth_id
-        ).ok, "eligible depth passes an isolated readiness contract")
-        if index > 1 then
-            check(not difficulty.RuntimeReleaseEnabled
-                and release:validate_entry(
-                    user_id, dungeon_id, depth_id
-                ).reason == "DifficultyContentNotReady",
-                "actual unreleased high-depth entry must remain blocked")
-        end
-        local created = assert(sessions:create(
-            dungeon_id, {user_id}, 0,
-            "depth-ladder-" .. dungeon_id, depth_id
-        ))
-        check(created.Difficulty.Id == depth_id,
-            "session must store the selected difficulty")
-        check(sessions:mark_connected(created.SessionId, user_id).ok,
-            "dungeon session must become active")
-        clear_run(
-            sessions, created.SessionId, difficulty.EncounterSequence,
-            map, clock
-        )
-        check(sessions:mark_complete(
-            created.SessionId, {user_id}
-        ).ok, "completed session must persist the reward recipient")
-        local initial_gold = profiles:get_character(user_id, 1).Gold
-        local first_clear = commit_depth(
-            sessions, created.SessionId, profiles, progression,
-            dungeon_id, depth_id
-        )
-        local recorded = first_clear.member_results[tostring(user_id)]
-            .difficulty_progress
-        check(recorded.ok and not recorded.already_completed
-            and recorded.completed_difficulty_id == depth_id,
-            "completion must unlock the correct depth exactly once")
-        check(profiles:get_character(user_id, 1).Gold > initial_gold,
-            "completion must grant scaled gold once before saving")
-        check(progression:record_clear(
-            user_id, dungeon_id, depth_id
-        ).already_completed, "repeat clear must not unlock twice")
-        check(profiles:save(user_id, "DepthLadderTest"),
-            "difficulty clear must persist in the player profile")
-        profiles = Profiles.new(profile_store)
-        check(profiles:load(user_id) ~= nil,
-            "new profile service must load the saved difficulty clear")
-        progression = Progression.new(profiles, ready)
-        release = Progression.new(profiles)
+        local difficulty = validate_depth(context, depth_id, index, order)
+        complete_depth(context, depth_id, difficulty)
+        context.profiles = Profiles.new(profile_store)
+        check(context.profiles:load(user_id) ~= nil,
+            "saved player profile reloads before the next depth")
+        context.progression = Progression.new(context.profiles, ready)
+        context.release = Progression.new(context.profiles)
     end
-    local progress = progression:get_snapshot(user_id).progress
+    local progress = context.progression:get_snapshot(user_id).progress
     local dungeon = progress.Dungeons[dungeon_id]
     check(dungeon.HighestClearedOrder == 4
         and dungeon.Completed.Depth4 == true,
-        "profile reload must retain all four difficulty clears")
+        "profile reload retains all four difficulty clears")
 end
 
 local profile_store = ProfileMap.new()
