@@ -1,5 +1,27 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — higher-depth multiplayer backend closeout
+
+Current integration branch wip/phase-4-test-hud-integration-v1.
+GitHub-first two- and four-client local Studio TEMP fixtures verify shared
+Temple/Mine Depth2/4 eligible runs, simultaneous Event and Secret touch
+without duplicate boss spawns, real mid-Event or mid-Secret member removal,
+continued party progression and member-specific reward replay protection.
+The two-member Temple Depth2 and four-member Mine Depth4 strict completion
+reruns passed real CompletionService persistence and idempotence for
+1/3 surviving recipients. One initial stricter run failed because fresh
+Studio profiles had not earned previous difficulties; fixture now awards
+only disposable earlier-depth clears through the authoritative
+progression service. A new Depth2/4, 1/2/4-member wipe/auto-revive
+service-level suite passed 392 assertions, optional focused 19/19 and
+broad backend 30/30; four local Rojo compositions built.
+Read docs/testing/phase4-higher-depth-multiplayer-lifecycle-2026-09-20.md
+for dated parent/child Studio logs and all caveats.
+Next backend candidate: dynamic dungeon-event/secret variety using
+the existing issuer, planner, boss registry and reward replay system,
+without new schedulers or new art. Retain real same-account rejoin/cloud
+acceptance as a separate deferred gate. No production release changes.
+
 ## 20 September 2026 — ChatGPT-authored roadmap v1.48 handoff
 
 Read `docs/roadmap/DungeonMMO_Roadmap_v1_48_Phase4_Backend_Update.md`
