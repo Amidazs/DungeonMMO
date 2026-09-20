@@ -2,17 +2,23 @@
 -- Snapshots optional boss availability when a server creates a dungeon run.
 local DungeonOptionalBossRunState = {}
 local Rules = require(script.Parent:WaitForChild("DungeonOptionalBossRules"))
+local Catalog = require(game:GetService("ReplicatedStorage")
+    :WaitForChild("Core"):WaitForChild("Shared")
+    :WaitForChild("DungeonOptionalBossVariantCatalog"))
 
-local DUNGEONS = table.freeze({
-    TestDungeon = {
-        EventId = "TempleEclipse",
-        SecretId = "TempleHiddenSanctum",
-    },
-    AbandonedMine = {
-        EventId = "MineEchoSurge",
-        SecretId = "MineSealedGallery",
-    },
-})
+-- Legacy default identities are catalog index 1; the opt-in path only
+-- changes a newly issued run, never an existing saved snapshot.
+local function selected_variant(
+    dungeon_id: string, kind: string, seed: number, enabled: boolean
+): any?
+    local index = 1
+    if enabled then
+        local offset = if kind == "Event"
+            then seed else math.floor(seed / 7)
+        index = (offset % Catalog.count(dungeon_id, kind)) + 1
+    end
+    return Catalog.get(dungeon_id, kind, index)
+end
 
 -- Rejects NaN and infinite timestamp, seed, or configuration values.
 -- Args: value (any): Number to validate.
@@ -92,8 +98,8 @@ function DungeonOptionalBossRunState.issue(
     release_enabled: boolean
 ): any
     local state = disabled_snapshot()
-    local dungeon = DUNGEONS[dungeon_id]
-    if not dungeon or release_enabled ~= true
+    if Catalog.count(dungeon_id, "Event") == 0
+        or release_enabled ~= true
         or not finite_number(entered_at)
         or not finite_number(session_seed)
     then
@@ -101,21 +107,27 @@ function DungeonOptionalBossRunState.issue(
     end
 
     local settings = Rules.resolve(dungeon_id, entered_at, options)
+    local variants_enabled = type(options) == "table"
+        and options.optional_boss_variants_enabled == true
+    local event_variant = assert(selected_variant(
+        dungeon_id, "Event", session_seed, variants_enabled))
+    local secret_variant = assert(selected_variant(
+        dungeon_id, "Secret", session_seed, variants_enabled))
     local window = eligible_event(
-        dungeon.EventId, entered_at, settings
+        event_variant.Id, entered_at, settings
     )
     local secret = hidden_route_selected(
         session_seed, settings
     )
     state.OptionalBossEventActive = window ~= nil
     state.OptionalBossEventId = if window
-        then dungeon.EventId else nil
+        then event_variant.Id else nil
     if window then
-        state.OptionalBossEventWindows[dungeon.EventId] = window
+        state.OptionalBossEventWindows[event_variant.Id] = window
     end
     state.OptionalBossSecretUnlocked = secret
     if secret then
-        state.OptionalBossSecretUnlocks[dungeon.SecretId] = true
+        state.OptionalBossSecretUnlocks[secret_variant.Id] = true
     end
     state.OptionalBossEnabled = window ~= nil or secret
     return state
