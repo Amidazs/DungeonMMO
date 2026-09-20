@@ -42,7 +42,6 @@ local definition=require(shared.DungeonDefinitions)
 local catalog=require(shared.DungeonRuntimeContentCatalog)
 local policy=require(SSS.Dungeon.DungeonOptionalBossPolicy)
 local content=require(SSS.Dungeon.DungeonOptionalBossContent)
-local layout=assert(catalog.get_layout("TestDungeon","Depth1"))
 local now=os.time()
 local function verify(origin: string, enabled: boolean)
     W:SetAttribute("Phase4TEMPOptionalOrigin",origin)
@@ -64,9 +63,13 @@ local function verify(origin: string, enabled: boolean)
             and opts.optional_boss_event_start <= now
             and opts.optional_boss_event_end > now,
             "TEST Event/Secret practice options missing at "..origin)
-        local evaluated=policy.evaluate(
-            {OptionalEncounters=content.for_difficulty("TestDungeon","Depth1")},
-            "Depth1",layout.Slots,true,run)
+        -- The Base creates the frozen run before teleport. Physical boss
+        -- slots and encounter executors exist only in the Dungeon place.
+        if origin == "Dungeon" then
+            local layout=assert(catalog.get_layout("TestDungeon","Depth1"))
+            local evaluated=policy.evaluate(
+                {OptionalEncounters=content.for_difficulty("TestDungeon","Depth1")},
+                "Depth1",layout.Slots,true,run)
         local count=if type(evaluated.encounters)=="table"
             then #evaluated.encounters else -1
         print("[Phase4 Optional Origin] POLICY "..origin
@@ -80,6 +83,7 @@ local function verify(origin: string, enabled: boolean)
         assert(evaluated.ok and count==2,
             "Event/Secret boss omitted from "..origin.." frozen plan: "
             ..tostring(evaluated.reason).." count="..count)
+        end
         print("[Phase4 Optional Origin] "..string.upper(origin)
             .."_EVENT_AND_SECRET_FROZEN_AT_ENTRY_PASS")
     else
