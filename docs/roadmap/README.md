@@ -1,5 +1,33 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.52 (non-boss Event variations and cross-profession backend, 20 September 2026).**
+Read [the v1.52 backend roadmap](DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md)
+and [the dated local Studio test report](../testing/phase4-nonboss-event-profession-chain-2026-09-20.md).
+The existing, separately gated after-Room2 Event room can now host
+an opted-in four-enemy Ambush or eight-enemy Surge in Temple/Mine:
+one server-frozen pack, not an additional boss, second scheduler,
+staggered wave or cave-in. Both variations passed assisted physical
+walking and two-/four-client mid-Event disconnect/replay-proof
+completion tests. New deterministic matrix: 144 assertions;
+25/25 focused optional suites, 30/30 broad backend suites,
+four local Rojo builds, original optional-enabled and
+optional-disabled Temple Depth2 physical regressions PASS.
+
+**Next major backend work has begun:** the existing Blacksmithing
+and Alchemy services now have a bidirectional material chain,
+`iron_bar` → Alchemy `forging_flux` → Blacksmithing
+`runic_ironbound_gloves`. New items and recipes use the
+existing atomic crafting/inventory/profile pipeline.
+46 new cross-profession assertions and 7/7 profession
+regressions passed in both local Base and Dungeon builds.
+Leatherworking, Enchanting, real station/minigame authority
+and larger raid/guild backend work are not yet complete.
+All new Event release/placeholder flags remain OFF by default;
+this checkpoint did not publish Roblox places, change real
+player DataStores, create finished art or overwrite the
+historical canonical v1.47 Word roadmap. v1.48–v1.51 remain
+historical supplements.
+
 **Latest ChatGPT-authored roadmap update: v1.51 (late Event physical and multiplayer acceptance, 20 September 2026).**
 Read [the v1.51 late Event acceptance roadmap](DungeonMMO_Roadmap_v1_51_Late_Event_Physical_Acceptance.md)
 and [its verified physical/multiplayer test report](../testing/phase4-late-event-physical-multiplayer-2026-09-20.md).
