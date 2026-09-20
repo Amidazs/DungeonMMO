@@ -13,6 +13,7 @@
       },
       "Combat": {
         "$className": "Folder",
+        "$ignoreUnknownInstances": true,
         "Shared": {
           "$path": "src/ReplicatedStorage/Combat/Shared"
         }
