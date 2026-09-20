@@ -48,9 +48,11 @@ local function copy_encounters(encounters: {any}): {any}
 end
 
 function DungeonInstanceDirector.runtime_options(): any
-    -- Only the exact published TEST Dungeon offers an always-open,
-    -- server-issued Event/Secret practice window for this playtest.
-    local test_dungeon = TestRelease.is_test_dungeon()
+    -- TeleportCoordinator freezes the run in the Base before teleporting.
+    -- The exact TEST lobby must issue the same server-owned Event/Secret
+    -- practice eligibility as a direct TEST Dungeon Studio session.
+    -- Other universes/places never receive this override.
+    local test_temple = TestRelease.is_test_temple_context()
     local now = os.time()
     return {
         force_rare = optional_boolean(Workspace:GetAttribute("DungeonMMOStudioForceRareState")),
@@ -63,17 +65,17 @@ function DungeonInstanceDirector.runtime_options(): any
         optional_boss_secret_routes_enabled = ServerScriptService:GetAttribute(
             "DungeonMMOOptionalBossSecretRoutesEnabled"
         ) == true,
-        optional_boss_event_start = if test_dungeon
+        optional_boss_event_start = if test_temple
             then now - 60
             else ServerScriptService:GetAttribute(
                 "DungeonMMOOptionalBossEventStartUnix"
             ),
-        optional_boss_event_end = if test_dungeon
+        optional_boss_event_end = if test_temple
             then now + 1800
             else ServerScriptService:GetAttribute(
                 "DungeonMMOOptionalBossEventEndUnix"
             ),
-        optional_boss_secret_chance_basis_points = if test_dungeon
+        optional_boss_secret_chance_basis_points = if test_temple
             then 10000
             else ServerScriptService:GetAttribute(
                 "DungeonMMOOptionalBossSecretChanceBasisPoints"
