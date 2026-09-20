@@ -1,5 +1,33 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 20 September 2026 — higher-depth multiplayer lifecycle
+
+- [x] Two-client Temple Depth2 and four-client Mine/Temple Depth4 shared
+  run, one Event boss despite simultaneous entry, actual disconnect
+  mid-Event and peer/3-member continuation to completion.
+- [x] Two-client Temple Depth4 and four-client Mine Depth2 mid-Secret
+  disconnection: one Secret boss, preserved checkpoint/ongoing encounter,
+  remaining party continues and completes.
+- [x] Strict follow-up Temple Depth2 2→1 and Mine Depth4 4→3 runs:
+  persisted completion recipient sets match connected surviving members;
+  a reconstructed CompletionService returns already_applied and does
+  not change per-member Gold or reward history.
+- [x] Fixture-only previous-depth progression bootstrap uses
+  DungeonDifficultyProgressionService; real higher-depth completion
+  remains blocked if a profile lacks its prior clears.
+- [x] Service-level 1/2/4-member party wipe/automatic revive and
+  authoritative Event checkpoint tests: 392 assertions PASS.
+- [x] Fresh 19/19 optional-focused and 30/30 gameplay backend suites;
+  all four local Rojo compositions build successfully.
+- [ ] Actual same-account network rejoin/new reserved-server recreation,
+  physical in-Play whole-party death/revive and manual unassisted
+  higher-depth party combat remain distinct acceptance gates.
+- [ ] Cloud TEST/PROD publish and higher-depth release flags remain
+  deliberately unchanged.
+
+Receipts: docs/testing/
+phase4-higher-depth-multiplayer-lifecycle-2026-09-20.md.
+
 ## 20 September 2026 — higher-depth optional physical integration
 
 - [x] Temple and Mine Depth2/3/4 TEMP geometry: level side bridge
