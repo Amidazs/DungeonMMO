@@ -1,5 +1,15 @@
 # Canonical Roadmap
 
+**20 September consecutive optional-combat follow-up (after v1.47):**
+Two local two-client Temple tests passed ordinary-health Event -> Secret
+combat with regular client attack requests. In the second run the server
+confirmed Dodge and a slotted healing skill, restoring ~32 party HP
+before Secret; final-room progression passed with test assistance.
+This does not supersede the failed injured-solo attempt, and
+required-room/final-boss manual combat, true rejoin and cloud
+verification remain open. See
+`docs/testing/phase4-optional-boss-consecutive-skill-defense-2026-09-20.md`.
+
 **20 September normal-combat follow-up (after v1.47):** Local
 GitHub-first normal-combat fixtures independently defeated Temple
 Event and Secret bosses with real client attacks and normal player HP.
