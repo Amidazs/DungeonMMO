@@ -112,6 +112,84 @@ local RECIPES = table.freeze({
         }),
         XP = 35,
     }),
+    cure_raw_hide = table.freeze({
+        Id = "cure_raw_hide",
+        Name = "Cure Raw Hide",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 3}),
+            -- Alchemy supplies the curing oil.
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "cured_leather", Quantity = 1}),
+        XP = 20,
+    }),
+    stitch_leatherbound_gloves = table.freeze({
+        Id = "stitch_leatherbound_gloves",
+        Name = "Stitch Leatherbound Gloves",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "cured_leather", Quantity = 1}),
+            -- Blacksmithing supplies the metal fittings.
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "leatherbound_gloves", Quantity = 1,
+        }),
+        XP = 20,
+    }),
+    distill_warding_essence = table.freeze({
+        Id = "distill_warding_essence",
+        Name = "Distill Warding Essence",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "warding_essence", Quantity = 1}),
+        XP = 25,
+    }),
+    inscribe_warding_rune = table.freeze({
+        Id = "inscribe_warding_rune",
+        Name = "Inscribe Warding Rune",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        XP = 30,
+    }),
+    enchant_leatherbound_gloves = table.freeze({
+        Id = "enchant_leatherbound_gloves",
+        Name = "Enchant Leatherbound Gloves",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            -- Leatherworking, Enchanting and Alchemy must contribute.
+            table.freeze({ItemId = "leatherbound_gloves", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warded_leatherbound_gloves", Quantity = 1,
+        }),
+        XP = 45,
+    }),
     temper_ironbound_gloves = table.freeze({
         Id = "temper_ironbound_gloves",
         Name = "Temper Ironbound Gloves",
@@ -141,6 +219,15 @@ local STATION_ORDER = table.freeze({
         "distill_tempering_oil",
         "distill_blueprinted_tempering_oil",
         "distill_forging_flux",
+        "distill_warding_essence",
+    }),
+    Leatherworking = table.freeze({
+        "cure_raw_hide",
+        "stitch_leatherbound_gloves",
+    }),
+    Enchanting = table.freeze({
+        "inscribe_warding_rune",
+        "enchant_leatherbound_gloves",
     }),
 })
 
