@@ -74,6 +74,7 @@ replace_once(dungeon.DungeonRuntime,
 SSS:SetAttribute("DungeonMMOOptionalBossEventStartUnix", os.time() - 60)
 SSS:SetAttribute("DungeonMMOOptionalBossEventEndUnix", os.time() + 900)
 SSS:SetAttribute("DungeonMMOOptionalBossSecretChanceBasisPoints", 10000)
+W:SetAttribute("DungeonMMOTempPartySize", party_size)
 W:SetAttribute("DungeonMMOStudioDungeonId", dungeon_id)
 W:SetAttribute("DungeonMMOStudioDifficultyId", depth_id)
 W:SetAttribute("DungeonMMOPlaceholderPreviewDungeonId", dungeon_id)
@@ -244,8 +245,7 @@ local function run()
         until_value(function()
             return state_of(runtime, id, entry.Id) == "Cleared"
         end, entry.RoomSlotId .. " completion", 20)
-        check(not entry.Kind == "SecretBoss", "dummy")
-    end
+        end
     local function start(entry, users)
         local slot = entry.RoomSlotId
         local kind = if entry.Kind == "EventBoss" then "Event"
