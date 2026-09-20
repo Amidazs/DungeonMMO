@@ -140,7 +140,9 @@ local function bridge(
     gate.CastShadow = false
     gate:SetAttribute("DungeonMMOOptionalEntranceGate", true)
     gate:SetAttribute("DungeonMMOOptionalArena",
-        if name == "EventBridge" then "EventArena" else "SecretArena")
+        if name == "EventBridge" then "EventArena"
+        elseif name == "EventBridgeLate" then "EventArenaLate"
+        else "SecretArena")
     return model
 end
 
@@ -228,7 +230,8 @@ end
 -- Depth2/3/4 blockout is a LOOK-AND-REPLACE preview only. Deliberately no
 -- gameplay anchors or physical layout registration: depth gates stay locked.
 local function build_depth_previews(
-    root: Instance, theme: any, optional_depth: number?
+    root: Instance, theme: any, optional_depth: number?,
+    late_depth: number?
 )
     for depth = 2, 4 do
         local group = Instance.new("Folder")
@@ -255,7 +258,8 @@ local function build_depth_previews(
             for _, side in ipairs({-1, 1}) do
                 local wall_x = center_x + side * 32
                 local side_route = selected_optional and side == 1
-                    and (index == 1 or index == count - 1)
+                    and (index == 1 or index == count - 1
+                        or (late_depth == depth and index == 2))
                 if side_route then
                     for _, offset in ipairs({-1, 1}) do
                         part(room, if offset < 0 then "EastWallSouth"
@@ -300,16 +304,24 @@ end
 --       depth (number): Selected higher difficulty, 2 through 4.
 -- Returns: nil: Creates both side rooms, walkable bridges and gated anchors.
 local function playable_depth_optional(
-    group: Instance, parent: Instance, theme: any, depth: number
+    group: Instance, parent: Instance, theme: any, depth: number,
+    include_late: boolean
 )
     local center_x = theme.PreviewX + (depth - 2) * 240
     local last_required = depth + 1
-    for _, entry in ipairs({
+    local entries = {
         {Kind = "Event", Room = 1},
         {Kind = "Secret", Room = last_required},
-    }) do
+    }
+    if include_late then
+        table.insert(entries, {
+            Kind = "EventLate", Room = 2,
+            Name = "EventArenaLate", Bridge = "EventBridgeLate",
+        })
+    end
+    for _, entry in ipairs(entries) do
         local z = 80 - (entry.Room - 1) * 90
-        local name = entry.Kind .. "Arena"
+        local name = entry.Name or entry.Kind .. "Arena"
         local room_x = center_x + 112
         local room = room_model(group, name, theme)
         room:SetAttribute("DungeonMMOPlaceholderRoomSlotId", name)
@@ -317,7 +329,7 @@ local function playable_depth_optional(
         part(room, "BossPedestal", Vector3.new(16, 1, 16),
             Vector3.new(room_x, 0.5, z - 12),
             theme.Accent, Enum.Material.Slate)
-        bridge(group, theme, entry.Kind .. "Bridge",
+        bridge(group, theme, entry.Bridge or entry.Kind .. "Bridge",
             center_x + 52, z, 40, 20, center_x + 34)
         local prefix = theme.Prefix .. ".Depth" .. depth
             .. "." .. entry.Kind .. "."
@@ -401,12 +413,18 @@ function Placeholder.create(
         and game:GetService("Workspace"):GetAttribute(
             "DungeonMMOPlaceholderOptionalPlayEnabled") == true
         then selected_depth else nil
+    local late_depth = if optional_depth ~= nil
+        and game:GetService("Workspace"):GetAttribute(
+            "DungeonMMOPlaceholderLateEventPlayEnabled") == true
+        then optional_depth else nil
     root:SetAttribute("DungeonMMOPlaceholderActiveDifficulty",
         selected or "Depth1")
     root:SetAttribute("DungeonMMOPlaceholderOptionalDepthRoutes",
         optional_depth ~= nil)
+    root:SetAttribute("DungeonMMOPlaceholderLateEventRoute",
+        late_depth ~= nil)
     build_optional(root, parent, theme)
-    build_depth_previews(root, theme, optional_depth)
+    build_depth_previews(root, theme, optional_depth, late_depth)
     local test_dungeon = TestRelease.is_test_dungeon()
         and dungeon_id == "TestDungeon"
     if test_dungeon or local_studio_preview then
@@ -417,7 +435,8 @@ function Placeholder.create(
                     "Depth" .. selected_depth .. "_TEMP_PLAYABLE")
                 assert(group, "OptionalDepthPreviewMissing")
                 playable_depth_optional(
-                    group, parent, theme, selected_depth
+                    group, parent, theme, selected_depth,
+                    late_depth ~= nil
                 )
             end
         end
