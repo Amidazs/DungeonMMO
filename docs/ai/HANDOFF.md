@@ -1,5 +1,26 @@
 # DungeonMMO Development Handoff
 
+## 20 September 2026 — six higher-depth optional physical routes
+
+Current integration branch: wip/phase-4-test-hud-integration-v1.
+GitHub-first placeholder geometry + physical layout + active-depth gate
+changes add separate Event/Secret bridges to the existing TEMP Temple
+and Mine Depth2/3/4 blockouts, without enabling release flags or
+changing required room sequences. The tests physically walked into/out
+of both side rooms and passed all six dungeon/depth combinations using
+assisted enemy defeats. One more Mine Depth4 Play-mode run demonstrated
+physical Secret bypass and backtracking before final completion, using
+a TEMP-only final-spawn hold. Structural test: 139 PASS; focused optional
+suite 18/18 PASS; broad backend matrix 30/30 PASS; optional-disabled
+Temple Depth2 baseline and all four local Rojo builds PASS. Full paths
+and seven Studio Play-mode log receipts:
+docs/testing/phase4-depth2-4-optional-physical-playtest-2026-09-20.md.
+These were automated Studio movement tests, not unassisted manual
+combat or live same-account reconnect. The user previously verified
+manual solo optional boss combat separately. No cloud push/publish or
+player DataStore/art modification. Next: preserve accepted backend,
+finish remaining Phase4 release/UX gates when requested.
+
 ## 20 September 2026 — optional depth/event backend continuation
 
 Active integration branch: wip/phase-4-test-hud-integration-v1.
