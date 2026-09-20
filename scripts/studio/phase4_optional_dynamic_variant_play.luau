@@ -305,6 +305,37 @@ local function run()
         end, slot_id .. " server completion", 15)
         print("[Depth Optional Physical] CLEARED " .. slot_id)
         if stage then
+            local character = assert(runtime.ProfileService:get_character(
+                player.UserId, 1))
+            local history = character.RewardHistory.Monster or {}
+            local wanted = encounter.BossId .. ":" .. encounter.Id
+            local key, before_count = nil, 0
+            for transaction in pairs(history) do
+                before_count += 1
+                if string.find(transaction, wanted, 1, true) then
+                    key = transaction
+                end
+            end
+            check(key ~= nil,
+                "alternate boss must grant its own encounter-scoped reward")
+            local replay = runtime.RewardService:grant_monster_reward(
+                {player.UserId},
+                {XP = 40, GoldMin = 0, GoldMax = 0,
+                    BossId = encounter.BossId}, key)
+            check(replay.ok and replay.already_applied,
+                "repeated alternate boss reward must not apply twice")
+            local after_count = 0
+            for _ in pairs(
+                assert(runtime.ProfileService:get_character(
+                    player.UserId, 1)).RewardHistory.Monster or {}
+            ) do
+                after_count += 1
+            end
+            check(after_count == before_count,
+                "reward replay must preserve player monster history")
+            print("[Depth Optional Variant] REWARD_REPLAY_PASS "
+                .. stage .. " " .. encounter.BossId
+                .. " encounter=" .. encounter.Id)
             cross_side(stage, false)
         end
     end
