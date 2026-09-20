@@ -7,10 +7,16 @@ local Catalog = require(ReplicatedStorage:WaitForChild("Core")
 
 local Layouts = {}
 local PREFIX = {TestDungeon = "Temple", AbandonedMine = "Mine"}
+local LATE_INSERT = {
+    Depth2 = "Depth2Combat2",
+    Depth3 = "Depth3Combat2",
+    Depth4 = "Depth4MiniBoss1",
+}
 
 local function slot(trigger: string, checkpoint: string,
     room_id: string, group: string?, spawn_prefix: string?,
-    min_count: number?, boss_spawn: string?): any
+    min_count: number?, boss_spawn: string?,
+    insert_after: string?): any
     return table.freeze({
         TriggerAnchor = trigger,
         CheckpointAnchor = checkpoint,
@@ -23,11 +29,13 @@ local function slot(trigger: string, checkpoint: string,
         ExitBarrierRoomId = nil,
         ExitBarrierAnchor = nil,
         BossSpawnAnchor = boss_spawn,
+        OptionalInsertAfterId = insert_after,
+        OptionalPlacementVerified = insert_after ~= nil,
     })
 end
 
 function Layouts.get(dungeon_id: string, layout_id: string,
-    include_optional: boolean): any?
+    include_optional: boolean, include_late: boolean?): any?
     local prefix = PREFIX[dungeon_id]
     if not prefix then return nil end
     if layout_id == "Depth1" then
@@ -75,6 +83,14 @@ function Layouts.get(dungeon_id: string, layout_id: string,
             slots[room_slot_id] = slot(
                 root .. "Trigger", root .. "Checkpoint",
                 room_slot_id, nil, nil, nil, root .. "BossSpawn"
+            )
+        end
+        if include_late == true then
+            local root = prefix .. "." .. layout_id .. ".EventLate."
+            slots.EventArenaLate = slot(
+                root .. "Trigger", root .. "Checkpoint",
+                "EventArenaLate", nil, nil, nil, root .. "BossSpawn",
+                LATE_INSERT[layout_id]
             )
         end
     end
