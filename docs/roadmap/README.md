@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**20 September full session-recovery checkpoint (after v1.47):**
+The existing session/encounter backend has passed a new 42-assertion
+persisted two-member recovery regression and all 15 local optional
+focused suites. A fresh assisted physical Temple Secret backtracking
+fixture also passed. The test constructs new session, controller and
+reward services over a shared in-memory store; it is not a genuine
+same-account Roblox reconnect or cloud server restart. No production
+gameplay, model, DataStore, TEST/PROD place or original roadmap DOCX
+was changed. The user separately confirms a successful manual solo
+optional-boss playtest. See
+`docs/testing/phase4-optional-full-session-recovery-2026-09-20.md`.
+
 **20 September consecutive optional-combat follow-up (after v1.47):**
 Two local two-client Temple tests passed ordinary-health Event -> Secret
 combat with regular client attack requests. In the second run the server
