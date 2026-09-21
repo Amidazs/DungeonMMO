@@ -48,9 +48,11 @@ function WorldBossCombatAuthority:record_for_user(
 
     local session = context.Sessions:get(context.SessionId)
     local member = session and session.Members[tostring(user_id)]
+    local event = session and session.InstanceState
+        and session.InstanceState.WeeklyWorldBoss
     if not member or member.Abandoned == true
         or not member.Connected
-        or session.InstanceState.WeeklyWorldBoss.Defeated == true
+        or type(event) ~= "table" or event.Defeated == true
     then
         return {ok = false, reason = "WorldBossMemberNotActive"}
     end
