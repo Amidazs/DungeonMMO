@@ -18,14 +18,14 @@ export type DamageContext = {
 }
 
 local damage_callback:
-    ((DamageContext, number) -> ())? = nil
+    ((DamageContext, number, boolean) -> ())? = nil
 
 function DamageService.calculate_damage(base_damage: number, multiplier: number): number
     return math.max(0, base_damage * multiplier)
 end
 
 function DamageService.set_damage_callback(
-    callback: ((DamageContext, number) -> ())?
+    callback: ((DamageContext, number, boolean) -> ())?
 )
     damage_callback = callback
 end
@@ -64,7 +64,10 @@ function DamageService.apply_damage(context: DamageContext): number
     end
 
     if health_damage > 0 and damage_callback then
-        damage_callback(context, health_damage)
+        -- A killing blow has already reduced Humanoid.Health to zero
+        -- when this callback runs. Preserve that trusted hit evidence
+        -- so the world-boss contribution gate does not discard it.
+        damage_callback(context, health_damage, humanoid.Health <= 0)
     end
 
     return health_damage
