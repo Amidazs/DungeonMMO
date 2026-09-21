@@ -125,10 +125,13 @@ function WorldBossMemberLifecycle:_activate_character(
     end
 
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
+        or character:WaitForChild("Humanoid", 5)
+    if humanoid and humanoid:IsA("Humanoid") then
         humanoid.Died:Connect(function()
             self:_handle_death(binding)
         end)
+    else
+        warn("[World Boss] Character missing Humanoid death signal.")
     end
 end
 
