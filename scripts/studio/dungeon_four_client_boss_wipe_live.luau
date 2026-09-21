@@ -59,7 +59,9 @@ local Players = game:GetService("Players")
 local Tags = game:GetService("CollectionService")
 local Workspace = game:GetService("Workspace")
 local STS = game:GetService("StudioTestService")
-local context = require(script.Parent.DungeonBossWipeContext_TEMP)
+local context = require(
+    script.Parent.Dungeon.DungeonBossWipeContext_TEMP
+)
 
 -- Args:
 --   predicate: () -> any; server-owned state expected to become true.
