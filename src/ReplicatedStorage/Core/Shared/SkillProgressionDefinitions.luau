@@ -15,6 +15,7 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 3,
         Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
         WeaponTags = table.freeze({}),
     }),
 
