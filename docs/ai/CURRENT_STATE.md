@@ -1,5 +1,31 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — eligible-threat support follow-up
+
+Current tested candidate: `b569435c9eb3cd4971eec06ca1baeeb4f17f4a09`.
+An enemy receives support threat only if it already has positive
+threat from a currently eligible target candidate. Stale threat
+from an absent/dead former target alone no longer activates healing
+aggro. Its support caster and recipient must also be eligible.
+
+All six compositions built; the focused Studio threat contract
+passed **51 assertions** (including the new absent-leader guard).
+Real two-client ordinary Marauder support and ordinary aggro
+fixtures both printed `VERIFIED_MULTIPLAYER_PASS` at this head.
+
+The isolated world-boss aggro rerun was attempted but its Studio
+process exceeded the **110-second outer timeout**; do not report
+a current-head pass or interpret the timeout as a combat failure.
+The earlier successful world-boss run remains historical evidence
+from its earlier commit. World-boss aggro and actual world-boss
+support need clean current-head Play. Only the orphan children
+belonging to the timed-out temporary test were terminated.
+
+All source/doc edits were GitHub-only. No Roblox publish,
+main merge or cloud data mutation. Receipt:
+`docs/testing/combat-support-eligible-threat-followup-2026-09-21.md`.
+
+
 ## 21 September 2026 — support threat and four-role contract LOCALLY VERIFIED
 
 Latest tested source/test head:
