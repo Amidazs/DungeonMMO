@@ -20,7 +20,7 @@
   14 in Dungeon for no/invalid contribution, real recorded
   damage, healing and in-memory persisted recovery.
 - [x] Existing local weekly policy/factory (40+8), session
-  persistence (30 each Base/Dungeon), Base profession 14/14,
+  persistence (33 each Base/Dungeon on final source), Base profession 14/14,
   Dungeon backend 30/30, and real-client Base crafting material
   chain Play passed on this travel-integration branch.
 - [ ] **The dedicated place still lacks playable guardian AI and
