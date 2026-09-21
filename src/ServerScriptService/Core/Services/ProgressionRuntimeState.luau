@@ -627,6 +627,18 @@ function ProgressionRuntimeState.is_skill_usable(
         return false, "UnknownSkill"
     end
 
+    local identity = state_for(user_id).Identity
+    for _, allowed_class in ipairs(
+        definition.AllowedBaseClasses or {}
+    ) do
+        if identity.BaseClassId == allowed_class then
+            break
+        end
+        if _ == #(definition.AllowedBaseClasses or {}) then
+            return false, "WrongClass"
+        end
+    end
+
     local authoritative_tags =
         ProgressionRuntimeState.get_weapon_tags(user_id)
 
