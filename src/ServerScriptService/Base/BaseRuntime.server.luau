@@ -38,6 +38,9 @@ local DungeonEntrySelectionRules = require(
     Base:WaitForChild("DungeonEntrySelectionRules")
 )
 local PartyRuntime = require(Base:WaitForChild("PartyRuntime"))
+local WorldBossBaseRuntime = require(
+    Base:WaitForChild("WorldBossBaseRuntime")
+)
 
 local BankRuntime = require(Base:WaitForChild("BankRuntime"))
 local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
@@ -738,6 +741,21 @@ party_controller = PartyRuntime.attach({
         return {ok = true}
     end,
 })
+
+-- The world-boss gateway is absent unless the server explicitly enables
+-- it. It is separate from the existing Temple portal and party entry.
+local weekly_boss_gateway = WorldBossBaseRuntime.attach({
+    environment = base_environment,
+    profiles = profiles,
+    coordinator = coordinator,
+    bridge = runtime.WeeklyWorldBossSessionBridge,
+    party_service = party_controller.service,
+    entry_result = entry_result,
+})
+if not weekly_boss_gateway.ok then
+    warn("[World Boss Base] Gateway disabled: "
+        .. tostring(weekly_boss_gateway.reason))
+end
 
 entry_request.OnServerEvent:Connect(function(player: Player, dungeon_id: any)
     handle_entry(player, dungeon_id)
