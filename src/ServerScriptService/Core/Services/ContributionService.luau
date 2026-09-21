@@ -1,5 +1,6 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Shared = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local DefaultConfig = require(Shared:WaitForChild("ContributionConfig"))
@@ -88,15 +89,25 @@ local function valid_positive_finite(value: any): boolean
     return true
 end
 
+-- Args:
+--   user_id: any; authenticated player ID supplied by server code.
+-- Returns:
+--   boolean: real positive UserIds, or negative Studio test identities.
+local function valid_contributor_id(user_id: any): boolean
+    return type(user_id) == "number"
+        and user_id % 1 == 0
+        and user_id < math.huge and user_id > -math.huge
+        and (user_id > 0
+            or (user_id < 0 and RunService:IsStudio()))
+end
+
 local function validate_event_shape(event: any): boolean
     return type(event) == "table"
         and type(event.EventId) == "string"
         and event.EventId ~= ""
         and type(event.SessionId) == "string"
         and event.SessionId ~= ""
-        and type(event.UserId) == "number"
-        and event.UserId > 0
-        and event.UserId % 1 == 0
+        and valid_contributor_id(event.UserId)
         and type(event.Type) == "string"
         and event.Type ~= ""
         and valid_positive_finite(event.Amount)
@@ -187,9 +198,7 @@ function ContributionService:record_for_user(
     user_id: number,
     event: any
 ): any
-    if type(user_id) ~= "number"
-        or user_id <= 0
-        or user_id % 1 ~= 0
+    if not valid_contributor_id(user_id)
         or type(event) ~= "table"
     then
         return result(false, "InvalidContributionEvent")
