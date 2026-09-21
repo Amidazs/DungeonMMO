@@ -1732,6 +1732,42 @@ local function apply_arc_slash_target(
 end
 
 
+--[[
+Applies optional skill-generated threat independently of health damage.
+
+A future Taunt-style skill can set TAUNT_BONUS_THREAT while keeping
+BASE_DAMAGE at zero. The server then moves that player above the current
+threat leader for the exact accepted NPC target.
+
+Args:
+    player (Player): Authenticated skill user.
+    skill_definition (table): Authoritative server skill definition.
+    target (Model): Server-accepted hostile NPC target.
+
+Returns:
+    None.
+]]
+local function apply_skill_threat(
+    player: Player,
+    skill_definition: any,
+    target: Model
+)
+    local bonus = tonumber(skill_definition.TAUNT_BONUS_THREAT) or 0
+    if bonus <= 0 or bonus >= math.huge then
+        return
+    end
+
+    ThreatService.taunt(target, player, bonus)
+    CombatValidationService.emit(
+        player,
+        "THREAT",
+        "TAUNT",
+        skill_definition.ID .. " -> " .. target.Name,
+        nil
+    )
+end
+
+
 local function apply_rogue_melee_target(
     player: Player,
     character: Model,
@@ -2024,6 +2060,11 @@ local function enter_skill_active(
                             target_index
                         )
                     end
+                    apply_skill_threat(
+                        player,
+                        skill_definition,
+                        target
+                    )
                 end
             end)(),
             on_candidate_rejected = function(target: Model, reason: string)
