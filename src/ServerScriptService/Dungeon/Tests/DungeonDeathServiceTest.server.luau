@@ -117,6 +117,11 @@ check(session.WipeDecisionEndsAt == now + 30, "Solo Spectating after the free re
 
 local paid_request = deaths:request_paid_revive(player)
 check(paid_request.ok == false and paid_request.reason == "PaidPurchaseRequired", "Later death must expose the paid revive purchase gate.")
+-- Mirror the real purchase service: it atomically commits the grant and
+-- changes the member to Active before invoking the spawn callback.
+session.Members["101"].PaidReviveCount = 1
+session.Members["101"].Mode = "Active"
+session.WipeDecisionEndsAt = nil
 local paid_spawn = deaths:complete_paid_revive(player)
 check(paid_spawn.ok == true, "Granted paid revive must respawn successfully.")
 check(
@@ -127,12 +132,39 @@ check(session.WipeDecisionEndsAt == nil, "Successful paid revive must clear the 
 local repeated_paid = deaths:complete_paid_revive(player)
 check(
     repeated_paid.ok == false
-        and repeated_paid.reason == "MemberNotDead"
+        and repeated_paid.reason == "PaidReviveAlreadyProcessed"
         and #spawns == 2,
     "A duplicate paid callback must never spawn an already active member."
 )
 
-local third_death = deaths:on_player_died(player, CFrame.new(30, 3, -30))
+-- Another purchase is valid only after a new death and a new granted count.
+local ungranted_death = deaths:on_player_died(
+    player, CFrame.new(30, 3, -30)
+)
+check(
+    ungranted_death.ok == true
+        and session.Members["101"].Mode == "Spectating",
+    "A later death must return a paid-revived player to spectating."
+)
+local ungranted_callback = deaths:complete_paid_revive(player)
+check(
+    ungranted_callback.ok == false
+        and ungranted_callback.reason == "PaidReviveAlreadyProcessed"
+        and #spawns == 2,
+    "A stale paid grant must not spawn a member after a later death."
+)
+session.Members["101"].PaidReviveCount = 2
+session.Members["101"].Mode = "Active"
+session.WipeDecisionEndsAt = nil
+local second_grant = deaths:complete_paid_revive(player)
+check(
+    second_grant.ok == true
+        and #spawns == 3,
+    "A newly granted paid purchase can respawn the member once."
+)
+
+
+local third_death = deaths:on_player_died(player, CFrame.new(35, 3, -35))
 check(third_death.ok == true and session.Members["101"].Mode == "Spectating", "Death after paid revive must return to Spectating and reopen the wipe window.")
 
 now = 1029
