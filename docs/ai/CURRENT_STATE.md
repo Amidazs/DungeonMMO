@@ -1,5 +1,29 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — animal-only Skinning backend implementation; Studio pending
+
+After v1.53's partially passing profession tests, the active branch gained
+a default-deny, server-owned animal Skinning policy. Only an explicitly
+tagged, allowlisted Beast corpse is eligible, after death and successful
+server loot. The shared ProfessionService grants hide exactly once with
+a per-corpse claim and server range check. DungeonEnemyCleanup preserves
+only such eligible animal corpses briefly; all existing Marauders and
+bosses keep the legacy cleanup path. RawHideCache is still a non-monster
+temporary material source. No animal enemy factory has been registered.
+
+All changes (including tests and this handoff) were written to GitHub,
+then safely fast-forwarded to the clean Windows integration worktree.
+All four Rojo compositions built at
+`c6af7cf080001f199e7383ef8cb4c63198e7d312`; **new Studio tests
+have not run**. The direct Studio MCP discovery attempt could not reach
+Studio, and the delegated Codex route hit a usage limit. The earlier
+Base RawHideCache simulated-input timeout is still unresolved. Do not
+promote Skinning or the whole v1.53 profession increment to accepted.
+
+Details and pending exact test gates:
+`docs/testing/animal-only-corpse-skinning-pending-studio-2026-09-21.md`.
+No cloud publish, real-player DataStore run or main merge occurred.
+
 ## 21 September 2026 — v1.53 tested locally; live profession acceptance pending
 
 GitHub-first staged source at `45a9bc25a185fcdb00579e977a22dc582eefc1ec`
