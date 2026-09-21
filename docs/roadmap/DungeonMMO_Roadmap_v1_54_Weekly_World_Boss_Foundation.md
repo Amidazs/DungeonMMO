@@ -41,11 +41,13 @@ a disposable Play-mode acceptance path:
   guardian spawns, assisted defeat grants one weekly reward, and
   a second guardian kill grants no additional reward.
 
-The first physical gateway is a **test fixture only**. It is not a
-normal Base portal, public event, reserved-server route or finished
-boss encounter. The guardian uses the existing combat rig for
-backend verification; the 100-gold payout is a provisional test
-value, not a balanced final reward.
+The **initial** physical gateway described in this section was
+a test fixture only. The later isolated-travel milestone introduces
+a separate default-off Base gateway and reserved-place source path;
+no published network journey or finished boss encounter is
+verified. The guardian still uses the existing combat rig for
+backend verification; the provisional 100-gold payout is not
+a balanced final reward.
 
 ## New local milestone — isolated weekly boss travel and return
 
@@ -97,7 +99,7 @@ TEST configuration. Thus the currently compiled destination is
 cross-place teleport, live MemoryStore/DataStore handoff, full
 Base → boss → Base playthrough or production release has occurred.
 
-## New local milestone — frozen session and contribution-gated reward
+## Earlier local milestone — frozen session and contribution-gated reward
 
 The next default-off backend layer is implemented and locally
 verified. `WeeklyWorldBossSessionBridge` uses the existing
@@ -115,13 +117,14 @@ in Base and 30 in Dungeon; original weekly policy 40 assertions
 in each composition; guardian factory eight assertions; existing
 professions 14/14 and Dungeon backend 30/30 PASS.
 
-**Boundary:** This is session persistence contract testing with
-the real session service against a **shared Studio in-memory
-adapter**. No normal Base entry, reserved-server teleport,
-dedicated boss destination or published cross-server MemoryStore/
-DataStore acceptance is claimed. The bridge is available in the
-shared server runtime but not yet invoked by normal gameplay.
-The disposable TestDungeon session used by the contract test
+**Boundary at this earlier checkpoint:** This was session
+persistence contract testing with the real session service
+against a **shared Studio in-memory adapter**. At that time,
+normal Base entry and reserved-boss destination source had not
+yet been implemented; the newer isolated-travel milestone above
+documents their default-off integration. Published cross-server
+MemoryStore/DataStore acceptance is still pending. The
+disposable TestDungeon session used by the contract test
 does not turn ordinary TestDungeon encounters into world bosses.
 
 Receipt:
