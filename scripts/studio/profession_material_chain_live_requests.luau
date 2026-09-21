@@ -24,6 +24,23 @@ runtime_source.Source = string.sub(source, 1, position - 1)
     .. original .. "\n_G.TempProfessionLiveRuntime = runtime"
     .. string.sub(source, position + #original)
 
+-- Expose the same already-validated Base environment used by the
+-- original station runtime, only in this disposable Studio fixture.
+local environment_anchor =
+    'local progression_controller = BaseProgressionController.new({'
+local environment_source = runtime_source.Source
+local environment_position = assert(string.find(
+    environment_source, environment_anchor, 1, true),
+    "Base environment instrumentation anchor not found")
+assert(not string.find(environment_source, environment_anchor,
+    environment_position + #environment_anchor, true),
+    "Base environment instrumentation anchor is ambiguous")
+runtime_source.Source = string.sub(
+    environment_source, 1, environment_position - 1)
+    .. '_G.TempProfessionLiveRuntime.TestEnvironment = '
+    .. 'base_environment\\n'
+    .. string.sub(environment_source, environment_position)
+
 local channel = Instance.new("RemoteEvent")
 channel.Name = "ProfessionMaterialLiveChannel_TEMP"
 channel.Parent = RS
@@ -123,19 +140,8 @@ local function craft(player, recipe_id, runtime)
         then stations:WaitForChild("LeatherworkingStationPlaceholder")
         elseif recipe.StationId == "Enchanting"
         then stations:WaitForChild("EnchantingStationPlaceholder")
-        else (function()
-            local wanted = "Base.Profession." .. recipe.StationId
-                .. "Placeholder"
-            for _, part in ipairs(
-                game:GetService("CollectionService"):GetTagged(
-                    "DungeonMMOEnvironmentAnchor")
-            ) do
-                if part:GetAttribute("AnchorId") == wanted then
-                    return part
-                end
-            end
-            return nil
-        end)()
+        else runtime.TestEnvironment:get(
+            "Base.Profession." .. recipe.StationId .. "Placeholder")
     assert(station and station:IsA("BasePart"),
         "No server station for " .. recipe_id)
     position_at(player, station)
