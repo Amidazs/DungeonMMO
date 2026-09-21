@@ -1,5 +1,35 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — weekly world-boss session bridge locally verified
+
+A default-off `WeeklyWorldBossSessionBridge` is now composed in
+Base/Dungeon shared RuntimeServices. It freezes the server-issued
+weekly event/party into the **existing** DungeonSessionService
+InstanceState, stores only a verified guardian defeat and rehydrates
+the same window and group from the session adapter after a local
+service restart. Reward delivery checks existing session membership,
+non-abandonment and server-certified contribution; an invited
+non-contributor gets no payout. A saved profile's once-per-week
+receipt prevents repeat payout after same-UserId in-memory reload.
+Stored windows are revalidated without reopening entry after close.
+
+Four Rojo compositions passed, the original 40 weekly policy
+assertions passed in Base/Dungeon, the guardian factory passed eight
+assertions, and the new **30-assertion** session contract passed
+in Base and Dungeon. Existing professions 14/14 and Dungeon
+backend 30/30 also passed at the latest source commit.
+
+This is NOT a normal Base portal or a completed reserved-server
+boss route. Session restart used a shared Studio in-memory adapter;
+no cross-server live MemoryStore or DataStore claims can be made.
+Normal dungeon runtime, normal portal and public event schedule
+were not changed or enabled. Source and documentation changes
+remain GitHub-only; no publish or main merge.
+
+Receipt: `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
+
+## Earlier 21 September weekly milestone (historical)
+
 ## 21 September 2026 — v1.54 weekly world-boss local foundation
 
 The active GitHub branch now includes a default-off weekly world-boss
