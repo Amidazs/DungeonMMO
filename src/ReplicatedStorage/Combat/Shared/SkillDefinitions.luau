@@ -110,6 +110,31 @@ local SHIELD_BASH: MeleeSkillDefinition = table.freeze({
     }),
 })
 
+-- Zero-damage server-targeted Fighter Taunt. MeleeHitService validates
+-- the actual hostile model and range; no damage event is fabricated.
+local TAUNT: MeleeSkillDefinition = table.freeze({
+    KIND = "Melee", ID = "Taunt", DISPLAY_NAME = "Taunt",
+    STAMINA_COST = 12, COOLDOWN_SECONDS = 8,
+    WIND_UP_SECONDS = 0.12, ACTIVE_SECONDS = 0.12,
+    RECOVERY_SECONDS = 0.25,
+    FORWARD_STEP_STUDS = 0, REACH_STUDS = 12, ARC_DEGREES = 100,
+    HITBOX = table.freeze({
+        SIZE = Vector3.new(14, 6, 12),
+        FORWARD_OFFSET = 6,
+        SAMPLE_COUNT = 3,
+    }),
+    BASE_DAMAGE = 0, STAGGER_SECONDS = 0,
+    TAUNT_BONUS_THREAT = 15,
+    MOVEMENT_SCALE = table.freeze({
+        WIND_UP = 0.75, ACTIVE = 0.75, RECOVERY = 0.85,
+    }),
+    RANKS = table.freeze({
+        [1] = table.freeze({TAUNT_BONUS_THREAT = 15}),
+        [2] = table.freeze({TAUNT_BONUS_THREAT = 25}),
+        [3] = table.freeze({TAUNT_BONUS_THREAT = 40}),
+    }),
+})
+
 local MEND: SupportSkillDefinition = table.freeze({
     KIND = "Support", ID = "Mend", DISPLAY_NAME = "Mend",
     STAMINA_COST = 20, COOLDOWN_SECONDS = 8.0,
@@ -354,6 +379,7 @@ local WINDSTALKER_QUICKSTEP = rogue_melee("WindstalkerQuickstep", "Quickstep", 1
 
 local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
+    Taunt = TAUNT,
     Mend = MEND,
     ArcSlash = ARC_SLASH,
     WindStrike = WIND_STRIKE,
