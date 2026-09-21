@@ -55,6 +55,7 @@ local active_session_id: string? = nil
 local boss_model: Model? = nil
 local admitted: {[number]: boolean} = {}
 local rewarded: {[number]: boolean} = {}
+local return_prompt: ProximityPrompt? = nil
 
 -- Args:
 --   user_id: number; authenticated member of the loaded boss session.
@@ -105,6 +106,9 @@ local function prepare_encounter(session_id: string)
             .. tostring(restored.reason))
     end
     if restored.snapshot.Defeated then
+        if return_prompt then
+            return_prompt.Enabled = true
+        end
         for user_id in pairs(admitted) do
             grant_if_eligible(user_id)
         end
@@ -123,6 +127,9 @@ local function prepare_encounter(session_id: string)
             warn("[World Boss] Defeat persistence failed: "
                 .. tostring(completed.reason))
             return
+        end
+        if return_prompt then
+            return_prompt.Enabled = true
         end
         for user_id in pairs(admitted) do
             grant_if_eligible(user_id)
@@ -252,7 +259,9 @@ prompt.ObjectText = "World Boss"
 prompt.MaxActivationDistance = 12
 prompt.HoldDuration = 0.25
 prompt.RequiresLineOfSight = false
+prompt.Enabled = false
 prompt.Parent = arena_spawn
+return_prompt = prompt
 prompt.Triggered:Connect(return_to_base)
 
 Players.PlayerAdded:Connect(admit_player)
