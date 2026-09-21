@@ -293,6 +293,16 @@ local function run()
     end, "all four automatic checkpoint revives", 25)
     assert(sessions:get(session_id).Checkpoint.Id == checkpoint_id,
         "Boss wipe must preserve the same active checkpoint")
+    print("[Four Client Depth4 MiniBoss Wipe] AFTER_WIPE_STATES "
+        .. tostring(encounter_state(
+            sessions, session_id, "Depth4Combat1"
+        )) .. " "
+        .. tostring(encounter_state(
+            sessions, session_id, "Depth4MiniBoss1"
+        )) .. " "
+        .. tostring(encounter_state(
+            sessions, session_id, "Depth4Combat2"
+        )))
     assert(encounter_state(sessions, session_id, "Depth4Combat1")
             == "Cleared"
         and encounter_state(sessions, session_id, "Depth4MiniBoss1")
