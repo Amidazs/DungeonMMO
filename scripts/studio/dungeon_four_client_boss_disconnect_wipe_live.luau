@@ -319,13 +319,14 @@ local function run()
             sessions, session_id, "Depth1Boss"
         ))
     )
-    assert(encounter_state(sessions, session_id, "CombatRoom1")
-            == "Cleared"
-        and encounter_state(sessions, session_id, "CombatRoom2")
-            == "Cleared"
-        and encounter_state(sessions, session_id, "Depth1Boss")
-            == "Pending",
-        "Only the interrupted boss may be reset")
+    wait_for(function()
+        return encounter_state(sessions, session_id, "CombatRoom1")
+                == "Cleared"
+            and encounter_state(sessions, session_id, "CombatRoom2")
+                == "Cleared"
+            and encounter_state(sessions, session_id, "Depth1Boss")
+                == "Pending"
+    end, "interrupted boss state persisted after peer departure", 12)
     print("[Four Client Boss Disconnect] FOUR_BOSS_CHECKPOINT_REVIVES_PASS")
 
     local fresh = enter_room(
