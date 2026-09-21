@@ -1,5 +1,36 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — real four-party encounter replay locally VERIFIED
+
+Locally verified gameplay head: `a5c0637888f8400703d07290f790a24d3b8406bf`.
+Four live Studio clients recovered after an interrupted physical
+Temple Room1 fight, with four checkpoint revives and a fresh
+full-health room; repeat killing a previously rewarded monster
+did not increase any player's Gold, XP, Level or bestiary count.
+Four-client Room3 boss and TEMP-enabled optional EventArena
+boss each respawned as one new full-health boss after wipe,
+without undoing cleared prerequisites.
+
+Fixed repeated terminal Failed broadcasts in
+`DungeonDeathService:tick` which had hidden ReplayWaiting.
+Real two-client server-owned Play again voting now displays
+Waiting for party to the first participant and simulated
+replay to both when all have consented. The source passed
+six Rojo builds, Dungeon backend 30/30 and death/revive
+41 assertions; earlier focused threat 51, Base professions
+14/14 and paid retry 15 remain passed.
+
+Outstanding: secret/higher-depth boss wipe/re-entry,
+real disconnected-party recovery, normal-client boss
+loot through wipe, actual cross-place reserved replay
+and cloud persistence. The latter need separate approval.
+
+Receipt:
+`docs/testing/dungeon-four-client-room-boss-event-replay-2026-09-21.md`.
+Roadmap v1.58:
+`docs/roadmap/DungeonMMO_Roadmap_v1_58_Four_Party_Boss_Replay_20260921.md`.
+
+
 ## 21 September 2026 — actual Room1 wipe/re-entry Play PASS
 
 At source `acb628fb99202a94f7f4cec781a15ec7f5614760`,
