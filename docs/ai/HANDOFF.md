@@ -1,6 +1,30 @@
 # DungeonMMO Development Handoff
 
-## 21 September 2026 — v1.53 GitHub-only profession staging handoff
+## 21 September 2026 — local profession verification handoff
+
+The active `wip/phase-4-test-hud-integration-v1` branch has passed
+all four Rojo builds, ten focused profession suites in BOTH disposable
+Dungeon/Base Studio places, 30 Dungeon backend suites and the generic
+Base Play smoke. The first GitHub-authored live Base client fixture
+passed actual near/far RemoteEvent routing at Leatherworking and
+Enchanting but **failed** to obtain a Gather result when simulating a
+RawHideCache ProximityPrompt hold. Do not promote v1.53 to full local
+acceptance or assume the fault is in production gathering rather than
+the test-input mechanism.
+
+Next: diagnose the live prompt through a new Github-only test fixture
+or actual client action in an unpublished disposable Studio place,
+then verify one-time hide claim, live material-backed cross-profession
+crafts, rapid same-player requests, independent players and disconnect/
+retry. Inspect Base-only unrelated Dungeon test autorun messages.
+Use `docs/testing/profession-v153-local-validation-2026-09-21.md`
+for exact test results and logs. Keep edits to source, fixtures,
+roadmap and documentation **on GitHub**; use Remote Desktop only for
+safe fast-forward pulling, local builds, Studio execution and log reads.
+No TEST/PROD publish, player DataStore acceptance, main merge or
+force-push is authorized.
+
+## 21 September 2026 — GitHub-only initial staging (historical)
 
 The active branch contains unverified-in-Studio profession work above
 the accepted v1.52 checkpoint. Do **not** rebuild these changes from
