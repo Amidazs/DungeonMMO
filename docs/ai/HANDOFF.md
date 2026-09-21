@@ -3,7 +3,7 @@
 ## 21 September 2026 — animal-only Skinning test handoff
 
 Latest GitHub-first branch is clean and locally fast-forwarded through
-`c6af7cf080001f199e7383ef8cb4c63198e7d312`. All four Rojo builds
+`8655c7e19bc97a9b9c803fc011e2e5a3080c47f3`. All four Rojo builds
 passed. `SkinningEligibility`, `CorpseSkinningRuntime` and the shared
 profession runtime now deny all unregistered and non-Beast enemies.
 DungeonEnemyCleanup preserves only registered, defeated animal-like
