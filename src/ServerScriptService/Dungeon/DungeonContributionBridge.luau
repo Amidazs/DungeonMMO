@@ -121,9 +121,16 @@ local function record(
     )
 end
 
+-- Args:
+--   context: any; trusted server-created damage context.
+--   applied_damage: number; positive damage applied by DamageService.
+--   lethal_hit: boolean?; server-observed death from that exact hit.
+-- Returns:
+--   any: recorded damage or an explicit contribution rejection.
 function DungeonContributionBridge.record_damage(
     context: any,
-    applied_damage: number
+    applied_damage: number,
+    lethal_hit: boolean?
 ): any
     if type(context) ~= "table" then
         return {ok = false, reason = "InvalidContributionEvent"}
@@ -155,6 +162,7 @@ function DungeonContributionBridge.record_damage(
             TargetName = if context.target
                 then context.target.Name
                 else nil,
+            VerifiedLethalHit = lethal_hit == true,
         }
     )
 end
