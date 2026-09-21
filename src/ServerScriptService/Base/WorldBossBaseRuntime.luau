@@ -92,18 +92,24 @@ function WorldBossBaseRuntime.validate_member(
     return {ok = true}
 end
 
--- Args:
---   options: any; already-initialized Base services and environment.
+-- Args: None.
 -- Returns:
---   any: disabled state or connected optional physical portal.
-function WorldBossBaseRuntime.attach(options: any): any
-    local config = {
+--   any: the current authoritative event settings on the Base server.
+local function current_config(): any
+    return {
         Enabled = SSS:GetAttribute("DungeonMMOWeeklyWorldBossEnabled"),
         PlaceId = SSS:GetAttribute("DungeonMMOWorldBossPlaceId"),
         StartAt = SSS:GetAttribute("DungeonMMOWorldBossStartUnix"),
         EndAt = SSS:GetAttribute("DungeonMMOWorldBossEndUnix"),
     }
-    if config.Enabled ~= true then
+end
+
+-- Args:
+--   options: any; already-initialized Base services and environment.
+-- Returns:
+--   any: disabled state or connected optional physical portal.
+function WorldBossBaseRuntime.attach(options: any): any
+    if current_config().Enabled ~= true then
         return {ok = true, enabled = false}
     end
 
@@ -125,6 +131,9 @@ function WorldBossBaseRuntime.attach(options: any): any
         if busy[leader.UserId] then
             return
         end
+        -- A live server kill-switch must close an already-attached
+        -- gateway immediately, not only on the next server restart.
+        local config = current_config()
         local schedule = WorldBossBaseRuntime.validate_config(config)
         local party = WorldBossBaseRuntime.resolve_party(
             leader, options.party_service)
