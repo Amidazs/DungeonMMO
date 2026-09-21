@@ -234,7 +234,15 @@ local function verify_peer_support(players, runtime, session_id)
             and updated
     end, "real peer Mage Heal and server support contribution", 12)
     print("[World Boss Party Live] PEER_HEAL_SUPPORT_PASS")
+    -- Restore the fixture's original melee combat identity. Equipping
+    -- a Mage Wand for healing changes basic-attack behavior; the later
+    -- shared-boss test intentionally proves the accepted melee path.
+    ProgressionRuntimeState.set_character(
+        caster.UserId,
+        ProfileSchema.create_default(caster.UserId).Characters.Slot1
+    )
     position_party(players, session_id)
+    task.wait(1.5)
 end
 
 -- Args:
