@@ -165,6 +165,9 @@ function DungeonReplayService:request(
     )
     if not started or started.ok ~= true then
         self._launching = false
+        -- Consent belongs to one launch attempt. After a failure,
+        -- every remaining member must explicitly choose replay again.
+        self._votes = {}
         return result(false,
             started and started.reason or "ReplayTeleportFailed")
     end
