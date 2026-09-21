@@ -1,5 +1,56 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — LOCAL-ONLY backend continuation handoff
+
+**User direction:** do not publish or configure a published TEST
+journey yet. Do any backend work possible locally. Source, test and
+documentation edits belong in GitHub; Remote Desktop must only be
+used for a clean fast-forward pull, local Rojo/Studio tests and
+read-only diagnostics when it is available.
+
+World-boss first-hit kill contribution is now fixed: DamageService
+passes server-observed lethal-hit evidence via CombatService into
+DungeonContributionBridge, and the boss authority allows the
+matched fatal hit after Humanoid health reaches zero without
+accepting ordinary post-defeat support or unrelated targets.
+The separate one-client one-hit fixture passed all four acceptance
+markers on source
+`5b7edc2675fd8fc6e9b6d0908bdf263742cf88b6`.
+An earlier source with the combat callback change also passed
+the pre-existing full-client and two-client Play regressions.
+The initial one-hit fixture *failed* because it was out of range;
+the corrected position produced the accepted result.
+
+Local in-memory reward recovery (17 assertions in Base and Dungeon)
+and failed departure-save lease retention (11 assertions) previously
+passed. The newly added post-save **lease-release** failure and lethal
+impostor filter assertions are pushed to the branch, but not accepted
+yet because the authorized desktop became unavailable before a new
+same-head test run. Do not confuse successful earlier assertions
+with a passing test of the new code.
+
+A real MageHeal two-client experiment failed on inconsistent
+Studio injured-target health and was reverted from the accepted
+melee/defeat fixture. Mend now records effective pulses, but neither
+client-driven peer Heal nor Ward is certified in the world-boss
+encounter. Keep a dedicated support test separate from the
+accepted real two-client melee fixture.
+
+**NEXT, still no publishing:** safe GitHub pull and six Rojo builds,
+one-hit client Play, existing two-client Play, expanded damage
+filter, post-save profile-exit and Base/Dungeon reward-retry
+contracts. Run profession and Dungeon backend regressions.
+Then tackle dedicated real peer healing/ward skill verification,
+four-player party/death/wipe/individual return and additional
+in-memory adapter failure/recovery cases. Only after fresh user
+approval revisit published TEST travel and cloud persistence.
+
+Receipt: `docs/testing/weekly-world-boss-v154-local-backend-continuation-2026-09-21.md`.
+No place publish, cloud player-data mutation, force-push or
+main merge has been performed in this continuation.
+
+## Earlier 21 September party handoff (historical)
+
 ## 21 September 2026 — two-client world-boss party resilience handoff
 
 The active branch now has a reusable `WorldBossMemberLifecycle`,
