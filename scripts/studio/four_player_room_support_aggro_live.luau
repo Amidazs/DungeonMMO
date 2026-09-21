@@ -298,6 +298,23 @@ local function run()
     end, "dead healer removed from second enemy target candidates", 8)
     print("[Four Player Aggro] DEAD_HEALER_FALLBACK_PASS")
 
+    -- Disconnect the real DPS client rather than calling the threat
+    -- service's cleanup API directly. PlayerRemoving owns that path.
+    damage:Kick("TEMP four-player threat cleanup acceptance")
+    wait_for(function()
+        return Players:GetPlayerByUserId(damage.UserId) == nil
+    end, "real damage-player disconnect", 25)
+    wait_for(function()
+        return threat.get_threat(enemy_b, damage.UserId) == 0
+            and threat.get_threat(enemy_a, damage.UserId) == 0
+            and enemy_b:GetAttribute("MarauderAggroMode")
+                == "Nearest"
+    end, "departed DPS threat cleared from both real enemies", 10)
+    assert(Players:GetPlayerByUserId(tank.UserId) == tank
+        and Players:GetPlayerByUserId(observer.UserId) == observer,
+        "disconnect cannot evict other living party members")
+    print("[Four Player Aggro] REAL_DISCONNECT_CLEANUP_PASS")
+
     threat.clear(enemy_a)
     threat.clear(enemy_b)
 end
