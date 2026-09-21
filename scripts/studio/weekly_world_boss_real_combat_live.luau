@@ -167,6 +167,10 @@ local function run()
     end, "real client hit and persisted server damage", 20)
     print("[World Boss Combat Live] REAL_CLIENT_HIT_PASS")
     print("[World Boss Combat Live] SERVER_CONTRIBUTION_PASS")
+    wait_for(function()
+        return humanoid.Health < humanoid.MaxHealth
+    end, "server guardian AI attacks the player", 8)
+    print("[World Boss Combat Live] GUARDIAN_ATTACK_PASS")
 
     wait_for(function()
         return boss.Humanoid.Health <= 0
