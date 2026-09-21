@@ -1,3 +1,14 @@
+# Animal-only corpse Skinning — historical staging receipt
+
+**This file records the earlier pending-test checkpoint.** Subsequent
+local Studio testing has passed both 12-suite focused profession
+runners, the Dungeon cleanup and broad regression suites, and real
+client Base hide-cache and temporary animal-corpse interactions.
+The authoritative newer receipt is
+`docs/testing/animal-only-corpse-skinning-studio-verified-2026-09-21.md`.
+
+## Earlier GitHub staging state
+
 # Animal-only corpse Skinning — GitHub integration, Studio pending
 
 Date: 21 September 2026
