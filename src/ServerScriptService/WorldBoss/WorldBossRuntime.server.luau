@@ -230,8 +230,17 @@ local function return_to_base(player: Player)
         return
     end
     grant_if_eligible(player.UserId)
+    local prepared = sessions:set_world_boss_return_pending(
+        session.SessionId, player.UserId, true)
+    if not prepared.ok then
+        warn("[World Boss] Return authorization failed: "
+            .. tostring(prepared.reason))
+        return
+    end
     local result = coordinator:return_to_base({player}, session)
     if not result.ok then
+        sessions:set_world_boss_return_pending(
+            session.SessionId, player.UserId, false)
         warn("[World Boss] Return failed: " .. tostring(result.reason))
     end
 end
