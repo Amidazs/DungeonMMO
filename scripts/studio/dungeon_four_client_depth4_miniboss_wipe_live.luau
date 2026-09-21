@@ -303,13 +303,14 @@ local function run()
         .. tostring(encounter_state(
             sessions, session_id, "Depth4Combat2"
         )))
-    assert(encounter_state(sessions, session_id, "Depth4Combat1")
-            == "Cleared"
-        and encounter_state(sessions, session_id, "Depth4MiniBoss1")
-            == "Pending"
-        and encounter_state(sessions, session_id, "Depth4Combat2")
-            == "Pending",
-        "Only the interrupted boss may be reset")
+    wait_for(function()
+        return encounter_state(sessions, session_id, "Depth4Combat1")
+                == "Cleared"
+            and encounter_state(sessions, session_id, "Depth4MiniBoss1")
+                == "Pending"
+            and encounter_state(sessions, session_id, "Depth4Combat2")
+                == "Pending"
+    end, "Depth4 cleared room and mini-boss rollback persisted", 12)
     print("[Four Client Depth4 MiniBoss Wipe] FOUR_BOSS_CHECKPOINT_REVIVES_PASS")
 
     local fresh = enter_room(
