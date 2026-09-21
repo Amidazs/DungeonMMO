@@ -305,12 +305,13 @@ local function run()
     -- swings. The NPC may turn or move after threat switches, and
     -- the basic combo's forward step can move a test character away.
     -- Every threat increase must come from an actual client hit.
-    for strike = 1, 2 do
+    -- The first attacker may land both Slash1 and Slash2 before the
+    -- challenger begins. Allow enough independently confirmed client
+    -- attacks to exceed that total rather than assuming two suffice.
+    for strike = 1, 5 do
         if strike > 1 then
-            -- Let the accepted 0.85-second combo timer expire so every
-            -- proof hit uses the stable Slash1 geometry instead of the
-            -- moving Slash2/Finisher combo steps.
-            task.wait(1.05)
+            -- Reset the combo to preserve stable Slash1 geometry.
+            task.wait(1.15)
         end
         local target_root = assert(
             boss:FindFirstChild("HumanoidRootPart"))
