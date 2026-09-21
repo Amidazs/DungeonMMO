@@ -143,7 +143,8 @@ function WeeklyWorldBossSessionBridge:resume(session_id: string): any
         return {ok = false, reason = "WorldBossNotIssued"}
     end
     local members = member_ids(session)
-    if not members or #members ~= #snapshot.Members then
+    if not members or type(snapshot.Members) ~= "table"
+        or #members ~= #snapshot.Members then
         return {ok = false, reason = "WorldBossMemberMismatch"}
     end
     local enrolled = {}
