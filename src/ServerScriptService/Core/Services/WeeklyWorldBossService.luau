@@ -3,6 +3,7 @@
 -- reward gate. No client RemoteEvent is allowed to call this service.
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local Window = require(
     ReplicatedStorage.Core.Shared:WaitForChild("WeeklyWorldBossWindow")
@@ -15,7 +16,6 @@ local BOSS_ID = "AncientGuardian"
 local BOSS_TAG = "DungeonMMOWeeklyWorldBoss"
 local REWARD_GOLD = 100
 local POST_WINDOW_GRACE_SECONDS = 30 * 60
-local WEEK_SECONDS = 7 * 24 * 60 * 60
 local MAX_PARTICIPANTS = 4
 
 -- Args:
@@ -23,8 +23,10 @@ local MAX_PARTICIPANTS = 4
 -- Returns:
 --   boolean: whether the ID can represent a real player account.
 local function valid_user_id(value: any): boolean
-    return type(value) == "number" and value > 0
-        and value < math.huge and value % 1 == 0
+    return type(value) == "number" and value ~= 0
+        and value < math.huge and value > -math.huge
+        and value % 1 == 0
+        and (value > 0 or RunService:IsStudio())
 end
 
 -- Args:
@@ -46,17 +48,6 @@ local function member_set(users: any): any?
         members[user_id] = true
     end
     return members
-end
-
--- Args:
---   character: any; character from a loaded player profile.
---   week_key: string; stable server-owned event/week reward identity.
--- Returns:
---   any?: existing persistent reward receipt, if any.
-local function reward_record(character: any, week_key: string): any?
-    local history = character.RewardHistory
-    local weekly = history and history.WeeklyWorldBoss
-    return if type(weekly) == "table" then weekly[week_key] else nil
 end
 
 -- Args:
@@ -151,8 +142,9 @@ function WeeklyWorldBossService:record_defeat(
     if not humanoid or humanoid.Health > 0 then
         return {ok = false, reason = "WorldBossStillAlive"}
     end
+    local was_defeated = state.Defeated
     state.Defeated = true
-    return {ok = true, already_defeated = false}
+    return {ok = true, already_defeated = was_defeated}
 end
 
 -- Args:
