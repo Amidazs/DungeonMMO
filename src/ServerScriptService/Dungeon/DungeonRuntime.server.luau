@@ -1905,10 +1905,16 @@ return_request.OnServerEvent:Connect(function(
             emit_revive_state(player.UserId, {error = "ReturnNotReady"})
             return
         end
-        local abandoned = return_service:request_abandon(
-            active_session_id,
-            {player}
-        )
+        local session = current_session()
+        local abandoned = if session and session.State == "Failed"
+            then return_service:request_failed_return(
+                active_session_id,
+                {player}
+            )
+            else return_service:request_abandon(
+                active_session_id,
+                {player}
+            )
         if not abandoned.ok then
             emit_revive_state(
                 player.UserId,
