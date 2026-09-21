@@ -288,9 +288,20 @@ local function run()
     end, "far player takes aggro after real client damage", 8)
     print("[World Boss Aggro Live] FIRST_DAMAGE_THREAT_PASS")
 
-    -- The threat holder is deliberately farther away than the near
-    -- player, but both remain inside the boss stop radius so movement
-    -- cannot make this target-switch proof flaky.
+    -- The guardian has moved since the initial player placement.
+    -- Re-establish the near/far geometry around its live position,
+    -- without altering either player's real damage/threat ledger.
+    local spacing_root = assert(
+        boss:FindFirstChild("HumanoidRootPart"))
+    local spacing_position = spacing_root.Position
+    local near_position = spacing_position + Vector3.new(0, 0, 1.5)
+    local far_position = spacing_position + Vector3.new(0, 0, -4.4)
+    near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+        near_position, spacing_position)
+    far_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+        far_position, spacing_position)
+
+    -- The damage leader stays the target despite being farther away.
     wait_for(function()
         return boss:GetAttribute("MarauderAggroTargetUserId")
             == far_player.UserId
