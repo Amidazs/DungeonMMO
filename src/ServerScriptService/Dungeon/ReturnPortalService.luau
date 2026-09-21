@@ -143,6 +143,59 @@ function ReturnPortalService:request_abandon(
     })
 end
 
+-- Returns failed-run members to Base without mutating the terminal session.
+-- A retry must be a new Base-created session, never a revival of this one.
+-- Args:
+--   session_id: string; failed dungeon session ID.
+--   players: {any}; authenticated connected members requesting return.
+-- Returns:
+--   any: explicit return result or a fail-closed membership rejection.
+function ReturnPortalService:request_failed_return(
+    session_id: string,
+    players: {any}
+): any
+    if #players == 0 then
+        return result(false, "NoPlayers")
+    end
+
+    local session = self._sessions:get(session_id)
+    if not session or session.State ~= "Failed" then
+        return result(false, "SessionNotFailed")
+    end
+
+    for _, player in ipairs(players) do
+        local user_id = player_user_id(player)
+        if not user_id then
+            return result(false, "InvalidPlayer")
+        end
+        local member = session.Members[tostring(user_id)]
+        if not member or member.Connected ~= true then
+            return result(false, "NotConnectedMember")
+        end
+    end
+
+    if self._is_studio then
+        return result(true, nil, {
+            simulated = true,
+            session = session,
+        })
+    end
+
+    local returned = self._coordinator:return_to_base(players, session)
+    if not returned or returned.ok ~= true then
+        return result(
+            false,
+            if returned then returned.reason else "ReturnTeleportFailed",
+            {session = session}
+        )
+    end
+
+    return result(true, nil, {
+        simulated = false,
+        session = session,
+    })
+end
+
 function ReturnPortalService:tick(
     session_id: string,
     players: {any}
