@@ -3,10 +3,9 @@
 **Date:** 21 September 2026  
 **Branch:** `wip/phase-4-test-hud-integration-v1`  
 **Status:** Default-off Base entry, reserved-server routing, separate
-world-boss place, Base return, existing combat integration and a real
-single-client guardian defeat/reward path are **locally verified**.
-Published cross-server travel, authored arena content, multi-client
-network recovery, genuine cloud persistence and live event release
+world-boss place, Base return, real combat and **two-client party
+resilience** are locally verified. Published same-account reconnect,
+real cross-place travel, cloud persistence and live event release
 **remain pending**.
 
 ## Goal and progress
@@ -152,6 +151,52 @@ disconnect/rejoin, published TEST profile lease handoff,
 DataStore/MemoryStore recovery and the complete Base → boss → Base
 journey remain pending. The event stays disabled by default.
 
+## New local milestone — two-client party resilience
+
+Added an explicitly opt-in geometric `WorldBossArenaLayout` with a
+stable `WorldBossArenaSpawn`, floor and closed walls for backend Play
+without manufacturing final art. Normal Base/Dungeon places remain
+unchanged, and final authored geometry can replace this prototype.
+
+The real Studio multiplayer fixture now uses two actual clients
+against one guardian. Both generate persisted server damage and
+receive independent once-weekly rewards after the shared kill.
+A client-owned Humanoid death is replicated to the server,
+persisted as `Dead`, respawned into the same frozen session and
+restored to `Active` without another reward. One client may then
+leave while the other remains; contribution and reward history remain
+intact.
+
+Roblox Studio multiplayer clients use negative UserIds. The
+ContributionService and DungeonContributionBridge now accept negative
+integral identities **only in Studio**, while production identity
+rules remain positive-only. Zero/nonfinite/malformed identities and
+invalid contribution events are still denied.
+
+The current prototype wipe policy is explicit: connected dead members
+may independently respawn into the same encounter. A wipe does not
+reroll boss/event/week identity or weekly entitlement. This policy can
+still be tuned later without changing the trusted session/reward
+contract.
+
+**Final local acceptance at source
+`e83e4fae522582ec98bfc9cf4938ffdca9aa810b`:**
+six Rojo builds; multiplayer Play `VERIFIED_MULTIPLAYER_PASS`;
+member lifecycle/wipe 14 assertions; contribution 20 assertions;
+Base travel 18; Base return 22; Dungeon world-boss session 33;
+Base professions 14/14; Dungeon backend 30/30.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-party-resilience-2026-09-21.md`.
+
+**Remaining blockers:** Studio cannot prove a genuine reconnect of
+the exact same Roblox account across a new reserved server. Published
+TEST Base → ReserveServer boss → Base travel, lease handoff,
+MemoryStore/DataStore recovery and cross-server reward recovery remain
+pending. Two-client real healing/ward skill execution also remains
+unverified, although support-event authority has focused coverage.
+Production event flags remain off.
+
 ## Earlier local milestone — frozen session and contribution-gated reward
 
 The next default-off backend layer is implemented and locally
@@ -183,25 +228,25 @@ does not turn ordinary TestDungeon encounters into world bosses.
 Receipt:
 `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
 
-## Next backend milestone — party resilience and published TEST gate
+## Next backend milestone — published TEST handoff gate
 
-1. Add an authored minimal `WorldBossArenaSpawn` and basic enclosed
-   arena to the dedicated place without replacing accepted combat.
-2. Exercise actual multi-client boss Play with at least two real
-   Studio clients: shared guardian damage, support contribution,
-   player death/respawn or wipe semantics, and independent weekly
-   eligibility.
-3. Harden disconnect/rejoin around the live fight and post-kill
-   reward path, including one player leaving while others continue,
-   reconnect after defeat, failed reward save retry and individual
-   return to Base.
-4. Only after those local tests, configure separate TEST-only Base
-   and world-boss place IDs and run the first published
-   Base → ReserveServer boss → Base journey. Verify real profile
-   lease handoff and DataStore/MemoryStore recovery there.
-5. Guardian-specific phases, event announcements, reward tuning,
-   final meshes/animations and public schedule remain separate
-   release work. Explicit approval is required before live rollout.
+1. Configure dedicated **TEST-only** Base and world-boss place IDs,
+   with the weekly event still disabled by default outside the
+   controlled acceptance window.
+2. Run the first real Base → ReserveServer world-boss → Base journey
+   using the existing party/session/lease handoff. Verify destination
+   admission, real Roblox reserved access code, return handoff and
+   per-member session cleanup.
+3. Prove same-account reconnect and post-defeat reward recovery using
+   genuine new-server profile leases plus TEST DataStore/MemoryStore,
+   including one member disconnecting while others continue.
+4. Add genuine two-client healing/ward Play against the guardian so
+   support contribution is proven through the client skill pipeline,
+   not only through focused server contracts.
+5. Only after the published TEST journey is green should guardian
+   phases, event announcements, reward tuning, final art/animations
+   and live scheduling move toward release. Explicit approval remains
+   required before any production rollout.
 
 ## Separate future/release gates
 
