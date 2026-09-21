@@ -120,7 +120,7 @@ check(prepared_new.ok, "retry prepares with preserved materials")
 local result = professions:complete_craft(
     USER_ID, "smelt_iron_bar",
     professions.foundation_success_outcome(prepared_new.minigame_id))
-check(result.ok and result.item_id == "iron_bar",
+check(result.ok and result.output_item_id == "iron_bar",
     "new session crafts once through the authoritative service")
 check(guard:finish(USER_ID, new_ticket),
     "new request releases only its own current ticket")
