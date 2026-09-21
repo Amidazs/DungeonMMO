@@ -222,11 +222,28 @@ local function run()
     end, "nearest tank with four real candidates", 12)
     print("[Four Player Aggro] REAL_FOUR_CLIENT_FALLBACK_PASS")
 
-    place(tank_character, root, 2.5)
-    channel:FireClient(tank, "Taunt")
-    wait_for(function()
-        return threat.get_threat(enemy_a, tank.UserId) >= 15
-    end, "real fighter Taunt engages enemy A", 10)
+    -- A moving enemy can leave the first real Taunt hit arc before
+    -- its active sample. A legitimate miss consumes the skill cooldown.
+    -- Retry from the current enemy root without bypassing that cooldown.
+    for attempt = 1, 2 do
+        place(tank_character, root, 2.2)
+        channel:FireClient(tank, "Taunt")
+        local deadline = os.clock() + 3
+        repeat
+            if threat.get_threat(enemy_a, tank.UserId) >= 15 then
+                break
+            end
+            task.wait(0.1)
+        until os.clock() >= deadline
+        if threat.get_threat(enemy_a, tank.UserId) >= 15 then
+            break
+        end
+        if attempt < 2 then
+            task.wait(8.2)
+        end
+    end
+    assert(threat.get_threat(enemy_a, tank.UserId) >= 15,
+        "real fighter Taunt must engage enemy A")
 
     local tank_humanoid = assert(
         tank_character:FindFirstChildOfClass("Humanoid"))
