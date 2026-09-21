@@ -1,5 +1,43 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — terminal wipe -> Base -> fresh retry VERIFIED
+
+Latest tested gameplay source:
+`8899fad6923628e86a8946fc9ce4c365bc738902`.
+After the existing revive-decision deadline, a `Failed` dungeon
+remains terminal. Connected members can now take the Return-to-Base
+route without calling `abandon_member` on an already-failed session;
+the real Dungeon UI exposes a failed-run return button (Studio
+`VERIFIED_PLAY_MODE_PASS`). A new run started from Base must
+create a new session ID, entrance checkpoint and free-revive state;
+the old failed run and its reward identity are preserved.
+
+The paid-revive callback was hardened against duplicate, late,
+disconnected and failed-session spawns. It respects the actual
+purchase-service order: the grant commits `PaidReviveCount` and
+sets member mode `Active` before the spawn callback. A dedicated
+integrated test covers the real purchase/session/death/return service
+chain and passed **15 assertions**.
+
+At that head: six Rojo builds; Dungeon backend **30/30** (including
+DungeonDeathService **33 assertions**); failed-run return contract
+**15 assertions**; fresh-session contract PASS; integrated paid retry
+**15 assertions**; real failed-run UI Play PASS. All edits went to
+GitHub; desktop used only for clean pulls/builds/unpublished tests.
+
+**This is the safe terminal-failure -> Base -> new-run path, NOT
+an in-place dungeon-room wipe/restart.** Current no-target cleanup
+still resets threat only; restoring active encounter HP/spawn,
+checkpoint-wide party respawn and reward-safe room re-entry remain
+the next local backend milestone. Published TEST/cloud travel,
+production purchases and main merge remain deferred.
+
+Receipt:
+`docs/testing/dungeon-terminal-wipe-return-fresh-run-2026-09-21.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_56_Terminal_Wipe_Base_Retry_20260921.md`.
+
+
 ## 21 September 2026 — next backend handoff after four-client wipe
 
 Verified source/test head:
