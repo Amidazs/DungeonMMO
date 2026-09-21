@@ -206,24 +206,21 @@ local function run()
     end, "far player takes aggro after first damage", 15)
     print("[World Boss Aggro Live] FIRST_DAMAGE_THREAT_PASS")
 
-    place(far_character, Vector3.new(0, 5, -11))
+    -- The threat holder is deliberately farther away than the near
+    -- player, but both remain inside the boss stop radius so movement
+    -- cannot make this target-switch proof flaky.
     wait_for(function()
         return boss:GetAttribute("MarauderAggroTargetUserId")
             == far_player.UserId
-    end, "highest threat retained while farther away", 8)
+            and (far_character.HumanoidRootPart.Position
+                - boss.HumanoidRootPart.Position).Magnitude
+                > (near_character.HumanoidRootPart.Position
+                    - boss.HumanoidRootPart.Position).Magnitude
+    end, "higher threat beats the nearer player", 8)
     print("[World Boss Aggro Live] THREAT_BEATS_DISTANCE_PASS")
 
     local boss_root = assert(boss:FindFirstChild("HumanoidRootPart"))
-    local attack_position = boss_root.Position
-        + Vector3.new(0, 0, 2.5)
-    near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
-        attack_position,
-        Vector3.new(
-            boss_root.Position.X,
-            attack_position.Y,
-            boss_root.Position.Z
-        )
-    )
+    place(near_character, boss_root.Position + Vector3.new(0, 0, 2.2))
     channel:FireClient(near_player, "StrikeThree")
     wait_for(function()
         return ThreatService.get_threat(boss, near_player.UserId)
