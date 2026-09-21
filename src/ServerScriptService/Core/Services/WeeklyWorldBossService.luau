@@ -117,6 +117,69 @@ function WeeklyWorldBossService:begin_instance(
 end
 
 -- Args:
+--   instance_id: string; immutable durable encounter session identity.
+--   snapshot: any; trusted server-side stored world-boss entry data.
+-- Returns:
+--   any: restored local reward authority or a reasoned rejection.
+function WeeklyWorldBossService:restore_instance(
+    instance_id: string,
+    snapshot: any
+): any
+    if type(instance_id) ~= "string" or instance_id == ""
+        or type(snapshot) ~= "table"
+        or snapshot.BossId ~= BOSS_ID
+        or type(snapshot.Members) ~= "table"
+        or type(snapshot.WindowStart) ~= "number"
+        or type(snapshot.WindowEnd) ~= "number"
+        or snapshot.WeekStart ~= Window.week_start(snapshot.WindowStart)
+        or snapshot.WindowEnd <= snapshot.WindowStart
+        or snapshot.WindowEnd - snapshot.WindowStart > 7200
+        or snapshot.WindowEnd > snapshot.WeekStart + 604800
+    then
+        return {ok = false, reason = "InvalidWorldBossSnapshot"}
+    end
+
+    local members = member_set(snapshot.Members)
+    if not members then
+        return {ok = false, reason = "InvalidWorldBossParty"}
+    end
+    if self._clock() > snapshot.WindowEnd + POST_WINDOW_GRACE_SECONDS then
+        return {ok = false, reason = "WorldBossInstanceExpired"}
+    end
+
+    local existing = self._instances[instance_id]
+    if existing then
+        if existing.WeekStart ~= snapshot.WeekStart
+            or existing.WindowEnd ~= snapshot.WindowEnd
+        then
+            return {ok = false, reason = "WorldBossInstanceMismatch"}
+        end
+        for user_id in pairs(existing.Members) do
+            if not members[user_id] then
+                return {ok = false, reason = "WorldBossInstanceMismatch"}
+            end
+        end
+        for user_id in pairs(members) do
+            if not existing.Members[user_id] then
+                return {ok = false, reason = "WorldBossInstanceMismatch"}
+            end
+        end
+        existing.Defeated = existing.Defeated
+            or snapshot.Defeated == true
+        return {ok = true, already_restored = true}
+    end
+
+    self._instances[instance_id] = {
+        BossId = BOSS_ID,
+        WeekStart = snapshot.WeekStart,
+        WindowEnd = snapshot.WindowEnd,
+        Members = members,
+        Defeated = snapshot.Defeated == true,
+    }
+    return {ok = true, already_restored = false}
+end
+
+-- Args:
 --   instance_id: string; server-owned encounter instance identity.
 --   boss: Model; authoritative boss model spawned by the server.
 -- Returns:
