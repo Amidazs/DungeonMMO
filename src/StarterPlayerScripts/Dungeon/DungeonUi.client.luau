@@ -343,6 +343,7 @@ local return_at: number? = nil
 local return_server_time = 0
 local return_received_at = 0
 local revive_action: string? = nil
+local run_failed = false
 
 --[[
 Updates whether the full-screen modal backdrop is visible.
@@ -529,6 +530,10 @@ local function apply_dungeon_state(payload: any)
     end
 
     if state == "Complete" then
+        run_failed = false
+        complete_caption.Text = "EXPEDITION COMPLETE"
+        complete_title.Text = "VICTORY"
+        return_button.Text = "Return to Base"
         revive_panel.Visible = false
         boss_frame.Visible = false
         complete_panel.Visible = true
@@ -555,9 +560,18 @@ local function apply_dungeon_state(payload: any)
             return_received_at = os.clock()
         end
     elseif state == "Failed" then
+        run_failed = true
+        return_at = nil
+        revive_action = nil
+        complete_caption.Text = "EXPEDITION FAILED"
+        complete_title.Text = "PARTY DEFEATED"
+        return_button.Text = "Return to Base"
+        reward_label.Text = if payload.return_simulated == true
+            then "Studio return simulated. Start a new run from Base."
+            else "This run has ended. Return to Base to start a new run."
         revive_panel.Visible = false
         boss_frame.Visible = false
-        complete_panel.Visible = false
+        complete_panel.Visible = true
         update_backdrop()
     end
 end
@@ -625,7 +639,7 @@ lobby_button.Activated:Connect(function()
 end)
 
 return_button.Activated:Connect(function()
-    return_request:FireServer("Complete")
+    return_request:FireServer(if run_failed then "Abandon" else "Complete")
 end)
 
 revive_state.OnClientEvent:Connect(
