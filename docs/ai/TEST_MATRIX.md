@@ -1,5 +1,40 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — four-client physical recovery and replay
+
+Latest tested gameplay head:
+`a5c0637888f8400703d07290f790a24d3b8406bf`.
+
+- [x] Four real Studio clients: Temple Room1 full wipe and
+  four automatic checkpoint revives.
+- [x] Partial-kill wipe: all four received original monster
+  reward; repeated same transaction did not duplicate
+  Gold, XP, Level or bestiary kill count for anyone.
+- [x] Four-client Room3 boss: old injured boss retired,
+  cleared rooms preserved and exactly one fresh full-health
+  boss spawns after checkpoint re-entry.
+- [x] Four-client optional event boss: equivalent physical
+  wipe/re-entry with Temple event enabled only in the
+  disposable test DataModel; production gate stays locked.
+- [x] Two authenticated clients through real PlayAgain remote:
+  first sees party wait, second vote produces simulated
+  replay UI on both.
+- [x] `DungeonDeathService:tick` announces terminal Failed
+  exactly once, so it cannot overwrite ReplayWaiting.
+- [x] Six Rojo builds, Dungeon backend **30/30**,
+  death/revive **41 assertions** at latest gameplay head.
+- [x] Focused threat 51, Base professions 14/14 and
+  paid retry 15 at preceding fix head.
+- [ ] Secret boss, higher depths and disconnect during
+  physical full-party wipe/re-entry.
+- [ ] Real published reserved-server replay, actual normal
+  boss-reward combat through wipe and cloud continuity;
+  publishing and cloud data remain deferred.
+
+Evidence:
+`docs/testing/dungeon-four-client-room-boss-event-replay-2026-09-21.md`.
+
+
 ## 21 September 2026 — actual Room1 wipe/re-entry Play PASS
 
 At source `acb628fb99202a94f7f4cec781a15ec7f5614760`,
