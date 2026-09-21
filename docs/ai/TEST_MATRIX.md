@@ -1,5 +1,39 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — v1.53 professions staged, NOT YET ACCEPTED
+
+- [ ] Pull the GitHub-only v1.53 source into the authorized Windows
+  worktree when it is online; confirm no unexpected local changes.
+- [ ] Build Dungeon, Base, published-style Dungeon and published-style
+  Base from the staged profession branch.
+- [ ] Run focused profession suite in local Dungeon and Base. It now
+  includes definition, migration, service, original cross-dependency,
+  Skinning/Leatherworking/Enchanting dependency, runtime-rule,
+  request-guard, recipe-knowledge and inventory regressions.
+- [ ] Prove the full staged chain: Skinning raw hide + Alchemy oil →
+  cured leather; + Blacksmithing bar → leatherbound gloves;
+  Alchemy/Blacksmithing → warding essence/rune; final Enchanting +
+  Leatherworking + Alchemy → warded leatherbound gloves.
+- [ ] Verify new profile states start at Level 1/0 XP and legacy
+  profiles gain Skinning/Leatherworking/Enchanting without losing
+  existing profession progress.
+- [ ] Real Base Play mode: far station request rejected; near request
+  accepted; rapid overlapping same-player request rejected; another
+  player remains independent; disconnect/retry does not leave a stuck
+  request lock; one Base hide-cache claim cannot be repeated.
+- [ ] Verify wrong/fabricated minigame identity cannot consume inputs
+  and the Base RemoteEvent itself exposes no client success payload.
+- [ ] Run broad gameplay backend matrix after profession integration.
+
+**No boxes above are accepted yet.** Source/tests are in GitHub, but the
+desktop is offline and no v1.53 Rojo/Studio result exists. Accepted v1.52
+counts remain the latest verified baseline.
+
+Staged plan:
+docs/testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md.
+Roadmap:
+docs/roadmap/DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md.
+
 ## 20 September 2026 — v1.52 combat Event variety / cross-profession backend
 
 - [x] Independently default-OFF new combat variation
