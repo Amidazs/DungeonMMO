@@ -151,6 +151,46 @@ disconnect/rejoin, published TEST profile lease handoff,
 DataStore/MemoryStore recovery and the complete Base → boss → Base
 journey remain pending. The event stays disabled by default.
 
+## New local milestone — shared aggro, threat and real Fighter Taunt
+
+A shared server-authoritative `ThreatService` now drives ordinary
+Marauders, Dungeon Captain-style enemies and the isolated world boss.
+Each hostile owns its own threat table. If no eligible player has
+positive threat, that enemy targets the closest eligible player.
+Once threat exists, the highest-threat eligible player becomes the
+target; distance is used only to break equal-threat ties.
+
+Actual server-applied health damage contributes threat to the exact
+enemy damaged. A new real Fighter `Taunt` can generate threat without
+health damage: it uses normal client skill request, server progression,
+cooldown/stamina and melee target validation, then raises the Fighter
+above the enemy's current threat leader using server-owned
+`TAUNT_BONUS_THREAT`. Taunt is learnable/rankable through the
+Fighter Trainer. Rogue ThreatDrop and respawn aggro suppression
+temporarily remove a character from target eligibility.
+
+**Local acceptance:** runtime source
+`9c744d0cfe4ecabd5b372229e446ceadc6653861` built all six Rojo
+compositions and passed ThreatService **14 assertions**, real
+two-client normal-enemy aggro, real two-client world-boss aggro,
+Fighter Trainer **12 assertions**, profile exit **18**, reward retry
+**17 Base + 17 Dungeon**, professions **14/14**, and Dungeon backend
+**30/30**. Existing one-hit lethal reward, two-client guardian and
+11-assertion lethal target-filter regressions also remained green.
+
+The real normal-enemy fixture proves nearest fallback, first real
+damage takeover, higher real damage takeover, real zero-damage Taunt,
+Rogue ThreatDrop suppression and highest-threat reacquisition.
+The real world-boss fixture proves nearest fallback, damage threat,
+threat beating distance, higher real damage takeover and real Taunt.
+At test-only head
+`e041bf2203c8b73b0c1c9b59aebc175a2c8cbddd`, both fixtures also
+proved a dead current threat leader immediately falls out and the
+remaining eligible player is selected.
+
+Receipt:
+`docs/testing/combat-aggro-threat-taunt-local-2026-09-21.md`.
+
 ## Local-only continuation — lethal hits and profile-save recovery
 
 **Publish and live network work are on hold at user request.** Continue
@@ -183,15 +223,16 @@ each passed 17 assertions on source
 The first departure-save test also passed 11 assertions on source
 `1b2554de8ea049b8bba18888f0f7d73a1b12be5f`.
 
-Additional GitHub code/test commits handle a failed **lease release
-after a successful profile save**, and extend lethal-target filtering.
-The desktop became unavailable before the latest-head builds and
-these new assertions could run. The new assertions are **pending
-verification**, not accepted yet. The two-client MageHeal experiment
-was also reverted to preserve the accepted combat baseline; genuine
-peer healing/ward support Play remains outstanding. The server-side
-Mend pulse now records effective positive healing, but has not yet
-passed a dedicated end-to-end support-skill Play test.
+The later local regression completed the previously pending cases:
+post-save lease-release recovery now passes **18 assertions**, the
+expanded lethal-target filter passes **11 assertions**, weekly reward
+retry passes **17 assertions in both Base and Dungeon**, and the
+existing professions/Dungeon regressions remain **14/14** and
+**30/30**. The two-client MageHeal experiment was reverted to preserve
+the accepted combat baseline; genuine peer healing/ward support Play
+remains outstanding. The server-side Mend pulse records effective
+positive healing, but has not yet passed a dedicated end-to-end
+support-skill Play test.
 
 Receipt:
 `docs/testing/weekly-world-boss-v154-local-backend-continuation-2026-09-21.md`.
@@ -275,26 +316,23 @@ Receipt:
 
 ## Next backend milestone — LOCAL ONLY, no publication
 
-1. Once the authorized desktop reconnects, perform a clean
-   fast-forward of the GitHub branch; build all six Rojo compositions,
-   then run the updated killing-blow Play, real two-client boss Play,
-   lethal-target filters and post-save profile/lease recovery tests.
-   Do not mark latest-head changes accepted before those tests pass.
-2. Run Base and Dungeon reward retry, existing profession regression,
-   Dungeon backend regression, default-off boss-place Play and local
-   session/return contracts against the same source head.
-3. Add a separate real client-to-client healing/ward skill fixture,
-   first proving injury and target selection, then effective healing
-   and scoped server support contribution. Leave the accepted
-   melee/defeat fixture unchanged until this test passes independently.
-4. Expand in-memory local backend acceptance to four-player party
-   coordination, full wipe and respawn, independent return,
-   disconnect/save failure, and failed-lease-release recovery.
-5. Continue the other non-visual backend systems after this local
-   milestone: dungeon difficulty/mini-boss/event insertion contracts,
+1. Define the **support-threat policy** for real healing and wards,
+   then prove it through a separate two-client skill fixture. Effective
+   healing/absorbed ward should create server-owned threat without
+   inventing damage, and overheal/unused ward must not inflate threat.
+2. Expand aggro acceptance to a four-player tank/DPS/support party:
+   real Taunt, DPS overtaking the tank through damage, tank reclaim,
+   support-generated threat, death, ThreatDrop and target fallback.
+3. Add multi-enemy room tests so each enemy maintains an independent
+   threat table; verify encounter reset/full wipe clears old threat
+   and returns enemies to nearest-player fallback.
+4. Expand local party recovery: disconnect while holding highest
+   threat, respawn/wipe, independent return, interrupted save and
+   lease-failure recovery with no duplicate reward or stale aggro.
+5. Continue other non-visual backend systems after combat roles are
+   stable: dungeon difficulty/mini-boss/event insertion contracts,
    crafting/economy and progression security, party/guild features
-   and persistence/migration tests. Reuse existing systems and
-   update the roadmap with results, not speculative completion.
+   and persistence/migration tests.
 
 **Deferred until separately approved:** published TEST-only Base →
 ReserveServer boss → Base, real same-account cross-server reconnect
