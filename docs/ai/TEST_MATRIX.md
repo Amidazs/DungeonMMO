@@ -1,5 +1,47 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — local aggro/threat and Fighter Taunt
+
+- [x] Shared per-enemy ThreatService: nearest fallback before positive
+  threat; highest eligible threat afterwards; distance tie-break only.
+- [x] Actual applied health damage generates threat for the exact
+  hostile target; threat is isolated between enemies.
+- [x] Zero-damage Fighter Taunt is learnable/rankable, server-targeted
+  and adds configured threat without fake damage/contribution.
+- [x] ThreatService focused contract: **14 assertions PASS**.
+- [x] Real two-client normal Marauder aggro:
+  nearest → first damage → higher damage → real Taunt →
+  ThreatDrop suppression → threat reacquire:
+  `VERIFIED_MULTIPLAYER_PASS`.
+- [x] Real two-client world-boss aggro:
+  nearest → first damage → threat beats distance → higher damage →
+  real Taunt: `VERIFIED_MULTIPLAYER_PASS`.
+- [x] Real client Taunt logged `SKILL ACCEPT Taunt`,
+  authoritative hit confirmation and `THREAT TAUNT` for both normal
+  Marauder and guardian.
+- [x] Dead highest-threat member is removed from target eligibility
+  for both normal enemy and world-boss controllers:
+  `DEAD_TARGET_FALLBACK_PASS`.
+- [x] Fighter Trainer catalogue: **12 assertions PASS**.
+- [x] Same runtime source retained six Rojo builds, profile exit
+  **18**, reward retry **17 Base + 17 Dungeon**, professions
+  **14/14**, Dungeon backend **30/30**, one-hit lethal reward and
+  existing two-client world-boss regressions.
+- [ ] Genuine healing/ward threat policy and real support-skill
+  multiplayer acceptance remain pending.
+- [ ] Four-player aggro roles, multi-enemy room behavior, full wipe
+  reset, and real controller-level disconnect tests remain pending.
+- [ ] Published TEST/cloud/cross-server work remains deferred.
+
+Runtime acceptance:
+`9c744d0cfe4ecabd5b372229e446ceadc6653861`.
+Death-fallback test head:
+`e041bf2203c8b73b0c1c9b59aebc175a2c8cbddd`.
+Receipt:
+`docs/testing/combat-aggro-threat-taunt-local-2026-09-21.md`.
+
+## Earlier 21 September local backend checkpoint (historical)
+
 ## 21 September 2026 — LOCAL-ONLY boss combat/recovery continuation
 
 - [x] First-and-only legitimate lethal boss hit persists server-side
