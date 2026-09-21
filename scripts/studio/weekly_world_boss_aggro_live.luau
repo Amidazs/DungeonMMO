@@ -64,6 +64,9 @@ local Factory = require(SSS.Dungeon.DungeonWeeklyWorldBossFactory)
 local Bridge = require(SSS.Dungeon.DungeonContributionBridge)
 local Authority = require(SSS.WorldBoss.WorldBossCombatAuthority)
 local ThreatService = require(SSS.Combat.ThreatService)
+local ArenaLayout = require(
+    SSS.WorldBoss.WorldBossArenaLayout
+)
 local ProgressionRuntimeState = require(
     SSS.Core.Services.ProgressionRuntimeState
 )
@@ -141,6 +144,13 @@ local function create_encounter(players)
     local now = os.time()
     assert(runtime.WeeklyWorldBossSessionBridge:issue(
         session_id, now - 5, now + 300).ok)
+
+    if not Workspace:FindFirstChild("WorldBossAggroArena_TEMP") then
+        ArenaLayout.create(
+            Workspace,
+            "WorldBossAggroArena_TEMP"
+        )
+    end
 
     local boss = Factory.create({
         Parent = Workspace,
