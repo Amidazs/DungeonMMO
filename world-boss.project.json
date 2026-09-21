@@ -1,28 +1,29 @@
 {
   "name": "DungeonMMO_WorldBoss_Local",
   "globIgnorePaths": [
-    "**/Tests/**"
+    "**/Tests/**",
+    "**/ArenaBuilder.server.luau"
   ],
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "$ignoreUnknownInstances": true,
-      "Core": {"$path": "src/ReplicatedStorage/Core"},
+      "Core": {
+        "$path": "src/ReplicatedStorage/Core"
+      },
       "Combat": {
-        "$className": "Folder",
-        "Shared": {"$path": "src/ReplicatedStorage/Combat/Shared"}
+        "$path": "src/ReplicatedStorage/Combat"
       }
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "$ignoreUnknownInstances": true,
-      "Core": {"$path": "src/ServerScriptService/Core"},
+      "Core": {
+        "$path": "src/ServerScriptService/Core"
+      },
       "Combat": {
-        "$className": "Folder",
-        "MarauderFactory": {
-          "$path": "src/ServerScriptService/Combat/MarauderFactory.luau"
-        }
+        "$path": "src/ServerScriptService/Combat"
       },
       "Dungeon": {
         "$className": "Folder",
@@ -31,16 +32,35 @@
         },
         "DungeonWeeklyWorldBossFactory": {
           "$path": "src/ServerScriptService/Dungeon/DungeonWeeklyWorldBossFactory.luau"
+        },
+        "DungeonContributionBridge": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonContributionBridge.luau"
+        },
+        "DungeonProgressionBridge": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonProgressionBridge.luau"
+        },
+        "MarauderCaptainController": {
+          "$path": "src/ServerScriptService/Dungeon/MarauderCaptainController.server.luau"
         }
       },
-      "WorldBoss": {"$path": "src/ServerScriptService/WorldBoss"}
+      "WorldBoss": {
+        "$path": "src/ServerScriptService/WorldBoss"
+      }
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "$ignoreUnknownInstances": true,
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
-        "Core": {"$path": "src/StarterPlayerScripts/Core"}
+        "Core": {
+          "$path": "src/StarterPlayerScripts/Core"
+        },
+        "Combat": {
+          "$path": "src/StarterPlayerScripts/Combat"
+        }
+      },
+      "$properties": {
+        "EnableMouseLockOption": false
       }
     }
   }
