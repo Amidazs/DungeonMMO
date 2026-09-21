@@ -26,6 +26,12 @@ local channel = RS:WaitForChild("ProfessionBaseLiveFixture_TEMP")
 local remotes = RS:WaitForChild("Core"):WaitForChild("Remotes")
 local craft = remotes:WaitForChild("ProfessionCraftRequest")
 local results = remotes:WaitForChild("ProfessionActionResult")
+local prompt_service = game:GetService("ProximityPromptService")
+local visible_prompts = {}
+
+prompt_service.PromptShown:Connect(function(prompt)
+    visible_prompts[prompt] = true
+end)
 
 results.OnClientEvent:Connect(function(payload)
     if type(payload) == "table"
@@ -47,8 +53,28 @@ channel.OnClientEvent:Connect(function(command, data)
         local node = runtime:WaitForChild("Base.RawHideCache")
         local prompt = node:WaitForChild("PromptRoot")
             :WaitForChild("ProfessionGatherPrompt")
+        local camera = workspace.CurrentCamera
+        if camera then
+            camera.CameraType = Enum.CameraType.Scriptable
+            camera.CFrame = CFrame.lookAt(
+                prompt.Parent.Position + Vector3.new(0, 3, 8),
+                prompt.Parent.Position
+            )
+        end
+
+        local deadline = os.clock() + 4
+        while not visible_prompts[prompt] and os.clock() < deadline do
+            task.wait(0.1)
+        end
+        channel:FireServer("GatherDiagnostic", {
+            shown = visible_prompts[prompt] == true,
+            enabled = prompt.Enabled,
+            parented = prompt:IsDescendantOf(workspace),
+            distance = (game.Players.LocalPlayer.Character
+                .HumanoidRootPart.Position - prompt.Parent.Position).Magnitude,
+        })
         prompt:InputHoldBegin()
-        task.wait(0.75)
+        task.wait(0.9)
         prompt:InputHoldEnd()
     end
 end)
@@ -66,12 +92,21 @@ local STS = game:GetService("StudioTestService")
 local channel = RS:WaitForChild("ProfessionBaseLiveFixture_TEMP")
 local ready_user_id = nil
 local results = {}
+local gather_diagnostic = nil
 
 channel.OnServerEvent:Connect(function(player, kind, payload)
     if kind == "Ready" then
         ready_user_id = player.UserId
     elseif kind == "Result" and player.UserId == ready_user_id then
         table.insert(results, payload)
+    elseif kind == "GatherDiagnostic" and player.UserId == ready_user_id
+    then
+        gather_diagnostic = payload
+        print("[Profession Base Live] GATHER_PROMPT shown="
+            .. tostring(payload.shown) .. " enabled="
+            .. tostring(payload.enabled) .. " parented="
+            .. tostring(payload.parented) .. " distance="
+            .. tostring(payload.distance))
     end
 end)
 
@@ -171,6 +206,8 @@ local function run()
 
     move_player(player, hide, 4)
     local first = request_action(player, "Gather")
+    assert(gather_diagnostic and gather_diagnostic.shown == true,
+        "client prompt did not become visible")
     assert(first.ok == true and first.node_id == "Base.RawHideCache",
         "first hide claim failed: " .. tostring(first.reason))
     local second = request_action(player, "Gather")
