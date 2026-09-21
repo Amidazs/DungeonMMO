@@ -17,9 +17,17 @@
 - [x] Dungeon broad gameplay backend matrix: 30/30 suites passed.
 - [x] Generic Base Play-mode smoke: player, Base runtime, profile
   remote and optional release locks passed.
-- [ ] **Actual Base player station test remains required**: real client
-  near/far craft RemoteEvent, one-time RawHideCache prompt, full
-  Leatherworking/Enchanting live server path, overlapping same-player
+- [x] Real unpublished Base Play-mode client RemoteEvent range smoke:
+  Leatherworking `cure_raw_hide` and Enchanting
+  `inscribe_warding_rune` both reject too-far requests and route nearby
+  requests to the service (`MissingMaterials`).
+- [ ] The live `RawHideCache` prompt hold did not emit a Gather result
+  in the first GitHub-authored fixture; it timed out. The *overall*
+  first fixture is FAIL. Determine whether client scripted input,
+  prompt visibility/range or server gathering caused the timeout.
+- [ ] **Remaining actual Base player station acceptance**: real client
+  one-time RawHideCache prompt, material-backed Leatherworking/
+  Enchanting crafting to final equipment, overlapping same-player
   requests, independent clients and real disconnect/retry cleanup.
 - [ ] Resolve or deliberately isolate Base-only unrelated Dungeon
   autorun test errors/warnings noted in the local validation receipt.
