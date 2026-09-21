@@ -1,5 +1,48 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.54 isolated world-boss travel and return
+
+A separate default-off Base boss gateway, new reserved-server travel
+coordinator path, dedicated world-boss-only Rojo place, stored-session
+arrival checks and per-member Base return path are on the active GitHub
+branch. Ordinary Dungeon rejects boss-session routing. The dedicated
+world-boss place remains disabled without explicit server enablement,
+reservation and an authored arena anchor. The normal Temple portal
+and existing dungeons remain unchanged.
+
+Unpublished Studio verified six Rojo compositions, 18 reserved-travel
+assertions each in Base and Dungeon, 22 Base return assertions,
+10 ordinary-Dungeon admission assertions and five isolated boss
+destination assertions. A dedicated-place default-off Play check
+passed. Previously accepted session/profession/gameplay regression
+suites still passed, including real Base material-chain Play.
+
+**Fixed a critical reward-contract bug:** the actual server
+ContributionService returns Damage/Tank/Support at the top level,
+not in a nested snapshot field. The isolated boss runtime now uses
+WorldBossContributionRules; 14 real-service assertions passed in
+both Base and Dungeon. Failed Base return teleports roll back
+WorldBossReturnPending, allowing the member to reconnect to the
+boss. The first validated boss session is bound before yielding
+profile/lease operations to prevent competing-party admission.
+
+This is source and local Studio contract acceptance, **not** a
+real Base → published reserved boss → Base Play acceptance.
+The boss place still lacks its authored arena, connected player
+combat/guardian attack and live contribution recording pipeline,
+published TEST transfer, cross-server profile/lease recovery,
+multi-client boss fight and production enablement. Do not claim
+these as complete or enable the event. No public publish, main
+merge, force-push or production player DataStore change occurred.
+
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipts:
+`docs/testing/weekly-world-boss-v154-isolated-travel-2026-09-21.md`,
+`docs/testing/weekly-world-boss-v154-travel-hardening-2026-09-21.md`.
+
+## Earlier 21 September world-boss session checkpoint (historical)
+
 ## 21 September 2026 — weekly world-boss session bridge locally verified
 
 A default-off `WeeklyWorldBossSessionBridge` is now composed in
