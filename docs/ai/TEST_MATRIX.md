@@ -1,5 +1,41 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — four-client secret / Depth4 / boss disconnect
+
+Focused test head:
+`9a63c6d25ac45cd67c9a4c5a684fa4c5a26adb24`.
+
+- [x] Four real Studio players: physical SecretArena boss
+  wipe; prior Room1, EventArena, Room2 stay cleared;
+  four checkpoint free revives and one new full-health
+  boss after physical re-entry.
+- [x] Depth4 six-encounter placeholder plan: physical
+  Room2 previous-depth mini-boss wipe and recovery.
+  Room1 stays Cleared; Room2 returns Pending; later
+  Room3 stays Pending; one full-health boss respawns.
+- [x] Peer disconnect during live Room3 boss; actual
+  PlayerRemoving persists `Connected=false`. Three
+  survivors later wipe/revive, while the departed
+  player's free revive remains unused. Prior clears
+  and checkpoint remain stable.
+- [x] Repaired outdated higher-depth regression for
+  one-shot terminal Failure notification: **392
+  assertions** pass across two dungeons, two depths
+  and three party sizes.
+- [x] Six local Rojo builds, Dungeon backend 30/30,
+  death/revive 41 assertions at latest gameplay head.
+- [ ] Actual same-account reconnect and cross-place
+  checkpoint resume; Studio leave alone does not
+  establish this.
+- [ ] Ordinary player-attack boss kill/reward retry,
+  higher-depth completion and new-run replay.
+- [ ] Published TEST reserved-server/cloud continuity
+  requires explicit separate approval.
+
+Receipt:
+`docs/testing/dungeon-secret-depth4-disconnect-recovery-2026-09-21.md`.
+
+
 ## 21 September 2026 — four-client physical recovery and replay
 
 Latest tested gameplay head:
