@@ -213,7 +213,17 @@ local function run()
     end, "highest threat retained while farther away", 8)
     print("[World Boss Aggro Live] THREAT_BEATS_DISTANCE_PASS")
 
-    place(near_character, Vector3.new(0, 5, 2.5))
+    local boss_root = assert(boss:FindFirstChild("HumanoidRootPart"))
+    local attack_position = boss_root.Position
+        + Vector3.new(0, 0, 2.5)
+    near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+        attack_position,
+        Vector3.new(
+            boss_root.Position.X,
+            attack_position.Y,
+            boss_root.Position.Z
+        )
+    )
     channel:FireClient(near_player, "StrikeThree")
     wait_for(function()
         return ThreatService.get_threat(boss, near_player.UserId)
