@@ -45,6 +45,9 @@ local MeleeHitService = require(
 local DamageService = require(
     script.Parent:WaitForChild("DamageService")
 )
+local ThreatService = require(
+    script.Parent:WaitForChild("ThreatService")
+)
 local SkillCooldownService = require(
     script.Parent:WaitForChild("SkillCooldownService")
 )
@@ -110,6 +113,17 @@ DamageService.set_damage_callback(function(
         applied_damage,
         lethal_hit
     )
+    if context.attacker
+        and context.target
+        and context.target:IsA("Model")
+        and applied_damage > 0
+    then
+        ThreatService.record_damage(
+            context.target,
+            context.attacker,
+            applied_damage
+        )
+    end
 end)
 
 WardService.set_absorb_callback(function(
