@@ -29,6 +29,8 @@ local BOSS_FACTORY_IDS = table.freeze({
 
 local ENEMY_FACTORY_IDS = table.freeze({
     "Marauder",
+    -- Registered but not inserted into any default dungeon pack.
+    "ForestWolf",
 })
 
 local ENEMY_ARCHETYPES = table.freeze({
@@ -37,10 +39,17 @@ local ENEMY_ARCHETYPES = table.freeze({
         RewardKey = "StandardMarauderReward",
         MaxHealthKey = "StandardMarauderMaxHealth",
     }),
+    -- Temporary combat tuning until independent beast rewards are authored.
+    Wolf = table.freeze({
+        FactoryId = "ForestWolf",
+        RewardKey = "StandardMarauderReward",
+        MaxHealthKey = "StandardMarauderMaxHealth",
+    }),
 })
 
 local ENEMY_FACTORIES = table.freeze({
     Marauder = true,
+    ForestWolf = true,
 })
 
 -- Creates one immutable physical room-slot definition.
