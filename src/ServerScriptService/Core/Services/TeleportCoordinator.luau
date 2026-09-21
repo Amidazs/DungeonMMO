@@ -257,7 +257,8 @@ function TeleportCoordinator:start_dungeon(
     players: {any},
     dungeon_id: string,
     dungeon_place_id: number,
-    difficulty_id: string?
+    difficulty_id: string?,
+    return_place_id: number?
 ): any
     if not known_dungeon(dungeon_id) then
         return response(false, "UnknownDungeon")
@@ -281,6 +282,13 @@ function TeleportCoordinator:start_dungeon(
 
     if type(dungeon_place_id) ~= "number" or dungeon_place_id <= 0 then
         return response(false, "InvalidDungeonPlaceId")
+    end
+    if return_place_id ~= nil and (
+        type(return_place_id) ~= "number"
+        or return_place_id <= 0
+        or return_place_id % 1 ~= 0
+    ) then
+        return response(false, "InvalidReturnPlaceId")
     end
     local definition = DungeonDefinitions.get(dungeon_id)
     if not definition then return response(false, "UnknownDungeon") end
@@ -313,7 +321,7 @@ function TeleportCoordinator:start_dungeon(
     local session, session_error = self._sessions:create(
         dungeon_id,
         member_user_ids,
-        game.PlaceId,
+        return_place_id or game.PlaceId,
         reserved_code,
         difficulty.Id
     )
