@@ -70,6 +70,8 @@ function DungeonDeathService.new(session_service:any, checkpoint_service:any, se
     self._on_member_mode=config.on_member_mode or function(_user_id:number,_mode:string) end
     self._death_cframes={}; self._revive_ends_at={}
     self._completed_paid_revive_counts = {}
+    self._on_recoverable_wipe = config.on_recoverable_wipe
+    self._wipe_reset_requested = false
     return self
 end
 
@@ -86,9 +88,42 @@ function DungeonDeathService:_emit(user_id:number)
     })
 end
 
+-- Args:
+--   session: any; authoritative session membership snapshot.
+-- Returns:
+--   boolean: true when no connected living member remains and
+--       at least one automatic free revive is already in progress.
+local function can_retry_wiped_room(session: any): boolean
+    local reviving = false
+    for _, member in pairs(session.Members or {}) do
+        if member.Connected == true then
+            if member.Mode == "Active" then
+                return false
+            end
+            if member.Mode == "Reviving" then
+                reviving = true
+            end
+        end
+    end
+    return reviving
+end
+
 function DungeonDeathService:_refresh_wipe_state():any
     local session=self._sessions:get(self._session_id)
     if not session or session.State ~= "Active" then return operation(false,"SessionNotActive") end
+
+    if can_retry_wiped_room(session)
+        and not self._wipe_reset_requested
+        and self._on_recoverable_wipe
+    then
+        local reset = self._on_recoverable_wipe(session)
+        if type(reset) == "table" and reset.ok == true then
+            self._wipe_reset_requested = true
+        end
+    elseif not can_retry_wiped_room(session) then
+        self._wipe_reset_requested = false
+    end
+
     if all_members_inactive(session) then
         if type(session.WipeDecisionEndsAt) ~= "number" then
             local deadline=self._clock()+ReviveConfig.WIPE_DECISION_SECONDS
