@@ -1971,12 +1971,17 @@ return_request.OnServerEvent:Connect(function(
             active_session_id, player, connected_loaded_players()
         )
         if not replay.ok then
-            dungeon_state:FireClient(player, {
-                state = "ReplayError",
-                objective = "Unable to start replay: "
-                    .. tostring(replay.reason),
-                replay_error = replay.reason,
-            })
+            local recipients = if replay.votes_reset == true
+                then connected_loaded_players()
+                else {player}
+            for _, recipient in ipairs(recipients) do
+                dungeon_state:FireClient(recipient, {
+                    state = "ReplayError",
+                    objective = "Unable to start replay: "
+                        .. tostring(replay.reason),
+                    replay_error = replay.reason,
+                })
+            end
         elseif replay.waiting then
             dungeon_state:FireClient(player, {
                 state = "ReplayWaiting",
@@ -1987,10 +1992,12 @@ return_request.OnServerEvent:Connect(function(
                 waiting = replay.waiting,
             })
         elseif replay.simulated then
-            dungeon_state:FireClient(player, {
-                state = "ReplaySimulated",
-                objective = "Studio replay simulated; new run is not published.",
-            })
+            for _, recipient in ipairs(connected_loaded_players()) do
+                dungeon_state:FireClient(recipient, {
+                    state = "ReplaySimulated",
+                    objective = "Studio replay simulated; new run is not published.",
+                })
+            end
         end
         return
     end
@@ -2103,7 +2110,9 @@ task.spawn(function()
         if completion_pending and not completion_committed and os.clock() >= next_completion_retry_at then
             commit_and_open_completion()
         end
-        if completion_committed and return_service and active_session_id then
+        if completion_committed and return_service and active_session_id
+            and not (replay_service and replay_service:is_launching())
+        then
             local auto = return_service:tick(active_session_id, connected_loaded_players())
             if auto.triggered and auto.result and auto.result.ok and auto.result.simulated == true then
                 send_objective("Studio auto-return simulated. Published TEST will return remaining players to Base.", "Complete")
