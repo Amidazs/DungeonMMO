@@ -17,6 +17,13 @@ function BaseReconnectRouting.decide(session: any?, user_id: number, now: number
     if member.Abandoned == true then
         return {route = "Base", reason = "MemberAbandoned"}
     end
+    if member.WorldBossReturnPending == true
+        and session.InstanceState
+        and session.InstanceState.WeeklyWorldBoss
+        and session.InstanceState.WeeklyWorldBoss.Defeated == true
+    then
+        return {route = "Base", reason = "WorldBossReturning"}
+    end
     if session.State ~= "Creating" and session.State ~= "Active" then
         return {route = "Base", reason = "SessionTerminal"}
     end
