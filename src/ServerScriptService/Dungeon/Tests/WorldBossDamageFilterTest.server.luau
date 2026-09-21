@@ -7,6 +7,7 @@ local Bridge = require(
 )
 
 local count = 0
+local last_event: any = nil
 local assertions = 0
 
 -- Args:
@@ -26,8 +27,9 @@ impostor.Name = guardian.Name
 local other = Instance.new("Model")
 other.Name = "UnrelatedEnemy"
 
-Bridge.set_recorder_for_test(function(_user_id, _event)
+Bridge.set_recorder_for_test(function(_user_id, event)
     count += 1
+    last_event = event
     return {ok = true}
 end)
 Bridge.bind_damage_target_validator(function(context)
@@ -47,12 +49,23 @@ check(Bridge.record_damage({
     attacker = attacker, target = guardian, source_id = "Slash",
 }, 25).ok, "the exact server-owned guardian may record damage")
 check(count == 1, "a valid hit must record exactly once")
+check(last_event.Metadata.VerifiedLethalHit == false,
+    "ordinary damage must not be labelled a server-confirmed killing blow")
+check(Bridge.record_damage({
+    attacker = attacker, target = guardian, source_id = "FinalSlash",
+}, 3, true).ok, "trusted killing-blow callback must record damage")
+check(last_event.Metadata.VerifiedLethalHit == true and count == 2,
+    "server killing-blow evidence must reach the persisted event")
+check(not Bridge.record_damage({
+    attacker = attacker, target = impostor, source_id = "FinalSlash",
+}, 3, true).ok and count == 2,
+    "even a lethal impostor hit cannot bypass exact-model filtering")
 
 Bridge.bind_damage_target_validator(nil)
 check(Bridge.record_damage({
     attacker = attacker, target = other, source_id = "Slash",
 }, 5).ok, "normal Dungeon contributor rules remain unchanged")
-check(count == 2, "clearing the filter restores normal Dungeon behavior")
+check(count == 3, "clearing the filter restores normal Dungeon behavior")
 
 Bridge.set_recorder_for_test(nil)
 guardian:Destroy()
