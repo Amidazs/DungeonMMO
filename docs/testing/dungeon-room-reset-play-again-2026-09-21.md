@@ -55,12 +55,26 @@ subsequent exhausted revive and terminal timer contract passed
 within DungeonDeathService's **40 assertions**. The same-head
 Dungeon backend matrix passed **30/30** in unpublished Studio.
 
-**Not yet verified end-to-end:** a real multiplayer run entering an
-authored room, damaging its enemies, wiping, rejoining and
-physically observing respawned enemy models; publisher-backed
-new reserved server teleport; or cloud datastore persistence
-across the replay. The server and pure service boundaries are
-locally verified, but do not claim these live gates passed.
+**Follow-on physical Studio acceptance:** at
+`acb628fb99202a94f7f4cec781a15ec7f5614760`, an unpublished
+one-client actual Dungeon runtime entered authored Temple Room1
+through its trigger, observed two spawned enemies, applied
+test-injected nonlethal health damage, then killed the real
+player character to cause a genuine free-revive wipe. The
+server retired the old enemy models. The player's new character
+respawned near the room checkpoint and physically re-entered
+the same trigger; the runtime spawned new enemy models at
+**full health**. The run printed `INJURED_ENEMY_PASS`,
+`OLD_ENCOUNTER_CLEANUP_PASS`, `CHECKPOINT_REVIVE_PASS`,
+`FRESH_FULL_HEALTH_PACK_PASS` and `VERIFIED_PLAY_MODE_PASS`.
+
+**Not yet verified end-to-end:** four real clients all wiping in
+an authored dungeon room, boss-room or secret/event-room reset,
+a full physical enemy kill/reward transaction reattempt across
+the wipe, a published reserved-server replay, or cloud persistence.
+The one-client fixture used test-injected enemy injury and player
+death, not a complete ordinary combat victory. The successful
+physical room test must not be presented as those other gates.
 
 All edits were made directly in GitHub. Remote Desktop was
 used only for a clean fast-forward pull, temporary Rojo builds,
