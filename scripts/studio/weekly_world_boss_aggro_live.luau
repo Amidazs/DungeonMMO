@@ -24,7 +24,15 @@ local attack = RS.Combat.Remotes:WaitForChild(
 local channel = RS:WaitForChild("WorldBossAggroChannel_TEMP")
 
 channel.OnClientEvent:Connect(function(command)
-    if command == "StrikeOnce" then
+    if command == "ProtectTestCharacter" then
+        local character = game:GetService("Players").LocalPlayer.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.MaxHealth = 10000
+            humanoid.Health = 10000
+        end
+    elseif command == "StrikeOnce" then
         attack:FireServer()
     elseif command == "StrikeThree" then
         for _ = 1, 3 do
@@ -186,6 +194,21 @@ local function run()
     local near_character = prepare_character(near_player, session_id)
     local far_character = prepare_character(far_player, session_id)
 
+    -- Studio multiplayer clients own their character's Humanoid.
+    -- Protect both disposable characters on the owning clients;
+    -- otherwise a 100-HP test account may die to normal guardian
+    -- attacks before it can retake aggro with zero-damage Taunt.
+    for _, player in ipairs(players) do
+        channel:FireClient(player, "ProtectTestCharacter")
+    end
+    wait_for(function()
+        local near_health = near_character:FindFirstChildOfClass("Humanoid")
+        local far_health = far_character:FindFirstChildOfClass("Humanoid")
+        return near_health and far_health
+            and near_health.MaxHealth >= 10000
+            and far_health.MaxHealth >= 10000
+    end, "both real clients acknowledge protected test health", 8)
+
     place(near_character, Vector3.new(0, 5, 1.8))
     place(far_character, Vector3.new(0, 5, -2.8))
 
@@ -268,6 +291,13 @@ local function run()
 
     local before_damage = runtime.ContributionService
         :get_player_snapshot(session_id, far_player.UserId).Damage
+    assert(far_character:FindFirstChildOfClass("Humanoid").Health > 0,
+        "taunting party member must be alive and targetable")
+    -- Leave the non-damaging taunter at a safe distance: a valid boss
+    -- should chase the highest-threat player instead of requiring
+    -- melee proximity to select them.
+    place(far_character, boss.HumanoidRootPart.Position
+        + Vector3.new(0, 0, -14))
     ThreatService.taunt(boss, far_player, 5)
     wait_for(function()
         return boss:GetAttribute("MarauderAggroTargetUserId")
