@@ -90,8 +90,28 @@ end
 
 local basic_recipe = ProfessionRecipes.get("forge_ironbound_gloves")
 local tempered_recipe = ProfessionRecipes.get("temper_ironbound_gloves")
-check(basic_recipe.RequiredLevel == 1, "Basic gloves must remain entry-level and self-sufficient.")
-check(tempered_recipe.RequiredLevel == 2, "Tempered gloves must demonstrate recipe progression.")
+local leather_recipe = ProfessionRecipes.get("stitch_leatherbound_gloves")
+local enchant_recipe = ProfessionRecipes.get("enchant_leatherbound_gloves")
+check(basic_recipe.RequiredLevel == 1,
+    "Basic gloves must remain entry-level and self-sufficient.")
+check(tempered_recipe.RequiredLevel == 2,
+    "Tempered gloves must demonstrate recipe progression.")
+check(leather_recipe.RequiredLevel == 1
+    and leather_recipe.StationId == "Leatherworking",
+    "Leatherworking base equipment recipe must use its own station.")
+check(enchant_recipe.RequiredLevel == 2
+    and enchant_recipe.StationId == "Enchanting",
+    "Advanced enchant must demonstrate Enchanting progression.")
+local leather_station = ProfessionRecipes.for_station("Leatherworking")
+local enchanting_station = ProfessionRecipes.for_station("Enchanting")
+check(#leather_station == 2
+    and leather_station[1].Id == "cure_raw_hide"
+    and leather_station[2].Id == "stitch_leatherbound_gloves",
+    "Leatherworking station must expose its two registered recipes in order.")
+check(#enchanting_station == 2
+    and enchanting_station[1].Id == "inscribe_warding_rune"
+    and enchanting_station[2].Id == "enchant_leatherbound_gloves",
+    "Enchanting station must expose its two registered recipes in order.")
 
 local needs_oil = false
 for _, input in ipairs(tempered_recipe.Inputs) do
