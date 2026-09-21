@@ -1,5 +1,24 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — support threat candidate (LOCAL VERIFICATION PENDING)
+
+GitHub-only candidate adds effective-heal and actually absorbed Ward
+threat to the existing per-enemy ThreatService. MageHeal/HoT, Mend pulses
+and ArcaneWard absorption use server-observed amounts, never skill
+activation or fabricated damage. The provisional multiplier is 0.5
+threat per effective support point; each enemy receives threat only
+if both caster and recipient were in that enemy's most recent eligible
+target-candidate set. Enemy cleanup discards that eligibility snapshot.
+
+Implementation and focused-test changes are committed on the active
+feature branch. The earlier two-client Taunt/aggro acceptance is still
+valid for its earlier source head; **the new support-threat candidate
+has not yet passed a fresh unpublished Studio regression or genuine
+two-client support-skill Play**. Treat this as unaccepted pending
+validation. No TEST/PROD place publish, merge or cloud testing.
+
+Receipt: `docs/testing/combat-support-threat-candidate-2026-09-21.md`.
+
 ## 21 September 2026 — local aggro/threat and Fighter Taunt verified
 
 Normal enemies and the world-boss Captain controller now share a
