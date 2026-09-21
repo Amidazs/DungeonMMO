@@ -222,4 +222,50 @@ assert(
     "Remaining party member must keep the active session index."
 )
 
+-- A full wipe is terminal. Retry must create a separate session
+-- after the member returns to Base, not reset the old session in place.
+local failed_run = assert(sessions:create(
+    "TestDungeon", {52}, 100, "reserved-failed-first"
+))
+assert(sessions:mark_connected(failed_run.SessionId, 52).ok)
+assert(sessions:activate_checkpoint(
+    failed_run.SessionId, "EncounterStart:CombatRoom2", 2
+).ok)
+assert(sessions:set_member_mode(failed_run.SessionId, 52, "Dead").ok)
+assert(sessions:consume_free_revive(failed_run.SessionId, 52).ok)
+assert(sessions:mark_failed(
+    failed_run.SessionId, "WipeReviveTimeout"
+).ok)
+
+local fresh_run = assert(sessions:create(
+    "TestDungeon", {52}, 100, "reserved-failed-retry"
+))
+assert(
+    fresh_run.SessionId ~= failed_run.SessionId
+        and fresh_run.State == "Creating",
+    "A retry after wipe must create a new session identity."
+)
+assert(
+    fresh_run.Checkpoint.Id == "Entrance"
+        and fresh_run.Checkpoint.Sequence == 0
+        and fresh_run.Members["52"].FreeReviveUsed == false,
+    "Retry must start with fresh checkpoint and revive eligibility."
+)
+assert(
+    fresh_run.CompletionRewardsCommitted ~= true,
+    "Retry must not inherit completion receipts from another session."
+)
+local previous_run = assert(sessions:get(failed_run.SessionId))
+assert(
+    previous_run.State == "Failed"
+        and previous_run.FailureReason == "WipeReviveTimeout"
+        and previous_run.Checkpoint.Sequence == 2
+        and previous_run.Members["52"].FreeReviveUsed == true,
+    "Creating a retry must leave the previous failed run immutable."
+)
+assert(
+    sessions:get_for_user(52).SessionId == fresh_run.SessionId,
+    "Retry must index the new run rather than reconnecting to failure."
+)
+
 print("[Dungeon Session Tests] PASS")
