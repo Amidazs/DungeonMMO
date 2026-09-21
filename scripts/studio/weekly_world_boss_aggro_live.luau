@@ -288,7 +288,13 @@ local function run()
     -- swings. The NPC may turn or move after threat switches, and
     -- the basic combo's forward step can move a test character away.
     -- Every threat increase must come from an actual client hit.
-    for strike = 1, 3 do
+    for strike = 1, 2 do
+        if strike > 1 then
+            -- Let the accepted 0.85-second combo timer expire so every
+            -- proof hit uses the stable Slash1 geometry instead of the
+            -- moving Slash2/Finisher combo steps.
+            task.wait(1.05)
+        end
         local target_root = assert(
             boss:FindFirstChild("HumanoidRootPart"))
         local position = target_root.Position + Vector3.new(0, 0, 2.2)
@@ -307,7 +313,6 @@ local function run()
         then
             break
         end
-        task.wait(0.85)
     end
     wait_for(function()
         return ThreatService.get_threat(boss, near_player.UserId)
