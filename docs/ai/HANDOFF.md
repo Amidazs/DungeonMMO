@@ -1,5 +1,64 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — isolated world-boss travel handoff
+
+On `wip/phase-4-test-hud-integration-v1`, the Base weekly entry
+now has an optional independent physical gateway using the existing
+DungeonBoard. Server-owned explicit UTC event settings and existing
+ready-party validation guard reserved-session issuance. The
+TeleportCoordinator uses the existing profile/lease handoff,
+reserves the separately configured boss place and persists the
+world-boss destination/party/week before transfer. An independent
+world-boss Rojo place validates the stored session/member and nonce.
+Normal Dungeon refuses all boss sessions.
+
+Per-member Base return after a verified defeat uses the existing
+coordinator. Its old session index is cleared only after Base
+actually loads the member. If the Base teleport fails, the pending
+return flag is rolled back to preserve boss reconnect. The runtime
+also binds the first verified session before yielding on admission
+to avoid cross-party collision in one reserved server.
+
+The real ContributionService.get_player_snapshot returns top-level
+Damage/Tank/Support. The original isolated runtime incorrectly
+looked for `snapshot.snapshot`, making all actual rewards
+unavailable. WorldBossContributionRules fixes that response
+interpretation; 14 focused actual-service tests in Base and Dungeon
+passed, including saved damage/healing and adapter-style recovery.
+This does NOT mean player attacks are yet wired into the isolated
+place. Ordinary dungeon/Temple and v1.53 professions remain
+unchanged.
+
+Acceptance receipts: isolated travel = six Rojo builds, Base and
+Dungeon travel 18 assertions each, Base return 22, ordinary
+Dungeon admission 10, destination factory 5, default-off Play,
+Base professions 14/14, Dungeon gameplay 30/30 and material-chain
+Play PASS. Hardening = Base and Dungeon contribution 14 assertions
+each, three current Rojo builds, Base return 22, Base travel 18
+and Dungeon session 30 assertions PASS.
+
+**NEXT:** integrate the existing combat/client/controller safely
+into the independent world-boss place, author a basic arena anchor,
+run a real unassisted boss encounter and verify server-validated
+damage/support, disconnect/reward retries and individual returns.
+Only then consider explicit TEST-only place configuration and
+published reserved-server networking. The boss place is
+currently disabled/unplayable; no published real-place journey
+or cloud MemoryStore/DataStore proof exists. Do not enable
+production events or claim the whole travel milestone is released.
+
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipts:
+`docs/testing/weekly-world-boss-v154-isolated-travel-2026-09-21.md`,
+`docs/testing/weekly-world-boss-v154-travel-hardening-2026-09-21.md`.
+All source/test/roadmap/handoff changes through GitHub; remote
+desktop restricted to clean fast-forward pulls, unpublished
+builds/Studio tests and read-only diagnostics. No cloud publish,
+force-push, main merge or production DataStore write.
+
+## Earlier 21 September session handoff (historical)
+
 ## 21 September 2026 — frozen weekly boss session handoff
 
 The active branch contains `WeeklyWorldBossSessionBridge` and
