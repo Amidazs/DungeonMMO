@@ -253,8 +253,13 @@ local function run()
         "Taunt must not fabricate reward contribution")
     print("[World Boss Taunt Live] ZERO_DAMAGE_SKILL_TAUNT_PASS")
 
+    local threat_after_first = ThreatService.get_threat(
+        boss, near_player.UserId)
     channel:FireClient(near_player, "CastTaunt")
     task.wait(0.25)
+    assert(ThreatService.get_threat(
+        boss, near_player.UserId) == threat_after_first,
+        "cooldown must reject repeated Taunt without increasing threat")
     assert(boss.Humanoid.Health == boss_health,
         "repeated Taunt input cannot bypass skill damage rules")
     print("[World Boss Taunt Live] REPEATED_INPUT_SAFE_PASS")
