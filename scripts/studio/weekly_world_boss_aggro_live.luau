@@ -21,6 +21,8 @@ local RS = game:GetService("ReplicatedStorage")
 local config = require(RS.Combat.Shared.CombatConfig)
 local attack = RS.Combat.Remotes:WaitForChild(
     config.REMOTES.ATTACK_REQUEST)
+local skill = RS.Combat.Remotes:WaitForChild(
+    config.REMOTES.SKILL_REQUEST)
 local channel = RS:WaitForChild("WorldBossAggroChannel_TEMP")
 
 channel.OnClientEvent:Connect(function(command)
@@ -39,6 +41,8 @@ channel.OnClientEvent:Connect(function(command)
             attack:FireServer()
             task.wait(0.72)
         end
+    elseif command == "Taunt" then
+        skill:FireServer("Taunt")
     end
 end)
 channel:FireServer("Ready")
@@ -60,6 +64,12 @@ local Factory = require(SSS.Dungeon.DungeonWeeklyWorldBossFactory)
 local Bridge = require(SSS.Dungeon.DungeonContributionBridge)
 local Authority = require(SSS.WorldBoss.WorldBossCombatAuthority)
 local ThreatService = require(SSS.Combat.ThreatService)
+local ProgressionRuntimeState = require(
+    SSS.Core.Services.ProgressionRuntimeState
+)
+local ProfileSchema = require(
+    RS.Core.Shared.ProfileSchema
+)
 
 local ready = {}
 
@@ -191,6 +201,24 @@ local function run()
     local runtime, session_id, boss = create_encounter(players)
     local near_player = players[1]
     local far_player = players[2]
+
+    local fighter = ProfileSchema.create_default(
+        far_player.UserId).Characters.Slot1
+    fighter.Identity.RaceId = "Human"
+    fighter.Identity.BaseClassId = "Fighter"
+    fighter.Identity.ClassId = "Fighter"
+    fighter.Identity.CreationStage = "Complete"
+    fighter.Progression.Skills.Taunt = {
+        Known = true,
+        PurchasedRank = 1,
+    }
+    fighter.Progression.Loadout[3] = "Taunt"
+    ProgressionRuntimeState.set_character(
+        far_player.UserId, fighter)
+    assert(ProgressionRuntimeState.is_skill_usable(
+        far_player.UserId, "Taunt"),
+        "real client Taunt must be authorized")
+
     local near_character = prepare_character(near_player, session_id)
     local far_character = prepare_character(far_player, session_id)
 
@@ -293,23 +321,26 @@ local function run()
         :get_player_snapshot(session_id, far_player.UserId).Damage
     assert(far_character:FindFirstChildOfClass("Humanoid").Health > 0,
         "taunting party member must be alive and targetable")
-    -- Leave the non-damaging taunter at a safe distance: a valid boss
-    -- should chase the highest-threat player instead of requiring
-    -- melee proximity to select them.
-    place(far_character, boss.HumanoidRootPart.Position
-        + Vector3.new(0, 0, -14))
-    ThreatService.taunt(boss, far_player, 5)
+    local target_root = assert(
+        boss:FindFirstChild("HumanoidRootPart"))
+    local taunt_position = target_root.Position
+        + Vector3.new(0, 0, -3.5)
+    far_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+        taunt_position,
+        target_root.Position
+    )
+    channel:FireClient(far_player, "Taunt")
     wait_for(function()
         return boss:GetAttribute("MarauderAggroTargetUserId")
             == far_player.UserId
             and ThreatService.get_threat(boss, far_player.UserId)
                 > ThreatService.get_threat(boss, near_player.UserId)
-    end, "zero-damage taunt takes aggro", 8)
+    end, "real zero-damage Taunt skill takes aggro", 10)
     local after_damage = runtime.ContributionService
         :get_player_snapshot(session_id, far_player.UserId).Damage
     assert(before_damage == after_damage,
-        "taunt must generate threat without generating fake damage")
-    print("[World Boss Aggro Live] ZERO_DAMAGE_TAUNT_PASS")
+        "Taunt skill must generate threat without fake damage")
+    print("[World Boss Aggro Live] REAL_TAUNT_SKILL_PASS")
 
     boss:Destroy()
 end
