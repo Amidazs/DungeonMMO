@@ -34,11 +34,18 @@ check(human.ok == true, "Human Fighter must resolve FighterTrainer.")
 check(elf.ok == true, "Elf Fighter must resolve FighterTrainer.")
 check(type(human.Trainer) == "table", "trainer snapshot must exist.")
 check(human.Trainer.DisplayName == "Fighter Trainer", "trainer display name mismatch.")
-check(#human.Trainer.Skills == 3, "Fighter trainer must expose exactly three Phase 2C.B skills.")
+check(#human.Trainer.Skills == 4, "Fighter trainer must expose four combat skills including Taunt.")
 check(human.Trainer.Skills[1].SkillId == "ShieldBash", "Shield Bash order mismatch.")
 check(human.Trainer.Skills[2].SkillId == "Mend", "Mend order mismatch.")
 check(human.Trainer.Skills[3].SkillId == "ArcSlash", "Arc Slash order mismatch.")
 check(human.Trainer.Skills[3].SourceItemId == "arc_slash_book_bound", "Arc Slash book source mismatch.")
+check(human.Trainer.Skills[4].SkillId == "Taunt", "Taunt order mismatch.")
+check(
+    TrainerCatalogues.can_offer(
+        "FighterTrainer", fighter("Human"), "Taunt"
+    ).ok == true,
+    "Fighter Trainer must offer Taunt."
+)
 check(TrainerCatalogues.can_offer("FighterTrainer", fighter("Human"), "FakeSkill").ok == false, "arbitrary skill must reject.")
 
 print(string.format("[Trainer Catalogues Tests] PASS: %d assertions.", assertions))
