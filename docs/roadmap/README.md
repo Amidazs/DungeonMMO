@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**Latest GitHub roadmap supplement: v1.57 — physical Room1
+wipe/re-entry and Play again.** Read
+[v1.57](DungeonMMO_Roadmap_v1_57_Room_Reset_Play_Again_20260921.md)
+and [local proof](../testing/dungeon-room-reset-play-again-2026-09-21.md).
+The unpublished one-client physical Room1 test verified old
+enemy retirement and newly spawned full-health enemies after a
+genuine player death and checkpoint revive. Both terminal
+end-screen replay buttons passed real-client UI Play; replay
+party-consent contract passed 17 assertions. Published
+reserved-server Play again and multi-client boss-room recovery
+remain pending. No place published or main merged.
+
+
 **Latest GitHub roadmap supplement: v1.56 (terminal dungeon wipe,
 Base return and fresh-run retry, 21 September 2026).**
 Read [the v1.56 backend roadmap](DungeonMMO_Roadmap_v1_56_Terminal_Wipe_Base_Retry_20260921.md)
