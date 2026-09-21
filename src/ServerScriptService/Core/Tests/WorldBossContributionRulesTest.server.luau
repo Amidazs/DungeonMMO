@@ -83,5 +83,31 @@ check(Rules.is_eligible(
     recovered:get_player_snapshot(session_id, FIRST_ID)),
     "fresh service reading the same durable adapter recovers eligibility")
 
+-- Real ExecuteMultiplayerTestAsync accounts use negative UserIds.
+-- This is allowed only by the studio-specific ID validator.
+check(not contributions:record_for_user(0, {
+    EventId = "zero-id", Type = "DamageDealt", Amount = 2,
+}).ok, "UserId zero cannot record a contribution")
+local studio_session = assert(sessions:create(
+    "TestDungeon", {-101, -102}, 0,
+    "WorldBossStudioAccountsReserved", "Depth1"))
+check(sessions:set_instance_state(studio_session.SessionId, {}).ok,
+    "real Studio-style negative UserIds may form a local session")
+check(sessions:mark_connected(studio_session.SessionId, -101).ok,
+    "negative Studio player may activate the test session")
+local recorded_studio = contributions:record_for_user(-101, {
+    EventId = "studio-damage", Type = "DamageDealt", Amount = 7,
+})
+check(recorded_studio.ok,
+    "negative Studio player ID must persist actual server damage")
+local ignored_studio = contributions:record_for_user(-102, {
+    EventId = "studio-zero", Type = "DamageDealt", Amount = 0,
+})
+check(not ignored_studio.ok,
+    "a Studio player cannot send invalid contribution amounts")
+check(contributions:get_player_snapshot(
+    studio_session.SessionId, -101).Damage == 7,
+    "negative Studio player ID can recover its persisted damage")
+
 print(string.format(
     "[World Boss Contribution] PASS: %d assertions.", assertions))
