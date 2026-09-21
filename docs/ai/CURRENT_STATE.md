@@ -1,5 +1,57 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.54 real guardian combat locally verified
+
+The isolated world-boss place now reuses the existing full combat
+server/client runtime and the existing Marauder Captain AI controller.
+The ordinary prototype ArenaBuilder remains excluded. On boss
+admission, characters receive the frozen weekly encounter ID so the
+guardian targets only that encounter's participants.
+
+World-boss contribution is now scoped to the exact active guardian
+and active admitted party. The combat bridge filters unrelated or
+same-name targets, and WorldBossCombatAuthority revalidates live
+membership, encounter identity, undefeated weekly state and support
+targets before forwarding any contribution to the existing
+ContributionService.
+
+A real unpublished Studio client used the normal CombatService attack
+RemoteEvent to damage the guardian. The same normal DamageService
+callback persisted contribution, the guardian AI damaged the player,
+the player defeated the guardian without direct health injection, and
+the verified weekly reward paid exactly once. Markers:
+`REAL_CLIENT_HIT_PASS`, `SERVER_CONTRIBUTION_PASS`,
+`GUARDIAN_ATTACK_PASS`, `REAL_CLIENT_BOSS_DEFEAT_PASS`,
+`WEEKLY_REWARD_ONCE_PASS`, `VERIFIED_PLAY_MODE_PASS`.
+
+That Play test exposed and fixed two real runtime bugs: a nil access
+when stored weekly event state was absent/malformed, and a local
+`event` variable that shadowed the incoming combat event and caused
+genuine hits to be rejected. The runtime also retries post-defeat
+reward grants and blocks Base return while an earned qualifying
+reward is still unsaved.
+
+Final source head
+`7605c811bb9f9a13ce2fb56f6b68a76f8c63ae89` passed six Rojo
+builds, seven damage-filter assertions, default-off boss-place Play,
+14 contribution-service assertions, weekly policy/factory 40+8,
+Base professions 14/14 and Dungeon gameplay 30/30.
+
+This is still **not** the complete published game journey. The real
+dedicated place needs an authored WorldBossArenaSpawn/basic arena.
+The accepted combat fixture manually creates its disposable session
+and guardian, so Base entry, Roblox ReserveServer travel, real lease
+handoff, Base return and cloud DataStore/MemoryStore recovery were
+not exercised in one networked flow. Multi-client boss combat,
+party wipe/death and disconnect/rejoin remain pending. Event flags
+stay off. No cloud publish, main merge, force-push or production
+player DataStore write occurred.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-real-combat-2026-09-21.md`.
+
+## Earlier 21 September world-boss travel checkpoint (historical)
+
 ## 21 September 2026 — v1.54 isolated world-boss travel and return
 
 A separate default-off Base boss gateway, new reserved-server travel
