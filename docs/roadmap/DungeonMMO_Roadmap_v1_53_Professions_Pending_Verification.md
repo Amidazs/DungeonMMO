@@ -132,7 +132,7 @@ Do not treat this feature as physically implemented end-to-end.
 The new `SkinningEligibilityTest` and `CorpseSkinningRuntimeTest`,
 plus an extended Dungeon enemy cleanup test, are staged. Four local
 Rojo builds succeeded at
-`c6af7cf080001f199e7383ef8cb4c63198e7d312`, but **the new
+`8655c7e19bc97a9b9c803fc011e2e5a3080c47f3`, but **the new
 Studio suites and actual corpse Play test have not run**: the local
 Studio MCP discovery returned an unavailable-connection error and
 the Codex Studio delegate reported its usage limit.
