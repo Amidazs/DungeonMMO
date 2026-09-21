@@ -1,21 +1,35 @@
 # DungeonMMO Current Engineering State
 
-## 21 September 2026 — support threat candidate (LOCAL VERIFICATION PENDING)
+## 21 September 2026 — support threat and four-role contract LOCALLY VERIFIED
 
-GitHub-only candidate adds effective-heal and actually absorbed Ward
-threat to the existing per-enemy ThreatService. MageHeal/HoT, Mend pulses
-and ArcaneWard absorption use server-observed amounts, never skill
-activation or fabricated damage. The provisional multiplier is 0.5
-threat per effective support point; each enemy receives threat only
-if both caster and recipient were in that enemy's most recent eligible
-target-candidate set. Enemy cleanup discards that eligibility snapshot.
+Latest tested source/test head:
+`df33735b10010b8aed8e7acc5193970b8f4cc9b1`.
+The shared ThreatService now credits 0.5 provisional threat per
+*effective* MageHeal/HoT, positive Mend pulse and absorbed ArcaneWard
+point. Both caster and healed/protected target must be in the enemy's
+latest eligible target set, and that enemy must already hold threat;
+idle nearby enemies do not receive free healing aggro. Player departure
+clears their per-enemy threat and candidacy, and enemy wipe/reset clears
+both the threat ledger and current eligible candidate snapshot.
 
-Implementation and focused-test changes are committed on the active
-feature branch. The earlier two-client Taunt/aggro acceptance is still
-valid for its earlier source head; **the new support-threat candidate
-has not yet passed a fresh unpublished Studio regression or genuine
-two-client support-skill Play**. Treat this as unaccepted pending
-validation. No TEST/PROD place publish, merge or cloud testing.
+Local Studio at that head: six Rojo builds; ThreatService 48 assertions,
+including server-side **simulated** four-player tank/DPS/healer,
+independent enemy, Taunt, disconnect and wipe contracts;
+Base professions 14/14; Dungeon backend 30/30; real two-client normal
+Marauder and isolated world-boss aggro PASS. A separate genuine
+two-client normal Marauder fixture passed client MageHeal on an injured
+Fighter, real client ArcaneWard application and a test-injected server
+DamageService hit absorbed by Ward, with positive support threat:
+`VERIFIED_MULTIPLAYER_PASS`.
+
+**Boundaries:** the Ward hit was test-injected, not a live NPC attack.
+Four-player aggro has only simulated server-side policy coverage,
+not actual four-client Play. Client-driven Mend, real NPC Ward
+absorption, real multi-enemy party/wipe/disconnect and world-boss
+support-skill Play remain pending. The 0.5 support multiplier is
+provisional. No Roblox publish, TEST cloud run, main merge,
+production DataStore access or force-push was performed.
+Source/test/docs changes were made in GitHub only.
 
 Receipt: `docs/testing/combat-support-threat-candidate-2026-09-21.md`.
 
