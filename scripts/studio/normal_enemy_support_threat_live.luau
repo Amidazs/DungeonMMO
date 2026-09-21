@@ -178,6 +178,9 @@ local function run()
             == fighter.UserId
     end, "nearest fighter", 12)
 
+    -- The mobile Marauder may have chased the initial spawn point.
+    -- Reacquire its live root before the real client melee hit window.
+    place(fighter_character, root, 2.5)
     channel:FireClient(fighter, "Taunt")
     wait_for(function()
         return Threat.get_threat(enemy, fighter.UserId) >= 15
