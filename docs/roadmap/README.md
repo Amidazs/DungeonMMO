@@ -1,5 +1,20 @@
 # Canonical Roadmap
 
+**Latest GitHub roadmap supplement: v1.56 (terminal dungeon wipe,
+Base return and fresh-run retry, 21 September 2026).**
+Read [the v1.56 backend roadmap](DungeonMMO_Roadmap_v1_56_Terminal_Wipe_Base_Retry_20260921.md)
+and [local test evidence](../testing/dungeon-terminal-wipe-return-fresh-run-2026-09-21.md).
+Failed dungeon sessions remain terminal, their connected members can
+return to Base, and the existing Base entry creates a fresh session
+rather than reopening the failed run. Legitimate paid revives follow
+the actual committed purchase ordering; repeated and late callbacks
+cannot respawn a failed run. Six Rojo builds, Dungeon backend
+30/30, integrated paid-retry service and real failed-run UI Play
+passed. **In-place room/encounter health/spawn reset and complete
+party checkpoint retry are not yet implemented**. No Roblox
+publish or main merge occurred.
+
+
 **Latest GitHub roadmap progress supplement: v1.55 (real
 four-client combat, world-boss support and threat-only full-wipe
 cleanup, 21 September 2026).**
