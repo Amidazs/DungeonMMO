@@ -279,6 +279,16 @@ local function return_to_base(player: Player)
         return
     end
     grant_if_eligible(player.UserId)
+    local recorded = contribution:get_player_snapshot(
+        session.SessionId, player.UserId)
+    if ContributionRules.is_eligible(recorded)
+        and not rewarded[player.UserId]
+    then
+        -- Never hand an earned but unsaved reward to another server.
+        -- A failed save keeps the player in their recoverable encounter.
+        warn("[World Boss] Reward save pending; retry before returning.")
+        return
+    end
     local prepared = sessions:set_world_boss_return_pending(
         session.SessionId, player.UserId, true)
     if not prepared.ok then
@@ -337,6 +347,16 @@ task.spawn(function()
         end
         if active_session_id then
             sessions:refresh(active_session_id)
+            local session = sessions:get(active_session_id)
+            local snapshot = session and session.InstanceState
+                and session.InstanceState.WeeklyWorldBoss
+            if snapshot and snapshot.Defeated == true then
+                -- Last-hit recording or profile saves can yield after
+                -- Died fires. Retry unpaid players without new kills.
+                for user_id in pairs(admitted) do
+                    grant_if_eligible(user_id)
+                end
+            end
         end
     end
 end)
