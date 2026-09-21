@@ -198,8 +198,13 @@ local function run()
         "Taunt must not deal damage to a normal enemy")
     print("[Normal Taunt Live] ZERO_DAMAGE_SKILL_TAUNT_PASS")
 
+    local threat_after_first = ThreatService.get_threat(
+        enemy, near_player.UserId)
     channel:FireClient(near_player, "CastTaunt")
     task.wait(0.25)
+    assert(ThreatService.get_threat(
+        enemy, near_player.UserId) == threat_after_first,
+        "cooldown must reject repeated Taunt without increasing threat")
     assert(enemy.Humanoid.Health == health_before,
         "repeated Taunt cannot damage the normal enemy")
     print("[Normal Taunt Live] REPEATED_INPUT_SAFE_PASS")
