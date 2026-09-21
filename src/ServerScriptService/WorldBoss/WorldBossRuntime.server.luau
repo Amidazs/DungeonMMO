@@ -13,6 +13,9 @@ local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
 local ArrivalRules = require(
     Services:WaitForChild("WeeklyWorldBossArrivalRules")
 )
+local ContributionRules = require(
+    Services:WaitForChild("WorldBossContributionRules")
+)
 local TeleportCoordinator = require(
     Services:WaitForChild("TeleportCoordinator")
 )
@@ -74,14 +77,7 @@ local function grant_if_eligible(user_id: number)
     end
     local snapshot = contribution:get_player_snapshot(
         session_id, user_id)
-    if not snapshot.ok or type(snapshot.snapshot) ~= "table" then
-        return
-    end
-    local totals = snapshot.snapshot
-    if (totals.Damage or 0) <= 0
-        and (totals.Tank or 0) <= 0
-        and (totals.Support or 0) <= 0
-    then
+    if not ContributionRules.is_eligible(snapshot) then
         return
     end
     local eligible = sessions:set_member_completion_eligibility(
