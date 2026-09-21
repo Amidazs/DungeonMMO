@@ -14,6 +14,7 @@ local DEFINITIONS = table.freeze({
         StarterEquipment = table.freeze({}),
         TeachableSkills = table.freeze({
             "ArcSlash",
+            "Taunt",
         }),
     }),
 
