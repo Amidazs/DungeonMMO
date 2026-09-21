@@ -49,6 +49,41 @@ that child, and the expected `EconomyAuditIntegrationTest` simulated
 review the Base composition test autorun separately from the targeted
 profession passes.
 
+## First real client/server Base profession fixture — PARTIAL / FAIL
+
+GitHub-created `scripts/studio/profession_base_live_requests.luau` at
+`31e26afbb558e9985527607a40f0a7d3dc1fcbf9` was safely pulled into
+the clean Windows worktree and executed unchanged on the same disposable
+unpublished Base Studio place. Unlike the earlier generic Play smoke,
+this fixture sends actual client `ProfessionCraftRequest:FireServer`
+calls while moving the server-owned player character near and far from
+each newly added station.
+
+The Base log
+`0.739.0.7390687_20260921T085257Z_Studio_94DB0_last.log` records:
+
+- `STATION_RANGE_PASS cure_raw_hide near_reason=MissingMaterials`.
+- `STATION_RANGE_PASS inscribe_warding_rune near_reason=MissingMaterials`.
+
+At both stations, the far client request returned
+`NotAtRequiredStation`, whereas the near request reached the live
+craft service and failed normally on missing materials. The client also
+sent a fabricated extra success argument; because materials were
+missing, this **does not prove** that a material-backed craft ignores
+forged success data in live Play.
+
+The same fixture's client-side scripted ProximityPrompt hold for
+`Base.RawHideCache` produced no Gather action result within 15
+seconds. The fixture terminated with
+`[Profession Base Live] TIMEOUT Gather result`. Treat the overall
+fixture as **FAIL**, not as a completed or accepted hide-cache test.
+This does not establish whether the issue is scripted input activation,
+physical prompt placement, or server claim processing. Investigate the
+prompt in the disposable place and rerun after a GitHub-only fixture
+change, or perform a genuinely physical client activation. No repeat-
+claim, full material-backed craft, overlapping requests or disconnect
+checks were executed in this fixture.
+
 ## Remaining v1.53 acceptance gate
 
 - [ ] A **fresh physical Base Play-mode profession fixture** sends real
