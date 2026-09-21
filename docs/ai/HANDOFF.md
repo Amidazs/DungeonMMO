@@ -1,5 +1,42 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — next backend handoff after four-client wipe
+
+Verified source/test head:
+`739e747d88d93ff00ed30497e9473edd17b037f4`.
+The real four-client two-Marauder fixture passed nearest fallback,
+server-authorized damage/heal/Taunt threat, independent ledgers,
+dead-healer fallback, genuine DPS client departure and a complete
+death of all remaining clients. A previously engaged enemy now
+clears **only threat and eligible target cache** after three
+continuous seconds with no valid target. Actual fixture and
+server logs: `REAL_DISCONNECT_CLEANUP_PASS`,
+`REAL_FULL_WIPE_THREAT_RESET_PASS`,
+`VERIFIED_FOUR_CLIENT_PASS`.
+
+Six Rojo builds; focused ThreatService 51; Dungeon backend 30/30;
+Base professions 14/14; genuine two-client world-boss aggro and
+support-skill Play on the correct isolated world-boss composition
+all PASS at this source. The former boss timeout came from
+using the ordinary Dungeon composition and is superseded.
+One moving-enemy Taunt miss during the new wipe fixture was
+handled by a genuine cooldown-respecting retry; server skill
+validation was not weakened.
+
+**NEXT (local-only):** full dungeon-session wipe/retry and
+respawn/checkpoint/reward invariants. The current controller does
+not restore enemy health/position or restart the boss; do not
+describe threat-only cleanup as full dungeon reset. Preserve
+existing accepted Play gates. Keep all source, tests and docs
+in GitHub; desktop may only fast-forward pull/build/test/diagnose.
+No Roblox publishing, main merge, force-push or PROD data writes
+without separate approval.
+
+Receipts:
+`docs/testing/four-player-full-wipe-threat-reset-2026-09-21.md`
+and roadmap v1.55 Markdown supplement.
+
+
 ## 21 September 2026 — eligible-threat support follow-up
 
 Current tested candidate: `b569435c9eb3cd4971eec06ca1baeeb4f17f4a09`.
