@@ -57,6 +57,7 @@ local Factory = require(SSS.Dungeon.DungeonWeeklyWorldBossFactory)
 local DamageBridge = require(SSS.Dungeon.DungeonContributionBridge)
 local Authority = require(SSS.WorldBoss.WorldBossCombatAuthority)
 local Arena = require(SSS.WorldBoss.WorldBossArenaLayout)
+local Lifecycle = require(SSS.WorldBoss.WorldBossMemberLifecycle)
 
 local ready = {}
 local departed = {}
@@ -206,6 +207,63 @@ local function verify_shared_completion(players, runtime, session_id, boss)
 end
 
 -- Args:
+--   players: {Player}; real two-client party after boss defeat.
+--   runtime: any; authoritative session/profiles for that party.
+--   session_id: string; saved, already-defeated encounter identity.
+-- Returns:
+--   nil: verifies a real Humanoid death and automatic same-run respawn.
+local function verify_death_and_respawn(players, runtime, session_id)
+    local victim = players[1]
+    local survivor = players[2]
+    local lifecycle = Lifecycle.new(runtime.SessionService)
+    local connection = lifecycle:bind_player(
+        victim, session_id, CFrame.new(0, 5, 19), 1)
+    local original = wait_for(function()
+        local character = victim.Character
+        return character and character:GetAttribute(
+            "WorldBossSessionId") == session_id
+            and character:FindFirstChildOfClass("Humanoid")
+            and character
+    end, "member lifecycle character", 15)
+    local humanoid = assert(
+        original:FindFirstChildOfClass("Humanoid"))
+    -- Deliberately force this member's death only in the disposable
+    -- fixture: actual client guardian kill was proven separately above.
+    humanoid.Health = 0
+    wait_for(function()
+        local record = runtime.SessionService:get(session_id)
+        return record and record.Members[tostring(victim.UserId)]
+            .Mode == "Dead"
+    end, "authoritative dead session mode", 8)
+    assert(Players:GetPlayerByUserId(survivor.UserId) == survivor,
+        "one member's death must not evict their surviving peer")
+    local recovered = wait_for(function()
+        local character = victim.Character
+        local record = runtime.SessionService:get(session_id)
+        if character and character ~= original and record
+            and character:GetAttribute("WorldBossSessionId")
+                == session_id
+            and record.Members[tostring(victim.UserId)]
+                .Mode == "Active"
+        then
+            return character
+        end
+        return nil
+    end, "fresh character in same active boss session", 15)
+    assert(recovered ~= original
+        and runtime.SessionService:get_for_user(victim.UserId)
+            .SessionId == session_id,
+        "respawn must retain original session identity")
+    local replay = runtime.WeeklyWorldBossSessionBridge
+        :grant_reward(session_id, victim.UserId)
+    assert(replay.ok and replay.already_applied
+        and replay.gold_granted == 0,
+        "dying and respawning after victory cannot grant again")
+    connection:Disconnect()
+    print("[World Boss Party Live] MEMBER_DEATH_RESPAWN_PASS")
+end
+
+-- Args:
 --   players: {Player}; two real clients after the shared defeat.
 --   runtime: any; server-owned profiles and session authority.
 --   session_id: string; already defeated weekly encounter.
@@ -251,6 +309,7 @@ local function run()
     position_party(players, session_id)
     task.wait(2)
     verify_shared_completion(players, runtime, session_id, boss)
+    verify_death_and_respawn(players, runtime, session_id)
     verify_peer_departure(players, runtime, session_id)
     boss:Destroy()
 end
