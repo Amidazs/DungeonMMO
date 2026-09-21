@@ -1,5 +1,11 @@
 # DungeonMMO Roadmap v1.53 — Leatherworking / Enchanting staged
 
+**Historical profession milestone:** The newer backend roadmap is
+`docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+v1.53 remains the source of truth for the earlier profession tests
+and its separate cross-server/release acceptance boundaries.
+
+
 **Date:** 21 September 2026  
 **Status:** Local backend Play acceptance for crafting, animal-only Skinning, two-client independence and interrupted-craft recovery; **actual same-account network reconnect, cross-server persistence, final animal art/AI and release/cloud validation pending**  
 **Branch:** `wip/phase-4-test-hud-integration-v1`
