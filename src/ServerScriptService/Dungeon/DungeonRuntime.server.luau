@@ -1924,6 +1924,7 @@ return_request.OnServerEvent:Connect(function(
             dungeon_state:FireClient(player, {
                 state = "Failed",
                 objective = "Studio Return to Lobby simulated.",
+                return_simulated = true,
             })
         end
         return
