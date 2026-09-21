@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**Latest ChatGPT-authored roadmap update: v1.53 (Leatherworking / Enchanting staged, 21 September 2026).**
+Read [the v1.53 pending-verification roadmap](DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md)
+and [the staged verification plan](../testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md).
+GitHub now contains Skinning, Leatherworking and Enchanting progression,
+items, recipes, placeholder Base acquisition/stations, a multi-profession
+equipment chain, migration/contract/dependency tests and a per-player
+server craft-request guard. **These v1.53 changes are not locally accepted
+yet** because the authorized Windows desktop is offline. No new Studio
+PASS counts, Rojo build results or cloud release are claimed. The accepted
+v1.52 results remain the latest verified checkpoint. No Remote Desktop,
+local pull, TEST/PROD publish, real player DataStore mutation, force-push
+or main merge occurred for v1.53 staging.
+
 **Latest ChatGPT-authored roadmap update: v1.52 (non-boss Event variations and cross-profession backend, 20 September 2026).**
 Read [the v1.52 backend roadmap](DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md)
 and [the dated local Studio test report](../testing/phase4-nonboss-event-profession-chain-2026-09-20.md).
