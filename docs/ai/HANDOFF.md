@@ -1,5 +1,52 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — real four-party room/boss/event + replay closeout
+
+Latest locally verified gameplay head:
+`a5c0637888f8400703d07290f790a24d3b8406bf`.
+Four **real unpublished Studio clients** recovered together
+from a physical Temple Room1 wipe. One monster had already
+produced four actual RewardService receipts; the same
+monster's post-wipe second kill granted **no duplicate**
+Gold/XP/Level/bestiary count to any party member.
+The Room1 checkpoint revived all four players; fresh
+full-health enemies spawned after physical re-entry.
+
+The real Room3 boss, and a Temple optional EventArena boss
+enabled **only in the disposable Studio fixture**, also
+passed four-client death/automatic revive/re-entry tests.
+Earlier cleared rooms persisted and each retired boss was
+replaced by exactly one new full-health boss.
+
+A new real-client Play again regression exposed a gameplay
+bug: terminal `DungeonDeathService:tick` announced failure
+on every subsequent tick and wiped out the party's
+`ReplayWaiting` UI. Fixed to announce the transition
+once and added a backend assertion. A repeat two-client
+test then passed authenticated replay requests, waiting
+for the other player and simulated replay displayed on
+both clients. This test seeded a temporary Failed
+session and did not publish or teleport across places.
+
+At latest gameplay head: all six Rojo builds; Dungeon
+backend 30/30 and death/revive 41 assertions PASS.
+At the preceding fix head: ThreatService 51, Base
+professions 14/14 and paid retry 15 PASS.
+All source/doc edits through GitHub only.
+
+**NEXT local-only:** secret/higher-depth boss recovery;
+actual player disconnect/reconnect during a physical
+encounter and boss reward idempotence across full fights.
+Published reserved-server Play again/cloud persistence
+need separate approval. No place published, `main` merged,
+force-pushed or PROD datastore mutated.
+
+Receipt:
+`docs/testing/dungeon-four-client-room-boss-event-replay-2026-09-21.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_58_Four_Party_Boss_Replay_20260921.md`.
+
+
 ## 21 September 2026 — actual Room1 wipe/re-entry Play PASS
 
 At source `acb628fb99202a94f7f4cec781a15ec7f5614760`,
