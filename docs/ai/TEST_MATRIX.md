@@ -11,7 +11,7 @@
   skinning window after successful encounter rewards; other dungeon
   enemies retain their old immediate cleanup.
 - [x] Four Rojo compositions built locally at
-  `c6af7cf080001f199e7383ef8cb4c63198e7d312`; clean fast-forward
+  `8655c7e19bc97a9b9c803fc011e2e5a3080c47f3`; clean fast-forward
   integration worktree.
 - [ ] **Studio tests still unexecuted:** the new eligibility and
   corpse-grant focused tests and modified DungeonEnemyCleanupTest,
