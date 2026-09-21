@@ -69,7 +69,7 @@ check(humanoid.Health > 0
 check(wolf:FindFirstChild("WolfRearLeg") ~= nil
     and wolf:FindFirstChild("TrainingBlade").Transparency == 1,
     "wolf has a quadruped placeholder silhouette, not a visible sword")
-check(wolf:GetAttribute("BestiaryCreatureId") == "",
+check(wolf:GetAttribute("BestiaryCreatureId") == nil,
     "temporary animal must not grant Marauder bestiary progress")
 
 local marauder_options = table.clone(options)
