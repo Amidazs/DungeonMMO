@@ -145,6 +145,17 @@ local function craft(player, recipe_id, runtime)
     assert(station and station:IsA("BasePart"),
         "No server station for " .. recipe_id)
     position_at(player, station)
+    local actual_root = assert(player.Character:FindFirstChild(
+        "HumanoidRootPart"))
+    local delta = (actual_root.Position - station.Position).Magnitude
+    print("[Profession Material Live] RANGE_DEBUG recipe="
+        .. recipe_id .. " distance=" .. tostring(delta)
+        .. " station=" .. tostring(station.Position)
+        .. " player=" .. tostring(actual_root.Position)
+        .. " allowed=" .. tostring(require(
+            game:GetService("ServerScriptService").Core.Services
+                .ProfessionRuntime
+        ).within_station_range(player, station, 18)))
     table.clear(results)
     channel:FireClient(player, "Craft", recipe_id)
     local result = wait_for(function()
