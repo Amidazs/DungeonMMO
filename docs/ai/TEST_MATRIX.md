@@ -1,5 +1,40 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — two-client world-boss party resilience
+
+- [x] Opt-in primitive enclosed arena provides stable
+  `WorldBossArenaSpawn`; normal Base/Dungeon projects remain unchanged.
+- [x] Real two-client Studio Play: both clients record independent
+  guardian damage through existing combat and defeat one shared boss.
+- [x] Both real contributors receive independent weekly rewards once;
+  immediate duplicate claims grant zero.
+- [x] Real client-owned Humanoid death replicates server-side,
+  persists member `Dead`, respawns into the same session as
+  `Active`, and cannot create another reward.
+- [x] One real Studio client leaves after completion while the other
+  remains present; contribution/reward history remains intact.
+- [x] Connected full-party wipe policy: each Dead member remains
+  independently recoverable without rerolling the boss/event/week.
+- [x] Negative integral Studio multiplayer IDs are accepted only under
+  `RunService:IsStudio()`; zero/nonfinite/malformed identities stay
+  rejected. Contribution focused suite now **20 assertions PASS**.
+- [x] Final source: six Rojo builds, multiplayer
+  `VERIFIED_MULTIPLAYER_PASS`, lifecycle/wipe **14 assertions**,
+  Base travel **18**, Base return **22**, Dungeon session **33**,
+  Base professions **14/14**, Dungeon backend **30/30**.
+- [ ] Same-account network reconnect on a genuine new reserved server
+  is not testable through local Studio replacement clients.
+- [ ] Published TEST Base → ReserveServer boss → Base, real lease
+  handoff and DataStore/MemoryStore recovery remain pending.
+- [ ] Genuine two-client healing/ward skill execution during the boss
+  fight remains pending; support authority has focused service coverage.
+- [ ] Production scheduling, final boss phases/art/balance and live
+  enablement remain explicitly out of scope.
+
+Receipt: `docs/testing/weekly-world-boss-v154-party-resilience-2026-09-21.md`.
+
+## Earlier 21 September real-combat checkpoint (historical)
+
 ## 21 September 2026 — real world-boss combat integration
 
 - [x] Isolated world-boss compositions include the existing full
