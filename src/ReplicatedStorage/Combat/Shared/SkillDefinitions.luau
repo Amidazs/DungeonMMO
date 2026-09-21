@@ -12,6 +12,7 @@ export type MeleeSkillDefinition = {
     FORWARD_STEP_STUDS: number, REACH_STUDS: number, ARC_DEGREES: number,
     HITBOX: {SIZE: Vector3, FORWARD_OFFSET: number, SAMPLE_COUNT: number},
     BASE_DAMAGE: number, STAGGER_SECONDS: number,
+    TAUNT_BONUS_THREAT: number?,
     MOVEMENT_SCALE: {WIND_UP: number, ACTIVE: number, RECOVERY: number},
     RANKS: {[number]: any}?,
 }
