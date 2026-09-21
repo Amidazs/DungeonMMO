@@ -443,6 +443,13 @@ local function validate_melee(definition: MeleeSkillDefinition)
     assert(definition.HITBOX.SAMPLE_COUNT >= 1, "Hitbox needs a sample.")
     assert(definition.BASE_DAMAGE >= 0, "Skill damage cannot be negative.")
     assert(definition.STAGGER_SECONDS >= 0, "Stagger cannot be negative.")
+    if definition.TAUNT_BONUS_THREAT ~= nil then
+        assert(
+            definition.TAUNT_BONUS_THREAT > 0
+                and definition.TAUNT_BONUS_THREAT < math.huge,
+            "Taunt threat must be positive and finite."
+        )
+    end
 end
 
 local function validate_support(definition: SupportSkillDefinition)
