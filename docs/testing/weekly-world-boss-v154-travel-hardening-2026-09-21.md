@@ -73,6 +73,32 @@ dedicated boss place's combat runtime yet**.
   the real-client material-chain Play regression.
   See `weekly-world-boss-v154-isolated-travel-2026-09-21.md`.
 
+## Final source regression after malformed snapshot test
+
+**Verified code head:** `f2afd0ced5f22c6e30ac2dda6aa61c759adc78be`.
+
+The session bridge's dedicated test now also removes a stored
+party member list, asserts that `resume` rejects the malformed
+snapshot without an exception, restores the original list and
+verifies a valid recovery. The session suite now reports **33**
+assertions in each Base and Dungeon composition.
+
+Final local output:
+`%TEMP%\DungeonMMO_weekly_boss_final_source\`.
+All **six** Rojo compositions built: Base, Dungeon,
+published-style Base, published-style Dungeon, local world-boss
+and published-style world-boss. The final source tests each exited
+Studio with code 0:
+
+- World-boss session: Base 33 assertions and Dungeon 33.
+- Actual contribution-service contract: Base 14 and Dungeon 14.
+- Base return including failed-teleport rollback: 22.
+- Existing Base profession suite: 14/14.
+- Existing Dungeon gameplay backend suite: 30/30.
+
+This additional check does not constitute real Roblox network
+handoff, a playable guardian encounter or a published TEST run.
+
 ## Release status
 
 The world-boss event is **OFF by default**, the dedicated place
