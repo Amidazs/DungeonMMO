@@ -111,28 +111,31 @@ function WorldBossMemberLifecycle:_activate_character(
     binding: PlayerBinding,
     character: Model
 )
-    character:SetAttribute("DungeonRunParticipant", true)
-    character:SetAttribute(
-        "DungeonEncounterId", "WeeklyBoss:" .. binding.session_id)
-    character:SetAttribute("WorldBossSessionId", binding.session_id)
-    character:PivotTo(binding.spawn_cframe)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+        or character:WaitForChild("Humanoid", 5)
+    if not humanoid or not humanoid:IsA("Humanoid") then
+        warn("[World Boss] Character missing Humanoid death signal.")
+        return
+    end
 
     local active = self:mark_active(
         binding.session_id, binding.player.UserId)
     if not active.ok then
         warn("[World Boss] Member activation failed: "
             .. tostring(active.reason))
+        return
     end
-
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-        or character:WaitForChild("Humanoid", 5)
-    if humanoid and humanoid:IsA("Humanoid") then
-        humanoid.Died:Connect(function()
-            self:_handle_death(binding)
-        end)
-    else
-        warn("[World Boss] Character missing Humanoid death signal.")
-    end
+    humanoid.Died:Connect(function()
+        self:_handle_death(binding)
+    end)
+    -- Expose the encounter identity only after the Humanoid death
+    -- signal has been bound; test and live combat may act immediately
+    -- once these attributes appear on the character.
+    character:PivotTo(binding.spawn_cframe)
+    character:SetAttribute(
+        "DungeonEncounterId", "WeeklyBoss:" .. binding.session_id)
+    character:SetAttribute("WorldBossSessionId", binding.session_id)
+    character:SetAttribute("DungeonRunParticipant", true)
 end
 
 -- Args:
