@@ -257,6 +257,8 @@ local function attach(model: Instance)
         attackSequence = 0,
     }
     runtimes[model] = runtime
+    model:SetAttribute("MarauderAggroTargetUserId", 0)
+    model:SetAttribute("MarauderAggroMode", "None")
     humanoid.Died:Connect(function()
         ThreatService.clear(model)
         runtime.attackSequence += 1
