@@ -25,7 +25,10 @@ local channel = RS:WaitForChild("WorldBossPartyLiveChannel_TEMP")
 
 channel.OnClientEvent:Connect(function(kind)
     if kind == "Strike" then
-        request:FireServer()
+        for _ = 1, 4 do
+            request:FireServer()
+            task.wait(0.7)
+        end
     elseif kind == "Finish" then
         for _ = 1, 25 do
             request:FireServer()
@@ -111,7 +114,7 @@ local function prepare_party(players, runtime)
         Parent = Workspace,
         SpawnCFrame = spawn.CFrame * CFrame.new(0, 5, -22),
         InstanceId = id,
-        HealthMultiplier = 0.3,
+        HealthMultiplier = 0.7,
     })
     local members = {}
     for _, player in ipairs(players) do
@@ -139,7 +142,7 @@ end
 -- Returns:
 --   nil: prepares normal combat on both independent player characters.
 local function position_party(players, session_id)
-    for index, player in ipairs(players) do
+    for _, player in ipairs(players) do
         local character = wait_for(function()
             return player.Character
                 and player.Character:FindFirstChild("HumanoidRootPart")
@@ -153,7 +156,7 @@ local function position_party(players, session_id)
         character:SetAttribute(
             "DungeonEncounterId", "WeeklyBoss:" .. session_id)
         character.HumanoidRootPart.CFrame = CFrame.lookAt(
-            Vector3.new(if index == 1 then -1 else 1, 5, 5),
+            Vector3.new(0, 5, 5),
             Vector3.new(0, 5, 0))
     end
 end
