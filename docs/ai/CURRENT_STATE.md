@@ -1,5 +1,49 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — local aggro/threat and Fighter Taunt verified
+
+Normal enemies and the world-boss Captain controller now share a
+server-authoritative per-enemy threat ledger. Before an eligible player
+has positive threat, the nearest eligible player is targeted. Once
+threat exists, the highest-threat eligible player is targeted; distance
+only breaks equal-threat ties. Actual server-applied health damage adds
+threat to the exact enemy hit.
+
+A real zero-damage Fighter `Taunt` is now learnable from the Fighter
+Trainer. It uses normal server skill/cooldown/stamina/melee target
+validation, then moves the player above that enemy's current threat
+leader using server-owned `TAUNT_BONUS_THREAT`. It does not fabricate
+damage or contribution. Rogue ThreatDrop and existing respawn aggro
+suppression remove a player from target eligibility temporarily.
+
+Local two-client Play proved the policy against both an ordinary
+Training Marauder and the isolated world boss. The accepted normal
+enemy run covered nearest fallback, first-damage takeover,
+higher-damage takeover, actual client Taunt, ThreatDrop suppression and
+highest-threat reacquisition. The world-boss run proved the same
+nearest/damage/higher-threat/Taunt sequence. Additional test-only
+reruns proved that a dead highest-threat player immediately falls out
+of the target set in both controllers.
+
+Runtime acceptance head:
+`9c744d0cfe4ecabd5b372229e446ceadc6653861`.
+All six Rojo compositions built there. Threat contract 14 assertions,
+Fighter Trainer 12, profile-exit recovery 18, reward retry 17 each
+Base/Dungeon, Base professions 14/14 and Dungeon backend 30/30 all
+passed. One-hit lethal boss and existing two-client boss regressions
+also remained green. Death-fallback test-only head:
+`e041bf2203c8b73b0c1c9b59aebc175a2c8cbddd`.
+
+Next local combat work: define and verify healing/ward threat, then
+four-player tank/DPS/support aggro, multi-enemy room isolation,
+wipe/reset threat cleanup and disconnect candidate removal. Publishing,
+real cross-server reconnect and cloud persistence remain deferred.
+
+Receipt:
+`docs/testing/combat-aggro-threat-taunt-local-2026-09-21.md`.
+
+## Earlier 21 September local backend checkpoint (historical)
+
 ## 21 September 2026 — v1.54 LOCAL backend, publish deferred
 
 At user request, continue backend-only work through GitHub and run
