@@ -12,6 +12,7 @@ local paths = {
     "ProfessionLeatherEnchantingDependencyTest",
     "ProfessionRuntimeRulesTest",
     "ProfessionCraftRequestGuardTest",
+    "ProfessionReconnectRecoveryTest",
     "SkinningEligibilityTest",
     "CorpseSkinningRuntimeTest",
     "CorpseSkinningTwoUserTest",
