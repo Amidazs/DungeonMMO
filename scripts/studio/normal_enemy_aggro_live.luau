@@ -35,6 +35,13 @@ channel.OnClientEvent:Connect(function(command)
         end
     elseif command == "Taunt" then
         skill:FireServer("Taunt")
+    elseif command == "Die" then
+        local character = game:GetService("Players").LocalPlayer.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.Health = 0
+        end
     end
 end)
 channel:FireServer("Ready")
@@ -258,6 +265,17 @@ local function run()
             == far_player.UserId
     end, "highest-threat player reacquires after suppression", 5)
     print("[Normal Aggro Live] THREAT_REACQUIRE_PASS")
+
+    channel:FireClient(far_player, "Die")
+    wait_for(function()
+        local far_humanoid = far_character:FindFirstChildOfClass("Humanoid")
+        return far_humanoid and far_humanoid.Health <= 0
+    end, "highest-threat client's replicated death", 8)
+    wait_for(function()
+        return enemy:GetAttribute("MarauderAggroTargetUserId")
+            == near_player.UserId
+    end, "dead highest-threat player is removed from aggro", 8)
+    print("[Normal Aggro Live] DEAD_TARGET_FALLBACK_PASS")
 end
 
 task.spawn(function()
