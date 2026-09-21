@@ -19,6 +19,9 @@ local Factory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
 local OptionalBossAttackRules = require(
     Combat:WaitForChild("OptionalBossAttackRules")
 )
+local ThreatService = require(
+    Combat:WaitForChild("ThreatService")
+)
 
 local TAG = "DungeonMarauderCaptain"
 local CHASE_SPEED = 17.5
@@ -50,22 +53,54 @@ local function living_target(player: Player, encounter_id: string): (Model?, Bas
     return character, root
 end
 
-local function nearest_target(runtime: Runtime): (Player?, Model?, BasePart?, number)
-    local encounter_id = tostring(runtime.model:GetAttribute("DungeonEncounterId") or "MarauderCaptain")
-    local best_player: Player? = nil
-    local best_character: Model? = nil
-    local best_root: BasePart? = nil
-    local best_distance = math.huge
+local function threat_target(
+    runtime: Runtime
+): (Player?, Model?, BasePart?, number)
+    local encounter_id = tostring(
+        runtime.model:GetAttribute("DungeonEncounterId")
+            or "MarauderCaptain"
+    )
+    local candidates = {}
+    local by_user_id = {}
+
     for _, player in ipairs(Players:GetPlayers()) do
         local character, root = living_target(player, encounter_id)
         if character and root then
-            local delta = Vector3.new(root.Position.X - runtime.root.Position.X, 0, root.Position.Z - runtime.root.Position.Z)
-            if delta.Magnitude < best_distance then
-                best_player, best_character, best_root, best_distance = player, character, root, delta.Magnitude
-            end
+            local delta = Vector3.new(
+                root.Position.X - runtime.root.Position.X,
+                0,
+                root.Position.Z - runtime.root.Position.Z
+            )
+            local distance = delta.Magnitude
+            table.insert(candidates, {
+                player = player,
+                distance = distance,
+            })
+            by_user_id[player.UserId] = {
+                character = character,
+                root = root,
+                distance = distance,
+            }
         end
     end
-    return best_player, best_character, best_root, best_distance
+
+    local player, mode = ThreatService.select_target(
+        runtime.model,
+        candidates
+    )
+    if not player then
+        runtime.model:SetAttribute("MarauderAggroTargetUserId", 0)
+        runtime.model:SetAttribute("MarauderAggroMode", "None")
+        return nil, nil, nil, math.huge
+    end
+
+    local selected = by_user_id[player.UserId]
+    runtime.model:SetAttribute(
+        "MarauderAggroTargetUserId",
+        player.UserId
+    )
+    runtime.model:SetAttribute("MarauderAggroMode", mode)
+    return player, selected.character, selected.root, selected.distance
 end
 
 local function face(runtime: Runtime, target_root: BasePart)
@@ -206,6 +241,7 @@ local function attach(model: Instance)
     }
     runtimes[model] = runtime
     humanoid.Died:Connect(function()
+        ThreatService.clear(model)
         runtime.attackSequence += 1
         runtime.attacking = false
         model:SetAttribute("AttackTelegraph", false)
@@ -216,7 +252,10 @@ end
 
 CollectionService:GetInstanceAddedSignal(TAG):Connect(attach)
 CollectionService:GetInstanceRemovedSignal(TAG):Connect(function(instance)
-    if instance:IsA("Model") then runtimes[instance] = nil end
+    if instance:IsA("Model") then
+        ThreatService.clear(instance)
+        runtimes[instance] = nil
+    end
 end)
 for _, instance in ipairs(CollectionService:GetTagged(TAG)) do attach(instance) end
 
@@ -238,7 +277,7 @@ RunService.Heartbeat:Connect(function(dt)
             model:SetAttribute("AttackName", "")
             model:SetAttribute("MarauderAIState", "Staggered")
         elseif not runtime.attacking then
-            local player, character, target_root, distance = nearest_target(runtime)
+            local player, character, target_root, distance = threat_target(runtime)
             if not player or not character or not target_root then
                 model:SetAttribute("MarauderAIState", "Idle")
                 PresentationService.reset_pose(model, 0)
