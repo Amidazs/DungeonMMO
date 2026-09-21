@@ -31,6 +31,7 @@ local CHASE_SPEED = 17.5
 local STOP_RANGE = 6.2
 local THINK_INTERVAL = 0.05
 local ATTACK_ORDER = {"CaptainSlash", "CaptainHeavy", "CaptainShockwave"}
+local AGGRO_SUPPRESSED_ATTRIBUTE = "CombatAggroSuppressed"
 
 type Runtime = {
     model: Model,
@@ -61,7 +62,7 @@ local function living_target(player: Player, encounter_id: string): (Model?, Bas
         character:GetAttribute("RogueThreatDropUntil")
     ) or 0
     local suppressed = character:GetAttribute(
-        "DungeonAggroSuppressed"
+        AGGRO_SUPPRESSED_ATTRIBUTE
     ) == true or threat_drop_until > os.clock()
     if not AggroGraceRules.can_target(suppressed) then
         return nil, nil
