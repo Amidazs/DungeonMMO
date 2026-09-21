@@ -41,6 +41,23 @@ for _, terminal_state in ipairs({"Complete", "Failed", "Expired"}) do
     check(DungeonAdmissionRules.validate(session, {SessionId = "session-a", DungeonId = "TestDungeon"}, 101, "TestDungeon").reason == "SessionNotActive", terminal_state .. " session must be rejected.")
 end
 
+local boss_session = table.clone(base_session)
+boss_session.InstanceState = {
+    WeeklyWorldBoss = {
+        BossId = "AncientGuardian",
+        DestinationPlaceId = 987654321,
+    },
+}
+check(
+    DungeonAdmissionRules.validate(
+        boss_session,
+        {SessionId = "session-a", DungeonId = "TestDungeon"},
+        101,
+        "TestDungeon"
+    ).reason == "WorldBossDedicatedPlaceRequired",
+    "Ordinary Dungeon must never admit a reserved world-boss session."
+)
+
 local accepted = DungeonAdmissionRules.validate(base_session, {SessionId = "session-a", DungeonId = "TestDungeon"}, 101, "TestDungeon")
 check(accepted.ok == true, "Valid active member admission must succeed.")
 
