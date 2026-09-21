@@ -49,5 +49,29 @@ check(boss:GetAttribute("DungeonRewardGoldMin") == 0
     "ordinary combat rewards cannot bypass weekly lockout")
 holder:Destroy()
 
+local Arena = require(
+    SSS.WorldBoss:WaitForChild("WorldBossArenaLayout")
+)
+local spawn = Arena.create(workspace, "WorldBossArenaTest_TEMP")
+local layout = assert(spawn.Parent)
+check(spawn.Name == "WorldBossArenaSpawn"
+    and spawn:IsA("BasePart") and spawn.Anchored
+    and spawn.CanCollide == false,
+    "opt-in prototype arena provides one safe physical entry anchor")
+local walls = {"NorthWall", "SouthWall", "EastWall", "WestWall"}
+for _, name in ipairs(walls) do
+    local wall = assert(layout:FindFirstChild(name))
+    check(wall:IsA("BasePart") and wall.CanCollide
+        and wall.Anchored and wall.Size.Y >= 20,
+        "prototype arena must include a full-height solid " .. name)
+end
+check(layout:FindFirstChild("Floor") ~= nil,
+    "prototype arena needs an anchored floor beneath entry and boss")
+local duplicate = pcall(function()
+    Arena.create(workspace, "WorldBossArenaTest_TEMP")
+end)
+check(not duplicate, "creating the same prototype twice must fail")
+layout:Destroy()
+
 print(string.format(
     "[World Boss Destination] PASS: %d assertions.", checks))
