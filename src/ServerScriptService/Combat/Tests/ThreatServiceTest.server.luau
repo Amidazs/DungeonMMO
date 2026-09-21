@@ -65,6 +65,22 @@ check(ThreatService.get_threat(enemy, player_c.UserId) == 14,
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
     "unengaged enemies cannot receive free support threat")
 
+local stale_enemy = Instance.new("Model")
+stale_enemy.Name = "StaleThreatEnemy_TEMP"
+stale_enemy.Parent = workspace
+local stale_user = {UserId = 98199} :: any
+ThreatService.record_damage(stale_enemy, stale_user, 50)
+ThreatService.select_target(stale_enemy, candidates)
+check(ThreatService.record_support(player_c, player_b, 8) == 1,
+    "threat from absent players must not engage a room")
+check(ThreatService.get_threat(stale_enemy, player_c.UserId) == 0,
+    "support cannot inherit an ineligible former target's threat")
+ThreatService.record_damage(stale_enemy, player_b, 1)
+check(ThreatService.record_support(player_c, player_b, 8) == 2,
+    "fresh eligible damage activates support threat for that room")
+ThreatService.clear(stale_enemy)
+stale_enemy:Destroy()
+
 ThreatService.record_damage(second_enemy, player_b, 1)
 check(ThreatService.record_support(player_c, player_b, 8) == 2,
     "effective support must reach independently engaged enemies")
