@@ -60,7 +60,22 @@ function WorldBossProfileExit:retry_pending(): number
                 .. tostring(renewed.reason))
             continue
         end
-        self:release(user_id, "WorldBossDepartureRetry")
+        -- ProfileService clears its local cache after a successful save
+        -- but before releasing the lease. If that final lease write
+        -- failed, repeating ProfileService:release would return early
+        -- because no writable profile remains. Finish the lease release
+        -- explicitly only after confirming there is no dirty profile.
+        if self._profiles:get_profile(user_id) == nil then
+            local released = self._leases:release(user_id)
+            if released.ok then
+                self._pending[user_id] = nil
+            else
+                warn("[World Boss] Saved profile lease release pending: "
+                    .. tostring(released.reason))
+            end
+        else
+            self:release(user_id, "WorldBossDepartureRetry")
+        end
     end
 
     local remaining = 0
