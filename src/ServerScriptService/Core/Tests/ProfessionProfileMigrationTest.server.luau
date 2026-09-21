@@ -53,9 +53,22 @@ malformed.Characters.Slot1.Professions = {
 
 local sanitized = ProfileMigration.migrate(malformed)
 local states = sanitized.Characters.Slot1.Professions
-check(states.Mining.Level == 1 and states.Mining.XP == 0, "Negative Mining XP must sanitize to zero.")
-check(states.Blacksmithing.Level == 2 and states.Blacksmithing.XP == 30, "Blacksmithing level must derive from XP.")
-check(states.Herbalism.Level == 1 and states.Herbalism.XP == 0, "Malformed Herbalism must reset safely.")
-check(states.Alchemy.Level == ProfessionDefinitions.MAX_LEVEL, "Huge XP must clamp level to foundation maximum.")
+check(states.Mining.Level == 1 and states.Mining.XP == 0,
+    "Negative Mining XP must sanitize to zero.")
+check(states.Blacksmithing.Level == 2 and states.Blacksmithing.XP == 30,
+    "Blacksmithing level must derive from XP.")
+check(states.Herbalism.Level == 1 and states.Herbalism.XP == 0,
+    "Malformed Herbalism must reset safely.")
+check(states.Alchemy.Level == ProfessionDefinitions.MAX_LEVEL,
+    "Huge XP must clamp level to foundation maximum.")
+for _, profession_id in ipairs({
+    "Skinning", "Leatherworking", "Enchanting",
+}) do
+    local state = states[profession_id]
+    check(type(state) == "table"
+        and state.Level == 1 and state.XP == 0,
+        "Existing profiles must gain " .. profession_id
+            .. " without changing prior profession state.")
+end
 
 print(string.format("[Profession Profile Migration Tests] PASS: %d assertions.", assertions))
