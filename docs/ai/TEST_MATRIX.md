@@ -1,5 +1,37 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — animal-only Skinning backend staged; Studio gate OPEN
+
+- [x] GitHub-only eligibility: explicitly server-tagged and allowlisted
+  Beast identity; defeated, server-looted and unclaimed corpse required.
+  Marauders/bosses and arbitrary unlisted monsters remain ineligible.
+- [x] Server-owned, one-time hide grant through the existing
+  ProfessionService; client proximity and living-character checks.
+- [x] Explicitly eligible beast corpses remain visible for a limited
+  skinning window after successful encounter rewards; other dungeon
+  enemies retain their old immediate cleanup.
+- [x] Four Rojo compositions built locally at
+  `c6af7cf080001f199e7383ef8cb4c63198e7d312`; clean fast-forward
+  integration worktree.
+- [ ] **Studio tests still unexecuted:** the new eligibility and
+  corpse-grant focused tests and modified DungeonEnemyCleanupTest,
+  full profession and broad regression runners, and actual Play-mode
+  creature interaction. A direct Studio MCP probe returned
+  `Unable to reach Roblox Studio right now`; Codex's Studio delegate
+  reported a usage limit. Do not assign a PASS count.
+- [ ] Existing Base RawHideCache scripted hold timed out in the prior
+  fixture; the additional diagnostic version has not been run.
+  RawHideCache remains an explicit temporary material cache, *not*
+  an automatically skinnable monster.
+- [ ] No existing enemy is factory-registered as an animal. Future
+  animal enemies must receive authorized species/family/tag only
+  from their server factory and be tested through real combat/loot/
+  corpse/prompt/once-only grant before full Skinning acceptance.
+
+Receipt:
+`docs/testing/animal-only-corpse-skinning-pending-studio-2026-09-21.md`.
+No cloud publish, real-player DataStore change or merge into main.
+
 ## 21 September 2026 — v1.53 local verification PARTIAL
 
 - [x] Safely fast-forward clean Windows integration worktree to staged GitHub
