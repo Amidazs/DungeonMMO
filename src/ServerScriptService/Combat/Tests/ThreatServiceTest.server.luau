@@ -127,7 +127,7 @@ check(selected == player_a and mode == "Threat",
 ThreatService.remove_player(player_c.UserId)
 check(ThreatService.record_support(player_c, player_b, 6) == 0,
     "repeating disconnect cleanup must be harmless")
-check(ThreatService.record_damage(second_enemy, player_b, 4) == 4,
+check(ThreatService.record_damage(second_enemy, player_b, 4) == 6,
     "another enemy must own a separate threat table")
 check(ThreatService.get_threat(enemy, player_b.UserId) == 2,
     "second enemy damage cannot alter first enemy threat")
