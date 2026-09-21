@@ -1,5 +1,36 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — craft disconnect protection and local recovery verified
+
+The active GitHub branch includes ticketed per-user craft locks.
+Each request checks ticket ownership and original Player instance
+after server preparation before committing any inventory mutation.
+PlayerRemoving invalidates the departing user's ticket; a stale
+completion cannot release a subsequent same-UserId request.
+
+All four Rojo builds passed. Both rebuilt Base/Dungeon focused
+profession runners passed **14/14** (guard: 21 assertions; same-UserId
+in-memory recovery: 20 assertions each). A genuine two-client Base
+Play fixture paused an actual client's craft, disconnected the
+client, observed release, loaded the **same UserId from the local
+in-memory adapter** and resumed the abandoned handler without
+losing ore or granting a duplicate bar. The other real Studio client
+remained connected. Studio admitted a distinct replacement test
+account, not the original account. The corrected fixture uses a
+disposable shared ModuleScript instead of a test-only global.
+Base material-backed crafting, the opt-in Dungeon wolf encounter
+and broad Dungeon backend matrix (30/30) were rerun and passed
+after the guard modification.
+
+Real same-account Roblox network reconnect, cross-server lease/
+DataStore recovery and published TEST/PROD remain NOT tested.
+No source or documentation changes were made via Remote Desktop;
+no publish, real-user DataStore mutation or merge into main.
+
+Receipt: `docs/testing/profession-v153-interrupted-reconnect-local-2026-09-21.md`.
+
+## Earlier 21 September progress (historical)
+
 ## 21 September 2026 — opt-in Dungeon wolf and full client crafting locally verified
 
 Latest source/fixture commit after the live tests:
