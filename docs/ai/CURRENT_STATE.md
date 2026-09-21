@@ -1,5 +1,43 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.54 weekly world-boss local foundation
+
+The active GitHub branch now includes a default-off weekly world-boss
+calendar, server-only instance admission and persistent per-character
+reward gate in the existing Base/Dungeon RuntimeServices. Each event
+uses an explicit server window, Monday UTC week identity and an
+exclusive entry cutoff. The prototype `AncientGuardian` factory
+reuses the accepted captain combat rig but has its own
+instance-specific tag/identity and no ordinary monster rewards.
+The provisional weekly gold is 100 per character; no finished
+guardian content or live event time has been scheduled.
+
+Four Rojo compositions, 40 window/reward assertions in each of
+Base/Dungeon, eight guardian-factory assertions, 14/14 existing Base
+profession suites and 30/30 Dungeon backend suites passed.
+A real client entered through a **disposable injected physical
+ProximityPrompt** while the explicit event window was open, spawned
+a guardian using the registered server factory, and completed two
+separate assisted encounters. Only the first kill paid weekly gold
+into the actual Dungeon Studio profile. The physical runner printed
+`VERIFIED_PLAY_MODE_PASS`; the dedicated factory runner also
+passed after correcting its test to check the proper
+`DungeonRewardGoldMin/Max` attribute names.
+
+**Do not treat the fixture as an enabled normal-game event.**
+The gateway, temporary arena and prompt are not production assets;
+there is no Base portal, published weekly event schedule, reserved
+server, durable world-boss instance/session snapshot, contribution
+eligibility or real DataStore/cloud handoff yet. A weekly reward
+receipt persists through the existing profile adapter; the local
+instance registry itself does not. No source/docs were edited
+locally and no cloud publish/main merge occurred.
+
+Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipt: `docs/testing/weekly-world-boss-v154-local-foundation-2026-09-21.md`.
+
+## Earlier 21 September v1.53 progress (historical)
+
 ## 21 September 2026 — craft disconnect protection and local recovery verified
 
 The active GitHub branch includes ticketed per-user craft locks.
