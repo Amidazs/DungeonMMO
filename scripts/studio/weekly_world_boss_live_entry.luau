@@ -33,6 +33,17 @@ W:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
 W:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled", true)
 W:SetAttribute("DungeonMMOPlaceholderPlayableEnabled", true)
 
+-- Autorun unit suites assume the unchanged default dungeon layout.
+-- This disposable fixture validates the normal runtime against a
+-- synthetic test layout; focused suites run separately in Edit mode.
+for _, group in ipairs({SSS.Core.Tests, SSS.Dungeon.Tests}) do
+    for _, test in ipairs(group:GetDescendants()) do
+        if test:IsA("Script") then
+            test.Enabled = false
+        end
+    end
+end
+
 local channel = Instance.new("RemoteEvent")
 channel.Name = "WeeklyWorldBossLiveChannel_TEMP"
 channel.Parent = RS
