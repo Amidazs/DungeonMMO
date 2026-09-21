@@ -191,6 +191,35 @@ remaining eligible player is selected.
 Receipt:
 `docs/testing/combat-aggro-threat-taunt-local-2026-09-21.md`.
 
+## New local milestone — healer/Ward threat and 4-role contracts
+
+The server now awards provisional 0.5 threat per point of actual
+healing or Ward absorption, including MageHeal/HoT, positive Mend
+pulses and ArcaneWard absorption. Both the support caster and target
+must be eligible for that exact already-engaged enemy. Nearby idle
+enemies cannot be pulled purely by a heal. Disconnect removes the
+departing player's threat and eligibility across enemies; enemy
+reset clears its entire threat/candidate snapshot.
+
+At tested source
+`df33735b10010b8aed8e7acc5193970b8f4cc9b1`,
+six Rojo builds, **48** focused threat assertions, Base professions
+**14/14**, Dungeon backend **30/30**, and both existing real two-client
+normal-enemy and world-boss aggro regressions passed. A separate
+real two-client Marauder fixture passed client MageHeal on a peer,
+client-cast ArcaneWard and a test-injected incoming hit using the
+production Ward absorption callback. It does **not** prove a genuine
+NPC attack absorbed by Ward.
+
+Four-player tank/DPS/healer/second-DPS, two-enemy isolation,
+Taunt, disconnect and wipe/reset were tested as **server-side
+simulated contracts** only. Real four-client Play, real NPC Ward
+absorption, client Mend and true world-boss support-skill Play
+remain next local gates. Support threat balancing is provisional.
+
+Receipt:
+`docs/testing/combat-support-threat-candidate-2026-09-21.md`.
+
 ## Local-only continuation — lethal hits and profile-save recovery
 
 **Publish and live network work are on hold at user request.** Continue
@@ -316,10 +345,10 @@ Receipt:
 
 ## Next backend milestone — LOCAL ONLY, no publication
 
-1. Define the **support-threat policy** for real healing and wards,
-   then prove it through a separate two-client skill fixture. Effective
-   healing/absorbed ward should create server-owned threat without
-   inventing damage, and overheal/unused ward must not inflate threat.
+1. Extend the locally verified support-threat policy to genuine
+   client Mend pulses, an NPC-generated attack absorbed by client Ward,
+   and support-skill Play in the isolated world-boss instance. Keep
+   support threat based only on actual effective amounts.
 2. Expand aggro acceptance to a four-player tank/DPS/support party:
    real Taunt, DPS overtaking the tank through damage, tank reclaim,
    support-generated threat, death, ThreatDrop and target fallback.
