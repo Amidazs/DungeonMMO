@@ -124,6 +124,20 @@ function TeleportCoordinator:_cancel_pending(user_id: number, reason: string)
     self._leases:cancel_handoff(user_id, pending.nonce)
     self._pending[user_id] = nil
 
+    -- Failed Base return must not strand a boss participant in a
+    -- permanent "returning" state. Restore their arena reconnect path.
+    if pending.destination_kind == "Base"
+        and type(pending.teleport_data) == "table"
+        and pending.teleport_data.WorldBoss == true
+    then
+        local rolled_back = self._sessions:set_world_boss_return_pending(
+            pending.session_id, user_id, false)
+        if not rolled_back.ok then
+            warn("[World Boss Return] Pending rollback failed: "
+                .. tostring(rolled_back.reason))
+        end
+    end
+
     if pending.fail_new_session == true then
         self._sessions:mark_failed(pending.session_id, reason)
     end
@@ -203,6 +217,7 @@ function TeleportCoordinator:_prepare_handoffs(
             reserved_code = reserved_code,
             teleport_data = teleport_data,
             attempts = 1,
+            destination_kind = destination_kind,
             fail_new_session = fail_new_session,
         }
 
