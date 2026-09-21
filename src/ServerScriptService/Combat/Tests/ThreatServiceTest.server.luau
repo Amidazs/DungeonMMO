@@ -56,6 +56,31 @@ check(selected == player_c and mode == "Threat",
 
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
     "threat must be isolated per enemy")
+
+ThreatService.select_target(second_enemy, candidates)
+local support_affected = ThreatService.record_support(
+    player_c,
+    player_b,
+    8
+)
+check(support_affected == 2,
+    "effective support must create threat on each shared engaged enemy")
+check(ThreatService.get_threat(enemy, player_c.UserId) == 14,
+    "support threat must equal half the effective support amount")
+check(ThreatService.get_threat(second_enemy, player_c.UserId) == 4,
+    "support threat must be tracked independently on every enemy")
+
+local third_enemy = Instance.new("Model")
+third_enemy.Name = "ThreatServiceEnemy3_TEMP"
+third_enemy.Parent = workspace
+ThreatService.select_target(third_enemy, {
+    {player = player_a, distance = 3},
+    {player = player_b, distance = 7},
+})
+check(ThreatService.record_support(player_c, player_b, 6) == 2,
+    "support must ignore enemies where the caster is not eligible")
+check(ThreatService.get_threat(third_enemy, player_c.UserId) == 0,
+    "out-of-encounter support cannot seed threat on that enemy")
 check(ThreatService.record_damage(second_enemy, player_b, 4) == 4,
     "another enemy must own a separate threat table")
 check(ThreatService.get_threat(enemy, player_b.UserId) == 2,
@@ -83,8 +108,10 @@ local invalid_amount = pcall(function()
 end)
 check(not invalid_amount, "zero threat increments must be rejected")
 
+ThreatService.clear(third_enemy)
 enemy:Destroy()
 second_enemy:Destroy()
+third_enemy:Destroy()
 
 print(string.format(
     "[Threat Service] PASS: %d assertions.", assertions))
