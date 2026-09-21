@@ -1,5 +1,37 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — opt-in Dungeon wolf and full client crafting locally verified
+
+Latest source/fixture commit after the live tests:
+`b3ce809d258ecfddcbc4077a80ff14ea3a67d826`.
+A distinct `ForestWolf` server factory and `Wolf` enemy archetype
+are registered but not inserted into any default dungeon combat pack.
+Its combat-rig animal silhouette is a temporary backend placeholder.
+The disposable Temple Room1 fixture opted in two wolves and passed
+the real encounter activation, assisted enemy defeat, normal reward/
+clear, retained looted corpse and one-hide real-client Skinning path.
+Ordinary Marauders and bosses remain unskinnable.
+
+A real Base client crafted the full material-backed profession chain
+to `warded_leatherbound_gloves` with station checks and authoritative
+inventory changes; a no-material repeat and a two-request burst were
+rejected/limited to one output. A real two-client Base Play fixture
+passed independent crafts, a one-hide contested shared corpse and
+a peer disconnect while the other player stayed connected. The
+additional two-user in-memory contest passed in both Base/Dungeon
+focused suites (13/13 each after the updated sources were rebuilt).
+The Dungeon regression matrix stayed 30/30.
+
+Do NOT infer true same-account reconnect or in-flight request retry,
+cross-server DataStore persistence, unassisted wolf combat, dedicated
+wolf AI, approved animal models, or a public deployment. These remain
+open release gates. All source/docs were edited via GitHub; local
+Studio tested disposable unpublished in-memory places only.
+
+Receipt: `docs/testing/profession-v153-wolf-and-crafting-local-acceptance-2026-09-21.md`.
+
+## Earlier 21 September checkpoints (historical)
+
 ## 21 September 2026 — animal-only Skinning verified in local Studio
 
 Four Rojo compositions and both 12-suite focused profession runners
