@@ -1,0 +1,47 @@
+{
+  "name": "DungeonMMO_WorldBoss_Local",
+  "globIgnorePaths": [
+    "**/Tests/**"
+  ],
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$ignoreUnknownInstances": true,
+      "Core": {"$path": "src/ReplicatedStorage/Core"},
+      "Combat": {
+        "$className": "Folder",
+        "Shared": {"$path": "src/ReplicatedStorage/Combat/Shared"}
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$ignoreUnknownInstances": true,
+      "Core": {"$path": "src/ServerScriptService/Core"},
+      "Combat": {
+        "$className": "Folder",
+        "MarauderFactory": {
+          "$path": "src/ServerScriptService/Combat/MarauderFactory.luau"
+        }
+      },
+      "Dungeon": {
+        "$className": "Folder",
+        "MarauderCaptainFactory": {
+          "$path": "src/ServerScriptService/Dungeon/MarauderCaptainFactory.luau"
+        },
+        "DungeonWeeklyWorldBossFactory": {
+          "$path": "src/ServerScriptService/Dungeon/DungeonWeeklyWorldBossFactory.luau"
+        }
+      },
+      "WorldBoss": {"$path": "src/ServerScriptService/WorldBoss"}
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "$ignoreUnknownInstances": true,
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Core": {"$path": "src/StarterPlayerScripts/Core"}
+      }
+    }
+  }
+}
