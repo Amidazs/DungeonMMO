@@ -173,6 +173,12 @@ check(before_expiry.failed == false and session.State == "Active", "Wipe must re
 now = 1030
 local expiry = deaths:tick(now)
 check(expiry.failed == true and session.State == "Failed", "Wipe deadline expiry must mark the run Failed.")
+local repeated_failure = deaths:tick(now + 1)
+check(
+    repeated_failure.failed == false
+        and session.State == "Failed",
+    "A terminal run must not re-announce failure on every server tick."
+)
 local spawns_at_failure = #spawns
 local late_paid = deaths:complete_paid_revive(player)
 check(
