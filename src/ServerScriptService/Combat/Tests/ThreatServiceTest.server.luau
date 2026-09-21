@@ -81,6 +81,24 @@ check(ThreatService.record_support(player_c, player_b, 6) == 2,
     "support must ignore enemies where the caster is not eligible")
 check(ThreatService.get_threat(third_enemy, player_c.UserId) == 0,
     "out-of-encounter support cannot seed threat on that enemy")
+
+local rejected_zero_support = pcall(function()
+    ThreatService.record_support(player_c, player_b, 0)
+end)
+check(not rejected_zero_support,
+    "zero effective healing and unabsorbed wards earn no threat")
+
+local rejected_invalid_support = pcall(function()
+    ThreatService.record_support(player_c, player_b, math.huge)
+end)
+check(not rejected_invalid_support,
+    "non-finite support values cannot inflate a threat table")
+
+ThreatService.clear(second_enemy)
+check(ThreatService.record_support(player_c, player_b, 10) == 1,
+    "cleared enemies cannot receive support threat")
+check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
+    "encounter cleanup must discard the support threat ledger")
 check(ThreatService.record_damage(second_enemy, player_b, 4) == 4,
     "another enemy must own a separate threat table")
 check(ThreatService.get_threat(enemy, player_b.UserId) == 2,
