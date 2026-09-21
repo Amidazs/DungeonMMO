@@ -48,6 +48,12 @@ local coordinator = TeleportCoordinator.new(
 local arena_spawn = Workspace:FindFirstChild("WorldBossArenaSpawn")
 if not arena_spawn or not arena_spawn:IsA("BasePart") then
     warn("[World Boss] Authored WorldBossArenaSpawn is required.")
+    Players.PlayerAdded:Connect(function(player: Player)
+        player:Kick("World-boss arena is not ready.")
+    end)
+    for _, player in ipairs(Players:GetPlayers()) do
+        player:Kick("World-boss arena is not ready.")
+    end
     return
 end
 
