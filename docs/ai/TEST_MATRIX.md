@@ -1,5 +1,36 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — interrupted crafting and local recovery
+
+- [x] Unique request tickets; old disconnected craft cannot release
+  the new same-UserId request or commit after preparing before leave.
+- [x] Four Rojo compositions built after the guard code update.
+- [x] Focused professions Base **14/14** and Dungeon **14/14**;
+  21 guard assertions and 20 same-UserId save/release/reload/
+  interrupted-request retry assertions in each composition.
+- [x] Genuine two-client Base Play: server pauses a craft *after
+  valid preparation*, real originating client leaves, server releases
+  profile, the test driver reloads its same UserId in memory, old
+  handler resumes without consuming ingredients or granting an
+  output; peer stays connected and distinct replacement joins.
+  Parent `VERIFIED_MULTIPLAYER_PASS`, child
+  `INTERRUPTED_DISCONNECT_PASS`.
+- [x] Regressions after ticketing: Base full material-backed
+  crafting/rapid request fixture PASS, Dungeon wolf reward/retained
+  corpse/client Skinning PASS, wider Dungeon gameplay 30/30 PASS.
+- [ ] **Actual same-account Roblox network reconnect, same-account
+  retry on a new server, cross-server profile leases and published
+  DataStore persistence remain untested**. Studio replacement
+  receives a distinct UserId; test-driver same-UserId reload is
+  not an authenticated network reconnect.
+- [ ] Final animal combat AI/art, default wolf encounter rollout,
+  published TEST/PROD and real-player DataStore gates remain open.
+
+Full evidence and early corrected test fixture failures:
+`docs/testing/profession-v153-interrupted-reconnect-local-2026-09-21.md`.
+
+## Previous local backend tests (historical)
+
 ## 21 September 2026 — v1.53 live profession and wolf milestone
 
 - [x] `ForestWolf` factory contract: 10 assertions; separate server
