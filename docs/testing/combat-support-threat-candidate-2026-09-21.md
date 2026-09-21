@@ -1,47 +1,79 @@
-# Local support-threat backend candidate — 21 September 2026
+# Local support-threat and four-player aggro contract acceptance
 
-Branch: `wip/phase-4-test-hud-integration-v1`
+**Date:** 21 September 2026
+**Branch:** `wip/phase-4-test-hud-integration-v1`
+**Accepted GitHub source/test head:**
+`df33735b10010b8aed8e7acc5193970b8f4cc9b1`
 
-## Implemented through GitHub
+All edits were made directly in GitHub. Remote Desktop was used
+only for a clean feature-worktree fast-forward, TEMP Rojo builds,
+unpublished Studio tests and read-only diagnostics.
 
-The existing server-owned ThreatService now records support threat from
-effective healing and effective ward absorption. CombatService wires it
-to genuine MageHeal callbacks (including heal-over-time ticks), actual
-ArcaneWard damage absorption, and positive Mend channel pulses.
+## Implemented backend
 
-Current provisional balancing: one threat point per two points of
-actual health restored or shield damage absorbed (multiplier 0.5).
-An overheal, an unabsorbed shield, and a zero-heal pulse earn no threat.
-A ward cast itself creates no threat; its subsequent absorption does.
+- Actual server-applied healing (MageHeal including HoT and positive
+  Mend pulses) and ArcaneWard damage absorption now add per-enemy
+  support threat through the shared authoritative ThreatService.
+- Provisional balance: 0.5 threat per effective support point.
+  Overheal, a zero-heal pulse and an unused Ward generate no threat.
+- An enemy must already have recorded threat and have both the
+  support caster and recipient in its latest eligible candidate set.
+  Healing elsewhere does not automatically pull nearby idle mobs.
+- Enemy-specific threat totals remain independent. Clearing an enemy
+  also clears its candidate snapshot. PlayerRemoving now removes
+  the departing UserId's threat and candidacy from every enemy.
+- Invalid support values, unbounded threat arithmetic and invalid
+  player identities are rejected by server-owned guards.
 
-Each enemy receives support threat only when its most recent eligible
-target-candidate set contains both the caster and the recipient.
-Threat is still kept separately for each enemy. On enemy cleanup,
-the threat table and remembered eligibility set are both discarded.
-This policy is provisional; four-player and room tests are required
-before it can be accepted as the final game balance.
+## Fresh acceptance evidence
 
-## Test and safety status
+At head `df33735b10010b8aed8e7acc5193970b8f4cc9b1`:
 
-The existing focused threat contract was extended with support
-distribution, enemy isolation, invalid-value and cleanup assertions.
-These tests are committed, but a fresh unpublished Studio test on the
-new commit has **not yet been verified**. The prior 14-assertion
-ThreatService pass and multiplayer normal/boss Taunt acceptance apply
-to the earlier code only, not this support-threat candidate.
+- All **six** Rojo compositions built successfully.
+- ThreatService focused Studio contract: **48 assertions PASS**.
+  This includes a four-player **server-side simulated** tank/DPS/
+  healer scenario, two independently engaged enemies, real-total
+  vs idle-mob isolation, a tank Taunt, equal-threat tie, disconnect
+  ledger removal and enemy wipe/reset. These are not four real clients.
+- Dungeon backend matrix: **30/30 PASS**.
+- Base profession regression: **14/14 PASS**.
+- Real two-client ordinary Marauder aggro:
+  `VERIFIED_MULTIPLAYER_PASS`.
+- Real two-client world-boss aggro:
+  `VERIFIED_MULTIPLAYER_PASS`.
+- Real two-client ordinary enemy support:
+  `REAL_TAUNT_ENGAGEMENT_PASS`,
+  `REAL_PEER_HEAL_THREAT_PASS`,
+  `REAL_WARD_ABSORB_THREAT_PASS`, and
+  `VERIFIED_MULTIPLAYER_PASS`.
 
-No Roblox place was published, no production player data was accessed,
-and no code or documentation was edited through Remote Desktop.
-Do not merge to main or enable public world-boss events as part of
-this candidate.
+The support fixture equipped a genuine Mage client with its
+server-authorized wand, MageHeal and ArcaneWard. It injured a real
+Fighter client, executed MageHeal through the ordinary client
+skill RemoteEvent, observed 32 actual instant HP restored and
+positive caster threat, and used the ordinary client skill path
+to apply Ward to that same Fighter. A separate fixture-owned,
+server-side incoming hit then went through the *production*
+DamageService/WardService absorption callback and generated
+additional support threat. This last incoming hit was deliberately
+injected by the test server; **it was not a genuine NPC attack**.
 
-## Next local gates
+The test also exposed and corrected missing Mage skill equipment
+and a Ward request issued while the Heal state was still Recovery.
+Neither required weakening server skill authority.
 
-1. Run all six required Rojo compositions, focused threat contract
-   and existing Base/Dungeon regressions on the current GitHub head.
-2. Execute real player-to-player MageHeal, Mend and ArcaneWard support
-   against an active enemy in unpublished multiplayer Studio.
-3. Verify support generates threat on the relevant enemies only,
-   Taunt can retake aggro, and no support contribution is fabricated.
-4. Verify four-player party, multiple enemies, wipe/reset and
-   disconnect removal before declaring full aggro acceptance.
+## Remaining local acceptance, not yet claimed
+
+- Client-driven Mend pulses with threat and an actual NPC-generated
+  attack absorbed by a client-cast Ward.
+- Real four-client tank/DPS/healer party aggro and independent
+  multi-enemy room behavior, including actual player departure,
+  respawn and full-party wipe/controller reset.
+- Genuine healing/Ward in the isolated weekly world-boss instance;
+  the dedicated boss support fixture remains a separate gate.
+- Published TEST reserved travel, true same-account cross-server
+  reconnect and cloud DataStore/MemoryStore recovery remain deferred.
+
+No Roblox place was published, no main merge or force-push occurred,
+and no production DataStore was accessed. The provisional 0.5
+support-threat multiplier remains subject to multiplayer balancing.
