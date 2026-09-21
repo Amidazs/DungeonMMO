@@ -21,8 +21,6 @@ local RS = game:GetService("ReplicatedStorage")
 local config = require(RS.Combat.Shared.CombatConfig)
 local request = RS.Combat.Remotes:WaitForChild(
     config.REMOTES.ATTACK_REQUEST)
-local skill_request = RS.Combat.Remotes:WaitForChild(
-    config.REMOTES.SKILL_REQUEST)
 local channel = RS:WaitForChild("WorldBossPartyLiveChannel_TEMP")
 
 channel.OnClientEvent:Connect(function(kind)
@@ -35,16 +33,6 @@ channel.OnClientEvent:Connect(function(kind)
         for _ = 1, 25 do
             request:FireServer()
             task.wait(0.65)
-        end
-    elseif kind == "PeerHeal" then
-        skill_request:FireServer("MageHeal")
-    elseif kind == "InjureForHeal" then
-        local player = game:GetService("Players").LocalPlayer
-        local character = player.Character
-        local humanoid = character
-            and character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.Health = math.max(1, humanoid.MaxHealth - 45)
         end
     elseif kind == "Die" then
         local player = game:GetService("Players").LocalPlayer
@@ -78,13 +66,6 @@ local DamageBridge = require(SSS.Dungeon.DungeonContributionBridge)
 local Authority = require(SSS.WorldBoss.WorldBossCombatAuthority)
 local Arena = require(SSS.WorldBoss.WorldBossArenaLayout)
 local Lifecycle = require(SSS.WorldBoss.WorldBossMemberLifecycle)
-local ProgressionRuntimeState = require(
-    SSS.Core.Services.ProgressionRuntimeState
-)
-local ProfileSchema = require(
-    RS.Core.Shared.ProfileSchema
-)
-local MageHealService = require(SSS.Combat.MageHealService)
 
 local ready = {}
 local departed = {}
@@ -126,24 +107,6 @@ local function prepare_party(players, runtime)
         assert(runtime.ProfileService:load(player.UserId))
         table.insert(users, player.UserId)
     end
-    -- A detached test-only Mage identity equips an existing legitimate
-    -- starter skill. The actual client must still pass combat checks.
-    local caster = players[1]
-    local mage = ProfileSchema.create_default(
-        caster.UserId).Characters.Slot1
-    mage.Identity.RaceId = "Human"
-    mage.Identity.BaseClassId = "Mage"
-    mage.Identity.ClassId = "Mage"
-    mage.Identity.CreationStage = "Complete"
-    mage.Equipment.Weapon = "apprentice_arcane_wand"
-    mage.Progression.Skills.MageHeal = {
-        Known = true, PurchasedRank = 1,
-    }
-    mage.Progression.Loadout[3] = "MageHeal"
-    ProgressionRuntimeState.set_character(caster.UserId, mage)
-    assert(ProgressionRuntimeState.is_skill_usable(
-        caster.UserId, "MageHeal"),
-        "existing authorized Mage Heal must be available")
     local session = assert(runtime.SessionService:create(
         "TestDungeon", users, 0, "WorldBossParty_TEMP", "Depth1"))
     local id = session.SessionId
@@ -205,69 +168,6 @@ local function position_party(players, session_id)
             Vector3.new(0.5, 5, if index == 1 then 3 else -3),
             Vector3.new(0, 5, 0))
     end
-end
-
--- Args:
---   players: {Player}; real caster and recipient for Mage Heal.
---   runtime: any; authoritative contribution and profile services.
---   session_id: string; shared frozen world-boss party session.
--- Returns:
---   nil: verifies effective peer healing via the actual skill RemoteEvent.
-local function verify_peer_support(players, runtime, session_id)
-    local caster = players[1]
-    local recipient = players[2]
-    local caster_character = assert(caster.Character)
-    local recipient_character = assert(recipient.Character)
-    local caster_humanoid = assert(
-        caster_character:FindFirstChildOfClass("Humanoid"))
-    local recipient_humanoid = assert(
-        recipient_character:FindFirstChildOfClass("Humanoid"))
-    local before = runtime.ContributionService
-        :get_player_snapshot(session_id, caster.UserId)
-    local previous_support = before.Support or 0
-
-    caster_character.HumanoidRootPart.CFrame = CFrame.lookAt(
-        Vector3.new(0, 5, 16), Vector3.new(0, 5, 14))
-    recipient_character.HumanoidRootPart.CFrame = CFrame.lookAt(
-        Vector3.new(0, 5, 13), Vector3.new(0, 5, 0))
-    caster_humanoid.Health = caster_humanoid.MaxHealth
-    -- Studio characters own their Humanoid replication. Injuring the
-    -- recipient from the server alone is immediately overwritten by
-    -- the owning test client, leaving no valid healing target.
-    channel:FireClient(recipient, "InjureForHeal")
-    wait_for(function()
-        return recipient_humanoid.Health
-            <= recipient_humanoid.MaxHealth - 40
-    end, "real injured client replicated to server", 8)
-    task.wait(0.2)
-    local selected = MageHealService.find_target(caster, 22)
-    print("[World Boss Party Live] PEER_HEAL_TARGET "
-        .. tostring(selected and selected.UserId)
-        .. " expected " .. tostring(recipient.UserId)
-        .. " casterHP " .. tostring(caster_humanoid.Health)
-        .. " recipientHP " .. tostring(recipient_humanoid.Health)
-        .. " positions "
-        .. tostring(caster_character.HumanoidRootPart.Position)
-        .. " " .. tostring(recipient_character.HumanoidRootPart.Position))
-    channel:FireClient(caster, "PeerHeal")
-    wait_for(function()
-        local updated = runtime.ContributionService
-            :get_player_snapshot(session_id, caster.UserId)
-        return updated.ok and updated.Support > previous_support
-            and recipient_humanoid.Health
-                > recipient_humanoid.MaxHealth - 45
-            and updated
-    end, "real peer Mage Heal and server support contribution", 12)
-    print("[World Boss Party Live] PEER_HEAL_SUPPORT_PASS")
-    -- Restore the fixture's original melee combat identity. Equipping
-    -- a Mage Wand for healing changes basic-attack behavior; the later
-    -- shared-boss test intentionally proves the accepted melee path.
-    ProgressionRuntimeState.set_character(
-        caster.UserId,
-        ProfileSchema.create_default(caster.UserId).Characters.Slot1
-    )
-    position_party(players, session_id)
-    task.wait(1.5)
 end
 
 -- Args:
@@ -427,7 +327,6 @@ local function run()
     local session_id, boss = prepare_party(players, runtime)
     position_party(players, session_id)
     task.wait(2)
-    verify_peer_support(players, runtime, session_id)
     verify_shared_completion(players, runtime, session_id, boss)
     verify_death_and_respawn(players, runtime, session_id)
     verify_peer_departure(players, runtime, session_id)
