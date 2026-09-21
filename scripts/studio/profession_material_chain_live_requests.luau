@@ -148,6 +148,8 @@ local function craft(player, recipe_id, runtime)
     local actual_root = assert(player.Character:FindFirstChild(
         "HumanoidRootPart"))
     local delta = (actual_root.Position - station.Position).Magnitude
+    assert(delta <= 18, "player moved away from " .. recipe_id
+        .. " after server positioning: " .. tostring(delta))
     print("[Profession Material Live] RANGE_DEBUG recipe="
         .. recipe_id .. " distance=" .. tostring(delta)
         .. " station=" .. tostring(station.Position)
@@ -186,6 +188,10 @@ local function run()
     end, "loaded in-memory Base profile", 30)
     assert(profile and runtime.ProfessionService,
         "Base profile and profession service required")
+
+    -- Base character bootstrap can reset the player to the entry spawn
+    -- after the profile becomes available. Wait until that completes.
+    task.wait(7)
 
     -- The test seeds *only* a local in-memory account. Real crafting
     -- below goes through the original client RemoteEvent and services.
