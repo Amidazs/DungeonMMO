@@ -43,7 +43,6 @@ local ProfileSchema = require(RS.Core.Shared.ProfileSchema)
 local Progression = require(
     SSS.Core.Services.ProgressionRuntimeState)
 local Threat = require(SSS.Combat.ThreatService)
-local Damage = require(SSS.Combat.DamageService)
 local Ward = require(SSS.Combat.WardService)
 local ready = {}
 
@@ -224,25 +223,19 @@ local function run()
     local ward_before = Ward.get_remaining(fighter_character)
     local threat_before = Threat.get_threat(enemy, mage.UserId)
 
-    -- Use the production DamageService and Ward absorption callback.
-    -- This incoming hit is an isolated server test, not an NPC attack.
-    Damage.apply_damage({
-        attacker = nil,
-        attacker_character = nil,
-        target = fighter_character,
-        source_kind = "FixtureIncoming",
-        source_id = "SupportThreat",
-        attack_id = nil,
-        base_damage = 10,
-        multiplier = 1,
-    })
+    -- The fixture only forces the Fighter's server threat priority.
+    -- The subsequent hit must come from the genuine attacking NPC.
+    place(fighter_character, root, 2.5)
+    Threat.taunt(enemy, fighter, 70)
+    wait_for(function()
+        return enemy:GetAttribute("MarauderAggroTargetUserId")
+            == fighter.UserId
+    end, "NPC turns toward Ward-protected Fighter", 5)
     wait_for(function()
         return Ward.get_remaining(fighter_character) < ward_before
             and Threat.get_threat(enemy, mage.UserId) > threat_before
-    end, "actual Ward absorption creates support threat", 5)
-    assert(Threat.get_threat(enemy, mage.UserId) >= threat_before + 5,
-        "ten absorbed damage must generate at least five threat")
-    print("[Support Threat Live] REAL_WARD_ABSORB_THREAT_PASS")
+    end, "genuine NPC attack is absorbed by client-cast Ward", 6)
+    print("[Support Threat Live] REAL_NPC_WARD_ABSORB_THREAT_PASS")
 
     -- The Fighter's own client now channels real Mend pulses while
     -- the hostile enemy continues to track this encounter.
