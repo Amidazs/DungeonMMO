@@ -1,5 +1,48 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — aggro/threat and Taunt handoff
+
+The active branch now has one shared `ThreatService` for ordinary
+Marauders, Dungeon Captain-style enemies and the isolated world boss.
+Target rule: nearest eligible player while no eligible positive threat
+exists; highest eligible threat after that, with distance only as an
+equal-threat tie-breaker. Damage threat comes only from actual
+DamageService-applied health damage and is isolated per enemy.
+
+Fighter `Taunt` is a real learnable/rankable zero-damage skill from
+the Fighter Trainer. It passes the ordinary client skill request,
+server skill authority, melee target geometry and cooldown/stamina
+checks before applying server-owned Taunt threat. Real normal-enemy
+and world-boss multiplayer logs both showed `SKILL ACCEPT Taunt` and
+`THREAT TAUNT` with no fabricated damage.
+
+Rogue ThreatDrop and existing combat aggro suppression are honored by
+both target controllers. Enemy death/reset clears threat. A later
+test-only rerun also proves a dead current threat leader drops out and
+the living eligible player becomes the target.
+
+Accepted runtime source:
+`9c744d0cfe4ecabd5b372229e446ceadc6653861`.
+Six builds; ThreatService 14; real normal aggro PASS; real world-boss
+aggro PASS; Fighter Trainer 12; profile exit 18; weekly reward retry
+17 Base + 17 Dungeon; Base professions 14/14; Dungeon backend 30/30.
+One-hit lethal contribution/reward and accepted two-client boss Play
+also passed. Death fallback passed in both two-client fixtures at
+test-only head `e041bf2203c8b73b0c1c9b59aebc175a2c8cbddd`.
+
+**NEXT, local only:** support/healing/ward threat policy and real
+support-skill Play, then four-player tank/DPS/support threat changes,
+multi-enemy room ledgers, full-wipe/reset cleanup and controller-level
+disconnect cases. Do not publish or start cloud persistence without
+new user approval.
+
+Receipt:
+`docs/testing/combat-aggro-threat-taunt-local-2026-09-21.md`.
+All edits stay GitHub-only; Remote Desktop remains pull/build/test/
+diagnostics only.
+
+## Earlier 21 September local-only continuation handoff (historical)
+
 ## 21 September 2026 — LOCAL-ONLY backend continuation handoff
 
 **User direction:** do not publish or configure a published TEST
