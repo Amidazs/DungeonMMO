@@ -140,6 +140,49 @@ local function living_character(player)
     return nil
 end
 
+-- Args:
+--   enemy: Model; real encountered monster with authored reward identity.
+--   session_id: string; active dungeon session ID.
+-- Returns:
+--   string: idempotent reward transaction across room resets.
+local function reward_transaction(enemy, session_id)
+    return string.format(
+        "%s:%s:Life%d",
+        session_id,
+        tostring(enemy:GetAttribute("DungeonEnemyId")),
+        tonumber(enemy:GetAttribute("DungeonLifeIndex")) or 1
+    )
+end
+
+-- Args:
+--   runtime: any; real runtime service container.
+--   players: {Player}; connected members eligible for monster rewards.
+--   transaction_id: string; stable transaction to validate.
+-- Returns:
+--   {[number]: any}: each member's actual paid reward and statistics.
+local function reward_snapshots(runtime, players, transaction_id)
+    local snapshots = {}
+    for _, player in ipairs(players) do
+        local character = runtime.ProfileService:get_character(
+            player.UserId, 1
+        )
+        local history = character
+            and character.RewardHistory
+            and character.RewardHistory.Monster
+        local receipt = history and history[transaction_id]
+        if not receipt then
+            return nil
+        end
+        snapshots[player.UserId] = {
+            gold = character.Gold,
+            level = character.Level,
+            xp = character.XP,
+            kill_count = receipt.BestiaryKillCount,
+        }
+    end
+    return snapshots
+end
+
 -- Args: None.
 -- Returns:
 --   nil: verifies genuine four-client wipe and physical room re-entry.
@@ -183,6 +226,16 @@ local function run()
         local enemies = living_enemies()
         return if #enemies >= 2 then enemies else nil
     end, "first real enemy pack", 25)
+    local rewarded_enemy = original[2]
+    local transaction_id = reward_transaction(
+        rewarded_enemy, session_id
+    )
+    rewarded_enemy:FindFirstChildOfClass("Humanoid").Health = 0
+    local before_retry = wait_for(function()
+        return reward_snapshots(runtime, players, transaction_id)
+    end, "four authoritative reward receipts on first enemy kill", 12)
+    print("[Four Client Room Wipe] FIRST_KILL_REWARDS_PASS")
+
     local injured = assert(original[1]:FindFirstChildOfClass("Humanoid"))
     injured.Health = injured.MaxHealth * 0.5
     assert(injured.Health > 0 and injured.Health < injured.MaxHealth,
@@ -251,6 +304,35 @@ local function run()
     assert(sessions:get(session_id).Checkpoint.Sequence >= 1,
         "Room checkpoint must remain active after recoverable wipe")
     print("[Four Client Room Wipe] FULL_HEALTH_ROOM_REENTRY_PASS")
+
+    local repeated_enemy
+    for _, enemy in ipairs(fresh) do
+        if reward_transaction(enemy, session_id) == transaction_id then
+            repeated_enemy = enemy
+            break
+        end
+    end
+    assert(repeated_enemy,
+        "Retried room must restore the same stable monster reward ID")
+    repeated_enemy:FindFirstChildOfClass("Humanoid").Health = 0
+    wait_for(function()
+        return repeated_enemy.Parent == nil
+    end, "retired repeated monster after idempotent reward", 12)
+    local after_retry = assert(reward_snapshots(
+        runtime, players, transaction_id
+    ))
+    for _, player in ipairs(players) do
+        local before = before_retry[player.UserId]
+        local after = after_retry[player.UserId]
+        assert(
+            after.gold == before.gold
+                and after.level == before.level
+                and after.xp == before.xp
+                and after.kill_count == before.kill_count,
+            "A retried monster cannot pay a party member twice"
+        )
+    end
+    print("[Four Client Room Wipe] NO_DUPLICATE_REWARDS_PASS")
 end
 
 task.spawn(function()
