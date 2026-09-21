@@ -68,6 +68,19 @@ check(lifecycle:mark_active(id, FIRST_ID).ok
     and not lifecycle:can_respawn(id, FIRST_ID),
     "successful respawn clears Dead mode")
 
+check(lifecycle:mark_dead(id, FIRST_ID).ok
+    and lifecycle:mark_dead(id, SECOND_ID).ok,
+    "simultaneous party deaths persist independently")
+check(lifecycle:can_respawn(id, FIRST_ID)
+    and lifecycle:can_respawn(id, SECOND_ID),
+    "full local wipe leaves both connected members recoverable")
+local wipe_state = sessions:get(id)
+check(wipe_state.InstanceState.WeeklyWorldBoss.Defeated == true,
+    "member wipe/respawn state cannot reroll or clear boss result")
+check(lifecycle:mark_active(id, FIRST_ID).ok
+    and lifecycle:mark_active(id, SECOND_ID).ok,
+    "both wiped members can return to Active independently")
+
 print(string.format(
     "[World Boss Member Lifecycle] PASS: %d assertions.", assertions))
 print(
