@@ -53,6 +53,10 @@ channel.OnClientEvent:Connect(function(command, data)
         local node = runtime:WaitForChild("Base.RawHideCache")
         local prompt = node:WaitForChild("PromptRoot")
             :WaitForChild("ProfessionGatherPrompt")
+        if not prompt.Enabled then
+            channel:FireServer("AlreadyDepleted")
+            return
+        end
         local camera = workspace.CurrentCamera
         if camera then
             camera.CameraType = Enum.CameraType.Scriptable
@@ -93,12 +97,21 @@ local channel = RS:WaitForChild("ProfessionBaseLiveFixture_TEMP")
 local ready_user_id = nil
 local results = {}
 local gather_diagnostic = nil
+local already_depleted = false
 
 channel.OnServerEvent:Connect(function(player, kind, payload)
     if kind == "Ready" then
         ready_user_id = player.UserId
     elseif kind == "Result" and player.UserId == ready_user_id then
+        print("[Profession Base Live] ACTION_RESULT action="
+            .. tostring(payload.action) .. " ok=" .. tostring(payload.ok)
+            .. " reason=" .. tostring(payload.reason)
+            .. " node=" .. tostring(payload.node_id))
         table.insert(results, payload)
+    elseif kind == "AlreadyDepleted" and player.UserId == ready_user_id
+    then
+        already_depleted = true
+        print("[Profession Base Live] CLIENT_NODE_DEPLETED")
     elseif kind == "GatherDiagnostic" and player.UserId == ready_user_id
     then
         gather_diagnostic = payload
@@ -210,11 +223,15 @@ local function run()
         "client prompt did not become visible")
     assert(first.ok == true and first.node_id == "Base.RawHideCache",
         "first hide claim failed: " .. tostring(first.reason))
-    local second = request_action(player, "Gather")
-    assert(second.ok == false
-        and second.reason == "ResourceAlreadyGathered",
-        "hide claim was not rejected on repeat: "
-            .. tostring(second.reason))
+    -- The authoritative success snapshot hides the personal node on
+    -- the client. Repeated physical triggering is therefore unavailable.
+    table.clear(results)
+    channel:FireClient(player, "Gather")
+    wait_for(function()
+        return already_depleted
+    end, "client prompt was not depleted after the first claim", 10)
+    assert(#results == 0,
+        "disabled personal node unexpectedly triggered a second grant")
     print("[Profession Base Live] HIDE_CLAIM_ONCE_PASS")
 end
 
