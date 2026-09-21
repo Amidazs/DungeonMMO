@@ -22,6 +22,9 @@ local OptionalBossAttackRules = require(
 local ThreatService = require(
     Combat:WaitForChild("ThreatService")
 )
+local AggroGraceRules = require(
+    Combat:WaitForChild("AggroGraceRules")
+)
 
 local TAG = "DungeonMarauderCaptain"
 local CHASE_SPEED = 17.5
@@ -48,8 +51,21 @@ local function living_target(player: Player, encounter_id: string): (Model?, Bas
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     local root = character:FindFirstChild("HumanoidRootPart")
     if not humanoid or humanoid.Health <= 0 or not root or not root:IsA("BasePart") then return nil, nil end
-    if character:GetAttribute("DungeonRunParticipant") ~= true then return nil, nil end
-    if character:GetAttribute("DungeonEncounterId") ~= encounter_id then return nil, nil end
+    if character:GetAttribute("DungeonRunParticipant") ~= true then
+        return nil, nil
+    end
+    if character:GetAttribute("DungeonEncounterId") ~= encounter_id then
+        return nil, nil
+    end
+    local threat_drop_until = tonumber(
+        character:GetAttribute("RogueThreatDropUntil")
+    ) or 0
+    local suppressed = character:GetAttribute(
+        "DungeonAggroSuppressed"
+    ) == true or threat_drop_until > os.clock()
+    if not AggroGraceRules.can_target(suppressed) then
+        return nil, nil
+    end
     return character, root
 end
 
