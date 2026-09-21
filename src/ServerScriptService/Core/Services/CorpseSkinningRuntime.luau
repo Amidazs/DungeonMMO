@@ -209,6 +209,9 @@ function CorpseSkinningRuntime.attach(config: any)
             return
         end
         watched[instance] = true
+        instance.Destroying:Connect(function()
+            watched[instance] = nil
+        end)
         watch_corpse(instance, professions, action_result, root)
     end
 
