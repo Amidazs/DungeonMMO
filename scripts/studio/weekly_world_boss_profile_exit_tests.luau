@@ -101,5 +101,67 @@ check(exits:retry_pending() == 0
     and assert(profiles_b:get_character(USER_ID, 1)).Gold == 100,
     "finished retries cannot mutate a different server's profile")
 
+-- A failed lease release occurs after ProfileService has already saved
+-- and cleared its local profile cache. Retrying release must not leave
+-- a stale 45-second owned lease that blocks the next server.
+local SECOND_ID = 97802
+local lease_proxy = {}
+
+-- Args:
+--   user_id: number; account claimed by this simulated source server.
+-- Returns:
+--   any: the ordinary lease acquisition result.
+function lease_proxy:claim(user_id: number): any
+    return lease_a:claim(user_id)
+end
+
+-- Args:
+--   user_id: number; account whose lease must remain held.
+-- Returns:
+--   any: a normal lease renewal.
+function lease_proxy:renew(user_id: number): any
+    return lease_a:renew(user_id)
+end
+
+local fail_release = true
+
+-- Args:
+--   user_id: number; profile whose saved lease needs releasing.
+-- Returns:
+--   any: one deliberate failure followed by real lease release.
+function lease_proxy:release(user_id: number): any
+    if fail_release then
+        fail_release = false
+        return {ok = false, reason = "SimulatedLeaseReleaseFailure"}
+    end
+    return lease_a:release(user_id)
+end
+
+local profiles_second = Profiles.new(store, lease_proxy)
+check(profiles_second:load(SECOND_ID) ~= nil,
+    "second account needs an independently acquired source lease")
+check(profiles_second:mutate(SECOND_ID, function(profile)
+    profile.Characters.Slot1.Gold += 75
+end), "second account must have a dirty reward to save")
+local second_exit = Exit.new(profiles_second, lease_proxy)
+local saved_second, second_error = second_exit:release(
+    SECOND_ID, "WorldBossPlayerRemoving")
+check(not saved_second
+    and second_error == "SimulatedLeaseReleaseFailure"
+    and second_exit:is_pending(SECOND_ID)
+    and profiles_second:get_profile(SECOND_ID) == nil,
+    "post-save lease failure must preserve a pending release record")
+check(not lease_b:claim(SECOND_ID).ok,
+    "next server cannot steal a lease still owned by original server")
+check(second_exit:retry_pending() == 0
+    and not second_exit:is_pending(SECOND_ID),
+    "retry must release lease even after source profile cache clears")
+check(lease_b:claim(SECOND_ID).ok,
+    "destination may immediately claim after a recovered lease release")
+local reloaded_second = Profiles.new(store, lease_b)
+check(reloaded_second:load(SECOND_ID) ~= nil
+    and assert(reloaded_second:get_character(SECOND_ID, 1)).Gold == 75,
+    "next server must load one intact persisted reward")
+
 print(string.format(
     "[World Boss Profile Exit] PASS: %d assertions.", assertions))
