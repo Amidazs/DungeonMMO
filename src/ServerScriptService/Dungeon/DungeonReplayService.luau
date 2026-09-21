@@ -169,12 +169,20 @@ function DungeonReplayService:request(
         -- every remaining member must explicitly choose replay again.
         self._votes = {}
         return result(false,
-            started and started.reason or "ReplayTeleportFailed")
+            started and started.reason or "ReplayTeleportFailed",
+            {votes_reset = true})
     end
     return result(true, nil, {
         party_size = #party,
         session = started.session,
     })
+end
+
+-- Args: None.
+-- Returns:
+--   boolean: true once a new-run launch has been accepted.
+function DungeonReplayService:is_launching(): boolean
+    return self._launching
 end
 
 return table.freeze(DungeonReplayService)
