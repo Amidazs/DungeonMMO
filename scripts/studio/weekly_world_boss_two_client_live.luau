@@ -76,6 +76,7 @@ local ProgressionRuntimeState = require(
 local ProfileSchema = require(
     RS.Core.Shared.ProfileSchema
 )
+local MageHealService = require(SSS.Combat.MageHealService)
 
 local ready = {}
 local departed = {}
@@ -224,6 +225,15 @@ local function verify_peer_support(players, runtime, session_id)
     caster_humanoid.Health = caster_humanoid.MaxHealth
     recipient_humanoid.Health = recipient_humanoid.MaxHealth - 45
     task.wait(0.35)
+    local selected = MageHealService.find_target(caster, 22)
+    print("[World Boss Party Live] PEER_HEAL_TARGET "
+        .. tostring(selected and selected.UserId)
+        .. " expected " .. tostring(recipient.UserId)
+        .. " casterHP " .. tostring(caster_humanoid.Health)
+        .. " recipientHP " .. tostring(recipient_humanoid.Health)
+        .. " positions "
+        .. tostring(caster_character.HumanoidRootPart.Position)
+        .. " " .. tostring(recipient_character.HumanoidRootPart.Position))
     channel:FireClient(caster, "PeerHeal")
     wait_for(function()
         local updated = runtime.ContributionService
