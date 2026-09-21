@@ -178,6 +178,9 @@ local function run()
         end, "real client Ready " .. tostring(player.UserId), 25)
     end
 
+    -- Keep the disposable clients dead until the wipe can be checked.
+    Players.RespawnTime = 60
+
     local tank = players[1]
     local healer = players[2]
     local damage = players[3]
@@ -314,6 +317,33 @@ local function run()
         and Players:GetPlayerByUserId(observer.UserId) == observer,
         "disconnect cannot evict other living party members")
     print("[Four Player Aggro] REAL_DISCONNECT_CLEANUP_PASS")
+
+    -- Genuine deaths of every remaining participant remove all
+    -- target candidates. No direct threat.clear call is permitted
+    -- until after the full-wipe state is verified.
+    channel:FireClient(tank, "Die")
+    channel:FireClient(observer, "Die")
+    wait_for(function()
+        for _, player in ipairs({tank, healer, observer}) do
+            local character = player.Character
+            local humanoid = character
+                and character:FindFirstChildOfClass("Humanoid")
+            if not humanoid or humanoid.Health > 0 then
+                return false
+            end
+        end
+        return true
+    end, "all connected players genuinely dead", 9)
+    wait_for(function()
+        return enemy_a:GetAttribute("MarauderAggroTargetUserId") == 0
+            and enemy_b:GetAttribute("MarauderAggroTargetUserId") == 0
+    end, "no living target survives the full wipe", 9)
+    wait_for(function()
+        return threat.get_threat(enemy_a, tank.UserId) == 0
+            and threat.get_threat(enemy_a, healer.UserId) == 0
+            and threat.get_threat(enemy_b, healer.UserId) == 0
+    end, "enemy threat ledgers clear after full party wipe", 9)
+    print("[Four Player Aggro] REAL_FULL_WIPE_THREAT_RESET_PASS")
 
     threat.clear(enemy_a)
     threat.clear(enemy_b)
