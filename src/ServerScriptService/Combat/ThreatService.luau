@@ -11,7 +11,10 @@ type Candidate = {
     distance: number,
 }
 
+local SUPPORT_THREAT_MULTIPLIER = 0.5
+
 local ledgers: {[Model]: ThreatLedger} = {}
+local candidate_users: {[Model]: {[number]: boolean}} = {}
 
 -- Args:
 --   user_id: any; authenticated Roblox player identity.
@@ -119,6 +122,37 @@ function ThreatService.get_threat(
 end
 
 -- Args:
+--   caster: Player; authenticated player creating effective support.
+--   target: Player; living ally who received healing or ward absorption.
+--   effective_amount: number; actual health restored or damage absorbed.
+-- Returns:
+--   number: count of engaged enemies that received support threat.
+function ThreatService.record_support(
+    caster: Player,
+    target: Player,
+    effective_amount: number
+): number
+    assert(valid_user_id(caster.UserId),
+        "Support threat caster must have a valid player identity")
+    assert(valid_user_id(target.UserId),
+        "Support threat target must have a valid player identity")
+    assert(valid_amount(effective_amount),
+        "Support threat amount must be positive and finite")
+
+    local threat_amount = effective_amount * SUPPORT_THREAT_MULTIPLIER
+    local affected = 0
+
+    for enemy, users in pairs(candidate_users) do
+        if users[caster.UserId] == true and users[target.UserId] == true then
+            ThreatService.add_threat(enemy, caster.UserId, threat_amount)
+            affected += 1
+        end
+    end
+
+    return affected
+end
+
+-- Args:
 --   enemy: Model; hostile NPC choosing its current target.
 --   candidates: {Candidate}; living, encounter-valid, targetable players.
 -- Returns:
@@ -127,6 +161,12 @@ function ThreatService.select_target(
     enemy: Model,
     candidates: {Candidate}
 ): (Player?, string)
+    local users: {[number]: boolean} = {}
+    for _, candidate in ipairs(candidates) do
+        users[candidate.player.UserId] = true
+    end
+    candidate_users[enemy] = users
+
     local ledger = ledgers[enemy]
     local best_player: Player? = nil
     local best_threat = 0
@@ -167,6 +207,7 @@ end
 --   nil: removes all per-player threat for that NPC.
 function ThreatService.clear(enemy: Model)
     ledgers[enemy] = nil
+    candidate_users[enemy] = nil
 end
 
 return table.freeze(ThreatService)
