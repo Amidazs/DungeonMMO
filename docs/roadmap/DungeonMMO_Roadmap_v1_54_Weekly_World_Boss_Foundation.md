@@ -151,6 +151,51 @@ disconnect/rejoin, published TEST profile lease handoff,
 DataStore/MemoryStore recovery and the complete Base → boss → Base
 journey remain pending. The event stays disabled by default.
 
+## Local-only continuation — lethal hits and profile-save recovery
+
+**Publish and live network work are on hold at user request.** Continue
+with GitHub-only backend edits and unpublished Studio/in-memory tests.
+
+The real damage callback now passes server-observed killing-blow
+evidence into the existing contribution bridge. The world-boss
+authority allows the exact fatal damage event even after guardian
+health reaches zero, while retaining the original member/guardian/
+event checks. This fixes the case where the only contributing
+action was the actual killing blow.
+
+A separate one-attack real-client fixture initially failed because
+its first slash was physically out of range. After correcting its
+position, unpublished Play at source
+`5b7edc2675fd8fc6e9b6d0908bdf263742cf88b6`
+passed `LETHAL_DAMAGE_CONTRIBUTION_PASS`,
+`REAL_CLIENT_BOSS_DEFEAT_PASS`,
+`WEEKLY_REWARD_ONCE_PASS` and `VERIFIED_PLAY_MODE_PASS`.
+The previously accepted two-client baseline also passed after the
+new damage callback was integrated (source
+`6252baa5bfea0694c3dd18d3c81caae19cc890a1`).
+
+An in-memory reward retry test confirmed that a failed profile save
+does not persist a false reward; retry saves the existing dirty
+entitlement without another gold grant, and a new same-UserId
+service reads the single stored receipt. Base and Dungeon suites
+each passed 17 assertions on source
+`c4bf5ec30026eb610d1ba6f6eca7ededd320254a`.
+The first departure-save test also passed 11 assertions on source
+`1b2554de8ea049b8bba18888f0f7d73a1b12be5f`.
+
+Additional GitHub code/test commits handle a failed **lease release
+after a successful profile save**, and extend lethal-target filtering.
+The desktop became unavailable before the latest-head builds and
+these new assertions could run. The new assertions are **pending
+verification**, not accepted yet. The two-client MageHeal experiment
+was also reverted to preserve the accepted combat baseline; genuine
+peer healing/ward support Play remains outstanding. The server-side
+Mend pulse now records effective positive healing, but has not yet
+passed a dedicated end-to-end support-skill Play test.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-local-backend-continuation-2026-09-21.md`.
+
 ## New local milestone — two-client party resilience
 
 Added an explicitly opt-in geometric `WorldBossArenaLayout` with a
@@ -228,25 +273,33 @@ does not turn ordinary TestDungeon encounters into world bosses.
 Receipt:
 `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
 
-## Next backend milestone — published TEST handoff gate
+## Next backend milestone — LOCAL ONLY, no publication
 
-1. Configure dedicated **TEST-only** Base and world-boss place IDs,
-   with the weekly event still disabled by default outside the
-   controlled acceptance window.
-2. Run the first real Base → ReserveServer world-boss → Base journey
-   using the existing party/session/lease handoff. Verify destination
-   admission, real Roblox reserved access code, return handoff and
-   per-member session cleanup.
-3. Prove same-account reconnect and post-defeat reward recovery using
-   genuine new-server profile leases plus TEST DataStore/MemoryStore,
-   including one member disconnecting while others continue.
-4. Add genuine two-client healing/ward Play against the guardian so
-   support contribution is proven through the client skill pipeline,
-   not only through focused server contracts.
-5. Only after the published TEST journey is green should guardian
-   phases, event announcements, reward tuning, final art/animations
-   and live scheduling move toward release. Explicit approval remains
-   required before any production rollout.
+1. Once the authorized desktop reconnects, perform a clean
+   fast-forward of the GitHub branch; build all six Rojo compositions,
+   then run the updated killing-blow Play, real two-client boss Play,
+   lethal-target filters and post-save profile/lease recovery tests.
+   Do not mark latest-head changes accepted before those tests pass.
+2. Run Base and Dungeon reward retry, existing profession regression,
+   Dungeon backend regression, default-off boss-place Play and local
+   session/return contracts against the same source head.
+3. Add a separate real client-to-client healing/ward skill fixture,
+   first proving injury and target selection, then effective healing
+   and scoped server support contribution. Leave the accepted
+   melee/defeat fixture unchanged until this test passes independently.
+4. Expand in-memory local backend acceptance to four-player party
+   coordination, full wipe and respawn, independent return,
+   disconnect/save failure, and failed-lease-release recovery.
+5. Continue the other non-visual backend systems after this local
+   milestone: dungeon difficulty/mini-boss/event insertion contracts,
+   crafting/economy and progression security, party/guild features
+   and persistence/migration tests. Reuse existing systems and
+   update the roadmap with results, not speculative completion.
+
+**Deferred until separately approved:** published TEST-only Base →
+ReserveServer boss → Base, real same-account cross-server reconnect
+and cloud DataStore/MemoryStore. Production enablement, art, public
+scheduling and live rewards remain off.
 
 ## Separate future/release gates
 
