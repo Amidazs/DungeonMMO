@@ -11,6 +11,28 @@ local function check(ok: boolean, message: string)
     assert(ok, "[Profession Craft Guard] " .. message)
 end
 
+-- Distance authority is independent of the request guard: a fabricated
+-- recipe request is still useless unless the server sees the player at the
+-- correct station anchor.
+local station = Instance.new("Part")
+station.Anchored = true
+station.Position = Vector3.new(0, 5, 0)
+station.Parent = workspace
+local character = Instance.new("Model")
+local root = Instance.new("Part")
+root.Name = "HumanoidRootPart"
+root.Anchored = true
+root.Position = Vector3.new(0, 5, 10)
+root.Parent = character
+local player_like = ({Character = character} :: any)
+check(Runtime.within_station_range(player_like, station, 18),
+    "server range check accepts a player physically near the station")
+root.Position = Vector3.new(0, 5, 30)
+check(not Runtime.within_station_range(player_like, station, 18),
+    "server range check rejects a fabricated remote request from afar")
+character:Destroy()
+station:Destroy()
+
 local guard = Runtime.new_craft_request_guard()
 check(guard:try_begin(70101),
     "first request for a player must acquire")
