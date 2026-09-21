@@ -1,5 +1,56 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.54 two-client party resilience locally verified
+
+The isolated weekly world-boss backend now has a local two-client
+acceptance path. Two genuine Studio clients damage one shared guardian
+through the existing CombatService/DamageService path, both persist
+their own contribution and both receive independent once-per-week
+rewards after the shared kill. Immediate duplicate claims pay zero.
+
+A new `WorldBossMemberLifecycle` owns encounter character
+attributes, Active/Dead member mode, replicated Humanoid death and
+safe delayed respawn into the same frozen encounter. The accepted
+multiplayer fixture kills one real client-owned Humanoid, observes
+the server `Died` signal, persists that member as Dead, automatically
+respawns them into the same session as Active and verifies no second
+weekly payout. The first client then leaves the real Studio network
+while the other remains present; stored contribution and reward state
+remain intact.
+
+The current prototype wipe policy is also explicit: connected dead
+members are independently respawnable and a wipe does not reroll or
+clear the event/boss/week snapshot. `WorldBossArenaLayout` provides
+an opt-in primitive enclosed arena with a stable
+`WorldBossArenaSpawn`; normal Base/Dungeon compositions are not
+changed by that prototype.
+
+Roblox Studio multiplayer clients use negative UserIds, which exposed
+another test-environment mismatch. ContributionService and
+DungeonContributionBridge now accept negative integral IDs only while
+`RunService:IsStudio()`; live player IDs remain positive-only.
+Zero/nonfinite/malformed IDs and contribution events remain denied.
+
+Final local acceptance at source
+`e83e4fae522582ec98bfc9cf4938ffdca9aa810b`: six Rojo builds;
+multiplayer Play `VERIFIED_MULTIPLAYER_PASS`; lifecycle/wipe
+14 assertions; contribution 20; Base travel 18; Base return 22;
+Dungeon world-boss session 33; Base professions 14/14; Dungeon
+backend 30/30.
+
+Same-account network reconnect remains explicitly unverified because
+Studio cannot prove the exact same Roblox account reconnecting across
+a new reserved server. Published TEST Base → ReserveServer boss →
+Base, real lease handoff and TEST DataStore/MemoryStore recovery are
+the next release gate. Two-client real healing/ward skill execution
+also remains pending. Event flags remain off and no cloud publish,
+production DataStore write, force-push or main merge occurred.
+
+Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipt: `docs/testing/weekly-world-boss-v154-party-resilience-2026-09-21.md`.
+
+## Earlier 21 September real-combat checkpoint (historical)
+
 ## 21 September 2026 — v1.54 real guardian combat locally verified
 
 The isolated world-boss place now reuses the existing full combat
