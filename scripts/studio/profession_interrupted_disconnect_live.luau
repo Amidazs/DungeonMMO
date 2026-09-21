@@ -28,17 +28,17 @@ local function replace_once(owner, previous, replacement)
         .. replacement .. string.sub(source, position + #previous)
 end
 
-local runtime_probe = Instance.new("BindableFunction")
+local runtime_probe = Instance.new("ModuleScript")
 runtime_probe.Name = "TwoClientProfessionRuntimeProbe_TEMP"
+runtime_probe.Source = "return {Runtime = nil}"
 runtime_probe.Parent = SSS
 
 local base = SSS.Base.BaseRuntime
 local source_anchor = 'local runtime = RuntimeServices.new("Base")'
 replace_once(base, source_anchor, source_anchor
-    .. '\nlocal probe = game:GetService("ServerScriptService")'
-    .. ':WaitForChild("TwoClientProfessionRuntimeProbe_TEMP")'
-    .. '\nprobe.OnInvoke = function() return runtime end'
-    .. '\nprobe:SetAttribute("Ready", true)')
+    .. '\nrequire(game:GetService("ServerScriptService")'
+    .. ':WaitForChild("TwoClientProfessionRuntimeProbe_TEMP"))'
+    .. '.Runtime = runtime')
 local environment_anchor =
     'local progression_controller = BaseProgressionController.new({'
 replace_once(base, environment_anchor,
@@ -395,8 +395,8 @@ local function run()
     local runtime = wait_for(function()
         local probe = game:GetService("ServerScriptService")
             :FindFirstChild("TwoClientProfessionRuntimeProbe_TEMP")
-        if probe and probe:GetAttribute("Ready") then
-            return probe:Invoke()
+        if probe then
+            return require(probe).Runtime
         end
         return nil
     end, "Base runtime", 25)
