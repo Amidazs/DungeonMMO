@@ -252,6 +252,18 @@ local function run()
 
     -- Two actual client RemoteEvent requests race for just one available
     -- iron bar. They may serialize or hit the guard, but cannot double-pay.
+    -- The normal Studio Base starter kit may already contain iron ore.
+    -- Clear it in this disposable in-memory profile so the burst has
+    -- exactly one recipe's worth of ingredients.
+    local before_burst = assert(runtime.ProfileService:get_character(
+        player.UserId, 1))
+    local existing_ore = Inventory.count_item(before_burst, "iron_ore")
+    local existing_bars = Inventory.count_item(before_burst, "iron_bar")
+    if existing_ore > 0 then
+        local cleared = runtime.InventoryService:consume_item(
+            player.UserId, "iron_ore", existing_ore)
+        assert(cleared.ok, "failed to isolate the craft-burst materials")
+    end
     local extra = runtime.InventoryService:add_item(
         player.UserId, "iron_ore", 2)
     assert(extra.ok, "failed to seed the single burst craft")
@@ -293,7 +305,8 @@ local function run()
         .. " first=" .. tostring(burst[1].reason)
         .. " second=" .. tostring(burst[2].reason))
     assert(successful == 1 and rejected == 1
-        and Inventory.count_item(after_burst, "iron_bar") == 1
+        and Inventory.count_item(after_burst, "iron_bar")
+            == existing_bars + 1
         and Inventory.count_item(after_burst, "iron_ore") == 0,
         "rapid client requests must consume inputs only once")
     print("[Profession Material Live] RAPID_DUPLICATE_PASS")
