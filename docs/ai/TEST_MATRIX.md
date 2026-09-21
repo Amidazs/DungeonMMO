@@ -1,5 +1,40 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — v1.53 live profession and wolf milestone
+
+- [x] `ForestWolf` factory contract: 10 assertions; separate server
+  identity/tag and Marauder isolation. Registered archetype, no
+  production pack opt-in.
+- [x] Four Rojo compositions, Dungeon cleanup 11 assertions,
+  Dungeon broad backend 30/30 after wolf source changes.
+- [x] Real disposable Temple Room1: physical encounter trigger,
+  two wolf factory spawns, assisted defeat, server rewards and clear,
+  retained looted wolf corpse, real client prompt/one hide and
+  disabled second claim. Not proof of unassisted or balanced combat.
+- [x] Real Base client twelve material-backed crafts across four
+  production professions to warded leatherbound gloves, including
+  authentic station checks and server inventory consumption.
+- [x] Base real client repeat enchant without materials rejected;
+  same-client two rapid crafts with exactly one recipe's inputs
+  produced only one bar. Actual overlap inside the guard is not
+  independently established by this result.
+- [x] Two-user in-memory corpse contest: 9 assertions, included in
+  13/13 focused suites in both newly rebuilt Base and Dungeon.
+- [x] Genuine two-client Studio Base Play: distinct profiles craft
+  independently, contest one shared corpse for exactly one hide
+  and one client leaves without disconnecting the other.
+- [ ] Same-account reconnect after interrupted live craft, session
+  transfer, real cross-server save/reload, animal-specific models/AI
+  and actual default-pack rollout remain NOT TESTED.
+- [ ] Published cloud TEST/PROD and real-player DataStore validation
+  remain NOT AUTHORIZED and NOT TESTED.
+
+See `docs/testing/profession-v153-wolf-and-crafting-local-acceptance-2026-09-21.md` for exact fixture files, logs and failed-then-fixed
+test expectations. All local artifacts are unpublished and
+Studio in-memory only.
+
+## Prior 21 September results (historical)
+
 ## 21 September 2026 — animal-only Skinning Studio validation complete
 
 - [x] Four Rojo compositions PASS with animal-only runtime code.
