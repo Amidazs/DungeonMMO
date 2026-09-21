@@ -1,5 +1,48 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — v1.53 latest local backend handoff
+
+The active branch now includes an opt-in `ForestWolf` factory and
+`Wolf` archetype. **No production/default packs include wolves**:
+Temple Room1 was changed to a two-wolf pack only inside the
+unpublished Studio Play fixture. The existing Marauder controller
+rig provides temporary animal-like placeholder behaviour and
+silhouette; final animal models/AI have not been authored.
+
+The actual disposable Dungeon client/server encounter test passed:
+Room1 physical trigger → two wolf spawns → assisted kills → ordinary
+reward/room clear → retained looted corpse → real client Skinning →
+one server-granted hide and disabled repeat. A genuine Base Play
+client also crafted through all material-backed professions to
+`warded_leatherbound_gloves`, including repeat/burst checks.
+Two actual Studio clients independently crafted, contested one
+corpse for exactly one hide and passed a peer disconnect check.
+The in-memory two-user contest passed in rebuilt Base/Dungeon
+focused runners (13/13 each). The broader Dungeon backend
+matrix remained 30/30.
+
+The *initial* burst fixture incorrectly assumed the Base starter
+inventory lacked ore; both requests legitimately succeeded. The
+corrected, source-versioned fixture cleared starter ore in a
+disposable in-memory player and seeded exactly one craft's inputs:
+one success/one rejection, no duplicated bar. The *initial*
+two-user focused run hung on missing source in a stale Rojo build;
+both rebuilds then passed. Do not report these earlier attempts
+as passes.
+
+Next backend step: same-account reconnect and interrupted
+craft-request cleanup, with an explicit distinction between an
+actual network disconnect and pure guard unit tests. Then decide
+on release-eligible animal encounters/models only when requested.
+Do not enable wolves in default packs merely to satisfy a test.
+Do not claim public deployment or real-user DataStore validation.
+Keep all future script, roadmap and handoff edits inside GitHub,
+then clean fast-forward pull for Rojo/Studio only.
+
+Evidence: `docs/testing/profession-v153-wolf-and-crafting-local-acceptance-2026-09-21.md`.
+
+## Prior 21 September checkpoints (historical)
+
 ## 21 September 2026 — local animal-only Skinning test closeout
 
 The server-only species allowlist, beast-tag requirement, defeated/
