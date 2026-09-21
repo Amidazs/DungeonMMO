@@ -329,10 +329,20 @@ local return_button = UiComponents.button(
     "Return to Base",
     "Primary"
 )
-return_button.AnchorPoint = Vector2.new(0.5, 0)
-return_button.Position = UDim2.new(0.5, 0, 0, 244)
-return_button.Size = UDim2.fromOffset(250, 52)
+return_button.AnchorPoint = Vector2.new(0, 0)
+return_button.Position = UDim2.new(0, 28, 0, 244)
+return_button.Size = UDim2.new(0.5, -36, 0, 52)
 return_button.ZIndex = 22
+
+local replay_button = UiComponents.button(
+    complete_panel,
+    "PlayAgainButton",
+    "Play again",
+    "Primary"
+)
+replay_button.Position = UDim2.new(0.5, 8, 0, 244)
+replay_button.Size = UDim2.new(0.5, -36, 0, 52)
+replay_button.ZIndex = 22
 
 local wipe_ends_at: number? = nil
 local revive_at: number? = nil
@@ -534,6 +544,8 @@ local function apply_dungeon_state(payload: any)
         complete_caption.Text = "EXPEDITION COMPLETE"
         complete_title.Text = "VICTORY"
         return_button.Text = "Return to Base"
+        replay_button.Text = "Play again"
+        UiTheme.set_button_enabled(replay_button, true)
         revive_panel.Visible = false
         boss_frame.Visible = false
         complete_panel.Visible = true
@@ -566,6 +578,8 @@ local function apply_dungeon_state(payload: any)
         complete_caption.Text = "EXPEDITION FAILED"
         complete_title.Text = "PARTY DEFEATED"
         return_button.Text = "Return to Base"
+        replay_button.Text = "Play again"
+        UiTheme.set_button_enabled(replay_button, true)
         reward_label.Text = if payload.return_simulated == true
             then "Studio return simulated. Start a new run from Base."
             else "This run has ended. Return to Base to start a new run."
@@ -573,6 +587,21 @@ local function apply_dungeon_state(payload: any)
         boss_frame.Visible = false
         complete_panel.Visible = true
         update_backdrop()
+    elseif state == "ReplayWaiting" then
+        replay_button.Text = "Waiting for party"
+        UiTheme.set_button_enabled(replay_button, false)
+        reward_label.Text = "Waiting for the remaining party members "
+            .. "to choose Play again. You can still return to Base."
+    elseif state == "ReplaySimulated" then
+        replay_button.Text = "Replay simulated"
+        UiTheme.set_button_enabled(replay_button, false)
+        reward_label.Text = "Studio replay simulated. In the published "
+            .. "game a new reserved run would start."
+    elseif state == "ReplayError" then
+        replay_button.Text = "Retry Play again"
+        UiTheme.set_button_enabled(replay_button, true)
+        reward_label.Text = "Replay could not start: "
+            .. tostring(payload.replay_error)
     end
 end
 
@@ -640,6 +669,12 @@ end)
 
 return_button.Activated:Connect(function()
     return_request:FireServer(if run_failed then "Abandon" else "Complete")
+end)
+
+replay_button.Activated:Connect(function()
+    UiTheme.set_button_enabled(replay_button, false)
+    replay_button.Text = "Starting..."
+    return_request:FireServer("PlayAgain")
 end)
 
 revive_state.OnClientEvent:Connect(
