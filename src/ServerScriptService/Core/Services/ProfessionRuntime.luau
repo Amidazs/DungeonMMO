@@ -5,6 +5,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
+local CorpseSkinningRuntime = require(
+    script.Parent:WaitForChild("CorpseSkinningRuntime")
+)
 local DungeonModifierDefinitions = require(
     Shared:WaitForChild("DungeonModifierDefinitions")
 )
@@ -958,6 +961,16 @@ function ProfessionRuntime.attach(config: any): any
         base_claims[player.UserId] = nil
         craft_request_guard:finish(player.UserId)
     end)
+
+    -- Existing Marauders are not beast-tagged; only explicitly registered,
+    -- defeated and looted animal corpses receive an interactive skin prompt.
+    CorpseSkinningRuntime.attach({
+        root = root_folder,
+        professions = professions,
+        action_result = function(player: Player, result: any)
+            finish_action(player, "Gather", result)
+        end,
+    })
 
     return {
         Root = root_folder,
