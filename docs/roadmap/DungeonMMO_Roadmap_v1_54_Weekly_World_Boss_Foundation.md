@@ -71,8 +71,9 @@ teleport restores that member's boss rejoin route.
 **Local acceptance:** six Rojo builds; 18 travel assertions each in
 Base and Dungeon; 22 Base return assertions including failed-teleport
 rollback; 10 ordinary-Dungeon admission assertions; five isolated
-destination assertions; a default-off Play-mode check; 30 durable
-session assertions in each Base/Dungeon; weekly policy 40, guardian
+destination assertions; a default-off Play-mode check; 33 durable
+session assertions in each Base/Dungeon (including malformed-party
+recovery); weekly policy 40, guardian
 factory eight; existing Base profession 14/14 and Dungeon gameplay
 30/30. Existing real-client material-chain Play regression also
 passed on the travel integration source.
