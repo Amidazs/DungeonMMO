@@ -158,7 +158,8 @@ local function enter_instance(player)
         instance_id, {player.UserId}, start_at, end_at)
     assert(entry.ok, "server event entry failed: "
         .. tostring(entry.reason))
-    local position = arena:GetPivot().Position
+    local gateway = assert(W:FindFirstChild("WeeklyBossGateway_TEMP"))
+    local position = gateway.Position
         + Vector3.new(#entries * 20, 6, 18)
     local boss = Factory.create({
         Parent = arena,
