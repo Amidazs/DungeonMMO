@@ -1,5 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — real world-boss combat integration
+
+- [x] Isolated world-boss compositions include the existing full
+  Combat server/client runtime and Marauder Captain AI; ordinary
+  prototype ArenaBuilder remains excluded.
+- [x] Admitted world-boss characters use the frozen weekly encounter
+  ID so guardian targeting is session-scoped.
+- [x] World-boss damage contribution requires the exact authoritative
+  guardian Model and admitted player; same-name/off-encounter target
+  filtering: **7 assertions PASS**.
+- [x] WorldBossCombatAuthority revalidates active membership,
+  encounter identity, live guardian, undefeated event and support
+  target before forwarding to the existing ContributionService.
+- [x] Real unpublished client Play used normal CombatService attack
+  input: real guardian health loss, persisted server contribution,
+  guardian AI damage to the player, unassisted client boss defeat,
+  verified weekly reward once, immediate duplicate reward zero.
+  `VERIFIED_PLAY_MODE_PASS`.
+- [x] Real Play exposed and fixed missing-event-state nil access and
+  combat-event variable shadowing. Post-defeat reward grants retry;
+  earned-but-unsaved reward blocks Base return.
+- [x] Final source also passed six Rojo builds, boss default-off Play,
+  contribution service **14 assertions**, weekly policy/factory
+  **40 + 8**, Base professions **14/14**, Dungeon backend **30/30**.
+- [ ] Dedicated production place still needs authored
+  `WorldBossArenaSpawn`/basic arena and actual multi-client fight.
+- [ ] Party death/wipe, disconnect/rejoin, independent return,
+  published Base → ReserveServer boss → Base, real lease transfer
+  and cloud DataStore/MemoryStore acceptance remain pending.
+- [ ] Public schedule, final boss phases/art/balance and production
+  enablement remain explicitly out of scope.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-real-combat-2026-09-21.md`.
+
+## Earlier 21 September isolated travel checkpoint (historical)
+
 ## 21 September 2026 — isolated weekly boss travel and reward hardening
 
 - [x] Six Base/Dungeon/world-boss Rojo compositions built,
