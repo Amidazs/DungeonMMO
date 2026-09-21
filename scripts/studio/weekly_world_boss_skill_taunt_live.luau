@@ -231,6 +231,12 @@ local function run()
     local before = runtime.ContributionService
         :get_player_snapshot(session_id, near_player.UserId)
     local boss_health = boss.Humanoid.Health
+    local boss_root = assert(boss:FindFirstChild("HumanoidRootPart"))
+    near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+        boss_root.Position + Vector3.new(0, 0, 2.3),
+        Vector3.new(boss_root.Position.X,
+            boss_root.Position.Y, boss_root.Position.Z)
+    )
     channel:FireClient(near_player, "CastTaunt")
     wait_for(function()
         return boss:GetAttribute("MarauderAggroTargetUserId")
