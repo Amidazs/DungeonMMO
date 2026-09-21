@@ -43,6 +43,13 @@ channel.OnClientEvent:Connect(function(command)
         end
     elseif command == "Taunt" then
         skill:FireServer("Taunt")
+    elseif command == "Die" then
+        local character = game:GetService("Players").LocalPlayer.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.Health = 0
+        end
     end
 end)
 channel:FireServer("Ready")
@@ -356,6 +363,17 @@ local function run()
     assert(before_damage == after_damage,
         "Taunt skill must generate threat without fake damage")
     print("[World Boss Aggro Live] REAL_TAUNT_SKILL_PASS")
+
+    channel:FireClient(far_player, "Die")
+    wait_for(function()
+        local far_humanoid = far_character:FindFirstChildOfClass("Humanoid")
+        return far_humanoid and far_humanoid.Health <= 0
+    end, "taunting client's replicated death", 8)
+    wait_for(function()
+        return boss:GetAttribute("MarauderAggroTargetUserId")
+            == near_player.UserId
+    end, "dead highest-threat player removed from boss aggro", 8)
+    print("[World Boss Aggro Live] DEAD_TARGET_FALLBACK_PASS")
 
     boss:Destroy()
 end
