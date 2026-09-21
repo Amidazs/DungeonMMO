@@ -575,6 +575,32 @@ function ProfessionRuntime.within_station_range(
     return (root.Position - anchor.Position).Magnitude <= (max_distance or STATION_RANGE)
 end
 
+-- Small server-side guard used by the RemoteEvent path so two overlapping
+-- craft requests from one player cannot both enter prepare/complete.
+-- The ProfessionService remains the authority for materials and output.
+function ProfessionRuntime.new_craft_request_guard(): any
+    local active: {[number]: boolean} = {}
+    local guard = {}
+
+    function guard:try_begin(user_id: number): boolean
+        if active[user_id] == true then
+            return false
+        end
+        active[user_id] = true
+        return true
+    end
+
+    function guard:finish(user_id: number)
+        active[user_id] = nil
+    end
+
+    function guard:is_active(user_id: number): boolean
+        return active[user_id] == true
+    end
+
+    return guard
+end
+
 function ProfessionRuntime.attach(config: any): any
     local context = assert(config.context, "ProfessionRuntime context required")
     local environment = assert(config.environment, "ProfessionRuntime environment required")
@@ -604,6 +630,7 @@ function ProfessionRuntime.attach(config: any): any
     local base_claims: {[number]: {[string]: boolean}} = {}
     local station_anchors: {[string]: BasePart} = {}
     local occupied_positions_by_group: {[string]: {Vector3}} = {}
+    local craft_request_guard = ProfessionRuntime.new_craft_request_guard()
 
     local function current_session_id(): string?
         if type(get_session_id) ~= "function" then
@@ -881,27 +908,43 @@ function ProfessionRuntime.attach(config: any): any
                 return
             end
 
-            local prepared = professions:prepare_craft(player.UserId, recipe_id)
-            if not prepared.ok then
-                finish_action(player, "Craft", prepared)
+            if not craft_request_guard:try_begin(player.UserId) then
+                finish_action(player, "Craft", {
+                    ok = false,
+                    reason = "CraftRequestInProgress",
+                })
                 return
             end
 
-            -- Profession-specific minigames will run between prepare_craft and
-            -- complete_craft. The foundation gate auto-resolves success while
-            -- preserving the final server-authoritative completion boundary.
-            local outcome = professions.foundation_success_outcome(
-                prepared.minigame_id
-            )
-            finish_action(
-                player,
-                "Craft",
-                professions:complete_craft(
-                    player.UserId,
-                    recipe_id,
-                    outcome
+            local completed_ok, result = pcall(function()
+                local prepared = professions:prepare_craft(
+                    player.UserId, recipe_id)
+                if not prepared.ok then
+                    return prepared
+                end
+
+                -- The current foundation never accepts a client-provided
+                -- minigame result. Until interactive minigames are authored,
+                -- only the server creates the success outcome passed to
+                -- complete_craft.
+                local outcome = professions.foundation_success_outcome(
+                    prepared.minigame_id
                 )
-            )
+                return professions:complete_craft(
+                    player.UserId, recipe_id, outcome)
+            end)
+            craft_request_guard:finish(player.UserId)
+
+            if not completed_ok then
+                warn("[Profession Runtime] Craft request failed: "
+                    .. tostring(result))
+                finish_action(player, "Craft", {
+                    ok = false,
+                    reason = "CraftRequestFailed",
+                })
+                return
+            end
+            finish_action(player, "Craft", result)
         end)
     end
 
@@ -913,6 +956,7 @@ function ProfessionRuntime.attach(config: any): any
 
     Players.PlayerRemoving:Connect(function(player: Player)
         base_claims[player.UserId] = nil
+        craft_request_guard:finish(player.UserId)
     end)
 
     return {
