@@ -267,41 +267,12 @@ local function admit_player(player: Player)
 
     active_session_id = session_id
     admitted[player.UserId] = true
-    player.CharacterAdded:Connect(function(character: Model)
-        character:SetAttribute("DungeonRunParticipant", true)
-        character:SetAttribute(
-            "DungeonEncounterId", "WeeklyBoss:" .. session_id)
-        character:SetAttribute("WorldBossSessionId", session_id)
-        character:PivotTo(
-            arena_spawn.CFrame * CFrame.new(0, 4, 12))
-        local active = member_lifecycle:mark_active(
-            session_id, player.UserId)
-        if not active.ok then
-            warn("[World Boss] Member activation failed: "
-                .. tostring(active.reason))
-        end
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.Died:Connect(function()
-                local dead = member_lifecycle:mark_dead(
-                    session_id, player.UserId)
-                if not dead.ok then
-                    warn("[World Boss] Member death persistence failed: "
-                        .. tostring(dead.reason))
-                    return
-                end
-                task.delay(RESPAWN_DELAY_SECONDS, function()
-                    if Players:GetPlayerByUserId(player.UserId) == player
-                        and member_lifecycle:can_respawn(
-                            session_id, player.UserId)
-                    then
-                        player:LoadCharacter()
-                    end
-                end)
-            end)
-        end
-    end)
-    player:LoadCharacter()
+    member_lifecycle:bind_player(
+        player,
+        session_id,
+        arena_spawn.CFrame * CFrame.new(0, 4, 12),
+        RESPAWN_DELAY_SECONDS
+    )
     prepare_encounter(session_id)
     grant_if_eligible(player.UserId)
     print("[World Boss] Admitted " .. tostring(player.UserId)
