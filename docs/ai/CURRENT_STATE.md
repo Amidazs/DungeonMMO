@@ -14,7 +14,7 @@ temporary material source. No animal enemy factory has been registered.
 All changes (including tests and this handoff) were written to GitHub,
 then safely fast-forwarded to the clean Windows integration worktree.
 All four Rojo compositions built at
-`c6af7cf080001f199e7383ef8cb4c63198e7d312`; **new Studio tests
+`8655c7e19bc97a9b9c803fc011e2e5a3080c47f3`; **new Studio tests
 have not run**. The direct Studio MCP discovery attempt could not reach
 Studio, and the delegated Codex route hit a usage limit. The earlier
 Base RawHideCache simulated-input timeout is still unresolved. Do not
