@@ -31,6 +31,9 @@ local CombatAuthority = require(
 local DungeonContributionBridge = require(
     SSS.Dungeon:WaitForChild("DungeonContributionBridge")
 )
+local ArenaLayout = require(
+    SSS.WorldBoss:WaitForChild("WorldBossArenaLayout")
+)
 
 -- This place must be deliberately enabled after its independent arena
 -- and combat runtime have been validated in a published TEST universe.
@@ -54,7 +57,18 @@ local coordinator = TeleportCoordinator.new(
     RobloxTeleportAdapter.new(), profiles, leases, sessions
 )
 
-local arena_spawn = Workspace:FindFirstChild("WorldBossArenaSpawn")
+-- An explicitly enabled geometric prototype is useful for backend
+-- testing without introducing unfinished meshes into normal places.
+-- A finished place may instead supply its own authored arena anchor.
+local arena_spawn = Workspace:FindFirstChild(
+    "WorldBossArenaSpawn", true)
+if not arena_spawn
+    and SSS:GetAttribute("DungeonMMOWorldBossPrototypeArenaEnabled")
+        == true
+then
+    arena_spawn = ArenaLayout.create(
+        Workspace, "WorldBossArenaPrototype")
+end
 if not arena_spawn or not arena_spawn:IsA("BasePart") then
     warn("[World Boss] Authored WorldBossArenaSpawn is required.")
     Players.PlayerAdded:Connect(function(player: Player)
