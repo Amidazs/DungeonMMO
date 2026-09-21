@@ -58,15 +58,18 @@ check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
     "threat must be isolated per enemy")
 
 ThreatService.select_target(second_enemy, candidates)
-local support_affected = ThreatService.record_support(
-    player_c,
-    player_b,
-    8
-)
-check(support_affected == 2,
-    "effective support must create threat on each shared engaged enemy")
+check(ThreatService.record_support(player_c, player_b, 8) == 1,
+    "support must not pull an otherwise unengaged nearby enemy")
 check(ThreatService.get_threat(enemy, player_c.UserId) == 14,
     "support threat must equal half the effective support amount")
+check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
+    "unengaged enemies cannot receive free support threat")
+
+ThreatService.record_damage(second_enemy, player_b, 1)
+check(ThreatService.record_support(player_c, player_b, 8) == 2,
+    "effective support must reach independently engaged enemies")
+check(ThreatService.get_threat(enemy, player_c.UserId) == 18,
+    "support must accumulate on the first enemy")
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 4,
     "support threat must be tracked independently on every enemy")
 
@@ -81,6 +84,12 @@ check(ThreatService.record_support(player_c, player_b, 6) == 2,
     "support must ignore enemies where the caster is not eligible")
 check(ThreatService.get_threat(third_enemy, player_c.UserId) == 0,
     "out-of-encounter support cannot seed threat on that enemy")
+
+ThreatService.record_damage(third_enemy, player_b, 3)
+check(ThreatService.record_support(player_c, player_b, 6) == 2,
+    "even engaged enemies must exclude out-of-range casters")
+check(ThreatService.get_threat(third_enemy, player_c.UserId) == 0,
+    "engagement alone cannot grant off-encounter support threat")
 
 local rejected_zero_support = pcall(function()
     ThreatService.record_support(player_c, player_b, 0)
@@ -99,6 +108,25 @@ check(ThreatService.record_support(player_c, player_b, 10) == 1,
     "cleared enemies cannot receive support threat")
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
     "encounter cleanup must discard the support threat ledger")
+ThreatService.select_target(second_enemy, candidates)
+check(ThreatService.record_support(player_c, player_b, 6) == 2,
+    "a new enemy encounter must remain unengaged until real threat")
+ThreatService.record_damage(second_enemy, player_b, 1)
+check(ThreatService.record_support(player_c, player_b, 6) == 3,
+    "a restarted enemy must only earn support on its new ledger")
+ThreatService.remove_player(player_c.UserId)
+check(ThreatService.get_threat(enemy, player_c.UserId) == 0,
+    "disconnect must discard former caster threat")
+check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
+    "disconnect cleanup must cover every enemy")
+check(ThreatService.record_support(player_c, player_b, 6) == 0,
+    "departed players cannot keep earning support through stale candidacy")
+selected, mode = ThreatService.select_target(enemy, candidates)
+check(selected == player_a and mode == "Threat",
+    "reacquired candidate has no stale threat after disconnect")
+ThreatService.remove_player(player_c.UserId)
+check(ThreatService.record_support(player_c, player_b, 6) == 0,
+    "repeating disconnect cleanup must be harmless")
 check(ThreatService.record_damage(second_enemy, player_b, 4) == 4,
     "another enemy must own a separate threat table")
 check(ThreatService.get_threat(enemy, player_b.UserId) == 2,
@@ -110,7 +138,6 @@ selected, mode = ThreatService.select_target(enemy, {
 })
 check(selected == player_a and mode == "Threat",
     "an absent high-threat player cannot remain a target candidate")
-
 ThreatService.clear(enemy)
 selected, mode = ThreatService.select_target(enemy, candidates)
 check(selected == player_a and mode == "Nearest",
