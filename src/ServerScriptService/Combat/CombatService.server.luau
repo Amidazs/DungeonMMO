@@ -2033,7 +2033,14 @@ local function enter_skill_active(
                 local target_index = 0
                 return function(target: Model)
                     target_index += 1
-                    if skill_definition.ID == "ArcSlash" then
+                    if skill_definition.ID == "Taunt" then
+                        -- Only the first server-confirmed hostile target
+                        -- receives threat. Taunt causes zero health damage
+                        -- and cannot inflate reward contributions.
+                        if target_index > 1 then
+                            return
+                        end
+                    elseif skill_definition.ID == "ArcSlash" then
                         apply_arc_slash_target(
                             player,
                             character,
