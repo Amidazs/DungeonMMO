@@ -1,5 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — isolated weekly boss travel and reward hardening
+
+- [x] Six Base/Dungeon/world-boss Rojo compositions built,
+  including published-style project definitions (not cloud publish).
+- [x] Default-off Base boss gateway with server-owned event window,
+  physical proximity, identity and ready-party checks. Default-off
+  separate destination boots without a boss or open return prompt.
+- [x] Fake reserved-server transport: 18 travel assertions PASS in
+  Base and 18 in Dungeon. Routing-only data, destination binding,
+  party membership and ordinary-place rejection verified.
+- [x] Separate world-boss place/factory contract: 5 assertions PASS;
+  ordinary Dungeon admission: 10 assertions PASS.
+- [x] Server-verified defeated-member Base return: 22 assertions
+  PASS, including failed-teleport rollback of the per-member
+  return flag; other party members' session indexes remain intact.
+- [x] Fixed real ContributionService response mismatch in weekly
+  payout check: 14 actual-service assertions PASS in Base and
+  14 in Dungeon for no/invalid contribution, real recorded
+  damage, healing and in-memory persisted recovery.
+- [x] Existing local weekly policy/factory (40+8), session
+  persistence (30 each Base/Dungeon), Base profession 14/14,
+  Dungeon backend 30/30, and real-client Base crafting material
+  chain Play passed on this travel-integration branch.
+- [ ] **The dedicated place still lacks playable guardian AI and
+  client combat/attack contribution wiring and arena anchor.**
+  No live Base → reserved boss → Base teleport has been tested.
+- [ ] Published TEST two-client encounter, full network
+  disconnect/rejoin, cloud DataStore/MemoryStore and production
+  release have not been performed. Event flags remain off.
+
+See
+`docs/testing/weekly-world-boss-v154-isolated-travel-2026-09-21.md`
+and
+`docs/testing/weekly-world-boss-v154-travel-hardening-2026-09-21.md`.
+
+## Earlier 21 September session contract (historical)
+
 ## 21 September 2026 — frozen weekly boss session contract
 
 - [x] `DungeonSessionService` issues exactly one server-owned
