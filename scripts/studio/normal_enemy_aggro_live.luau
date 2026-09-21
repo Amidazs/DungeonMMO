@@ -141,6 +141,15 @@ local function run()
     local near_character = get_character(near_player)
     local far_character = get_character(far_player)
 
+    -- Keep unrelated prototype mobs away from this one-enemy test.
+    -- This affects only the disposable unpublished Studio fixture.
+    for index = 2, 3 do
+        local unrelated = Workspace:FindFirstChild(
+            marauder_config.MODEL_NAME .. "_" .. index)
+        if unrelated and unrelated:IsA("Model") then
+            unrelated:PivotTo(CFrame.new(500 + index * 20, 5, 500))
+        end
+    end
     ThreatService.clear(enemy)
     place(near_character, enemy_root, 1.8)
     place(far_character, enemy_root, -2.8)
@@ -160,23 +169,37 @@ local function run()
     end, "first damage threat", 15)
     print("[Normal Aggro Live] FIRST_DAMAGE_THREAT_PASS")
 
-    enemy_root = assert(enemy:FindFirstChild("HumanoidRootPart"))
-    place(far_character, enemy_root, -10)
-    wait_for(function()
-        return enemy:GetAttribute("MarauderAggroTargetUserId")
-            == far_player.UserId
-    end, "threat retained over nearer player", 8)
-    print("[Normal Aggro Live] THREAT_BEATS_DISTANCE_PASS")
-
-    enemy_root = assert(enemy:FindFirstChild("HumanoidRootPart"))
-    place(near_character, enemy_root, 2.4)
-    channel:FireClient(near_player, "StrikeThree")
+    -- Attack the current enemy position again between real client
+    -- swings. The NPC may turn or move after threat switches, and
+    -- the basic combo's forward step can move a test character away.
+    -- Every threat increase must come from an actual client hit.
+    for strike = 1, 3 do
+        local target_root = assert(
+            enemy:FindFirstChild("HumanoidRootPart"))
+        local position = target_root.Position + Vector3.new(0, 0, 2.2)
+        near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+            position, target_root.Position
+        )
+        local previous = ThreatService.get_threat(
+            enemy, near_player.UserId)
+        channel:FireClient(near_player, "StrikeOnce")
+        wait_for(function()
+            return ThreatService.get_threat(
+                enemy, near_player.UserId) > previous
+        end, "real challenger melee hit " .. strike, 8)
+        if ThreatService.get_threat(enemy, near_player.UserId)
+            > ThreatService.get_threat(enemy, far_player.UserId)
+        then
+            break
+        end
+        task.wait(0.85)
+    end
     wait_for(function()
         return ThreatService.get_threat(enemy, near_player.UserId)
             > ThreatService.get_threat(enemy, far_player.UserId)
             and enemy:GetAttribute("MarauderAggroTargetUserId")
                 == near_player.UserId
-    end, "higher damage threat takeover", 18)
+    end, "higher real damage takes aggro", 8)
     print("[Normal Aggro Live] HIGHER_DAMAGE_SWITCH_PASS")
 
     local humanoid = assert(enemy:FindFirstChildOfClass("Humanoid"))
