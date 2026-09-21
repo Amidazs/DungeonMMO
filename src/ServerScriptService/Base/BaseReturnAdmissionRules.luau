@@ -28,7 +28,15 @@ function BaseReturnAdmissionRules.validate(
         or session.State == "Failed"
     local abandoned_active = session.State == "Active"
         and member.Abandoned == true
-    if not terminal and not abandoned_active then
+    local world_boss_return = session.State == "Active"
+        and member.WorldBossReturnPending == true
+        and teleport_data.WorldBoss == true
+        and type(session.InstanceState) == "table"
+        and type(session.InstanceState.WeeklyWorldBoss) == "table"
+        and session.InstanceState.WeeklyWorldBoss.Defeated == true
+    if not terminal and not abandoned_active
+        and not world_boss_return
+    then
         return {ok = false, reason = "SessionNotReturnable"}
     end
     return {ok = true, reason = nil}
