@@ -171,7 +171,7 @@ local function run()
 
     -- Keep unrelated prototype mobs away from this one-enemy test.
     -- This affects only the disposable unpublished Studio fixture.
-    for index = 2, 3 do
+    for index = 2, 4 do
         local unrelated = Workspace:FindFirstChild(
             marauder_config.MODEL_NAME .. "_" .. index)
         if unrelated and unrelated:IsA("Model") then
