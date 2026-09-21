@@ -69,6 +69,7 @@ function DungeonDeathService.new(session_service:any, checkpoint_service:any, se
     self._paid_offer_provider=config.paid_offer_provider or function(_user_id:number) return nil end
     self._on_member_mode=config.on_member_mode or function(_user_id:number,_mode:string) end
     self._death_cframes={}; self._revive_ends_at={}
+    self._completed_paid_revive_counts = {}
     return self
 end
 
@@ -174,13 +175,23 @@ function DungeonDeathService:complete_paid_revive(player: any): any
     if member.Connected ~= true then
         return operation(false, "MemberDisconnected")
     end
-    if member.Mode ~= "Dead" and member.Mode ~= "Spectating" then
-        return operation(false, "MemberNotDead")
-    end
     if member.FreeReviveUsed ~= true then
         return operation(false, "FreeReviveStillAvailable")
     end
 
+    -- DungeonSessionService atomically records the purchase and sets
+    -- Mode to Active BEFORE the authorized on_granted callback fires.
+    local paid_count = member.PaidReviveCount
+    local completed = self._completed_paid_revive_counts[player.UserId] or 0
+    if member.Mode ~= "Active"
+        or type(paid_count) ~= "number"
+        or paid_count <= completed
+    then
+        return operation(false, "PaidReviveAlreadyProcessed")
+    end
+
+    -- Reserve the grant before the potentially yielding LoadCharacter.
+    self._completed_paid_revive_counts[player.UserId] = paid_count
     local checkpoint = self._checkpoints:get_active_checkpoint()
     local target = checkpoint.CFrame
     local spawned = self._spawn_player(player, target)
@@ -189,6 +200,8 @@ function DungeonDeathService:complete_paid_revive(player: any): any
             self._session_id, player.UserId, "Spectating"
         )
         self._on_member_mode(player.UserId, "Spectating")
+        self:_refresh_wipe_state()
+        self:_emit(player.UserId)
         return operation(false, "RespawnFailed")
     end
 
