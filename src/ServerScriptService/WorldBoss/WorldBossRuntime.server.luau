@@ -37,6 +37,9 @@ local ArenaLayout = require(
 local MemberLifecycle = require(
     SSS.WorldBoss:WaitForChild("WorldBossMemberLifecycle")
 )
+local ProfileExit = require(
+    SSS.WorldBoss:WaitForChild("WorldBossProfileExit")
+)
 
 -- This place must be deliberately enabled after its independent arena
 -- and combat runtime have been validated in a published TEST universe.
@@ -60,6 +63,7 @@ local coordinator = TeleportCoordinator.new(
     RobloxTeleportAdapter.new(), profiles, leases, sessions
 )
 local member_lifecycle = MemberLifecycle.new(sessions)
+local profile_exit = ProfileExit.new(profiles, leases)
 local RESPAWN_DELAY_SECONDS = 4
 
 
@@ -192,6 +196,10 @@ end
 -- Returns:
 --   nil: admits only via stored reserved session and lease handoff.
 local function admit_player(player: Player)
+    if profile_exit:is_pending(player.UserId) then
+        player:Kick("Your previous world-boss profile save is pending.")
+        return
+    end
     if active_session_id and not sessions:get(active_session_id) then
         player:Kick("World boss session has expired.")
         return
@@ -345,7 +353,7 @@ Players.PlayerRemoving:Connect(function(player: Player)
         profiles:forget_for_handoff(player.UserId)
         coordinator:acknowledge_departure(player.UserId)
     else
-        profiles:release(player.UserId, "WorldBossPlayerRemoving")
+        profile_exit:release(player.UserId, "WorldBossPlayerRemoving")
         if active_session_id then
             sessions:mark_disconnected(
                 active_session_id, player.UserId)
@@ -362,6 +370,9 @@ task.spawn(function()
                 profiles:save(user_id, "WorldBossAutosave")
             end
         end
+        -- A disconnected player is no longer in admitted, so ordinary
+        -- autosave alone cannot recover their failed departure write.
+        profile_exit:retry_pending()
         if active_session_id then
             sessions:refresh(active_session_id)
             local session = sessions:get(active_session_id)
@@ -383,7 +394,15 @@ game:BindToClose(function()
         if coordinator:is_pending(user_id) then
             profiles:forget_for_handoff(user_id)
         else
-            profiles:release(user_id, "WorldBossClose")
+            profile_exit:release(user_id, "WorldBossClose")
         end
+    end
+    -- Best-effort flush while this server still owns the profile
+    -- lease. Never hand an unsaved profile to another writer.
+    for _ = 1, 3 do
+        if profile_exit:retry_pending() == 0 then
+            break
+        end
+        task.wait(1)
     end
 end)
