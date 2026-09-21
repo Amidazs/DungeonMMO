@@ -1,14 +1,14 @@
 # DungeonMMO Roadmap v1.53 — Leatherworking / Enchanting staged
 
 **Date:** 21 September 2026  
-**Status:** GitHub implementation checkpoint, **pending local verification**  
+**Status:** Four local builds and Studio deterministic suites PASS; **live profession station acceptance pending**  
 **Branch:** `wip/phase-4-test-hud-integration-v1`
 
 This supplement follows the accepted v1.52 Event-variation /
-Blacksmithing-Alchemy checkpoint. It records source work completed while
-the authorized Windows desktop is offline. It does **not** claim a new
-Studio acceptance result and does not replace the historical canonical
-`DungeonMMO_Roadmap_v1_47.docx`.
+Blacksmithing-Alchemy checkpoint. The work was first staged in GitHub
+while the desktop was offline; local verification has now resumed. The
+physical profession station gate is still pending. The historical
+canonical `DungeonMMO_Roadmap_v1_47.docx` is unchanged.
 
 ## Implemented in GitHub
 
@@ -63,45 +63,45 @@ the request finishes or the player leaves; other players use independent
 request lanes. Ingredient/output mutation remains inside
 `ProfessionService` and `ProfileService`.
 
-## Tests written but not yet executed
+## 21 September local verification (partial)
 
-The staged source includes:
+The clean Windows integration worktree was safely fast-forwarded to
+`45a9bc25a185fcdb00579e977a22dc582eefc1ec`. Four unpublished
+Rojo compositions (Dungeon, Base and both published-style layouts) built
+successfully. The existing focused profession runner passed **10/10**
+in each disposable local Dungeon/Base Studio Edit place; the Base result
+records **305 assertions**. The Dungeon broad gameplay matrix passed
+**30/30**. The in-memory full profession chain, profile migration,
+equipped-item protection, wrong-minigame rejection, save/reload,
+station-range rules and isolated craft-request guard are included in
+those focused passes. The existing generic Base Play-mode smoke passed
+player spawn, Base runtime/profile remote and release-lock checks.
 
-- expanded profession-definition contract coverage;
-- new-profile and legacy-profile migration checks;
-- a complete Skinning/Leatherworking/Alchemy/Blacksmithing/Enchanting
-  dependency test using actual service APIs and in-memory persistence;
-- equipped-item and wrong-minigame rejection;
-- duplicate output prevention and save/reload assertions;
-- server station-distance and overlapping-request guard tests;
-- an expanded focused profession runner.
+This is **not** live interaction acceptance. Base Play mode has not yet
+proven an actual near/far client craft request, the one-time RawHideCache
+prompt, the client-driven Leatherworking/Enchanting station chain,
+rapid duplicate requests, two-player independence or real disconnect/
+retry cleanup. The Base Play log also contains unrelated Dungeon-only
+autorun script errors/warnings. Preserve this remaining gate and do not
+claim that the entire new profession system is fully accepted yet.
 
-The exact staged test plan and scope are recorded in:
-
+Evidence: `docs/testing/profession-v153-local-validation-2026-09-21.md`.
+Original staged scope and test plan:
 `docs/testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md`.
 
-## Acceptance boundary
+## Remaining v1.53 acceptance boundary
 
-Because the Windows desktop is offline, this v1.53 checkpoint is
-**implemented, not accepted**. No new assertion/suite/build counts should
-be quoted as passing until the branch is pulled and executed locally.
-
-Tomorrow's intended acceptance gate is:
-
-1. safe fast-forward pull into the existing clean worktree;
-2. all four Rojo build compositions;
-3. focused profession suites in Base and Dungeon builds;
-4. broad backend regression matrix;
-5. real Base Play-mode station interaction test:
-   - too-far request rejected;
-   - correct station request accepted;
-   - rapid duplicate request cannot double-consume/double-create;
-   - Skinning hide claim is one-time per Base visit;
-   - Leatherworking and Enchanting chain reaches final equipment;
-   - disconnect/retry does not leave the request guard stuck.
-
-Only after those pass should v1.53 be promoted from pending to locally
-accepted.
+1. Create any new reusable live test fixture through **GitHub only**;
+   fast-forward pull it into the clean Windows integration worktree.
+2. Run a disposable real Base Play-mode profession station/RemoteEvent
+   test: too-far rejection, near-station routing, rapid same-player
+   requests, independent players, hide-cache one-time claim, and real
+   Leatherworking/Enchanting crafting through final equipment.
+3. Verify disconnect/retry releases the lock and investigate unrelated
+   Base composition's Dungeon-only autorun warnings.
+4. Only after the required physical cases pass promote v1.53 from
+   partial verification to locally accepted. Published TEST/PROD and
+   real-player DataStore acceptance remain separate gates.
 
 ## Remaining profession backend after this staged increment
 
@@ -124,6 +124,8 @@ then guild/castle competition and full progression/economy integration.
 
 ## Operational constraint
 
-No Remote Desktop, local pull, Studio run, Roblox publish, DataStore
-mutation, force-push or main merge was performed for this v1.53 staging
-work. Continue GitHub-first until the desktop is available again.
+All source, test-fixture and documentation edits must be made through
+GitHub; Remote Desktop is for read-only inspection, safe fast-forward
+pulling and local build/Studio execution only. The above verification
+performed no cloud publish, real-player DataStore migration,
+force-push or merge into `main`.
