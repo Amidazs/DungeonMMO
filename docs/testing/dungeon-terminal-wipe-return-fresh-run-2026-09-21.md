@@ -37,7 +37,7 @@ Integration fixture head:
 
 At `9862ce4`, all six Rojo compositions built; the Dungeon
 backend matrix passed **30/30**, including DungeonDeathService's
-paid-revive regression **32 assertions**. The dedicated failed
+paid-revive regression **33 assertions**. The dedicated failed
 return service contract passed **15 assertions**. The separate
 fresh session identity test passed, proving a failed run remains
 terminal while the same player can create a distinct new run.
@@ -80,3 +80,15 @@ Remote Desktop was limited to clean fast-forward pulls, temporary
 Rojo builds, unpublished Studio tests and read-only diagnostics.
 No Roblox place was published, no `main` merge or force-push,
 and no production DataStore/reward transaction was performed.
+
+## Same-head closeout
+
+At `8899fad6923628e86a8946fc9ce4c365bc738902`, a clean
+fast-forward and fresh **six** Rojo builds succeeded. The same-head
+unpublished Studio results were: Dungeon backend **30/30**;
+DungeonDeathService **33 assertions**; ReturnPortalService
+**15 assertions**; paid-revive + return + new-session integrated
+contract **15 assertions**; fresh-session service suite PASS; and
+real-client failed-return panel `VERIFIED_PLAY_MODE_PASS`.
+`git diff --check` passed. These tests do not verify a published
+cross-place return or a complete in-place dungeon-room restart.
