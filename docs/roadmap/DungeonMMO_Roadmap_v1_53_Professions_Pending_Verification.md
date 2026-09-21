@@ -112,6 +112,39 @@ Original staged scope and test plan:
    partial verification to locally accepted. Published TEST/PROD and
    real-player DataStore acceptance remain separate gates.
 
+## Animal-only Skinning foundation — new backend increment, NOT accepted
+
+A server-side positive species allowlist and explicit animal-factory tag
+now restrict corpse Skinning to registered Beast creatures only.
+Unregistered monsters, Marauders, humanoids and bosses cannot become
+skinnable just because they die. The creature must also have been
+defeated and looted on the server, and can grant hide just once to a
+nearby living player using the existing profession/inventory mutation
+path. The Dungeon cleanup path retains only eligible animal corpses
+briefly after encounter rewards; unrelated enemy cleanup is unchanged.
+
+Example forest-wolf/wild-boar/cave-bear identities are *future factory
+IDs*, not existing live game creatures. The Base RawHideCache is still a
+temporary independent non-monster resource for crafting QA; an
+authored/server-registered animal encounter is not yet present.
+Do not treat this feature as physically implemented end-to-end.
+
+The new `SkinningEligibilityTest` and `CorpseSkinningRuntimeTest`,
+plus an extended Dungeon enemy cleanup test, are staged. Four local
+Rojo builds succeeded at
+`c6af7cf080001f199e7383ef8cb4c63198e7d312`, but **the new
+Studio suites and actual corpse Play test have not run**: the local
+Studio MCP discovery returned an unavailable-connection error and
+the Codex Studio delegate reported its usage limit.
+
+Keep v1.53 local acceptance pending until those tests and the
+previously outstanding Base hide-cache prompt, full
+Leatherworking/Enchanting live crafting, duplicate-request,
+multiplayer and disconnect/retry checks are complete.
+
+Evidence and exact acceptance list:
+`docs/testing/animal-only-corpse-skinning-pending-studio-2026-09-21.md`.
+
 ## Remaining profession backend after this staged increment
 
 Even if tomorrow's tests pass, the profession backend will still need
