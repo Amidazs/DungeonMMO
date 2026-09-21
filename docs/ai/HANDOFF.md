@@ -1,5 +1,33 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — v1.53 GitHub-only profession staging handoff
+
+The active branch contains unverified-in-Studio profession work above
+the accepted v1.52 checkpoint. Do **not** rebuild these changes from
+scratch. Read:
+docs/roadmap/DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md
+and
+docs/testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md.
+
+Staged: Skinning/Leatherworking/Enchanting definitions and profile state,
+raw-hide Base placeholder acquisition, separate temporary
+Leatherworking/Enchanting station roots, cured-leather/warding material
+chain, leatherbound and warded equipment, full cross-profession recipe
+dependencies, migration/definition/atomic dependency tests, and a
+per-player craft RemoteEvent request guard. Craft requests still require
+the server-known station and distance; the RemoteEvent accepts recipe_id
+only and no client-provided success outcome.
+
+Desktop was intentionally not contacted. Tomorrow first confirm the
+existing Windows worktree is clean and at v1.52, then fast-forward pull
+the current branch, build all four Rojo compositions, run the focused
+profession suite in Base and Dungeon, run the broad backend matrix, then
+perform a Base Play-mode near/far/rapid-duplicate/disconnect crafting
+interaction. Keep v1.53 status **pending** until those pass.
+
+No cloud publish, real player DataStore migration, force-push or main
+merge has been authorized.
+
 ## 20 September 2026 — v1.52 Event variation / profession backend handoff
 
 Read docs/roadmap/
