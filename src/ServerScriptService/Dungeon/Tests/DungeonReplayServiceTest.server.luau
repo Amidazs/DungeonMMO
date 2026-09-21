@@ -183,6 +183,58 @@ check(
         and starts == 3,
     "Studio must simulate replay without a published reserved teleport."
 )
+-- A rejected launch must not preserve an earlier member's consent
+-- for a later retry after the initial teleport attempt failed.
+local failing_coordinator = {}
+local launch_attempts = 0
+function failing_coordinator:start_dungeon(
+    _players: {any},
+    _dungeon_id: string,
+    _place_id: number,
+    _difficulty_id: string?,
+    _return_place_id: number?
+): any
+    launch_attempts += 1
+    if launch_attempts == 1 then
+        return {ok = false, reason = "ReservedTeleportFailed"}
+    end
+    return {ok = true, session = {SessionId = "retry-session"}}
+end
+session.State = "Failed"
+local retry_after_failure = ReplayService.new(
+    sessions, failing_coordinator, {
+        destination_place_id = 245,
+        is_player_ready = function(_player: any): boolean
+            return true
+        end,
+    }
+)
+check(
+    retry_after_failure:request(
+        session.SessionId, tank, {tank, healer}
+    ).waiting == 1,
+    "Initial replay must collect the full party's consent."
+)
+check(
+    retry_after_failure:request(
+        session.SessionId, healer, {tank, healer}
+    ).reason == "ReservedTeleportFailed"
+        and launch_attempts == 1,
+    "A failed teleport must return an explicit launch error."
+)
+check(
+    retry_after_failure:request(
+        session.SessionId, healer, {tank, healer}
+    ).waiting == 1 and launch_attempts == 1,
+    "A launch failure must invalidate the previous party vote."
+)
+check(
+    retry_after_failure:request(
+        session.SessionId, tank, {tank, healer}
+    ).ok == true and launch_attempts == 2,
+    "Both participants can explicitly consent to a second attempt."
+)
+
 print(string.format(
     "[Dungeon Replay Tests] PASS: %d assertions.", assertions
 ))
