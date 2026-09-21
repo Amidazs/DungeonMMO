@@ -34,6 +34,14 @@ channel.OnClientEvent:Connect(function(kind)
             request:FireServer()
             task.wait(0.65)
         end
+    elseif kind == "Die" then
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.Health = 0
+        end
     elseif kind == "Leave" then
         game:GetService("StudioTestService"):LeaveTest()
     end
@@ -234,15 +242,13 @@ local function verify_death_and_respawn(players, runtime, session_id)
     humanoid.Died:Connect(function()
         print("[World Boss Party Live] HUMANOID_DIED_SIGNAL")
     end)
-    -- Deliberately kill this member only in the disposable fixture:
-    -- actual client guardian kill was proven separately above.
-    humanoid:TakeDamage(humanoid.MaxHealth * 2)
-    if humanoid.Health > 0 then
-        original:BreakJoints()
-    end
-    print("[World Boss Party Live] FORCED_DEATH "
-        .. tostring(humanoid.Health) .. " "
-        .. tostring(humanoid:GetState()))
+    -- Ask the real owning Studio client to die. This exercises the
+    -- replicated Humanoid.Died signal rather than mutating session mode.
+    channel:FireClient(victim, "Die")
+    wait_for(function()
+        return humanoid.Health <= 0
+    end, "client-replicated Humanoid death", 8)
+    print("[World Boss Party Live] CLIENT_DEATH_REPLICATED")
     wait_for(function()
         local record = runtime.SessionService:get(session_id)
         return record and record.Members[tostring(victim.UserId)]
