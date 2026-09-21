@@ -257,7 +257,11 @@ end
 
 function DungeonDeathService:tick(now:number?):any
     local tick_now=now or self._clock(); local session=self._sessions:get(self._session_id)
-    if not session or session.State ~= "Active" then return {failed=session and session.State=="Failed" or false} end
+    if not session or session.State ~= "Active" then
+        -- A terminal failure is announced once, at the transition.
+        -- Repeated announcements hide replay voting and error screens.
+        return {failed = false}
+    end
     local deadline=session.WipeDecisionEndsAt
     if type(deadline)=="number" and tick_now>=deadline and all_members_inactive(session) then
         local failed=self._sessions:mark_failed(self._session_id,"WipeReviveTimeout")
