@@ -1,5 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — v1.54 weekly boss foundation
+
+- [x] No automatic schedule or public entry enabled. Trusted explicit
+  entry start/end, exclusive end, maximum two-hour window and Monday
+  UTC reward-week identity: **40 assertions PASS in Base and 40
+  in Dungeon**, including first/second week and invalid window.
+- [x] Unique local encounter ID; server-approved loaded party
+  (up to four), matching tagged dead guardian and saved character
+  reward receipt. An outsider, living boss, mismatched instance
+  and second reward within the same week are denied.
+- [x] Actual guardian prototype factory: **8 assertions PASS**.
+  Distinct `AncientGuardian` identity, no ordinary monster XP/gold,
+  reused captain combat rig, default-off in all standard packs.
+- [x] Four Rojo compositions, existing Base profession **14/14**,
+  Dungeon gameplay **30/30** regressions PASS.
+- [x] Real unpublished Dungeon Play test: client physically enters
+  an injected temporary gateway inside the event window; guardian
+  spawns; two assisted defeats grant 100 gold exactly once to that
+  Dungeon player. Markers:
+  `CLIENT_WINDOW_ENTRY_PASS`,
+  `FIRST_WEEKLY_REWARD_PASS`,
+  `NO_WEEKLY_REWARD_FARM_PASS`,
+  `VERIFIED_PLAY_MODE_PASS`.
+- [ ] **Actual Base portal → reserved dungeon server, durable
+  instance/session admission, configured event schedule,
+  contribution checks, real cross-server/TEST DataStore recovery,
+  final boss phases/art and cloud release NOT implemented.**
+  The physical gateway exists only in the disposable Studio fixture.
+- [ ] Provisional 100-gold reward and two-hour maximum window
+  require gameplay balancing and explicit rollout decisions.
+
+Receipt: `docs/testing/weekly-world-boss-v154-local-foundation-2026-09-21.md`. Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+All code/docs authored through GitHub; no publishing, main
+merge, force-push or player production DataStore test.
+
+## Previous v1.53 local regression checkpoint (historical)
+
 ## 21 September 2026 — interrupted crafting and local recovery
 
 - [x] Unique request tickets; old disconnected craft cannot release
