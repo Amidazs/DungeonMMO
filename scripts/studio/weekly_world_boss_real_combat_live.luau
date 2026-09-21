@@ -115,10 +115,14 @@ local function run()
         Parent = W,
         SpawnCFrame = CFrame.new(0, 5, 0),
         InstanceId = id,
-        HealthMultiplier = 2,
+        -- Shorten ONLY the disposable Play fixture's guardian health
+        -- so an unassisted client defeat completes in a short test.
+        HealthMultiplier = 0.1,
     })
     local guardian_health = assert(
         boss:FindFirstChildOfClass("Humanoid")).Health
+    local initial_gold = assert(profiles:get_character(
+        player.UserId, 1)).Gold
     local admitted = {[player.UserId] = true}
     local authority = Authority.new(
         runtime.ContributionService,
@@ -163,6 +167,34 @@ local function run()
     end, "real client hit and persisted server damage", 20)
     print("[World Boss Combat Live] REAL_CLIENT_HIT_PASS")
     print("[World Boss Combat Live] SERVER_CONTRIBUTION_PASS")
+
+    wait_for(function()
+        return boss.Humanoid.Health <= 0
+    end, "real client defeats the guardian without health injection", 20)
+    local bridge = runtime.WeeklyWorldBossSessionBridge
+    local defeated = bridge:record_defeat(id, boss)
+    assert(defeated.ok,
+        "real combat death did not persist through session bridge")
+    print("[World Boss Combat Live] REAL_CLIENT_BOSS_DEFEAT_PASS")
+
+    local contribution = runtime.ContributionService
+        :get_player_snapshot(id, player.UserId)
+    assert(contribution.ok and contribution.Damage > 0,
+        "weekly reward must require the server's actual damage")
+    assert(sessions:set_member_completion_eligibility(
+        id, player.UserId, true).ok,
+        "server-confirmed contributing member eligibility failed")
+    local reward = bridge:grant_reward(id, player.UserId)
+    assert(reward.ok and reward.gold_granted == 100
+        and not reward.already_applied,
+        "verified guardian defeat must grant one weekly reward")
+    local duplicate = bridge:grant_reward(id, player.UserId)
+    assert(duplicate.ok and duplicate.already_applied
+        and duplicate.gold_granted == 0
+        and assert(profiles:get_character(player.UserId, 1)).Gold
+            == initial_gold + 100,
+        "the same encounter must not grant the weekly reward twice")
+    print("[World Boss Combat Live] WEEKLY_REWARD_ONCE_PASS")
     boss:Destroy()
 end
 
