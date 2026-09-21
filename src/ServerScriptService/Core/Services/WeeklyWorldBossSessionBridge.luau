@@ -57,16 +57,25 @@ end
 --   session_id: string; already-created authoritative dungeon session.
 --   start_at: number; trusted explicit UTC start of scheduled event.
 --   end_at: number; trusted exclusive UTC end of scheduled event.
+--   destination_place_id: number?; explicit dedicated world-boss place.
 -- Returns:
 --   any: once-only durable session snapshot or a reasoned rejection.
 function WeeklyWorldBossSessionBridge:issue(
     session_id: string,
     start_at: number,
-    end_at: number
+    end_at: number,
+    destination_place_id: number?
 ): any
     local window = Window.resolve(self._clock(), start_at, end_at)
     if not window.ok then
         return window
+    end
+    if destination_place_id ~= nil and (
+        type(destination_place_id) ~= "number"
+        or destination_place_id <= 0
+        or destination_place_id % 1 ~= 0
+    ) then
+        return {ok = false, reason = "InvalidWorldBossPlaceId"}
     end
     local session = self._sessions:get(session_id)
     if not session or (session.State ~= "Creating"
@@ -90,6 +99,7 @@ function WeeklyWorldBossSessionBridge:issue(
     end
     local snapshot = {
         BossId = BOSS_ID,
+        DestinationPlaceId = destination_place_id,
         WeekStart = window.WeekStart,
         WindowStart = start_at,
         WindowEnd = end_at,
