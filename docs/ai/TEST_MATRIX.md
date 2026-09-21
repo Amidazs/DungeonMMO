@@ -1,5 +1,33 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — LOCAL-ONLY boss combat/recovery continuation
+
+- [x] First-and-only legitimate lethal boss hit persists server-side
+  contribution and earns one weekly reward, immediate duplicate zero:
+  corrected real-client one-attack Play at
+  `5b7edc2675fd8fc6e9b6d0908bdf263742cf88b6` PASS.
+- [x] Earlier post-callback existing client-combat/two-client boss
+  Play and prior target-filter, weekly-reward-retry and profile-exit
+  suites passed on the earlier tested source.
+- [x] Existing failed-save reward retry: Base **17 assertions** and
+  Dungeon **17 assertions** passed on the earlier tested source;
+  separate previously tested profile-save departure **11 assertions**.
+- [ ] Expanded lethal-target bridge assertions, post-save lease-release
+  failure recovery test and full latest-head regression remain
+  **pending** because the desktop became unavailable.
+- [ ] Genuine two-client healing or Ward skill during the encounter
+  remains pending. The experimental MageHeal fixture failed and
+  was reverted; server Mend now records actual positive healing
+  but has no fresh dedicated client-skill acceptance.
+- [ ] Four-player party/full-wipe/independent return and additional
+  in-memory failure-injection regressions remain local follow-up.
+- [ ] Published TEST transport, true new-server same-account reconnect
+  and cloud DataStore/MemoryStore deliberately deferred at user request.
+
+Receipt: `docs/testing/weekly-world-boss-v154-local-backend-continuation-2026-09-21.md`.
+
+## Earlier 21 September party resilience checkpoint (historical)
+
 ## 21 September 2026 — two-client world-boss party resilience
 
 - [x] Opt-in primitive enclosed arena provides stable
