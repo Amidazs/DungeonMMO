@@ -307,6 +307,18 @@ local function run()
         "Absent player must never receive an automatic revive")
     assert(sessions:get(session_id).Checkpoint.Id == checkpoint_id,
         "Boss wipe must preserve the same active checkpoint")
+    print(
+        "[Four Client Boss Disconnect] AFTER_WIPE_STATES "
+        .. tostring(encounter_state(
+            sessions, session_id, "CombatRoom1"
+        )) .. " "
+        .. tostring(encounter_state(
+            sessions, session_id, "CombatRoom2"
+        )) .. " "
+        .. tostring(encounter_state(
+            sessions, session_id, "Depth1Boss"
+        ))
+    )
     assert(encounter_state(sessions, session_id, "CombatRoom1")
             == "Cleared"
         and encounter_state(sessions, session_id, "CombatRoom2")
