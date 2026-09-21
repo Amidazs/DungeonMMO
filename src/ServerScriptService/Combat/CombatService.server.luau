@@ -2336,7 +2336,12 @@ local function run_mend_pulse(
         skill_definition.PULSE_HEAL * ProgressionRuntimeState.get_heal_multiplier(player.UserId)
     )
     if valid and mend_target and healed > 0 then
-        DungeonProgressionBridge.award_heal(player, skill_definition.ID, mend_target, healed)
+        DungeonProgressionBridge.award_heal(
+            player, skill_definition.ID, mend_target, healed
+        )
+        DungeonContributionBridge.record_heal(
+            player, mend_target, healed, skill_definition.ID
+        )
     end
 
     if not valid then
