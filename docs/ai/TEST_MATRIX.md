@@ -1,5 +1,27 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — eligible support-threat follow-up
+
+Source head: `b569435c9eb3cd4971eec06ca1baeeb4f17f4a09`.
+
+- [x] Stale threat belonging only to an ineligible player cannot
+  activate support aggro. Eligible damage restores valid engagement.
+- [x] Six fresh Rojo builds and `git diff --check` PASS.
+- [x] Focused unpublished Studio threat contract: **51 assertions PASS**.
+- [x] Real two-client normal-enemy support fixture:
+  `VERIFIED_MULTIPLAYER_PASS`.
+- [x] Real two-client normal-enemy aggro fixture:
+  `VERIFIED_MULTIPLAYER_PASS`.
+- [ ] Fresh isolated world-boss aggro regression: attempted, but
+  the outer Studio process exceeded 110 seconds. Earlier passing
+  world-boss result belongs to an older head.
+- [ ] Real world-boss healing/Ward, four real players and
+  multi-enemy room/wipe/disconnect acceptance.
+
+Receipt:
+`docs/testing/combat-support-eligible-threat-followup-2026-09-21.md`.
+
+
 ## 21 September 2026 — support threat follow-on (LOCAL VERIFIED)
 
 Tested head:
