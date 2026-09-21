@@ -427,6 +427,21 @@ local function route_recoverable_session(player: Player, session: any): boolean
     end
 
     local dungeon_place_id, place_error = configured_dungeon_place_id()
+    local world_boss = session.InstanceState
+        and session.InstanceState.WeeklyWorldBoss
+    if world_boss then
+        local configured = ServerScriptService:GetAttribute(
+            "DungeonMMOWorldBossPlaceId")
+        if configured == world_boss.DestinationPlaceId
+            and type(configured) == "number" and configured > 0
+        then
+            dungeon_place_id = configured
+            place_error = nil
+        else
+            dungeon_place_id = nil
+            place_error = "WorldBossPlaceNotConfigured"
+        end
+    end
     if not dungeon_place_id then
         print(string.format(
             "[Base Runtime] Recoverable session %s found for %s; %s.",
@@ -509,6 +524,23 @@ local function load_player(player: Player)
         return
     end
 
+    -- A returning world-boss member's old active-session index is
+    -- released only AFTER Base has claimed the handoff and loaded
+    -- that account. Other party members remain in their boss session.
+    if returned_from_dungeon and not RunService:IsStudio() then
+        local data = player:GetJoinData().TeleportData
+        local returned = sessions:get(data.SessionId)
+        if returned and returned.InstanceState
+            and returned.InstanceState.WeeklyWorldBoss
+        then
+            local cleared = sessions:release_world_boss_return_index(
+                returned.SessionId, player.UserId)
+            if not cleared.ok then
+                warn("[World Boss Base] Return index cleanup failed: "
+                    .. tostring(cleared.reason))
+            end
+        end
+    end
     loaded_users[player.UserId] = true
     local market_recovery = market:recover_user(player.UserId)
     if market_recovery.ok ~= true then
