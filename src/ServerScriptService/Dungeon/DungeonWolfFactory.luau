@@ -84,7 +84,7 @@ function DungeonWolfFactory.create(options: any): Model
     wolf:SetAttribute("CreatureFamily", "Beast")
     wolf:SetAttribute("LootComplete", false)
     wolf:SetAttribute("SkinningClaimed", false)
-    wolf:SetAttribute("BestiaryCreatureId", "")
+    wolf:SetAttribute("BestiaryCreatureId", nil)
 
     -- Register the fully constructed server entity before enabling AI.
     CollectionService:AddTag(wolf, WOLF_TAG)
