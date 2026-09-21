@@ -38,7 +38,7 @@ assert(not string.find(environment_source, environment_anchor,
 runtime_source.Source = string.sub(
     environment_source, 1, environment_position - 1)
     .. '_G.TempProfessionLiveRuntime.TestEnvironment = '
-    .. 'base_environment\\n'
+    .. 'base_environment\n'
     .. string.sub(environment_source, environment_position)
 
 local channel = Instance.new("RemoteEvent")
