@@ -1,6 +1,21 @@
 # Canonical Roadmap
 
-**Latest ChatGPT-authored roadmap update: v1.53 (Leatherworking / Enchanting staged, 21 September 2026).**
+**Latest GitHub roadmap progress supplement: v1.55 (real
+four-client combat, world-boss support and threat-only full-wipe
+cleanup, 21 September 2026).**
+Read [v1.55 combat and wipe progress](DungeonMMO_Roadmap_v1_55_Combat_Threat_Wipe_20260921.md)
+and [the real multiplayer test receipt](../testing/four-player-full-wipe-threat-reset-2026-09-21.md).
+All six local Rojo compositions, 51 focused threat assertions,
+30/30 Dungeon backend and 14/14 Base profession regressions
+passed at `739e747`. Real four-client, two-enemy gameplay proved
+actual player departure and all-dead threat cleanup; genuine
+world-boss aggro and support passed on the **correct isolated
+world-boss composition**. This is threat-only cleanup, not enemy
+health/spawn or full session restart. No main merge, place
+publish or production DataStore change was made.
+
+
+**Earlier roadmap supplement: v1.53 (Leatherworking / Enchanting staged, 21 September 2026).**
 Read [the v1.53 pending-verification roadmap](DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md)
 and [the staged verification plan](../testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md).
 GitHub now contains Skinning, Leatherworking and Enchanting progression,
@@ -13,7 +28,7 @@ v1.52 results remain the latest verified checkpoint. No Remote Desktop,
 local pull, TEST/PROD publish, real player DataStore mutation, force-push
 or main merge occurred for v1.53 staging.
 
-**Latest ChatGPT-authored roadmap update: v1.52 (non-boss Event variations and cross-profession backend, 20 September 2026).**
+**Earlier roadmap supplement: v1.52 (non-boss Event variations and cross-profession backend, 20 September 2026).**
 Read [the v1.52 backend roadmap](DungeonMMO_Roadmap_v1_52_Event_Variations_And_Professions.md)
 and [the dated local Studio test report](../testing/phase4-nonboss-event-profession-chain-2026-09-20.md).
 The existing, separately gated after-Room2 Event room can now host
