@@ -36,12 +36,17 @@ function WorldBossCombatAuthority:record_for_user(
     local boss = context and context.Boss
     local humanoid = boss and boss:FindFirstChildOfClass("Humanoid")
     local player = Players:GetPlayerByUserId(user_id)
+    local killing_blow = type(event) == "table"
+        and event.Type == "DamageDealt"
+        and type(event.Metadata) == "table"
+        and event.Metadata.VerifiedLethalHit == true
     if not context or not context.Admitted[user_id]
         or not player or not player.Character
         or player.Character:GetAttribute("DungeonRunParticipant") ~= true
         or player.Character:GetAttribute("DungeonEncounterId")
             ~= "WeeklyBoss:" .. tostring(context.SessionId)
-        or not humanoid or humanoid.Health <= 0
+        or not humanoid
+        or (humanoid.Health <= 0 and not killing_blow)
     then
         return {ok = false, reason = "WorldBossCombatNotActive"}
     end
