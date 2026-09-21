@@ -28,19 +28,24 @@ end
 
 -- Only the TEMP Studio content catalogue receives the alternate wolf pack.
 local catalog = RS.Core.Shared.DungeonRuntimeContentCatalog
-replace_once(catalog,
-    'pack_entry(\n                    "Marauders",\n'
-        .. '                    "Marauder",\n'
-        .. '                    2,\n'
-        .. '                    "Room1_Marauder_",\n'
-        .. '                    100\n'
-        .. '                ),',
-    'pack_entry(\n                    "Beasts",\n'
-        .. '                    "Wolf",\n'
-        .. '                    2,\n'
-        .. '                    "Room1_Wolf_",\n'
-        .. '                    100\n'
-        .. '                ),')
+-- Include the empty BonusRules of Temple Room1: Mine Room1 also uses
+-- two Marauders but has nonempty rules and must not be changed.
+local original_pack = 'StandardRoom1 = table.freeze({\\n'
+    .. '            Entries = table.freeze({\\n'
+    .. '                pack_entry(\\n'
+    .. '                    "Marauders",\\n'
+    .. '                    "Marauder",\\n'
+    .. '                    2,\\n'
+    .. '                    "Room1_Marauder_",\\n'
+    .. '                    100\\n'
+    .. '                ),\\n'
+    .. '            }),\\n'
+    .. '            BonusRules = table.freeze({}),'
+local wolf_pack = original_pack
+    :gsub('"Marauders"', '"Beasts"')
+    :gsub('"Marauder"', '"Wolf"')
+    :gsub('"Room1_Marauder_"', '"Room1_Wolf_"')
+replace_once(catalog, original_pack, wolf_pack)
 replace_once(SSS.Dungeon.DungeonRuntime,
     'local runtime = RuntimeServices.new("Dungeon")',
     'local runtime = RuntimeServices.new("Dungeon")\n'
