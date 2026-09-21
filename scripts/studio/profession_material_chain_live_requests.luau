@@ -66,6 +66,9 @@ channel.OnClientEvent:Connect(function(command, recipe_id)
         craft:FireServer(recipe_id, {
             MinigameId = "ForgedClientSuccess", Succeeded = true,
         })
+    elseif command == "CraftBurst" then
+        craft:FireServer(recipe_id)
+        craft:FireServer(recipe_id)
     end
 end)
 channel:FireServer("Ready")
@@ -246,6 +249,46 @@ local function run()
         and duplicate.reason == "MissingMaterials",
         "crafted output must not duplicate on repeated client requests")
     print("[Profession Material Live] DUPLICATE_DENIED_PASS")
+
+    -- Two actual client RemoteEvent requests race for just one available
+    -- iron bar. They may serialize or hit the guard, but cannot double-pay.
+    local extra = runtime.InventoryService:add_item(
+        player.UserId, "iron_ore", 2)
+    assert(extra.ok, "failed to seed the single burst craft")
+    local smith = assert(runtime.TestEnvironment:get(
+        "Base.Profession.BlacksmithingPlaceholder"))
+    position_at(player, smith)
+    table.clear(results)
+    channel:FireClient(player, "CraftBurst", "smelt_iron_bar")
+    local burst = {}
+    wait_for(function()
+        while #results > 0 do
+            table.insert(burst, table.remove(results, 1))
+        end
+        return #burst == 2 and burst
+    end, "two real client craft-burst results", 12)
+    local successful = 0
+    local rejected = 0
+    for _, response in ipairs(burst) do
+        if response.ok == true then
+            successful += 1
+            assert(response.item_id == "iron_bar",
+                "burst crafted an unexpected item")
+        else
+            rejected += 1
+            assert(response.reason == "MissingMaterials"
+                or response.reason == "CraftRequestInProgress",
+                "burst rejected for unexpected reason: "
+                    .. tostring(response.reason))
+        end
+    end
+    local after_burst = assert(runtime.ProfileService:get_character(
+        player.UserId, 1))
+    assert(successful == 1 and rejected == 1
+        and Inventory.count_item(after_burst, "iron_bar") == 1
+        and Inventory.count_item(after_burst, "iron_ore") == 0,
+        "rapid client requests must consume inputs only once")
+    print("[Profession Material Live] RAPID_DUPLICATE_PASS")
 
     local saved = runtime.ProfileService:save(
         player.UserId, "ProfessionMaterialLiveFixture")
