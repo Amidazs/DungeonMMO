@@ -124,6 +124,13 @@ check(
     "Paid revive must return to the active checkpoint."
 )
 check(session.WipeDecisionEndsAt == nil, "Successful paid revive must clear the wipe deadline.")
+local repeated_paid = deaths:complete_paid_revive(player)
+check(
+    repeated_paid.ok == false
+        and repeated_paid.reason == "MemberNotDead"
+        and #spawns == 2,
+    "A duplicate paid callback must never spawn an already active member."
+)
 
 local third_death = deaths:on_player_died(player, CFrame.new(30, 3, -30))
 check(third_death.ok == true and session.Members["101"].Mode == "Spectating", "Death after paid revive must return to Spectating and reopen the wipe window.")
@@ -134,6 +141,25 @@ check(before_expiry.failed == false and session.State == "Active", "Wipe must re
 now = 1030
 local expiry = deaths:tick(now)
 check(expiry.failed == true and session.State == "Failed", "Wipe deadline expiry must mark the run Failed.")
+local spawns_at_failure = #spawns
+local late_paid = deaths:complete_paid_revive(player)
+check(
+    late_paid.ok == false
+        and late_paid.reason == "SessionNotActive"
+        and #spawns == spawns_at_failure,
+    "A paid callback after a terminal wipe must not respawn a member."
+)
+local late_request = deaths:request_paid_revive(player)
+check(
+    late_request.ok == false
+        and late_request.reason == "SessionNotActive",
+    "A failed session must not offer a new paid revive."
+)
+check(
+    session.State == "Failed"
+        and session.FailureReason == "WipeReviveTimeout",
+    "A late purchase callback must never undo the terminal failure."
+)
 
 -- Party safety: one Active member means the global wipe timer must not open.
 session = {
@@ -153,5 +179,27 @@ local party_deaths = DungeonDeathService.new(fake_sessions, fake_checkpoint, "se
 })
 check(party_deaths:on_player_died(player, CFrame.new()).ok == true, "Party member death must be accepted.")
 check(session.WipeDecisionEndsAt == nil, "One living party member must keep encounter running without global wipe pause.")
+
+-- A paid grant must not respawn someone who has disconnected.
+local departing_member = session.Members["101"]
+departing_member.Connected = false
+local before_departure_spawns = #spawns
+local departed_paid = party_deaths:complete_paid_revive(player)
+check(
+    departed_paid.ok == false
+        and departed_paid.reason == "MemberDisconnected"
+        and #spawns == before_departure_spawns,
+    "Late paid callbacks must not spawn a departed party member."
+)
+
+-- A stale callback must not revive a player removed from session membership.
+session.Members["101"] = nil
+local removed_paid = party_deaths:complete_paid_revive(player)
+check(
+    removed_paid.ok == false
+        and removed_paid.reason == "NotMember"
+        and #spawns == before_departure_spawns,
+    "A paid callback must reject a player absent from the run roster."
+)
 
 print(string.format("[Dungeon Death/Revive Tests] PASS: %d assertions.", assertions))
