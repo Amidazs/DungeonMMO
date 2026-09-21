@@ -1,5 +1,38 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — interrupted craft and same-UserId recovery handoff
+
+Active source includes unique craft lock tickets and post-preparation
+checks of both ticket ownership and the exact original Player.
+This closes the stale-completion/new-lock-release risk on a same-UserId
+rejoin within one server's runtime. The pure same-UserId lifecycle
+uses a shared in-memory adapter: old request paused → release/save →
+same UserId reload → old request resumes but cannot consume/award →
+new request successfully crafts and persists exactly once.
+
+Studio Base/Dungeon profession focused suites now pass **14/14**
+each (21 craft-guard and 20 reconnect assertions). A real two-client
+Base Play test paused server-side crafting and made the originating
+client actually leave. The same UserId was reloaded **by the test
+driver**, not by a new network connection. The old handler resumed
+without touching the reloaded materials; an independent player
+continued, and a distinct replacement account joined. Material-backed
+Base crafting, wolf Dungeon encounter and the 30-suite Dungeon
+regression were rerun and passed after the source fix.
+
+Next: only if permitted by release scope, test *actual* same-account
+relogin to a published TEST environment and cross-server lease/
+DataStore handoff; do not use real-player production data to satisfy
+the Studio test. Keep finished wolf art and dedicated animal AI as a
+separate content gate. For any further source/fixture/roadmap changes,
+edit **in GitHub only**, fast-forward a clean Windows worktree,
+then build and run disposable unpublished Studio validation.
+No production publish, force push or main merge occurred.
+
+Receipt: `docs/testing/profession-v153-interrupted-reconnect-local-2026-09-21.md`.
+
+## Earlier 21 September handoff (historical)
+
 ## 21 September 2026 — v1.53 latest local backend handoff
 
 The active branch now includes an opt-in `ForestWolf` factory and
