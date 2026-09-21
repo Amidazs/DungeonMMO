@@ -234,10 +234,12 @@ local function verify_death_and_respawn(players, runtime, session_id)
     humanoid.Died:Connect(function()
         print("[World Boss Party Live] HUMANOID_DIED_SIGNAL")
     end)
-    -- Deliberately force this member's death only in the disposable
-    -- fixture: actual client guardian kill was proven separately above.
-    humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-    humanoid.Health = 0
+    -- Deliberately kill this member only in the disposable fixture:
+    -- actual client guardian kill was proven separately above.
+    humanoid:TakeDamage(humanoid.MaxHealth * 2)
+    if humanoid.Health > 0 then
+        original:BreakJoints()
+    end
     print("[World Boss Party Live] FORCED_DEATH "
         .. tostring(humanoid.Health) .. " "
         .. tostring(humanoid:GetState()))
