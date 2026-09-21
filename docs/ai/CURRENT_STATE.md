@@ -1,5 +1,35 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — real four-client wipe threat reset VERIFIED
+
+Latest gameplay source/test head:
+`739e747d88d93ff00ed30497e9473edd17b037f4`.
+Real four-client unpublished Dungeon Play proved independent aggro
+from two actual Marauders, effective MageHeal threat, Fighter Taunt
+retake, dead-healer fallback, genuine DPS departure cleanup and
+**all remaining clients dead**. After three seconds with no
+eligible target, both previously engaged controllers cleared
+their threat ledgers; server log:
+`REAL_FULL_WIPE_THREAT_RESET_PASS`, overall
+`VERIFIED_FOUR_CLIENT_PASS`.
+
+Same-head six Rojo builds and focused ThreatService 51, Dungeon
+backend 30/30 and Base professions 14/14 PASS. Correct isolated
+`world-boss.project.json` real two-client guardian aggro and
+guardian MageHeal/Ward/Mend fixtures both
+`VERIFIED_MULTIPLAYER_PASS`, superseding the older incorrect-
+composition timeout. This resets **threat only**, not enemy HP,
+spawn locations, weekly admission, rewards or full dungeon
+session/checkpoint state. Full session wipe/retry, true reconnect,
+cloud and published TEST remain pending.
+
+Only GitHub source/docs edits and unpublished local tests were used.
+No publish, main merge or production data mutation. Receipt:
+`docs/testing/four-player-full-wipe-threat-reset-2026-09-21.md`.
+Roadmap supplement:
+`docs/roadmap/DungeonMMO_Roadmap_v1_55_Combat_Threat_Wipe_20260921.md`.
+
+
 ## 21 September 2026 — eligible-threat support follow-up
 
 Current tested candidate: `b569435c9eb3cd4971eec06ca1baeeb4f17f4a09`.
