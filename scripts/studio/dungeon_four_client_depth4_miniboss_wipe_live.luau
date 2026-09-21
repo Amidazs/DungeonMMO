@@ -233,7 +233,7 @@ local function run()
         "Depth4 fixture must preserve the six-slot dungeon plan")
 
     local first = enter_room(
-        players[1], "Temple.Room1.Trigger", 2
+        players[1], "Temple.Depth4.Room1.Trigger", 2
     )
     clear_prerequisite(first, "Room1")
     wait_for(function()
@@ -244,7 +244,7 @@ local function run()
     print("[Four Client Depth4 MiniBoss Wipe] CLEARED_ROOMS_PRESERVED_PASS")
 
     local bosses = enter_room(
-        players[1], "Temple.Room2.Trigger", 1
+        players[1], "Temple.Depth4.Room2.Trigger", 1
     )
     assert(#bosses == 1, "Depth4 Room2 must have one mini-boss")
     local original_boss = bosses[1]
@@ -303,7 +303,7 @@ local function run()
     print("[Four Client Depth4 MiniBoss Wipe] FOUR_BOSS_CHECKPOINT_REVIVES_PASS")
 
     local fresh = enter_room(
-        players[1], "Temple.Room2.Trigger", 1
+        players[1], "Temple.Depth4.Room2.Trigger", 1
     )
     assert(#fresh == 1 and fresh[1] ~= original_boss,
         "Boss retry must spawn exactly one different boss")
