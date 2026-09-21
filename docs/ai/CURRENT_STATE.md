@@ -1,5 +1,33 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — animal-only Skinning verified in local Studio
+
+Four Rojo compositions and both 12-suite focused profession runners
+passed (363 focused assertions in each). The 42-assertion species
+eligibility, 16-assertion corpse runtime and 11-assertion Dungeon
+cleanup tests passed; the broad Dungeon backend matrix passed 30/30.
+Two real Base Play fixtures passed: an actual client RawHideCache grant
+followed by authoritative prompt depletion, and a temporary
+server-created, dead/looted wolf corpse granting precisely one hide
+through the actual server profession runtime. Base live near/far
+Leatherworking/Enchanting routing also passed. The earlier hide-cache
+fixture timed out only because its second attempted activation expected
+another result after the prompt was already correctly disabled.
+
+These runs used Roblox Studio's CLI RunScript on unpublished local
+places when a separate direct MCP client still could not attach to the
+active Studio proxy; the test outcomes are from actual Studio, not
+in-memory-only simulation. Source, test and documentation edits remain
+GitHub-only. Source code, authored animal factories and cloud places
+were not published or merged to main. Actual authored animal dungeon
+combat/reward/skin, material-backed live crafting, multiplayer races,
+disconnect/retry and real-user DataStore validation remain open.
+
+Latest receipt:
+`docs/testing/animal-only-corpse-skinning-studio-verified-2026-09-21.md`.
+
+## Historical staging checkpoint — before the above tests
+
 ## 21 September 2026 — animal-only Skinning backend implementation; Studio pending
 
 After v1.53's partially passing profession tests, the active branch gained
