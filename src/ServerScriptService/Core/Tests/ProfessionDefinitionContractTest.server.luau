@@ -71,7 +71,8 @@ local allowed = {}
 for _, class_id in ipairs(basic.AllowedBaseClasses or {}) do
     allowed[class_id] = true
 end
-check(allowed.Fighter and allowed.Mage and allowed.Ranger, "Crafted gloves must be eligible for all three starting classes.")
+check(allowed.Fighter and allowed.Mage and allowed.Ranger and allowed.Rogue,
+    "Foundation crafted gloves must stay usable by every base class.")
 
 for _, recipe_id in ipairs({
     "smelt_iron_bar",
