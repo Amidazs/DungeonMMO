@@ -21,6 +21,8 @@ local RS = game:GetService("ReplicatedStorage")
 local config = require(RS.Combat.Shared.CombatConfig)
 local attack = RS.Combat.Remotes:WaitForChild(
     config.REMOTES.ATTACK_REQUEST)
+local skill = RS.Combat.Remotes:WaitForChild(
+    config.REMOTES.SKILL_REQUEST)
 local channel = RS:WaitForChild("NormalAggroChannel_TEMP")
 
 channel.OnClientEvent:Connect(function(command)
@@ -31,6 +33,8 @@ channel.OnClientEvent:Connect(function(command)
             attack:FireServer()
             task.wait(0.72)
         end
+    elseif command == "Taunt" then
+        skill:FireServer("Taunt")
     end
 end)
 channel:FireServer("Ready")
@@ -48,6 +52,12 @@ local Workspace = game:GetService("Workspace")
 
 local config = require(RS.Combat.Shared.CombatConfig)
 local ThreatService = require(SSS.Combat.ThreatService)
+local ProgressionRuntimeState = require(
+    SSS.Core.Services.ProgressionRuntimeState
+)
+local ProfileSchema = require(
+    RS.Core.Shared.ProfileSchema
+)
 local channel = RS:WaitForChild("NormalAggroChannel_TEMP")
 local marauder_config = config.TRAINING_MARAUDER
 local ready = {}
@@ -138,6 +148,24 @@ local function run()
     local enemy_root = assert(enemy:FindFirstChild("HumanoidRootPart"))
     local near_player = players[1]
     local far_player = players[2]
+
+    local fighter = ProfileSchema.create_default(
+        far_player.UserId).Characters.Slot1
+    fighter.Identity.RaceId = "Human"
+    fighter.Identity.BaseClassId = "Fighter"
+    fighter.Identity.ClassId = "Fighter"
+    fighter.Identity.CreationStage = "Complete"
+    fighter.Progression.Skills.Taunt = {
+        Known = true,
+        PurchasedRank = 1,
+    }
+    fighter.Progression.Loadout[3] = "Taunt"
+    ProgressionRuntimeState.set_character(
+        far_player.UserId, fighter)
+    assert(ProgressionRuntimeState.is_skill_usable(
+        far_player.UserId, "Taunt"),
+        "normal-enemy Taunt must be authorized")
+
     local near_character = get_character(near_player)
     local far_character = get_character(far_player)
 
@@ -204,14 +232,19 @@ local function run()
 
     local humanoid = assert(enemy:FindFirstChildOfClass("Humanoid"))
     local health_before_taunt = humanoid.Health
-    ThreatService.taunt(enemy, far_player, 5)
+    local enemy_root = assert(
+        enemy:FindFirstChild("HumanoidRootPart"))
+    place(far_character, enemy_root, -3.5)
+    channel:FireClient(far_player, "Taunt")
     wait_for(function()
         return enemy:GetAttribute("MarauderAggroTargetUserId")
             == far_player.UserId
-    end, "zero-damage taunt takeover", 8)
+            and ThreatService.get_threat(enemy, far_player.UserId)
+                > ThreatService.get_threat(enemy, near_player.UserId)
+    end, "real zero-damage Taunt skill takeover", 10)
     assert(humanoid.Health == health_before_taunt,
-        "taunt must not fabricate health damage")
-    print("[Normal Aggro Live] ZERO_DAMAGE_TAUNT_PASS")
+        "Taunt skill must not fabricate health damage")
+    print("[Normal Aggro Live] REAL_TAUNT_SKILL_PASS")
 
     far_character:SetAttribute(
         "RogueThreatDropUntil", os.clock() + 1.5)
