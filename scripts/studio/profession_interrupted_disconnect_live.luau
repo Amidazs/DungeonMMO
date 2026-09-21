@@ -28,20 +28,26 @@ local function replace_once(owner, previous, replacement)
         .. replacement .. string.sub(source, position + #previous)
 end
 
+local runtime_probe = Instance.new("BindableFunction")
+runtime_probe.Name = "TwoClientProfessionRuntimeProbe_TEMP"
+runtime_probe.Parent = SSS
+
 local base = SSS.Base.BaseRuntime
 local source_anchor = 'local runtime = RuntimeServices.new("Base")'
 replace_once(base, source_anchor, source_anchor
-    .. '\n_G.TempTwoClientProfessions = runtime')
+    .. '\nlocal probe = game:GetService("ServerScriptService")'
+    .. ':WaitForChild("TwoClientProfessionRuntimeProbe_TEMP")'
+    .. '\nprobe.OnInvoke = function() return runtime end'
+    .. '\nprobe:SetAttribute("Ready", true)')
 local environment_anchor =
     'local progression_controller = BaseProgressionController.new({'
 replace_once(base, environment_anchor,
-    '_G.TempTwoClientProfessions.TestEnvironment = base_environment\n'
+    'runtime.TestEnvironment = base_environment\n'
     .. environment_anchor)
 
 -- The delay applies only to a test-selected UserId and recipe. It is
 -- injected into the disposable place, never into versioned Base code.
-local pause_anchor =
-    '_G.TempTwoClientProfessions.TestEnvironment = base_environment\n'
+local pause_anchor = 'runtime.TestEnvironment = base_environment\n'
 replace_once(base, pause_anchor, pause_anchor .. [==[
 local original_profession_prepare =
     runtime.ProfessionService.prepare_craft
@@ -387,7 +393,12 @@ local function run()
         return if #current == 2 then current else nil
     end, "two real Studio clients", 35)
     local runtime = wait_for(function()
-        return _G.TempTwoClientProfessions
+        local probe = game:GetService("ServerScriptService")
+            :FindFirstChild("TwoClientProfessionRuntimeProbe_TEMP")
+        if probe and probe:GetAttribute("Ready") then
+            return probe:Invoke()
+        end
+        return nil
     end, "Base runtime", 25)
     for _, player in ipairs(players) do
         wait_for(function()
@@ -425,6 +436,7 @@ end)
 server:Destroy()
 client:Destroy()
 channel:Destroy()
+runtime_probe:Destroy()
 assert(ok and result == "PASS",
     "Two-client profession test failed: " .. tostring(result))
 print("[Two Client Professions] VERIFIED_MULTIPLAYER_PASS")
