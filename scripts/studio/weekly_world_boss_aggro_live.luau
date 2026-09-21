@@ -196,14 +196,28 @@ local function run()
     end, "nearest fallback before threat", 12)
     print("[World Boss Aggro Live] NEAREST_FALLBACK_PASS")
 
-    channel:FireClient(far_player, "StrikeOnce")
+    -- Reposition for each actual client slash. The guardian may
+    -- move/turn while the first Studio client finishes spawning.
+    -- No test-only threat or synthetic damage is injected.
+    for strike = 1, 3 do
+        local root = assert(boss:FindFirstChild("HumanoidRootPart"))
+        local position = root.Position + Vector3.new(0, 0, -2.2)
+        far_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+            position, root.Position
+        )
+        channel:FireClient(far_player, "StrikeOnce")
+        task.wait(0.85)
+        if ThreatService.get_threat(boss, far_player.UserId) > 0 then
+            break
+        end
+    end
     wait_for(function()
         return ThreatService.get_threat(
             boss, far_player.UserId) > 0
             and boss:GetAttribute("MarauderAggroTargetUserId")
                 == far_player.UserId
             and boss:GetAttribute("MarauderAggroMode") == "Threat"
-    end, "far player takes aggro after first damage", 15)
+    end, "far player takes aggro after real client damage", 8)
     print("[World Boss Aggro Live] FIRST_DAMAGE_THREAT_PASS")
 
     -- The threat holder is deliberately farther away than the near
