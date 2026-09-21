@@ -62,6 +62,8 @@ function ThreatService.add_threat(
 
     local ledger = get_ledger(enemy)
     local updated = (ledger[user_id] or 0) + amount
+    assert(valid_amount(updated),
+        "Threat total must remain positive and finite")
     ledger[user_id] = updated
     return updated
 end
@@ -104,6 +106,8 @@ function ThreatService.taunt(
         ledger[player.UserId] or 0,
         highest + bonus_threat
     )
+    assert(valid_amount(forced),
+        "Taunt must not overflow the enemy threat ledger")
     ledger[player.UserId] = forced
     return forced
 end
@@ -143,7 +147,13 @@ function ThreatService.record_support(
     local affected = 0
 
     for enemy, users in pairs(candidate_users) do
-        if users[caster.UserId] == true and users[target.UserId] == true then
+        local ledger = ledgers[enemy]
+        if enemy.Parent
+            and ledger
+            and next(ledger) ~= nil
+            and users[caster.UserId] == true
+            and users[target.UserId] == true
+        then
             ThreatService.add_threat(enemy, caster.UserId, threat_amount)
             affected += 1
         end
@@ -199,6 +209,23 @@ function ThreatService.select_target(
     end
 
     return best_player, if best_player then "Nearest" else "None"
+end
+
+-- Args:
+--   user_id: number; authenticated ID of the departing player.
+-- Returns:
+--   nil: discards their threat and candidacy across active enemies.
+function ThreatService.remove_player(user_id: number)
+    assert(valid_user_id(user_id),
+        "Departing threat user ID must be a valid player identity")
+
+    for _, ledger in pairs(ledgers) do
+        ledger[user_id] = nil
+    end
+
+    for _, users in pairs(candidate_users) do
+        users[user_id] = nil
+    end
 end
 
 -- Args:
