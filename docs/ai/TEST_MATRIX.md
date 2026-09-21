@@ -1,5 +1,36 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — animal-only Skinning Studio validation complete
+
+- [x] Four Rojo compositions PASS with animal-only runtime code.
+- [x] Base **12/12** and Dungeon **12/12** profession suites PASS,
+  including **42** eligibility and **16** corpse-runtime assertions
+  in each composition (363 focused assertions per composition).
+- [x] Modified DungeonEnemyCleanup test **11 assertions PASS**;
+  broad Dungeon backend matrix **30/30 PASS**.
+- [x] Genuine Base Play-mode client-to-server RawHideCache prompt:
+  successful first hide grant, then client node disabled and no repeat.
+  Previous timeout resulted from expecting a second Gather response
+  despite correct client-side personal-node depletion.
+- [x] Genuine Base Play-mode temporary server-authored wolf corpse:
+  no prompt while living/unlooted, real client prompt grants one hide
+  only after death/loot, per-corpse claim and prompt disable PASS.
+- [x] Actual Base Play-mode near/far Leatherworking/Enchanting request
+  routing: far is rejected; near reaches service (MissingMaterials).
+- [ ] Full authored animal dungeon encounter with actual combat/reward
+  and retained-corpse client Skinning is not tested or implemented.
+- [ ] Material-backed client crafting through final enchanted equipment,
+  two-client contested corpse/craft concurrency, disconnect/retry and
+  real-player DataStore/cloud TEST remain pending.
+
+Actual Studio was used via the supported RunScript CLI after the
+separate direct MCP-client probe could not reach the Studio session.
+Only the authored GitHub test files were executed in disposable,
+unpublished local places. Full receipt:
+`docs/testing/animal-only-corpse-skinning-studio-verified-2026-09-21.md`.
+
+## Historical staging checkpoint — before the above tests
+
 ## 21 September 2026 — animal-only Skinning backend staged; Studio gate OPEN
 
 - [x] GitHub-only eligibility: explicitly server-tagged and allowlisted
