@@ -175,6 +175,14 @@ local function admit_player(player: Player)
             .. tostring(checked.reason))
         return
     end
+    -- Reserve this one encounter for the first VALID stored session
+    -- before the next yielding lease/profile operation. Two parties
+    -- arriving simultaneously must not take over one reserved server.
+    if active_session_id and active_session_id ~= session_id then
+        player:Kick("Another party owns this reserved encounter.")
+        return
+    end
+    active_session_id = session_id
     local restored = bridge:resume(session_id)
     if not restored.ok then
         player:Kick("World-boss event unavailable: "
