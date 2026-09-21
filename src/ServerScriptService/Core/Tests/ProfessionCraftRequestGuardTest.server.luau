@@ -61,5 +61,32 @@ guard:finish(70102)
 check(not guard:is_active(70102),
     "second player can be independently released")
 
+-- PlayerRemoving invalidates the old request; a newly admitted request
+-- with the SAME UserId must not lose its guard when the stale handler ends.
+local acquired, old_ticket = guard:try_begin(70103)
+check(acquired and old_ticket ~= nil
+    and guard:is_current(70103, old_ticket),
+    "original connection must receive a unique active request ticket")
+check(guard:finish(70103, old_ticket),
+    "PlayerRemoving should release the original request ticket")
+local reconnected, new_ticket = guard:try_begin(70103)
+check(reconnected and new_ticket ~= old_ticket,
+    "same-account reconnect must acquire a fresh request ticket")
+check(not guard:is_current(70103, old_ticket),
+    "the disconnected request must not be accepted after reconnect")
+check(not guard:finish(70103, old_ticket),
+    "stale completion must not release the reconnected user's lock")
+check(guard:is_current(70103, new_ticket)
+    and guard:is_active(70103),
+    "reconnected user's live request remains protected")
+check(not guard:try_begin(70103),
+    "duplicate request still rejected during new account session")
+check(guard:finish(70103, new_ticket)
+    and not guard:is_active(70103),
+    "new request may complete and release normally")
+check(guard:try_begin(70103),
+    "same account can retry immediately after successful completion")
+guard:finish(70103)
+
 print(string.format(
     "[Profession Craft Guard] PASS: %d assertions.", assertions))
