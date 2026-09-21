@@ -1,5 +1,48 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — v1.54 weekly world-boss foundation handoff
+
+Source at the active `wip/phase-4-test-hud-integration-v1` branch
+contains `WeeklyWorldBossWindow`,
+`WeeklyWorldBossService` and the default-off
+`DungeonWeeklyWorldBossFactory`. Shared Base/Dungeon
+`RuntimeServices` composes the weekly service but no client
+RemoteEvent or normal-game entry route invokes it. A trusted
+server-issued instance captures the active event window, an
+approved party and a stable week ID. A matching tagged dead
+guardian is required before the existing character profile can
+receive the provisional 100 gold once per week; repeat kills
+in another local instance pay zero. Monday 00:00 UTC is the
+current calendar reset and the maximum allowed entry window
+is two hours, both preliminary rules.
+
+Studio accepted 40 policy assertions in BOTH Base/Dungeon,
+eight factory assertions in Dungeon, 14/14 existing Base
+profession and 30/30 Dungeon backend regressions. The
+unpublished physical Play fixture used a real client prompt,
+then spawned and assisted-defeated two guardians: first paid
+100 gold in the loaded Dungeon profile and second paid none.
+The final fixture disables incompatible autorun layout unit
+tests only in its disposable DataModel; the dedicated factory
+and general backend regressions were run independently.
+
+**Next backend job:** connect server-authorized schedule/rollout,
+real Base portal, existing session/teleport admission, reserved
+boss place, persistent instance state and participation-based
+reward eligibility without reimplementing the already accepted
+dungeon/party/reward services. Test same-account network
+rejoin and cloud TEST before enabling any live events.
+No public entry, cloud publish, production DataStore writes,
+main merge, final guardian rig or dedicated phase attacks.
+
+Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipt: `docs/testing/weekly-world-boss-v154-local-foundation-2026-09-21.md`.
+Keep all source, fixtures, roadmap and handoff edits through
+GitHub only; Remote Desktop is restricted to a safe fast-forward
+pull, unpublished Rojo/Studio runs and read-only inspection.
+
+## Earlier 21 September v1.53 handoff (historical)
+
 ## 21 September 2026 — interrupted craft and same-UserId recovery handoff
 
 Active source includes unique craft lock tickets and post-preparation
