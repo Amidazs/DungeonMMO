@@ -22,14 +22,26 @@ Fighter, real client ArcaneWard application and a test-injected server
 DamageService hit absorbed by Ward, with positive support threat:
 `VERIFIED_MULTIPLAYER_PASS`.
 
-**Boundaries:** the Ward hit was test-injected, not a live NPC attack.
-Four-player aggro has only simulated server-side policy coverage,
-not actual four-client Play. Client-driven Mend, real NPC Ward
-absorption, real multi-enemy party/wipe/disconnect and world-boss
-support-skill Play remain pending. The 0.5 support multiplier is
-provisional. No Roblox publish, TEST cloud run, main merge,
-production DataStore access or force-push was performed.
-Source/test/docs changes were made in GitHub only.
+**Follow-on real-client acceptance:** at fixture head
+`04c3f1eb5087d34e49ef4cb7bd38b731de9fd610`, genuine client
+MageHeal and ArcaneWard succeeded against an ordinary Marauder,
+an actual NPC melee attack was absorbed by the client's Ward,
+and client-driven Fighter Mend produced positive effective-heal
+threat. The live fixture printed
+`REAL_PEER_HEAL_THREAT_PASS`,
+`REAL_NPC_WARD_ABSORB_THREAT_PASS`,
+`REAL_FIGHTER_MEND_THREAT_PASS` and
+`VERIFIED_MULTIPLAYER_PASS`. This supersedes the earlier
+test-injected Ward-only support fixture.
+
+**Remaining boundaries:** four-player aggro still has only simulated
+server-side policy coverage, not four real clients. Real multi-enemy
+room combat, full-party wipe/controller reset, controller-level
+disconnect and actual healing/Ward in the isolated world-boss
+session remain pending. The 0.5 support multiplier is provisional.
+No Roblox place publish, TEST cloud run, main merge, production
+DataStore access or force-push was performed. Source/test/docs
+changes were made through GitHub only.
 
 Receipt: `docs/testing/combat-support-threat-candidate-2026-09-21.md`.
 
