@@ -1,8 +1,42 @@
 # DungeonMMO Roadmap v1.53 — Leatherworking / Enchanting staged
 
 **Date:** 21 September 2026  
-**Status:** Local backend Play acceptance for material-backed crafting, opt-in wolf encounter/Skinning and two-client independence; **same-account interrupted reconnect, final animal AI/art and release/cloud validation pending**  
+**Status:** Local backend Play acceptance for crafting, animal-only Skinning, two-client independence and interrupted-craft recovery; **actual same-account network reconnect, cross-server persistence, final animal art/AI and release/cloud validation pending**  
 **Branch:** `wip/phase-4-test-hud-integration-v1`
+
+## Latest local recovery acceptance — 21 September 2026
+
+The craft request guard now issues unique per-request tickets and
+validates the original player instance **after preparation, before
+inventory mutation**. An old craft suspended while the client leaves
+cannot complete into a reloaded same-UserId profile or release the
+new session's lock when it resumes.
+
+Four Rojo compositions built successfully. The 14-suite focused
+profession runners passed in Base and Dungeon, with **21 guard
+assertions** and **20 same-UserId recovery assertions** in each.
+A genuine disposable two-client Studio Base Play test deliberately
+paused one client's server craft after preparation, disconnected that
+client, waited for profile release, reloaded the same UserId using the
+test server's in-memory adapter, and resumed the old request. The
+reloaded character retained its two ore without an extra iron bar;
+the other client remained connected, and Studio admitted a distinct
+replacement test account. The parent Studio multiplayer run passed.
+Full client material-backed crafting, opt-in wolf encounter/Skinning
+and the wider 30-suite Dungeon matrix were rerun and passed after
+the guard change.
+
+**Remaining release gate:** Studio's replacement account is not a
+network reconnect of the departed UserId. Real same-account reconnect
+on a new live server, lease handoff, cross-server DataStore persistence
+and retry remain unverified. Do not describe this local lifecycle
+proof as production cloud/cross-server acceptance. Final animal
+AI/art, default-pack rollout and published validation are also
+still separate gates.
+
+Receipt: `docs/testing/profession-v153-interrupted-reconnect-local-2026-09-21.md`.
+
+## Earlier local milestones (historical)
 
 ## Latest local milestone — 21 September 2026
 
