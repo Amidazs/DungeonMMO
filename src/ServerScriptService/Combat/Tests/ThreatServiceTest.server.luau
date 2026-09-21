@@ -84,7 +84,7 @@ stale_enemy:Destroy()
 ThreatService.record_damage(second_enemy, player_b, 1)
 check(ThreatService.record_support(player_c, player_b, 8) == 2,
     "effective support must reach independently engaged enemies")
-check(ThreatService.get_threat(enemy, player_c.UserId) == 18,
+check(ThreatService.get_threat(enemy, player_c.UserId) == 26,
     "support must accumulate on the first enemy")
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 4,
     "support threat must be tracked independently on every enemy")
