@@ -1,5 +1,43 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — actual Room1 wipe/re-entry Play PASS
+
+At source `acb628fb99202a94f7f4cec781a15ec7f5614760`,
+the real unpublished one-client Dungeon runtime entered authored
+Temple Room1, observed a test-injured enemy, handled the player's
+genuine death and free revive, removed old encounter models,
+returned the new character near the current checkpoint, and
+physically re-entered Room1 to spawn **new full-health enemies**.
+Fixture `scripts/studio/dungeon_room_wipe_reentry_live.luau`
+printed `VERIFIED_PLAY_MODE_PASS`.
+
+The terminal Complete/Failed UI now presents Play again and Return
+to Base. At `c1d7f83`, real-client UI Play proved both button
+states, six Rojo builds passed and Dungeon backend 30/30 plus
+ReplayService's **17 assertions** passed. At `341c84d`,
+the one-shot recoverable wipe contract passed **40 assertions**
+and Dungeon backend remained 30/30. The replay service's
+actual new-place teleport remains untested in unpublished
+Studio, where it is intentionally simulated; completed runs
+cannot replay until completion rewards are committed. All-party
+consent resets after a failed launch; automatic completed-run
+return is suppressed during replay launch.
+
+**NEXT:** genuine two-/four-client physical dungeon wipe and
+boss/optional encounter recovery; actual replay button-to-server
+multi-client Play, persisted reward idempotence through a physical
+partial-kill wipe, and later published TEST/cloud verification
+with separate approval. Do not conflate the physical one-client
+room reset with these outstanding gates.
+
+Evidence:
+`docs/testing/dungeon-room-reset-play-again-2026-09-21.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_57_Room_Reset_Play_Again_20260921.md`.
+No Roblox publish, `main` merge or force-push. Source/docs
+edited in GitHub; desktop limited to pull/build/unpublished tests.
+
+
 ## 21 September 2026 — recoverable room reset and Play again
 
 Candidate gameplay/test head:
