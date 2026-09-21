@@ -269,6 +269,13 @@ local function run()
     end, "effective real heal creates threat on both engaged mobs", 12)
     print("[Four Player Aggro] REAL_TWO_ENEMY_HEAL_PASS")
 
+    -- The first Fighter Taunt has an eight-second server cooldown.
+    -- Wait for it to expire before issuing another real skill request.
+    task.wait(1.6)
+    wait_for(function()
+        return tank_character:GetAttribute("CombatState")
+            == "Locomotion"
+    end, "Fighter ready to retake aggro", 5)
     place(tank_character, root, 2.5)
     channel:FireClient(tank, "Taunt")
     wait_for(function()
