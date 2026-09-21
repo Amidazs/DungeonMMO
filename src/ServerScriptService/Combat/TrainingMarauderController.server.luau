@@ -35,6 +35,9 @@ local StaggerService = require(script.Parent:WaitForChild("StaggerService"))
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
+local ThreatService = require(
+    script.Parent:WaitForChild("ThreatService")
+)
 
 local MarauderConfig = CombatConfig.TRAINING_MARAUDER
 local DEBUG = CombatConfig.DEBUG
@@ -193,43 +196,50 @@ local function get_target_context(
 end
 
 
---[[Finds the nearest living room target for one Marauder.]]
-local function find_nearest_target(runtime: MarauderRuntime): TargetContext?
-    local best_context: TargetContext? = nil
+--[[
+Selects this Marauder's target from all currently eligible room members.
+
+Before any eligible player has generated threat against this exact enemy,
+the nearest eligible player is selected. Once threat exists, the highest
+eligible threat holder is selected, with distance only breaking equal-threat
+ties.
+
+Args:
+    runtime (MarauderRuntime): Server-owned enemy runtime.
+
+Returns:
+    TargetContext?: Current selected target context, if any.
+]]
+local function update_target(runtime: MarauderRuntime): TargetContext?
+    local candidates = {}
+    local contexts_by_user_id: {[number]: TargetContext} = {}
 
     for _, player in Players:GetPlayers() do
         local context = get_target_context(runtime, player)
-
         if context
             and MarauderBehaviorRules.can_acquire(context.distance)
-            and (not best_context or context.distance < best_context.distance) then
-            best_context = context
+        then
+            table.insert(candidates, {
+                player = player,
+                distance = context.distance,
+            })
+            contexts_by_user_id[player.UserId] = context
         end
     end
 
-    return best_context
-end
-
-
---[[Retains or reacquires one Marauder's target.]]
-local function update_target(runtime: MarauderRuntime): TargetContext?
-    if runtime.current_target then
-        local retained = get_target_context(runtime, runtime.current_target)
-
-        if retained and MarauderBehaviorRules.can_retain(retained.distance) then
-            return retained
-        end
-
+    local selected, mode = ThreatService.select_target(
+        runtime.model,
+        candidates
+    )
+    if not selected then
         set_current_target(runtime, nil)
+        runtime.model:SetAttribute("MarauderAggroMode", "None")
+        return nil
     end
 
-    local acquired = find_nearest_target(runtime)
-
-    if acquired then
-        set_current_target(runtime, acquired.player)
-    end
-
-    return acquired
+    set_current_target(runtime, selected)
+    runtime.model:SetAttribute("MarauderAggroMode", mode)
+    return contexts_by_user_id[selected.UserId]
 end
 
 
@@ -742,6 +752,7 @@ end
 
 --[[Resets one dead Marauder to its original independent spawn.]]
 local function reset_runtime(runtime: MarauderRuntime)
+    ThreatService.clear(runtime.model)
     local old_humanoid = runtime.model:FindFirstChildOfClass("Humanoid")
     if old_humanoid then
         old_humanoid:Destroy()
@@ -768,6 +779,7 @@ end
 
 --[[Handles one Marauder death and schedules guarded respawn.]]
 local function handle_death(runtime: MarauderRuntime)
+    ThreatService.clear(runtime.model)
     runtime.life_sequence += 1
     local expected_sequence = runtime.life_sequence
 
