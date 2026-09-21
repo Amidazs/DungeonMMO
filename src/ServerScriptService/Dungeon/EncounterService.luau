@@ -112,6 +112,30 @@ function EncounterService:start(encounter_id: string, member_user_ids: {number},
     return operation(true, nil, {encounter = record})
 end
 
+-- Releases an uncleared encounter after the party has fully wiped.
+-- Cleared enemies retain their original transaction IDs across retries.
+-- Args:
+--   encounter_id: string; current authoritative runtime encounter.
+-- Returns:
+--   any: cancellation result without changing prior reward receipts.
+function EncounterService:cancel_active(encounter_id: string): any
+    if self._current_id ~= encounter_id then
+        return operation(false, "EncounterNotCurrent")
+    end
+
+    local encounter: EncounterRecord? = self._encounters[encounter_id]
+    if not encounter then
+        return operation(false, "EncounterNotFound")
+    end
+    if encounter.Clear then
+        return operation(false, "EncounterAlreadyCleared")
+    end
+
+    self._encounters[encounter_id] = nil
+    self._current_id = nil
+    return operation(true, nil)
+end
+
 function EncounterService:mark_member_mode(user_id: number, mode: string)
     for _, encounter in pairs(self._encounters) do
         local member = encounter.Members[user_id]
