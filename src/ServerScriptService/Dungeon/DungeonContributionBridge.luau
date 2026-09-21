@@ -4,6 +4,7 @@ local DungeonContributionBridge = {}
 local event_serial = 0
 local bound_service: any = nil
 local recorder_override: ((number, any) -> any)? = nil
+local damage_target_validator: ((any) -> boolean)? = nil
 
 local function next_event_id(
     kind: string,
@@ -50,6 +51,16 @@ end
 
 function DungeonContributionBridge.bind_service(service: any?)
     bound_service = service
+end
+
+-- Args:
+--   validator: ((any) -> boolean)?; server-only target admission rule.
+-- Returns:
+--   nil: installs the scoped damage filter, or restores default behavior.
+function DungeonContributionBridge.bind_damage_target_validator(
+    validator: ((any) -> boolean)?
+)
+    damage_target_validator = validator
 end
 
 function DungeonContributionBridge.set_recorder_for_test(
@@ -106,6 +117,10 @@ function DungeonContributionBridge.record_damage(
 ): any
     if type(context) ~= "table" then
         return {ok = false, reason = "InvalidContributionEvent"}
+    end
+
+    if damage_target_validator and not damage_target_validator(context) then
+        return {ok = false, reason = "IneligibleDamageTarget"}
     end
 
     local attacker_id = user_id_of(context.attacker)
