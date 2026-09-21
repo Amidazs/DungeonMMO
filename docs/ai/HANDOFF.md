@@ -1,5 +1,61 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — real world-boss combat handoff
+
+The active branch now includes the existing CombatService/client
+controls and Marauder Captain AI in the isolated world-boss
+composition. The world-boss runtime marks admitted characters with
+the frozen weekly encounter ID and binds the shared contribution
+bridge through WorldBossCombatAuthority.
+
+Damage contribution now requires the exact active guardian Model and
+an admitted player. The authority also verifies connected/non-abandoned
+session membership, matching encounter attributes, a live guardian and
+an undefeated weekly snapshot. Healing/ward support must target an
+admitted member. Ordinary Dungeon behavior is unchanged because the
+damage-target validator is optional and unset there.
+
+A genuine unpublished Studio client used the normal attack RemoteEvent.
+The guardian lost health through CombatService/DamageService, the
+same hit persisted ContributionService damage, the existing guardian
+AI damaged the player, and the player killed the guardian without
+direct health injection. The session bridge persisted defeat, server
+contribution certified completion eligibility, first weekly claim
+paid 100 provisional gold and the immediate duplicate paid zero.
+All final combat markers passed.
+
+The real-client test found/fixed:
+- nil indexing when weekly event state was missing/malformed;
+- an `event` local shadowing the actual combat event, causing
+  `InvalidWorldBossContribution` on genuine hits.
+
+Post-kill reward delivery now retries from the runtime's existing
+periodic loop. A contributor with an earned but unsaved reward is
+kept in the recoverable boss session instead of being handed to Base.
+
+Final accepted source:
+`7605c811bb9f9a13ce2fb56f6b68a76f8c63ae89`.
+Six Rojo builds, damage filter 7 assertions, contribution 14,
+weekly 40 + factory 8, Base professions 14/14 and Dungeon backend
+30/30 passed. Default-off boss-place Play also still passed.
+
+**NEXT:** add a minimal authored WorldBossArenaSpawn/basic arena and
+run actual multi-client boss combat. Test shared damage/support,
+player death/wipe semantics, one member disconnecting while others
+continue, reconnect after defeat, retry of unsaved reward and
+independent Base return. Only after that should we configure
+TEST-only real place IDs and run the first published Base →
+ReserveServer boss → Base journey with real lease and cloud
+persistence. Production event flags remain off.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-real-combat-2026-09-21.md`.
+All source/test/docs edits remain GitHub-only. Remote Desktop was used
+only for clean pulls, Rojo builds, Studio Play and diagnostics.
+No cloud publish, production DataStore write, force-push or main merge.
+
+## Earlier 21 September world-boss travel handoff (historical)
+
 ## 21 September 2026 — isolated world-boss travel handoff
 
 On `wip/phase-4-test-hud-integration-v1`, the Base weekly entry
