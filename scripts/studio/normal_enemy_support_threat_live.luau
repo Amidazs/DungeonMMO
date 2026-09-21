@@ -84,11 +84,12 @@ local function set_class(player, class_id, skill_ids)
     character.Identity.BaseClassId = class_id
     character.Identity.ClassId = class_id
     character.Identity.CreationStage = "Complete"
-    for _, skill_id in ipairs(skill_ids) do
+    for index, skill_id in ipairs(skill_ids) do
         character.Progression.Skills[skill_id] = {
             Known = true,
             PurchasedRank = 1,
         }
+        character.Progression.Loadout[index] = skill_id
     end
     Progression.set_character(player.UserId, character)
     for _, skill_id in ipairs(skill_ids) do
