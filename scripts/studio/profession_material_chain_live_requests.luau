@@ -123,8 +123,19 @@ local function craft(player, recipe_id, runtime)
         then stations:WaitForChild("LeatherworkingStationPlaceholder")
         elseif recipe.StationId == "Enchanting"
         then stations:WaitForChild("EnchantingStationPlaceholder")
-        else runtime.TestEnvironment:get(
-            "Base.Profession." .. recipe.StationId .. "Placeholder")
+        else (function()
+            local wanted = "Base.Profession." .. recipe.StationId
+                .. "Placeholder"
+            for _, part in ipairs(
+                game:GetService("CollectionService"):GetTagged(
+                    "DungeonMMOEnvironmentAnchor")
+            ) do
+                if part:GetAttribute("AnchorId") == wanted then
+                    return part
+                end
+            end
+            return nil
+        end)()
     assert(station and station:IsA("BasePart"),
         "No server station for " .. recipe_id)
     position_at(player, station)
