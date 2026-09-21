@@ -227,9 +227,20 @@ local function verify_death_and_respawn(players, runtime, session_id)
     end, "member lifecycle character", 15)
     local humanoid = assert(
         original:FindFirstChildOfClass("Humanoid"))
+    assert(original:IsDescendantOf(Workspace),
+        "the real Studio character must exist in Workspace")
+    assert(humanoid.Health > 0,
+        "fresh member character must start alive")
+    humanoid.Died:Connect(function()
+        print("[World Boss Party Live] HUMANOID_DIED_SIGNAL")
+    end)
     -- Deliberately force this member's death only in the disposable
     -- fixture: actual client guardian kill was proven separately above.
+    humanoid:ChangeState(Enum.HumanoidStateType.Dead)
     humanoid.Health = 0
+    print("[World Boss Party Live] FORCED_DEATH "
+        .. tostring(humanoid.Health) .. " "
+        .. tostring(humanoid:GetState()))
     wait_for(function()
         local record = runtime.SessionService:get(session_id)
         return record and record.Members[tostring(victim.UserId)]
