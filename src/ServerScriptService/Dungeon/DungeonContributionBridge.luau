@@ -1,4 +1,6 @@
 --!strict
+local RunService = game:GetService("RunService")
+
 local DungeonContributionBridge = {}
 
 local event_serial = 0
@@ -29,6 +31,18 @@ local function valid_amount(amount: any): boolean
         and math.abs(amount) < math.huge
 end
 
+-- Args:
+--   user_id: any; authenticated Roblox player UserId.
+-- Returns:
+--   boolean: positive live identity or negative local Studio identity.
+local function valid_user_id(user_id: any): boolean
+    return type(user_id) == "number"
+        and user_id % 1 == 0
+        and user_id < math.huge and user_id > -math.huge
+        and (user_id > 0
+            or (user_id < 0 and RunService:IsStudio()))
+end
+
 local function user_id_of(value: any): number?
     if type(value) ~= "table" and typeof(value) ~= "Instance" then
         return nil
@@ -38,11 +52,7 @@ local function user_id_of(value: any): number?
         return value.UserId
     end)
 
-    if ok
-        and type(user_id) == "number"
-        and user_id > 0
-        and user_id % 1 == 0
-    then
+    if ok and valid_user_id(user_id) then
         return user_id
     end
 
@@ -204,10 +214,7 @@ function DungeonContributionBridge.record_mitigation(
     mitigated: number,
     source_id: string?
 ): any
-    if type(user_id) ~= "number"
-        or user_id <= 0
-        or user_id % 1 ~= 0
-    then
+    if not valid_user_id(user_id) then
         return {ok = false, reason = "NoContributionOwner"}
     end
 
