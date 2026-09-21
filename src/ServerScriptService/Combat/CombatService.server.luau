@@ -143,6 +143,7 @@ WardService.set_absorb_callback(function(
         absorbed,
         "ArcaneWard"
     )
+    ThreatService.record_support(caster, target, absorbed)
 end)
 
 MageHealService.set_heal_callback(function(
@@ -162,6 +163,7 @@ MageHealService.set_heal_callback(function(
         healed,
         "MageHeal"
     )
+    ThreatService.record_support(caster, target, healed)
 end)
 
 local attack_request = remotes_folder:WaitForChild(
@@ -2406,6 +2408,7 @@ local function run_mend_pulse(
         DungeonContributionBridge.record_heal(
             player, mend_target, healed, skill_definition.ID
         )
+        ThreatService.record_support(player, mend_target, healed)
     end
 
     if not valid then
