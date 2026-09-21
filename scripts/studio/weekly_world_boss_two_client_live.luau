@@ -156,7 +156,7 @@ local function position_party(players, session_id)
         character:SetAttribute(
             "DungeonEncounterId", "WeeklyBoss:" .. session_id)
         character.HumanoidRootPart.CFrame = CFrame.lookAt(
-            Vector3.new(1, 5, if index == 1 then 5 else -5),
+            Vector3.new(0.5, 5, if index == 1 then 3 else -3),
             Vector3.new(0, 5, 0))
     end
 end
