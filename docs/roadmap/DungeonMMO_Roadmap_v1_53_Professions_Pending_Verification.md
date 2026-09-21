@@ -85,6 +85,15 @@ retry cleanup. The Base Play log also contains unrelated Dungeon-only
 autorun script errors/warnings. Preserve this remaining gate and do not
 claim that the entire new profession system is fully accepted yet.
 
+The first GitHub-authored real-client Base Play fixture passed
+station range/routing for both Leatherworking and Enchanting:
+too-far requests were rejected and near requests reached
+`ProfessionService` (which returned `MissingMaterials`). It then
+**failed** at the scripted RawHideCache interaction with a 15-second
+Gather-result timeout; do not treat the fixture as fully passing or
+infer successful live resource claiming. Only the service-only complete
+crafting chain has passed. Keep the full live profession gate pending.
+
 Evidence: `docs/testing/profession-v153-local-validation-2026-09-21.md`.
 Original staged scope and test plan:
 `docs/testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md`.
