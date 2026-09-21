@@ -51,8 +51,9 @@ check(CollectionService:HasTag(
     "only the server factory may enroll the actual guardian model")
 check(boss:GetAttribute("DungeonBossRole") == "WorldBoss",
     "existing combat controller must retain its distinct boss role")
-check(boss:GetAttribute("RewardGoldMin") == 0
-    and boss:GetAttribute("RewardGoldMax") == 0,
+check(boss:GetAttribute("DungeonRewardGoldMin") == 0
+    and boss:GetAttribute("DungeonRewardGoldMax") == 0
+    and boss:GetAttribute("DungeonRewardXP") == 0,
     "ordinary combat rewards must not bypass the weekly reward gate")
 check(boss:GetAttribute("BestiaryCreatureId") == nil,
     "prototype must not award unrelated existing boss bestiary entries")
