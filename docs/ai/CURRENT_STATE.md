@@ -1,5 +1,38 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — Four-client secret/Depth4/disconnect acceptance
+
+GitHub feature head with latest focused verification:
+`9a63c6d25ac45cd67c9a4c5a684fa4c5a26adb24`.
+
+Real unpublished four-client physical Studio Play passed
+Temple SecretArena optional-boss and Depth4 Room2
+mini-boss recovery: previously cleared encounters stayed
+cleared, four checkpoint auto revives succeeded, retired
+bosses were replaced by new full-health models and
+later rooms remained Pending. Only disposable Studio
+test places unlocked the optional event/secret content;
+production release settings are unchanged.
+
+Real peer disconnection during an active Room3 boss
+left three players fighting. Their later collective
+wipe/revive preserved the absent member's unused
+free revive, earlier room clears and boss checkpoint,
+and permitted a single fresh full-health boss.
+
+Previously stale higher-depth service expectation was
+corrected for one-shot Failed broadcasting and passed
+392 assertions across 12 dungeon/depth/party cases.
+Six Rojo builds; backend matrix 30/30; death/revive
+41 assertions. A real same-account reconnect and
+published cross-place continuity remain unverified.
+
+Evidence:
+`docs/testing/dungeon-secret-depth4-disconnect-recovery-2026-09-21.md`.
+Roadmap v1.59:
+`docs/roadmap/DungeonMMO_Roadmap_v1_59_Secret_Depth4_Disconnect_20260921.md`.
+
+
 ## 21 September 2026 — real four-party encounter replay locally VERIFIED
 
 Locally verified gameplay head: `a5c0637888f8400703d07290f790a24d3b8406bf`.
