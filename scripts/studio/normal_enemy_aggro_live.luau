@@ -81,6 +81,9 @@ end
 -- Returns:
 --   Model: living combat character excluded from dungeon routing.
 local function get_character(player)
+    if not player.Character then
+        player:LoadCharacter()
+    end
     local character = wait_for(function()
         return player.Character
             and player.Character:FindFirstChild("HumanoidRootPart")
