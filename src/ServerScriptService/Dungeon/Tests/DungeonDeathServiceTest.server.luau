@@ -234,4 +234,73 @@ check(
     "A paid callback must reject a player absent from the run roster."
 )
 
+-- A recoverable full wipe resets the active room only once while
+-- the first free revive is pending. A surviving party member
+-- would suppress this callback until that member is defeated.
+session = {
+    SessionId = "session-recoverable-wipe",
+    State = "Active",
+    Members = {
+        ["101"] = {
+            UserId = 101,
+            Connected = true,
+            Mode = "Active",
+            FreeReviveUsed = false,
+        },
+        ["102"] = {
+            UserId = 102,
+            Connected = true,
+            Mode = "Spectating",
+            FreeReviveUsed = true,
+        },
+    },
+}
+local reset_count = 0
+local recoverable = DungeonDeathService.new(
+    fake_sessions, fake_checkpoint, "session-recoverable-wipe", {
+        clock = function(): number
+            return now
+        end,
+        schedule = schedule,
+        spawn_player = spawn_player,
+        on_recoverable_wipe = function(_current: any): any
+            reset_count += 1
+            return {ok = true}
+        end,
+    }
+)
+check(
+    recoverable:on_player_died(player, CFrame.new()).ok,
+    "The last living party member must enter its automatic revive."
+)
+check(
+    reset_count == 1,
+    "A party wipe with a pending free revive must reset its room."
+)
+recoverable:_refresh_wipe_state()
+check(
+    reset_count == 1,
+    "Repeated wipe polling cannot reset the same encounter twice."
+)
+local recoverable_callback = assert(scheduled_callback)
+recoverable_callback()
+check(
+    session.Members["101"].Mode == "Active"
+        and reset_count == 1,
+    "The free revive must return from checkpoint without a second reset."
+)
+check(
+    recoverable:on_player_died(player, CFrame.new()).ok,
+    "The revived member can be defeated in the recovered room."
+)
+check(
+    reset_count == 1
+        and session.Members["101"].Mode == "Spectating",
+    "An exhausted free revive cannot silently restart the same room."
+)
+check(
+    type(session.WipeDecisionEndsAt) == "number",
+    "An exhausted party must still enter the terminal revive decision."
+)
+
 print(string.format("[Dungeon Death/Revive Tests] PASS: %d assertions.", assertions))
