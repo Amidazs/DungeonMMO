@@ -38,6 +38,14 @@ channel.OnClientEvent:Connect(function(kind)
         end
     elseif kind == "PeerHeal" then
         skill_request:FireServer("MageHeal")
+    elseif kind == "InjureForHeal" then
+        local player = game:GetService("Players").LocalPlayer
+        local character = player.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.Health = math.max(1, humanoid.MaxHealth - 45)
+        end
     elseif kind == "Die" then
         local player = game:GetService("Players").LocalPlayer
         local character = player.Character
@@ -223,8 +231,15 @@ local function verify_peer_support(players, runtime, session_id)
     recipient_character.HumanoidRootPart.CFrame = CFrame.lookAt(
         Vector3.new(0, 5, 13), Vector3.new(0, 5, 0))
     caster_humanoid.Health = caster_humanoid.MaxHealth
-    recipient_humanoid.Health = recipient_humanoid.MaxHealth - 45
-    task.wait(0.35)
+    -- Studio characters own their Humanoid replication. Injuring the
+    -- recipient from the server alone is immediately overwritten by
+    -- the owning test client, leaving no valid healing target.
+    channel:FireClient(recipient, "InjureForHeal")
+    wait_for(function()
+        return recipient_humanoid.Health
+            <= recipient_humanoid.MaxHealth - 40
+    end, "real injured client replicated to server", 8)
+    task.wait(0.2)
     local selected = MageHealService.find_target(caster, 22)
     print("[World Boss Party Live] PEER_HEAL_TARGET "
         .. tostring(selected and selected.UserId)
