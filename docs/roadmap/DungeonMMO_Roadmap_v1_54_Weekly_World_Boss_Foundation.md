@@ -2,9 +2,10 @@
 
 **Date:** 21 September 2026  
 **Branch:** `wip/phase-4-test-hud-integration-v1`  
-**Status:** Default-off weekly policy, local boss prototype and durable
-session bridge **locally verified**; normal-game Base entry, dedicated
-reserved server and cloud release **not implemented or enabled**.
+**Status:** Default-off Base entry source, reserved-server routing,
+separate world-boss place and Base return contracts **locally
+verified**. Published cross-server travel, dedicated playable combat,
+genuine cloud persistence and live event release **remain pending**.
 
 ## Goal and progress
 
@@ -46,6 +47,56 @@ boss encounter. The guardian uses the existing combat rig for
 backend verification; the 100-gold payout is a provisional test
 value, not a balanced final reward.
 
+## New local milestone — isolated weekly boss travel and return
+
+Implemented a disabled-by-default Base boss gateway using the
+existing DungeonBoard anchor and the shared party, teleport, profile,
+lease and dungeon-session services. Server-issued weekly entry
+captures an explicit UTC window, reserves the configured **separate
+world-boss place**, and saves the destination and party identity
+before teleport. A dedicated arrival rule refuses ordinary dungeon
+routing, outsiders and other-place snapshots. Ordinary Dungeon
+admission also refuses the world-boss session.
+
+Two new Rojo compositions build the isolated world-boss destination.
+Its runtime remains disabled unless explicitly enabled and requires
+a reserved server and authored arena anchor. A proven defeat opens
+a per-member Base return flow without ending other party members'
+recoverable session. Base clears a returning member's old session
+index only after their arrival and profile load. A failed return
+teleport restores that member's boss rejoin route.
+
+**Local acceptance:** six Rojo builds; 18 travel assertions each in
+Base and Dungeon; 22 Base return assertions including failed-teleport
+rollback; 10 ordinary-Dungeon admission assertions; five isolated
+destination assertions; a default-off Play-mode check; 30 durable
+session assertions in each Base/Dungeon; weekly policy 40, guardian
+factory eight; existing Base profession 14/14 and Dungeon gameplay
+30/30. Existing real-client material-chain Play regression also
+passed on the travel integration source.
+
+**Important correction:** The real contribution service returns
+`Damage`, `Tank` and `Support` at its response's top level, not
+inside a nested `snapshot` field. Fixed the destination's reward
+check and added 14-assertion focused Studio tests in both Base and
+Dungeon, including zero/invalid values, actual persisted damage,
+independent healing support and simulated service recovery.
+These are contract tests, **not** evidence of a playable boss fight.
+
+Travel receipt:
+`docs/testing/weekly-world-boss-v154-isolated-travel-2026-09-21.md`.
+Contribution fix and failed-teleport receipt:
+`docs/testing/weekly-world-boss-v154-travel-hardening-2026-09-21.md`.
+
+**Remaining blockers:** The separate world-boss place does not yet
+have its authored `WorldBossArenaSpawn`, dedicated integrated combat
+controller/client, real boss attack/combat contribution loop,
+full-party wipe/reward retry acceptance or an approved published
+TEST configuration. Thus the currently compiled destination is
+**not a playable or releasable weekly encounter**. No actual
+cross-place teleport, live MemoryStore/DataStore handoff, full
+Base → boss → Base playthrough or production release has occurred.
+
 ## New local milestone — frozen session and contribution-gated reward
 
 The next default-off backend layer is implemented and locally
@@ -76,36 +127,26 @@ does not turn ordinary TestDungeon encounters into world bosses.
 Receipt:
 `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
 
-## Remaining world-boss travel and release work
+## Next backend milestone — dedicated playable boss encounter
 
-## Next backend milestone — make entry and reward recoverable
-
-1. **Event issuance and Base entry:** add a default-off server
-   schedule/release configuration and Base portal adapter. Reuse
-   existing party/session/teleport infrastructure; issue a single
-   authoritative event token at the moment of entry, independent
-   of any client-supplied success or calendar value.
-2. **Reserved instance and recovery:** bind event ID, week key,
-   party membership, frozen entry time, dedicated boss encounter,
-   checkpoint, completion and pending per-player rewards to the
-   existing durable session adapter. Rejoin must not reroll event
-   state or create another weekly entitlement.
-3. **Eligibility/reward delivery:** authorize participation using
-   real session membership and encounter contribution. Define
-   disconnect, wipe, expired-event, ineligible-member, late-arrival
-   and retry semantics before enabling cloud travel. Keep the weekly
-   claim in one atomic profile mutation and verify persistence
-   across genuine new-server profile leases.
-4. **Physical Play acceptance:** exercise Base portal → reserved
-   Dungeon arrival → real boss combat/reward → return, including
-   separate party instances, two-client completion, defeated-player
-   eligibility, duplicate-kill protection and disconnect/retry.
-   Studio-only fixtures are not substitutes for cross-server TEST.
-5. **Only then expand raid mechanics:** phased attacks, coordinated
-   group mechanics, independent encounter phases/checkpoints and
-   broader raid reward rules. Dedicated guardian meshes/animations,
-   event calendar announcement, reward tuning and UI can follow
-   independently of the server contract.
+1. Connect the existing combat, player controls, guardian AI,
+   server damage and participation recorder to the isolated boss
+   place. Author a basic arena anchor and an opt-in Studio fixture
+   without changing ordinary Dungeon/Temple encounters.
+2. Make rewards resilient to verified boss defeat when eligible
+   players disconnect, fail a save or return to Base. Verify
+   pending entitlements, session TTL, wipe and retry semantics;
+   never pay merely for invitation or untrusted client data.
+3. Run isolated, actual multi-client Play-mode boss combat
+   including damage/support, two distinct sessions, deaths,
+   reconnect and individual return (no assisted boss kill).
+4. Only after those checks, configure separate Base/boss TEST
+   place IDs, published reserved-server admission, lease and
+   DataStore/MemoryStore recovery. Prove Base → boss → Base
+   over a real published TEST network before enabling the event.
+5. Final guardian-specific phases, raid mechanics, reward
+   tuning, event notices and models follow the trusted backend
+   contract. Explicit approval is required for any public launch.
 
 ## Separate future/release gates
 
