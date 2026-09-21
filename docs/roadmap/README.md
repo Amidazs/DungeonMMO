@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**Latest GitHub progress: v1.58 — real four-client Room1,
+Room3 boss and optional EventArena wipe/re-entry; replay
+party voting verified (21 September 2026).**
+[Roadmap v1.58](DungeonMMO_Roadmap_v1_58_Four_Party_Boss_Replay_20260921.md)
+and [local evidence](../testing/dungeon-four-client-room-boss-event-replay-2026-09-21.md).
+A physical partial-kill wipe did not duplicate any
+of four players' monster rewards. A repeated Failed
+state broadcast was fixed so party replay votes remain
+visible. Secret/higher-depth bosses, actual published
+cross-place replay and cloud persistence remain pending.
+No place publish or `main` merge.
+
+
 **Latest GitHub roadmap supplement: v1.57 — physical Room1
 wipe/re-entry and Play again.** Read
 [v1.57](DungeonMMO_Roadmap_v1_57_Room_Reset_Play_Again_20260921.md)
