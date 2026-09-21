@@ -1,5 +1,57 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.54 LOCAL backend, publish deferred
+
+At user request, continue backend-only work through GitHub and run
+only unpublished Studio/in-memory tests. No TEST or production place
+is to be published as part of this milestone.
+
+The world-boss combat pipeline now passes the server-observed lethal
+hit from DamageService to the contribution bridge. The scoped
+authority credits the *actual first killing blow* after guardian
+health reaches zero while still requiring the exact boss model,
+admitted player, matching encounter identity and undefeated frozen
+session. Unpublished one-attack Studio Play at
+`5b7edc2675fd8fc6e9b6d0908bdf263742cf88b6`
+passed real client lethal contribution, guardian defeat, weekly
+reward once and duplicate reward zero. Earlier acceptance after
+the combat change also passed the original real-client combat and
+two-client party Play, plus existing target-filter/reward-retry/
+profile-exit tests on source
+`6252baa5bfea0694c3dd18d3c81caae19cc890a1`.
+
+Existing local retry tests verified that a simulated failed profile
+save retains the dirty weekly receipt and retry persists only one
+award (17 assertions each Base and Dungeon). A departure-save
+helper test verified that two failed saves leave the profile lease
+owned until successful persistence (11 assertions).
+
+Additional GitHub-only changes add exact-target lethal bridge
+assertions and fix the distinct case where profile saving succeeded
+but its subsequent lease release failed after local cache removal.
+The updated exit test now covers this latter case. The desktop
+connection became unavailable before latest-head verification; do
+not claim those additional assertions or builds have passed.
+
+Mend now records only positive server-applied healing through the
+contribution bridge. An attempted genuine two-client Mage Heal
+fixture failed due to unreliable injured-target state in the
+test environment and was reverted to restore the accepted combat
+baseline. Actual two-client skill-based healing/ward support remains
+an open local test gate.
+
+Next: reconnect authorized desktop; safely fast-forward; run all
+six Rojo builds, the one-hit/two-client fixtures, updated lethal
+filter and profile-exit contracts, weekly reward retry and existing
+profession/Dungeon regressions. Then continue local support skills,
+four-member party/wipe/return and offline persistence contracts.
+Published travel, same-account true cross-server reconnect and cloud
+storage tests remain deliberately deferred.
+
+Receipt: `docs/testing/weekly-world-boss-v154-local-backend-continuation-2026-09-21.md`.
+
+## Earlier 21 September party checkpoint (historical)
+
 ## 21 September 2026 — v1.54 two-client party resilience locally verified
 
 The isolated weekly world-boss backend now has a local two-client
