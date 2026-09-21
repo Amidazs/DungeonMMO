@@ -30,6 +30,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
                 SourceItemId = "arc_slash_book_bound",
             }),
+            table.freeze({
+                SkillId = "Taunt",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
