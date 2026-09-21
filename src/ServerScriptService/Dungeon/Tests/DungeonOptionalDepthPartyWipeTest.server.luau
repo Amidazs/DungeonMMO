@@ -161,9 +161,9 @@ local function check_party(dungeon_id: string, depth_id: string,
         and failed.InstanceState.EncounterRuntime
             .EncounterStates[event.Id] == "Active",
         "failed run retains its saved Event/checkpoint audit state")
-    check(deaths:tick(now + 1).failed
+    check(not deaths:tick(now + 1).failed
         and sessions:get(id).State == "Failed",
-        "subsequent tick reports an already-failed session without reset")
+        "subsequent tick must preserve failure without rebroadcasting it")
     check(not sessions:mark_connected(id, members[1]).ok,
         "terminal failed session cannot be re-entered as an active run")
 end
