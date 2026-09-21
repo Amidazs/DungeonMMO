@@ -129,13 +129,14 @@ function WeeklyWorldBossService:restore_instance(
         or type(snapshot) ~= "table"
         or snapshot.BossId ~= BOSS_ID
         or type(snapshot.Members) ~= "table"
-        or type(snapshot.WindowStart) ~= "number"
-        or type(snapshot.WindowEnd) ~= "number"
-        or snapshot.WeekStart ~= Window.week_start(snapshot.WindowStart)
-        or snapshot.WindowEnd <= snapshot.WindowStart
-        or snapshot.WindowEnd - snapshot.WindowStart > 7200
-        or snapshot.WindowEnd > snapshot.WeekStart + 604800
     then
+        return {ok = false, reason = "InvalidWorldBossSnapshot"}
+    end
+    -- Revalidate a stored server-issued window without checking whether
+    -- it is *currently* open: an admitted group may finish after closing.
+    local window = Window.resolve(
+        snapshot.WindowStart, snapshot.WindowStart, snapshot.WindowEnd)
+    if not window.ok or window.WeekStart ~= snapshot.WeekStart then
         return {ok = false, reason = "InvalidWorldBossSnapshot"}
     end
 
