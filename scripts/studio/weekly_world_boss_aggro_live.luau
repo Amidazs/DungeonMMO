@@ -219,15 +219,37 @@ local function run()
     end, "higher threat beats the nearer player", 8)
     print("[World Boss Aggro Live] THREAT_BEATS_DISTANCE_PASS")
 
-    local boss_root = assert(boss:FindFirstChild("HumanoidRootPart"))
-    place(near_character, boss_root.Position + Vector3.new(0, 0, 2.2))
-    channel:FireClient(near_player, "StrikeThree")
+    -- Attack the current enemy position again between real client
+    -- swings. The NPC may turn or move after threat switches, and
+    -- the basic combo's forward step can move a test character away.
+    -- Every threat increase must come from an actual client hit.
+    for strike = 1, 3 do
+        local target_root = assert(
+            boss:FindFirstChild("HumanoidRootPart"))
+        local position = target_root.Position + Vector3.new(0, 0, 2.2)
+        near_character.HumanoidRootPart.CFrame = CFrame.lookAt(
+            position, target_root.Position
+        )
+        local previous = ThreatService.get_threat(
+            boss, near_player.UserId)
+        channel:FireClient(near_player, "StrikeOnce")
+        wait_for(function()
+            return ThreatService.get_threat(
+                boss, near_player.UserId) > previous
+        end, "real challenger melee hit " .. strike, 8)
+        if ThreatService.get_threat(boss, near_player.UserId)
+            > ThreatService.get_threat(boss, far_player.UserId)
+        then
+            break
+        end
+        task.wait(0.85)
+    end
     wait_for(function()
         return ThreatService.get_threat(boss, near_player.UserId)
             > ThreatService.get_threat(boss, far_player.UserId)
             and boss:GetAttribute("MarauderAggroTargetUserId")
                 == near_player.UserId
-    end, "higher damage takes aggro", 18)
+    end, "higher real damage takes aggro", 8)
     print("[World Boss Aggro Live] HIGHER_DAMAGE_SWITCH_PASS")
 
     local before_damage = runtime.ContributionService
