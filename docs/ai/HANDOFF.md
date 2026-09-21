@@ -1,5 +1,38 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — local animal-only Skinning test closeout
+
+The server-only species allowlist, beast-tag requirement, defeated/
+looted/corpse-once rules, temporary corpse prompt and animal-only
+Dungeon cleanup have now passed actual unpublished Roblox Studio
+tests. Four Rojo builds, Base/Dungeon focused professions 12/12 each
+(363 assertions each), Dungeon cleanup 11 assertions and broad backend
+30/30 PASS. Base Play tests proved real server grant and client
+depletion at RawHideCache, as well as a server-authored test wolf
+producing exactly one hide after death and loot. Existing Marauders
+and unregistered enemies remain unskinnable; there are still no
+authored animal factories/encounters in gameplay.
+
+The Studio MCP bridge's direct client continued reporting an
+unreachable Studio despite MCP being enabled. The official Studio
+RunScript CLI successfully ran the unchanged GitHub test runners
+and the StudioTestService Play-mode fixtures. Avoid asking the user
+to toggle MCP merely to repeat tests already verified by this route.
+
+Continue backend-first with a proper animal factory/content hook
+only if needed, then actual combat → server loot → retained corpse →
+skin interaction, a two-player contested skin claim, material-backed
+Leatherworking → Enchanting client completion and craft
+disconnect/retry. The local worktree must remain clean; create code,
+new tests, roadmap and handoff edits **in GitHub**, then safely
+fast-forward pull only for build/test. No publish, user DataStore
+migration, force-push or main merge.
+
+Receipt:
+`docs/testing/animal-only-corpse-skinning-studio-verified-2026-09-21.md`.
+
+## Historical staging checkpoint — before the above tests
+
 ## 21 September 2026 — animal-only Skinning test handoff
 
 Latest GitHub-first branch is clean and locally fast-forwarded through
