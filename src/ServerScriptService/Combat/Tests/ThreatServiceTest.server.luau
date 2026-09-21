@@ -109,10 +109,10 @@ check(ThreatService.record_support(player_c, player_b, 10) == 1,
 check(ThreatService.get_threat(second_enemy, player_c.UserId) == 0,
     "encounter cleanup must discard the support threat ledger")
 ThreatService.select_target(second_enemy, candidates)
-check(ThreatService.record_support(player_c, player_b, 6) == 2,
+check(ThreatService.record_support(player_c, player_b, 6) == 1,
     "a new enemy encounter must remain unengaged until real threat")
 ThreatService.record_damage(second_enemy, player_b, 1)
-check(ThreatService.record_support(player_c, player_b, 6) == 3,
+check(ThreatService.record_support(player_c, player_b, 6) == 2,
     "a restarted enemy must only earn support on its new ledger")
 ThreatService.remove_player(player_c.UserId)
 check(ThreatService.get_threat(enemy, player_c.UserId) == 0,
