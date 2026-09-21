@@ -154,7 +154,16 @@ end
 -- Returns:
 --   {Model}: spawned enemy handles from the real encounter.
 local function enter_room(player, trigger_name, minimum)
-    approach(player, anchor(trigger_name))
+    local trigger = anchor(trigger_name)
+    approach(player, trigger)
+    task.wait(1)
+    print("[Four Client Depth4 MiniBoss Wipe] ENTER_DIAGNOSTIC "
+        .. trigger_name
+        .. " enemies=" .. tostring(#living_enemies())
+        .. " player_position=" .. tostring(
+            player.Character.HumanoidRootPart.Position
+        )
+        .. " trigger_position=" .. tostring(trigger.Position))
     return wait_for(function()
         local enemies = living_enemies()
         return if #enemies >= minimum then enemies else nil
