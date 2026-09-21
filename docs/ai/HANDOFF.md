@@ -1,5 +1,52 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — two-client world-boss party resilience handoff
+
+The active branch now has a reusable `WorldBossMemberLifecycle`,
+an opt-in geometric `WorldBossArenaLayout`, and verified two-client
+world-boss Play. Two real Studio clients independently damage one
+guardian, persist contribution and each receive their own weekly
+reward once. One client then dies through its owning client Humanoid,
+the server persists Dead mode, respawns that member into the same
+session as Active and proves death/respawn cannot duplicate reward.
+One client can then leave while the surviving peer remains active.
+
+ContributionService and DungeonContributionBridge now accept negative
+integral Roblox Studio multiplayer UserIds **only in Studio**. This
+was required because ExecuteMultiplayerTestAsync clients use negative
+IDs. Production/live identities remain positive-only and all malformed
+IDs/events remain rejected.
+
+Current wipe policy: connected dead members may respawn independently
+into the same frozen encounter; wipe/death does not reroll event/week
+or reset reward history. The arena helper is primitive geometry for
+backend testing only and can be replaced by final authored art while
+preserving `WorldBossArenaSpawn`.
+
+Final accepted source:
+`e83e4fae522582ec98bfc9cf4938ffdca9aa810b`.
+Final local matrix: six Rojo builds; multiplayer
+`VERIFIED_MULTIPLAYER_PASS`; lifecycle/wipe 14 assertions;
+contribution 20; Base travel 18; Base return 22; Dungeon session 33;
+Base professions 14/14; Dungeon backend 30/30.
+
+**NEXT:** published TEST-only handoff. Configure explicit TEST Base
+and world-boss place IDs, keep the event off outside the controlled
+window, then prove Base → ReserveServer boss → Base using genuine
+profile lease and MemoryStore/DataStore handoff. That is also where
+same-account network reconnect and cross-server reward recovery must
+be accepted. Separately add a real two-client healing/ward skill test
+against the guardian before public release.
+
+Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_54_Weekly_World_Boss_Foundation.md`.
+Receipt: `docs/testing/weekly-world-boss-v154-party-resilience-2026-09-21.md`.
+All source/test/docs editing remains GitHub-only. Remote Desktop is
+restricted to clean fast-forward pulls, Rojo builds, Studio tests and
+read-only diagnostics. No cloud publish, production player DataStore,
+force-push or main merge.
+
+## Earlier 21 September real-combat handoff (historical)
+
 ## 21 September 2026 — real world-boss combat handoff
 
 The active branch now includes the existing CombatService/client
