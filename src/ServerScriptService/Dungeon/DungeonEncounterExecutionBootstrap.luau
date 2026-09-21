@@ -65,6 +65,9 @@ local AbandonedMineSecretBossFactory = require(
 local DungeonMarauderFactory = require(
     Dungeon:WaitForChild("DungeonMarauderFactory")
 )
+local DungeonWolfFactory = require(
+    Dungeon:WaitForChild("DungeonWolfFactory")
+)
 
 local DungeonEncounterExecutionBootstrap = {}
 
@@ -182,6 +185,13 @@ function DungeonEncounterExecutionBootstrap.create(): any
             DungeonMarauderFactory
         ),
         "Marauder enemy factory"
+    )
+    require_registration(
+        enemy_factories:register(
+            "ForestWolf",
+            DungeonWolfFactory
+        ),
+        "ForestWolf enemy factory"
     )
 
     for _, factory_id in ipairs(
