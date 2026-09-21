@@ -32,7 +32,8 @@ check(not Rules.is_eligible({ok = true, Damage = 0, Tank = 0,
 check(Rules.is_eligible({ok = true, Support = 3}),
     "server-recorded support must count independently of damage")
 
-local sessions = Sessions.new(Adapter.new())
+local session_map = Adapter.new()
+local sessions = Sessions.new(session_map)
 local session, error_message = sessions:create(
     "TestDungeon", {FIRST_ID, SECOND_ID}, 0,
     "WorldBossContributionTestReserved", "Depth1")
@@ -77,8 +78,7 @@ check(support.ok, "server-recorded healing must persist independently")
 check(Rules.is_eligible(
     contributions:get_player_snapshot(session_id, SECOND_ID)),
     "actual top-level Support field must unlock a support participant")
-local recovered = Contributions.new(Sessions.new(
-    sessions._map))
+local recovered = Contributions.new(Sessions.new(session_map))
 check(Rules.is_eligible(
     recovered:get_player_snapshot(session_id, FIRST_ID)),
     "fresh service reading the same durable adapter recovers eligibility")
