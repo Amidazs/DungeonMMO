@@ -1,8 +1,17 @@
 --!strict
 -- Shared per-member death/respawn state for the isolated world boss.
 -- It deliberately reuses DungeonSessionService member modes.
+local Players = game:GetService("Players")
+
 local WorldBossMemberLifecycle = {}
 WorldBossMemberLifecycle.__index = WorldBossMemberLifecycle
+
+type PlayerBinding = {
+    player: Player,
+    session_id: string,
+    spawn_cframe: CFrame,
+    respawn_delay: number,
+}
 
 -- Args:
 --   sessions: any; authoritative DungeonSessionService.
@@ -65,6 +74,95 @@ function WorldBossMemberLifecycle:can_respawn(
     end
     return type(session.InstanceState) == "table"
         and type(session.InstanceState.WeeklyWorldBoss) == "table"
+end
+
+-- Args:
+--   binding: PlayerBinding; immutable per-player encounter routing.
+-- Returns:
+--   nil: persists death and schedules one server-authorized respawn.
+function WorldBossMemberLifecycle:_handle_death(
+    binding: PlayerBinding
+)
+    local user_id = binding.player.UserId
+    local dead = self:mark_dead(binding.session_id, user_id)
+    if not dead.ok then
+        warn("[World Boss] Member death persistence failed: "
+            .. tostring(dead.reason))
+        return
+    end
+
+    task.delay(binding.respawn_delay, function()
+        local same_player = Players:GetPlayerByUserId(user_id)
+            == binding.player
+        if same_player
+            and self:can_respawn(binding.session_id, user_id)
+        then
+            binding.player:LoadCharacter()
+        end
+    end)
+end
+
+-- Args:
+--   binding: PlayerBinding; server-owned encounter routing.
+--   character: Model; freshly spawned Roblox character.
+-- Returns:
+--   nil: marks encounter identity, positions, and binds one death event.
+function WorldBossMemberLifecycle:_activate_character(
+    binding: PlayerBinding,
+    character: Model
+)
+    character:SetAttribute("DungeonRunParticipant", true)
+    character:SetAttribute(
+        "DungeonEncounterId", "WeeklyBoss:" .. binding.session_id)
+    character:SetAttribute("WorldBossSessionId", binding.session_id)
+    character:PivotTo(binding.spawn_cframe)
+
+    local active = self:mark_active(
+        binding.session_id, binding.player.UserId)
+    if not active.ok then
+        warn("[World Boss] Member activation failed: "
+            .. tostring(active.reason))
+    end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.Died:Connect(function()
+            self:_handle_death(binding)
+        end)
+    end
+end
+
+-- Args:
+--   player: Player; authenticated admitted world-boss member.
+--   session_id: string; frozen encounter session.
+--   spawn_cframe: CFrame; trusted arena spawn for this member.
+--   respawn_delay: number; server delay before same-session respawn.
+-- Returns:
+--   RBXScriptConnection: CharacterAdded connection for runtime lifetime.
+function WorldBossMemberLifecycle:bind_player(
+    player: Player,
+    session_id: string,
+    spawn_cframe: CFrame,
+    respawn_delay: number
+): RBXScriptConnection
+    assert(type(session_id) == "string" and session_id ~= "",
+        "World boss member binding requires session ID")
+    assert(typeof(spawn_cframe) == "CFrame",
+        "World boss member binding requires spawn CFrame")
+    assert(type(respawn_delay) == "number" and respawn_delay >= 0,
+        "World boss member binding requires nonnegative respawn delay")
+
+    local binding: PlayerBinding = {
+        player = player,
+        session_id = session_id,
+        spawn_cframe = spawn_cframe,
+        respawn_delay = respawn_delay,
+    }
+    local connection = player.CharacterAdded:Connect(function(character)
+        self:_activate_character(binding, character)
+    end)
+    player:LoadCharacter()
+    return connection
 end
 
 return table.freeze(WorldBossMemberLifecycle)
