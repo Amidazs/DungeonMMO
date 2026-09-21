@@ -55,8 +55,8 @@ beast.PrimaryPart = beast_root
 
 local beast_humanoid = Instance.new("Humanoid")
 beast_humanoid.BreakJointsOnDeath = false
-beast_humanoid.Health = 0
 beast_humanoid.Parent = beast
+beast_humanoid.Health = 0
 beast.Parent = workspace
 collection_service:AddTag(beast, "DungeonMMOSkinnableBeast")
 
@@ -76,8 +76,8 @@ local disguised_root = Instance.new("Part")
 disguised_root.Name = "HumanoidRootPart"
 disguised_root.Parent = disguised
 local disguised_humanoid = Instance.new("Humanoid")
-disguised_humanoid.Health = 0
 disguised_humanoid.Parent = disguised
+disguised_humanoid.Health = 0
 disguised.Parent = workspace
 collection_service:AddTag(disguised, "DungeonMMOSkinnableBeast")
 
