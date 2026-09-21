@@ -34,8 +34,8 @@ Dungeon travel 18 assertions each, Base return 22, ordinary
 Dungeon admission 10, destination factory 5, default-off Play,
 Base professions 14/14, Dungeon gameplay 30/30 and material-chain
 Play PASS. Hardening = Base and Dungeon contribution 14 assertions
-each, three current Rojo builds, Base return 22, Base travel 18
-and Dungeon session 30 assertions PASS.
+each, six final Rojo builds, Base return 22, Base travel 18,
+and final session regression 33 assertions in Base and Dungeon PASS.
 
 **NEXT:** integrate the existing combat/client/controller safely
 into the independent world-boss place, author a basic arena anchor,
