@@ -2,10 +2,12 @@
 
 **Date:** 21 September 2026  
 **Branch:** `wip/phase-4-test-hud-integration-v1`  
-**Status:** Default-off Base entry source, reserved-server routing,
-separate world-boss place and Base return contracts **locally
-verified**. Published cross-server travel, dedicated playable combat,
-genuine cloud persistence and live event release **remain pending**.
+**Status:** Default-off Base entry, reserved-server routing, separate
+world-boss place, Base return, existing combat integration and a real
+single-client guardian defeat/reward path are **locally verified**.
+Published cross-server travel, authored arena content, multi-client
+network recovery, genuine cloud persistence and live event release
+**remain pending**.
 
 ## Goal and progress
 
@@ -100,6 +102,56 @@ TEST configuration. Thus the currently compiled destination is
 cross-place teleport, live MemoryStore/DataStore handoff, full
 Base → boss → Base playthrough or production release has occurred.
 
+## New local milestone — real guardian combat and reward path
+
+The isolated world-boss composition now includes the existing full
+combat server/client runtime plus the existing captain AI controller,
+while excluding the ordinary prototype ArenaBuilder. Admitted boss
+players are marked with the frozen weekly encounter ID so the guardian
+targets only the correct encounter participants.
+
+Player damage contribution is scoped twice on the server:
+`DungeonContributionBridge` accepts only the exact active guardian
+model, and `WorldBossCombatAuthority` also verifies active session
+membership, connected/non-abandoned state, matching encounter
+attributes, live guardian state and the undefeated weekly snapshot.
+Healing and wards must target admitted encounter members.
+
+Real Studio Play uncovered and fixed two bugs missed by earlier
+contract tests: a missing-event-state nil access and an `event`
+variable-shadowing bug that rejected genuine guardian hits. The
+post-defeat runtime now also retries unpaid weekly rewards, and a
+qualifying player cannot return to Base while their earned reward
+remains unsaved.
+
+**Real-client Play acceptance:** using normal client attack input and
+the existing CombatService/DamageService path, the player damaged the
+guardian, generated persisted server contribution, was damaged by the
+guardian AI, defeated the guardian without direct health injection,
+received the weekly reward once and received zero on an immediate
+duplicate claim. Final markers:
+`REAL_CLIENT_HIT_PASS`, `SERVER_CONTRIBUTION_PASS`,
+`GUARDIAN_ATTACK_PASS`, `REAL_CLIENT_BOSS_DEFEAT_PASS`,
+`WEEKLY_REWARD_ONCE_PASS`, `VERIFIED_PLAY_MODE_PASS`.
+
+Final source head `7605c811bb9f9a13ce2fb56f6b68a76f8c63ae89`
+also passed six Rojo builds, seven scoped damage-filter assertions,
+default-off boss-place Play, 14 contribution-service assertions,
+40 weekly-policy assertions, eight guardian-factory assertions,
+Base professions 14/14 and Dungeon backend 30/30.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-real-combat-2026-09-21.md`.
+
+**Remaining blockers:** this proves the isolated combat backend, not
+the full networked game journey. The real world-boss place still needs
+an authored `WorldBossArenaSpawn`; the accepted fixture manually
+creates its disposable session/guardian rather than traversing Base
+entry and Roblox ReserveServer. Multi-client fight, party wipe/death,
+disconnect/rejoin, published TEST profile lease handoff,
+DataStore/MemoryStore recovery and the complete Base → boss → Base
+journey remain pending. The event stays disabled by default.
+
 ## Earlier local milestone — frozen session and contribution-gated reward
 
 The next default-off backend layer is implemented and locally
@@ -131,26 +183,25 @@ does not turn ordinary TestDungeon encounters into world bosses.
 Receipt:
 `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
 
-## Next backend milestone — dedicated playable boss encounter
+## Next backend milestone — party resilience and published TEST gate
 
-1. Connect the existing combat, player controls, guardian AI,
-   server damage and participation recorder to the isolated boss
-   place. Author a basic arena anchor and an opt-in Studio fixture
-   without changing ordinary Dungeon/Temple encounters.
-2. Make rewards resilient to verified boss defeat when eligible
-   players disconnect, fail a save or return to Base. Verify
-   pending entitlements, session TTL, wipe and retry semantics;
-   never pay merely for invitation or untrusted client data.
-3. Run isolated, actual multi-client Play-mode boss combat
-   including damage/support, two distinct sessions, deaths,
-   reconnect and individual return (no assisted boss kill).
-4. Only after those checks, configure separate Base/boss TEST
-   place IDs, published reserved-server admission, lease and
-   DataStore/MemoryStore recovery. Prove Base → boss → Base
-   over a real published TEST network before enabling the event.
-5. Final guardian-specific phases, raid mechanics, reward
-   tuning, event notices and models follow the trusted backend
-   contract. Explicit approval is required for any public launch.
+1. Add an authored minimal `WorldBossArenaSpawn` and basic enclosed
+   arena to the dedicated place without replacing accepted combat.
+2. Exercise actual multi-client boss Play with at least two real
+   Studio clients: shared guardian damage, support contribution,
+   player death/respawn or wipe semantics, and independent weekly
+   eligibility.
+3. Harden disconnect/rejoin around the live fight and post-kill
+   reward path, including one player leaving while others continue,
+   reconnect after defeat, failed reward save retry and individual
+   return to Base.
+4. Only after those local tests, configure separate TEST-only Base
+   and world-boss place IDs and run the first published
+   Base → ReserveServer boss → Base journey. Verify real profile
+   lease handoff and DataStore/MemoryStore recovery there.
+5. Guardian-specific phases, event announcements, reward tuning,
+   final meshes/animations and public schedule remain separate
+   release work. Explicit approval is required before live rollout.
 
 ## Separate future/release gates
 
