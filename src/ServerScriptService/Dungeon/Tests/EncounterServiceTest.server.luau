@@ -61,7 +61,26 @@ local duplicate = encounters:on_enemy_died(enemy_a)
 check(duplicate.already_processed == true, "Same enemy life must be processed only once.")
 check(#reward_calls == 1, "Duplicate death must not call RewardService again.")
 
-local second = encounters:on_enemy_died(enemy_b)
+-- A party wipe only discards current enemy handles. Previously paid
+-- monster lives retain identical transaction IDs when the room restarts.
+local cancelled = encounters:cancel_active("CombatRoom1")
+check(cancelled.ok == true,
+    "Wipe must retire an uncleared encounter without completing it.")
+check(encounters:get_current_id() == nil,
+    "The old encounter must stop owning combat after wipe.")
+check(not encounters:cancel_active("CombatRoom1").ok,
+    "Repeated wipe callbacks must not cancel an already retired fight.")
+local enemy_a_retry = enemy_a:Clone()
+local enemy_b_retry = enemy_b:Clone()
+check(encounters:start("CombatRoom1", {101}, {
+    enemy_a_retry, enemy_b_retry,
+}).ok, "Wiped encounter must be startable again with fresh models.")
+check(encounters:on_enemy_died(enemy_a_retry).ok,
+    "A previously rewarded enemy must be valid in the retry.")
+check(reward_calls[2].transaction_id == reward_calls[1].transaction_id,
+    "Retry must use the original monster reward transaction ID.")
+
+local second = encounters:on_enemy_died(enemy_b_retry)
 check(second.ok == true and second.cleared == true, "Final registered enemy death must clear encounter.")
 check(encounters:is_clear("CombatRoom1") == true, "Encounter must report clear after all registered enemies die.")
 
