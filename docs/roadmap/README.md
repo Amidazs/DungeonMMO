@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**Latest GitHub roadmap supplement: v1.59 — physical
+four-player SecretArena boss, Depth4 mini-boss and live
+boss peer-disconnect recovery.** See
+[v1.59](DungeonMMO_Roadmap_v1_59_Secret_Depth4_Disconnect_20260921.md)
+and [local acceptance evidence](../testing/dungeon-secret-depth4-disconnect-recovery-2026-09-21.md).
+All three unpublished Studio multiplayer fixtures passed.
+The higher-depth terminal wipe service regression passed
+392 assertions. Same-account published rejoin, full normal
+combat/boss rewards and reserved-server replay remain
+outstanding. No `main` merge or place publish.
+
+
 **Latest GitHub progress: v1.58 — real four-client Room1,
 Room3 boss and optional EventArena wipe/re-entry; replay
 party voting verified (21 September 2026).**
