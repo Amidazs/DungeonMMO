@@ -96,6 +96,7 @@ local DungeonEncounterExecutionController = require(
 local CompletionEligibilityRules = require(Dungeon:WaitForChild("CompletionEligibilityRules"))
 local CompletionService = require(Dungeon:WaitForChild("CompletionService"))
 local ReturnPortalService = require(Dungeon:WaitForChild("ReturnPortalService"))
+local DungeonReplayService = require(Dungeon:WaitForChild("DungeonReplayService"))
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
 )
@@ -178,6 +179,8 @@ local active_session_id: string? = nil
 local encounter_service: any = nil
 local encounter_runtime_controller: any = nil
 local encounter_execution_controller: any = nil
+local active_execution: any = nil
+local replay_service: any = nil
 local encounter_flow: any = nil
 local encounter_bindings: any = nil
 local checkpoint_service: any = nil
@@ -792,6 +795,7 @@ local function connect_enemy(enemy: Model, encounter_id: string)
                 )
             end
 
+            active_execution = nil
             if flow_clear.complete then
                 if handle_run_cleared then
                     handle_run_cleared()
@@ -904,6 +908,7 @@ local function start_executed_slot(room_slot_id: string): any?
         return nil
     end
 
+    active_execution = started
     sync_encounter_members_from_session()
     for _, enemy in ipairs(enemies) do
         connect_enemy(enemy, encounter_id)
@@ -944,6 +949,54 @@ local function start_executed_slot(room_slot_id: string): any?
     end
 
     return started
+end
+
+-- Args:
+--   session: any; active session with an interrupted encounter.
+-- Returns:
+--   any: rollback result; cleared rooms and reward receipts are retained.
+local function reset_wiped_encounter(session: any): any
+    if session.State ~= "Active" or not active_execution
+        or not encounter_execution_controller or not encounter_service
+    then
+        return {ok = false, reason = "NoActiveEncounterToRetry"}
+    end
+    local binding = active_execution.Binding
+    local encounter_id = binding.RuntimeEncounterId
+    if encounter_service:is_clear(encounter_id) then
+        return {ok = false, reason = "EncounterAlreadyCleared"}
+    end
+
+    local cancelled = encounter_execution_controller:abort_slot(
+        binding.RoomSlotId,
+        active_execution.Execution,
+        encounter_execution_context()
+    )
+    if not cancelled.ok then
+        warn("[Dungeon Runtime] Wipe rollback failed: "
+            .. tostring(cancelled.reason))
+        return cancelled
+    end
+
+    local retired = encounter_service:cancel_active(encounter_id)
+    if not retired.ok then
+        warn("[Dungeon Runtime] Wipe encounter release failed: "
+            .. tostring(retired.reason))
+        return retired
+    end
+
+    active_execution = nil
+    sync_all_character_encounters("")
+    sessions:set_runtime_progress(
+        session.SessionId,
+        binding.PlanEncounterId .. "Ready",
+        ""
+    )
+    send_objective(
+        "Party wiped. Current room reset; return from checkpoint to retry.",
+        "Active"
+    )
+    return {ok = true, checkpoint = checkpoint_service:get_active_checkpoint()}
 end
 
 local function send_completion_state(commit_result: any, return_at: number)
@@ -1434,6 +1487,14 @@ local function initialize_session_services(session: any): (any?, boolean)
         is_studio = RunService:IsStudio(),
         auto_return_seconds = 60,
     })
+    replay_service = DungeonReplayService.new(sessions, coordinator, {
+        is_studio = RunService:IsStudio(),
+        destination_place_id = game.PlaceId,
+        is_player_ready = function(player: Player): boolean
+            return loaded_users[player.UserId] == true
+                and Players:GetPlayerByUserId(player.UserId) == player
+        end,
+    })
 
     local death_ref: any = nil
     purchase_service = RevivePurchaseService.new(sessions, {
@@ -1458,6 +1519,7 @@ local function initialize_session_services(session: any): (any?, boolean)
         on_member_mode = function(user_id: number, mode: string)
             encounter_service:mark_member_mode(user_id, mode)
         end,
+        on_recoverable_wipe = reset_wiped_encounter,
     })
     death_ref = death_service
     return recovery_plan, true
@@ -1898,6 +1960,38 @@ return_request.OnServerEvent:Connect(function(
     action: any
 )
     if not loaded_users[player.UserId] then
+        return
+    end
+    if action == "PlayAgain" then
+        if not replay_service or not active_session_id then
+            emit_revive_state(player.UserId, {error = "ReplayNotReady"})
+            return
+        end
+        local replay = replay_service:request(
+            active_session_id, player, connected_loaded_players()
+        )
+        if not replay.ok then
+            dungeon_state:FireClient(player, {
+                state = "ReplayError",
+                objective = "Unable to start replay: "
+                    .. tostring(replay.reason),
+                replay_error = replay.reason,
+            })
+        elseif replay.waiting then
+            dungeon_state:FireClient(player, {
+                state = "ReplayWaiting",
+                objective = string.format(
+                    "Waiting for %d party member(s) to select Play again.",
+                    replay.waiting
+                ),
+                waiting = replay.waiting,
+            })
+        elseif replay.simulated then
+            dungeon_state:FireClient(player, {
+                state = "ReplaySimulated",
+                objective = "Studio replay simulated; new run is not published.",
+            })
+        end
         return
     end
     if action == "Abandon" then
