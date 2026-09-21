@@ -1,7 +1,7 @@
 # DungeonMMO Roadmap v1.53 — Leatherworking / Enchanting staged
 
 **Date:** 21 September 2026  
-**Status:** Four local builds and Studio deterministic suites PASS; **live profession station acceptance pending**  
+**Status:** Animal-only Skinning and temporary live hide-grant interactions locally verified; **full live crafting, multiplayer and authored animal encounter acceptance pending**  
 **Branch:** `wip/phase-4-test-hud-integration-v1`
 
 This supplement follows the accepted v1.52 Event-variation /
@@ -9,6 +9,33 @@ Blacksmithing-Alchemy checkpoint. The work was first staged in GitHub
 while the desktop was offline; local verification has now resumed. The
 physical profession station gate is still pending. The historical
 canonical `DungeonMMO_Roadmap_v1_47.docx` is unchanged.
+
+## Latest local verification — 21 September 2026
+
+The animal-only Skinning policy and the first interactive
+client/server hide-grant path are **locally verified**. Four Rojo
+builds, Base/Dungeon focused profession suites (12/12 each; 363
+assertions each), Dungeon cleanup (11 assertions), and broad Dungeon
+backend matrix (30/30) PASS. A real Base Play client gathered exactly
+one raw hide from a temporary Base cache, after which the prompt
+was disabled. A separate real Base Play client skinned a temporary
+server-created, dead-and-looted wolf and received exactly one hide;
+a second interaction on that corpse was disabled. The earlier cache
+timeout was a test expectation mistake after prompt depletion,
+not evidence of an unprocessed first grant.
+
+The actual game does **not** yet include authored animal enemies,
+so a genuine dungeon animal combat → loot → retained corpse → skin
+flow remains pending. Also pending: actual client material-backed
+Leatherworking/Enchanting completion, contested two-player corpse
+claim, overlapping real crafting requests and disconnect/retry,
+cloud TEST/PROD and real user DataStore migration. The Base cache
+is still a non-monster temporary material source.
+
+Full local evidence:
+`docs/testing/animal-only-corpse-skinning-studio-verified-2026-09-21.md`.
+
+## Historical v1.53 implementation checkpoint
 
 ## Implemented in GitHub
 
