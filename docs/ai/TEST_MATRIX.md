@@ -23,8 +23,12 @@ Tested head:
   ArcaneWard application; a **server-injected** incoming hit through
   production DamageService/WardService absorption generated threat.
   `VERIFIED_MULTIPLAYER_PASS`.
-- [ ] Genuine client Mend pulse threat and genuine NPC attack
-  absorption of Ward in a multiplayer fight.
+- [x] Follow-on genuine two-client Marauder fixture at
+  `04c3f1e`: client MageHeal and ArcaneWard; actual NPC attack
+  absorbed by the client-cast Ward; actual Fighter Mend pulses
+  generated support threat. `VERIFIED_MULTIPLAYER_PASS`.
+- [ ] Recheck these genuine support-skill interactions in the
+  isolated weekly world-boss encounter.
 - [ ] Real 4-client tank/DPS/support aggro, multi-enemy room behavior,
   full-party wipe/reset and live controller-level disconnect.
 - [ ] Genuine healing/Ward in isolated world-boss session.
