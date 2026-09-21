@@ -130,15 +130,6 @@ local function run()
         end
     )
     Bridge.bind_service(authority)
-    -- Disposable instrumentation of the existing combat bridge,
-    -- not a fabricated attack or a direct contribution grant.
-    Bridge.set_recorder_for_test(function(user_id, event)
-        local outcome = authority:record_for_user(user_id, event)
-        print("[World Boss Combat Live] CONTRIBUTION_RESULT "
-            .. tostring(outcome.ok) .. " "
-            .. tostring(outcome.reason))
-        return outcome
-    end)
     Bridge.bind_damage_target_validator(function(context)
         return context.target == boss
             and context.attacker == player
