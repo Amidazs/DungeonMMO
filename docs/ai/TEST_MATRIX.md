@@ -1,5 +1,35 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — frozen weekly boss session contract
+
+- [x] `DungeonSessionService` issues exactly one server-owned
+  world-boss snapshot for an existing authorized session; second
+  issuance cannot reroll week or party.
+- [x] Defeat requires existing server-tagged matching dead guardian,
+  then persists defeat into the session InstanceState.
+- [x] Fresh bridge/session/weekly service sharing an in-memory
+  adapter rehydrates one frozen snapshot after simulated restart.
+  Entry does not reopen merely because the group reconnects.
+- [x] An outsider, invited non-contributor and abandoned member
+  cannot claim a reward through the session bridge.
+- [x] Existing server-certified member completion eligibility is
+  required, then each player receives an independent once-per-week
+  profile reward. Same-UserId save/reload cannot duplicate it.
+- [x] Local Studio: **30 session assertions PASS** in Base and
+  **30 PASS** in Dungeon; previous weekly policy 40 in each,
+  guardian factory eight; Base profession regression 14/14 and
+  Dungeon gameplay 30/30 PASS; four Rojo compositions build.
+- [ ] Real Base entry gateway, dedicated reserved world-boss
+  destination/admission, durable cloud server-handoff verification
+  and contribution proof from real boss attacks remain pending.
+  Ordinary dungeon portal/gameplay remains unchanged.
+- [ ] Public schedule/rollout, actual published TEST/PROD,
+  real-user DataStore, final guardian AI/art and balance remain open.
+
+Receipt: `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
+
+## Prior 21 September weekly milestone (historical)
+
 ## 21 September 2026 — v1.54 weekly boss foundation
 
 - [x] No automatic schedule or public entry enabled. Trusted explicit
