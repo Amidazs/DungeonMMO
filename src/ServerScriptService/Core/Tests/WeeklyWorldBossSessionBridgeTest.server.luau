@@ -151,6 +151,25 @@ local next_bridge = bridge_for(next_sessions, next_weekly, clock)
 local restored = next_bridge:resume(session_id)
 check(restored.ok and restored.snapshot.Defeated == true,
     "new server-style services restore the original defeated event")
+
+-- A damaged persistent member list must reject without a runtime error.
+local altered = next_sessions:update_instance_state(
+    session_id, function(state)
+        state.WeeklyWorldBoss.Members = nil
+        return state, nil
+    end)
+check(altered.ok, "test can simulate a malformed stored snapshot")
+check(next_bridge:resume(session_id).reason
+    == "WorldBossMemberMismatch",
+    "malformed persisted members must reject without indexing nil")
+local repaired = next_sessions:update_instance_state(
+    session_id, function(state)
+        state.WeeklyWorldBoss.Members = restored.snapshot.Members
+        return state, nil
+    end)
+check(repaired.ok and next_bridge:resume(session_id).ok,
+    "restoring the correct durable party must recover admission")
+
 local replay = next_bridge:grant_reward(session_id, FIRST_ID)
 check(replay.ok and replay.already_applied
     and replay.gold_granted == 0,
