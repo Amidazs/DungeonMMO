@@ -149,10 +149,6 @@ end
 -- Returns:
 --   (any, string, Model): local session authority, ID and guardian.
 local function create_encounter(players)
-
--- Returns:
---   (any, string, Model): runtime services, session ID, guardian.
-local function create_encounter(players)
     local runtime = RuntimeServices.new("Dungeon")
     local user_ids = {}
     for _, player in ipairs(players) do
