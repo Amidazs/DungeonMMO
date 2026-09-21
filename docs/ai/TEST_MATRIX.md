@@ -1,5 +1,33 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — failed dungeon return and fresh retry
+
+Verified gameplay head:
+`8899fad6923628e86a8946fc9ce4c365bc738902`.
+
+- [x] Server rejects late or duplicate paid-respawn callbacks,
+  absent members and disconnected players after the run fails;
+  real grant ordering (`PaidReviveCount` + `Active` first)
+  is preserved.
+- [x] Connected failed-run members can return to Base without
+  reopening the terminal session or using active-run abandonment.
+- [x] New session retry has a new SessionId, Entrance checkpoint
+  and unused free revive while the predecessor stays `Failed`.
+- [x] Real client shows failed-run return control:
+  `VERIFIED_PLAY_MODE_PASS`.
+- [x] Six local Rojo builds; Dungeon backend **30/30**;
+  DungeonDeathService **33 assertions**; ReturnPortalService
+  **15 assertions**; integrated paid-retry service **15 assertions**;
+  fresh-session contract PASS.
+- [ ] Actual in-place encounter reset restoring enemy health/spawn,
+  party checkpoint respawn and reward-safe room re-entry.
+- [ ] Published TEST cross-place Base return and fresh run Play,
+  cloud reconnect and production rollout remain deferred.
+
+Receipt:
+`docs/testing/dungeon-terminal-wipe-return-fresh-run-2026-09-21.md`.
+
+
 ## 21 September 2026 — real wipe/disconnect acceptance
 
 Verified head:
