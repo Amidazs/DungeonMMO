@@ -1,8 +1,46 @@
 # DungeonMMO Roadmap v1.53 — Leatherworking / Enchanting staged
 
 **Date:** 21 September 2026  
-**Status:** Animal-only Skinning and temporary live hide-grant interactions locally verified; **full live crafting, multiplayer and authored animal encounter acceptance pending**  
+**Status:** Local backend Play acceptance for material-backed crafting, opt-in wolf encounter/Skinning and two-client independence; **same-account interrupted reconnect, final animal AI/art and release/cloud validation pending**  
 **Branch:** `wip/phase-4-test-hud-integration-v1`
+
+## Latest local milestone — 21 September 2026
+
+**Locally verified:** an opt-in `ForestWolf` factory and separate
+`Wolf` archetype; real disposable Temple Room1 encounter/reward →
+retained looted animal corpse → actual client Skinning → one raw hide.
+The default dungeon packs remain Marauder-only; this test changes
+Temple Room1 only inside an unpublished disposable Studio DataModel.
+The current wolf is temporary combat-rig/animal-silhouette content,
+not finished wolf art or dedicated animal AI.
+
+**Locally verified:** one actual Base player completed the entire
+material-backed Blacksmithing → Alchemy → Leatherworking → Enchanting
+dependency chain to `warded_leatherbound_gloves` through the original
+station-checked client RemoteEvents. A repeated enchant with no inputs
+was rejected. Two rapid requests with just enough ore for one recipe
+yielded one iron bar, one `MissingMaterials` rejection and no
+double-consumption.
+
+**Locally verified:** a two-user atomic corpse contest passed in both
+Base and Dungeon (13/13 focused suites in each composition). A
+separate genuine two-client Base Play-mode fixture proved independent
+iron-bar crafting, exactly one total hide granted from a shared corpse
+and peer survival after the other client disconnected.
+The normal Dungeon backend matrix remained 30/30; wolf factory and
+enemy cleanup tests remained green.
+
+**Still pending:** same-account reconnect and in-flight
+disconnect/retry, end-to-end cross-server persistence, dedicated
+animal AI and final enemy models/balance, production wolf pack
+placement, unassisted dungeon combat, published cloud validation and
+real-player DataStore acceptance. Keep these gates open; do not
+equate the disposable local Play proofs with a live release.
+
+Detailed source and Studio receipts:
+`docs/testing/profession-v153-wolf-and-crafting-local-acceptance-2026-09-21.md`.
+
+## Historical v1.53 progress snapshots
 
 This supplement follows the accepted v1.52 Event-variation /
 Blacksmithing-Alchemy checkpoint. The work was first staged in GitHub
