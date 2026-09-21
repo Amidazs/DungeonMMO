@@ -1,5 +1,44 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — recoverable room reset and Play again
+
+Candidate gameplay/test head:
+`341c84da73b9c1246414a51e171cc363d4e71c1b`.
+The live dungeon death callback now resets an **uncleared active
+encounter** once when all living party members fall but an
+automatic free revive is still pending. The executor destroys
+old enemy handles, releases boss spawn guards and rolls the
+current encounter to Pending while preserving prior clears and
+the room-start checkpoint. Free-reviving players respawn at that
+checkpoint, then the authored room can spawn fresh enemies
+with full health and fresh threat on re-entry. Already paid
+monster lives retain their transaction IDs; no extra revive
+or reward receipt is created by the rollback.
+
+Completed runs with committed rewards and fully failed runs
+now expose **Play again** alongside Return to Base. The
+authoritative replay service requires affirmative consent from
+all currently connected party members before requesting a new
+reserved session with the same dungeon, difficulty and original
+Base destination. A failed launch clears previous votes.
+Unpublished Studio simulates actual cross-server travel.
+
+Six Rojo builds; Dungeon backend **30/30**, replay contract
+**17 assertions**, paid-retry regression and real-client terminal
+UI `COMPLETION_BUTTON_PASS` / `WIPE_BUTTON_PASS` all passed at
+`c1d7f83`. After one-shot wipe test additions, the same-head
+`341c84d` Dungeon death suite passed **40 assertions** and the
+backend matrix remained **30/30**.
+
+**Outstanding:** a complete real-client physical dungeon
+room fight -> death -> rebuilt enemies -> checkpoint re-entry
+playtest; actual published reserved-place Play again and
+cross-server/cloud rewards. These were NOT verified by the
+local service/UI tests. No place published or main merged.
+Receipt:
+`docs/testing/dungeon-room-reset-play-again-2026-09-21.md`.
+
+
 ## 21 September 2026 — terminal wipe -> Base -> fresh retry VERIFIED
 
 Latest tested gameplay source:
