@@ -2,9 +2,9 @@
 
 **Date:** 21 September 2026  
 **Branch:** `wip/phase-4-test-hud-integration-v1`  
-**Status:** Local backend policy and opt-in physical prototype
-**verified**; normal-game event entry, reserved server and release
-**not implemented or enabled**.
+**Status:** Default-off weekly policy, local boss prototype and durable
+session bridge **locally verified**; normal-game Base entry, dedicated
+reserved server and cloud release **not implemented or enabled**.
 
 ## Goal and progress
 
@@ -45,6 +45,38 @@ normal Base portal, public event, reserved-server route or finished
 boss encounter. The guardian uses the existing combat rig for
 backend verification; the 100-gold payout is a provisional test
 value, not a balanced final reward.
+
+## New local milestone — frozen session and contribution-gated reward
+
+The next default-off backend layer is implemented and locally
+verified. `WeeklyWorldBossSessionBridge` uses the existing
+`DungeonSessionService` to issue a frozen event/party/week snapshot,
+persist a verified boss defeat, and rehydrate that encounter after
+a simulated service restart. It refuses unauthorized and duplicate
+issuance, outsiders and invited non-contributors. Once an existing
+server-side session has certified a member's completion
+eligibility, that member can claim their independent weekly
+reward. A new service reading the same in-memory session map
+and previously saved same-UserId profile cannot grant it twice.
+
+**Acceptance:** four Rojo compositions; 30 session assertions
+in Base and 30 in Dungeon; original weekly policy 40 assertions
+in each composition; guardian factory eight assertions; existing
+professions 14/14 and Dungeon backend 30/30 PASS.
+
+**Boundary:** This is session persistence contract testing with
+the real session service against a **shared Studio in-memory
+adapter**. No normal Base entry, reserved-server teleport,
+dedicated boss destination or published cross-server MemoryStore/
+DataStore acceptance is claimed. The bridge is available in the
+shared server runtime but not yet invoked by normal gameplay.
+The disposable TestDungeon session used by the contract test
+does not turn ordinary TestDungeon encounters into world bosses.
+
+Receipt:
+`docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
+
+## Remaining world-boss travel and release work
 
 ## Next backend milestone — make entry and reward recoverable
 
