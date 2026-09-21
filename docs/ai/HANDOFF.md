@@ -1,5 +1,43 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — frozen weekly boss session handoff
+
+The active branch contains `WeeklyWorldBossSessionBridge` and
+`WeeklyWorldBossService.restore_instance`, both composed
+server-side into Base/Dungeon RuntimeServices. After an **existing
+server-authorized** DungeonSessionService run has InstanceState,
+`issue` may store one immutable weekly boss/window/party snapshot.
+A matching dead tagged guardian's defeat is written into the
+same stored session state. A newly created bridge/service reading
+the same map can resume the recorded state and deliver the
+once-per-week reward only to a non-abandoned member whose existing
+session completion eligibility was certified server-side.
+
+Base and Dungeon session contract tests each passed **30 assertions**
+in real unpublished Studio. Original weekly policy 40 each, boss
+factory eight, Base professions 14/14 and Dungeon regression 30/30
+passed too. Four Rojo compositions were built successfully.
+
+**Immediate next backend:** dedicated world-boss destination/place,
+server-authorized default-off Base gateway, reserved-session
+handoff via existing coordinator and genuine destination admission.
+Do not route an existing ordinary dungeon place to a world-boss
+snapshot: the current ordinary DungeonRuntime remains unaware of
+this bridge and would continue its normal encounter sequence.
+Before release add validated contribution, disconnect and
+pending reward semantics in the actual dedicated boss runtime.
+
+The bridge is not hooked into normal portal gameplay.
+Tests shared a Studio in-memory session adapter and profile store,
+not real Roblox cross-server persistence. No cloud publish,
+production DataStore, force-push or main merge took place.
+All source/test/roadmap changes were via GitHub; local desktop
+only fast-forward-pulled, built and tested.
+
+Receipt: `docs/testing/weekly-world-boss-v154-session-bridge-2026-09-21.md`.
+
+## Earlier 21 September weekly handoff (historical)
+
 ## 21 September 2026 — v1.54 weekly world-boss foundation handoff
 
 Source at the active `wip/phase-4-test-hud-integration-v1` branch
