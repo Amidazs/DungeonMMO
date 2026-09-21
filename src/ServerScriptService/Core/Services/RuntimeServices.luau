@@ -27,6 +27,9 @@ local RewardService = require(Services:WaitForChild("RewardService"))
 local WeeklyWorldBossService = require(
     Services:WaitForChild("WeeklyWorldBossService")
 )
+local WeeklyWorldBossSessionBridge = require(
+    Services:WaitForChild("WeeklyWorldBossSessionBridge")
+)
 local AttributeService = require(Services:WaitForChild("AttributeService"))
 local LoadoutService = require(Services:WaitForChild("LoadoutService"))
 local SkillProgressionService = require(Services:WaitForChild("SkillProgressionService"))
@@ -109,6 +112,9 @@ function RuntimeServices.new(place_kind: string): any
     )
     local rewards = RewardService.new(profiles, progression, inventory, sessions)
     local weekly_world_boss = WeeklyWorldBossService.new(profiles)
+    local weekly_world_boss_sessions = WeeklyWorldBossSessionBridge.new(
+        sessions, weekly_world_boss
+    )
     rewards:set_audit_service(audit)
     guilds:set_audit_service(audit)
     market:set_audit_service(audit)
@@ -152,6 +158,7 @@ function RuntimeServices.new(place_kind: string): any
         RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
         WeeklyWorldBossService = weekly_world_boss,
+        WeeklyWorldBossSessionBridge = weekly_world_boss_sessions,
         AttributeService = attributes,
         LoadoutService = loadout,
         SkillProgressionService = skills,
