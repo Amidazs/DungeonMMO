@@ -10,6 +10,7 @@ local Sessions = require(Core.Services.DungeonSessionService)
 local ReturnRules = require(Base.BaseReturnAdmissionRules)
 local Reconnect = require(Base.BaseReconnectRouting)
 local Gateway = require(Base.WorldBossBaseRuntime)
+local Coordinator = require(Core.Services.TeleportCoordinator)
 
 local assertions = 0
 local FIRST_ID = 95401
@@ -35,7 +36,7 @@ check(Gateway.validate_config({
 
 local sessions = Sessions.new(MapAdapter.new())
 local session, reason = sessions:create(
-    "TestDungeon", {FIRST_ID, SECOND_ID}, 0,
+    "TestDungeon", {FIRST_ID, SECOND_ID}, 778899,
     "WorldBossReturnReserved_TEMP", "Depth1")
 check(session ~= nil and reason == nil,
     "existing session authority issues a valid party transport")
@@ -85,6 +86,43 @@ check(Reconnect.decide(session, SECOND_ID).route == "Dungeon",
     "other party members remain recoverable in their boss instance")
 check(sessions:get_for_user(FIRST_ID).SessionId == id,
     "old index remains until a confirmed Base arrival")
+-- A synchronous return-teleport error must restore the member's
+-- ability to reconnect to the boss, not leave an orphaned return flag.
+local failing_transport = {}
+function failing_transport:teleport(
+    _place_id, _players, _code, _routing)
+    return false, "SimulatedBaseTeleportFailure"
+end
+function failing_transport:connect_init_failed(_handler)
+    return nil
+end
+local fake_profiles = {}
+function fake_profiles:save(_user_id, _reason)
+    return true, nil
+end
+local fake_leases = {}
+function fake_leases:begin_handoff(_user_id, _nonce, _destination)
+    return {ok = true}
+end
+function fake_leases:cancel_handoff(_user_id, _nonce)
+    return {ok = true}
+end
+local transport = Coordinator.new(
+    failing_transport, fake_profiles, fake_leases, sessions)
+local failed = transport:return_to_base({{UserId = FIRST_ID}}, session)
+check(not failed.ok
+    and failed.reason == "SimulatedBaseTeleportFailure",
+    "failed Base teleport must be reported by the coordinator")
+local rolled_back = sessions:get(id)
+check(rolled_back.Members[tostring(FIRST_ID)]
+    .WorldBossReturnPending == false,
+    "a failed Base teleport must release the per-player return flag")
+check(Reconnect.decide(rolled_back, FIRST_ID).route == "Dungeon",
+    "after a failed Base teleport, reconnect must route to the boss")
+check(sessions:set_world_boss_return_pending(
+    id, FIRST_ID, true).ok,
+    "a recovered participant may retry their Base return")
+
 check(sessions:release_world_boss_return_index(
     id, FIRST_ID).ok,
     "Base may release the returned member's existing dungeon index")
