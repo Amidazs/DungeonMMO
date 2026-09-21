@@ -206,6 +206,14 @@ local function run()
         "effective MageHeal must create server-owned support threat")
     print("[Support Threat Live] REAL_PEER_HEAL_THREAT_PASS")
 
+    -- Do not fire a second skill during MageHeal's Recovery state.
+    -- Fill the recipient's health so delayed HoT ticks cannot masquerade
+    -- as extra Ward-generated threat in the next assertion.
+    wait_for(function()
+        return mage_character:GetAttribute("CombatState")
+            == "Locomotion"
+    end, "MageHeal recovery completed", 5)
+    target_humanoid.Health = target_humanoid.MaxHealth
     place(mage_character, root, 7)
     channel:FireClient(mage, "ArcaneWard")
     wait_for(function()
