@@ -102,11 +102,13 @@ local DungeonContributionBridge = require(
 
 DamageService.set_damage_callback(function(
     context: any,
-    applied_damage: number
+    applied_damage: number,
+    lethal_hit: boolean
 )
     DungeonContributionBridge.record_damage(
         context,
-        applied_damage
+        applied_damage,
+        lethal_hit
     )
 end)
 
