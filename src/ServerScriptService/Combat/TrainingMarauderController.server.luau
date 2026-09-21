@@ -41,6 +41,7 @@ local ThreatService = require(
 
 local MarauderConfig = CombatConfig.TRAINING_MARAUDER
 local DEBUG = CombatConfig.DEBUG
+local NO_TARGET_THREAT_RESET_SECONDS = 3.0
 
 export type AttackDefinition = {
     DISPLAY_NAME: string,
@@ -77,6 +78,8 @@ type MarauderRuntime = {
     life_sequence: number,
     steering_candidate_index: number?,
     steering_commit_until: number,
+    no_target_since: number?,
+    had_threat: boolean,
 }
 
 local runtimes: {MarauderRuntime} = {}
@@ -697,6 +700,31 @@ local function attack(runtime: MarauderRuntime, player: Player)
 end
 
 
+--[[Clears aggro after a sustained gap with no eligible targets.
+
+This does not alter enemy health, position, weekly encounter admission,
+or rewards. The temporary target absence caused by one dodge or death
+must not erase the ledger while another party member remains eligible.
+
+Args:
+    runtime (MarauderRuntime): Enemy with no current target candidates.
+
+Returns:
+    nil: Clears stale threat once after the no-target grace period.
+]]
+local function clear_abandoned_threat(runtime: MarauderRuntime)
+    if runtime.no_target_since == nil then
+        runtime.no_target_since = os.clock()
+    end
+
+    if runtime.had_threat
+        and os.clock() - runtime.no_target_since
+            >= NO_TARGET_THREAT_RESET_SECONDS then
+        ThreatService.clear(runtime.model)
+        runtime.had_threat = false
+    end
+end
+
 --[[Runs one hostile-loop update for one Marauder.]]
 local function update_hostile_loop(runtime: MarauderRuntime, delta_seconds: number)
     if runtime.humanoid.Health <= 0 then
@@ -716,9 +744,15 @@ local function update_hostile_loop(runtime: MarauderRuntime, delta_seconds: numb
 
     local context = update_target(runtime)
     if not context then
+        clear_abandoned_threat(runtime)
         set_ai_state(runtime, "Idle")
         MarauderPresentationService.reset_pose(runtime.model, 0)
         return
+    end
+
+    runtime.no_target_since = nil
+    if runtime.model:GetAttribute("MarauderAggroMode") == "Threat" then
+        runtime.had_threat = true
     end
 
     if MarauderBehaviorRules.get_range_state(context.distance) == "Chasing" then
@@ -753,6 +787,8 @@ end
 --[[Resets one dead Marauder to its original independent spawn.]]
 local function reset_runtime(runtime: MarauderRuntime)
     ThreatService.clear(runtime.model)
+    runtime.no_target_since = nil
+    runtime.had_threat = false
     local old_humanoid = runtime.model:FindFirstChildOfClass("Humanoid")
     if old_humanoid then
         old_humanoid:Destroy()
@@ -781,6 +817,8 @@ end
 --[[Handles one Marauder death and schedules guarded respawn.]]
 local function handle_death(runtime: MarauderRuntime)
     ThreatService.clear(runtime.model)
+    runtime.no_target_since = nil
+    runtime.had_threat = false
     runtime.life_sequence += 1
     local expected_sequence = runtime.life_sequence
 
@@ -833,6 +871,8 @@ local function create_runtime(model: Model, spawn_cframe: CFrame): MarauderRunti
         life_sequence = 0,
         steering_candidate_index = nil,
         steering_commit_until = 0,
+        no_target_since = nil,
+        had_threat = false,
     }
 end
 
