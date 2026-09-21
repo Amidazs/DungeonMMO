@@ -1,5 +1,46 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — SecretArena, Depth4 mini-boss, boss peer-leave VERIFIED
+
+Latest focused tested source:
+`9a63c6d25ac45cd67c9a4c5a684fa4c5a26adb24`.
+
+Four real unpublished Studio clients successfully wiped/re-entered
+a physical Temple SecretArena boss (optional gate opened only in
+the disposable fixture) and a separate physical Depth4 Room2
+mini-boss (using the **Depth4** layout anchors, not Depth1).
+Earlier room clears, six-depth encounter planning, the current
+checkpoint and full-health new boss spawning were preserved.
+
+A genuine fourth client disconnected **during** the active
+Depth1 Room3 boss fight. The remaining three clients kept the
+boss active, then wiped and free-revived at the saved checkpoint.
+The absent member remained disconnected with their free
+revive unused. Re-entry spawned one full-health boss and
+earlier rooms stayed cleared. The new fixture awaits
+persisted post-wipe encounter states, avoiding a previously
+observed false-negative immediate read.
+
+The existing Depth2/Depth4 optional party wipe regression
+was aligned with the production fix for one-shot terminal
+Failed broadcasts and passed **392 assertions** across
+Temple/Mine and 1/2/4-person parties. Six Rojo builds,
+Dungeon backend 30/30, death/revive 41 assertions and
+independent physical SecretArena, Depth4 and disconnected
+boss tests passed in local unpublished Studio.
+
+**Remaining**: actual same-account rejoin, normal client-attack
+and boss reward reattempt, higher-depth completion and
+fresh-session replay, and published TEST reserved/cloud
+continuity. None of the latter should be claimed from the
+current tests. No Roblox publish, `main` merge or force-push.
+
+Evidence:
+`docs/testing/dungeon-secret-depth4-disconnect-recovery-2026-09-21.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_59_Secret_Depth4_Disconnect_20260921.md`.
+
+
 ## 21 September 2026 — real four-party room/boss/event + replay closeout
 
 Latest locally verified gameplay head:
