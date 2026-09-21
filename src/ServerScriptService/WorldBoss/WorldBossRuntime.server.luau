@@ -25,6 +25,12 @@ local RobloxTeleportAdapter = require(
 local BossFactory = require(
     SSS.Dungeon:WaitForChild("DungeonWeeklyWorldBossFactory")
 )
+local CombatAuthority = require(
+    SSS.WorldBoss:WaitForChild("WorldBossCombatAuthority")
+)
+local DungeonContributionBridge = require(
+    SSS.Dungeon:WaitForChild("DungeonContributionBridge")
+)
 
 -- This place must be deliberately enabled after its independent arena
 -- and combat runtime have been validated in a published TEST universe.
@@ -65,6 +71,28 @@ local boss_model: Model? = nil
 local admitted: {[number]: boolean} = {}
 local rewarded: {[number]: boolean} = {}
 local return_prompt: ProximityPrompt? = nil
+
+-- The existing combat service already reports damage through the
+-- shared contribution bridge. Scope this bridge to the admitted boss
+-- session rather than authoring a second attack or reward pipeline.
+local combat_authority = CombatAuthority.new(
+    contribution, function()
+        return {
+            SessionId = active_session_id,
+            Boss = boss_model,
+            Admitted = admitted,
+            Sessions = sessions,
+        }
+    end
+)
+DungeonContributionBridge.bind_service(combat_authority)
+DungeonContributionBridge.bind_damage_target_validator(
+    function(context: any): boolean
+        return boss_model ~= nil and context.target == boss_model
+            and context.attacker ~= nil
+            and admitted[context.attacker.UserId] == true
+    end
+)
 
 -- Args:
 --   user_id: number; authenticated member of the loaded boss session.
@@ -220,6 +248,10 @@ local function admit_player(player: Player)
     active_session_id = session_id
     admitted[player.UserId] = true
     player.CharacterAdded:Connect(function(character: Model)
+        character:SetAttribute("DungeonRunParticipant", true)
+        character:SetAttribute(
+            "DungeonEncounterId", "WeeklyBoss:" .. session_id)
+        character:SetAttribute("WorldBossSessionId", session_id)
         character:PivotTo(
             arena_spawn.CFrame * CFrame.new(0, 4, 12))
     end)
