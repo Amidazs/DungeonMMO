@@ -60,6 +60,9 @@ local function routing_data(session: any): any
         SessionId = session.SessionId,
         DungeonId = session.DungeonId,
         DifficultyId = difficulty_id,
+        WorldBoss = type(session.InstanceState) == "table"
+            and type(session.InstanceState.WeeklyWorldBoss) == "table"
+            or nil,
     }
 end
 
@@ -334,6 +337,104 @@ function TeleportCoordinator:start_dungeon(
     return self:_teleport_prepared(players, session, dungeon_place_id, reserved_code)
 end
 
+-- Args:
+--   players: {Player}; authorized Base party members.
+--   world_boss_place_id: number; dedicated, configured destination.
+--   bridge: any; existing weekly boss/session authority.
+--   start_at: number; server-owned UTC opening timestamp.
+--   end_at: number; server-owned exclusive closing timestamp.
+-- Returns:
+--   any: reserved encounter session or a reasoned rejection.
+function TeleportCoordinator:start_weekly_world_boss(
+    players: {any},
+    world_boss_place_id: number,
+    bridge: any,
+    start_at: number,
+    end_at: number
+): any
+    if type(world_boss_place_id) ~= "number"
+        or world_boss_place_id <= 0 or world_boss_place_id % 1 ~= 0
+        or world_boss_place_id == game.PlaceId
+    then
+        return response(false, "InvalidWorldBossPlaceId")
+    end
+    if #players < 1 or #players > 4 or bridge == nil then
+        return response(false, "InvalidWorldBossParty")
+    end
+    local user_ids = {}
+    local seen = {}
+    for _, player in ipairs(players) do
+        local user_id = user_id_from_player(player)
+        if not user_id or seen[user_id] then
+            return response(false, "InvalidWorldBossParty")
+        end
+        seen[user_id] = true
+        if self:is_pending(user_id) then
+            return response(false, "TeleportAlreadyPending")
+        end
+        local current = self._sessions:get_for_user(user_id)
+        if current and (current.State == "Creating"
+            or current.State == "Active")
+        then
+            return response(false, "ActiveSessionExists", current)
+        end
+        if not self._profiles:get_character(user_id, 1) then
+            return response(false, "ProfileNotLoaded")
+        end
+        table.insert(user_ids, user_id)
+    end
+
+    -- Reject a closed event before reserving or creating a session.
+    local Window = require(
+        ReplicatedStorage.Core.Shared:WaitForChild(
+            "WeeklyWorldBossWindow")
+    )
+    local entry = Window.resolve(os.time(), start_at, end_at)
+    if not entry.ok then
+        return response(false, entry.reason)
+    end
+    local reserved, code = self._teleport:reserve_server(
+        world_boss_place_id)
+    if not reserved or not code then
+        return response(false, code or "ReserveServerFailed")
+    end
+
+    -- TestDungeon is reused as a validated session transport only.
+    -- The dedicated destination must reject ordinary dungeon sessions.
+    local session, reason = self._sessions:create(
+        "TestDungeon", user_ids, game.PlaceId, code, "Depth1")
+    if not session then
+        return response(false, reason or "SessionCreateFailed")
+    end
+    local initialized = self._sessions:set_instance_state(
+        session.SessionId, {})
+    if not initialized.ok then
+        self._sessions:mark_failed(
+            session.SessionId, initialized.reason)
+        return response(false, initialized.reason, session)
+    end
+    local issued = bridge:issue(
+        session.SessionId, start_at, end_at, world_boss_place_id)
+    if not issued.ok then
+        self._sessions:mark_failed(
+            session.SessionId, issued.reason)
+        return response(false, issued.reason, session)
+    end
+    session = issued.session
+    local data = routing_data(session)
+    local prepared, prepare_error = self:_prepare_handoffs(
+        players, session, "Dungeon", world_boss_place_id,
+        code, data, true)
+    if not prepared then
+        self._sessions:mark_failed(
+            session.SessionId, prepare_error or "HandoffPrepareFailed")
+        return response(
+            false, prepare_error or "HandoffPrepareFailed", session)
+    end
+    return self:_teleport_prepared(
+        players, session, world_boss_place_id, code)
+end
+
 function TeleportCoordinator:rejoin_session(player: any, session_record: any, dungeon_place_id: number): any
     local user_id = user_id_from_player(player)
     if not user_id then
@@ -353,6 +454,11 @@ function TeleportCoordinator:rejoin_session(player: any, session_record: any, du
     end
     if type(dungeon_place_id) ~= "number" or dungeon_place_id <= 0 then
         return response(false, "InvalidDungeonPlaceId")
+    end
+    local boss = session_record.InstanceState
+        and session_record.InstanceState.WeeklyWorldBoss
+    if boss and boss.DestinationPlaceId ~= dungeon_place_id then
+        return response(false, "WorldBossDestinationMismatch")
     end
 
     local teleport_data = routing_data(session_record)
