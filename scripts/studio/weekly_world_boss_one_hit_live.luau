@@ -149,7 +149,7 @@ local function run()
     character:SetAttribute("DungeonRunParticipant", true)
     character:SetAttribute("DungeonEncounterId", "WeeklyBoss:" .. id)
     root.CFrame = CFrame.lookAt(
-        Vector3.new(0, 5, 5), Vector3.new(0, 5, 0))
+        Vector3.new(0, 5, 2.5), Vector3.new(0, 5, 0))
     assert(guardian_health > 0,
         "one-hit fixture must spawn a genuinely living guardian")
     task.wait(2)
