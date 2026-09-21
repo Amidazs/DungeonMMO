@@ -584,6 +584,67 @@ function DungeonSessionService:refresh(session_id: string): any
     end)
 end
 
+-- Args:
+--   session_id: string; active server-issued world-boss session.
+--   user_id: number; authenticated returning member.
+--   pending: boolean; whether a verified Base return is in progress.
+-- Returns:
+--   any: stored return state or a reasoned rejection.
+function DungeonSessionService:set_world_boss_return_pending(
+    session_id: string,
+    user_id: number,
+    pending: boolean
+): any
+    return self:_update(session_id, function(session: any, now: number)
+        if type(session) ~= "table" or session.State ~= "Active"
+            or type(session.InstanceState) ~= "table"
+            or type(session.InstanceState.WeeklyWorldBoss) ~= "table"
+            or session.InstanceState.WeeklyWorldBoss.Defeated ~= true
+        then
+            return session or {}, operation(
+                false, "WorldBossNotReturnable")
+        end
+        local member = session.Members[tostring(user_id)]
+        if not member or member.Abandoned == true then
+            return session, operation(false, "NotMember")
+        end
+        member.WorldBossReturnPending = pending == true
+        session.UpdatedAt = now
+        return session, operation(true, nil)
+    end)
+end
+
+-- Args:
+--   session_id: string; completed outbound world-boss return.
+--   user_id: number; authenticated Base arrival with claimed handoff.
+-- Returns:
+--   any: forgets only that returned member's old dungeon index.
+function DungeonSessionService:release_world_boss_return_index(
+    session_id: string,
+    user_id: number
+): any
+    local session = self:get(session_id)
+    local member = session and session.Members
+        and session.Members[tostring(user_id)]
+    if not member or member.WorldBossReturnPending ~= true
+        or not session.InstanceState
+        or not session.InstanceState.WeeklyWorldBoss
+        or session.InstanceState.WeeklyWorldBoss.Defeated ~= true
+    then
+        return operation(false, "WorldBossReturnNotConfirmed")
+    end
+    local key = member_session_index_key(user_id)
+    local index = self._map:get(key)
+    if not index or index.SessionId ~= session_id then
+        return operation(false, "WorldBossReturnIndexMismatch")
+    end
+    local removed, reason = self._map:remove(key)
+    if not removed then
+        return operation(false, reason or "WorldBossIndexReleaseFailed")
+    end
+    return operation(true, nil)
+end
+
 function DungeonSessionService:set_member_mode(session_id: string, user_id: number, mode: string): any
     if VALID_MEMBER_MODES[mode] ~= true then
         return operation(false, "InvalidMemberMode")
