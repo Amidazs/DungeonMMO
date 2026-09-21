@@ -157,13 +157,54 @@ function DungeonDeathService:request_paid_revive(player:any):any
     return operation(false,"PaidPurchaseRequired",{paid_offer=offer})
 end
 
-function DungeonDeathService:complete_paid_revive(player:any):any
-    local checkpoint=self._checkpoints:get_active_checkpoint(); local target=checkpoint.CFrame
-    local spawned=self._spawn_player(player,target)
-    if not spawned then self._sessions:set_member_mode(self._session_id,player.UserId,"Spectating"); self._on_member_mode(player.UserId,"Spectating"); return operation(false,"RespawnFailed") end
-    self._sessions:set_member_mode(self._session_id,player.UserId,"Active")
-    self._on_member_mode(player.UserId,"Active"); self:_refresh_wipe_state(); self:_emit(player.UserId)
-    return operation(true,nil,{cframe=target,checkpoint=checkpoint})
+-- Args:
+--   player: Player; member whose paid revive was already granted.
+-- Returns:
+--   any: respawn result, or an explicit fail-closed rejection.
+function DungeonDeathService:complete_paid_revive(player: any): any
+    local session = self._sessions:get(self._session_id)
+    if not session or session.State ~= "Active" then
+        return operation(false, "SessionNotActive")
+    end
+
+    local member = session.Members[tostring(player.UserId)]
+    if not member then
+        return operation(false, "NotMember")
+    end
+    if member.Connected ~= true then
+        return operation(false, "MemberDisconnected")
+    end
+    if member.Mode ~= "Dead" and member.Mode ~= "Spectating" then
+        return operation(false, "MemberNotDead")
+    end
+    if member.FreeReviveUsed ~= true then
+        return operation(false, "FreeReviveStillAvailable")
+    end
+
+    local checkpoint = self._checkpoints:get_active_checkpoint()
+    local target = checkpoint.CFrame
+    local spawned = self._spawn_player(player, target)
+    if not spawned then
+        self._sessions:set_member_mode(
+            self._session_id, player.UserId, "Spectating"
+        )
+        self._on_member_mode(player.UserId, "Spectating")
+        return operation(false, "RespawnFailed")
+    end
+
+    local changed = self._sessions:set_member_mode(
+        self._session_id, player.UserId, "Active"
+    )
+    if not changed.ok then
+        return changed
+    end
+    self._on_member_mode(player.UserId, "Active")
+    self:_refresh_wipe_state()
+    self:_emit(player.UserId)
+    return operation(true, nil, {
+        cframe = target,
+        checkpoint = checkpoint,
+    })
 end
 
 function DungeonDeathService:tick(now:number?):any
