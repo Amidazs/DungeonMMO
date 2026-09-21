@@ -1,6 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
-## 21 September 2026 — local aggro/threat and Fighter Taunt
+## 21 September 2026 — support threat follow-on (LOCAL VERIFIED)
+
+Tested head:
+`df33735b10010b8aed8e7acc5193970b8f4cc9b1`.
+
+- [x] Effective MageHeal/HoT, positive Mend pulses and absorbed
+  ArcaneWard add server-owned threat at a provisional 0.5 multiplier.
+- [x] Idle enemies do not gain free support threat. Caster and
+  recipient must both be in the engaged enemy's eligible target set.
+- [x] PlayerRemoving removes disconnected users from all threat
+  ledgers/candidate snapshots; enemy reset clears both tables.
+- [x] ThreatService focused Studio contract: **48 assertions PASS**,
+  including simulated 4-person roles, 2 engaged enemies, Taunt,
+  equal-threat tie, wipe/reset and disconnect cleanup.
+- [x] All six Rojo compositions built; `git diff --check` passed.
+- [x] Base professions **14/14** and Dungeon gameplay **30/30** PASS.
+- [x] Existing real two-client normal Marauder and isolated world-boss
+  aggro fixtures both `VERIFIED_MULTIPLAYER_PASS`.
+- [x] Separate genuine two-client Marauder support fixture:
+  real client MageHeal effective peer healing; real client
+  ArcaneWard application; a **server-injected** incoming hit through
+  production DamageService/WardService absorption generated threat.
+  `VERIFIED_MULTIPLAYER_PASS`.
+- [ ] Genuine client Mend pulse threat and genuine NPC attack
+  absorption of Ward in a multiplayer fight.
+- [ ] Real 4-client tank/DPS/support aggro, multi-enemy room behavior,
+  full-party wipe/reset and live controller-level disconnect.
+- [ ] Genuine healing/Ward in isolated world-boss session.
+- [ ] Published TEST travel, cross-server reconnect, cloud
+  persistence and production enablement remain deferred.
+
+Receipt:
+`docs/testing/combat-support-threat-candidate-2026-09-21.md`.
+
+## Earlier 21 September local aggro/Taunt gate (historical)
+
+
 
 - [x] Shared per-enemy ThreatService: nearest fallback before positive
   threat; highest eligible threat afterwards; distance tie-break only.
