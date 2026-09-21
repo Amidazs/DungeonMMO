@@ -1,5 +1,36 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 21 September 2026 — real wipe/disconnect acceptance
+
+Verified head:
+`739e747d88d93ff00ed30497e9473edd17b037f4`.
+
+- [x] Four genuine Studio clients; two real enemy controllers;
+  effective healing/Taunt threat, role changes and two isolated ledgers.
+- [x] Genuine DPS PlayerRemoving clears enemy A and B ledgers:
+  `REAL_DISCONNECT_CLEANUP_PASS`.
+- [x] Remaining tank and observer genuinely die on their owning
+  clients; healer is already dead; both enemies lose candidates
+  and clear threat after a three-second no-target grace:
+  `REAL_FULL_WIPE_THREAT_RESET_PASS`,
+  `VERIFIED_FOUR_CLIENT_PASS`.
+- [x] Six Rojo compositions PASS.
+- [x] ThreatService **51 assertions PASS**.
+- [x] Dungeon backend **30/30 PASS**.
+- [x] Base professions **14/14 PASS**.
+- [x] Correct isolated world-boss composition: real two-client
+  aggro and real peer MageHeal/Ward/Mend support fixtures both
+  `VERIFIED_MULTIPLAYER_PASS`.
+- [ ] Full session/checkpoint wipe/retry with enemy HP/spawn
+  restoration and reward idempotence. Current cleanup is
+  **threat-only**, not a complete encounter reset.
+- [ ] Published TEST, real cloud/cross-server reconnect and PROD
+  remain deferred.
+
+Receipt:
+`docs/testing/four-player-full-wipe-threat-reset-2026-09-21.md`.
+
+
 ## 21 September 2026 — eligible support-threat follow-up
 
 Source head: `b569435c9eb3cd4971eec06ca1baeeb4f17f4a09`.
