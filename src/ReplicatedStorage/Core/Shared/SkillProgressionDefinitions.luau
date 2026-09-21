@@ -10,6 +10,14 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    Taunt = table.freeze({
+        Id = "Taunt",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Control",
+        WeaponTags = table.freeze({}),
+    }),
+
     ShieldBash = table.freeze({
         Id = "ShieldBash",
         Tier = "Uncommon",
