@@ -4,7 +4,7 @@ assert(game.PlaceId == 0 and game.GameId == 0,
     "Boss damage filter needs an unpublished local Studio place")
 
 local SSS = game:GetService("ServerScriptService")
-local source = SSS.Core.Tests:WaitForChild("WorldBossDamageFilterTest")
+local source = SSS.Dungeon.Tests:WaitForChild("WorldBossDamageFilterTest")
 local runner = Instance.new("ModuleScript")
 runner.Name = "TEMP_WorldBossDamageFilterTest"
 runner.Source = source.Source .. "\nreturn true\n"
