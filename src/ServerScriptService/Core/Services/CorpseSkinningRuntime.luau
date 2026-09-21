@@ -87,59 +87,109 @@ function CorpseSkinningRuntime.try_skin(
     return result
 end
 
+type WatchState = {
+    model: Model,
+    root: BasePart,
+    professions: any,
+    action_result: (Player, any) -> (),
+    prompt: ProximityPrompt?,
+}
+
 -- Args:
---   model: Model; a tagged, fully constructed creature model.
+--   state: WatchState; active model, root and existing prompt state.
+-- Returns:
+--   nil: updates only eligible dead and looted animal-corpse prompts.
+local function refresh_prompt(state: WatchState)
+    local ready = CorpseSkinningRuntime.can_skin_model(state.model)
+    if state.prompt then
+        state.prompt.Enabled = ready
+        return
+    end
+    if not ready then
+        return
+    end
+
+    local prompt = Instance.new("ProximityPrompt")
+    prompt.Name = "BeastSkinningPrompt"
+    prompt.ActionText = "Skin"
+    prompt.ObjectText = state.model.Name
+    prompt.MaxActivationDistance = SKINNING_RANGE
+    prompt.HoldDuration = 0.5
+    prompt.RequiresLineOfSight = false
+    state.prompt = prompt
+
+    prompt.Triggered:Connect(function(player)
+        local result = CorpseSkinningRuntime.try_skin(
+            player, state.model, state.professions)
+        if result.ok then
+            prompt.Enabled = false
+        end
+        state.action_result(player, result)
+    end)
+    prompt.Parent = state.root
+end
+
+-- Args:
+--   model: Model; a tagged and fully constructed server creature.
 --   professions: any; the existing profession service.
 --   action_result: (Player, any) -> (); forwards server results to client.
---   connections: {RBXScriptConnection}; connections to release on teardown.
+--   lifetime_root: Instance; the owner of the skinning runtime.
 -- Returns:
---   nil: installs an eligible-corpse prompt when death and loot are ready.
+--   nil: watches death and loot completion, without retaining old corpses.
 local function watch_corpse(
     model: Model,
     professions: any,
     action_result: (Player, any) -> (),
-    connections: {RBXScriptConnection}
+    lifetime_root: Instance
 )
     local humanoid = model:FindFirstChildOfClass("Humanoid")
-    local root = model.PrimaryPart
+    local part = model.PrimaryPart
         or model:FindFirstChild("HumanoidRootPart")
-    if not humanoid or not root or not root:IsA("BasePart") then
+    if not humanoid or not part or not part:IsA("BasePart") then
         return
     end
-
-    local prompt: ProximityPrompt? = nil
-    local function update_prompt()
-        local ready = CorpseSkinningRuntime.can_skin_model(model)
-        if not prompt and ready then
-            prompt = Instance.new("ProximityPrompt")
-            prompt.Name = "BeastSkinningPrompt"
-            prompt.ActionText = "Skin"
-            prompt.ObjectText = model.Name
-            prompt.MaxActivationDistance = SKINNING_RANGE
-            prompt.HoldDuration = 0.5
-            prompt.RequiresLineOfSight = false
-            prompt.Triggered:Connect(function(player)
-                local result = CorpseSkinningRuntime.try_skin(
-                    player, model, professions)
-                if result.ok then
-                    prompt.Enabled = false
-                end
-                action_result(player, result)
-            end)
-            prompt.Parent = root
-        elseif prompt then
-            prompt.Enabled = ready
-        end
+    if not SkinningEligibility.is_species_allowed(
+        model:GetAttribute("CreatureSpeciesId"),
+        model:GetAttribute("CreatureFamily")
+    ) then
+        return
+    end
+    if model:GetAttribute("SkinningClaimed") == nil then
+        model:SetAttribute("SkinningClaimed", false)
     end
 
-    table.insert(connections, humanoid.Died:Connect(update_prompt))
-    table.insert(connections,
-        model:GetAttributeChangedSignal("LootComplete")
-            :Connect(update_prompt))
-    table.insert(connections,
+    local state: WatchState = {
+        model = model,
+        root = part,
+        professions = professions,
+        action_result = action_result,
+        prompt = nil,
+    }
+    local listeners: {RBXScriptConnection} = {}
+
+    local function disconnect()
+        for _, listener in ipairs(listeners) do
+            listener:Disconnect()
+        end
+        table.clear(listeners)
+    end
+
+    table.insert(listeners, model.Destroying:Connect(disconnect))
+    table.insert(listeners, lifetime_root.Destroying:Connect(disconnect))
+    table.insert(listeners,
+        humanoid.Died:Connect(function()
+            refresh_prompt(state)
+        end))
+    table.insert(listeners,
+        model:GetAttributeChangedSignal("LootComplete"):Connect(function()
+            refresh_prompt(state)
+        end))
+    table.insert(listeners,
         model:GetAttributeChangedSignal("SkinningClaimed")
-            :Connect(update_prompt))
-    update_prompt()
+            :Connect(function()
+                refresh_prompt(state)
+            end))
+    refresh_prompt(state)
 end
 
 -- Args:
@@ -152,7 +202,6 @@ function CorpseSkinningRuntime.attach(config: any)
         config.professions, "Corpse skinning professions required")
     local action_result = assert(
         config.action_result, "Corpse skinning result callback required")
-    local connections: {RBXScriptConnection} = {}
     local watched: {[Model]: boolean} = {}
 
     local function register(instance: Instance)
@@ -160,19 +209,16 @@ function CorpseSkinningRuntime.attach(config: any)
             return
         end
         watched[instance] = true
-        watch_corpse(instance, professions, action_result, connections)
+        watch_corpse(instance, professions, action_result, root)
     end
 
-    table.insert(connections,
-        CollectionService:GetInstanceAddedSignal(BEAST_TAG)
-            :Connect(register))
+    local added = CollectionService:GetInstanceAddedSignal(BEAST_TAG)
+        :Connect(register)
     for _, instance in ipairs(CollectionService:GetTagged(BEAST_TAG)) do
         register(instance)
     end
     root.Destroying:Connect(function()
-        for _, connection in ipairs(connections) do
-            connection:Disconnect()
-        end
+        added:Disconnect()
     end)
 end
 
