@@ -578,27 +578,56 @@ function ProfessionRuntime.within_station_range(
     return (root.Position - anchor.Position).Magnitude <= (max_distance or STATION_RANGE)
 end
 
--- Small server-side guard used by the RemoteEvent path so two overlapping
--- craft requests from one player cannot both enter prepare/complete.
--- The ProfessionService remains the authority for materials and output.
+-- A unique ticket prevents an old, interrupted request from releasing
+-- the new request lock when that same UserId reconnects on this server.
+-- The ProfessionService remains the authority for inventory mutations.
 function ProfessionRuntime.new_craft_request_guard(): any
-    local active: {[number]: boolean} = {}
+    local active: {[number]: number} = {}
+    local next_ticket = 0
     local guard = {}
 
-    function guard:try_begin(user_id: number): boolean
-        if active[user_id] == true then
+    -- Args:
+    --   user_id: number; authoritative account ID.
+    -- Returns:
+    --   (boolean, number?): whether acquired and the unique request ticket.
+    function guard:try_begin(user_id: number): (boolean, number?)
+        if active[user_id] ~= nil then
+            return false, nil
+        end
+        next_ticket += 1
+        active[user_id] = next_ticket
+        return true, next_ticket
+    end
+
+    -- Args:
+    --   user_id: number; owner of the original request.
+    --   ticket: number?; optional ticket for conditional cleanup.
+    -- Returns:
+    --   boolean: true only when the matching lock was released.
+    function guard:finish(user_id: number, ticket: number?): boolean
+        if ticket ~= nil and active[user_id] ~= ticket then
             return false
         end
-        active[user_id] = true
-        return true
-    end
-
-    function guard:finish(user_id: number)
+        local was_active = active[user_id] ~= nil
         active[user_id] = nil
+        return was_active
     end
 
+    -- Args:
+    --   user_id: number; account owning the in-flight request.
+    --   ticket: number; the ticket returned when that request acquired.
+    -- Returns:
+    --   boolean: whether the exact request remains current.
+    function guard:is_current(user_id: number, ticket: number): boolean
+        return active[user_id] == ticket
+    end
+
+    -- Args:
+    --   user_id: number; authoritative account ID.
+    -- Returns:
+    --   boolean: whether that user currently owns a request lock.
     function guard:is_active(user_id: number): boolean
-        return active[user_id] == true
+        return active[user_id] ~= nil
     end
 
     return guard
@@ -911,13 +940,16 @@ function ProfessionRuntime.attach(config: any): any
                 return
             end
 
-            if not craft_request_guard:try_begin(player.UserId) then
+            local acquired, ticket = craft_request_guard:try_begin(
+                player.UserId)
+            if not acquired then
                 finish_action(player, "Craft", {
                     ok = false,
                     reason = "CraftRequestInProgress",
                 })
                 return
             end
+            assert(ticket ~= nil, "Acquired craft must have a ticket")
 
             local completed_ok, result = pcall(function()
                 local prepared = professions:prepare_craft(
@@ -926,17 +958,30 @@ function ProfessionRuntime.attach(config: any): any
                     return prepared
                 end
 
-                -- The current foundation never accepts a client-provided
-                -- minigame result. Until interactive minigames are authored,
-                -- only the server creates the success outcome passed to
-                -- complete_craft.
+                -- A yielding preparation may resume after PlayerRemoving
+                -- and a same-account reconnect. Never commit that old
+                -- request into the newly loaded character profile.
+                if not craft_request_guard:is_current(
+                    player.UserId, ticket)
+                    or Players:GetPlayerByUserId(player.UserId) ~= player
+                then
+                    return {ok = false, reason = "CraftRequestCancelled"}
+                end
+
+                -- Client minigame-success arguments are never accepted.
                 local outcome = professions.foundation_success_outcome(
                     prepared.minigame_id
                 )
                 return professions:complete_craft(
                     player.UserId, recipe_id, outcome)
             end)
-            craft_request_guard:finish(player.UserId)
+            local still_current = craft_request_guard:is_current(
+                player.UserId, ticket)
+                and Players:GetPlayerByUserId(player.UserId) == player
+            craft_request_guard:finish(player.UserId, ticket)
+            if not still_current then
+                return
+            end
 
             if not completed_ok then
                 warn("[Profession Runtime] Craft request failed: "
