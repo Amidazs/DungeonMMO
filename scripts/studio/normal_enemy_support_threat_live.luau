@@ -155,7 +155,7 @@ local function run()
     end
 
     set_class(mage, "Mage", {"MageHeal", "ArcaneWard"})
-    set_class(fighter, "Fighter", {"Taunt"})
+    set_class(fighter, "Fighter", {"Taunt", "Mend"})
     local mage_character = get_character(mage)
     local fighter_character = get_character(fighter)
 
@@ -243,6 +243,26 @@ local function run()
     assert(Threat.get_threat(enemy, mage.UserId) >= threat_before + 5,
         "ten absorbed damage must generate at least five threat")
     print("[Support Threat Live] REAL_WARD_ABSORB_THREAT_PASS")
+
+    -- The Fighter's own client now channels real Mend pulses while
+    -- the hostile enemy continues to track this encounter.
+    wait_for(function()
+        return fighter_character:GetAttribute("CombatState")
+            == "Locomotion"
+    end, "Fighter ready to channel Mend", 5)
+    place(fighter_character, root, 3)
+    target_humanoid:TakeDamage(120)
+    assert(target_humanoid.Health > 0
+        and target_humanoid.Health < target_humanoid.MaxHealth,
+        "Mend requires a genuinely injured Fighter")
+    local fighter_threat_before = Threat.get_threat(
+        enemy, fighter.UserId)
+    channel:FireClient(fighter, "Mend")
+    wait_for(function()
+        return Threat.get_threat(enemy, fighter.UserId)
+            > fighter_threat_before
+    end, "real Fighter Mend pulse generates support threat", 8)
+    print("[Support Threat Live] REAL_FIGHTER_MEND_THREAT_PASS")
 
     Threat.clear(enemy)
 end
