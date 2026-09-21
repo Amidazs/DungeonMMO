@@ -1,6 +1,34 @@
 # DungeonMMO Current Engineering State
 
-## 21 September 2026 — v1.53 professions staged in GitHub; local verification pending
+## 21 September 2026 — v1.53 tested locally; live profession acceptance pending
+
+GitHub-first staged source at `45a9bc25a185fcdb00579e977a22dc582eefc1ec`
+was safely fast-forwarded to the clean Windows integration worktree.
+Four Rojo compositions built; the new ten-suite profession runner
+passed in both unpublished local Dungeon and Base Studio Edit places
+(Base: 305 assertions), Dungeon general backend matrix passed 30/30,
+and the generic Base Play smoke passed. Deterministic full five-profession
+chain, migration, material protection, station range and pure request
+guard are included in the focused suites.
+
+A new disposable real Base client/server fixture was authored **in
+GitHub**, fast-forward pulled and run in Studio Play mode. Actual client
+craft requests were rejected when far from Leatherworking/Enchanting
+stations and routed to crafting service when near (then rejected for
+missing materials). The same fixture **failed** at a scripted
+RawHideCache ProximityPrompt hold: no Gather result within 15 seconds.
+The live hide claim, material-backed full craft chain, duplicate
+requests, independent players and disconnect/retry are not accepted.
+
+Source/testing receipt:
+`docs/testing/profession-v153-local-validation-2026-09-21.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md`.
+All source and document changes are made in GitHub, not via Remote
+Desktop. No cloud publish, real-player DataStore validation, main merge
+or force-push occurred.
+
+## 21 September 2026 — initial GitHub-only v1.53 staging (historical)
 
 While the authorized Windows desktop is offline, source work continued
 **in GitHub only** from accepted v1.52. Skinning, Leatherworking and
