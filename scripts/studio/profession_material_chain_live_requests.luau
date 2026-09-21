@@ -284,6 +284,14 @@ local function run()
     end
     local after_burst = assert(runtime.ProfileService:get_character(
         player.UserId, 1))
+    print("[Profession Material Live] BURST_DIAGNOSTIC success="
+        .. tostring(successful) .. " rejected=" .. tostring(rejected)
+        .. " bars=" .. tostring(Inventory.count_item(
+            after_burst, "iron_bar"))
+        .. " ore=" .. tostring(Inventory.count_item(
+            after_burst, "iron_ore"))
+        .. " first=" .. tostring(burst[1].reason)
+        .. " second=" .. tostring(burst[2].reason))
     assert(successful == 1 and rejected == 1
         and Inventory.count_item(after_burst, "iron_bar") == 1
         and Inventory.count_item(after_burst, "iron_ore") == 0,
