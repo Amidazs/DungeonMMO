@@ -148,9 +148,18 @@ function ThreatService.record_support(
 
     for enemy, users in pairs(candidate_users) do
         local ledger = ledgers[enemy]
+        local engaged = false
+        if ledger then
+            for user_id, amount in pairs(ledger) do
+                if users[user_id] == true and amount > 0 then
+                    engaged = true
+                    break
+                end
+            end
+        end
+
         if enemy.Parent
-            and ledger
-            and next(ledger) ~= nil
+            and engaged
             and users[caster.UserId] == true
             and users[target.UserId] == true
         then
