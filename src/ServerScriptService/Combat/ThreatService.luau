@@ -1,6 +1,8 @@
 --!strict
 -- Server-authoritative per-enemy threat ledger shared by dungeon enemies
 -- and world bosses. Distance is only used before any eligible threat exists.
+local RunService = game:GetService("RunService")
+
 local ThreatService = {}
 
 type ThreatLedger = {[number]: number}
@@ -10,6 +12,18 @@ type Candidate = {
 }
 
 local ledgers: {[Model]: ThreatLedger} = {}
+
+-- Args:
+--   user_id: any; authenticated Roblox player identity.
+-- Returns:
+--   boolean: live positive ID, or negative local Studio test identity.
+local function valid_user_id(user_id: any): boolean
+    return type(user_id) == "number"
+        and user_id % 1 == 0
+        and user_id < math.huge and user_id > -math.huge
+        and (user_id > 0
+            or (user_id < 0 and RunService:IsStudio()))
+end
 
 local function valid_amount(amount: any): boolean
     return type(amount) == "number"
@@ -39,8 +53,8 @@ function ThreatService.add_threat(
     amount: number
 ): number
     assert(enemy:IsA("Model"), "Threat enemy must be a Model")
-    assert(type(user_id) == "number" and user_id % 1 == 0,
-        "Threat user ID must be an integer")
+    assert(valid_user_id(user_id),
+        "Threat user ID must be a valid player identity")
     assert(valid_amount(amount), "Threat amount must be positive and finite")
 
     local ledger = get_ledger(enemy)
