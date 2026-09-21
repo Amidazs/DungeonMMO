@@ -1,5 +1,41 @@
 # DungeonMMO Current Engineering State
 
+## 21 September 2026 — v1.53 professions staged in GitHub; local verification pending
+
+While the authorized Windows desktop is offline, source work continued
+**in GitHub only** from accepted v1.52. Skinning, Leatherworking and
+Enchanting are staged on the existing profession framework. Fresh
+profiles initialize all three; migration still sanitizes every profession
+through ProfessionDefinitions.order(). The Base profession runtime now
+has a server-claimed RawHideCache placeholder plus distinct temporary
+Leatherworking and Enchanting station roots derived from existing Base
+anchors.
+
+The staged dependency chain reaches warded_leatherbound_gloves through
+Skinning hide, Alchemy oil/flux/essence, Blacksmithing bars,
+Leatherworking cured leather/base gloves and Enchanting rune/final
+equipment. No second inventory, crafting or profile service was created.
+
+ProfessionRuntime's Base craft RemoteEvent still takes only recipe_id.
+Station/distance authority remains server-side. A new per-player
+craft-request guard rejects overlapping requests and is released after
+completion/error/PlayerRemoving; different players are independent.
+The client still cannot submit a minigame success payload into this
+RemoteEvent; the current foundation success result remains server-created.
+
+New/extended GitHub tests cover all seven definitions, station recipe
+ordering, legacy-profile migration, full multi-profession atomic
+dependency/save-reload behavior, equipped-input and wrong-minigame
+rejection, station distance and request-lock semantics. The focused
+profession runner includes these tests.
+
+**Do not report these tests as passing yet.** No Remote Desktop/local
+pull/Rojo/Studio run occurred after v1.52 because the desktop is offline.
+Latest verified acceptance remains v1.52. Tomorrow follow:
+docs/testing/profession-leatherworking-enchanting-pending-verification-2026-09-21.md.
+Roadmap:
+docs/roadmap/DungeonMMO_Roadmap_v1_53_Professions_Pending_Verification.md.
+
 ## 20 September 2026 — v1.52 Event combat variations and first broader profession backend
 
 The existing, server-frozen after-Room2 late Event slot now accepts
