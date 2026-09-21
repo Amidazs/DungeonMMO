@@ -24,6 +24,9 @@ local DungeonDifficultyProgressionService = require(
 local ProgressionService = require(Services:WaitForChild("ProgressionService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RewardService = require(Services:WaitForChild("RewardService"))
+local WeeklyWorldBossService = require(
+    Services:WaitForChild("WeeklyWorldBossService")
+)
 local AttributeService = require(Services:WaitForChild("AttributeService"))
 local LoadoutService = require(Services:WaitForChild("LoadoutService"))
 local SkillProgressionService = require(Services:WaitForChild("SkillProgressionService"))
@@ -105,6 +108,7 @@ function RuntimeServices.new(place_kind: string): any
         inventory
     )
     local rewards = RewardService.new(profiles, progression, inventory, sessions)
+    local weekly_world_boss = WeeklyWorldBossService.new(profiles)
     rewards:set_audit_service(audit)
     guilds:set_audit_service(audit)
     market:set_audit_service(audit)
@@ -147,6 +151,7 @@ function RuntimeServices.new(place_kind: string): any
         InventoryService = inventory,
         RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
+        WeeklyWorldBossService = weekly_world_boss,
         AttributeService = attributes,
         LoadoutService = loadout,
         SkillProgressionService = skills,
