@@ -84,6 +84,9 @@ local function set_class(player, class_id, skill_ids)
     character.Identity.BaseClassId = class_id
     character.Identity.ClassId = class_id
     character.Identity.CreationStage = "Complete"
+    if class_id == "Mage" then
+        character.Equipment.Weapon = "apprentice_arcane_wand"
+    end
     for index, skill_id in ipairs(skill_ids) do
         character.Progression.Skills[skill_id] = {
             Known = true,
