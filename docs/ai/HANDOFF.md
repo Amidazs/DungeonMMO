@@ -1,5 +1,32 @@
 # DungeonMMO Development Handoff
 
+## 21 September 2026 — animal-only Skinning test handoff
+
+Latest GitHub-first branch is clean and locally fast-forwarded through
+`c6af7cf080001f199e7383ef8cb4c63198e7d312`. All four Rojo builds
+passed. `SkinningEligibility`, `CorpseSkinningRuntime` and the shared
+profession runtime now deny all unregistered and non-Beast enemies.
+DungeonEnemyCleanup preserves only registered, defeated animal-like
+corpses after reward processing; it never makes Marauders or bosses
+skinnable. These are server logic and example future wolf/boar/bear
+identities, **not a claim that animal enemies already exist**. The
+temporary Base hide cache is still available separately.
+
+The two new focused suites and expanded Dungeon cleanup suite exist in
+GitHub but have **not** been executed in Studio. Direct Studio MCP
+discovery returned `Unable to reach Roblox Studio right now`, and
+delegated Codex Studio testing hit a usage limit. Restore the Studio
+Assistant MCP-server connection, then run the versioned focused runner
+in disposable Base/Dungeon, Dungeon cleanup tests, broad regression,
+and a real server-authored animal corpse Play test. Re-run the Base hide
+prompt diagnostic; it previously timed out and is not accepted.
+Avoid editing scripts/docs via Remote Desktop: create any revisions in
+GitHub, then safely fast-forward pull for local builds/Studio only.
+
+Detailed receipt:
+`docs/testing/animal-only-corpse-skinning-pending-studio-2026-09-21.md`.
+No publishing, player DataStore migration, force-push or main merge.
+
 ## 21 September 2026 — local profession verification handoff
 
 The active `wip/phase-4-test-hud-integration-v1` branch has passed
