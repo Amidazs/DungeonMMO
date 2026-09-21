@@ -105,6 +105,11 @@ local function run()
     local id = session.SessionId
     assert(sessions:set_instance_state(id, {}).ok)
     assert(sessions:mark_connected(id, player.UserId).ok)
+    local now = os.time()
+    local issued = runtime.WeeklyWorldBossSessionBridge:issue(
+        id, now - 5, now + 300)
+    assert(issued.ok, "trusted boss session issue failed: "
+        .. tostring(issued.reason))
 
     local boss = Factory.create({
         Parent = W,
