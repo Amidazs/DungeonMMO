@@ -14,6 +14,11 @@ function DungeonAdmissionRules.validate(
     if type(session) ~= "table" then
         return result(false, "SessionNotFound")
     end
+    if type(session.InstanceState) == "table"
+        and session.InstanceState.WeeklyWorldBoss ~= nil
+    then
+        return result(false, "WorldBossDedicatedPlaceRequired")
+    end
     if type(teleport_data) ~= "table" then
         return result(false, "MissingTeleportData")
     end
