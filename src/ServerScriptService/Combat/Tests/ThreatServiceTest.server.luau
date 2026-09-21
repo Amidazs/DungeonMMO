@@ -153,6 +153,71 @@ local invalid_amount = pcall(function()
 end)
 check(not invalid_amount, "zero threat increments must be rejected")
 
+-- Args: None.
+-- Returns:
+--   nil: proves independent tank, damage and support aggro for four players.
+local function run_four_player_contract()
+    local room_a = Instance.new("Model")
+    room_a.Name = "FourPlayerRoomA_TEMP"
+    room_a.Parent = workspace
+    local room_b = Instance.new("Model")
+    room_b.Name = "FourPlayerRoomB_TEMP"
+    room_b.Parent = workspace
+    local player_d = {UserId = 98104} :: any
+    local party = {
+        {player = player_a, distance = 2},
+        {player = player_b, distance = 6},
+        {player = player_c, distance = 5},
+        {player = player_d, distance = 10},
+    }
+
+    ThreatService.select_target(room_a, party)
+    ThreatService.select_target(room_b, party)
+    ThreatService.record_damage(room_a, player_b, 30)
+    ThreatService.record_damage(room_a, player_a, 10)
+    ThreatService.record_damage(room_a, player_d, 20)
+    local leader = ThreatService.select_target(room_a, party)
+    check(leader == player_b, "highest damage must initially lead")
+    check(ThreatService.record_support(player_c, player_a, 10) == 1,
+        "support reaches engaged room but not idle neighboring room")
+    check(ThreatService.record_support(player_c, player_b, 80) == 1,
+        "support threat accumulates on the engaged room only")
+    leader = ThreatService.select_target(room_a, party)
+    check(leader == player_c,
+        "effective healing must allow the support role to draw aggro")
+
+    check(ThreatService.taunt(room_a, player_a, 5) == 50,
+        "tank Taunt must move above accumulated healer threat")
+    leader = ThreatService.select_target(room_a, party)
+    check(leader == player_a, "tank must retake aggro through Taunt")
+
+    ThreatService.record_damage(room_b, player_d, 50)
+    check(ThreatService.record_support(player_c, player_a, 10) == 2,
+        "support can contribute to both independently engaged enemies")
+    leader = ThreatService.select_target(room_a, party)
+    check(leader == player_a, "nearer tank wins an equal-threat tie")
+    leader = ThreatService.select_target(room_b, party)
+    check(leader == player_d,
+        "support on another enemy must not override room B's leader")
+
+    ThreatService.remove_player(player_c.UserId)
+    check(ThreatService.get_threat(room_a, player_c.UserId) == 0,
+        "disconnect removes healer threat from the first enemy")
+    check(ThreatService.get_threat(room_b, player_c.UserId) == 0,
+        "disconnect removes healer threat from the second enemy")
+    check(ThreatService.record_support(player_c, player_a, 10) == 0,
+        "disconnected healer cannot accrue stale support threat")
+    ThreatService.clear(room_a)
+    ThreatService.clear(room_b)
+    leader = ThreatService.select_target(room_a, party)
+    check(leader == player_a,
+        "room wipe resets surviving party back to nearest targeting")
+    room_a:Destroy()
+    room_b:Destroy()
+end
+
+run_four_player_contract()
+
 ThreatService.clear(third_enemy)
 enemy:Destroy()
 second_enemy:Destroy()
