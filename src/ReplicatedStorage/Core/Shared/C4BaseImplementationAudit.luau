@@ -14,6 +14,16 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        PhysicalAttackMastery = table.freeze({
+            [5] = "FighterPhysicalTraining",
+            [10] = "FighterPhysicalTraining",
+            [15] = "FighterPhysicalTraining",
+        }),
+        ArmorMastery = table.freeze({
+            [5] = "FighterArmorTraining",
+            [10] = "FighterArmorTraining",
+            [15] = "FighterArmorTraining",
+        }),
         SwordBluntStrike = table.freeze({
             [5] = "IronCleave",
             [10] = "IronCleave",
@@ -69,8 +79,12 @@ local function executable_ranks_at_level(
             local effect = Combat.get_for_rank(skill_id, rank)
             local damage = effect and effect.BASE_DAMAGE or 0
             local heal = effect and effect.TOTAL_HEAL or 0
-            if type(damage) == "number" and damage > 0
-                or type(heal) == "number" and heal > 0
+            local passive = definition.DamageBonusPerRank
+                or definition.PhysicalReductionPerRank
+            if (type(damage) == "number" and damage > 0)
+                or (type(heal) == "number" and heal > 0)
+                or (definition.Kind == "Passive"
+                    and type(passive) == "number" and passive > 0)
             then
                 count += 1
             end
