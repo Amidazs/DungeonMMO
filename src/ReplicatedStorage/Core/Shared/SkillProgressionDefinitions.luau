@@ -250,6 +250,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- C4 Human Mystic level-seven poison curse. Periodic damage is
+    -- applied exclusively by the server after a real damaging spell hit.
+    MysticPoisonCurse = table.freeze({
+        Id = "MysticPoisonCurse",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Magic",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 7}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MysticWindBolt",
+                Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Mystic Ice Bolt first-tier source ranks: two at 7/14.
     -- Server projectile impact applies real enemy movement impairment.
     MysticFrostBolt = table.freeze({
