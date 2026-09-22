@@ -2064,7 +2064,8 @@ local function enter_skill_active(
                             target_index
                         )
                     elseif skill_definition.ID == "ShieldBash"
-                        or skill_definition.ID == "ThornwardenBash" then
+                        or skill_definition.ID == "ThornwardenBash"
+                        or skill_definition.ID == "GuardBreaker" then
                         apply_shield_bash_target(
                             player,
                             character,
