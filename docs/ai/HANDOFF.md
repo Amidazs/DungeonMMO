@@ -1,5 +1,47 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.74 C4 basic and first-transfer audit PARTIAL
+
+Read `docs/testing/c4-base-first-transfer-coverage-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_74_C4_Base_First_Transfer_20260922.md`.
+The current source-backed completion test is
+`scripts/studio/c4_catalogue_coverage_tests.luau` and its production
+audit is `C4CatalogueCoverage.report()`. The final audited
+Human/Elf starting rank counts are Human Fighter **36/39**,
+Elven Fighter **41/43**, Human Mystic **31/44**, Elven Mystic
+**31/42**. The two partially mapped C4 first-transfer
+inventory totals remain Human Rogue **75/99** and Elven Scout
+**102/129**. This is **316 functional analogue ranks of 396
+sourced rows**, with 80 missing; seven OTHER first-transfer
+class catalogues are still UNMAPPED. Exactly **0/9 original
+Human/Elf C4 first-transfer paths are complete**.
+
+The latest real additions are three worn-robe-only Mystic
+level-one passives (actual basic attack rate, ManaService
+regen and server magic skill cast wind-up) and level-one
+Novice Protection (2% real physical NPC mitigation until
+character level 20). Base Rojo now mounts the required
+CombatStatusService; old missing-Combat error is fixed.
+Focused tests PASS: Mage robe 38, novice 36, branch-tree 44,
+latest base audit 63, unified completion gate 7 assertions.
+Both Base/Dungeon TEMP Rojo compositions succeeded. No
+new full live-client, saved-profile trainer GUI or cloud
+test is claimed after these changes.
+
+NEXT: complete exact missing skill families shown in the
+linked source-audit ledger, then source-inventory and
+implement Human Warrior/Knight/Wizard/Cleric and Elven
+Knight/Wizard/Oracle as SEPARATE first-transfer choices.
+The current game's Ranger/Rogue starter and original
+secondary class trees cannot be silently labeled as
+the nine original C4 first-transfer classes. The separate
+Phase2A paid-revive auto-test remains open. All scripts,
+tests and docs through GitHub only; Remote Desktop only
+fast-forward pull, TEMP builds, unpublished Studio tests
+and log reads. No merge, publish, paid work, PROD save
+mutation or repeat old dungeon wipe/aggro/revive loops.
+
+
 ## 22 September 2026 — C4 Scout catalogue v1.73, PARTIAL and tested
 
 Read `docs/testing/c4-scout-source-catalogue-2026-09-22.md`
