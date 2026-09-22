@@ -140,7 +140,7 @@ check_ladder(
 )
 check_ladder(
     "Rogue", "Ranger", "RogueFinishingCut", "RogueVitalBlow",
-    "marauder_sword", 77595
+    "scout_dagger", 77595
 )
 
 -- C4's one Rogue/Scout class lists both weapon branches together.
