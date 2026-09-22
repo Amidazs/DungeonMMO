@@ -678,6 +678,30 @@ local ROGUE_VITAL_BLOW = specialize_skill(
     }
 )
 
+-- A C4-inspired bleeding sword strike with an actual server-applied
+-- damage-over-time component; upgrading changes the subsequent ticks.
+local LACERATING_CUT = specialize_skill(
+    BACKSTAB, "LaceratingCut", "Lacerating Cut", {
+        STAMINA_COST = 20,
+        COOLDOWN_SECONDS = 10,
+        BASE_DAMAGE = 6,
+        REAR_MULTIPLIER = 1,
+        BLEED_TICK_DAMAGE = 3,
+        BLEED_TICK_COUNT = 3,
+        BLEED_TICK_INTERVAL = 0.6,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 6,
+                BLEED_TICK_DAMAGE = 3,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 9,
+                BLEED_TICK_DAMAGE = 5,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -772,6 +796,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ThunderShot = THUNDER_SHOT,
     ArcherDraw = ARCHER_DRAW,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
+    LaceratingCut = LACERATING_CUT,
     DisruptingCut = DISRUPTING_CUT,
     ArcanistEmber = ARCANIST_EMBER,
     SpellweaverAegis = SPELLWEAVER_AEGIS,
