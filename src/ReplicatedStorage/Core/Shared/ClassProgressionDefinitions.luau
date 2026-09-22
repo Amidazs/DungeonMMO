@@ -16,6 +16,8 @@ local DEFINITIONS = table.freeze({
             "ArcSlash",
             "Taunt",
             "GuardBreaker",
+            "IronCleave",
+            "PursuitStep",
         }),
     }),
 
