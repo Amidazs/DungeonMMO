@@ -214,6 +214,18 @@
       "ClassName": "RemoteEvent"
     },
     {
+      "Name": "ClassAdvancementRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "ClassAdvancementResult",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "ClassAdvancementSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "QuestActionRequest",
       "ClassName": "RemoteEvent"
     },
