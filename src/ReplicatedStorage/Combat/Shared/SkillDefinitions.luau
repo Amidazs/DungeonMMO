@@ -406,6 +406,60 @@ local function specialize_skill(
     return table.freeze(definition)
 end
 
+local GUARD_BREAKER = specialize_skill(
+    SHIELD_BASH, "GuardBreaker", "Guard Breaker", {
+        STAMINA_COST = 16,
+        COOLDOWN_SECONDS = 6,
+        BASE_DAMAGE = 5,
+        STAGGER_SECONDS = 0.5,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 5, STAGGER_SECONDS = 0.5}),
+            [2] = table.freeze({BASE_DAMAGE = 7, STAGGER_SECONDS = 0.6}),
+            [3] = table.freeze({BASE_DAMAGE = 9, STAGGER_SECONDS = 0.7}),
+        }),
+    }
+)
+
+local AETHER_BOLT = specialize_skill(
+    WIND_STRIKE, "AetherBolt", "Aether Bolt", {
+        MANA_COST = 17,
+        COOLDOWN_SECONDS = 4,
+        BASE_DAMAGE = 18,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 18}),
+            [2] = table.freeze({BASE_DAMAGE = 22}),
+            [3] = table.freeze({BASE_DAMAGE = 26}),
+        }),
+    }
+)
+
+local TRACKER_SHOT = specialize_skill(
+    PIERCING_SHOT, "TrackerShot", "Tracker Shot", {
+        STAMINA_COST = 15,
+        COOLDOWN_SECONDS = 5,
+        BASE_DAMAGE = 18,
+        MAX_TARGETS = 1,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 18}),
+            [2] = table.freeze({BASE_DAMAGE = 22}),
+            [3] = table.freeze({BASE_DAMAGE = 26}),
+        }),
+    }
+)
+
+local VIPER_STRIKE = specialize_skill(
+    QUICK_STRIKE, "ViperStrike", "Viper Strike", {
+        STAMINA_COST = 14,
+        COOLDOWN_SECONDS = 4,
+        BASE_DAMAGE = 11,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 11}),
+            [2] = table.freeze({BASE_DAMAGE = 14}),
+            [3] = table.freeze({BASE_DAMAGE = 17}),
+        }),
+    }
+)
+
 local VANGUARD_CHALLENGE = specialize_skill(
     TAUNT, "VanguardChallenge", "Vanguard Challenge", {
         COOLDOWN_SECONDS = 10,
@@ -461,6 +515,10 @@ local WINDRUNNER_VOLLEY = specialize_skill(
 
 local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
+    GuardBreaker = GUARD_BREAKER,
+    AetherBolt = AETHER_BOLT,
+    TrackerShot = TRACKER_SHOT,
+    ViperStrike = VIPER_STRIKE,
     Taunt = TAUNT,
     VanguardChallenge = VANGUARD_CHALLENGE,
     ThornwardenBash = THORNWARDEN_BASH,
