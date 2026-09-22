@@ -46,7 +46,7 @@ local function make_character(class_id: string): any
     character.Identity.BaseClassId = class_id
     character.Identity.ClassId = class_id
     character.Identity.CreationStage = "Complete"
-    character.Equipment.Weapon = "marauder_sword"
+    character.Equipment.Weapon = "scout_dagger"
     return character
 end
 
