@@ -56,7 +56,13 @@ local function main()
             for family, count in pairs(audit.MissingFamilies) do
                 check(count > 0,
                     race_id .. " " .. class_id .. " zero missing rank")
-                check(source.Levels[1][family] ~= false,
+                local source_family = false
+                for _, row in pairs(source.Levels) do
+                    if row[family] then
+                        source_family = true
+                    end
+                end
+                check(source_family,
                     race_id .. " " .. class_id .. " unknown family")
                 missing += count
             end
