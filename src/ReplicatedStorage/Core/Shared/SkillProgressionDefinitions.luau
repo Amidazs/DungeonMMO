@@ -286,6 +286,34 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Dagger"}),
     }),
 
+    -- C4 source Fighter attack mastery: 1 rank at 5, 10 and 15.
+    FighterPhysicalTraining = table.freeze({
+        Id = "FighterPhysicalTraining",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
+        DamageBonusPerRank = 0.02,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 base Fighter armour mastery: one rank at level 5,
+    -- two at 10 and two at 15; real mitigation requires worn body gear.
+    FighterArmorTraining = table.freeze({
+        Id = "FighterArmorTraining",
+        Tier = "Common",
+        MaxRank = 5,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 10, [3] = 10,
+            [4] = 15, [5] = 15,
+        }),
+        PhysicalReductionPerRank = 0.007,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The shield-line counterpart to Iron Discipline: purchased ranks
     -- add real maximum HP without creating an inert combat action.
     StalwartTraining = table.freeze({
