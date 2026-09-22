@@ -1,5 +1,36 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — skill mastery ladder / level-40 cap (v1.64)
+
+Gameplay source `bf93f07`: four additional rankable
+base-class combat skills with levels 8/14/20;
+class trial requires level 20 and two fully
+mastered prerequisite core skills; specialist
+Fighter/Ranger skill ranks unlock at 24/28/32 only
+after earning the right advanced class and basic
+skill mastery. Unknown locked skills remain
+hidden in trainer/journal snapshots, and server
+purchase/use independently validates the gates.
+Post-20 XP progression and cap 40 now permit
+specialist ranks without altering the old 1–20
+curve.
+
+Gameplay source `e0e2f39`: successful zero-damage
+Taunt/VanguardChallenge now earns bounded control
+proficiency through the authoritative dungeon
+encounter bridge. Ineffective taunts or disconnected/
+spectating members cannot farm mastery.
+
+Local receipts: 62 skill mastery assertions, 44
+extended-level assertions, 5/5 affected contracts
+at `bf93f07`; one Dungeon Rojo build and seven
+taunt mastery assertions at `e0e2f39`. This
+is not a complete Mage/Rogue specialist tree
+or proof of published persistence/final balance.
+[Roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_64_Skill_Mastery_Level_Gates_20260922.md).
+[Evidence](docs/testing/dungeon-skill-mastery-lineage-style-2026-09-22.md).
+
+
 ## 22 September 2026 — advanced class/skill backend (v1.63)
 
 Gameplay/test source `b017fbce6aceb2a9ba301057a145697a471320ab`.
