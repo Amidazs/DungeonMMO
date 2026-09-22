@@ -502,6 +502,27 @@ local PURSUIT_STEP = specialize_skill(
     }
 )
 
+-- A sustained healing variant of Mage Heal, not a cosmetic spellbook.
+-- Each purchased rank raises the actual server-applied healing amount.
+local RENEWING_LIGHT = specialize_skill(
+    MAGE_HEAL, "RenewingLight", "Renewing Light", {
+        MANA_COST = 22,
+        COOLDOWN_SECONDS = 7,
+        HUMAN_INSTANT_FRACTION = 0.35,
+        ELF_INSTANT_FRACTION = 0.15,
+        BASE_DAMAGE = nil,
+        TOTAL_HEAL = 16,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 16}),
+            [2] = table.freeze({TOTAL_HEAL = 20}),
+            [3] = table.freeze({TOTAL_HEAL = 24}),
+            [4] = table.freeze({TOTAL_HEAL = 28}),
+            [5] = table.freeze({TOTAL_HEAL = 32}),
+            [6] = table.freeze({TOTAL_HEAL = 36}),
+        }),
+    }
+)
+
 local VANGUARD_CHALLENGE = specialize_skill(
     TAUNT, "VanguardChallenge", "Vanguard Challenge", {
         COOLDOWN_SECONDS = 10,
@@ -561,6 +582,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     IronCleave = IRON_CLEAVE,
     PursuitStep = PURSUIT_STEP,
     AetherBolt = AETHER_BOLT,
+    RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
     ViperStrike = VIPER_STRIKE,
     Taunt = TAUNT,
