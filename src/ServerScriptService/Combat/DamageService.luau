@@ -60,6 +60,19 @@ function DamageService.apply_damage(context: DamageContext): number
     if normal_damage <= 0 then return 0 end
     local damage = normal_damage * resolve_critical_multiplier(context)
     local defender = Players:GetPlayerFromCharacter(context.target)
+    if defender and context.source_kind == "EnemyMelee" then
+        local moving = humanoid.MoveDirection.Magnitude > 0.1
+            and humanoid.WalkSpeed > 0
+        local evasion = ProgressionRuntimeState
+            .get_scout_evasion_chance(defender.UserId, moving)
+        if evasion > 0 and critical_random:NextNumber() < evasion then
+            CombatValidationService.emit(
+                defender, "DAMAGE", "EVADED",
+                context.source_id, context.sequence_id
+            )
+            return 0
+        end
+    end
     if defender and (
         context.source_kind == "EnemyMelee"
         or context.source_kind == "EnemyArea"
