@@ -187,7 +187,10 @@ local function render_choices(slots: any)
                 row.TextScaled = false
                 row.TextSize = 20
                 row.Text = string.format(
-                    "%s: %s%s", kind, definition.Name,
+                    "%s: %s%s",
+                    if kind == "Creation" then "Crafting"
+                        else "Gathering",
+                    definition.Name,
                     if selected ~= "" then
                         (if selected == profession_id
                             then " (selected)" else " (unavailable)")
