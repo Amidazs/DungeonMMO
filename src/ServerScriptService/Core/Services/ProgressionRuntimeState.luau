@@ -371,6 +371,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
         character, "IronDiscipline"
     ) + PassiveSkillEffects.damage_bonus(
         character, "RogueBladeMastery"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "RogueEdgeDiscipline"
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
@@ -392,10 +394,31 @@ function ProgressionRuntimeState.get_ranged_physical_multiplier(
     local baseline = AttributeConfig.ranged_physical_multiplier(
         ProgressionRuntimeState.get_attribute(user_id, "Dexterity")
     )
+    local character = state_for(user_id)
     local mastery = PassiveSkillEffects.damage_bonus(
-        state_for(user_id), "RangerBowMastery"
+        character, "RangerBowMastery"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "ScoutBowDiscipline"
     )
     return math.max(0, baseline + mastery)
+end
+
+--[[
+Returns the passive mitigation earned by a character wearing light
+Body armour. This is a server-side defense against physical NPC hits.
+
+Args:
+    user_id (number): Defender's authoritative runtime identity.
+
+Returns:
+    number: Current physical-damage reduction, capped at eight percent.
+]]
+function ProgressionRuntimeState.get_light_armor_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.light_armor_reduction(
+        state_for(user_id)
+    )
 end
 
 --[[
