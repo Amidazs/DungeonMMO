@@ -95,6 +95,7 @@ local channel = RS:WaitForChild("C4ControlClientProbe_TEMP")
 local Schema = require(RS.Core.Shared.ProfileSchema)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local DamageService = require(SSS.Combat.DamageService)
+local ThreatService = require(SSS.Combat.ThreatService)
 local cases = {
     {class = "Ranger", skill = "BriarVolley",
         weapon = "apprentice_longbow", kind = "Slow"},
@@ -111,6 +112,14 @@ local cases = {
         level = 20},
     {class = "Rogue", skill = "RogueFinishingCut",
         weapon = "marauder_sword", kind = "Damage",
+        level = 20},
+    {class = "Ranger", race = "Elf",
+        skill = "ElvenCalmingShot",
+        weapon = "apprentice_longbow", kind = "Charm",
+        level = 20},
+    {class = "Rogue", race = "Elf",
+        skill = "ElvenRenewal",
+        weapon = "marauder_sword", kind = "Heal",
         level = 20},
 }
 local receipts = {}
@@ -156,7 +165,7 @@ end
 local function seed_class(player, case)
     local character = Schema.create_default(player.UserId)
         .Characters.Slot1
-    character.Identity.RaceId = "Human"
+    character.Identity.RaceId = case.race or "Human"
     character.Identity.BaseClassId = case.class
     character.Identity.ClassId = case.class
     character.Identity.CreationStage = "Complete"
@@ -235,6 +244,22 @@ local function check_skill(player, target, case)
         ))
     end
     local initial_health = humanoid.Health
+    local health_before_heal = 0
+    local threat_before = 0
+    if case.kind == "Heal" then
+        local player_humanoid = assert(
+            player.Character:FindFirstChildOfClass("Humanoid")
+        )
+        player_humanoid.Health = math.max(
+            1, player_humanoid.MaxHealth - 70
+        )
+        health_before_heal = player_humanoid.Health
+    elseif case.kind == "Charm" then
+        ThreatService.add_threat(target, player.UserId, 120)
+        threat_before = ThreatService.get_threat(
+            target, player.UserId
+        )
+    end
     receipts[player.UserId] = nil
     channel:FireClient(player, "LOAD", case.skill)
     await_receipt(player, "LOADED", case.skill)
@@ -243,10 +268,33 @@ local function check_skill(player, target, case)
     local sent = await_receipt(player, "CAST", case.skill)
     assert(sent.sent == true,
         case.skill .. " was not sent from CombatInputActions")
-    wait_for(function()
-        return humanoid.Health < initial_health
-    end, case.skill .. " real target damage", 9)
-    if case.kind == "Slow" then
+    if case.kind ~= "Heal" then
+        wait_for(function()
+            return humanoid.Health < initial_health
+        end, case.skill .. " real target damage", 9)
+    end
+    if case.kind == "Heal" then
+        local player_humanoid = assert(
+            player.Character:FindFirstChildOfClass("Humanoid")
+        )
+        wait_for(function()
+            return player_humanoid.Health > health_before_heal
+        end, "Elf Renewal real owner healing", 8)
+        local initial_recovery = player_humanoid.Health
+        wait_for(function()
+            return player_humanoid.Health > initial_recovery + 1
+        end, "Elf Renewal real regeneration tick", 5)
+        assert(target.Humanoid.Health == initial_health,
+            "Elf self-heal incorrectly damaged the training NPC")
+        print("[C4 Control Client] ELF_SELF_RENEWAL_PASS")
+    elseif case.kind == "Charm" then
+        local applied = initial_health - humanoid.Health
+        wait_for(function()
+            return ThreatService.get_threat(target, player.UserId)
+                <= (threat_before + applied) * 0.91
+        end, "Elf arrow must reduce actual post-impact enemy threat", 6)
+        print("[C4 Control Client] ELF_CALMING_THREAT_PASS")
+    elseif case.kind == "Slow" then
         wait_for(function()
             return (target:GetAttribute("RangerSlowMultiplier") or 1)
                 < 0.99
@@ -396,7 +444,7 @@ local function run()
         check_skill(player, dummy, case)
     end
     check_light_armor(player)
-    print("[C4 Control Client] ALL_SIX_C4_SKILL_EFFECTS_PASS")
+    print("[C4 Control Client] ALL_EIGHT_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
