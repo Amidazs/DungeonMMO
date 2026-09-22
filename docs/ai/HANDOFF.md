@@ -7,8 +7,8 @@ and `docs/roadmap/DungeonMMO_Roadmap_v1_73_Scout_Catalogue_20260922.md`
 before changing more source or trainer data. The complete *first-transfer*
 C4 Human Rogue (99 rows) and Elven Scout (129 rows) inventories at
 20/24/28/32/36 are in `C4ScoutSkillInventory.luau`. Functional
-DungeonMMO analogue coverage is currently Human **74/99**, Elf
-**102/129**, with **25 Human + 27 Elf source ranks still missing**.
+DungeonMMO analogue coverage is currently Human **75/99**, Elf
+**102/129**, with **24 Human + 27 Elf source ranks still missing**.
 The inventory's `audit(race_id).MissingFamilies` lists every
 unimplemented source family and exact rank count. Its test explicitly
 fails completion while any source ranks are missing. These figures
@@ -16,9 +16,11 @@ are source FIRST-TRANSFER coverage, not the whole C4 game.
 
 Latest additions: Human critical-power rank 1/2 at level 24/32,
 Human critical-rate rank at 28, Elf critical-rate at 32, shared
-Scout Fleet Foot at level 28. Race/class/level/actual purchased
+Scout Fleet Foot at level 28, and Human level-36 Scout Rapid Hands
+which reduces real basic-attack timing by a bought 6% rate boost.
+Race/class/level/actual purchased
 rank gate and real server crit damage/chance and Humanoid movement
-are wired. Focused tests: **241 passive**, **1065 source-audit**,
+are wired. Focused tests: **254 passive**, **1066 source-audit**,
 **38 actual trainer/save-reload** assertions, plus actual
 unpublished Play client eight skill effects, light armour,
 `SCOUT_REAL_MOVEMENT_SPEED_PASS`,
