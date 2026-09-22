@@ -1,5 +1,37 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — C4 base/first-transfer v1.74 PARTIAL
+
+The new strict `C4CatalogueCoverage.report()` source audit
+counts starting Human Fighter 36/39, Elf Fighter 41/43,
+Human Mystic 31/44 and Elf Mystic 31/42 functional rank
+analogues. Existing partial first-transfer source inventories
+have Human Rogue 75/99 and Elf Scout 102/129, totalling
+316/396 functional ranks from the SIX enumerated source
+classes; 80 ranks remain unimplemented. Only TWO of the NINE
+distinct original C4 Human/Elf first-transfer classes have
+even partially mapped source skill inventories, and ZERO
+of nine are complete.
+
+New functional Mystic robe casting/mana/basic speed and
+level-one novice physical protection are integrated into
+authoritative runtime and server skill/NPC hit paths.
+Novice defense expires at character level 20; robe effects
+require real equipped robe and class-owned purchased ranks.
+Base/Dungeon Rojo builds and 38 robe + 36 novice + 44
+first-transfer tree + 63 base-audit + 7 overall-audit
+focused Studio assertions PASS. `Completed=false` is
+deliberate and verified, not a test failure.
+[Exact test receipts](../testing/c4-base-first-transfer-coverage-2026-09-22.md).
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v1_74_C4_Base_First_Transfer_20260922.md).
+
+Actual saved-player trainer GUI, new physical control
+verification and published/cloud multiplayer remain open.
+Previously observed Phase2A paid-revive auto-test failure
+is separate and unresolved. No main merge, Roblox publish
+or production DataStore/paid operation has occurred.
+
+
 ## 22 September 2026 — v1.73 Scout source inventory, PARTIAL PASS
 
 C4 Human Rogue has 99 first-transfer rank entries and Elven
