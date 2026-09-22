@@ -552,6 +552,75 @@ local RENEWING_LIGHT = specialize_skill(
     }
 )
 
+-- Early weapon progression reuses proven C4-style high-impact bow
+-- shots and rear-attack strikes. All nine ranks have real damage.
+local ARCHER_DRAW = specialize_skill(
+    PIERCING_SHOT, "ArcherDraw", "Archer Draw", {
+        STAMINA_COST = 15,
+        COOLDOWN_SECONDS = 4.5,
+        MAX_TARGETS = 1,
+        BASE_DAMAGE = 7,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 7}),
+            [2] = table.freeze({BASE_DAMAGE = 9}),
+            [3] = table.freeze({BASE_DAMAGE = 11}),
+            [4] = table.freeze({BASE_DAMAGE = 13}),
+            [5] = table.freeze({BASE_DAMAGE = 15}),
+            [6] = table.freeze({BASE_DAMAGE = 17}),
+            [7] = table.freeze({BASE_DAMAGE = 19}),
+            [8] = table.freeze({BASE_DAMAGE = 21}),
+            [9] = table.freeze({BASE_DAMAGE = 23}),
+        }),
+    }
+)
+
+local ROGUE_VITAL_BLOW = specialize_skill(
+    BACKSTAB, "RogueVitalBlow", "Vital Blow", {
+        STAMINA_COST = 14,
+        COOLDOWN_SECONDS = 4.5,
+        BASE_DAMAGE = 7,
+        REAR_MULTIPLIER = 1.5,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 7}),
+            [2] = table.freeze({BASE_DAMAGE = 9}),
+            [3] = table.freeze({BASE_DAMAGE = 11}),
+            [4] = table.freeze({BASE_DAMAGE = 13}),
+            [5] = table.freeze({BASE_DAMAGE = 15}),
+            [6] = table.freeze({BASE_DAMAGE = 17}),
+            [7] = table.freeze({BASE_DAMAGE = 19}),
+            [8] = table.freeze({BASE_DAMAGE = 21}),
+            [9] = table.freeze({BASE_DAMAGE = 23}),
+        }),
+    }
+)
+
+local ARCANIST_EMBER = specialize_skill(
+    WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
+        MANA_COST = 38,
+        COOLDOWN_SECONDS = 7.5,
+        BASE_DAMAGE = 45,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 45}),
+            [2] = table.freeze({BASE_DAMAGE = 53}),
+            [3] = table.freeze({BASE_DAMAGE = 62}),
+        }),
+    }
+)
+
+local SPELLWEAVER_AEGIS = specialize_skill(
+    ARCANE_WARD, "SpellweaverAegis", "Spellweaver Aegis", {
+        MANA_COST = 35,
+        COOLDOWN_SECONDS = 9,
+        WARD_AMOUNT = 45,
+        DURATION_SECONDS = 8,
+        RANKS = table.freeze({
+            [1] = table.freeze({WARD_AMOUNT = 45}),
+            [2] = table.freeze({WARD_AMOUNT = 55}),
+            [3] = table.freeze({WARD_AMOUNT = 67}),
+        }),
+    }
+)
+
 local VANGUARD_CHALLENGE = specialize_skill(
     TAUNT, "VanguardChallenge", "Vanguard Challenge", {
         COOLDOWN_SECONDS = 10,
@@ -615,6 +684,10 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
+    ArcherDraw = ARCHER_DRAW,
+    RogueVitalBlow = ROGUE_VITAL_BLOW,
+    ArcanistEmber = ARCANIST_EMBER,
+    SpellweaverAegis = SPELLWEAVER_AEGIS,
     ViperStrike = VIPER_STRIKE,
     Taunt = TAUNT,
     VanguardChallenge = VANGUARD_CHALLENGE,
