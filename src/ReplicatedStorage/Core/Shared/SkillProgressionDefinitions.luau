@@ -146,6 +146,44 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
 
+    -- Passive ranks are purchased at class-training levels, not earned
+    -- by casting a passive. Each rank changes real server damage scaling.
+    IronDiscipline = table.freeze({
+        Id = "IronDiscipline",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        DamageBonusPerRank = 0.01,
+        WeaponTags = table.freeze({}),
+    }),
+
+    ArcaneDiscipline = table.freeze({
+        Id = "ArcaneDiscipline",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 7,
+            [4] = 14, [5] = 14, [6] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        DamageBonusPerRank = 0.015,
+        WeaponTags = table.freeze({}),
+    }),
+
     AetherBolt = table.freeze({
         Id = "AetherBolt",
         Tier = "Common",
