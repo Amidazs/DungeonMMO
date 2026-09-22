@@ -446,7 +446,11 @@ local function apply_movement_scale(
         end
     end
 
-    humanoid.WalkSpeed = record.base_walk_speed * scale
+    -- A purchased passive scales actual running speed without bypassing
+    -- blocked movement during dodge, death, channel or casting.
+    local scout_movement = ProgressionRuntimeState
+        .get_movement_multiplier(player.UserId)
+    humanoid.WalkSpeed = record.base_walk_speed * scale * scout_movement
 
     local movement_locked = scale <= 0
     humanoid.Jump = false
