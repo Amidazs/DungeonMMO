@@ -99,6 +99,9 @@ local cases = {
         weapon = "apprentice_longbow", kind = "Slow"},
     {class = "Rogue", skill = "DisruptingCut",
         weapon = "marauder_sword", kind = "Stagger"},
+    {class = "Ranger", skill = "ThunderShot",
+        weapon = "apprentice_longbow", kind = "Stagger",
+        level = 36},
 }
 local receipts = {}
 channel.OnServerEvent:Connect(function(player, action, skill, sent)
@@ -147,7 +150,19 @@ local function seed_class(player, case)
     character.Identity.BaseClassId = case.class
     character.Identity.ClassId = case.class
     character.Identity.CreationStage = "Complete"
-    character.Level = 5
+    character.Level = case.level or 5
+    if case.skill == "ThunderShot" then
+        for _, required in ipairs(
+            require(RS.Core.Shared.SkillProgressionDefinitions)
+                .get("ThunderShot").Prerequisites
+        ) do
+            character.Progression.Skills[required.SkillId] = {
+                Known = true,
+                PurchasedRank = required.Rank,
+                Proficiency = required.Proficiency,
+            }
+        end
+    end
     character.Equipment.Weapon = case.weapon
     character.Progression.Skills[case.skill] = {
         Known = true,
@@ -274,7 +289,7 @@ local function run()
     for _, case in ipairs(cases) do
         check_skill(player, dummy, case)
     end
-    print("[C4 Control Client] BOTH_CONTROL_SKILLS_PASS")
+    print("[C4 Control Client] ALL_THREE_CONTROL_SKILLS_PASS")
 end
 
 task.spawn(function()
