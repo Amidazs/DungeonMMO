@@ -1,5 +1,35 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — started NEW progression content (v1.62)
+
+Read:
+`docs/roadmap/DungeonMMO_Roadmap_v1_62_Story_Quest_Backend_20260922.md`
+and
+`docs/testing/story-quest-backend-slice-2026-09-22.md`.
+
+The previous consolidated audit found real-client individual
+Temple/Mine boss wins and assisted multi-client reward completion.
+Only one representative fully normal-input party journey remains
+as later integration evidence; DO NOT rerun the complete
+dungeon matrix, wipe/revive, aggro or replay fixtures now.
+
+New GitHub gameplay source `89d8e7e` adds two one-time,
+same-character prerequisite story quests (Temple Worldroot
+relic -> Mine ore), atomic Gold/item claim via QuestService,
+and validated Base QuestActionRequest/QuestActionResult/
+QuestSnapshot remotes. Class advancement remains separate.
+One Base Rojo build and 40 focused QuestService assertions
+passed in unpublished Studio. No finished Base quest board/
+journal UI or actual client request journey is claimed.
+
+**NEXT:** wire a minimal visible quest board to the existing
+Base remotes and do ONE focused client story start/claim test.
+Then add truly new class/loot/profession game content using
+current services, not another foundation. Published TEST
+rejoin, cross-place travel and real cloud data stay deferred.
+Only GitHub may edit code/docs; no publish or `main` merge.
+
+
 ## 22 September 2026 — consolidated backend gap audit / STOP repeated test loops
 
 Read `docs/roadmap/DungeonMMO_Consolidated_Backend_Audit_20260922.md`
