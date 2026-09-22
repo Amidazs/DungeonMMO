@@ -12,7 +12,7 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 70, Missing = 29,
+    Human = {Raw = 99, Functional = 72, Missing = 27,
         EquipmentMismatch = 0},
     Elf = {Raw = 129, Functional = 100, Missing = 29,
         EquipmentMismatch = 0},
@@ -96,6 +96,7 @@ local function check_implementation(
     if definition.Kind == "Passive" then
         local bonus = definition.DamageBonusPerRank
             or definition.PhysicalReductionPerRank
+            or definition.CriticalDamageBonusPerRank
             or definition.BowRangeBonusStudsPerRank
             or definition.ArrowSpeedBonusPerRank
         check(type(bonus) == "number" and bonus > 0,
