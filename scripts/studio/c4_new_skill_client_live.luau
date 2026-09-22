@@ -192,11 +192,17 @@ local function check_skill(player, target, case)
     local humanoid = assert(target:FindFirstChildOfClass("Humanoid"))
     humanoid.MaxHealth = 1000
     humanoid.Health = 1000
-    local baseline_mana = Mana.get(player)
     local initial_health = humanoid.Health
     receipts[player.UserId] = nil
     channel:FireClient(player, "LOAD", case.skill)
     await_receipt(player, "LOADED", case.skill)
+    local baseline_mana = Mana.get(player)
+    local lowest_mana = baseline_mana
+    local mana_changed = player:GetAttributeChangedSignal(
+        "CombatMana"
+    ):Connect(function()
+        lowest_mana = math.min(lowest_mana, Mana.get(player))
+    end)
     receipts[player.UserId] = nil
     channel:FireClient(player, "CAST", case.skill)
     local sent = await_receipt(player, "CAST", case.skill)
@@ -215,9 +221,10 @@ local function check_skill(player, target, case)
     end
     if case.class == "Mage" then
         wait_for(function()
-            return Mana.get(player) < baseline_mana - 2
+            return lowest_mana < baseline_mana - 2
         end, case.skill .. " server mana spend", 5)
     end
+    mana_changed:Disconnect()
     print("[C4 Client] " .. case.skill .. " REAL_CLIENT_EFFECT_PASS")
     task.wait(0.6)
 end
