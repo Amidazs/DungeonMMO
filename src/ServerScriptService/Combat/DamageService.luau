@@ -1,11 +1,15 @@
 --!strict
 local Players = game:GetService("Players")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local shared_folder = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 local CombatConfig = require(shared_folder:WaitForChild("CombatConfig"))
 local CriticalHitRules = require(shared_folder:WaitForChild("CriticalHitRules"))
 local CombatValidationService = require(script.Parent:WaitForChild("CombatValidationService"))
 local WardService = require(script.Parent:WaitForChild("WardService"))
+local ProgressionRuntimeState = require(
+    ServerScriptService.Core.Services.ProgressionRuntimeState
+)
 
 local DamageService = {}
 local critical_random = Random.new()
@@ -52,7 +56,21 @@ function DamageService.apply_damage(context: DamageContext): number
     local normal_damage = DamageService.calculate_damage(context.base_damage, context.multiplier)
     if normal_damage <= 0 then return 0 end
     local damage = normal_damage * resolve_critical_multiplier(context)
-    local health_damage, ward_absorbed = WardService.absorb_damage(context.target, damage)
+    local defender = Players:GetPlayerFromCharacter(context.target)
+    if defender and (
+        context.source_kind == "EnemyMelee"
+        or context.source_kind == "EnemyArea"
+    ) then
+        -- C4-inspired light-armour mastery mitigates real physical NPC
+        -- attacks only. Magic, player attacks and unarmoured targets are
+        -- unaffected; the defender's saved equipment/ranks own the value.
+        local reduction = ProgressionRuntimeState
+            .get_light_armor_reduction(defender.UserId)
+        damage *= 1 - reduction
+    end
+    local health_damage, ward_absorbed = WardService.absorb_damage(
+        context.target, damage
+    )
     if health_damage > 0 then humanoid:TakeDamage(health_damage) end
 
     local observer = context.attacker
