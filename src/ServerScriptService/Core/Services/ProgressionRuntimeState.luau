@@ -25,6 +25,9 @@ local ProfileSchema = require(
 local SkillProgressionDefinitions = require(
     Shared:WaitForChild("SkillProgressionDefinitions")
 )
+local SkillUnlockRules = require(
+    Shared:WaitForChild("SkillUnlockRules")
+)
 
 local ProgressionRuntimeState = {}
 
@@ -104,6 +107,7 @@ local function state_for(user_id: number): any
     local equipment = default_equipment()
 
     return {
+        Level = 1,
         Identity = default_identity(),
         ClassAdvancement = {},
         Progression = default_progression(),
@@ -164,6 +168,7 @@ function ProgressionRuntimeState.set_character(
     user_id: number,
     character_or_progression: any
 )
+    local level: number
     local identity: any
     local advancement: any
     local progression: any
@@ -172,6 +177,7 @@ function ProgressionRuntimeState.set_character(
     if type(character_or_progression) == "table"
         and type(character_or_progression.Progression) == "table"
     then
+        level = tonumber(character_or_progression.Level) or 1
         identity = if type(character_or_progression.Identity) == "table"
             then character_or_progression.Identity
             else default_identity()
@@ -184,11 +190,13 @@ function ProgressionRuntimeState.set_character(
             then character_or_progression.Equipment
             else default_equipment()
     elseif type(character_or_progression) == "table" then
+        level = 1
         identity = default_identity()
         advancement = {}
         progression = character_or_progression
         equipment = default_equipment()
     else
+        level = 1
         identity = default_identity()
         advancement = {}
         progression = default_progression()
@@ -198,6 +206,7 @@ function ProgressionRuntimeState.set_character(
     local equipment_snapshot = ProfileSchema.deep_clone(equipment)
 
     states[user_id] = {
+        Level = math.max(1, math.floor(level)),
         Identity = ProfileSchema.deep_clone(identity),
         ClassAdvancement = ProfileSchema.deep_clone(advancement),
         Progression = ProfileSchema.deep_clone(progression),
@@ -664,6 +673,19 @@ function ProgressionRuntimeState.is_skill_usable(
         if not matching then
             return false, "AdvancedClassRequired"
         end
+    end
+
+    local state = state_for(user_id)
+    local earned, locked_reason = SkillUnlockRules.can_train({
+        Level = state.Level,
+        Identity = state.Identity,
+        ClassAdvancement = state.ClassAdvancement,
+        Progression = state.Progression,
+    }, definition, ProgressionRuntimeState.get_skill_rank(
+        user_id, skill_id
+    ))
+    if not earned then
+        return false, locked_reason or "SkillLocked"
     end
 
     local authoritative_tags =
