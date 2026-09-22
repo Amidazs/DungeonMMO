@@ -14,6 +14,9 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        NewbieProtection = table.freeze({
+            [1] = "NoviceProtection",
+        }),
         DefenseBuff = table.freeze({
             [5] = "ElvenFighterGuard",
         }),
@@ -50,6 +53,9 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        NewbieProtection = table.freeze({
+            [1] = "NoviceProtection",
+        }),
         RobeAttackSpeed = table.freeze({
             [1] = "MysticRobeAttackSpeed",
         }),
