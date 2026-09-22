@@ -378,6 +378,24 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 Elven Fighter Elemental Heal ranks 1-3 at level 15.
+    -- Authored server self-renewal needs the correct race and class.
+    ElvenFighterRenewal = table.freeze({
+        Id = "ElvenFighterRenewal",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 15, [2] = 15, [3] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 100,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The shield-line counterpart to Iron Discipline: purchased ranks
     -- add real maximum HP without creating an inert combat action.
     StalwartTraining = table.freeze({
