@@ -71,15 +71,19 @@ catalogue completion nor animation production is implied here.
   gathering node, opposite profession denial, a saved reload,
   and (with two clients) an actual market purchase. Do not
   equate authored tests or Rojo builds with execution evidence.
-- [ ] Review and update older unrestricted-profession test
-  fixtures: `ProfessionServiceTest`,
-  `ProfessionCrossDependencyTest`,
-  `ProfessionLeatherEnchantingDependencyTest`, and any
-  profile/blueprint integration fixtures that assume a single
-  character can train multiple gathering or crafting careers.
-  Those legacy assumptions contradict the new requirement.
-  They must become multi-character/trade scenarios **before
-  any broad test-suite claim**.
+- [x] Source-update the older unrestricted-profession
+  `ProfessionServiceTest`, `ProfessionCrossDependencyTest`,
+  `ProfessionLeatherEnchantingDependencyTest`,
+  `ProfessionReconnectRecoveryTest`,
+  `RecipeKnowledgeCraftingGateTest`, and
+  `RecipeKnowledgeServiceTest`. The three material dependency
+  fixtures now use distinct characters and real market escrow
+  purchases rather than allowing one character to use all careers.
+  The other fixtures select a single real crafting profession;
+  the learned Alchemy blueprint belongs to a different player.
+- [ ] Execute these updated focused fixtures in unpublished Studio,
+  resolve any newly exposed legacy assumptions, and audit other
+  indirect profession clients before a broad test-suite claim.
 - [ ] Add a clear profession trainer NPC/choice UX and decide
   retraining/unlearning policy (if any) after user approval.
 - [ ] Integrate C4 RecipeReading/CommonItemCreation rank families
