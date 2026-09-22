@@ -709,6 +709,31 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 first-transfer critical-rate training differs by race:
+    -- Human Rogue learns it at 28, Elven Scout at 32.
+    HumanScoutPrecision = table.freeze({
+        Id = "HumanScoutPrecision",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 28}),
+        CriticalChanceBonusPerRank = 0.02,
+        WeaponTags = table.freeze({}),
+    }),
+    ElvenScoutPrecision = table.freeze({
+        Id = "ElvenScoutPrecision",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 32}),
+        CriticalChanceBonusPerRank = 0.02,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
