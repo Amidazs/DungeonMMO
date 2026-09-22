@@ -16,6 +16,9 @@ local MageHealService = require(
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
+local PoisonStatusService = require(
+    script.Parent:WaitForChild("PoisonStatusService")
+)
 
 local WindStrikeService = {}
 
@@ -155,6 +158,28 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                         context.attacker,
                         context.attacker,
                         applied_damage * drain_fraction,
+                        context.skill_definition.ID
+                    )
+                end
+                -- A server-confirmed hostile hit alone may apply the
+                -- source curse's bounded non-stacking poison ticks.
+                local poison_damage = tonumber(
+                    context.skill_definition.POISON_TICK_DAMAGE
+                ) or 0
+                if applied_damage > 0 and poison_damage > 0 then
+                    PoisonStatusService.apply(
+                        target,
+                        context.attacker,
+                        poison_damage,
+                        tonumber(
+                            context.skill_definition.POISON_TICK_COUNT
+                        ) or 0,
+                        tonumber(
+                            context.skill_definition.POISON_TICK_SECONDS
+                        ) or 0,
+                        tonumber(
+                            context.skill_definition.POISON_TIER
+                        ) or 0,
                         context.skill_definition.ID
                     )
                 end
