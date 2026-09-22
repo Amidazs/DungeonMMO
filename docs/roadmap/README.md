@@ -1,5 +1,19 @@
 # Canonical Roadmap
 
+**Latest v1.61: all-member higher-difficulty unlock,
+spectator combat exclusion and party Play again.**
+[Roadmap](DungeonMMO_Roadmap_v1_61_Party_Unlock_Spectator_Replay_20260922.md)
+and [unpublished Studio acceptance](../testing/dungeon-party-unlock-spectator-replay-2026-09-22.md).
+Every member must independently unlock the selected dungeon
+depth; Base, new-run transport and replay enforce it.
+Six builds, 23 coordinator checks, 28 replay checks,
+Dungeon backend 30/30, real two-client spectator and replay
+fixtures passed at `c6925c0`. Base UI now identifies
+the locked member; all six builds and the focused Base
+party regression passed at `b6fe3be`. A real same-account
+published reserved-server reconnect is still outstanding.
+
+
 **v1.60 same-server reconnect is now locally verified.**
 [Updated v1.60 roadmap](DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md)
 and [same-head Studio acceptance](../testing/dungeon-same-server-reconnect-local-acceptance-2026-09-22.md).
