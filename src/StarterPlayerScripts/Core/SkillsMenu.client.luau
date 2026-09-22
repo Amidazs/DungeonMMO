@@ -324,6 +324,9 @@ for order, skill_id in ipairs(sorted_skill_ids()) do
         order
     )
     skill_buttons[skill_id] = button
+    -- Skill definitions are public assets, but the player's unlocked
+    -- catalogue must come only from their authoritative profile snapshot.
+    button.Visible = false
 
     button.Activated:Connect(function()
         if not is_known(latest, skill_id) then
@@ -379,6 +382,9 @@ local function render(snapshot: any)
         local display_name = if definition
             then definition.DISPLAY_NAME
             else skill_id
+        local available = type(latest.Skills) == "table"
+            and type(latest.Skills[skill_id]) == "table"
+        button.Visible = available
         local known = is_known(latest, skill_id)
         local rank = skill_rank(latest, skill_id)
         local selected = selected_skill == skill_id
