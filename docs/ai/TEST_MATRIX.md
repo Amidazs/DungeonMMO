@@ -1,5 +1,32 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — targeted vitality/restoration passives
+
+- [x] `3be5de3`: Base Rojo build and **64 focused
+  StalwartTraining/RestorativeTraining assertions**.
+  Hidden pre-level offers, forged early purchases,
+  six actual server HP/healing stat increases,
+  level bracket transition, rank cap, class
+  isolation and profile save/reload passed.
+- [x] The first test run correctly rejected learning
+  because the new passives were absent from the
+  class-authoritative teachable lists; GitHub
+  fix followed by a single focused rerun passed.
+- [x] Same source: **64 existing damage-passive
+  assertions** passed after refactoring their
+  shared class-safe purchased-rank resolver.
+- [x] Read-only C4 reference audit: **16 mapped,
+  13 mismatched, 14 unmapped skill-rank occurrences**.
+  Human Fighter level 10 has one extra authored
+  rank; no parity claim.
+- [ ] One future actual normal-client HP/heal
+  integration and broader C4 rank-content mapping
+  remain; do not substitute old dungeon regressions.
+
+Receipt:
+`docs/testing/c4-vitality-restoration-rank-effects-2026-09-22.md`.
+
+
 ## 22 September 2026 — focused rank-passive acceptance
 
 - [x] `08710c1`: one Base Rojo build, one
