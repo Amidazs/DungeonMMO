@@ -1,5 +1,38 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — real Ranger/Rogue control skills
+
+- [x] New focused Base Studio test initially RED on
+  missing BriarVolley progression definition.
+- [x] Backend `f927f0d`: 41 class/trainer/weapon,
+  rank-level and meaningful control-effect assertions
+  PASS; Rojo Base build PASS.
+- [x] Unpublished Dungeon client test at fixture
+  `19cfeb5`: one BriarVolley hit/slowed **two**
+  separate tagged training targets; DisruptingCut
+  damaged and staggered the real target.
+  `VERIFIED_PLAY_MODE_PASS`. Only temporary
+  class/equipment/loadout and UI state was seeded.
+- [x] Real isolated SkillProgressionService purchase/
+  reload test at `3fe8b70`: 46 assertions PASS for
+  5/10/15 level bands, earned proficiency 40/110,
+  class isolation, rank caps and profile durability.
+- [x] Rogue catalogue's obsolete claim of five
+  visible skills for an unearned Duelist corrected:
+  45 focused assertions PASS; all five only after
+  legitimate advanced class/level/prerequisites.
+- [ ] Source-verified Ranger/Rogue C4 reference
+  rank manifest and fuller class-effect catalogue.
+- [ ] Real saved-player trainer GUI and ordinary
+  physical keyboard gameplay, full balance/cloud
+  acceptance. Separate Phase2A paid-revive
+  automatic test failure remains unresolved.
+
+Proof: `docs/testing/c4-ranger-rogue-control-skills-2026-09-22.md`.
+No unrelated Dungeon wipe/aggro/revive/replay rerun
+or general Dungeon regression acceptance.
+
+
 ## 22 September 2026 — targeted real-client C4 actions/effects
 
 - [x] Unpublished Rojo Dungeon composition at `755fab0`
