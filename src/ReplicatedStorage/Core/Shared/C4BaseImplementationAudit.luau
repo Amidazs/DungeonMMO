@@ -14,6 +14,9 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        Regeneration = table.freeze({
+            [15] = "ElvenFighterRenewal",
+        }),
         PhysicalAttackMastery = table.freeze({
             [5] = "FighterPhysicalTraining",
             [10] = "FighterPhysicalTraining",
