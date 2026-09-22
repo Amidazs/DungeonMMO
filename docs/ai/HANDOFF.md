@@ -1,5 +1,39 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.69 Mage starter rank/visibility slice
+
+Read `docs/roadmap/DungeonMMO_Roadmap_v1_69_Mage_Starter_Unlock_Visibility_20260922.md`
+and `docs/testing/c4-mage-starter-ward-bolt-trainer-2026-09-22.md`.
+Focused tested gameplay head: `e6033e0c1a024837eef62fdea6cecc1c280beb8a`.
+
+New Mage level-one Dawn Ward and Cinder Bolt each have **three
+real ward/projectile ranks** trained at 1/7/14, mastery
+35/100 for ranks 2/3, SP and class restrictions. New
+combat definitions reuse existing server-owned effects.
+The SkillsMenu now hides unoffered foreign/future skills
+rather than revealing every public skill definition;
+ProgressionTrainer shows locked NEXT ranks and their
+actual level/prerequisite blockers. Known skills remain
+visible, including ones not currently usable in a
+different advanced class.
+
+One clean Base Rojo build + **39 focused assertions PASS**;
+one read-only source rank audit: **13/16 C4 brackets
+mismatched** and 14 older unmapped rank occurrences.
+The Mage level-one mapped bracket now explicitly offers
+2 new ranks versus a C4 target of 7. Do NOT invent missing
+ranks or treat UI source edits as real-client GUI acceptance.
+
+**NEXT:** one *targeted* real-client Mage trainer/Skills
+menu visibility + actual new Ward/Bolt input/impact test.
+Then explicitly map starter ranks and implement more
+genuine C4-era role-skill content until each mapped
+rank bracket is satisfied. Do not rerun old dungeon
+wipe/aggro/revive tests. Continue GitHub-only code/docs
+edits; remote restricted to clean pull/build/Studio logs.
+No Roblox publish or main merge.
+
+
 ## 22 September 2026 — v1.68 NEW MAX-HP / HEAL PASSIVES PASS
 
 Read:
