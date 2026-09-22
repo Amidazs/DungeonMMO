@@ -26,8 +26,8 @@ local function check(condition: boolean, message: string)
 end
 
 check(
-    ProfileSchema.VERSION == 13,
-    "RED: progressive dungeon difficulty requires profile schema v13."
+    ProfileSchema.VERSION >= 13,
+    "Progressive dungeon difficulty requires schema v13 or newer."
 )
 local source = ProfileSchema.create_default(9401)
 source.SchemaVersion = 12
@@ -44,8 +44,8 @@ local migrated = ProfileMigration.migrate(source)
 local character = migrated.Characters.Slot1
 
 check(
-    migrated.SchemaVersion == 13,
-    "v12 profile must migrate to schema v13."
+    migrated.SchemaVersion == ProfileSchema.VERSION,
+    "v12 difficulty state must migrate to the current schema."
 )
 check(
     character.DungeonProgress.TestDungeon == "BossRoomStart",
