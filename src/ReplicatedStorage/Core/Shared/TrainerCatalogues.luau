@@ -144,6 +144,14 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "RangerLongRange",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RangerArrowVelocity",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ScoutLightArmorMastery",
                 Mode = "LearnOrRank",
             }),
