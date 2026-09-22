@@ -39,6 +39,8 @@ local DEFINITIONS = table.freeze({
         TeachableSkills = table.freeze({
             "DawnWard",
             "CinderBolt",
+            "MysticWindBolt",
+            "MysticHealingPrayer",
             "AetherBolt",
             "RenewingLight",
             "ArcaneDiscipline",
