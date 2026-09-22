@@ -564,4 +564,44 @@ function PassiveSkillEffects.scout_evasion_chance(
     return math.clamp(chance, 0, 0.055)
 end
 
+--[[
+Computes recovery earned from purchased Human Fighter / Scout sitting
+ranks or either Scout's running rank. Only verified actual motion or
+sitting counts. These are original-game stamina analogues of the C4
+source recovery families, not an unconditional healing modifier.
+
+Args:
+    character (any): Server-owned class, race and bought skill ranks.
+    is_sitting (boolean): True only while the real Humanoid is seated.
+    is_moving (boolean): True only with real nonzero server movement.
+
+Returns:
+    number: Bounded Stamina regeneration multiplier from 1 to 1.25.
+]]
+function PassiveSkillEffects.stamina_recovery_multiplier(
+    character: any,
+    is_sitting: boolean,
+    is_moving: boolean
+): number
+    local bonus = 0
+    if is_sitting == true then
+        bonus = resolve_bonus(
+            character,
+            "FighterRestingRecovery",
+            "RestingStaminaBonusPerRank"
+        ) + resolve_bonus(
+            character,
+            "HumanScoutRestingRecovery",
+            "RestingStaminaBonusPerRank"
+        )
+    elseif is_moving == true then
+        bonus = resolve_bonus(
+            character,
+            "ScoutRunningRecovery",
+            "RunningStaminaBonusPerRank"
+        )
+    end
+    return math.clamp(1 + bonus, 1, 1.25)
+end
+
 return table.freeze(PassiveSkillEffects)
