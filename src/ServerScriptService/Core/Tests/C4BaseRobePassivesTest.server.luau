@@ -10,10 +10,12 @@ local Skills = require(Shared.SkillProgressionDefinitions)
 local Unlocks = require(Shared.SkillUnlockRules)
 local Trainers = require(Shared.TrainerCatalogues)
 local Passive = require(Shared.PassiveSkillEffects)
+local Combat = require(RS.Combat.Shared.SkillDefinitions)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
 local assertions = 0
 local SKILLS = {
+    "MysticRobeCasting",
     "MysticRobeManaRecovery",
     "MysticRobeAttackSpeed",
 }
@@ -84,6 +86,8 @@ local function check_robe(user_id: number, race_id: string)
     Runtime.set_character(user_id, character)
     local base_regen = Runtime.get_mana_regen_per_second(user_id)
     local base_rate = Runtime.get_basic_attack_rate(user_id)
+    local spell = assert(Combat.get("MysticWindBolt"))
+    local base_cast = Runtime.get_skill_wind_up_seconds(user_id, spell)
     check(base_regen > 0 and base_rate > 0,
         "Starting mage needs positive mana and attack timing")
     for _, skill_id in ipairs(SKILLS) do
@@ -100,6 +104,14 @@ local function check_robe(user_id: number, race_id: string)
         Runtime.get_basic_attack_rate(user_id)
             - base_rate * 1.06
     ) < 0.0001, "Robe training did not accelerate basic attacks")
+    check(math.abs(
+        Runtime.get_skill_wind_up_seconds(user_id, spell)
+            - base_cast / 1.06
+    ) < 0.0001, "Robe training did not shorten real magic wind-up")
+    local physical = assert(Combat.get("ArcSlash"))
+    check(Runtime.get_skill_wind_up_seconds(user_id, physical)
+        == physical.WIND_UP_SECONDS,
+        "Robe casting mastery must not accelerate physical skills")
     character.Equipment.Body = nil
     Runtime.set_character(user_id, character)
     check(math.abs(
@@ -108,16 +120,22 @@ local function check_robe(user_id: number, race_id: string)
     check(math.abs(
         Runtime.get_basic_attack_rate(user_id) - base_rate
     ) < 0.0001, "Missing robe still increased attack rate")
+    check(math.abs(
+        Runtime.get_skill_wind_up_seconds(user_id, spell)
+            - base_cast
+    ) < 0.0001, "Unequipping robe failed to restore cast time")
     character.Equipment.Body = "marauder_armor"
     Runtime.set_character(user_id, character)
     check(Passive.robe_mana_regen_bonus(character) == 0
-        and Passive.robe_attack_rate_bonus(character) == 0,
+        and Passive.robe_attack_rate_bonus(character) == 0
+        and Passive.robe_casting_rate_bonus(character) == 0,
         "Heavy armour illegally granted robe passives")
     character.Equipment.Body = "apprentice_mystic_robe"
     character.Identity.BaseClassId = "Fighter"
     Runtime.set_character(user_id, character)
     check(Passive.robe_mana_regen_bonus(character) == 0
-        and Passive.robe_attack_rate_bonus(character) == 0,
+        and Passive.robe_attack_rate_bonus(character) == 0
+        and Passive.robe_casting_rate_bonus(character) == 0,
         "Foreign class must not retain forged Mystic training")
     Runtime.clear_character(user_id)
 end
