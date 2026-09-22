@@ -1,5 +1,34 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — v1.73 Scout source inventory, PARTIAL PASS
+
+C4 Human Rogue has 99 first-transfer rank entries and Elven
+Scout 129 in source levels 20/24/28/32/36. The audited DungeonMMO
+analogues now map **74/99 Human**, **102/129 Elf** to meaningful
+skills, while the remaining 25/27 are still explicitly missing.
+The source inventory records each unimplemented family and
+its count. DO NOT call these source totals overall C4 parity:
+the earlier Fighter/Mage audit had 13/16 mismatched brackets;
+advanced careers and other classes remain incomplete.
+
+New actual mechanics: human crit-power ranks at 24/32, race-specific
+Human/Elf critical rate at 28/32, and shared Scout level-28 server
+movement +6% when allowed to move. Class/race/level/trainer gates
+and saved ranks are authoritative. Focused Base Studio 241 passive,
+1065 inventory, 38 trainer assertions PASS. Real unpublished
+Dungeon Play client eight earlier ability effects plus real
+light-armour damage mitigation, actual server Humanoid speed and
+crit damage PASS. Evidence:
+`docs/testing/c4-scout-source-catalogue-2026-09-22.md`.
+Roadmap: `docs/roadmap/DungeonMMO_Roadmap_v1_73_Scout_Catalogue_20260922.md`.
+
+Actual normal saved-player trainer UI, physical controls and cloud
+multiplayer remain untested. The separate Phase2A paid-revive
+auto-test failure has not been fixed in this focused scope.
+No full Dungeon regression claim, `main` merge, publish,
+production DataStore or unrelated art edit.
+
+
 ## 22 September 2026 — Rogue bleed v1.72 focused LOCAL PASS
 
 New level-24/32 Rogue `LaceratingCut` requires
