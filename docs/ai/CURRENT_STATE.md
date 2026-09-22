@@ -1,5 +1,38 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — Rogue bleed v1.72 focused LOCAL PASS
+
+New level-24/32 Rogue `LaceratingCut` requires
+Vital Blow rank 9/proficiency 350 plus
+Disrupting Cut rank 3/proficiency 110.
+Actual server-only melee damage starts a bounded,
+non-stacking three-tick NPC bleed; rank two increases
+both direct and delayed damage. Expired/replaced ticks
+do not continue; player/target invalidation cancels
+the active effect. The live unpublished Play client
+verified three delayed 3-HP ticks and no fourth tick
+alongside the earlier Ranger/Rogue control effects.
+Focused progression: 19 assertions PASS. Real
+isolated-profile purchase/save/reload: 20 PASS.
+Base and Dungeon Rojo builds passed.
+
+C4 Rogue and Elven Scout have Bleed at levels
+24/32, but C4 requires a **dagger**; DungeonMMO
+currently uses a temporary one-handed sword. This
+is a functional analogue, NOT exact source parity
+or a completed C4 catalogue. Earlier Fighter/Mage
+13/16 reference bracket mismatch and unmapped
+Ranger/Rogue career volumes remain open. Separate
+`Phase2AFailurePathTest` automatic paid-revive
+failure was observed again; no full Dungeon suite
+was accepted.
+
+[Roadmap v1.72](../roadmap/DungeonMMO_Roadmap_v1_72_Rogue_Bleed_20260922.md).
+[Focused acceptance](../testing/c4-rogue-bleed-2026-09-22.md).
+No GitHub `main` merge, Roblox publish or live
+profile/paid operation occurred.
+
+
 ## 22 September 2026 — Ranger/Rogue control skills v1.71 LOCAL PASS
 
 At backend head `f927f0d`, two original C4-inspired
