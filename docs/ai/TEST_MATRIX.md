@@ -1,5 +1,34 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — latest C4 healing and active-status focus
+
+- [x] Mystic Battle Heal: **28** assertions; genuine server
+  healing with earned prerequisite and all three source ranks.
+- [x] Scout purchased passive standing/running dodge:
+  **286** assertions; functional source inventory **1,073**.
+- [x] Timed Scout active evasion and Elf self-guard:
+  **24** source/race/level/status-lifetime assertions.
+- [x] Strict first-tier and total C4 source audits:
+  **57** + **7** assertions; Base 147/168, Scouts 184/228,
+  class paths 0/9 complete; overall `Completed=false`.
+- [x] Unpublished real Play client: **18** authenticated
+  hotbar skills with true NPC/ally effects and both newly
+  registered server combat statuses. No normal persisted-
+  player purchase or published multiplayer claim.
+- [x] Legacy Fighter trainer regression test fixed for
+  expanding C4 catalogue: **13** focused assertions PASS.
+- [ ] **65** sourced rank entries missing across currently
+  inventoried six source classes. Seven other original C4
+  first-transfer class inventories not yet built.
+- [ ] Complete class quests, persistent-player purchase/GUI,
+  remaining crafting/world/status systems and final regression.
+  Existing separate Phase2A paid-revive failure stays open.
+
+[Current receipts](../testing/c4-source-catalogue-v1-75-2026-09-22.md).
+All code/docs via GitHub; only TEMP local builds/Studio tests
+through the remote machine. No main merge or publish.
+
+
 ## 22 September 2026 — v1.75 Scout evasion and Mystic healing
 
 - [x] Scout standing/running chance/race/class/level
