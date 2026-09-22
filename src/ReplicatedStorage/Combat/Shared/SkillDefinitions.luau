@@ -1071,6 +1071,42 @@ local MYSTIC_POISON_CURSE = specialize_skill(
     }
 )
 
+-- Physical attack power and attack frequency are separate server
+-- effects, triggered exclusively after a genuine NPC projectile hit.
+local MYSTIC_FEEBLE_CURSE = specialize_skill(
+    WIND_STRIKE, "MysticFeebleCurse", "Feeble Curse", {
+        MANA_COST = 16,
+        COOLDOWN_SECONDS = 9,
+        BASE_DAMAGE = 3,
+        DEBUFF_POWER_FRACTION = 0.20,
+        DEBUFF_SECONDS = 6,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 3,
+                DEBUFF_POWER_FRACTION = 0.20,
+                DEBUFF_SECONDS = 6,
+            }),
+        }),
+    }
+)
+
+local ELVEN_MYSTIC_LANGUOR = specialize_skill(
+    WIND_STRIKE, "ElvenMysticLanguor", "Languor", {
+        MANA_COST = 16,
+        COOLDOWN_SECONDS = 9,
+        BASE_DAMAGE = 3,
+        DEBUFF_RATE_FRACTION = 0.20,
+        DEBUFF_SECONDS = 6,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 3,
+                DEBUFF_RATE_FRACTION = 0.20,
+                DEBUFF_SECONDS = 6,
+            }),
+        }),
+    }
+)
+
 -- Each authentic server projectile applies a real non-stacking slow
 -- only after impact on a living NPC. All four source ranks improve it.
 local MYSTIC_FROST_BOLT = specialize_skill(
@@ -1361,6 +1397,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ElvenScoutGuard = ELVEN_SCOUT_GUARD,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
+    MysticFeebleCurse = MYSTIC_FEEBLE_CURSE,
+    ElvenMysticLanguor = ELVEN_MYSTIC_LANGUOR,
     MysticCurePoison = MYSTIC_CURE_POISON,
     ElvenScoutPoisonRecovery = ELVEN_SCOUT_POISON_RECOVERY,
     AetherBolt = AETHER_BOLT,
