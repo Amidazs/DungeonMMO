@@ -1970,9 +1970,12 @@ local function enter_skill_active(
         return
     end
 
-    local is_wind_strike = skill_definition.ID == "WindStrike"
+    -- All Mage projectile variants spend mana on release, including
+    -- newly trained advanced spells. Never leave an alternate ID free.
+    local is_magic_projectile =
+        skill_definition.KIND == "MagicProjectile"
 
-    if is_wind_strike then
+    if is_magic_projectile then
         if not ManaService.try_spend(
             player,
             skill_definition.MANA_COST
