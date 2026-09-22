@@ -309,8 +309,8 @@ function ProgressionSnapshotBuilder.build(
                 if target_rank
                     <= definition.MaxRank
                     then SkillProgressionConfig
-                        .get_threshold(
-                            definition.Tier,
+                        .get_skill_threshold(
+                            definition,
                             target_rank
                         )
                     else nil,
