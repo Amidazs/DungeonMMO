@@ -1,6 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
-## 22 September 2026 — current v1.76 C4 conditional recovery focus
+## 22 September 2026 — C4 v1.77 poison status focus
+
+- [x] Source-level seven Human Mystic curse, both Mystic
+  poison cures and Elf-only Scout self-cure: **20** focused
+  trainer/race/class/effect assertions PASS.
+- [x] Actual source implementation audit: Human Fighter
+  37/39, Elf Fighter 41/43, Human Mystic 38/44,
+  Elf Mystic 35/42: **49** assertions PASS.
+- [x] Scout source audit: Human Rogue 81/99,
+  Elven Scout 108/129: **1,080** assertions PASS.
+- [x] Strict overall audit: Base=151/168, Scouts=189/228,
+  seven unmapped original source class inventories,
+  zero of nine first-transfer paths complete and
+  `Completed=false`: **seven** assertions PASS.
+- [x] Base and Dungeon TEMP Rojo compositions built
+  without changing the canonical release place.
+- [x] Unpublished real Play client sent all THREE
+  skills through genuine client hotbar input. Poison
+  impact damaged TrainingDummy, three timed server
+  ticks dealt four HP each, and both full-health
+  client cures removed real poison without later damage.
+  `VERIFIED_PLAY_MODE_PASS`.
+- [ ] 56 missing source ranks across the six currently
+  inventoried classes; seven other original first-
+  transfer class inventories unenumerated/unimplemented.
+- [ ] Authored normal NPC/boss poison application,
+  real saved-player trainer/quest UI, multiplayer
+  support and final milestone-wide regression OPEN.
+  Existing unrelated Phase2A paid-revive auto-test
+  failure remains unresolved.
+
+[Full test receipts](../testing/c4-poison-status-v1-77-2026-09-22.md).
+The updated separate humanoid animation roadmap remains
+untouched. GitHub-only edits; remote only TEMP tests.
+
+
+## 22 September 2026 — previous v1.76 C4 conditional recovery focus
 
 - [x] Human Fighter sitting level-5 rank; Human Scout
   sitting level-24/32 ranks; both Scout races' level-36
