@@ -478,6 +478,33 @@ local function check_scout_movement(player, target)
 end
 
 --[[
+Deals one guaranteed server-owned critical hit using the live player's
+authoritative purchased skill multiplier.
+
+Args:
+    player (Player): Disposable player whose saved rank controls damage.
+    target (Model): Real tagged NPC receiving the physical hit.
+
+Returns:
+    number: Actual health damage dealt to the NPC.
+]]
+local function apply_scout_critical(player, target)
+    return DamageService.apply_damage({
+        attacker = nil,
+        attacker_character = player.Character,
+        target = target,
+        source_kind = "Melee",
+        source_id = "C4ScoutCriticalFocus",
+        base_damage = 20,
+        multiplier = 1,
+        critical_chance = 1,
+        critical_damage_multiplier = Runtime
+            .get_critical_damage_multiplier(player.UserId),
+        critical_roll = 0,
+    })
+end
+
+--[[
 Checks that bought Human critical-power ranks change real guaranteed-hit
 damage on an actual tagged NPC, rather than merely changing UI metadata.
 
@@ -502,28 +529,12 @@ local function check_scout_critical_damage(player, target)
     humanoid.MaxHealth = 1000
     humanoid.Health = 1000
 
-    local function apply_critical()
-        return DamageService.apply_damage({
-            attacker = nil,
-            attacker_character = player.Character,
-            target = target,
-            source_kind = "Melee",
-            source_id = "C4ScoutCriticalFocus",
-            base_damage = 20,
-            multiplier = 1,
-            critical_chance = 1,
-            critical_damage_multiplier = Runtime
-                .get_critical_damage_multiplier(player.UserId),
-            critical_roll = 0,
-        })
-    end
-
-    local baseline = apply_critical()
+    local baseline = apply_scout_critical(player, target)
     character.Progression.Skills.HumanScoutCriticalPower = {
         Known = true, PurchasedRank = 2, Proficiency = 0,
     }
     Runtime.set_character(player.UserId, character)
-    local trained = apply_critical()
+    local trained = apply_scout_critical(player, target)
     assert(math.abs(trained - baseline - 3.2) < 0.01,
         "Two bought critical-power ranks must add 3.2 hit damage")
     print("[C4 Control Client] HUMAN_CRIT_REAL_DAMAGE_PASS")
