@@ -151,6 +151,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "MysticPoisonCurse",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "MysticCurePoison",
+                Mode = "LearnOrRank",
+            }),
 
 
             table.freeze({
@@ -280,6 +284,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "ElvenScoutGuard",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "ElvenScoutPoisonRecovery",
+                Mode = "LearnOrRank",
+            }),
 
 
             table.freeze({
@@ -379,6 +387,10 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ElvenScoutGuard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutPoisonRecovery",
                 Mode = "LearnOrRank",
             }),
 
