@@ -590,6 +590,61 @@ local function check_scout_critical_damage(player, target)
     print("[C4 Control Client] HUMAN_CRIT_REAL_DAMAGE_PASS")
 end
 
+--[[
+Verifies a real client's trained Scout hotbar cast creates the correct
+bounded timed server status rather than awarding a display-only buff.
+
+Args:
+    player (Player): Actual unpublished Studio client character.
+    target (Model): Existing training dummy for safe positioning.
+    race_id (string): Legitimate Human or Elf owner of the skill.
+    skill_id (string): Server-authorized purchased active buff.
+    buff_kind (string): Expected registered server combat-status kind.
+    expected (number): Magnitude applied by the real cast.
+
+Returns:
+    nil: Confirms authentic client input and authoritative status.
+]]
+local function check_scout_active_buff(
+    player, target, race_id, skill_id, buff_kind, expected
+)
+    local character = Schema.create_default(player.UserId)
+        .Characters.Slot1
+    character.Identity.RaceId = race_id
+    character.Identity.BaseClassId = "Rogue"
+    character.Identity.ClassId = "Rogue"
+    character.Identity.CreationStage = "Complete"
+    character.Level = 28
+    character.Equipment.Weapon = "scout_dagger"
+    character.Progression.Skills[skill_id] = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
+    character.Progression.Loadout[1] = skill_id
+    Runtime.set_character(player.UserId, character)
+    local usable, reason = Runtime.is_skill_usable(
+        player.UserId, skill_id
+    )
+    assert(usable, skill_id .. " was not usable: " .. tostring(reason))
+    position(player, target, {class = "Rogue", weapon = "scout_dagger"})
+
+    require(SSS.Combat.StaminaService).reset_player(player)
+    require(SSS.Combat.ManaService).reset_player(player)
+    receipts[player.UserId] = nil
+    channel:FireClient(player, "LOAD", skill_id)
+    await_receipt(player, "LOADED", skill_id)
+    receipts[player.UserId] = nil
+    channel:FireClient(player, "CAST", skill_id)
+    local receipt = await_receipt(player, "CAST", skill_id)
+    assert(receipt.sent == true,
+        skill_id .. " was not sent by the real client hotbar")
+    local Status = require(SSS.Combat.CombatStatusService)
+    wait_for(function()
+        return Status.get(player.Character, buff_kind) >= expected
+    end, skill_id .. " genuine server status", 7)
+    print("[C4 Control Client] " .. skill_id
+        .. " LIVE_SERVER_STATUS_PASS")
+end
+
 -- Args: None.
 -- Returns: nil: Runs the targeted sequential client combat contract.
 local function run()
@@ -615,7 +670,15 @@ local function run()
     check_light_armor(player)
     check_scout_movement(player, dummy)
     check_scout_critical_damage(player, dummy)
-    print("[C4 Control Client] ALL_SIXTEEN_C4_SKILL_EFFECTS_PASS")
+    check_scout_active_buff(
+        player, dummy, "Human", "ScoutEvasiveFocus",
+        "Evasion", 0.14
+    )
+    check_scout_active_buff(
+        player, dummy, "Elf", "ElvenScoutGuard",
+        "PhysicalGuard", 0.07
+    )
+    print("[C4 Control Client] ALL_EIGHTEEN_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
