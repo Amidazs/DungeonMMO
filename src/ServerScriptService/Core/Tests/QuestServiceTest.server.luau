@@ -14,6 +14,8 @@ local ProfileService = require(Services:WaitForChild("ProfileService"))
 local QuestService = require(Services:WaitForChild("QuestService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
+local QuestDefinitions = require(Shared:WaitForChild("QuestDefinitions"))
+
 
 local assertions = 0
 
@@ -41,6 +43,20 @@ local function set_identity(
             ClassId = base_class_id,
             CreationStage = "Complete",
         }
+        if base_class_id == "Mage" then
+            local trial = assert(QuestDefinitions.get(
+                "MageAdvancementTrial"
+            ))
+            character.Progression.SkillPointEntitlement = 60
+            for _, required in ipairs(trial.SkillPrerequisites) do
+                character.Progression.Skills[required.SkillId] = {
+                    Known = true,
+                    PurchasedRank = required.Rank,
+                    Proficiency = required.Proficiency,
+                    StarterGranted = false,
+                }
+            end
+        end
     end)
     check(ok == true, "Test identity mutation failed: " .. tostring(reason))
 end
