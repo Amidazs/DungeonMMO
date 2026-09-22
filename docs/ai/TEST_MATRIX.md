@@ -1,5 +1,32 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — focused class and ability acceptance
+
+- [x] `e73f9ef`: Base build, **66 class advancement**
+  and **40 story quest** assertions passed in
+  unpublished Studio. Four new race-specific
+  Fighter/Ranger quest paths tested at level 20,
+  wrong-dungeon rejection, duplicate claims,
+  role labels and save/reload.
+- [x] `ffc20d1`: Base build and **60 skill**
+  assertions passed after fixing an invalid
+  test profile fixture to include a genuine
+  CompletedByRace record; ProfileMigration
+  correctly rejected the incomplete history.
+- [x] `b017fbc`: Dungeon build and same **60 skill**
+  assertions passed for all four new ranked
+  skills, trainers, class-exclusive execution
+  authorization, weapon requirements and
+  duplicate purchase rejection.
+- [ ] Targeted real-client skill impact and
+  playable advancement/trainer board remains
+  outstanding. Focus on NEW feature acceptance,
+  not another room/wipe/aggro/Play Again loop.
+
+Receipt:
+`docs/testing/dungeon-class-progression-expansion-2026-09-22.md`.
+
+
 ## 22 September 2026 — new story quest focused test
 
 - [x] `89d8e7e`: Base Rojo build and one focused
