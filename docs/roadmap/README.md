@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**Latest C4 backend increment v1.75 — Scout evasion and first-tier
+Mystic healing.** [Roadmap](DungeonMMO_Roadmap_v1_75_C4_Scout_Evasion_Mystic_20260922.md)
+and [focused source/tests](../testing/c4-scout-evasion-base-healing-2026-09-22.md).
+New genuine bought Scout direct-melee/running evasion,
+three-rank Battle Heal and Human-only two-rank Life Drain
+passed focused trainer/progression tests and actual
+unpublished client combat effects. Six inventoried C4
+source classes have 328/396 functional analogue ranks;
+68 missing ranks PLUS seven separate first-transfer class
+skill inventories still need implementation. All nine
+source first-transfer paths remain incomplete.
+The strict `C4CatalogueCoverage.report().Completed`
+is FALSE. No publish, `main` merge or production
+DataStore change occurred.
+
+
 **Latest focused backend increment: v1.74 C4 base + first
 transfer source coverage.** [Working roadmap](DungeonMMO_Roadmap_v1_74_C4_Base_First_Transfer_20260922.md)
 and [audited test receipts](../testing/c4-base-first-transfer-coverage-2026-09-22.md).
