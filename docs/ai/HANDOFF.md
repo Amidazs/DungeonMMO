@@ -1,6 +1,48 @@
 # DungeonMMO Development Handoff
 
-## 22 September 2026 — current v1.76 C4 recovery, PARTIAL
+## 22 September 2026 — v1.77 C4 poison/cure, still INCOMPLETE
+
+Read `docs/testing/c4-poison-status-v1-77-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_77_C4_Poison_Cure_20260922.md`.
+The roadmap index's separate and newer humanoid-animation
+authoring plan remains intact. This backend scope continues
+from C4 v1.76; it does not replace the rig, no-manual-Blender
+or user visual-approval requirements.
+
+Current SIX enumerated Human/Elf original C4 basic and
+partial-first-transfer inventories: **340/396 functional
+analogue ranks, 56 missing**. Base 151/168, two Scout
+source inventories 189/228. Human Fighter 37/39,
+Elf Fighter 41/43, Human Mystic 38/44, Elf Mystic
+35/42, Human Rogue 81/99, Elven Scout 108/129.
+Seven further original first-transfer source class
+inventories remain UNMAPPED; **0/9** transfer paths complete.
+`C4CatalogueCoverage.report().Completed` remains FALSE.
+
+New actual runtime: Human Mystic level-seven poison curse
+requires a confirmed hostile spell hit, then deals three
+non-stacking server damage ticks; Mystic Cure Poison removes
+a real friendly server poison at full health, and Elf-only
+Scout Poison Recovery is self-only. Disposable unpublished
+Play: all THREE authenticated hotbar skills and their
+true NPC/player health/status effects PASS; source/skill
+test 20, base audit 49, Scout inventory 1080, strict
+overall audit 7 assertions PASS. Base and Dungeon
+temporary Rojo builds succeed. Authored ordinary NPC/boss
+poison attacks and full persisted-player trainer/party
+UI remain untested/unimplemented. Prior separate Phase2A
+paid-revive automatic failure is still OPEN.
+
+NEXT: finish 17 base and 39 Scout sourced rank gaps,
+then source-map/implement seven wholly missing original
+C4 first-transfer class trees. No merge, publish, paid
+action, production saves or old dungeon regression loop.
+All source/tests/docs edited in GitHub only; remote
+desktop limited to clean pull, TEMP unpublished tests
+and log inspection.
+
+
+## 22 September 2026 — previous v1.76 C4 recovery, PARTIAL
 
 Read `docs/testing/c4-conditional-recovery-v1-76-2026-09-22.md`
 and `docs/roadmap/DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md`.
