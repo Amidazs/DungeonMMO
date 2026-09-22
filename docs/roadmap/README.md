@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**C4 client-effects focus (22 September 2026):**
+[Focused Studio Play acceptance](../testing/c4-new-skill-live-client-2026-09-22.md)
+verifies Dawn Ward, Cinder Bolt, Archer Draw and Vital Blow
+through a real client hotbar and server combat effects.
+Temporary profiles/snapshots were used, so real trainer
+UI and saved-profile interactions are still pending. Two
+unrelated automatic Dungeon-test failures are not accepted.
+C4 quantitative skill-rank gaps remain open. Continue
+GitHub-first backend work without repeating old dungeon
+wipe/aggro/revive/play-again tests.
+
+
 **Latest v1.70 — all four current class families now have
 C4-inspired level, skill-rank and earned-proficiency gates.**
 [Roadmap v1.70](DungeonMMO_Roadmap_v1_70_All_Four_C4_Class_Families_20260922.md)
