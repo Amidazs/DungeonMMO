@@ -223,6 +223,29 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Accessible introductory Mage options, distinct from the starters.
+    -- Each subsequent rank is a separate level-gated trainer offering.
+    DawnWard = table.freeze({
+        Id = "DawnWard",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 1, [2] = 7, [3] = 14}),
+        RankThresholds = table.freeze({[2] = 35, [3] = 100}),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+    CinderBolt = table.freeze({
+        Id = "CinderBolt",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Magic",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 1, [2] = 7, [3] = 14}),
+        RankThresholds = table.freeze({[2] = 35, [3] = 100}),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     AetherBolt = table.freeze({
         Id = "AetherBolt",
         Tier = "Common",
