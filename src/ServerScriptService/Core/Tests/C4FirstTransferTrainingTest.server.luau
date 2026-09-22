@@ -58,7 +58,7 @@ local function seed_character(
         character.Progression.SkillPointEntitlement = 150
         character.Equipment.Weapon = if class_id == "Ranger"
             then "apprentice_longbow"
-            else "marauder_sword"
+            else "scout_dagger"
         character.Progression.Skills[basic_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 350,
         }
