@@ -702,6 +702,61 @@ local LACERATING_CUT = specialize_skill(
     }
 )
 
+-- C4 first-transfer 20/24/28/32/36 bow and sword damage ladders.
+-- All fifteen ranks have a distinct server-executed impact, not mere
+-- trainer entries. The dagger path will replace the temporary sword.
+local SCOUT_FOCUSED_SHOT = specialize_skill(
+    PIERCING_SHOT, "ScoutFocusedShot", "Focused Shot", {
+        STAMINA_COST = 23,
+        COOLDOWN_SECONDS = 5,
+        MAX_TARGETS = 1,
+        BASE_DAMAGE = 24,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 24}),
+            [2] = table.freeze({BASE_DAMAGE = 27}),
+            [3] = table.freeze({BASE_DAMAGE = 30}),
+            [4] = table.freeze({BASE_DAMAGE = 33}),
+            [5] = table.freeze({BASE_DAMAGE = 36}),
+            [6] = table.freeze({BASE_DAMAGE = 39}),
+            [7] = table.freeze({BASE_DAMAGE = 42}),
+            [8] = table.freeze({BASE_DAMAGE = 45}),
+            [9] = table.freeze({BASE_DAMAGE = 48}),
+            [10] = table.freeze({BASE_DAMAGE = 51}),
+            [11] = table.freeze({BASE_DAMAGE = 54}),
+            [12] = table.freeze({BASE_DAMAGE = 57}),
+            [13] = table.freeze({BASE_DAMAGE = 60}),
+            [14] = table.freeze({BASE_DAMAGE = 63}),
+            [15] = table.freeze({BASE_DAMAGE = 66}),
+        }),
+    }
+)
+
+local ROGUE_FINISHING_CUT = specialize_skill(
+    BACKSTAB, "RogueFinishingCut", "Finishing Cut", {
+        STAMINA_COST = 20,
+        COOLDOWN_SECONDS = 5,
+        BASE_DAMAGE = 20,
+        REAR_MULTIPLIER = 1.65,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 20}),
+            [2] = table.freeze({BASE_DAMAGE = 23}),
+            [3] = table.freeze({BASE_DAMAGE = 26}),
+            [4] = table.freeze({BASE_DAMAGE = 29}),
+            [5] = table.freeze({BASE_DAMAGE = 32}),
+            [6] = table.freeze({BASE_DAMAGE = 35}),
+            [7] = table.freeze({BASE_DAMAGE = 38}),
+            [8] = table.freeze({BASE_DAMAGE = 41}),
+            [9] = table.freeze({BASE_DAMAGE = 44}),
+            [10] = table.freeze({BASE_DAMAGE = 47}),
+            [11] = table.freeze({BASE_DAMAGE = 50}),
+            [12] = table.freeze({BASE_DAMAGE = 53}),
+            [13] = table.freeze({BASE_DAMAGE = 56}),
+            [14] = table.freeze({BASE_DAMAGE = 59}),
+            [15] = table.freeze({BASE_DAMAGE = 62}),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -795,7 +850,9 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     BriarVolley = BRIAR_VOLLEY,
     ThunderShot = THUNDER_SHOT,
     ArcherDraw = ARCHER_DRAW,
+    ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
+    RogueFinishingCut = ROGUE_FINISHING_CUT,
     LaceratingCut = LACERATING_CUT,
     DisruptingCut = DISRUPTING_CUT,
     ArcanistEmber = ARCANIST_EMBER,
