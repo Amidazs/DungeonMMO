@@ -1,5 +1,30 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — four-family skill rank/mastery focus
+
+- [x] `02154e8`: Fighter/Mage/Ranger/Rogue
+  level-bracket, skill-rank, earned proficiency,
+  trial and specialist visibility test **74 assertions
+  PASS**; affected class advancement **66** and
+  existing Fighter/Ranger advanced skill **60** passed.
+- [x] `d1ca4fa`: Base and Dungeon Rojo builds;
+  same 74-assertion four-family test passed. Read-only
+  Fighter/Mage rank-volume audit still reports
+  **13/16 mismatched**, no claim of parity.
+- [x] `687e27c`: Final Rogue full-nine-rank
+  requirement: Base build and same 74 assertions PASS.
+- [ ] One real-client Mage projectile/ward and
+  Ranger/Rogue new-skill hit/UI check.
+- [ ] Map Ranger/Rogue source-rank counts and fill
+  remaining mechanics genuinely, not dummy ranks.
+- [ ] Published cross-place/cloud acceptance remains
+  a separate approval-gated release task.
+
+Evidence:
+`docs/testing/c4-all-four-class-families-2026-09-22.md`.
+No full dungeon reset/aggro/revive/backend rerun.
+
+
 ## 22 September 2026 — v1.69 focused Mage rank and visibility
 
 - [x] `e6033e0`: one Base Rojo build plus 39 focused
