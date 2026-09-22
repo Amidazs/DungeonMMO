@@ -109,6 +109,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "MysticFrostBolt",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "MysticHealingPrayer",
                 Mode = "LearnOrRank",
             }),
