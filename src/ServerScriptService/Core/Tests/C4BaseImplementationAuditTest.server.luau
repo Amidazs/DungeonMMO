@@ -70,10 +70,16 @@ local function main()
                 race_id .. " " .. class_id .. " missing ledger differs")
             check(audit.Functional + audit.Missing == audit.Raw,
                 race_id .. " " .. class_id .. " counted a rank twice")
-            print(("[C4 Base Coverage] %s %s %d/%d; missing %d")
+            local pending = {}
+            for family, count in pairs(audit.MissingFamilies) do
+                table.insert(pending, family .. "=" .. tostring(count))
+            end
+            table.sort(pending)
+            print(("[C4 Base Coverage] %s %s %d/%d; missing %d: %s")
                 :format(
                     race_id, class_id, audit.Functional,
-                    audit.Raw, audit.Missing
+                    audit.Raw, audit.Missing,
+                    table.concat(pending, ", ")
                 ))
         end
     end
