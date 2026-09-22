@@ -27,6 +27,9 @@ local RangerProjectileService = require(
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
+local ThreatService = require(
+    script.Parent:WaitForChild("ThreatService")
+)
 local StaggerService = require(
     script.Parent:WaitForChild("StaggerService")
 )
@@ -133,6 +136,24 @@ local function handle_projectile_skill_hit(
         applied_damage,
         target_index
     )
+
+    -- The confirmed projectile hit has already generated actual damage
+    -- threat. A calming arrow reduces only this player's existing value.
+    local calm_fraction = tonumber(
+        definition.THREAT_REDUCTION_FRACTION
+    ) or 0
+    local humanoid = target:FindFirstChildOfClass("Humanoid")
+    if applied_damage > 0 and calm_fraction > 0
+        and humanoid and humanoid.Health > 0
+    then
+        local removed = ThreatService.reduce_threat(
+            target, player, calm_fraction
+        )
+        DungeonProgressionBridge.award_control(
+            player, definition.ID, target,
+            "Threat", removed > 0
+        )
+    end
 
     -- Server-authored control fields select slow-capable projectile
     -- skills. Never infer control effects from a client-supplied ID.
