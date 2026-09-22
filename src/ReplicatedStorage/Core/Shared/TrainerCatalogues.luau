@@ -147,6 +147,14 @@ local DEFINITIONS = table.freeze({
                 SkillId = "ScoutLightArmorMastery",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "ElvenRenewal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenCalmingShot",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -193,6 +201,10 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ScoutLightArmorMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenRenewal",
                 Mode = "LearnOrRank",
             }),
         }),
