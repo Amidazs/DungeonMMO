@@ -1,5 +1,19 @@
 # Canonical Roadmap
 
+**Latest active work: v1.64 — earned skill mastery, level-bracket training
+and prerequisite-gated class advancement.**
+[Roadmap v1.64](DungeonMMO_Roadmap_v1_64_Skill_Mastery_Level_Gates_20260922.md)
+and [focused local evidence](../testing/dungeon-skill-mastery-lineage-style-2026-09-22.md).
+New basic abilities at levels 8/14/20, level-20 trials requiring
+two fully mastered class skills, level-24/28/32 specialist skill
+ranks and an extended level-40 cap now have local focused
+tests. The taunt-proficiency integration was corrected and
+tested separately. This is a *first connected progression
+ladder*, not a complete Lineage II C4 skill catalogue.
+Do not rerun old dungeon wipe/aggro/revive regressions
+for isolated skill-data edits.
+
+
 **Latest v1.63: race-specific advanced classes and playable-skill
 foundations (Lineage II / WoW-inspired structure, original content).**
 [Roadmap v1.63](DungeonMMO_Roadmap_v1_63_Class_Progression_Role_Skills_20260922.md)
