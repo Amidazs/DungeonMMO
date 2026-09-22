@@ -8,6 +8,12 @@ local CharacterIdentityRules = require(
 local SecondaryClassDefinitions = require(
     Shared:WaitForChild("SecondaryClassDefinitions")
 )
+local QuestDefinitions = require(
+    Shared:WaitForChild("QuestDefinitions")
+)
+local SkillUnlockRules = require(
+    Shared:WaitForChild("SkillUnlockRules")
+)
 
 local QuestService = require(script.Parent:WaitForChild("QuestService"))
 
@@ -128,6 +134,16 @@ function ClassAdvancementService:start_trial(user_id: number): any
         return result(false, "AdvancementAlreadyCompleted")
     end
 
+    local trial = QuestDefinitions.get(candidate.QuestId)
+    local ready, missing_reason, missing_requirement =
+        SkillUnlockRules.can_start_trial(character, trial)
+    if not ready then
+        return result(false, "AdvancementRequirementsNotMet", {
+            requirement_reason = missing_reason,
+            missing_requirement = missing_requirement,
+        })
+    end
+
     local started = self._quests:start(
         user_id,
         candidate.QuestId
@@ -169,6 +185,16 @@ function ClassAdvancementService:claim(user_id: number): any
         return result(false, "AdvancementAlreadyCompleted")
     end
 
+    local trial = QuestDefinitions.get(candidate.QuestId)
+    local ready, missing_reason, missing_requirement =
+        SkillUnlockRules.can_start_trial(character, trial)
+    if not ready then
+        return result(false, "AdvancementRequirementsNotMet", {
+            requirement_reason = missing_reason,
+            missing_requirement = missing_requirement,
+        })
+    end
+
     local quest_state = QuestService.character_state(
         character,
         candidate.QuestId
@@ -199,6 +225,14 @@ function ClassAdvancementService:claim(user_id: number): any
 
             if completed_for(live_character, live_candidate) then
                 error("AdvancementAlreadyCompleted")
+            end
+            local current_trial = QuestDefinitions.get(
+                live_candidate.QuestId
+            )
+            if not select(1, SkillUnlockRules.can_start_trial(
+                live_character, current_trial
+            )) then
+                error("AdvancementRequirementsChanged")
             end
 
             local completed, quest_error =
@@ -252,12 +286,20 @@ function ClassAdvancementService:build_snapshot(user_id: number): any
     local quest_state = if candidate
         then QuestService.character_state(character, candidate.QuestId)
         else nil
+    local trial = candidate and QuestDefinitions.get(candidate.QuestId)
+    local requirements_met, requirement_reason, missing_requirement =
+        SkillUnlockRules.can_start_trial(character, trial)
 
     return result(true, nil, {
         ActiveClassId = advancement.ActiveClassId,
         CandidateClassId = if candidate then candidate.Id else nil,
         CandidateDisplayName = if candidate then candidate.DisplayName else nil,
         CandidateRoleId = if candidate then candidate.RoleId else nil,
+        RequiredLevel = trial and trial.MinimumLevel or nil,
+        SkillRequirements = trial and trial.SkillPrerequisites or {},
+        RequirementsMet = requirements_met,
+        MissingRequirementReason = requirement_reason,
+        MissingRequirement = missing_requirement,
         QuestId = if candidate then candidate.QuestId else nil,
         QuestReady = type(quest_state) == "table"
             and quest_state.Ready == true,
