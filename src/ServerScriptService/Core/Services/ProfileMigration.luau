@@ -368,8 +368,8 @@ local function sanitize_skill_state(
     if definition then
         proficiency = math.min(
             proficiency,
-            SkillProgressionConfig.get_max_threshold(
-                definition.Tier
+            SkillProgressionConfig.get_skill_max_threshold(
+                definition
             )
         )
     end
