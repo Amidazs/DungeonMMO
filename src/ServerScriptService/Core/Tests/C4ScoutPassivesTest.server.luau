@@ -11,6 +11,7 @@ local Unlocks = require(Shared.SkillUnlockRules)
 local Trainers = require(Shared.TrainerCatalogues)
 local Classes = require(Shared.ClassProgressionDefinitions)
 local Passive = require(Shared.PassiveSkillEffects)
+local CombatStats = require(Shared.CharacterCombatStats)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
 local LEVELS_BOW = {20, 20, 20, 24, 24, 24, 28, 28, 28,
@@ -257,8 +258,8 @@ for _, character in ipairs({ranger, rogue}) do
         "Human-only critical power leaked to Elf trainer")
     check(math.abs(
         Runtime.get_critical_damage_multiplier(user_id)
-        - 1.5
-    ) > 0, "Race-specific critical damage must remain well-defined")
+        - CombatStats.critical_damage_multiplier("Elf")
+    ) < 0.0001, "Forged Human rank altered Elf critical damage")
     check(Passive.critical_damage_bonus(character) == 0,
         "Forged Human passive must not boost an Elf")
     Runtime.clear_character(user_id)
