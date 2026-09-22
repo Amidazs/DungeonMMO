@@ -63,12 +63,12 @@ local function check(
 end
 
 -- ------------------------------------------------------------
--- Exact Level 20 config contract
+-- Extended level-40 cap with unchanged level-1-to-20 thresholds
 -- ------------------------------------------------------------
 
 check(
-    ProgressionConfig.MAX_LEVEL == 20,
-    "maximum level must be 20."
+    ProgressionConfig.MAX_LEVEL == 40,
+    "First extended progression bracket must reach level 40."
 )
 
 local expected_xp = {
@@ -98,14 +98,24 @@ end
 
 check(
     ProgressionConfig.get_required_xp(20)
-        == nil,
-    "Level 20 must not have a next-level threshold."
+        == 4508,
+    "Level 20 must now progress to level 21 with a deterministic threshold."
 )
 
 check(
     ProgressionConfig.level_entitlement(20)
         == 19,
     "Level 20 entitlement must be exactly 19."
+)
+check(
+    ProgressionConfig.get_required_xp(39)
+        > ProgressionConfig.get_required_xp(20)
+        and ProgressionConfig.get_required_xp(40) == nil,
+    "Post-20 XP must grow and stop at the new level-40 cap."
+)
+check(
+    ProgressionConfig.level_entitlement(40) == 39,
+    "Level 40 grants exactly 39 earned AP/SP entitlement."
 )
 
 -- Existing early thresholds remain unchanged.
@@ -264,7 +274,7 @@ check(
 )
 
 -- ------------------------------------------------------------
--- Huge grant must stop at Level 20
+-- Huge grant must stop at the new Level 40 cap
 -- ------------------------------------------------------------
 
 local huge =
@@ -282,25 +292,25 @@ character = assert(
 
 check(
     huge.ok == true
-        and character.Level == 20,
-    "huge XP grant must stop at Level 20."
+        and character.Level == 40,
+    "huge XP grant must stop at Level 40."
 )
 
 check(
     character.XP == 0,
-    "excess XP at Level 20 must be discarded."
+    "excess XP at Level 40 must be discarded."
 )
 
 check(
     character
         .Progression
         .AttributePointEntitlement
-        == 19
+        == 39
         and character
             .Progression
             .SkillPointEntitlement
-            == 19,
-    "Level 20 entitlement must be exactly 19/19."
+            == 39,
+    "Level 40 entitlement must be exactly 39/39."
 )
 
 local entitlement_before_cap_grant =
@@ -323,9 +333,9 @@ check(
     at_cap.ok == true
         and at_cap.at_cap == true
         and at_cap.xp_granted == 0
-        and character.Level == 20
+        and character.Level == 40
         and character.XP == 0,
-    "further XP at Level 20 must be discarded."
+    "further XP at Level 40 must be discarded."
 )
 
 check(
@@ -421,7 +431,7 @@ check(
 local dev_cap =
     debug_progression:set_level_for_test(
         9102,
-        20,
+        40,
         "DEV"
     )
 
@@ -434,27 +444,27 @@ debug_character = assert(
 
 check(
     dev_cap.ok == true
-        and debug_character.Level == 20
+        and debug_character.Level == 40
         and debug_character.XP == 0,
-    "DEV level command must support the new Level 20 cap."
+    "DEV level command must support the new Level 40 cap."
 )
 
 check(
     debug_character
         .Progression
         .AttributePointEntitlement
-        == 19
+        == 39
         and debug_character
             .Progression
             .SkillPointEntitlement
-            == 19,
-    "DEV Level 20 must synchronize entitlement to 19/19."
+            == 39,
+    "DEV Level 40 must synchronize entitlement to 39/39."
 )
 
 check(
     notifications == 2
-        and notified_level == 20,
-    "DEV Level 20 mutation must notify exactly once."
+        and notified_level == 40,
+    "DEV Level 40 mutation must notify exactly once."
 )
 
 local prod_level =
@@ -479,18 +489,18 @@ check(
 local invalid_level =
     debug_progression:set_level_for_test(
         9102,
-        21,
+        41,
         "DEV"
     )
 
 check(
     invalid_level.ok == false,
-    "Level 21 debug mutation must reject."
+    "Level 41 debug mutation must reject."
 )
 
 check(
     notifications == 2,
-    "invalid Level 21 mutation must not notify."
+    "invalid Level 41 mutation must not notify."
 )
 
 local xp_result =
@@ -517,17 +527,17 @@ debug_character = assert(
 )
 
 check(
-    debug_character.Level == 20
+    debug_character.Level == 40
         and debug_character.XP == 0
         and debug_character
             .Progression
             .AttributePointEntitlement
-            == 19
+            == 39
         and debug_character
             .Progression
             .SkillPointEntitlement
-            == 19,
-    "cap XP request must leave Level 20 state unchanged."
+            == 39,
+    "cap XP request must leave Level 40 state unchanged."
 )
 
 print(
