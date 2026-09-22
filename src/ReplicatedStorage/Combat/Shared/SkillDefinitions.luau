@@ -1160,6 +1160,52 @@ local MYSTICSTONESKIN = specialize_skill(
     }
 )
 
+-- A purchased C4 Scout active evasion buff: real temporary server
+-- status, with no permanent benefit when not cast or after expiry.
+local SCOUT_EVASIVE_FOCUS = specialize_skill(
+    MAGE_HEAL, "ScoutEvasiveFocus", "Evasive Focus", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 0,
+        STAMINA_COST = 18,
+        COOLDOWN_SECONDS = 28,
+        BUFF_KIND = "Evasion",
+        BUFF_MAGNITUDE = 0.14,
+        BUFF_SECONDS = 7,
+        WIND_UP_SECONDS = 0.12,
+        ACTIVE_SECONDS = 0.08,
+        RECOVERY_SECONDS = 0.22,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.14, BUFF_SECONDS = 7,
+            }),
+        }),
+    }
+)
+
+-- Source C4 Elven Scout self-defence uses the same real server
+-- guard status that reduces incoming physical NPC melee damage.
+local ELVEN_SCOUT_GUARD = specialize_skill(
+    MAGE_HEAL, "ElvenScoutGuard", "Elven Scout Guard", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 9,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 22,
+        BUFF_KIND = "PhysicalGuard",
+        BUFF_MAGNITUDE = 0.07,
+        BUFF_SECONDS = 12,
+        WIND_UP_SECONDS = 0.16,
+        ACTIVE_SECONDS = 0.08,
+        RECOVERY_SECONDS = 0.22,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.07, BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1258,6 +1304,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticStoneSkin = MYSTICSTONESKIN,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     MysticBattleHeal = MYSTIC_BATTLE_HEAL,
+    ScoutEvasiveFocus = SCOUT_EVASIVE_FOCUS,
+    ElvenScoutGuard = ELVEN_SCOUT_GUARD,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
@@ -1369,6 +1417,7 @@ local function validate_buff(definition: BuffSkillDefinition)
         definition.BUFF_KIND == "PhysicalPower"
             or definition.BUFF_KIND == "PhysicalGuard"
             or definition.BUFF_KIND == "MagicPower",
+            or definition.BUFF_KIND == "Evasion",
         "Unknown authoritative combat buff kind."
     )
     assert(definition.BUFF_MAGNITUDE > 0
