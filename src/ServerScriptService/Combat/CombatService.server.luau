@@ -78,6 +78,9 @@ local WardService = require(
 local MageHealService = require(
     script.Parent:WaitForChild("MageHealService")
 )
+local CombatStatusService = require(
+    script.Parent:WaitForChild("CombatStatusService")
+)
 local RangerDrawService = require(
     script.Parent:WaitForChild("RangerDrawService")
 )
@@ -2293,6 +2296,17 @@ local function enter_skill_active(
             player,
             "VOLLEY",
             if cast then "CAST" else "REJECT",
+            skill_definition.ID,
+            sequence_id
+        )
+    elseif character and skill_definition.KIND == "Buff" then
+        local applied = CombatStatusService.apply_self(
+            player, skill_definition
+        )
+        CombatValidationService.emit(
+            player,
+            "BUFF",
+            if applied then "APPLIED" else "REJECT",
             skill_definition.ID,
             sequence_id
         )
