@@ -1,5 +1,46 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.72 Rogue bleeding backend
+
+Read `docs/testing/c4-rogue-bleed-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_72_Rogue_Bleed_20260922.md`.
+Final focused live-client fixture `2ea9152` passed
+server-confirmed Rogue Lacerating Cut and all
+previous Ranger/Rogue control skills. The real
+tagged NPC lost three additional 3-HP server
+bleed ticks after initial damage, then the effect
+expired with no fourth tick. Existing DamageService,
+threat, contribution and skill proficiency credit
+are used. The server cancels ticks on invalid
+attacker/target and replaces instead of stacking.
+
+Lacerating Cut rank 1 at lv24 requires fully
+purchased and use-mastered Vital Blow/Disrupting
+Cut; rank 2 at lv32 requires use-earned skill
+proficiency 120. Focused 19 progression assertions
+and isolated real trainer purchase/save/reload
+20 assertions PASS. Base and Dungeon builds PASS.
+C4 source Bleed level bands match, but exact
+C4 uses a DAGGER: current one-handed sword is
+a compatibility path, never claim weapon parity.
+
+**NEXT:** continue source-backed shared first-transfer
+Rogue/Scout and Fighter/Mage rank-volume inventory;
+build real remaining utility/passive/combat effects
+instead of padding counts; add dagger support before
+exact C4 equipment claims. Full C4 catalogue is NOT
+complete. Real player trainer GUI/ordinary physical
+input and production or published multiplayer were
+not tested. The unrelated Phase2A paid-revive
+auto-test remains open before release.
+
+All code/docs/test edits through GitHub only.
+Remote Desktop permitted solely for clean pull,
+TEMP Rojo build, unpublished Studio tests and logs.
+Do not re-run unrelated old Dungeon wipe/aggro/
+revive/replay loops or merge/publish without approval.
+
+
 ## 22 September 2026 — v1.71 Ranger/Rogue control slice verified
 
 Read `docs/testing/c4-ranger-rogue-control-skills-2026-09-22.md`
