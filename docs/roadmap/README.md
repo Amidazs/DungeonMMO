@@ -1,3 +1,19 @@
+**Current professions/economy backend: v1.79 exclusive careers.**
+[Latest roadmap and acceptance gates](
+DungeonMMO_Roadmap_v1_79_Exclusive_Professions_20260923.md).
+One character may explicitly choose one Gathering and one Creation
+profession, independently. Server authority now rejects unauthorized
+gathering, skinning, recipe learning and crafting. Schema v14 retains
+old profession XP but does not auto-select multiple careers. The
+existing player market provides cross-career iron bars, alchemical
+reagents and crafted gear; a new two-character focused trade test
+is authored but **has not run in Studio**. Initial Base/Dungeon
+Rojo builds and changed-file Luau parser checks passed. Rewrite
+older unrestricted-profession fixture assumptions before a broad
+suite. C4 v1.78 skill acceptance and the separate humanoid
+animation production roadmap remain open. No main merge, publish,
+paid operations or production DataStore change.
+
 **Current C4 backend implementation: v1.78 enemy weakening.**
 [Backend roadmap](DungeonMMO_Roadmap_v1_78_C4_Enemy_Weakening_20260923.md).
 Human/Elf first-tier Mystics now have authored level-14
