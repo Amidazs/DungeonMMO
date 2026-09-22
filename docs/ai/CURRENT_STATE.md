@@ -1,5 +1,29 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — four-family C4-like progression backend v1.70
+
+Latest focused gameplay source `687e27c`. All
+currently supported Fighter/Mage/Ranger/Rogue families
+have level/rank/mastery-gated basics, functional weapon
+damage/mastery/ward/shot/rear-attack abilities and
+earned advanced-class specialist skills. New Arcanist
+Ember and Spellweaver Aegis use existing Mage combat
+executors with correct spell-specific mana and damage
+source. Rogue finishers require max nine-rank basic
+Vital Blow; service/preview/trial gates remain
+server-authoritative. Base build and 74 focused
+assertions passed at final source; both Base/Dungeon
+built at previous implementation head `d1ca4fa`.
+
+**Boundary:** Fighter/Mage C4 count audit still reports
+13/16 unmatched brackets, Ranger/Rogue source rank
+parity is not yet mapped, and new real-client spell/
+ability impacts are pending. Existing dungeon replay/
+wipe tests deliberately not repeated.
+[Roadmap v1.70](../roadmap/DungeonMMO_Roadmap_v1_70_All_Four_C4_Class_Families_20260922.md).
+[Evidence](../testing/c4-all-four-class-families-2026-09-22.md).
+
+
 ## 22 September 2026 — v1.69 early Mage spells / skill visibility
 
 Focused gameplay/test head `e6033e0`: two early Mage
