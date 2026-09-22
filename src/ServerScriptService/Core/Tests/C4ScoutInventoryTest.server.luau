@@ -176,6 +176,18 @@ local function check_race(race_id: string)
         race_id .. " missing family ledger does not reconcile")
     check(audit.Missing > 0,
         "Incomplete C4 Scout catalogue must not be declared complete")
+
+    -- Sorted missing source families form the next actionable content gate.
+    local pending = {}
+    for family, count in pairs(audit.MissingFamilies) do
+        table.insert(pending, family .. "=" .. tostring(count))
+    end
+    table.sort(pending)
+    print(("[C4 Scout Inventory] %s %d/%d, missing %d: %s")
+        :format(
+            race_id, audit.Functional, audit.Raw,
+            audit.Missing, table.concat(pending, ", ")
+        ))
 end
 
 check_race("Human")
