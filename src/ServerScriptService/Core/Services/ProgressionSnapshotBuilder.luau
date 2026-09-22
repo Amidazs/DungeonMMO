@@ -27,6 +27,9 @@ local SkillDefinitions = require(
         "SkillProgressionDefinitions"
     )
 )
+local SkillUnlockRules = require(
+    Shared:WaitForChild("SkillUnlockRules")
+)
 
 local RaceDefinitions = require(
     Shared:WaitForChild(
@@ -249,6 +252,7 @@ function ProgressionSnapshotBuilder.build(
     for skill_id, definition in pairs(
         SkillDefinitions.all()
     ) do
+        if SkillUnlockRules.can_show(character, definition) then
         local state =
             skill_states[skill_id]
 
@@ -333,7 +337,20 @@ function ProgressionSnapshotBuilder.build(
                         )
                         > 0
                     else false,
+
+            NextRequiredLevel = if target_rank <= definition.MaxRank
+                then (definition.RankLevels
+                    and definition.RankLevels[target_rank])
+                    or definition.MinimumLevel or 1
+                else nil,
+
+            NextRankUnlocked = if target_rank <= definition.MaxRank
+                then select(1, SkillUnlockRules.can_train(
+                    character, definition, target_rank
+                ))
+                else false,
         }
+        end
     end
 
     return {
