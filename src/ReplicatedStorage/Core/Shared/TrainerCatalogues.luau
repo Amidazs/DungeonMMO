@@ -84,6 +84,58 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    VanguardTrainer = table.freeze({
+        Id = "VanguardTrainer",
+        DisplayName = "Vanguard Trainer",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedAdvancedClasses = table.freeze({"HumanVanguard"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "VanguardChallenge",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
+    ThornwardenTrainer = table.freeze({
+        Id = "ThornwardenTrainer",
+        DisplayName = "Thornwarden Trainer",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedAdvancedClasses = table.freeze({"ElfThornwarden"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "ThornwardenBash",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
+    SharpshooterTrainer = table.freeze({
+        Id = "SharpshooterTrainer",
+        DisplayName = "Sharpshooter Trainer",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        AllowedAdvancedClasses = table.freeze({"HumanSharpshooter"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "SharpshooterPierce",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
+    WindrunnerTrainer = table.freeze({
+        Id = "WindrunnerTrainer",
+        DisplayName = "Windrunner Trainer",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        AllowedAdvancedClasses = table.freeze({"ElfWindrunner"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "WindrunnerVolley",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
     DuelistTrainer = table.freeze({
         Id = "DuelistTrainer",
         DisplayName = "Duelist Trainer",
