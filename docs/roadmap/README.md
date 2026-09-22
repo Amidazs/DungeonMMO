@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**Latest active C4 skill-volume increment: v1.66.**
+[Updated content roadmap](DungeonMMO_Roadmap_v1_66_C4_Early_Rank_Content_20260922.md)
+and [focused acceptance](../testing/c4-early-fighter-mage-skill-ranks-2026-09-22.md).
+Two Fighter nine-rank combat families at level 5/10/15,
+one Mage six-rank heal at level 7/14, and per-skill
+mastery/profile migration were implemented and locally
+focused-tested. C4's mapped reference-volume requirement
+is **NOT complete: 16/16 verified brackets remain short**.
+Next: real passive/utility/craft families and remaining
+mapped rank offerings, not another dungeon recovery suite.
+
+
 **Latest active requirement (v1.65): Chronicle 4 skill-RANK
 volume per corresponding class and level, not just a few
 additional active skills.**
