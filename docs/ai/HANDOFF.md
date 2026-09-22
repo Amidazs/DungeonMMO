@@ -1,5 +1,34 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.67 C4-STYLE PASSIVE SKILLS PASS
+
+Read:
+`docs/roadmap/DungeonMMO_Roadmap_v1_67_C4_Passive_Ranks_20260922.md`
+and
+`docs/testing/c4-passive-rank-effects-2026-09-22.md`.
+
+Focused tested gameplay source `08710c1ce8e2390804080d826925e5346b1a48a6`.
+Iron Discipline (Fighter) and Arcane Discipline (Mage)
+each have six bought ranks; their level 5/10 and 7/14
+trainer brackets modify server-owned physical/magic
+damage scaling by 0.01 and 0.015 per rank. Passive
+rank training needs SP and level, NOT proficiency
+that can only come from casting an active ability.
+All active mastery/advancement prerequisites remain.
+
+One clean Base build and 64 focused assertions passed.
+One read-only audit reports 16/16 C4 mapped brackets
+still short, with Fighter 10 authored ranks at 5/10,
+Mage 7 at 7/14; no parity or real-client combat
+balance claim. NEXT implement other genuinely missing
+early skill/rank effects and source-aligned training
+schedules, then one targeted actual client-combat test.
+Do not rerun full dungeon wipe/aggro/revive suites.
+Only edit scripts/docs via GitHub; local remote use
+is restricted to clean pull, builds, tests, diagnostics.
+No Roblox publish or `main` merge.
+
+
 ## 22 September 2026 — v1.66 C4 RANK CONTENT (STILL NOT PARITY)
 
 Read
