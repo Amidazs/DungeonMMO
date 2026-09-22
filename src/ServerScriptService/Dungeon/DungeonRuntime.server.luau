@@ -2087,7 +2087,11 @@ end)
 
 revive_request.OnServerEvent:Connect(function(player: Player, action: any)
     if not death_service or not loaded_users[player.UserId] then return end
-    if action == "Free" then
+    if action == "State" then
+        -- A client may connect its RemoteEvent listener after the initial
+        -- admission push. Re-send only that authenticated member's state.
+        death_service:send_member_state(player)
+    elseif action == "Free" then
         local result = death_service:request_free_revive(player)
         if not result.ok then emit_revive_state(player.UserId, {error = result.reason}) end
     elseif action == "Paid" then
