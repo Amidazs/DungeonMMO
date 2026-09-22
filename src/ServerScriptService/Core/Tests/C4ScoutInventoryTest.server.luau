@@ -12,9 +12,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 77, Missing = 22,
+    Human = {Raw = 99, Functional = 78, Missing = 21,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 104, Missing = 25,
+    Elf = {Raw = 129, Functional = 106, Missing = 23,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +93,15 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if definition.Kind == "Passive" then
+    if category == "ActiveEvasion" or category == "DefenseBuff" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        local kind = if category == "ActiveEvasion"
+            then "Evasion" else "PhysicalGuard"
+        check(effect.KIND == "Buff" and effect.BUFF_KIND == kind
+            and effect.BUFF_MAGNITUDE > 0 and effect.BUFF_SECONDS > 0
+            and effect.COOLDOWN_SECONDS > 0,
+            mapping.SkillId .. " must execute a real timed combat status")
+    elseif definition.Kind == "Passive" then
         local bonus = definition.DamageBonusPerRank
             or definition.PhysicalReductionPerRank
             or definition.CriticalDamageBonusPerRank
