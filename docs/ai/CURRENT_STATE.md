@@ -1,5 +1,28 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — v1.68 health/healing passive rank content
+
+Focused gameplay source `3be5de3`: Fighter
+Stalwart Training and Mage Restorative Training
+each have six level/SP-paid passive ranks with
+real server max-HP (+30 at rank six) and
+healing-multiplier (+0.072 at rank six) effects.
+The same class-safe passive resolution still
+supports earlier damage passives.
+
+One Base Rojo build, **64 new + 64 existing**
+focused assertions passed. Read-only C4 rank
+volume audit reports **13/16 mapped brackets
+still mismatched** and 14 unmapped rank
+occurrences; a Human Fighter level-10 overcount
+also remains. This is new gameplay content,
+NOT C4 skill parity or a normal-client fight/
+heal balance test. No published game changes.
+
+[Roadmap v1.68](docs/roadmap/DungeonMMO_Roadmap_v1_68_Vitality_Restoration_Ranks_20260922.md)
+and [focused acceptance](docs/testing/c4-vitality-restoration-rank-effects-2026-09-22.md).
+
+
 ## 22 September 2026 — v1.67 physical/magic passives focused PASS
 
 At gameplay source `08710c1`, Fighter Iron Discipline
