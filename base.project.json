@@ -21,6 +21,12 @@
       "Core": {
         "$path": "src/ServerScriptService/Core"
       },
+      "Combat": {
+        "$className": "Folder",
+        "CombatStatusService": {
+          "$path": "src/ServerScriptService/Combat/CombatStatusService.luau"
+        }
+      },
       "Base": {
         "$path": "src/ServerScriptService/Base"
       }
