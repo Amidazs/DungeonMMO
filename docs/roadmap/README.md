@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**Consolidated active backend backlog (22 September 2026):**
+[Gap audit and stop-retesting plan](DungeonMMO_Consolidated_Backend_Audit_20260922.md).
+This is the practical NEXT-WORK list across dungeon, progression,
+professions, world boss/raid, guild/PvP, quests/economy and
+release gates. It does not overwrite historical canonical
+`DungeonMMO_Roadmap_v1_47.docx` or reclassify older local
+passes as published acceptance. Finish only the missing
+ordinary-combat dungeon integration, then move to new
+progression/content systems; do not repeat all accepted
+wipe/aggro/revive fixtures after unrelated edits.
+
+
 **Latest v1.61: all-member higher-difficulty unlock,
 spectator combat exclusion and party Play again.**
 [Roadmap](DungeonMMO_Roadmap_v1_61_Party_Unlock_Spectator_Replay_20260922.md)
