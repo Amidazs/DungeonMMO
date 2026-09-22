@@ -51,6 +51,11 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "Rogue",
         DaggerEquipmentPending = false,
     }),
+    CriticalDamagePassive = table.freeze({
+        SkillId = "HumanScoutCriticalPower",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
     HPRegeneration = table.freeze({
         SkillId = "ElvenRenewal",
         Owner = "RangerRogue",
