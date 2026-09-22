@@ -1,5 +1,26 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — targeted live C4 skill effects PASS
+
+At gameplay build `755fab0`, final GitHub fixture `c944ddd`
+executed in an unpublished actual Dungeon Studio Play client.
+DawnWard applied a server ward and spent 12 mana; CinderBolt
+hit a real TrainingDummy and spent 10 mana; Ranger ArcherDraw
+and RogueVitalBlow both caused real client-triggered damage.
+The real SkillsMenu filtered a temporary simulated snapshot
+and displayed the selected rank. `VERIFIED_PLAY_MODE_PASS`
+was observed. This **does not** prove real-profile trainer
+purchase/UI, physical key presses or frontal-versus-rear
+bonus balance. Details: `docs/testing/c4-new-skill-live-client-2026-09-22.md`.
+
+Unscoped automatic Dungeon tests emitted separate
+`Phase2AFailurePathTest` and `RogueDefinitionsTest` failures;
+these require targeted follow-up and are not marked green.
+Exact C4 rank-volume parity remains open. No published
+place, production DataStore, `main` merge or unrelated
+Dungeon regression was performed.
+
+
 ## 22 September 2026 — four-family C4-like progression backend v1.70
 
 Latest focused gameplay source `687e27c`. All
