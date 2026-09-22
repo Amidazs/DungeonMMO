@@ -1,5 +1,19 @@
 # Canonical Roadmap
 
+**Latest v1.68 — two more C4-style rank families with real HP/heal effects.**
+[Roadmap v1.68](DungeonMMO_Roadmap_v1_68_Vitality_Restoration_Ranks_20260922.md)
+and [focused test report](../testing/c4-vitality-restoration-rank-effects-2026-09-22.md).
+Fighter Stalwart Training and Mage Restorative Training each
+have six SP/level-gated passive ranks with live authoritative
+max-HP or heal-multiplier effects. A Base build and
+64 new + 64 affected existing passive assertions passed
+at `3be5de3`. The C4 count audit still shows 13/16
+mapped brackets mismatched, including a Human Fighter
+level-10 **overcount**. No numerical C4 parity or
+normal-client combat-balance claim; do not rerun the old
+dungeon wipe/aggro/revive matrix for these passives.
+
+
 **Latest v1.67 — C4-style class passives with actual damage effects.**
 [Roadmap](DungeonMMO_Roadmap_v1_67_C4_Passive_Ranks_20260922.md)
 and [focused acceptance](../testing/c4-passive-rank-effects-2026-09-22.md).
