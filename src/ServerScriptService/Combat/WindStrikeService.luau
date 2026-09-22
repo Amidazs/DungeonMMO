@@ -124,8 +124,8 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                     attacker_character = context.character,
                     target = target,
                     source_kind = "MagicSkill",
-                    source_id = "WindStrike",
-                    attack_id = "WindStrike",
+                    source_id = context.skill_definition.ID,
+                    attack_id = context.skill_definition.ID,
                     base_damage = context.skill_definition.BASE_DAMAGE
                         * context.magical_multiplier,
                     multiplier = 1,
@@ -133,7 +133,12 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                     critical_chance = context.critical_chance,
                     critical_damage_multiplier = context.critical_damage_multiplier,
                 })
-                target:SetAttribute("LastWindStrikeSequence", context.sequence_id or 0)
+                target:SetAttribute(
+                    "LastMagicSkillId", context.skill_definition.ID
+                )
+                target:SetAttribute(
+                    "LastWindStrikeSequence", context.sequence_id or 0
+                )
                 finish(result.Position)
                 return
             end
