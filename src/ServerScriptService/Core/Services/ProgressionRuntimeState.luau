@@ -714,6 +714,28 @@ function ProgressionRuntimeState.get_scout_evasion_chance(
 end
 
 --[[
+Returns authoritative purchased recovery after the actual Humanoid
+condition has been verified by the Stamina regeneration service.
+
+Args:
+    user_id (number): Server-authenticated selected character.
+    is_sitting (boolean): Server-observed real seated state.
+    is_moving (boolean): Server-observed nonzero movement.
+
+Returns:
+    number: Real resource regeneration multiplier, bounded 1..1.25.
+]]
+function ProgressionRuntimeState.get_stamina_recovery_multiplier(
+    user_id: number,
+    is_sitting: boolean,
+    is_moving: boolean
+): number
+    return PassiveSkillEffects.stamina_recovery_multiplier(
+        state_for(user_id), is_sitting, is_moving
+    )
+end
+
+--[[
 Returns race/attribute crit chance plus the approved Equipment crit bonus.
 
 Args:
