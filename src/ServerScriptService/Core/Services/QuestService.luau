@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local ProfileSchema = require(Shared:WaitForChild("ProfileSchema"))
 local QuestDefinitions = require(Shared:WaitForChild("QuestDefinitions"))
+local InventoryService = require(script.Parent:WaitForChild("InventoryService"))
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
@@ -282,6 +283,83 @@ function QuestService:record_event(user_id: number, event: any): any
     return result(true, nil, {
         progressed_quests = progressed_quests,
         ready_quests = ready_quests,
+    })
+end
+
+-- Claims one story quest's server-defined reward as an atomic character
+-- mutation. Class advancement quests remain owned by their class service.
+--
+-- Args:
+--   user_id (number): Authenticated, loaded character owner.
+--   quest_id (string): Known story quest identifier.
+-- Returns:
+--   any: Success and granted items/gold, or a fail-closed reason.
+function QuestService:claim_reward(
+    user_id: number,
+    quest_id: string
+): any
+    local definition = QuestDefinitions.get(quest_id)
+    if not definition or definition.Kind ~= "Adventure" then
+        return result(false, "QuestRewardUnavailable")
+    end
+
+    local character = self._profiles:get_character(user_id)
+    if not character then
+        return result(false, "ProfileNotLoaded")
+    end
+
+    local quests = ensure_state(character)
+    if quests.Completed[quest_id] == true then
+        return result(false, "QuestAlreadyCompleted")
+    end
+
+    local state = quests.Active[quest_id]
+    if not state then
+        return result(false, "QuestNotActive")
+    end
+    if state.Ready ~= true or not state_is_ready(definition, state) then
+        return result(false, "QuestNotReady")
+    end
+
+    local reward = definition.Reward
+    if type(reward) ~= "table" then
+        return result(false, "QuestRewardUnavailable")
+    end
+
+    local mutated = self._profiles:mutate(user_id, function(profile: any)
+        local live_character = selected_character(profile)
+        if not live_character then
+            error("CharacterUnavailable")
+        end
+
+        -- A second request cannot spend or complete the same quest twice.
+        local completed, reason =
+            QuestService.complete_ready_character_quest(
+                live_character, quest_id
+            )
+        if not completed then
+            error(reason or "QuestNotReady")
+        end
+
+        local item = InventoryService.apply_item_to_character(
+            live_character,
+            reward.ItemId,
+            reward.Quantity
+        )
+        if not item.ok then
+            error(item.reason or "QuestItemGrantFailed")
+        end
+        live_character.Gold += reward.Gold
+    end)
+
+    if not mutated then
+        return result(false, "QuestRewardFailed")
+    end
+    return result(true, nil, {
+        quest_id = quest_id,
+        gold_granted = reward.Gold,
+        item_id = reward.ItemId,
+        quantity = reward.Quantity,
     })
 end
 
