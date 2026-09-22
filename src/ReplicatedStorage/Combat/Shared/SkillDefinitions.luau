@@ -489,6 +489,63 @@ local VIPER_STRIKE = specialize_skill(
     }
 )
 
+-- A lower-damage two-target control arrow. Every rank improves the
+-- server-owned slow duration, not just the projectile's damage.
+local BRIAR_VOLLEY = specialize_skill(
+    CRIPPLING_SHOT, "BriarVolley", "Briar Volley", {
+        STAMINA_COST = 24,
+        COOLDOWN_SECONDS = 9,
+        MAX_TARGETS = 2,
+        DEFAULT_RETENTION = 0.85,
+        HUMAN_RETENTION = 0.85,
+        BASE_DAMAGE = 9,
+        HUMAN_SLOW_FRACTION = 0.20,
+        ELF_SLOW_FRACTION = 0.25,
+        HUMAN_SLOW_SECONDS = 1.5,
+        ELF_SLOW_SECONDS = 2.0,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 9,
+                HUMAN_SLOW_SECONDS = 1.5,
+                ELF_SLOW_SECONDS = 2.0,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 12,
+                HUMAN_SLOW_SECONDS = 2.0,
+                ELF_SLOW_SECONDS = 2.5,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 15,
+                HUMAN_SLOW_SECONDS = 2.5,
+                ELF_SLOW_SECONDS = 3.0,
+            }),
+        }),
+    }
+)
+
+-- A close-range interruption with brief stagger, instead of Feint's
+-- exposed-target damage amplifier. Stagger duration increases by rank.
+local DISRUPTING_CUT = specialize_skill(
+    FEINT, "DisruptingCut", "Disrupting Cut", {
+        STAMINA_COST = 16,
+        COOLDOWN_SECONDS = 8,
+        BASE_DAMAGE = 5,
+        EXPOSE_SECONDS = 0,
+        STAGGER_SECONDS = 0.35,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 5, STAGGER_SECONDS = 0.35,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 7, STAGGER_SECONDS = 0.50,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 9, STAGGER_SECONDS = 0.70,
+            }),
+        }),
+    }
+)
+
 -- Nine effective sword strikes spanning the first three Fighter brackets.
 local IRON_CLEAVE = specialize_skill(
     ARC_SLASH, "IronCleave", "Iron Cleave", {
@@ -684,8 +741,10 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
+    BriarVolley = BRIAR_VOLLEY,
     ArcherDraw = ARCHER_DRAW,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
+    DisruptingCut = DISRUPTING_CUT,
     ArcanistEmber = ARCANIST_EMBER,
     SpellweaverAegis = SPELLWEAVER_AEGIS,
     ViperStrike = VIPER_STRIKE,
