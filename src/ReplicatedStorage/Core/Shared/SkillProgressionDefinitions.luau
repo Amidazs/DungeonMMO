@@ -270,6 +270,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- Source C4 level-seven Mystic cleanse: server-owned poison of
+    -- tier three or lower is removed on a real friendly support cast.
+    MysticCurePoison = table.freeze({
+        Id = "MysticCurePoison",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 7}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MageHeal",
+                Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Mystic Ice Bolt first-tier source ranks: two at 7/14.
     -- Server projectile impact applies real enemy movement impairment.
     MysticFrostBolt = table.freeze({
@@ -1175,6 +1195,19 @@ local DEFINITIONS = table.freeze({
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
         RankLevels = table.freeze({[1] = 28}),
         EvasionChancePerRank = 0.025,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 Elven Scout level-24 self-only Poison Recovery. A real
+    -- non-stacking server poison must exist before use is allowed.
+    ElvenScoutPoisonRecovery = table.freeze({
+        Id = "ElvenScoutPoisonRecovery",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24}),
         WeaponTags = table.freeze({}),
     }),
 
