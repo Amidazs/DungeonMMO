@@ -1,5 +1,30 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — targeted real-client C4 actions/effects
+
+- [x] Unpublished Rojo Dungeon composition at `755fab0`
+  built successfully; GitHub-only fixture at `c944ddd`
+  ran with `StudioTestService:ExecutePlayModeAsync`.
+- [x] DawnWard applied real server ward and spent 12 mana;
+  CinderBolt damaged real tagged dummy and spent 10 mana;
+  ArcherDraw (Longbow) and RogueVitalBlow (rear-positioned
+  sword) damaged the dummy via the actual client hotbar
+  input module. `VERIFIED_PLAY_MODE_PASS` observed.
+- [x] Real SkillsMenu displayed a trained rank and hid a
+  foreign-class row from **synthetic test snapshots**.
+- [ ] Real saved-profile trainer/purchase and physical
+  keyboard/mouse input, rear-versus-front damage comparison,
+  real-client balance and cloud multiplayer not yet tested.
+- [ ] Unrelated auto-run `Phase2AFailurePathTest` and
+  `RogueDefinitionsTest` emitted failures: separate focused
+  investigations before claiming general regression green.
+- [ ] Fighter/Mage 13/16 rank-volume gaps and reference
+  coverage for Ranger/Rogue remain open.
+
+Receipt: `docs/testing/c4-new-skill-live-client-2026-09-22.md`.
+No old Dungeon wipe/aggro/revive/replay matrix rerun.
+
+
 ## 22 September 2026 — four-family skill rank/mastery focus
 
 - [x] `02154e8`: Fighter/Mage/Ranger/Rogue
