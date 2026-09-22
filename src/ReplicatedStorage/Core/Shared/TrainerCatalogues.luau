@@ -119,6 +119,14 @@ local DEFINITIONS = table.freeze({
                 SkillId = "TrackerShot",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "ArcherDraw",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RangerBowMastery",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -137,6 +145,14 @@ local DEFINITIONS = table.freeze({
             table.freeze({SkillId = "ThreatDrop", Mode = "LearnOrRank"}),
             table.freeze({
                 SkillId = "ViperStrike",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RogueVitalBlow",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RogueBladeMastery",
                 Mode = "LearnOrRank",
             }),
         }),
@@ -189,6 +205,31 @@ local DEFINITIONS = table.freeze({
         Skills = table.freeze({
             table.freeze({
                 SkillId = "WindrunnerVolley",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
+    ArcanistTrainer = table.freeze({
+        Id = "ArcanistTrainer",
+        DisplayName = "Arcanist Trainer",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedAdvancedClasses = table.freeze({"HumanArcanist"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "ArcanistEmber",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+    SpellweaverTrainer = table.freeze({
+        Id = "SpellweaverTrainer",
+        DisplayName = "Spellweaver Trainer",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedAdvancedClasses = table.freeze({"ElfSpellweaver"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "SpellweaverAegis",
                 Mode = "LearnOrRank",
             }),
         }),
