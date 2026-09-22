@@ -32,20 +32,25 @@ local level_two = assert(ProfessionDefinitions.xp_to_next(1))
 
 local profiles = ProfileService.new(InMemoryProfileAdapter.new())
 assert(profiles:load(8601))
+assert(profiles:load(8602))
 local inventory = InventoryService.new(profiles)
 local professions = ProfessionService.new(profiles, inventory)
 local knowledge = RecipeKnowledgeService.new(profiles, inventory)
+assert(professions:choose_profession(8601, "Blacksmithing").ok)
+assert(professions:choose_profession(8602, "Alchemy").ok)
 
 assert(profiles:mutate(8601, function(profile: any)
     local character = profile.Characters.Slot1
     character.Professions.Blacksmithing.XP = level_two
-    character.Professions.Alchemy.XP = level_two
+end))
+assert(profiles:mutate(8602, function(profile: any)
+    profile.Characters.Slot1.Professions.Alchemy.XP = level_two
 end))
 
 assert(inventory:add_item(8601, "iron_bar", 6).ok)
-assert(inventory:add_item(8601, "silverleaf", 6).ok)
+assert(inventory:add_item(8602, "silverleaf", 6).ok)
 assert(inventory:add_item(8601, "blacksmith_iron_guard_blueprint", 1).ok)
-assert(inventory:add_item(8601, "alchemy_restorative_tonic_recipe", 1).ok)
+assert(inventory:add_item(8602, "alchemy_restorative_tonic_recipe", 1).ok)
 
 local before_iron = InventoryService.count_item(
     assert(profiles:get_character(8601, 1)),
@@ -95,7 +100,7 @@ check(
 )
 
 local alchemy_blocked = professions:prepare_craft(
-    8601,
+    8602,
     "distill_blueprinted_tempering_oil"
 )
 check(
@@ -106,14 +111,14 @@ check(
 
 check(
     knowledge:learn_from_item(
-        8601,
+        8602,
         "alchemy_restorative_tonic_recipe"
     ).ok == true,
     "Alchemy recipe learning must succeed."
 )
 
 local alchemy_ready = professions:prepare_craft(
-    8601,
+    8602,
     "distill_blueprinted_tempering_oil"
 )
 check(
@@ -143,8 +148,17 @@ check(
     "Snapshot must expose learned recipe knowledge."
 )
 check(
-    snapshot.Recipes.distill_blueprinted_tempering_oil.Known == true,
-    "Snapshot must expose learned Alchemy knowledge."
+    snapshot.Recipes.distill_blueprinted_tempering_oil.Known == false
+        and snapshot.Recipes.distill_blueprinted_tempering_oil.Unlocked == false,
+    "The smith cannot unlock another player's Alchemy recipe."
+)
+local alchemist_snapshot = professions:build_snapshot(8602)
+check(
+    alchemist_snapshot.Recipes.distill_blueprinted_tempering_oil.Known
+        == true
+        and alchemist_snapshot.Recipes.distill_blueprinted_tempering_oil.Unlocked
+            == true,
+    "The separate Alchemist alone owns and may use the learned recipe."
 )
 
 print(string.format(
