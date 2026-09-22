@@ -42,6 +42,20 @@ local function purchased_rank(character: any, definition: any): number
         return 0
     end
 
+    local allowed_races = definition.AllowedRaces
+    if type(allowed_races) == "table" then
+        local race_eligible = false
+        for _, race_id in ipairs(allowed_races) do
+            if identity.RaceId == race_id then
+                race_eligible = true
+                break
+            end
+        end
+        if not race_eligible then
+            return 0
+        end
+    end
+
     local progression = character.Progression
     local skills = type(progression) == "table" and progression.Skills
     local state = type(skills) == "table" and skills[definition.Id]
@@ -225,6 +239,25 @@ function PassiveSkillEffects.light_armor_reduction(
         character, "ScoutLightArmorMastery", "PhysicalReductionPerRank"
     )
     return math.clamp(bonus, 0, 0.08)
+end
+
+--[[
+Returns the real Human Scout critical-hit damage bonus from owned ranks.
+
+Args:
+    character (any): Server-owned character and authenticated skill ranks.
+
+Returns:
+    number: Additive critical-damage multiplier from this passive.
+]]
+function PassiveSkillEffects.critical_damage_bonus(
+    character: any
+): number
+    return resolve_bonus(
+        character,
+        "HumanScoutCriticalPower",
+        "CriticalDamageBonusPerRank"
+    )
 end
 
 return table.freeze(PassiveSkillEffects)
