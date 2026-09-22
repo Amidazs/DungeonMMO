@@ -14,6 +14,9 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        SittingRecovery = table.freeze({
+            [5] = "FighterRestingRecovery",
+        }),
         NewbieProtection = table.freeze({
             [1] = "NoviceProtection",
         }),
@@ -138,6 +141,7 @@ local function executable_ranks_at_level(
                 or definition.MagicReductionPerRank
                 or definition.CastingRateBonusPerRank
                 or definition.ManaRegenBonusPerRank
+                or definition.RestingStaminaBonusPerRank
                 or definition.AttackRateBonusPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
