@@ -13,9 +13,9 @@ local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
     Human = {Raw = 99, Functional = 68, Missing = 31,
-        EquipmentMismatch = 25},
+        EquipmentMismatch = 0},
     Elf = {Raw = 129, Functional = 98, Missing = 31,
-        EquipmentMismatch = 25},
+        EquipmentMismatch = 0},
 }
 
 --[[
@@ -85,6 +85,14 @@ local function check_implementation(
     end
     check(owned, mapping.SkillId .. " is not owned by its mapped class")
 
+    if mapping.DaggerEquipmentPending == false
+        and (category == "DaggerAttack"
+            or category == "DaggerMastery"
+            or category == "Bleed")
+    then
+        check(table.find(definition.WeaponTags or {}, "Dagger")
+            ~= nil, "Dagger skill is not actually weapon-gated")
+    end
     if definition.Kind == "Passive" then
         local bonus = definition.DamageBonusPerRank
             or definition.PhysicalReductionPerRank
