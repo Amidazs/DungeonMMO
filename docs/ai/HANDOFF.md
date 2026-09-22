@@ -1,5 +1,35 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — latest C4 status/heal follow-up, PARTIAL
+
+Read `docs/testing/c4-source-catalogue-v1-75-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_75_C4_Status_Heal_20260922.md`.
+The six **source-inventoried** Human/Elf starting and partial first-
+transfer classes now have **331/396 real functional analogue ranks**,
+with **65** source rank entries still unmapped. The original C4
+first-transfer source tree remains **0/9 complete**, and seven distinct
+class inventories have yet to be source-enumerated/implemented.
+`C4CatalogueCoverage.report().Completed` still correctly returns FALSE.
+
+New: three real level-14 Mystic Battle Heal ranks, bought Scout
+standing/running melee evasion, the timed active Scout evade, and
+Elf-only physical guard. Focused Studio: Battle Heal 28, passive
+286, Scout inventory 1073, active status 24, Base source 57,
+strict coverage 7 assertions PASS. An unpublished real Play client
+verified **18** hotbar skill effects including actual server
+`ScoutEvasiveFocus` and `ElvenScoutGuard` statuses. Existing
+stale Fighter trainer four-row regression was corrected in GitHub;
+focused TrainerCataloguesTest now PASSES 13 assertions.
+
+NEXT: implement the remaining **21** base and **44** Scout
+functional source rank entries, plus seven entire original
+first-transfer class source inventories and real abilities.
+No `main` merge or publish; no production DataStore work.
+All scripts and documents straight through GitHub; remote only
+for fast-forward pull, TEMP builds, unpublished Play and logs.
+The separate Phase2A paid-revive automated failure is still open.
+
+
 ## 22 September 2026 — v1.75 C4 Scout evasion and first-tier heals
 
 Read `docs/testing/c4-scout-evasion-base-healing-2026-09-22.md`
