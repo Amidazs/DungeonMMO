@@ -291,6 +291,115 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
 
+    -- Repeated early bow and dagger training (C4-inspired effects):
+    -- a stronger single-target shot/blow and weapon damage masteries.
+    ArcherDraw = table.freeze({
+        Id = "ArcherDraw",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+            [7] = 15, [8] = 15, [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 20, [3] = 50, [4] = 90,
+            [5] = 130, [6] = 180, [7] = 230,
+            [8] = 290, [9] = 350,
+        }),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    RangerBowMastery = table.freeze({
+        Id = "RangerBowMastery",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        DamageBonusPerRank = 0.012,
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    RogueVitalBlow = table.freeze({
+        Id = "RogueVitalBlow",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+            [7] = 15, [8] = 15, [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 20, [3] = 50, [4] = 90,
+            [5] = 130, [6] = 180, [7] = 230,
+            [8] = 290, [9] = 350,
+        }),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+    RogueBladeMastery = table.freeze({
+        Id = "RogueBladeMastery",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        DamageBonusPerRank = 0.012,
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+    ArcanistEmber = table.freeze({
+        Id = "ArcanistEmber",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Magic",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedAdvancedClasses = table.freeze({"HumanArcanist"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "AetherBolt", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "WindStrike", Rank = 3, Proficiency = 300,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+    SpellweaverAegis = table.freeze({
+        Id = "SpellweaverAegis",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedAdvancedClasses = table.freeze({"ElfSpellweaver"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "DawnWard", Rank = 3, Proficiency = 100,
+            }),
+            table.freeze({
+                SkillId = "ArcaneWard", Rank = 3, Proficiency = 300,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- Advanced skill purchase and combat use require the same
     -- persisted, race-specific advanced class, not just a base class.
     VanguardChallenge = table.freeze({
@@ -379,17 +488,17 @@ local DEFINITIONS = table.freeze({
     LightFoot = table.freeze({Id="LightFoot",Tier="Common",MaxRank=3,Kind="Passive",WeaponTags=table.freeze({})}),
     ThreatDrop = table.freeze({Id="ThreatDrop",Tier="Uncommon",MaxRank=3,Kind="Utility",WeaponTags=table.freeze({"OneHandedSword"})}),
 
-    DuelistAmbush = table.freeze({Id="DuelistAmbush",Tier="Rare",MaxRank=3,Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
-    DuelistDeadlyBlow = table.freeze({Id="DuelistDeadlyBlow",Tier="Rare",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
-    DuelistExposeWeakness = table.freeze({Id="DuelistExposeWeakness",Tier="Uncommon",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
-    DuelistRush = table.freeze({Id="DuelistRush",Tier="Uncommon",MaxRank=3,Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
-    DuelistCriticalMastery = table.freeze({Id="DuelistCriticalMastery",Tier="Rare",MaxRank=3,Kind="Passive",WeaponTags=table.freeze({"OneHandedSword"})}),
+    DuelistAmbush = table.freeze({Id="DuelistAmbush",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="RogueVitalBlow",Rank=3,Proficiency=300}),table.freeze({SkillId="Backstab",Rank=3,Proficiency=400})}),Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
+    DuelistDeadlyBlow = table.freeze({Id="DuelistDeadlyBlow",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="RogueVitalBlow",Rank=3,Proficiency=300}),table.freeze({SkillId="Backstab",Rank=3,Proficiency=400})}),Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
+    DuelistExposeWeakness = table.freeze({Id="DuelistExposeWeakness",Tier="Uncommon",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="ViperStrike",Rank=3,Proficiency=300}),table.freeze({SkillId="Feint",Rank=3,Proficiency=300})}),Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
+    DuelistRush = table.freeze({Id="DuelistRush",Tier="Uncommon",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="ViperStrike",Rank=3,Proficiency=300}),table.freeze({SkillId="ShadowDash",Rank=3,Proficiency=400})}),Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
+    DuelistCriticalMastery = table.freeze({Id="DuelistCriticalMastery",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="RogueBladeMastery",Rank=6,Proficiency=0}),table.freeze({SkillId="CriticalFocus",Rank=3,Proficiency=400})}),Kind="Passive",WeaponTags=table.freeze({"OneHandedSword"})}),
 
-    WindstalkerFlurry = table.freeze({Id="WindstalkerFlurry",Tier="Rare",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
-    WindstalkerSlipstream = table.freeze({Id="WindstalkerSlipstream",Tier="Uncommon",MaxRank=3,Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
-    WindstalkerBlur = table.freeze({Id="WindstalkerBlur",Tier="Rare",MaxRank=3,Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
-    WindstalkerQuickstep = table.freeze({Id="WindstalkerQuickstep",Tier="Common",MaxRank=3,Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
-    WindstalkerEvasionMastery = table.freeze({Id="WindstalkerEvasionMastery",Tier="Rare",MaxRank=3,Kind="Passive",WeaponTags=table.freeze({})}),
+    WindstalkerFlurry = table.freeze({Id="WindstalkerFlurry",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="RogueVitalBlow",Rank=3,Proficiency=300}),table.freeze({SkillId="Backstab",Rank=3,Proficiency=400})}),Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
+    WindstalkerSlipstream = table.freeze({Id="WindstalkerSlipstream",Tier="Uncommon",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="ViperStrike",Rank=3,Proficiency=300}),table.freeze({SkillId="ShadowDash",Rank=3,Proficiency=400})}),Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
+    WindstalkerBlur = table.freeze({Id="WindstalkerBlur",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="ViperStrike",Rank=3,Proficiency=300}),table.freeze({SkillId="EvasiveStep",Rank=3,Proficiency=300})}),Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
+    WindstalkerQuickstep = table.freeze({Id="WindstalkerQuickstep",Tier="Common",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="ViperStrike",Rank=3,Proficiency=300}),table.freeze({SkillId="ShadowDash",Rank=3,Proficiency=400})}),Kind="Mobility",WeaponTags=table.freeze({"OneHandedSword"})}),
+    WindstalkerEvasionMastery = table.freeze({Id="WindstalkerEvasionMastery",Tier="Rare",MaxRank=3,RankLevels=table.freeze({[1]=24,[2]=28,[3]=32}),Prerequisites=table.freeze({table.freeze({SkillId="RogueBladeMastery",Rank=6,Proficiency=0}),table.freeze({SkillId="LightFoot",Rank=3,Proficiency=300})}),Kind="Passive",WeaponTags=table.freeze({})}),
 })
 
 function SkillProgressionDefinitions.get(
