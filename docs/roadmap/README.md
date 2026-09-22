@@ -1,6 +1,22 @@
 # Canonical Roadmap
 
-**Latest tested C4 continuation: Battle Heal + Scout active statuses.**
+**Latest C4 backend increment: v1.76 conditional recovery.**
+[Roadmap](DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md)
+and [focused source/test receipts](../testing/c4-conditional-recovery-v1-76-2026-09-22.md).
+Six inventoried original Human/Elf basic and partial
+first-transfer source classes now have **336/396**
+functional rank analogues; **60** source ranks remain,
+seven original first-transfer skill catalogues have
+not been enumerated and **0/9** C4 first-transfer paths
+are complete. Real server Stamina seated/running
+recovery now uses purchased rank and actual Humanoid
+conditions; the live seated Stamina regeneration test
+passed. Strict `C4CatalogueCoverage.report().Completed`
+is FALSE. No `main` merge, Roblox publish or PROD
+DataStore changes.
+
+
+**Previous tested C4 continuation: Battle Heal + Scout active statuses.**
 [Current roadmap](DungeonMMO_Roadmap_v1_75_C4_Status_Heal_20260922.md)
 and [source/test ledger](../testing/c4-source-catalogue-v1-75-2026-09-22.md).
 **331/396** functional analogues across six currently enumerated
