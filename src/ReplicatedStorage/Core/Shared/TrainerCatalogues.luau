@@ -65,6 +65,14 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "FighterPhysicalTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "FighterArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "StalwartTraining",
                 Mode = "LearnOrRank",
             }),
