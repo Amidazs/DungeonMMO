@@ -1,5 +1,37 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — v1.74 C4 strict coverage and source gaps
+
+- [x] 152 sourced four-class base rank assertions PASS;
+  corrected Elf Fighter level-15 source bracket contains 15.
+- [x] Base Fighter bow/dagger 88, Mage wind/heal 52,
+  Fighter physical/armour 72 focused assertions PASS
+  during prior backend increments.
+- [x] New Mage robe casting/mana/basic-speed 38; novice
+  level-one/expiry/foreign-class 36; source first-transfer
+  branch enumeration 44 focused Studio assertions PASS.
+- [x] Latest source-to-actual-effect audit 63 assertions PASS:
+  Human Fighter 36/39; Elf Fighter 41/43; Human Mystic
+  31/44; Elf Mystic 31/42. Combined currently mapped Scout
+  source ranks Human Rogue 75/99 and Elf Scout 102/129.
+- [x] Unified strict source coverage audit 7 assertions PASS:
+  base=139/168, Scout=177/228, nine original first-transfer
+  class paths, 0 fully complete and seven not yet mapped.
+  `Completed=false` is CORRECT, not permission to publish.
+- [x] Unpublished Base and Dungeon Rojo builds after new
+  Mystic casting-speed and novice defense changes.
+- [ ] Exact remaining source families (80 ranks in six
+  enumerated classes), plus separate source catalogues and
+  all real skills for seven missing first-transfer careers.
+- [ ] New real client skill timing/novice defense, actual
+  persisted-character trainer GUI/ordinary physical input,
+  cloud multiplayer and one milestone-wide regression.
+  The unrelated Phase2A paid-revive auto-test remains open.
+
+[Full source ledger and focused receipts](../testing/c4-base-first-transfer-coverage-2026-09-22.md).
+GitHub-only edits; local machine only for TEMP builds/tests.
+
+
 ## 22 September 2026 — v1.73 C4 Scout catalogue focus
 
 - [x] Source-accurate C4 Human Rogue (99) and Elven Scout
