@@ -1008,6 +1008,26 @@ local MYSTIC_FROST_BOLT = specialize_skill(
     }
 )
 
+-- Elven first-tier Fighter's C4 level-15 self-regeneration.
+-- The authenticated MageHeal executor handles the immediate and HoT
+-- portions without requiring a Mage's wand or cross-class access.
+local ELVEN_FIGHTER_RENEWAL = specialize_skill(
+    MAGE_HEAL, "ElvenFighterRenewal", "Elemental Renewal", {
+        SELF_ONLY = true,
+        MANA_COST = 12,
+        COOLDOWN_SECONDS = 7,
+        TOTAL_HEAL = 22,
+        ELF_INSTANT_FRACTION = 0.20,
+        ELF_HOT_SECONDS = 4.5,
+        HOT_TICK_SECONDS = 0.75,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 22}),
+            [2] = table.freeze({TOTAL_HEAL = 27}),
+            [3] = table.freeze({TOTAL_HEAL = 32}),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1099,6 +1119,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     CinderBolt = CINDER_BOLT,
     MysticWindBolt = MYSTIC_WIND_BOLT,
     MysticFrostBolt = MYSTIC_FROST_BOLT,
+    ElvenFighterRenewal = ELVEN_FIGHTER_RENEWAL,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
