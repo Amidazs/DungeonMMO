@@ -290,6 +290,43 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- A real first-tier hostile weakening projectile: genuine NPC
+    -- damage is required before its attack-power reduction can apply.
+    MysticFeebleCurse = table.freeze({
+        Id = "MysticFeebleCurse",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Control",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 14}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MysticWindBolt", Rank = 2,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
+    -- Original Elf Mystic's separate source attack-speed impairment.
+    ElvenMysticLanguor = table.freeze({
+        Id = "ElvenMysticLanguor",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Control",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 14}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MysticWindBolt", Rank = 2,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Mystic Ice Bolt first-tier source ranks: two at 7/14.
     -- Server projectile impact applies real enemy movement impairment.
     MysticFrostBolt = table.freeze({
