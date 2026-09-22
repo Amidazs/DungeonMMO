@@ -32,7 +32,10 @@ local DEFINITIONS = table.freeze({
         StarterEquipment = table.freeze({
             Weapon = "apprentice_arcane_wand",
         }),
-        TeachableSkills = table.freeze({"AetherBolt"}),
+        TeachableSkills = table.freeze({
+            "AetherBolt",
+            "RenewingLight",
+        }),
     }),
 
     Ranger = table.freeze({
