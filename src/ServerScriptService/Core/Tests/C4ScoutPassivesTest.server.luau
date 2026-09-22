@@ -265,4 +265,59 @@ for _, character in ipairs({ranger, rogue}) do
     Runtime.clear_character(user_id)
 end
 
+--[[
+Checks race-unique C4 critical-rate ranks and actual combat-stat changes.
+
+Args:
+    race_id (string): Human or Elf race whose training band is tested.
+    skill_id (string): Matching race-specific critical chance skill.
+    level (number): Source-verified purchase level.
+    user_id (number): Isolated server-side runtime identity.
+
+Returns:
+    nil: Verifies rank visibility, class, race, and critical-rate effect.
+]]
+local function check_scout_precision(
+    race_id: string,
+    skill_id: string,
+    level: number,
+    user_id: number
+)
+    local character = make_character("Ranger", user_id)
+    character.Identity.RaceId = race_id
+    character.Level = level - 1
+    local definition = assert(Skills.get(skill_id))
+    check(definition.MaxRank == 1
+        and definition.RankLevels[1] == level,
+        skill_id .. " has the wrong race-specific C4 level")
+    check(not Unlocks.can_show(character, definition),
+        skill_id .. " appeared below its level")
+    character.Level = level
+    check(Unlocks.can_show(character, definition),
+        skill_id .. " was hidden from its rightful race")
+    check(Trainers.can_offer(
+        "RangerTrainer", character, skill_id
+    ).ok, skill_id .. " was missing from the Ranger trainer")
+    Runtime.set_character(user_id, character)
+    local baseline = Runtime.get_critical_chance(user_id)
+    character.Progression.Skills[skill_id] = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
+    Runtime.set_character(user_id, character)
+    check(math.abs(
+        Runtime.get_critical_chance(user_id) - baseline - 0.02
+    ) < 0.0001, skill_id .. " failed to increase server critical rate")
+    character.Identity.RaceId = if race_id == "Human"
+        then "Elf" else "Human"
+    Runtime.set_character(user_id, character)
+    check(not Unlocks.can_show(character, definition),
+        skill_id .. " leaked to an ineligible race")
+    check(Passive.critical_chance_bonus(character) == 0,
+        skill_id .. " allowed forged foreign-race critical bonus")
+    Runtime.clear_character(user_id)
+end
+
+check_scout_precision("Human", "HumanScoutPrecision", 28, 77611)
+check_scout_precision("Elf", "ElvenScoutPrecision", 32, 77612)
+
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
