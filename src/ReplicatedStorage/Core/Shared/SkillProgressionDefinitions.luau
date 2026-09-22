@@ -155,6 +155,23 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 7, [2] = 14, [3] = 20}),
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
+    RenewingLight = table.freeze({
+        Id = "RenewingLight",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 7,
+            [4] = 14, [5] = 14, [6] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 25, [3] = 50, [4] = 75,
+            [5] = 110, [6] = 150,
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     TrackerShot = table.freeze({
         Id = "TrackerShot",
         Tier = "Common",
