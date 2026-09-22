@@ -1,5 +1,20 @@
 # Canonical Roadmap
 
+**Latest v1.63: race-specific advanced classes and playable-skill
+foundations (Lineage II / WoW-inspired structure, original content).**
+[Roadmap v1.63](DungeonMMO_Roadmap_v1_63_Class_Progression_Role_Skills_20260922.md)
+and [focused skill/class acceptance](../testing/dungeon-class-progression-expansion-2026-09-22.md).
+Four new Fighter/Ranger advancement paths, level-gated
+trials, four specialist active abilities and trainers
+were added. Server skill use requires the persisted
+active advanced class. One Base and one Dungeon build;
+66 class, 40 quest and 60 advanced ability assertions
+passed (skills tested in the Dungeon composition at
+`b017fbc`). A full real-client combat impact and
+the quest/trainer UI remain next **new feature** work;
+no repeated dungeon wipe/aggro/revive matrix was run.
+
+
 **Latest v1.62 — new story quest backend content, NOT another
 dungeon recovery-test cycle.**
 [Roadmap v1.62](DungeonMMO_Roadmap_v1_62_Story_Quest_Backend_20260922.md)
