@@ -1,5 +1,37 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — real-client C4 skill effects verified
+
+Read `docs/testing/c4-new-skill-live-client-2026-09-22.md`.
+Latest gameplay composition `755fab0`; final test fixture `c944ddd`.
+An unpublished Dungeon Studio Play client used the real
+CombatInputActions hotbar path to apply DawnWard (ward and
+12 actual mana), CinderBolt (TrainingDummy damage and
+10 actual mana), Ranger ArcherDraw (damage) and Rogue
+Vital Blow (rear-positioned damage). Existing server
+combat handlers were not bypassed. Actual SkillsMenu
+rendered a *simulated* learned-rank snapshot and hid
+foreign-class skills; no live saved-profile trainer
+transaction, physical keyboard input or rear-bonus
+comparison was claimed. Focused `VERIFIED_PLAY_MODE_PASS`.
+
+The same automatic Dungeon boot reported unrelated failing
+`Phase2AFailurePathTest` and `RogueDefinitionsTest` suites.
+Investigate these separately before broader regression/release;
+do not label this run full Dungeon green. C4 Fighter/Mage
+rank-volume mismatch 13/16 and Ranger/Rogue source-rank
+mapping remain open.
+
+**NEXT:** source-map and implement additional *real-effect*
+C4-inspired skills/ranks (Ranger/Rogue and later advanced
+classes), then target real saved-profile/trainer progression
+and rear-damage comparison in one focused client test.
+Do not repeat old wipe/revive/aggro/replay loops. Code,
+fixture and docs edits **only through GitHub**; Remote
+Desktop may fast-forward pull, build and run Studio tests.
+No place publish, main merge, force-push or production data.
+
+
 ## 22 September 2026 — v1.70 all-family C4 progression PASS (partial catalogue)
 
 Read:
