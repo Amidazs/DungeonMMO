@@ -335,6 +335,80 @@ function PassiveSkillEffects.mystic_magic_reduction(
 end
 
 --[[
+Returns the earned rank bonus only while a legitimate Mystic robe is worn.
+
+Args:
+    character (any): Server-owned class, purchased ranks and Body slot.
+    skill_id (string): Registered Mystic robe passive.
+    stat_field (string): Requested authored per-rank stat field.
+
+Returns:
+    number: Owned robe-only bonus, or zero when absent/ineligible.
+]]
+local function robe_bonus(
+    character: any,
+    skill_id: string,
+    stat_field: string
+): number
+    if type(character) ~= "table"
+        or type(character.Equipment) ~= "table"
+    then
+        return 0
+    end
+    local body_id = character.Equipment.Body
+    local body = if type(body_id) == "string"
+        then ItemDefinitions.get(body_id) else nil
+    if not body or body.Kind ~= "Equipment"
+        or body.Slot ~= "Body" or body.Category ~= "Robe"
+    then
+        return 0
+    end
+    return resolve_bonus(character, skill_id, stat_field)
+end
+
+--[[
+Returns the C4 starting Mystic's real mana-regeneration bonus.
+
+Args:
+    character (any): Authentic selected Mage and equipped robe.
+
+Returns:
+    number: Earned regeneration fraction, capped at fifteen percent.
+]]
+function PassiveSkillEffects.robe_mana_regen_bonus(
+    character: any
+): number
+    return math.clamp(
+        robe_bonus(
+            character,
+            "MysticRobeManaRecovery",
+            "ManaRegenBonusPerRank"
+        ), 0, 0.15
+    )
+end
+
+--[[
+Returns the C4 starting Mystic's robe-only basic attack speed bonus.
+
+Args:
+    character (any): Authentic selected Mage and equipped robe.
+
+Returns:
+    number: Earned basic attack speed bonus, capped at six percent.
+]]
+function PassiveSkillEffects.robe_attack_rate_bonus(
+    character: any
+): number
+    return math.clamp(
+        robe_bonus(
+            character,
+            "MysticRobeAttackSpeed",
+            "AttackRateBonusPerRank"
+        ), 0, 0.06
+    )
+end
+
+--[[
 Returns the real Human Scout critical-hit damage bonus from owned ranks.
 
 Args:
