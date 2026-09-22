@@ -166,6 +166,11 @@ local function get_target_context(
     local target_is_dungeon_member = character:GetAttribute(MarauderConfig.RUN_PARTICIPANT_ATTRIBUTE) == true
     local target_encounter = character:GetAttribute(MarauderConfig.ENCOUNTER_ATTRIBUTE)
     if type(model_encounter) == "string" and model_encounter ~= "" then
+        -- A character created for a returning spectator may still
+        -- carry a room ID, but must never enter the enemy target pool.
+        if not target_is_dungeon_member then
+            return nil
+        end
         if target_encounter ~= model_encounter then
             return nil
         end
