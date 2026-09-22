@@ -86,7 +86,7 @@ local function set_skill(
 end
 
 -- Args:
---   profiles (any): Profile containing a Human Fighter at level 7.
+--   profiles (any): Profile containing a Human Fighter at level 4.
 --   skills (any): Existing authoritative skill progression service.
 -- Returns:
 --   nil: Verifies hidden abilities, level-bracket rank purchase.
@@ -96,7 +96,7 @@ local function test_basic_levels(profiles: any, skills: any)
 
     check(
         not Rules.can_show(character, basic),
-        "Guard Breaker must be absent before level 8."
+        "Guard Breaker must be absent before level 5."
     )
     check(
         Snapshots.build(character).Skills.GuardBreaker == nil,
@@ -114,29 +114,29 @@ local function test_basic_levels(profiles: any, skills: any)
         "Direct calls cannot learn the hidden skill early."
     )
 
-    set_level(profiles, 8)
+    set_level(profiles, 5)
     character = assert(profiles:get_character(USER_ID))
     check(
         Rules.can_show(character, basic)
             and Snapshots.build(character).Skills.GuardBreaker ~= nil,
-        "Level 8 must reveal the first Guard Breaker rank."
+        "Level 5 must reveal the first Guard Breaker rank."
     )
     check(
         skills:learn_trainer_skill(USER_ID, "GuardBreaker").ok,
         "The existing trainer must teach an eligible basic skill."
     )
 
-    set_level(profiles, 13)
+    set_level(profiles, 9)
     set_skill(profiles, "GuardBreaker", 1, 100)
     check(
         skills:purchase_rank(USER_ID, "GuardBreaker").reason
             == "CharacterLevelTooLow",
-        "Earned proficiency must not bypass rank-2 level 14."
+        "Earned proficiency must not bypass rank-2 level 10."
     )
-    set_level(profiles, 14)
+    set_level(profiles, 10)
     check(
         skills:purchase_rank(USER_ID, "GuardBreaker").rank == 2,
-        "Rank 2 must require both proficiency and level 14."
+        "Rank 2 must require both proficiency and level 10."
     )
     set_level(profiles, 20)
     set_skill(profiles, "GuardBreaker", 2, 299)
@@ -148,7 +148,7 @@ local function test_basic_levels(profiles: any, skills: any)
     set_skill(profiles, "GuardBreaker", 2, 300)
     check(
         skills:purchase_rank(USER_ID, "GuardBreaker").rank == 3,
-        "Level 20 and earned proficiency unlock basic rank 3."
+        "Level 15+ and earned proficiency unlock basic rank 3."
     )
 end
 
@@ -280,14 +280,14 @@ end
 -- Args:
 --   None.
 -- Returns:
---   nil: Checks every base-class ability uses the same level-8 visibility
+--   nil: Checks each base-class ability's C4-style first level bracket
 --       and registered server-owned combat skill definition.
 local function test_all_basic_classes()
     local examples = {
-        {"Fighter", "GuardBreaker", "FighterTrainer", "Melee"},
-        {"Mage", "AetherBolt", "MageTrainer", "MagicProjectile"},
-        {"Ranger", "TrackerShot", "RangerTrainer", "RangerProjectile"},
-        {"Rogue", "ViperStrike", "RogueTrainer", "Melee"},
+        {"Fighter", "GuardBreaker", "FighterTrainer", "Melee", 5},
+        {"Mage", "AetherBolt", "MageTrainer", "MagicProjectile", 7},
+        {"Ranger", "TrackerShot", "RangerTrainer", "RangerProjectile", 5},
+        {"Rogue", "ViperStrike", "RogueTrainer", "Melee", 5},
     }
 
     for _, example in ipairs(examples) do
@@ -295,8 +295,9 @@ local function test_all_basic_classes()
         local skill_id = example[2]
         local trainer_id = example[3]
         local expected_kind = example[4]
+        local first_level = example[5]
         local character = {
-            Level = 7,
+            Level = first_level - 1,
             Identity = {
                 Version = 1,
                 RaceId = "Human",
@@ -310,15 +311,15 @@ local function test_all_basic_classes()
         local definition = assert(Definitions.get(skill_id))
         check(
             not Rules.can_show(character, definition),
-            "Each class's new basic ability must be hidden at level 7."
+            "A basic ability must remain hidden before its own level bracket."
         )
-        character.Level = 8
+        character.Level = first_level
         check(
             Rules.can_show(character, definition)
                 and Trainers.can_offer(
                     trainer_id, character, skill_id
                 ).ok,
-            "Each class must see its own base skill at level 8."
+            "Each class must see its own base skill at its correct level."
         )
         check(
             CombatSkills.get(skill_id).KIND == expected_kind,
@@ -341,7 +342,7 @@ local function main()
     check(profiles:load(USER_ID) ~= nil, "Fixture must load.")
     check(profiles:mutate(USER_ID, function(profile: any)
         local character = profile.Characters.Slot1
-        character.Level = 7
+        character.Level = 4
         character.Identity = {
             Version = 1,
             RaceId = "Human",
