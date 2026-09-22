@@ -367,6 +367,33 @@ local function robe_bonus(
 end
 
 --[[
+Returns a bounded protection bonus only for a purchased level-one
+starting-class passive while the authentic character is below level 20.
+
+Args:
+    character (any): Server-owned race, class, level and purchased ranks.
+
+Returns:
+    number: Real physical NPC mitigation from zero through two percent.
+]]
+function PassiveSkillEffects.novice_physical_reduction(
+    character: any
+): number
+    if type(character) ~= "table"
+        or type(character.Level) ~= "number"
+        or character.Level < 1 or character.Level > 19
+    then
+        return 0
+    end
+    return math.clamp(
+        resolve_bonus(
+            character, "NoviceProtection", "PhysicalReductionPerRank"
+        ),
+        0, 0.02
+    )
+end
+
+--[[
 Returns the C4 starting Mystic's real mana-regeneration bonus.
 
 Args:
