@@ -1018,6 +1018,29 @@ local MYSTIC_LIFE_DRAIN = specialize_skill(
     }
 )
 
+-- Human Mystic C4 level-seven poison curse: only a genuine NPC
+-- projectile hit may start bounded, non-stacking periodic damage.
+local MYSTIC_POISON_CURSE = specialize_skill(
+    WIND_STRIKE, "MysticPoisonCurse", "Poison Curse", {
+        MANA_COST = 15,
+        COOLDOWN_SECONDS = 10,
+        BASE_DAMAGE = 3,
+        POISON_TICK_DAMAGE = 4,
+        POISON_TICK_COUNT = 3,
+        POISON_TICK_SECONDS = 1,
+        POISON_TIER = 1,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 3,
+                POISON_TICK_DAMAGE = 4,
+                POISON_TICK_COUNT = 3,
+                POISON_TICK_SECONDS = 1,
+                POISON_TIER = 1,
+            }),
+        }),
+    }
+)
+
 -- Each authentic server projectile applies a real non-stacking slow
 -- only after impact on a living NPC. All four source ranks improve it.
 local MYSTIC_FROST_BOLT = specialize_skill(
@@ -1307,6 +1330,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ScoutEvasiveFocus = SCOUT_EVASIVE_FOCUS,
     ElvenScoutGuard = ELVEN_SCOUT_GUARD,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
+    MysticPoisonCurse = MYSTIC_POISON_CURSE,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
