@@ -45,7 +45,8 @@ Returns:
     any: Existing market service, not a mocked trade grant.
 ]]
 local function make_services(): (any, any, any)
-    local profiles = Profiles.new(ProfileAdapter.new())
+    local adapter = ProfileAdapter.new()
+    local profiles = Profiles.new(adapter)
     check(profiles:load(SELLER), "Seller profile must load")
     check(profiles:load(BUYER), "Buyer profile must load")
     local inventory = Inventory.new(profiles)
@@ -64,8 +65,11 @@ local function make_services(): (any, any, any)
             profile.Characters.Slot1.Gold = 500
         end), "Disposable market buyer must have earned-style gold")
     end
-    return {Profiles = profiles, Professions = professions},
-        inventory, market
+    return {
+        Profiles = profiles,
+        Professions = professions,
+        Adapter = adapter,
+    }, inventory, market
 end
 
 --[[
@@ -209,6 +213,39 @@ local function trade_and_craft(
 end
 
 --[[
+Verifies the selected professions and completed gear survive profile reload.
+
+Args:
+    services (any): Two loaded characters and their in-memory adapter.
+
+Returns:
+    nil: Confirms the saved slots cannot be replaced after reconnect.
+]]
+local function check_persistence(services: any)
+    local profiles = services.Profiles
+    check(profiles:save(SELLER, "ProfessionChoiceTradeTest"),
+        "Seller choices and earned output must persist")
+    check(profiles:save(BUYER, "ProfessionChoiceTradeTest"),
+        "Buyer choices must persist")
+    local restored = Profiles.new(services.Adapter)
+    check(restored:load(SELLER), "Seller must reload")
+    check(restored:load(BUYER), "Buyer must reload")
+    local professions = Professions.new(restored, Inventory.new(restored))
+    local seller = assert(restored:get_character(SELLER, 1))
+    local buyer = assert(restored:get_character(BUYER, 1))
+    check(seller.ProfessionSlots.Gathering == "Mining"
+        and seller.ProfessionSlots.Creation == "Blacksmithing"
+        and buyer.ProfessionSlots.Gathering == "Herbalism"
+        and buyer.ProfessionSlots.Creation == "Alchemy",
+        "Profession selections must survive a fresh service load")
+    check(not professions:choose_profession(SELLER, "Alchemy").ok,
+        "Reconnect cannot grant a second crafting profession")
+    check(Inventory.count_item(
+        seller, "runic_ironbound_gloves"
+    ) == 1, "Market-dependent gear must survive reload")
+end
+
+--[[
 Ensures older profiles retain XP without gaining all seven careers.
 
 Args:
@@ -247,6 +284,7 @@ local function main()
     check_choices(services)
     prepare_traders(services)
     trade_and_craft(services, inventory, market)
+    check_persistence(services)
     print(("[Profession Exclusive Choice] PASS: %d assertions.")
         :format(checks))
 end
