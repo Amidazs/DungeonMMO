@@ -64,6 +64,8 @@ local DEFINITIONS = table.freeze({
             "ArcherDraw",
             "RangerBowMastery",
             "ScoutBowDiscipline",
+            "RangerLongRange",
+            "RangerArrowVelocity",
             "ScoutLightArmorMastery",
             "ElvenRenewal",
             "ElvenCalmingShot",
