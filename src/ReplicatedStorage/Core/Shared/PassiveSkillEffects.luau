@@ -279,6 +279,62 @@ function PassiveSkillEffects.fighter_armor_reduction(
 end
 
 --[[
+Resolves a Mystic's physical-defence mastery only with a real robe Body.
+
+Args:
+    character (any): Server-owned Mage and equipped Body gear.
+
+Returns:
+    number: Passive physical mitigation in the range zero to 2.4%.
+]]
+function PassiveSkillEffects.mystic_armor_reduction(
+    character: any
+): number
+    if type(character) ~= "table"
+        or type(character.Equipment) ~= "table"
+    then
+        return 0
+    end
+    local body_id = character.Equipment.Body
+    local body = if type(body_id) == "string"
+        then ItemDefinitions.get(body_id) else nil
+    if not body or body.Kind ~= "Equipment"
+        or body.Slot ~= "Body"
+        or body.Category ~= "Robe"
+    then
+        return 0
+    end
+    return math.clamp(
+        resolve_bonus(
+            character, "MysticArmorTraining",
+            "PhysicalReductionPerRank"
+        ),
+        0, 0.024
+    )
+end
+
+--[[
+Returns trained magic defence independently of physical armour.
+
+Args:
+    character (any): Server-owned selected Mage and purchased ranks.
+
+Returns:
+    number: Magic damage mitigation in the range zero through 6%.
+]]
+function PassiveSkillEffects.mystic_magic_reduction(
+    character: any
+): number
+    return math.clamp(
+        resolve_bonus(
+            character, "MysticSpellResistance",
+            "MagicReductionPerRank"
+        ),
+        0, 0.06
+    )
+end
+
+--[[
 Returns the real Human Scout critical-hit damage bonus from owned ranks.
 
 Args:
