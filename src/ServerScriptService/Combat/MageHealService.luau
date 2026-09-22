@@ -5,6 +5,9 @@ local Workspace = game:GetService("Workspace")
 local SupportTargetRules = require(
     script.Parent:WaitForChild("SupportTargetRules")
 )
+local PoisonStatusService = require(
+    script.Parent:WaitForChild("PoisonStatusService")
+)
 
 local MageHealService = {}
 
@@ -78,9 +81,23 @@ function MageHealService.set_heal_callback(
     heal_callback = callback
 end
 
+--[[
+Selects the real forward-facing injured ally or affected poison target.
+A poison cure may target a healthy, poisoned ally but does not treat
+unpoisoned players as valid healing targets.
+
+Args:
+    caster (Player): Authenticated friendly spell caster.
+    range_studs (number): Maximum authored supportive spell range.
+    poison_only (boolean?): True for a genuine poison cleanse.
+
+Returns:
+    Player?: Eligible visible ally or caster, or nil when unavailable.
+]]
 function MageHealService.find_target(
     caster: Player,
-    range_studs: number
+    range_studs: number,
+    poison_only: boolean?
 ): Player?
     local caster_humanoid, caster_root =
         get_character_parts(caster)
@@ -116,6 +133,11 @@ function MageHealService.find_target(
         if not humanoid
             or not root
             or humanoid.Health <= 0
+        then
+            continue
+        end
+        if poison_only == true
+            and not PoisonStatusService.is_poisoned(candidate.Character)
         then
             continue
         end
@@ -157,7 +179,7 @@ function MageHealService.find_target(
     return SupportTargetRules.choose_aimed_or_self(
         candidates,
         range_studs,
-        true,
+        poison_only ~= true,
         0.85
     )
 end
