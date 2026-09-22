@@ -281,4 +281,25 @@ function PassiveSkillEffects.critical_chance_bonus(
     )
 end
 
+--[[
+Returns a positive movement-speed multiplier from the purchased Scout
+mastery. This affects locomotion only; locked combat states remain locked.
+
+Args:
+    character (any): Server-owned class, race, and learned passive ranks.
+
+Returns:
+    number: Authoritative locomotion multiplier from 1 through 1.06.
+]]
+function PassiveSkillEffects.movement_multiplier(
+    character: any
+): number
+    return math.clamp(
+        1 + resolve_bonus(
+            character, "ScoutFleetFoot", "MovementBonusPerRank"
+        ),
+        1, 1.06
+    )
+end
+
 return table.freeze(PassiveSkillEffects)
