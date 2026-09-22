@@ -56,6 +56,9 @@ local MAPPINGS = table.freeze({
         BattleHeal = table.freeze({
             [14] = "MysticBattleHeal",
         }),
+        LifeDrain = table.freeze({
+            [14] = "MysticLifeDrain",
+        }),
         RobeCasting = table.freeze({
             [1] = "MysticRobeCasting",
         }),
