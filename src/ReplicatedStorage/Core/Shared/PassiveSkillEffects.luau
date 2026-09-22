@@ -260,4 +260,25 @@ function PassiveSkillEffects.critical_damage_bonus(
     )
 end
 
+--[[
+Returns the purchased Human/Elf race-specific scout critical chance bonus.
+
+Args:
+    character (any): Server-owned player class, race and bought skill ranks.
+
+Returns:
+    number: Additive critical-hit chance granted by eligible Scout training.
+]]
+function PassiveSkillEffects.critical_chance_bonus(
+    character: any
+): number
+    return resolve_bonus(
+        character, "HumanScoutPrecision",
+        "CriticalChanceBonusPerRank"
+    ) + resolve_bonus(
+        character, "ElvenScoutPrecision",
+        "CriticalChanceBonusPerRank"
+    )
+end
+
 return table.freeze(PassiveSkillEffects)
