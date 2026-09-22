@@ -46,6 +46,9 @@ local BankRuntime = require(Base:WaitForChild("BankRuntime"))
 local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
 local GuildRuntime = require(Base:WaitForChild("GuildRuntime"))
 local BaseQuestRuntime = require(Base:WaitForChild("BaseQuestRuntime"))
+local BaseClassAdvancementRuntime = require(
+    Base:WaitForChild("BaseClassAdvancementRuntime")
+)
 local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -424,6 +427,16 @@ GuildRuntime.attach({
 BaseQuestRuntime.attach({
     remotes = remotes,
     quests = runtime.QuestService,
+    is_ready = function(player: Player): boolean
+        return loaded_users[player.UserId] == true
+            and profiles:get_profile(player.UserId) ~= nil
+            and not coordinator:is_pending(player.UserId)
+    end,
+})
+
+BaseClassAdvancementRuntime.attach({
+    remotes = remotes,
+    advancement = runtime.ClassAdvancementService,
     is_ready = function(player: Player): boolean
         return loaded_users[player.UserId] == true
             and profiles:get_profile(player.UserId) ~= nil
