@@ -671,6 +671,29 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Longbow"}),
     }),
 
+    -- C4 first-transfer Long Shot and arrow-velocity roles. Both alter
+    -- genuine Ranger projectile travel after being purchased and equipped.
+    RangerLongRange = table.freeze({
+        Id = "RangerLongRange",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 20}),
+        BowRangeBonusStudsPerRank = 12,
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    RangerArrowVelocity = table.freeze({
+        Id = "RangerArrowVelocity",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 32}),
+        ArrowSpeedBonusPerRank = 18,
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
