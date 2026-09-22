@@ -25,6 +25,24 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    scout_dagger = table.freeze({
+        Id = "scout_dagger",
+        Name = "Scout Dagger",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Weapon",
+        Category = "Dagger",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        Rarity = "Basic",
+        Stackable = false,
+        -- The dagger may still execute accepted starter sword hitboxes
+        -- until its own meshes/animations are manufactured.
+        WeaponTags = table.freeze({"Dagger", "OneHandedSword"}),
+        CombatModifiers = table.freeze({
+            PhysicalDamageBonus = 0.08,
+        }),
+    }),
+
     apprentice_arcane_wand = table.freeze({
         Id = "apprentice_arcane_wand",
         Name = "Apprentice Arcane Wand",
