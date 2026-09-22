@@ -3,6 +3,9 @@
 local SkillDefinitions = require(
     script.Parent:WaitForChild("SkillProgressionDefinitions")
 )
+local Classes = require(
+    script.Parent:WaitForChild("SecondaryClassDefinitions")
+)
 
 local SkillUnlockRules = {}
 
@@ -107,6 +110,20 @@ function SkillUnlockRules.can_train(
         if not matches then
             return false, "AdvancedClassRequired", nil
         end
+
+        local class = Classes.get(active)
+        local history = type(owned) == "table"
+            and owned.CompletedByRace
+        local race_history = type(history) == "table"
+            and history[identity.RaceId]
+        if not class
+            or class.RaceId ~= identity.RaceId
+            or class.BaseClassId ~= identity.BaseClassId
+            or type(race_history) ~= "table"
+            or race_history[active] ~= true
+        then
+            return false, "AdvancedClassNotEarned", nil
+        end
     end
 
     local rank_levels = definition.RankLevels
@@ -173,10 +190,8 @@ function SkillUnlockRules.can_show(
         and progression.Skills
     local state = type(skills) == "table"
         and skills[definition.Id]
-    if type(state) == "table" and state.Known == true then
-        return true
-    end
-
+    -- Previously learned skills are not a loophole after a race change,
+    -- class switch or loss of an earned prerequisite.
     return select(1, SkillUnlockRules.can_train(
         character, definition, 1
     ))
