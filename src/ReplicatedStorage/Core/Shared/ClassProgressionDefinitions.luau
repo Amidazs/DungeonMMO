@@ -58,6 +58,7 @@ local DEFINITIONS = table.freeze({
         TeachableSkills = table.freeze({
             "TrackerShot",
             "BriarVolley",
+            "ThunderShot",
             "ArcherDraw",
             "RangerBowMastery",
         }),
