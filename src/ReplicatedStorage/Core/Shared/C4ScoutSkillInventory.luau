@@ -51,6 +51,11 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "Rogue",
         DaggerEquipmentPending = false,
     }),
+    MovementPassive = table.freeze({
+        SkillId = "ScoutFleetFoot",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
     CriticalDamagePassive = table.freeze({
         SkillId = "HumanScoutCriticalPower",
         Owner = "RangerRogue",
