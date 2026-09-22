@@ -285,6 +285,16 @@ function ProgressionSnapshotBuilder.build(
         local target_rank =
             rank + 1
 
+        local next_rank_ok = false
+        local next_rank_reason: string? = nil
+        local missing_requirement: any = nil
+        if target_rank <= definition.MaxRank then
+            next_rank_ok, next_rank_reason, missing_requirement =
+                SkillUnlockRules.can_train(
+                    character, definition, target_rank
+                )
+        end
+
         skill_payload[skill_id] = {
             Id = skill_id,
 
@@ -344,11 +354,9 @@ function ProgressionSnapshotBuilder.build(
                     or definition.MinimumLevel or 1
                 else nil,
 
-            NextRankUnlocked = if target_rank <= definition.MaxRank
-                then select(1, SkillUnlockRules.can_train(
-                    character, definition, target_rank
-                ))
-                else false,
+            NextRankUnlocked = next_rank_ok,
+            NextRankLockReason = next_rank_reason,
+            NextMissingRequirement = missing_requirement,
         }
         end
     end
