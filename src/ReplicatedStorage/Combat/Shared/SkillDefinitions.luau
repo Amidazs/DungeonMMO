@@ -406,6 +406,35 @@ local function specialize_skill(
     return table.freeze(definition)
 end
 
+-- Low-level Mage defence and attack use the already-validated ward
+-- and projectile executors. All values and upgrades are server-owned.
+local DAWN_WARD = specialize_skill(
+    ARCANE_WARD, "DawnWard", "Dawn Ward", {
+        MANA_COST = 12,
+        COOLDOWN_SECONDS = 7.0,
+        WARD_AMOUNT = 14,
+        DURATION_SECONDS = 4.0,
+        RANKS = table.freeze({
+            [1] = table.freeze({WARD_AMOUNT = 14}),
+            [2] = table.freeze({WARD_AMOUNT = 21}),
+            [3] = table.freeze({WARD_AMOUNT = 29}),
+        }),
+    }
+)
+
+local CINDER_BOLT = specialize_skill(
+    WIND_STRIKE, "CinderBolt", "Cinder Bolt", {
+        MANA_COST = 10,
+        COOLDOWN_SECONDS = 3.5,
+        BASE_DAMAGE = 12,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 12}),
+            [2] = table.freeze({BASE_DAMAGE = 18}),
+            [3] = table.freeze({BASE_DAMAGE = 25}),
+        }),
+    }
+)
+
 local GUARD_BREAKER = specialize_skill(
     SHIELD_BASH, "GuardBreaker", "Guard Breaker", {
         STAMINA_COST = 16,
@@ -581,6 +610,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GuardBreaker = GUARD_BREAKER,
     IronCleave = IRON_CLEAVE,
     PursuitStep = PURSUIT_STEP,
+    DawnWard = DAWN_WARD,
+    CinderBolt = CINDER_BOLT,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
