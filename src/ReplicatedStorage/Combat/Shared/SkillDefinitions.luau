@@ -757,6 +757,111 @@ local ROGUE_FINISHING_CUT = specialize_skill(
     }
 )
 
+-- Elf-only first-transfer recovery uses the same verified self/ally
+-- heal-over-time executor, but explicitly targets the owner.
+local ELVEN_RENEWAL = specialize_skill(
+    MAGE_HEAL, "ElvenRenewal", "Elven Renewal", {
+        SELF_ONLY = true,
+        MANA_COST = 15,
+        COOLDOWN_SECONDS = 6,
+        ELF_INSTANT_FRACTION = 0.15,
+        ELF_HOT_SECONDS = 4.5,
+        HOT_TICK_SECONDS = 0.75,
+        TOTAL_HEAL = 15,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 15}),
+            [2] = table.freeze({TOTAL_HEAL = 18}),
+            [3] = table.freeze({TOTAL_HEAL = 21}),
+            [4] = table.freeze({TOTAL_HEAL = 24}),
+            [5] = table.freeze({TOTAL_HEAL = 27}),
+            [6] = table.freeze({TOTAL_HEAL = 30}),
+            [7] = table.freeze({TOTAL_HEAL = 33}),
+            [8] = table.freeze({TOTAL_HEAL = 36}),
+            [9] = table.freeze({TOTAL_HEAL = 39}),
+            [10] = table.freeze({TOTAL_HEAL = 42}),
+            [11] = table.freeze({TOTAL_HEAL = 45}),
+            [12] = table.freeze({TOTAL_HEAL = 48}),
+            [13] = table.freeze({TOTAL_HEAL = 51}),
+            [14] = table.freeze({TOTAL_HEAL = 54}),
+            [15] = table.freeze({TOTAL_HEAL = 57}),
+        }),
+    }
+)
+
+-- Confirmed Elf arrows lower the caster's actual threat on that NPC.
+-- Reduction grows across all fifteen source-band ranks.
+local ELVEN_CALMING_SHOT = specialize_skill(
+    PIERCING_SHOT, "ElvenCalmingShot", "Calming Shot", {
+        STAMINA_COST = 18,
+        COOLDOWN_SECONDS = 6,
+        MAX_TARGETS = 1,
+        BASE_DAMAGE = 7,
+        THREAT_REDUCTION_FRACTION = 0.10,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 7,
+                THREAT_REDUCTION_FRACTION = 0.100,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 8,
+                THREAT_REDUCTION_FRACTION = 0.125,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 9,
+                THREAT_REDUCTION_FRACTION = 0.150,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 10,
+                THREAT_REDUCTION_FRACTION = 0.175,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 11,
+                THREAT_REDUCTION_FRACTION = 0.200,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 12,
+                THREAT_REDUCTION_FRACTION = 0.225,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 13,
+                THREAT_REDUCTION_FRACTION = 0.250,
+            }),
+            [8] = table.freeze({
+                BASE_DAMAGE = 14,
+                THREAT_REDUCTION_FRACTION = 0.275,
+            }),
+            [9] = table.freeze({
+                BASE_DAMAGE = 15,
+                THREAT_REDUCTION_FRACTION = 0.300,
+            }),
+            [10] = table.freeze({
+                BASE_DAMAGE = 16,
+                THREAT_REDUCTION_FRACTION = 0.325,
+            }),
+            [11] = table.freeze({
+                BASE_DAMAGE = 17,
+                THREAT_REDUCTION_FRACTION = 0.350,
+            }),
+            [12] = table.freeze({
+                BASE_DAMAGE = 18,
+                THREAT_REDUCTION_FRACTION = 0.375,
+            }),
+            [13] = table.freeze({
+                BASE_DAMAGE = 19,
+                THREAT_REDUCTION_FRACTION = 0.400,
+            }),
+            [14] = table.freeze({
+                BASE_DAMAGE = 20,
+                THREAT_REDUCTION_FRACTION = 0.425,
+            }),
+            [15] = table.freeze({
+                BASE_DAMAGE = 21,
+                THREAT_REDUCTION_FRACTION = 0.450,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -851,6 +956,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ThunderShot = THUNDER_SHOT,
     ArcherDraw = ARCHER_DRAW,
     ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
+    ElvenRenewal = ELVEN_RENEWAL,
+    ElvenCalmingShot = ELVEN_CALMING_SHOT,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
     RogueFinishingCut = ROGUE_FINISHING_CUT,
     LaceratingCut = LACERATING_CUT,
