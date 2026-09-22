@@ -44,8 +44,8 @@ check(
     "Rogue starters must establish damage, position and evasion identity."
 )
 check(
-    rogue ~= nil and rogue.StarterEquipment.Weapon == "marauder_sword",
-    "Rogue must use the temporary One-Handed Sword compatibility weapon."
+    rogue ~= nil and rogue.StarterEquipment.Weapon == "scout_dagger",
+    "Rogue must receive an authoritative dagger with starter sword hitbox compatibility."
 )
 
 local human_secondary = SecondaryDefinitions.resolve("Human", "Rogue")
