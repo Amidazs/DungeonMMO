@@ -14,7 +14,7 @@ local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
     Human = {Raw = 99, Functional = 81, Missing = 18,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 107, Missing = 22,
+    Elf = {Raw = 129, Functional = 108, Missing = 21,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +93,15 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "ActiveEvasion" or category == "DefenseBuff" then
+    if category == "CurePoison" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        check(effect.KIND == "MageHeal"
+            and effect.TOTAL_HEAL == 0
+            and effect.SELF_ONLY == true
+            and effect.CURE_POISON_TIER >= 3
+            and effect.MANA_COST > 0,
+            "Elven Scout poison recovery must actually cleanse self")
+    elseif category == "ActiveEvasion" or category == "DefenseBuff" then
         local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
         local kind = if category == "ActiveEvasion"
             then "Evasion" else "PhysicalGuard"
