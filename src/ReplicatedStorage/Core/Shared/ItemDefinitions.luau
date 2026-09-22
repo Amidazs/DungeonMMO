@@ -84,6 +84,18 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    apprentice_mystic_robe = table.freeze({
+        Id = "apprentice_mystic_robe",
+        Name = "Apprentice Mystic Robe",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body",
+        Category = "Robe",
+        AllowedBaseClasses = MAGE,
+        Rarity = "Basic",
+        Stackable = false,
+    }),
+
     scout_leather_vest = table.freeze({
         Id = "scout_leather_vest",
         Name = "Scout Leather Vest",
