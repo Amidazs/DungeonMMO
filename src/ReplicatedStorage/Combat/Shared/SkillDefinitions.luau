@@ -974,6 +974,40 @@ local MYSTIC_HEALING_PRAYER = specialize_skill(
     }
 )
 
+-- Each authentic server projectile applies a real non-stacking slow
+-- only after impact on a living NPC. All four source ranks improve it.
+local MYSTIC_FROST_BOLT = specialize_skill(
+    WIND_STRIKE, "MysticFrostBolt", "Mystic Frost Bolt", {
+        MANA_COST = 14,
+        COOLDOWN_SECONDS = 5,
+        BASE_DAMAGE = 9,
+        MAGIC_SLOW_FRACTION = 0.20,
+        MAGIC_SLOW_SECONDS = 2,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 9,
+                MAGIC_SLOW_FRACTION = 0.2,
+                MAGIC_SLOW_SECONDS = 2,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 11,
+                MAGIC_SLOW_FRACTION = 0.24,
+                MAGIC_SLOW_SECONDS = 2.5,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 14,
+                MAGIC_SLOW_FRACTION = 0.28,
+                MAGIC_SLOW_SECONDS = 3,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 17,
+                MAGIC_SLOW_FRACTION = 0.32,
+                MAGIC_SLOW_SECONDS = 3.5,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1064,6 +1098,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     DawnWard = DAWN_WARD,
     CinderBolt = CINDER_BOLT,
     MysticWindBolt = MYSTIC_WIND_BOLT,
+    MysticFrostBolt = MYSTIC_FROST_BOLT,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
