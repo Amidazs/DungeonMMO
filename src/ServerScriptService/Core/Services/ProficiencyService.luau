@@ -98,14 +98,14 @@ function ProficiencyService.get_current_cap(
     end
 
     local next_threshold =
-        SkillConfig.get_threshold(
-            definition.Tier,
+        SkillConfig.get_skill_threshold(
+            definition,
             current + 1
         )
 
     return next_threshold
-        or SkillConfig.get_max_threshold(
-            definition.Tier
+        or SkillConfig.get_skill_max_threshold(
+            definition
         )
 end
 
@@ -372,8 +372,8 @@ function ProficiencyService:set_for_test(
                 elseif mode_or_value == "max" then
                     value =
                         SkillConfig
-                            .get_max_threshold(
-                                definition.Tier
+                            .get_skill_max_threshold(
+                                definition
                             )
                 elseif (
                     type(mode_or_value)
@@ -397,8 +397,8 @@ function ProficiencyService:set_for_test(
                         value,
                         0,
                         SkillConfig
-                            .get_max_threshold(
-                                definition.Tier
+                            .get_skill_max_threshold(
+                                definition
                             )
                     )
 
