@@ -1,5 +1,44 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — C4 Rogue bleed v1.72
+
+- [x] Rogue level-24/32 `LaceratingCut` two
+  actual-effect ranks, full Vital Blow and
+  Disrupting Cut purchased/use-earned prerequisites,
+  class/weapon/trainer restrictions: 19 focused
+  Studio assertions PASS.
+- [x] Production SkillProgressionService with
+  isolated in-memory profiles: 20 assertions PASS
+  for denied early/prerequisite purchases, lvl24
+  rank one, lvl32/mastery120 rank two, max rank,
+  and saved/reloaded purchased rank.
+- [x] Unpublished Dungeon real client Play:
+  authenticated hotbar accepted Lacerating Cut,
+  hit a tagged NPC, caused three later 3-HP
+  server bleed ticks, then expired without a
+  fourth tick. The previous two-target slow
+  and both stagger cases remained PASS.
+  `VERIFIED_PLAY_MODE_PASS`.
+- [x] TEMP Base/Dungeon Rojo compositions.
+- [ ] Actual production-profile trainer GUI,
+  physical keyboard input and published/cloud
+  multiplayer not yet verified; Play character
+  and client skill snapshot used temporary
+  isolated fixtures.
+- [ ] Correct C4 dagger-only Bleed equipment
+  contract; temporary sword is not source parity.
+- [ ] Full C4 catalogue/rank-count parity:
+  Fighter/Mage historic 13/16 mismatches,
+  Ranger/Rogue owned-career reference ranks
+  still not mapped.
+- [ ] Separate Phase2A paid-revive auto-test
+  failure remains unresolved. No general
+  Dungeon regression acceptance claimed.
+
+[Evidence](../testing/c4-rogue-bleed-2026-09-22.md).
+No unrelated dungeon lifecycle suite repeat.
+
+
 ## 22 September 2026 — real Ranger/Rogue control skills
 
 - [x] New focused Base Studio test initially RED on
