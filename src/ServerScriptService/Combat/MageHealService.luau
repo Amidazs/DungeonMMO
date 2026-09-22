@@ -14,7 +14,7 @@ type HotRecord = {
 }
 local hot_records: {[Model]: HotRecord} = {}
 local serial_counter = 0
-local heal_callback: ((Player, Player, number) -> ())? = nil
+local heal_callback: ((Player, Player, number, string) -> ())? = nil
 
 local function get_character_parts(
     player: Player
@@ -73,7 +73,7 @@ local function line_of_sight(
 end
 
 function MageHealService.set_heal_callback(
-    callback: ((Player, Player, number) -> ())?
+    callback: ((Player, Player, number, string) -> ())?
 )
     heal_callback = callback
 end
@@ -205,7 +205,8 @@ end
 function MageHealService.apply_heal(
     caster: Player,
     target: Player,
-    amount: number
+    amount: number,
+    source_id: string?
 ): number
     local humanoid = get_character_parts(target)
 
@@ -246,7 +247,7 @@ function MageHealService.apply_heal(
         end
 
         if heal_callback then
-            heal_callback(caster, target, healed)
+            heal_callback(caster, target, healed, source_id or "MageHeal")
         end
     end
 
@@ -292,7 +293,8 @@ function MageHealService.cast(
         MageHealService.apply_heal(
             caster,
             target,
-            instant_amount
+            instant_amount,
+            definition.ID
         )
 
     if hot_amount <= 0 or hot_seconds <= 0 then
@@ -344,7 +346,8 @@ function MageHealService.cast(
                     MageHealService.apply_heal(
                         caster,
                         target,
-                        per_tick
+                        per_tick,
+                        definition.ID
                     )
 
                 if healed > 0 then
