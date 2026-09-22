@@ -21,8 +21,10 @@ local RS = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local channel = RS:WaitForChild("C4ClientSkillProbe_TEMP")
 local scripts = player:WaitForChild("PlayerScripts")
-local state = require(scripts.Core.ProgressionClientState)
-local actions = require(scripts.Combat.CombatInputActions)
+local state = require(scripts:WaitForChild("Core")
+    :WaitForChild("ProgressionClientState"))
+local actions = require(scripts:WaitForChild("Combat")
+    :WaitForChild("CombatInputActions"))
 
 -- Args: predicate (function): Observation to poll.
 --       label (string): Timeout diagnostic.
