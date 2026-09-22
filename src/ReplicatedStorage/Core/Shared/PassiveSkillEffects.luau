@@ -6,19 +6,15 @@ local SkillDefinitions = require(
 
 local PassiveSkillEffects = {}
 
--- Resolves a character's purchased passive damage bonus, not proficiency.
--- Passive ranks are trained with SP and level; they are not cast or slotted.
+-- Reads the purchased rank only for a passive owned by the character's
+-- current base class. A foreign class or unsaved preview gets no bonus.
 --
 -- Args:
 --   character (any): Server-owned character or runtime snapshot.
---   skill_id (string): Registered class-specific passive identifier.
+--   definition (any): Registered passive skill definition.
 -- Returns:
---   number: Additive damage multiplier bonus, or zero if ineligible.
-function PassiveSkillEffects.damage_bonus(
-    character: any,
-    skill_id: string
-): number
-    local definition = SkillDefinitions.get(skill_id)
+--   number: Earned, clamped passive rank or zero for an ineligible class.
+local function purchased_rank(character: any, definition: any): number
     if type(character) ~= "table"
         or type(definition) ~= "table"
         or definition.Kind ~= "Passive"
@@ -27,15 +23,13 @@ function PassiveSkillEffects.damage_bonus(
     end
 
     local identity = character.Identity
-    local allowed_classes = definition.AllowedBaseClasses
-    if type(identity) ~= "table"
-        or type(allowed_classes) ~= "table"
-    then
+    local allowed = definition.AllowedBaseClasses
+    if type(identity) ~= "table" or type(allowed) ~= "table" then
         return 0
     end
 
     local eligible = false
-    for _, class_id in ipairs(allowed_classes) do
+    for _, class_id in ipairs(allowed) do
         if identity.BaseClassId == class_id then
             eligible = true
             break
@@ -46,18 +40,78 @@ function PassiveSkillEffects.damage_bonus(
     end
 
     local progression = character.Progression
-    local skills = type(progression) == "table"
-        and progression.Skills
-    local state = type(skills) == "table" and skills[skill_id]
+    local skills = type(progression) == "table" and progression.Skills
+    local state = type(skills) == "table" and skills[definition.Id]
     if type(state) ~= "table" or state.Known ~= true then
         return 0
     end
 
-    local purchased = math.floor(
-        tonumber(state.PurchasedRank) or 0
+    local rank = math.floor(tonumber(state.PurchasedRank) or 0)
+    return math.clamp(rank, 0, definition.MaxRank)
+end
+
+-- Converts an earned passive rank to a server-authored stat bonus.
+--
+-- Args:
+--   character (any): Current authoritative character.
+--   skill_id (string): Registered passive skill identifier.
+--   stat_field (string): The stat bonus field on that definition.
+-- Returns:
+--   number: Character-specific stat increase or zero when unavailable.
+local function resolve_bonus(
+    character: any,
+    skill_id: string,
+    stat_field: string
+): number
+    local definition = SkillDefinitions.get(skill_id)
+    if type(definition) ~= "table" then
+        return 0
+    end
+
+    local per_rank = definition[stat_field]
+    if type(per_rank) ~= "number" then
+        return 0
+    end
+
+    return purchased_rank(character, definition) * per_rank
+end
+
+-- Resolves a purchased physical or magical damage passive.
+--
+-- Args:
+--   character (any): Current server-owned character.
+--   skill_id (string): Registered damage passive skill.
+-- Returns:
+--   number: Additive damage multiplier increase.
+function PassiveSkillEffects.damage_bonus(
+    character: any,
+    skill_id: string
+): number
+    return resolve_bonus(character, skill_id, "DamageBonusPerRank")
+end
+
+-- Resolves the Fighter's trained, flat maximum-health increase.
+--
+-- Args:
+--   character (any): Current server-owned character.
+-- Returns:
+--   number: Extra maximum HP from earned passive ranks.
+function PassiveSkillEffects.health_bonus(character: any): number
+    return resolve_bonus(
+        character, "StalwartTraining", "HealthBonusPerRank"
     )
-    local rank = math.clamp(purchased, 0, definition.MaxRank)
-    return rank * (definition.DamageBonusPerRank or 0)
+end
+
+-- Resolves the Mage's trained healing multiplier bonus.
+--
+-- Args:
+--   character (any): Current server-owned character.
+-- Returns:
+--   number: Additive multiplier for authoritative healing.
+function PassiveSkillEffects.heal_bonus(character: any): number
+    return resolve_bonus(
+        character, "RestorativeTraining", "HealBonusPerRank"
+    )
 end
 
 return table.freeze(PassiveSkillEffects)
