@@ -12,6 +12,7 @@ local ProfileService = require(Services:WaitForChild("ProfileService"))
 local QuestService = require(Services:WaitForChild("QuestService"))
 local ClassAdvancementService = require(Services:WaitForChild("ClassAdvancementService"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
+local QuestDefinitions = require(Shared:WaitForChild("QuestDefinitions"))
 
 local assertions = 0
 local function check(condition: boolean, message: string)
@@ -36,6 +37,18 @@ local function prepare(user_id: number, race_id: string)
             ClassId = "Rogue",
             CreationStage = "Complete",
         }
+        character.Progression.SkillPointEntitlement = 60
+        for _, required in ipairs(
+            QuestDefinitions.get("RogueAdvancementTrial")
+                .SkillPrerequisites
+        ) do
+            character.Progression.Skills[required.SkillId] = {
+                Known = true,
+                StarterGranted = false,
+                PurchasedRank = required.Rank,
+                Proficiency = required.Proficiency,
+            }
+        end
     end))
 end
 
