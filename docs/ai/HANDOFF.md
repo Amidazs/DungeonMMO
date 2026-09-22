@@ -1,5 +1,50 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.75 C4 Scout evasion and first-tier heals
+
+Read `docs/testing/c4-scout-evasion-base-healing-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_75_C4_Scout_Evasion_Mystic_20260922.md`.
+Current actual C4 source coverage is Human Fighter 36/39,
+Elf Fighter 41/43, Human Mystic 36/44, Elf Mystic 34/42,
+Human Rogue 77/99 and Elven Scout 104/129.
+**328/396** mapped functional analogue ranks for the SIX
+source-inventoried classes; **68** still missing in these
+six, plus SEVEN first-transfer source class catalogues not
+yet inventoried. ZERO of nine original Human/Elf C4
+first-transfer classes are complete.
+
+New server mechanics: Scout level-24 evasion chance +3%
+on direct enemy melee, level-28 moving-only additional
++2.5%; Mage Battle Heal three levels at 14 with genuine
+MageHeal delivery and rank prerequisites; Human-only
+Life Drain two ranks at level 14 that actually heal
+the living original caster by 20/30% of confirmed
+hostile NPC damage. All source/race/class/trainer gates
+are server owned. Unpublished Studio: 286 Scout passive,
+1070 Scout inventory, 28 Battle Heal, 11 Life Drain,
+37 actual saved-profile trainer/proficiency, 57 base
+source, 7 strict overall-coverage assertions PASS.
+Real Play client 16 hotbar-to-combat abilities PASS,
+including authentic Battle Heal and Life Drain impacts.
+Base and Dungeon disposable Rojo compositions PASS.
+The strict completion gate correctly remains FALSE.
+
+NEXT: real recipe crafting, Human sitting recovery,
+party heals, poison cure/status and attack debuffs for
+21 remaining base rank entries; Scout missing-family
+ledger currently 22 Human and 25 Elf. Separately
+source-enumerate/build all seven untouched C4 first
+transfer classes and integrate their class quests/trainers.
+Do NOT treat analogous DungeonMMO role classes or rank
+metadata alone as source parity. Real saved-player
+trainer GUI, RNG dodge real-hit sample, multiplayer and
+the unrelated Phase2A paid-revive auto-test remain open.
+No main merge, publish, real DataStore or paid operation.
+All code/docs edited in GitHub; Remote Desktop only for
+fast-forward pull, TEMP build, unpublished Studio tests
+and diagnostic log reads.
+
+
 ## 22 September 2026 — v1.74 C4 basic and first-transfer audit PARTIAL
 
 Read `docs/testing/c4-base-first-transfer-coverage-2026-09-22.md`
