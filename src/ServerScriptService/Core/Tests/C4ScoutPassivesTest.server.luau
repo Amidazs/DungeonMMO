@@ -12,6 +12,10 @@ local Trainers = require(Shared.TrainerCatalogues)
 local Classes = require(Shared.ClassProgressionDefinitions)
 local Passive = require(Shared.PassiveSkillEffects)
 local CombatStats = require(Shared.CharacterCombatStats)
+local CombatConfig = require(RS.Combat.Shared.CombatConfig)
+local AttackTiming = require(
+    RS.Combat.Shared.BasicAttackTimingRules
+)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
 local LEVELS_BOW = {20, 20, 20, 24, 24, 24, 28, 28, 28,
@@ -355,6 +359,51 @@ for _, race_id in ipairs({"Human", "Elf"}) do
             "Foreign-class movement rank must not grant speed")
         Runtime.clear_character(user_id)
     end
+end
+
+-- Human C4 level-36 attack-speed training must shorten real basic attack
+-- WIND_UP/ACTIVE/RECOVERY timing rather than only changing a UI value.
+local rapid_hands = assert(Skills.get("HumanScoutRapidHands"))
+check(rapid_hands.MaxRank == 1
+    and rapid_hands.RankLevels[1] == 36,
+    "Human attack-speed training must unlock at source level 36")
+for _, class_id in ipairs({"Ranger", "Rogue"}) do
+    local user_id = if class_id == "Ranger" then 77641 else 77642
+    local character = make_character(class_id, user_id)
+    character.Identity.RaceId = "Human"
+    character.Level = 35
+    check(not Unlocks.can_show(character, rapid_hands),
+        "Human attack-speed mastery appeared before level 36")
+    character.Level = 36
+    check(Trainers.can_offer(
+        class_id .. "Trainer", character, "HumanScoutRapidHands"
+    ).ok, "Human level-36 speed was missing from class trainer")
+    Runtime.set_character(user_id, character)
+    local baseline = Runtime.get_basic_attack_rate(user_id)
+    character.Progression.Skills.HumanScoutRapidHands = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
+    Runtime.set_character(user_id, character)
+    local trained = Runtime.get_basic_attack_rate(user_id)
+    check(math.abs(trained - baseline * 1.06) < 0.0001,
+        "Bought Human Scout mastery failed to increase attack rate")
+
+    local original = AttackTiming.scale_definition(
+        CombatConfig.RANGER_LONGBOW.RELEASE, baseline
+    )
+    local faster = AttackTiming.scale_definition(
+        CombatConfig.RANGER_LONGBOW.RELEASE, trained
+    )
+    check(faster.WIND_UP_SECONDS < original.WIND_UP_SECONDS
+        and faster.ACTIVE_SECONDS < original.ACTIVE_SECONDS,
+        "Real authored basic attacks must execute faster after mastery")
+    character.Identity.RaceId = "Elf"
+    Runtime.set_character(user_id, character)
+    check(not Unlocks.can_show(character, rapid_hands),
+        "Human attack-speed mastery leaked to the Elf trainer")
+    check(Passive.attack_rate_bonus(character) == 0,
+        "Forged Human attack-rate ranks must not benefit an Elf")
+    Runtime.clear_character(user_id)
 end
 
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
