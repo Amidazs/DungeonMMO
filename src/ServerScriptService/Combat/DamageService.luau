@@ -7,6 +7,9 @@ local CombatConfig = require(shared_folder:WaitForChild("CombatConfig"))
 local CriticalHitRules = require(shared_folder:WaitForChild("CriticalHitRules"))
 local CombatValidationService = require(script.Parent:WaitForChild("CombatValidationService"))
 local WardService = require(script.Parent:WaitForChild("WardService"))
+local CombatStatusService = require(
+    script.Parent:WaitForChild("CombatStatusService")
+)
 local ProgressionRuntimeState = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
@@ -70,8 +73,12 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_fighter_armor_reduction(defender.UserId)
         local mystic_reduction = ProgressionRuntimeState
             .get_mystic_armor_reduction(defender.UserId)
+        local guard_bonus = CombatStatusService.get(
+            context.target, "PhysicalGuard"
+        )
         damage *= 1 - math.clamp(
-            reduction + fighter_reduction + mystic_reduction,
+            reduction + fighter_reduction + mystic_reduction
+                + guard_bonus,
             0, 0.50
         )
     elseif defender and context.source_kind == "EnemyMagic" then
