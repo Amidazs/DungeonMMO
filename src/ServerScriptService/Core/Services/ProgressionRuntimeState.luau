@@ -552,6 +552,24 @@ function ProgressionRuntimeState.get_mystic_magic_reduction(
 end
 
 --[[
+Returns bounded real physical mitigation from a purchased starting-class
+protection rank, ending automatically at first-transfer level 20.
+
+Args:
+    user_id (number): Server-authoritative character owner.
+
+Returns:
+    number: Actual novice physical damage reduction, zero to two percent.
+]]
+function ProgressionRuntimeState.get_novice_physical_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.novice_physical_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns the accepted Spirit-based healing multiplier unchanged by 2C.C gear.
 
 Args:
