@@ -8,6 +8,10 @@ local InMemoryProfileAdapter = require(Adapters:WaitForChild("InMemoryProfileAda
 local ProfileService = require(Services:WaitForChild("ProfileService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local ProfessionService = require(Services:WaitForChild("ProfessionService"))
+local MarketService = require(Services:WaitForChild("MarketService"))
+local EntityAdapter = require(
+    Adapters:WaitForChild("InMemoryEntityAdapter")
+)
 
 local assertions = 0
 local function check(condition: boolean, message: string)
@@ -19,8 +23,17 @@ end
 
 local profiles = ProfileService.new(InMemoryProfileAdapter.new())
 assert(profiles:load(4101))
+assert(profiles:load(4102))
 local inventory = InventoryService.new(profiles)
 local professions = ProfessionService.new(profiles, inventory)
+check(professions:choose_profession(4101, "Mining").ok,
+    "The smith must select its one gathering career.")
+check(professions:choose_profession(4101, "Blacksmithing").ok,
+    "The smith must select its one crafting career.")
+check(professions:choose_profession(4102, "Herbalism").ok,
+    "The second player gathers Alchemy's herbs.")
+check(professions:choose_profession(4102, "Alchemy").ok,
+    "The second player, not the smith, makes Tempering Oil.")
 
 local no_materials = professions:prepare_craft(4101, "smelt_iron_bar")
 check(no_materials.ok == false and no_materials.reason == "MissingMaterials", "Prepare must fail cleanly without materials.")
@@ -99,7 +112,7 @@ local after_failed_temper = assert(profiles:get_character(4101, 1))
 check(InventoryService.count_item(after_failed_temper, "ironbound_gloves") == basic_before, "Rejected craft must preserve input equipment atomically.")
 
 for _ = 1, 3 do
-    local herb = professions:gather(4101, {
+    local herb = professions:gather(4102, {
         ProfessionId = "Herbalism",
         ItemId = "silverleaf",
         Quantity = 1,
@@ -107,14 +120,33 @@ for _ = 1, 3 do
     })
     check(herb.ok == true, "Herbalism gather must succeed.")
 end
-local oil_prepare = professions:prepare_craft(4101, "distill_tempering_oil")
+local oil_prepare = professions:prepare_craft(4102, "distill_tempering_oil")
 check(oil_prepare.ok == true and oil_prepare.minigame_id == "AlchemyBrewing", "Alchemy prepare must identify the brewing minigame hook.")
 local oil = professions:complete_craft(
-    4101,
+    4102,
     "distill_tempering_oil",
     ProfessionService.foundation_success_outcome(oil_prepare.minigame_id)
 )
 check(oil.ok == true, "Alchemy must create Tempering Oil from gathered Silverleaf.")
+
+-- The smith cannot use the Alchemy station; purchase the oil through
+-- the existing market escrow and buyer-gold authority instead.
+check(profiles:mutate(4101, function(profile: any)
+    profile.Characters.Slot1.Gold = 500
+end), "Market buyer has disposable test gold.")
+local market = MarketService.new(
+    EntityAdapter.new(), profiles, function(): number return 1000 end,
+    function(): string return "profession-service-oil-listing" end
+)
+local listing = market:create_listing(
+    4102, "tempering_oil", 1, 100, "oil-listing"
+)
+check(listing.ok, "Alchemist lists one tradeable Tempering Oil.")
+check(market:buy(
+    4101, listing.listing.ListingId, "oil-purchase"
+).ok, "Smith purchases rather than crafts a second profession's oil.")
+check(not professions:can_use(4101, "Alchemy"),
+    "Market ownership of Alchemy materials must not unlock Alchemy.")
 
 -- Add one bar for the tempered recipe; the basic gloves and oil already exist.
 assert(inventory:add_item(4101, "iron_bar", 1).ok)
