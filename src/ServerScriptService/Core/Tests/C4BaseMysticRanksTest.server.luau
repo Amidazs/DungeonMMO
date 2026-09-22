@@ -14,6 +14,7 @@ local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
 local assertions = 0
 local WIND_LEVELS = {7, 7, 14, 14}
+local FROST_LEVELS = {7, 7, 14, 14}
 local HEAL_LEVELS = {7, 7, 7, 14, 14, 14}
 
 --[[
@@ -96,8 +97,13 @@ local function check_family(
         check(definition.RankLevels[rank] == level,
             skill_id .. " has a mismatched rank training bracket")
         local effect = assert(Combat.get_for_rank(skill_id, rank))
-        local magnitude = if skill_id == "MysticWindBolt"
-            then effect.BASE_DAMAGE else effect.TOTAL_HEAL
+        local magnitude = if skill_id == "MysticHealingPrayer"
+            then effect.TOTAL_HEAL else effect.BASE_DAMAGE
+        if skill_id == "MysticFrostBolt" then
+            check(effect.MAGIC_SLOW_FRACTION > 0
+                and effect.MAGIC_SLOW_SECONDS > 0,
+                "Frost Bolt must deliver genuine timed movement slow")
+        end
         check(magnitude > previous_magnitude and effect.MANA_COST > 0,
             skill_id .. " rank lacks a genuine increasing effect")
         previous_magnitude = magnitude
@@ -127,6 +133,9 @@ check_family(
 )
 check_family(
     "MysticHealingPrayer", "MageHeal", HEAL_LEVELS, "Elf", 77662
+)
+check_family(
+    "MysticFrostBolt", "WindStrike", FROST_LEVELS, "Human", 77663
 )
 
 print(("[C4 Base Mystic Ranks] PASS: %d assertions.")
