@@ -1072,6 +1072,31 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- First-transfer source evasion ranks at levels 24 and 28.
+    -- Only incoming direct enemy melee attacks can be evaded.
+    ScoutEvasion = table.freeze({
+        Id = "ScoutEvasion",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24}),
+        EvasionChancePerRank = 0.03,
+        WeaponTags = table.freeze({}),
+    }),
+    ScoutRunningEvasion = table.freeze({
+        Id = "ScoutRunningEvasion",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 28}),
+        EvasionChancePerRank = 0.025,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
