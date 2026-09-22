@@ -1527,7 +1527,21 @@ end
 
 local function claim_published_handoff(player: Player, session: any): (boolean, string?)
     local nonce = sessions:get_handoff_nonce(session.SessionId, player.UserId)
-    if not nonce then return false, "MissingHandoffNonce" end
+    if not nonce then
+        -- A fresh Base -> Dungeon handoff always needs its one-time
+        -- nonce. Only this already-bound server can readmit a genuine
+        -- departed member whose initial handoff was previously claimed.
+        -- ProfileService:load independently reacquires the writer lease.
+        local reconnect = DungeonAdmissionRules.same_server_reconnect(
+            session,
+            player.UserId,
+            active_session_id
+        )
+        if reconnect.ok then
+            return true, nil
+        end
+        return false, "MissingHandoffNonce"
+    end
     local claimed = leases:claim_handoff(player.UserId, nonce)
     if not claimed.ok then return false, claimed.reason end
     sessions:clear_handoff_nonce(session.SessionId, player.UserId)
