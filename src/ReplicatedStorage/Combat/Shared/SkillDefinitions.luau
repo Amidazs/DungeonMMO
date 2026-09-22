@@ -546,6 +546,33 @@ local DISRUPTING_CUT = specialize_skill(
     }
 )
 
+-- C4-inspired level-36 bow stun: unlike Briar Volley it targets one
+-- enemy and invokes the existing authoritative stagger executor.
+local THUNDER_SHOT = specialize_skill(
+    CRIPPLING_SHOT, "ThunderShot", "Thunder Shot", {
+        STAMINA_COST = 26,
+        COOLDOWN_SECONDS = 9.0,
+        MAX_TARGETS = 1,
+        BASE_DAMAGE = 19,
+        HUMAN_SLOW_FRACTION = 0,
+        ELF_SLOW_FRACTION = 0,
+        HUMAN_SLOW_SECONDS = 0,
+        ELF_SLOW_SECONDS = 0,
+        STAGGER_SECONDS = 0.35,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 19, STAGGER_SECONDS = 0.35,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 22, STAGGER_SECONDS = 0.50,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 25, STAGGER_SECONDS = 0.70,
+            }),
+        }),
+    }
+)
+
 -- Nine effective sword strikes spanning the first three Fighter brackets.
 local IRON_CLEAVE = specialize_skill(
     ARC_SLASH, "IronCleave", "Iron Cleave", {
@@ -742,6 +769,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
     BriarVolley = BRIAR_VOLLEY,
+    ThunderShot = THUNDER_SHOT,
     ArcherDraw = ARCHER_DRAW,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
     DisruptingCut = DISRUPTING_CUT,
