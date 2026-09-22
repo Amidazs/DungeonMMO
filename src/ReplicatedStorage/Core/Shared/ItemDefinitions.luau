@@ -134,6 +134,17 @@ local DEFINITIONS = table.freeze({
         TestOnly = true,
     }),
 
+    worldroot_relic = table.freeze({
+        Id = "worldroot_relic",
+        Name = "Worldroot Relic",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Uncommon",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     iron_ore = table.freeze({
         Id = "iron_ore",
         Name = "Iron Ore",
