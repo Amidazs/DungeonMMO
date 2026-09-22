@@ -63,8 +63,14 @@ function DamageService.apply_damage(context: DamageContext): number
     if defender and context.source_kind == "EnemyMelee" then
         local moving = humanoid.MoveDirection.Magnitude > 0.1
             and humanoid.WalkSpeed > 0
-        local evasion = ProgressionRuntimeState
+        local passive_evasion = ProgressionRuntimeState
             .get_scout_evasion_chance(defender.UserId, moving)
+        local active_evasion = CombatStatusService.get(
+            context.target, "Evasion"
+        )
+        local evasion = math.clamp(
+            passive_evasion + active_evasion, 0, 0.40
+        )
         if evasion > 0 and critical_random:NextNumber() < evasion then
             CombatValidationService.emit(
                 defender, "DAMAGE", "EVADED",
