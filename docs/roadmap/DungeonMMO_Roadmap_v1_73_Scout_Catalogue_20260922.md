@@ -20,19 +20,22 @@ Working branch: `wip/phase-4-test-hud-integration-v1`
   ranks at their distinct source levels 28/32, and both Scout class
   movement passives at level 28; actual physical critical-hit damage,
   critical chance and server Humanoid speed are changed by purchases.
-- [x] Source audit counts: Human **74/99 functional analogues,
-  25 missing**; Elf **102/129 functional analogues, 27 missing**.
+- [x] Human level-36 Scout Rapid Hands now increases the actual
+  server basic attack rate by 6%, shortening real basic-attack
+  wind-up/active/recovery; Human-only race/level/trainer gates PASS.
+- [x] Source audit counts: Human **75/99 functional analogues,
+  24 missing**; Elf **102/129 functional analogues, 27 missing**.
   Missing family names and counts are surfaced by `MissingFamilies`
   and tested; do not mark this catalogue complete while nonzero.
-- [x] Unpublished Studio focused tests: 241 passive assertions;
-  1065 source/functional inventory assertions; 38 trainer and
+- [x] Unpublished Studio focused tests: 254 passive assertions;
+  1066 source/functional inventory assertions; 38 trainer and
   save/reload assertions; actual Play client authenticated eight
   skill effects, light armour, human critical damage and Scout
   movement speed.
 
 ## Still open — C4 catalogue completion criteria
 
-- [ ] Human Rogue: 25 source rank entries across 14 remaining
+- [ ] Human Rogue: 24 source rank entries across 14 remaining
   families (including continuous-MP critical/accuracy toggles,
   lockpicking/keys, common item creation, environmental/underwater
   and fall abilities, and real evasion and recovery mechanics).
