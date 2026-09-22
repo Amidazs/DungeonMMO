@@ -108,6 +108,44 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
         WeaponTags = table.freeze({}),
     }),
+    IronCleave = table.freeze({
+        Id = "IronCleave",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+            [7] = 15, [8] = 15, [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 20, [3] = 50, [4] = 90,
+            [5] = 130, [6] = 180, [7] = 230,
+            [8] = 290, [9] = 350,
+        }),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+
+    PursuitStep = table.freeze({
+        Id = "PursuitStep",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Mobility",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+            [7] = 15, [8] = 15, [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 20, [3] = 50, [4] = 90,
+            [5] = 130, [6] = 180, [7] = 230,
+            [8] = 290, [9] = 350,
+        }),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+
     AetherBolt = table.freeze({
         Id = "AetherBolt",
         Tier = "Common",
