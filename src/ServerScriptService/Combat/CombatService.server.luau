@@ -1865,6 +1865,21 @@ local function apply_rogue_melee_target(
         target:SetAttribute("RogueExposeUntil", os.clock() + expose_seconds)
     end
 
+    local stagger_seconds = tonumber(
+        skill_definition.STAGGER_SECONDS
+    ) or 0
+    if stagger_seconds > 0 then
+        local target_humanoid = target:FindFirstChildOfClass("Humanoid")
+        if target_humanoid and target_humanoid.Health > 0 then
+            local already_staggered = StaggerService.is_staggered(target)
+            StaggerService.apply(target, stagger_seconds)
+            DungeonProgressionBridge.award_control(
+                player, skill_definition.ID, target,
+                "Stagger", not already_staggered
+            )
+        end
+    end
+
     DungeonProgressionBridge.award_damage(
         player,
         skill_definition.ID,
