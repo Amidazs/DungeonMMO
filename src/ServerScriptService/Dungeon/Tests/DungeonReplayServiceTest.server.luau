@@ -235,6 +235,87 @@ check(
     "Both participants can explicitly consent to a second attempt."
 )
 
+-- A replay is a NEW entry: every connected member must retain
+-- the selected difficulty unlock, including when Studio simulates
+-- reservation. One leader's progress never carries the others.
+session.State = "Failed"
+session.Members["102"].Connected = true
+local unlocked = {[101] = true, [102] = false}
+local checked = {}
+local gated_replay = ReplayService.new(sessions, coordinator, {
+    is_studio = true,
+    destination_place_id = 245,
+    is_player_ready = function(_player: any): boolean
+        return true
+    end,
+    validate_member = function(
+        member: any,
+        dungeon_id: string,
+        difficulty_id: string
+    ): any
+        table.insert(checked, member.UserId)
+        check(
+            dungeon_id == "TestDungeon"
+                and difficulty_id == "Depth2",
+            "Replay must validate the original dungeon and difficulty."
+        )
+        return {
+            ok = unlocked[member.UserId] == true,
+            reason = if unlocked[member.UserId] == true
+                then nil else "DifficultyLocked",
+        }
+    end,
+})
+local locked_replay = gated_replay:request(
+    session.SessionId, tank, {tank, healer}
+)
+check(
+    locked_replay.reason == "DifficultyLocked"
+        and locked_replay.MemberUserId == 102
+        and locked_replay.votes_reset == true
+        and starts == 3,
+    "An unqualified party member must block replay before voting or launch."
+)
+check(
+    #checked == 2,
+    "Replay must check both the leader and the other party member."
+)
+unlocked[102] = true
+check(
+    gated_replay:request(
+        session.SessionId, tank, {tank, healer}
+    ).waiting == 1,
+    "After unlocking, every member must still consent individually."
+)
+check(
+    gated_replay:request(
+        session.SessionId, healer, {tank, healer}
+    ).simulated == true and starts == 3,
+    "All eligible and consenting members may replay in Studio."
+)
+unlocked[101] = false
+local leader_locked = ReplayService.new(
+    sessions, coordinator, {
+        is_studio = true,
+        destination_place_id = 245,
+        is_player_ready = function(_player: any): boolean
+            return true
+        end,
+        validate_member = function(member: any): any
+            return {
+                ok = unlocked[member.UserId] == true,
+                reason = "DifficultyLocked",
+            }
+        end,
+    }
+)
+check(
+    leader_locked:request(
+        session.SessionId, healer, {tank, healer}
+    ).MemberUserId == 101,
+    "The party leader cannot replay a depth that they have not unlocked."
+)
+
 print(string.format(
     "[Dungeon Replay Tests] PASS: %d assertions.", assertions
 ))
