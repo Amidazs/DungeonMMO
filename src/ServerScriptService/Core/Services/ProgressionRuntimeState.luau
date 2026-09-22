@@ -438,6 +438,23 @@ function ProgressionRuntimeState.get_ranged_arrow_speed_bonus(
 end
 
 --[[
+Returns the real movement multiplier earned by a Scout character.
+
+Args:
+    user_id (number): Server-authenticated character identity.
+
+Returns:
+    number: Movement multiplier, bounded to 1 through 1.06.
+]]
+function ProgressionRuntimeState.get_movement_multiplier(
+    user_id: number
+): number
+    return PassiveSkillEffects.movement_multiplier(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns the passive mitigation earned by a character wearing light
 Body armour. This is a server-side defense against physical NPC hits.
 
