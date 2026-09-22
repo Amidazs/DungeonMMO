@@ -334,6 +334,29 @@ local DEFINITIONS = table.freeze({
         }),
         WeaponTags = table.freeze({"Longbow"}),
     }),
+    -- The C4 first-transfer Rogue/Scout line adds Bleed at 24/32.
+    -- This original analogue requires fully trained early dagger/bleed
+    -- foundations; only confirmed NPC hits may start its damage-over-time.
+    LaceratingCut = table.freeze({
+        Id = "LaceratingCut",
+        Tier = "Rare",
+        MaxRank = 2,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 32}),
+        RankThresholds = table.freeze({[2] = 120}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "RogueVitalBlow", Rank = 9,
+                Proficiency = 350,
+            }),
+            table.freeze({
+                SkillId = "DisruptingCut", Rank = 3,
+                Proficiency = 110,
+            }),
+        }),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
     DisruptingCut = table.freeze({
         Id = "DisruptingCut",
         Tier = "Common",
