@@ -65,6 +65,8 @@ local DEFINITIONS = table.freeze({
             "RangerBowMastery",
             "ScoutBowDiscipline",
             "ScoutLightArmorMastery",
+            "ElvenRenewal",
+            "ElvenCalmingShot",
         }),
     }),
 
@@ -94,6 +96,7 @@ local DEFINITIONS = table.freeze({
             "RogueBladeMastery",
             "RogueEdgeDiscipline",
             "ScoutLightArmorMastery",
+            "ElvenRenewal",
         }),
     }),
 })
