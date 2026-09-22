@@ -98,7 +98,7 @@ local function seed_character(path: any)
     assert(profiles:load(path.UserId), "Test profile must load.")
     local ok = profiles:mutate(path.UserId, function(profile: any)
         local character = profile.Characters.Slot1
-        character.Level = 20
+        character.Level = 32
         character.Identity = {
             Version = 1,
             RaceId = path.RaceId,
@@ -107,6 +107,24 @@ local function seed_character(path: any)
             CreationStage = "Complete",
         }
         character.Progression.SkillPointEntitlement = 60
+        local basic_id = if path.BaseClassId == "Fighter"
+            then "GuardBreaker" else "TrackerShot"
+        local core_id = if path.BaseClassId == "Fighter"
+            then "ShieldBash" else "PiercingShot"
+        local proficiency = if path.BaseClassId == "Fighter"
+            then 400 else 300
+        character.Progression.Skills[basic_id] = {
+            Known = true,
+            StarterGranted = false,
+            PurchasedRank = 3,
+            Proficiency = 300,
+        }
+        character.Progression.Skills[core_id] = {
+            Known = true,
+            StarterGranted = true,
+            PurchasedRank = 3,
+            Proficiency = proficiency,
+        }
         if path.BaseClassId == "Ranger" then
             character.Equipment.Weapon = "apprentice_longbow"
         end
