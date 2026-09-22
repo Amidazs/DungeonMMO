@@ -107,6 +107,54 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Source C4 Mystic Wind Strike continuation: two ranks at 7,
+    -- two at 14; the base WindStrike remains the level-one starter.
+    MysticWindBolt = table.freeze({
+        Id = "MysticWindBolt",
+        Tier = "Common",
+        MaxRank = 4,
+        Kind = "Magic",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 14, [4] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 100, [4] = 160,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "WindStrike", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
+    -- Source C4 Mystic level-7/14 healing ranks, while the level-one
+    -- MageHeal starter remains a distinct earlier self-heal analogue.
+    MysticHealingPrayer = table.freeze({
+        Id = "MysticHealingPrayer",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 7,
+            [4] = 14, [5] = 14, [6] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 130,
+            [5] = 190, [6] = 260,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MageHeal", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- L2 C4-inspired rank milestones: skills are taught at the
     -- trainer only after the character earns each level bracket.
     GuardBreaker = table.freeze({
