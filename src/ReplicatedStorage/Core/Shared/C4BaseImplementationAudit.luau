@@ -41,6 +41,18 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        PhysicalMagicAttackMastery = table.freeze({
+            [7] = "MysticWeaponTraining",
+            [14] = "MysticWeaponTraining",
+        }),
+        ArmorMastery = table.freeze({
+            [7] = "MysticArmorTraining",
+            [14] = "MysticArmorTraining",
+        }),
+        MagicDefenseMastery = table.freeze({
+            [7] = "MysticSpellResistance",
+            [14] = "MysticSpellResistance",
+        }),
         WindAttack = table.freeze({
             [1] = "WindStrike",
             [7] = "MysticWindBolt",
@@ -81,6 +93,7 @@ local function executable_ranks_at_level(
             local heal = effect and effect.TOTAL_HEAL or 0
             local passive = definition.DamageBonusPerRank
                 or definition.PhysicalReductionPerRank
+                or definition.MagicReductionPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
                 or (definition.Kind == "Passive"
