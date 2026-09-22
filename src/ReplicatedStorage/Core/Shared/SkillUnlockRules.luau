@@ -95,6 +95,20 @@ function SkillUnlockRules.can_train(
         end
     end
 
+    local allowed_races = definition.AllowedRaces
+    if type(allowed_races) == "table" then
+        local correct_race = false
+        for _, race_id in ipairs(allowed_races) do
+            if identity.RaceId == race_id then
+                correct_race = true
+                break
+            end
+        end
+        if not correct_race then
+            return false, "WrongRace", nil
+        end
+    end
+
     local advanced = definition.AllowedAdvancedClasses
     if type(advanced) == "table" then
         local owned = character.ClassAdvancement
