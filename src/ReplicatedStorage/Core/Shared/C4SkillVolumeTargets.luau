@@ -26,7 +26,7 @@ local TARGETS = table.freeze({
             SourceClass = "Elven Fighter",
             SourceUrl = "https://l2hub.info/c4/classes/elven_fighter",
             Levels = table.freeze({
-                [1] = 2, [5] = 13, [10] = 13, [15] = 12,
+                [1] = 2, [5] = 13, [10] = 13, [15] = 15,
             }),
         }),
         Mage = table.freeze({
