@@ -8,7 +8,8 @@
   Fighter physical/armour 72 focused assertions PASS
   during prior backend increments.
 - [x] New Mage robe casting/mana/basic-speed 38; novice
-  level-one/expiry/foreign-class 36; source first-transfer
+  level-one/expiry/foreign-class 36; real isolated
+  trainer purchase/save/reload 32; source first-transfer
   branch enumeration 44 focused Studio assertions PASS.
 - [x] Latest source-to-actual-effect audit 63 assertions PASS:
   Human Fighter 36/39; Elf Fighter 41/43; Human Mystic
