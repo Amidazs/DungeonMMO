@@ -1416,7 +1416,7 @@ local function validate_buff(definition: BuffSkillDefinition)
     assert(
         definition.BUFF_KIND == "PhysicalPower"
             or definition.BUFF_KIND == "PhysicalGuard"
-            or definition.BUFF_KIND == "MagicPower",
+            or definition.BUFF_KIND == "MagicPower"
             or definition.BUFF_KIND == "Evasion",
         "Unknown authoritative combat buff kind."
     )
