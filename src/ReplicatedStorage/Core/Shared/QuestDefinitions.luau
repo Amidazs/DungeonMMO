@@ -5,6 +5,40 @@ local CharacterIdentityRules = require(script.Parent.CharacterIdentityRules)
 local QuestDefinitions = {}
 
 local DEFINITIONS = table.freeze({
+    FighterAdvancementTrial = table.freeze({
+        Id = "FighterAdvancementTrial",
+        DisplayName = "Trial of the Vanguard",
+        Kind = "ClassAdvancement",
+        MinimumLevel = 20,
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearTemple",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+                Required = 1,
+            }),
+        }),
+    }),
+
+    RangerAdvancementTrial = table.freeze({
+        Id = "RangerAdvancementTrial",
+        DisplayName = "Trial of the Far Path",
+        Kind = "ClassAdvancement",
+        MinimumLevel = 20,
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearAbandonedMine",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+                Required = 1,
+            }),
+        }),
+    }),
+
     MageAdvancementTrial = table.freeze({
         Id = "MageAdvancementTrial",
         DisplayName = "Mage Advancement Trial",
