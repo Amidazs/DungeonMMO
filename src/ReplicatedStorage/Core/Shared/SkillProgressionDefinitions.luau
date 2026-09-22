@@ -97,12 +97,61 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- L2 C4-inspired rank milestones: skills are taught at the
+    -- trainer only after the character earns each level bracket.
+    GuardBreaker = table.freeze({
+        Id = "GuardBreaker",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+    AetherBolt = table.freeze({
+        Id = "AetherBolt",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Magic",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+    TrackerShot = table.freeze({
+        Id = "TrackerShot",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    ViperStrike = table.freeze({
+        Id = "ViperStrike",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+
     -- Advanced skill purchase and combat use require the same
     -- persisted, race-specific advanced class, not just a base class.
     VanguardChallenge = table.freeze({
         Id = "VanguardChallenge",
         Tier = "Rare",
         MaxRank = 3,
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "GuardBreaker", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "ShieldBash", Rank = 3,
+                Proficiency = 400,
+            }),
+        }),
         Kind = "Control",
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedAdvancedClasses = table.freeze({"HumanVanguard"}),
@@ -112,6 +161,16 @@ local DEFINITIONS = table.freeze({
         Id = "ThornwardenBash",
         Tier = "Rare",
         MaxRank = 3,
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "GuardBreaker", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "ShieldBash", Rank = 3,
+                Proficiency = 400,
+            }),
+        }),
         Kind = "Physical",
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedAdvancedClasses = table.freeze({"ElfThornwarden"}),
@@ -121,6 +180,16 @@ local DEFINITIONS = table.freeze({
         Id = "SharpshooterPierce",
         Tier = "Rare",
         MaxRank = 3,
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "TrackerShot", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "PiercingShot", Rank = 3,
+                Proficiency = 300,
+            }),
+        }),
         Kind = "Physical",
         AllowedBaseClasses = table.freeze({"Ranger"}),
         AllowedAdvancedClasses = table.freeze({"HumanSharpshooter"}),
@@ -130,6 +199,16 @@ local DEFINITIONS = table.freeze({
         Id = "WindrunnerVolley",
         Tier = "Rare",
         MaxRank = 3,
+        RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "TrackerShot", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "PiercingShot", Rank = 3,
+                Proficiency = 300,
+            }),
+        }),
         Kind = "Physical",
         AllowedBaseClasses = table.freeze({"Ranger"}),
         AllowedAdvancedClasses = table.freeze({"ElfWindrunner"}),
