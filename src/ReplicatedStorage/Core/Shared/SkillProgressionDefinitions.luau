@@ -313,6 +313,27 @@ local DEFINITIONS = table.freeze({
         RankThresholds = table.freeze({[2] = 40, [3] = 110}),
         WeaponTags = table.freeze({"Longbow"}),
     }),
+    -- C4 Rogue/Scout gain stun-capable bow attacks in their level-36
+    -- bracket. The new ability needs the completed basic bow line and
+    -- our earlier control arrow before it becomes visible or trainable.
+    ThunderShot = table.freeze({
+        Id = "ThunderShot",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 36, [2] = 36, [3] = 36}),
+        RankThresholds = table.freeze({[2] = 50, [3] = 125}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "ArcherDraw", Rank = 9, Proficiency = 350,
+            }),
+            table.freeze({
+                SkillId = "BriarVolley", Rank = 3, Proficiency = 110,
+            }),
+        }),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
     DisruptingCut = table.freeze({
         Id = "DisruptingCut",
         Tier = "Common",
