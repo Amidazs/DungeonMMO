@@ -421,6 +421,114 @@ local function check_light_armor(player)
     print("[C4 Control Client] LIGHT_ARMOR_REAL_DAMAGE_PASS")
 end
 
+--[[
+Verifies a bought level-28 passive changes actual server Humanoid speed
+after a real client-triggered combat-state transition.
+
+Args:
+    player (Player): Disposable live Studio client.
+    target (Model): Existing server-owned training dummy.
+
+Returns:
+    nil: Rejects metadata-only movement and locked-state bypasses.
+]]
+local function check_scout_movement(player, target)
+    local humanoid = assert(
+        player.Character:FindFirstChildOfClass("Humanoid")
+    )
+    local character = Schema.create_default(player.UserId)
+        .Characters.Slot1
+    character.Identity.RaceId = "Human"
+    character.Identity.BaseClassId = "Ranger"
+    character.Identity.ClassId = "Ranger"
+    character.Identity.CreationStage = "Complete"
+    character.Level = 28
+    character.Equipment.Weapon = "apprentice_longbow"
+    character.Progression.Skills.PiercingShot = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
+    character.Progression.Loadout[1] = "PiercingShot"
+    Runtime.set_character(player.UserId, character)
+    position(player, target, {class = "Ranger"})
+    local baseline = wait_for(function()
+        return humanoid.WalkSpeed >= 15 and humanoid.WalkSpeed
+    end, "untrained live player locomotion", 5)
+    character.Progression.Skills.ScoutFleetFoot = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
+    Runtime.set_character(player.UserId, character)
+
+    local stamina = require(SSS.Combat.StaminaService)
+    stamina.reset_player(player)
+    receipts[player.UserId] = nil
+    channel:FireClient(player, "LOAD", "PiercingShot")
+    await_receipt(player, "LOADED", "PiercingShot")
+    receipts[player.UserId] = nil
+    channel:FireClient(player, "CAST", "PiercingShot")
+    local receipt = await_receipt(player, "CAST", "PiercingShot")
+    assert(receipt.sent == true,
+        "Movement test skill was not issued through live input")
+    local boosted = wait_for(function()
+        local speed = humanoid.WalkSpeed
+        return speed > baseline + 0.5 and speed
+    end, "earned speed applied to real Humanoid", 8)
+    assert(math.abs(boosted - baseline * 1.06) < 0.15,
+        "Scout passive speed is not the authored six-percent increase")
+    print("[C4 Control Client] SCOUT_REAL_MOVEMENT_SPEED_PASS")
+end
+
+--[[
+Checks that bought Human critical-power ranks change real guaranteed-hit
+damage on an actual tagged NPC, rather than merely changing UI metadata.
+
+Args:
+    player (Player): Disposable server-owned attacker identity.
+    target (Model): Living tagged NPC used for hit resolution.
+
+Returns:
+    nil: Confirms full rank-two critical damage exceeds untrained damage.
+]]
+local function check_scout_critical_damage(player, target)
+    local character = Schema.create_default(player.UserId)
+        .Characters.Slot1
+    character.Identity.RaceId = "Human"
+    character.Identity.BaseClassId = "Rogue"
+    character.Identity.ClassId = "Rogue"
+    character.Identity.CreationStage = "Complete"
+    character.Level = 32
+    character.Equipment.Weapon = "scout_dagger"
+    Runtime.set_character(player.UserId, character)
+    local humanoid = assert(target:FindFirstChildOfClass("Humanoid"))
+    humanoid.MaxHealth = 1000
+    humanoid.Health = 1000
+
+    local function apply_critical()
+        return DamageService.apply_damage({
+            attacker = nil,
+            attacker_character = player.Character,
+            target = target,
+            source_kind = "Melee",
+            source_id = "C4ScoutCriticalFocus",
+            base_damage = 20,
+            multiplier = 1,
+            critical_chance = 1,
+            critical_damage_multiplier = Runtime
+                .get_critical_damage_multiplier(player.UserId),
+            critical_roll = 0,
+        })
+    end
+
+    local baseline = apply_critical()
+    character.Progression.Skills.HumanScoutCriticalPower = {
+        Known = true, PurchasedRank = 2, Proficiency = 0,
+    }
+    Runtime.set_character(player.UserId, character)
+    local trained = apply_critical()
+    assert(math.abs(trained - baseline - 3.2) < 0.01,
+        "Two bought critical-power ranks must add 3.2 hit damage")
+    print("[C4 Control Client] HUMAN_CRIT_REAL_DAMAGE_PASS")
+end
+
 -- Args: None.
 -- Returns: nil: Runs the targeted sequential client combat contract.
 local function run()
@@ -444,6 +552,8 @@ local function run()
         check_skill(player, dummy, case)
     end
     check_light_armor(player)
+    check_scout_movement(player, dummy)
+    check_scout_critical_damage(player, dummy)
     print("[C4 Control Client] ALL_EIGHT_C4_SKILL_EFFECTS_PASS")
 end
 
