@@ -160,8 +160,80 @@ local function count_item(item_id: string): number
     return math.max(0, math.floor(tonumber(latest.Inventory[item_id]) or 0))
 end
 
+--[[
+Shows a one-time choice for each of the two profession categories.
+
+Args:
+    slots (any): Server-returned gathering and crafting selections.
+
+Returns:
+    nil: Renders only still-available choices; server authorizes clicks.
+]]
+local function render_choices(slots: any)
+    title.Text = "Choose Your Professions"
+    progress.Text = "  One gathering + one crafting profession per character."
+    status.Text = "Your choices are permanent for now. Trade for other goods."
+    clear_rows()
+
+    for _, kind in {"Gathering", "Creation"} do
+        local selected = slots[kind]
+        for _, profession_id in ipairs(ProfessionDefinitions.order()) do
+            local definition = ProfessionDefinitions.get(profession_id)
+            if definition and definition.Kind == kind then
+                local row = Instance.new("TextButton")
+                row.Size = UDim2.new(1, -12, 0, 52)
+                row.BackgroundColor3 = Color3.fromRGB(37, 41, 45)
+                row.TextColor3 = Color3.fromRGB(244, 238, 220)
+                row.TextScaled = false
+                row.TextSize = 20
+                row.Text = string.format(
+                    "%s: %s%s", kind, definition.Name,
+                    if selected ~= "" then
+                        (if selected == profession_id
+                            then " (selected)" else " (unavailable)")
+                    else " (choose)"
+                )
+                row.Active = selected == ""
+                row.AutoButtonColor = selected == ""
+                row.Parent = recipe_container
+                if selected == "" then
+                    row.MouseButton1Click:Connect(function()
+                        status.Text = "Choosing " .. definition.Name .. "..."
+                        profession_snapshot:FireServer({
+                            Action = "ChooseProfession",
+                            ProfessionId = profession_id,
+                        })
+                    end)
+                end
+            end
+        end
+    end
+    task.defer(function()
+        recipe_container.CanvasSize = UDim2.fromOffset(
+            0, layout.AbsoluteContentSize.Y + 8
+        )
+    end)
+end
+
+--[[
+Renders selected profession progress or the mandatory selection view.
+
+Args:
+    None.
+
+Returns:
+    nil: Updates only this existing, closable profession window.
+]]
 local function render()
-    if not station_id or not latest or latest.ok ~= true then
+    if not latest or latest.ok ~= true then
+        return
+    end
+    local slots = latest.ProfessionSlots or {}
+    if slots.Gathering == "" or slots.Creation == "" then
+        render_choices(slots)
+        return
+    end
+    if not station_id then
         return
     end
 
@@ -189,6 +261,13 @@ local function render()
 
     clear_rows()
     local recipes = ProfessionRecipes.for_station(station_id)
+    if slots.Creation ~= station_id then
+        status.Text = "You chose " .. profession_name(slots.Creation)
+            .. ". Trade with a " .. profession_name(station_id)
+            .. " crafter for these goods."
+    else
+        status.Text = "Server-authoritative crafting"
+    end
 
     for _, recipe in ipairs(recipes) do
         local row = Instance.new("Frame")
@@ -244,7 +323,12 @@ local function render()
         button.Parent = row
 
         local unlocked = level >= recipe.RequiredLevel
-        if not unlocked then
+            and slots.Creation == recipe.ProfessionId
+        if slots.Creation ~= recipe.ProfessionId then
+            button.Text = "Not Your Craft"
+            button.Active = false
+            button.AutoButtonColor = false
+        elseif not unlocked then
             button.Text = "Level " .. tostring(recipe.RequiredLevel)
             button.Active = false
             button.AutoButtonColor = false
@@ -285,6 +369,14 @@ end)
 profession_snapshot.OnClientEvent:Connect(function(payload: any)
     if type(payload) == "table" and payload.ok == true then
         latest = payload
+        local slots = latest.ProfessionSlots or {}
+        local needs_choice = slots.Gathering == ""
+            or slots.Creation == ""
+        if needs_choice then
+            panel.Visible = true
+        elseif not station_id then
+            panel.Visible = false
+        end
         if panel.Visible then
             render()
         end
@@ -293,6 +385,18 @@ end)
 
 action_result.OnClientEvent:Connect(function(payload: any)
     if type(payload) ~= "table" then
+        return
+    end
+
+    if payload.action == "ChooseProfession" then
+        if payload.ok == true then
+            show_toast(
+                profession_name(payload.profession_id)
+                    .. " selected. Other professions require trading."
+            )
+        else
+            show_toast(tostring(payload.reason or "ChoiceRejected"))
+        end
         return
     end
 
@@ -328,6 +432,8 @@ action_result.OnClientEvent:Connect(function(payload: any)
             reason = "Not enough materials"
         elseif reason == "ProfessionLevelTooLow" then
             reason = "Profession level is too low"
+        elseif reason == "ProfessionNotSelected" then
+            reason = "This is not your selected profession. Trade for its goods."
         elseif reason == "NotAtRequiredStation" then
             reason = "Move closer to the required station"
         elseif reason == "IngredientEquipped" then
