@@ -309,4 +309,56 @@ check(
     "An exhausted party must still enter the terminal revive decision."
 )
 
+-- Reconnection must rehydrate the authoritative revive mode rather
+-- than treating a freshly loaded character as a new free life.
+local returning_member = session.Members["101"]
+local returning_player = {UserId = 101, Name = "Returning"}
+local reconnect_states = {}
+local reconnect_deaths = DungeonDeathService.new(
+    fake_sessions, fake_checkpoint, "session-recoverable-wipe", {
+        emit_state = function(_user_id: number, payload: any)
+            table.insert(reconnect_states, payload)
+        end,
+        paid_offer_provider = function(_user_id: number)
+            return {price = 9, paid_number = 1}
+        end,
+    }
+)
+local spectator_sync = reconnect_deaths:send_member_state(returning_player)
+check(
+    spectator_sync.ok == true
+        and reconnect_states[#reconnect_states].member_mode
+            == "Spectating"
+        and reconnect_states[#reconnect_states].free_available == false,
+    "A returning spectator must retain their exhausted free revive."
+)
+returning_member.Connected = false
+local emitted_before_departure = #reconnect_states
+local refused_sync = reconnect_deaths:send_member_state(returning_player)
+check(
+    refused_sync.ok == false
+        and refused_sync.reason == "MemberNotConnected"
+        and #reconnect_states == emitted_before_departure,
+    "A departed member cannot receive another revive-state payload."
+)
+returning_member.Connected = true
+returning_member.Mode = "Active"
+check(
+    reconnect_deaths:send_member_state(returning_player).ok
+        and reconnect_states[#reconnect_states].member_mode == "Active"
+        and reconnect_states[#reconnect_states].free_available == false,
+    "Re-admission must restore Active mode without a second free revive."
+)
+returning_member.Mode = "Reviving"
+check(
+    reconnect_deaths:send_member_state(returning_player).ok
+        and reconnect_states[#reconnect_states].member_mode == "Reviving",
+    "The authoritative revive countdown state must be presented."
+)
+session.Members["101"] = nil
+check(
+    reconnect_deaths:send_member_state(returning_player).ok == false,
+    "An unknown user cannot receive a former member's revive state."
+)
+
 print(string.format("[Dungeon Death/Revive Tests] PASS: %d assertions.", assertions))
