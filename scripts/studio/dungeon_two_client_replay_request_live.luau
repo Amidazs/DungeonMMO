@@ -64,6 +64,17 @@ local RS = game:GetService("ReplicatedStorage")
 local channel = RS:WaitForChild("DungeonReplayClientAck_TEMP")
 local remotes = RS.Core.Remotes
 local return_request = remotes:WaitForChild("ReturnRequest")
+local state_changed = remotes:WaitForChild("DungeonStateChanged")
+state_changed.OnClientEvent:Connect(function(payload)
+    if type(payload) == "table" and payload.state == "ReplayError" then
+        warn(
+            "[Dungeon Replay Client] REPLAY_ERROR "
+            .. tostring(payload.replay_error)
+            .. " member=" .. tostring(payload.MemberUserId)
+            .. " depth=" .. tostring(payload.DifficultyId)
+        )
+    end
+end)
 
 -- Args:
 --   predicate: () -> any; observable client UI state.
