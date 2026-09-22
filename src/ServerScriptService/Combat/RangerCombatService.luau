@@ -234,8 +234,14 @@ function RangerCombatService.fire_basic(
         base_damage = config.BASE_DAMAGE,
         damage_multiplier = ranged_multiplier(player)
             * (tonumber(draw_tier.DamageMultiplier) or 1),
-        speed = config.PROJECTILE_SPEED,
-        max_range = config.MAX_RANGE_STUDS,
+        speed = config.PROJECTILE_SPEED
+            + ProgressionRuntimeState.get_ranged_arrow_speed_bonus(
+                player.UserId
+            ),
+        max_range = config.MAX_RANGE_STUDS
+            + ProgressionRuntimeState.get_ranged_range_bonus(
+                player.UserId
+            ),
         max_targets = 1,
         retention = 1,
         critical_chance = critical_chance,
@@ -280,8 +286,14 @@ function RangerCombatService.fire_projectile_skill(
         source_id = definition.ID,
         base_damage = definition.BASE_DAMAGE,
         damage_multiplier = ranged_multiplier(player),
-        speed = definition.PROJECTILE_SPEED,
-        max_range = definition.RANGE_STUDS,
+        speed = definition.PROJECTILE_SPEED
+            + ProgressionRuntimeState.get_ranged_arrow_speed_bonus(
+                player.UserId
+            ),
+        max_range = definition.RANGE_STUDS
+            + ProgressionRuntimeState.get_ranged_range_bonus(
+                player.UserId
+            ),
         max_targets = definition.MAX_TARGETS,
         retention = retention,
         critical_chance = critical_chance,
