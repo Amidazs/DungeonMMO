@@ -77,6 +77,38 @@ function SkillUnlockRules.can_train(
         return false, "InvalidSkillRank", nil
     end
 
+    local identity = character.Identity or {}
+    local allowed_classes = definition.AllowedBaseClasses
+    if type(allowed_classes) == "table" then
+        local matches = false
+        for _, class_id in ipairs(allowed_classes) do
+            if identity.BaseClassId == class_id then
+                matches = true
+                break
+            end
+        end
+        if not matches then
+            return false, "WrongClass", nil
+        end
+    end
+
+    local advanced = definition.AllowedAdvancedClasses
+    if type(advanced) == "table" then
+        local owned = character.ClassAdvancement
+        local active = type(owned) == "table"
+            and owned.ActiveClassId
+        local matches = false
+        for _, class_id in ipairs(advanced) do
+            if active == class_id then
+                matches = true
+                break
+            end
+        end
+        if not matches then
+            return false, "AdvancedClassRequired", nil
+        end
+    end
+
     local rank_levels = definition.RankLevels
     local required_level = if type(rank_levels) == "table"
         then rank_levels[target_rank]
@@ -115,6 +147,39 @@ function SkillUnlockRules.can_start_trial(
     return SkillUnlockRules.check_prerequisites(
         character, quest.SkillPrerequisites
     )
+end
+
+-- Filters a trainer/journal catalogue before revealing an unknown,
+-- level-locked or class-locked skill to that character.
+--
+-- Args:
+--   character (any): Authoritative selected character profile.
+--   definition (any): Registered skill metadata.
+-- Returns:
+--   boolean: Known skills stay visible; unknown skills require rank-1
+--       eligibility, including current race/class, level and mastery.
+function SkillUnlockRules.can_show(
+    character: any,
+    definition: any
+): boolean
+    if type(character) ~= "table"
+        or type(definition) ~= "table"
+    then
+        return false
+    end
+
+    local progression = character.Progression
+    local skills = type(progression) == "table"
+        and progression.Skills
+    local state = type(skills) == "table"
+        and skills[definition.Id]
+    if type(state) == "table" and state.Known == true then
+        return true
+    end
+
+    return select(1, SkillUnlockRules.can_train(
+        character, definition, 1
+    ))
 end
 
 return table.freeze(SkillUnlockRules)
