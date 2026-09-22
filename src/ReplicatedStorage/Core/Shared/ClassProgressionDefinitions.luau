@@ -48,6 +48,8 @@ local DEFINITIONS = table.freeze({
             "MysticWindBolt",
             "MysticFrostBolt",
             "MysticHealingPrayer",
+            "MysticRobeManaRecovery",
+            "MysticRobeAttackSpeed",
             "MysticWeaponTraining",
             "MysticArmorTraining",
             "MysticSpellResistance",
