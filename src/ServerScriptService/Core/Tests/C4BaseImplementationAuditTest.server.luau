@@ -13,7 +13,7 @@ local EXPECTED = {
         Mage = {Raw = 44, Functional = 25, Missing = 19},
     },
     Elf = {
-        Fighter = {Raw = 43, Functional = 35, Missing = 8},
+        Fighter = {Raw = 43, Functional = 38, Missing = 5},
         Mage = {Raw = 42, Functional = 25, Missing = 17},
     },
 }
