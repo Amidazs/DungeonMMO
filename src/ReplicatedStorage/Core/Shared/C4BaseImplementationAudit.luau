@@ -14,6 +14,12 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        DefenseBuff = table.freeze({
+            [5] = "ElvenFighterGuard",
+        }),
+        AttackBuff = table.freeze({
+            [10] = "ElvenFighterBattleCry",
+        }),
         Regeneration = table.freeze({
             [15] = "ElvenFighterRenewal",
         }),
@@ -44,6 +50,12 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        AttackBuff = table.freeze({
+            [7] = "MysticBattleChant",
+        }),
+        DefenseBuff = table.freeze({
+            [7] = "MysticStoneSkin",
+        }),
         IceSlow = table.freeze({
             [7] = "MysticFrostBolt",
             [14] = "MysticFrostBolt",
@@ -99,12 +111,15 @@ local function executable_ranks_at_level(
             local damage = effect and effect.BASE_DAMAGE or 0
             local heal = effect and effect.TOTAL_HEAL or 0
             local slow = effect and effect.MAGIC_SLOW_FRACTION or 0
+            local buff = effect and effect.BUFF_MAGNITUDE or 0
             local passive = definition.DamageBonusPerRank
                 or definition.PhysicalReductionPerRank
                 or definition.MagicReductionPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
                 or (type(slow) == "number" and slow > 0)
+                or (effect and effect.KIND == "Buff"
+                    and type(buff) == "number" and buff > 0)
                 or (definition.Kind == "Passive"
                     and type(passive) == "number" and passive > 0)
             then
