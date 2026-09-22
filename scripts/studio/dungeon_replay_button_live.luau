@@ -65,6 +65,22 @@ wait_for(function()
 end, "fully wiped run has both choices")
 print("[Dungeon Replay UI] WIPE_BUTTON_PASS")
 channel:FireServer("FAILED_PASS")
+
+wait_for(function()
+    return panel.Visible and replay.Text == "Replay simulated"
+end, "the first replay state keeps its terminal panel")
+channel:FireServer("SIMULATED_PASS")
+
+channel.OnClientEvent:Connect(function(command)
+    if command ~= "CHECK_LATE_REVIVE" then
+        return
+    end
+    task.wait(0.3)
+    assert(panel.Visible and replay.Text == "Replay simulated",
+        "A late revive snapshot must not hide Play again")
+    print("[Dungeon Replay UI] LATE_REVIVE_PANEL_PASS")
+    channel:FireServer("LATE_REVIVE_PASS")
+end)
 ]==]
 client.Parent = SPS
 
@@ -117,6 +133,19 @@ local function run()
         objective = "Dungeon failed: revive window expired.",
     })
     wait_for(player, "FAILED_PASS")
+    state:FireClient(player, {
+        state = "ReplaySimulated",
+        objective = "Studio replay simulated.",
+    })
+    wait_for(player, "SIMULATED_PASS")
+    RS.Core.Remotes:WaitForChild("ReviveStateChanged")
+        :FireClient(player, {
+            session_state = "Failed",
+            member_mode = "Spectating",
+            free_available = false,
+        })
+    channel:FireClient(player, "CHECK_LATE_REVIVE")
+    wait_for(player, "LATE_REVIVE_PASS")
 end
 
 task.spawn(function()
