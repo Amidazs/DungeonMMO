@@ -621,9 +621,13 @@ Returns the authoritative runtime Mana regeneration derived from Spirit.
 function ProgressionRuntimeState.get_mana_regen_per_second(
     user_id: number
 ): number
-    return AttributeConfig.mana_regen_per_second(
+    local base_regen = AttributeConfig.mana_regen_per_second(
         ProgressionRuntimeState.get_attribute(user_id, "Spirit")
     )
+    local robe_bonus = PassiveSkillEffects.robe_mana_regen_bonus(
+        state_for(user_id)
+    )
+    return base_regen * (1 + robe_bonus)
 end
 
 --[[
@@ -693,9 +697,10 @@ function ProgressionRuntimeState.get_basic_attack_rate(
     local baseline = CharacterCombatStats.basic_attack_rate(
         ProgressionRuntimeState.get_race_id(user_id)
     )
+    local character = state_for(user_id)
     local earned_bonus = PassiveSkillEffects.attack_rate_bonus(
-        state_for(user_id)
-    )
+        character
+    ) + PassiveSkillEffects.robe_attack_rate_bonus(character)
     return math.clamp(baseline * (1 + earned_bonus), 0.1, 2.0)
 end
 
