@@ -116,6 +116,10 @@ local cases = {
     {class = "Mage", skill = "MysticHealingPrayer",
         weapon = "apprentice_arcane_wand", kind = "Heal",
         level = 7},
+    {class = "Fighter", race = "Elf",
+        skill = "ElvenFighterRenewal",
+        weapon = "marauder_sword", kind = "Heal",
+        level = 15},
     {class = "Fighter", skill = "FighterBowShot",
         weapon = "apprentice_longbow", kind = "Damage",
         level = 5},
@@ -589,7 +593,7 @@ local function run()
     check_light_armor(player)
     check_scout_movement(player, dummy)
     check_scout_critical_damage(player, dummy)
-    print("[C4 Control Client] ALL_THIRTEEN_C4_SKILL_EFFECTS_PASS")
+    print("[C4 Control Client] ALL_FOURTEEN_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
