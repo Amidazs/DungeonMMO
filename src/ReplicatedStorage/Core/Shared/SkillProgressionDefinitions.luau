@@ -748,6 +748,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Human C4 Rogue attack-speed training at the level-36 bracket.
+    -- A bought rank shortens actual server basic-attack timing.
+    HumanScoutRapidHands = table.freeze({
+        Id = "HumanScoutRapidHands",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 36}),
+        AttackRateBonusPerRank = 0.06,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
