@@ -38,4 +38,40 @@ function SkillProgressionConfig.get_max_threshold(tier: string): number
     return maximum
 end
 
+-- Gets an authored skill's next proficiency milestone; longer skill
+-- families can add more ranks without changing legacy tier thresholds.
+--
+-- Args:
+--   definition (any): Server-registered skill metadata.
+--   target_rank (number): Rank the character is learning next.
+-- Returns:
+--   number?: Earned proficiency required for that rank.
+function SkillProgressionConfig.get_skill_threshold(
+    definition: any,
+    target_rank: number
+): number?
+    local thresholds = definition.RankThresholds
+    if type(thresholds) == "table" then
+        return thresholds[target_rank]
+    end
+    return SkillProgressionConfig.get_threshold(
+        definition.Tier, target_rank
+    )
+end
+
+-- Caps mastery at the last authored rank's proficiency milestone.
+--
+-- Args:
+--   definition (any): Registered skill with a declared maximum rank.
+-- Returns:
+--   number: Highest reachable proficiency for this skill.
+function SkillProgressionConfig.get_skill_max_threshold(
+    definition: any
+): number
+    if type(definition.RankThresholds) == "table" then
+        return definition.RankThresholds[definition.MaxRank] or 0
+    end
+    return SkillProgressionConfig.get_max_threshold(definition.Tier)
+end
+
 return table.freeze(SkillProgressionConfig)
