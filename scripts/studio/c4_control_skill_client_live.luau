@@ -102,6 +102,9 @@ local cases = {
     {class = "Ranger", skill = "ThunderShot",
         weapon = "apprentice_longbow", kind = "Stagger",
         level = 36},
+    {class = "Rogue", skill = "LaceratingCut",
+        weapon = "marauder_sword", kind = "Bleed",
+        level = 24},
 }
 local receipts = {}
 channel.OnServerEvent:Connect(function(player, action, skill, sent)
@@ -151,11 +154,11 @@ local function seed_class(player, case)
     character.Identity.ClassId = case.class
     character.Identity.CreationStage = "Complete"
     character.Level = case.level or 5
-    if case.skill == "ThunderShot" then
-        for _, required in ipairs(
-            require(RS.Core.Shared.SkillProgressionDefinitions)
-                .get("ThunderShot").Prerequisites
-        ) do
+    local progression = require(
+        RS.Core.Shared.SkillProgressionDefinitions
+    ).get(case.skill)
+    if progression and progression.Prerequisites then
+        for _, required in ipairs(progression.Prerequisites) do
             character.Progression.Skills[required.SkillId] = {
                 Known = true,
                 PurchasedRank = required.Rank,
@@ -256,12 +259,26 @@ local function check_skill(player, target, case)
             target:GetPivot().Position + Vector3.new(25, 0, 0)
         ))
         print("[C4 Control Client] SERVER_SLOW_PASS")
-    else
+    elseif case.kind == "Stagger" then
         wait_for(function()
             return (target:GetAttribute("CombatStaggeredUntil") or 0)
                 > os.clock()
-        end, "Disrupting Cut real target stagger", 6)
+        end, case.skill .. " real target stagger", 6)
         print("[C4 Control Client] SERVER_STAGGER_PASS")
+    else
+        wait_for(function()
+            return (target:GetAttribute("RogueBleedRemainingTicks")
+                or 0) == 3
+        end, "Lacerating Cut server bleed applied", 6)
+        local direct_hit_health = humanoid.Health
+        wait_for(function()
+            return humanoid.Health < direct_hit_health
+                and (target:GetAttribute("RogueBleedRemainingTicks")
+                    or 0) < 3
+        end, "Lacerating Cut real delayed damage tick", 5)
+        assert(target:GetAttribute("RogueBleedSourceUserId")
+            == player.UserId, "Bleed damage lost attacker attribution")
+        print("[C4 Control Client] SERVER_BLEED_TICK_PASS")
     end
     print("[C4 Control Client] " .. case.skill .. " REAL_CLIENT_EFFECT_PASS")
     task.wait(0.6)
@@ -289,7 +306,7 @@ local function run()
     for _, case in ipairs(cases) do
         check_skill(player, dummy, case)
     end
-    print("[C4 Control Client] ALL_THREE_CONTROL_SKILLS_PASS")
+    print("[C4 Control Client] ALL_FOUR_CONTROL_SKILLS_PASS")
 end
 
 task.spawn(function()
