@@ -320,4 +320,41 @@ end
 check_scout_precision("Human", "HumanScoutPrecision", 28, 77611)
 check_scout_precision("Elf", "ElvenScoutPrecision", 32, 77612)
 
+-- Both races receive one real movement-speed rank at source level 28.
+local fleet_foot = assert(Skills.get("ScoutFleetFoot"))
+check(fleet_foot.MaxRank == 1
+    and fleet_foot.RankLevels[1] == 28,
+    "Fleet Foot must only unlock at first-transfer level 28")
+for _, race_id in ipairs({"Human", "Elf"}) do
+    for _, class_id in ipairs({"Ranger", "Rogue"}) do
+        local user_id = if race_id == "Human"
+            then (if class_id == "Ranger" then 77631 else 77632)
+            else (if class_id == "Ranger" then 77633 else 77634)
+        local character = make_character(class_id, user_id)
+        character.Identity.RaceId = race_id
+        character.Level = 27
+        check(not Unlocks.can_show(character, fleet_foot),
+            race_id .. " " .. class_id .. " exposed early movement")
+        character.Level = 28
+        check(Trainers.can_offer(
+            class_id .. "Trainer", character, "ScoutFleetFoot"
+        ).ok, "Eligible Scout cannot learn its movement passive")
+        Runtime.set_character(user_id, character)
+        check(Runtime.get_movement_multiplier(user_id) == 1,
+            "Untrained Scout must have neutral movement")
+        character.Progression.Skills.ScoutFleetFoot = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+        Runtime.set_character(user_id, character)
+        check(math.abs(
+            Runtime.get_movement_multiplier(user_id) - 1.06
+        ) < 0.0001, "Purchased Fleet Foot did not improve server speed")
+        character.Identity.BaseClassId = "Mage"
+        Runtime.set_character(user_id, character)
+        check(Runtime.get_movement_multiplier(user_id) == 1,
+            "Foreign-class movement rank must not grant speed")
+        Runtime.clear_character(user_id)
+    end
+end
+
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
