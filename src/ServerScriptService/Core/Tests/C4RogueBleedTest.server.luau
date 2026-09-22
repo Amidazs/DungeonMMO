@@ -151,9 +151,11 @@ check(not Unlocks.can_show(ranger, definition),
 seed(rogue, "LaceratingCut", 1, 120)
 check(Unlocks.can_train(rogue, definition, 2),
     "Level 32 and use mastery 120 must allow rank two")
+rogue.Progression.Loadout[1] = "LaceratingCut"
 Runtime.set_character(77591, rogue)
-check(Runtime.is_skill_usable(77591, "LaceratingCut"),
-    "Learned melee bleed must be usable with owned sword")
+local usable, reason = Runtime.is_skill_usable(77591, "LaceratingCut")
+check(usable,
+    "Learned melee bleed blocked: " .. tostring(reason))
 Runtime.clear_character(77591)
 
 print(("[C4 Rogue Bleed] PASS: %d assertions."):format(assertions))
