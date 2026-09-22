@@ -683,6 +683,9 @@ revive_state.OnClientEvent:Connect(
 dungeon_state.OnClientEvent:Connect(
     apply_dungeon_state
 )
+-- Readmission can precede the new client's listener setup.
+-- Request a fresh server-owned snapshot after both listeners exist.
+revive_request:FireServer("State")
 RunService.RenderStepped:Connect(
     update_countdowns
 )
