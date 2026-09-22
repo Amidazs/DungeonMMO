@@ -559,8 +559,15 @@ Returns:
 function ProgressionRuntimeState.get_critical_damage_multiplier(
     user_id: number
 ): number
-    return CharacterCombatStats.critical_damage_multiplier(
-        ProgressionRuntimeState.get_race_id(user_id)
+    local racial_multiplier = CharacterCombatStats
+        .critical_damage_multiplier(
+            ProgressionRuntimeState.get_race_id(user_id)
+        )
+    return math.max(
+        1,
+        racial_multiplier + PassiveSkillEffects.critical_damage_bonus(
+            state_for(user_id)
+        )
     )
 end
 
