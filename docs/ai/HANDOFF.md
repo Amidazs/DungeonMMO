@@ -1,5 +1,48 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.70 all-family C4 progression PASS (partial catalogue)
+
+Read:
+`docs/roadmap/DungeonMMO_Roadmap_v1_70_All_Four_C4_Class_Families_20260922.md`
+and
+`docs/testing/c4-all-four-class-families-2026-09-22.md`.
+Latest focused-tested gameplay source: `687e27c`.
+
+C4-style skill progression now spans every **currently
+implemented** base family: Fighter, Mage, Ranger and
+Rogue (Human/Elf). Original, server-owned skills reuse
+existing physical/rear/ranged projectile/ward/heal/
+control executors. Added nine-rank Ranger Archer Draw
+and Rogue Vital Blow, six-rank weapon damage masteries,
+Arcanist Ember and Spellweaver Aegis, and level/
+previous-skill prerequisites across 8 existing
+race-specific class paths. A Rogue advanced finisher
+requires **full Vital Blow rank 9/proficiency 350**.
+Shared server gates check owned advanced race/class,
+earned history, level, purchased rank and use-earned
+proficiency at trainer, preview, quest start/claim
+and skill use. Generic Mage projectile mana-release
+spending and source attribution were corrected.
+
+Focus evidence: Base and Dungeon builds; the all-family
+test passed **74 assertions** at the final gameplay
+head. Directly affected advancement **66** and earlier
+specialist skill **60** suites passed at the earlier
+`02154e8` head. No claim of normal-client impact.
+The read-only volume audit remains **13/16 mismatch**
+for its Fighter/Mage source rank brackets; Ranger/Rogue
+are not covered by its reference manifest. This work
+is NOT a complete C4 skill clone or quantitative parity.
+
+**NEXT:** one targeted real-client Mage + Ranger/Rogue
+skill effect/visibility test, then add actual missing
+C4-inspired class effects and source-mapped rank
+milestones, *without dummy skills or further unrelated
+dungeon wipe/revive/aggro regressions*. All source/docs
+edits through GitHub only. No Roblox place publish,
+`main` merge or production data operations.
+
+
 ## 22 September 2026 — v1.69 Mage starter rank/visibility slice
 
 Read `docs/roadmap/DungeonMMO_Roadmap_v1_69_Mage_Starter_Unlock_Visibility_20260922.md`
