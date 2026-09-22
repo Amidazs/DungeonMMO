@@ -150,6 +150,15 @@ function SkillUnlockRules.can_train(
         }
     end
 
+    local maximum_level = definition.MaximumLevel
+    if type(maximum_level) == "number"
+        and (tonumber(character.Level) or 1) > maximum_level
+    then
+        return false, "CharacterLevelTooHigh", {
+            MaximumLevel = maximum_level,
+        }
+    end
+
     return SkillUnlockRules.check_prerequisites(
         character, definition.Prerequisites
     )
