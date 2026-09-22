@@ -25,7 +25,7 @@ source audit:
 
 | C4 source class | Raw rank rows | Mapped functional analogues | Unmapped |
 | --- | ---: | ---: | ---: |
-| Human Rogue | 99 | 74 | 25 |
+| Human Rogue | 99 | 75 | 24 |
 | Elven Scout | 129 | 102 | 27 |
 
 These numbers concern **only source-mapped first-transfer rows**.
@@ -48,9 +48,11 @@ This increment additionally implements C4-inspired:
   ranks do not grant stats or appear at trainers;
 - shared Ranger/Rogue level-28 Scout Fleet Foot, with purchased
   rank increasing the server's real Humanoid locomotion speed by
-  6% without bypassing movement locks.
+  6% without bypassing movement locks;
+- Human level-36 Scout Rapid Hands, a bought 6% increase in the
+  actual server basic attack rate and shorter basic attack timings.
 
-All three families are server-owned, authored with correct source
+All four families are server-owned, authored with correct source
 levels/race requirements and exposed by both class trainers.
 `C4ScoutSkillInventory.audit(race_id)` also returns exact
 `MissingFamilies` counts, allowing acceptance to fail closed
@@ -59,9 +61,9 @@ until every source family has a genuine registered mechanic.
 ## Verified local tests
 
 Unpublished Base Rojo build:
-- `C4ScoutPassivesTest`: **241 assertions PASS** after adding
+- `C4ScoutPassivesTest`: **254 assertions PASS** after adding
   critical damage, race-specific critical chance and movement;
-- `C4ScoutInventoryTest`: **1065 assertions PASS**, including raw
+- `C4ScoutInventoryTest`: **1066 assertions PASS**, including raw
   per-level source totals, real analogues and the exact unmapped
   family-ledger sum;
 - `C4ScoutCriticalTrainingTest`: **38 assertions PASS** using
@@ -97,7 +99,7 @@ Local receipts (not uploaded):
 
 The current read-only audit prints these source families as **unmapped**:
 
-Human (25): AccuracyToggle 1; ActiveEvasion 1; AttackSpeed 1;
+Human (24): AccuracyToggle 1; ActiveEvasion 1;
 CommonItemCreation 3; CriticalPowerToggle 5; EquipmentExpertise 1;
 EvasionPassive 1; FallResistance 1; Lockpicking 5; LungCapacity 1;
 RunningEvasion 1; RunningRecovery 1; SittingRecovery 2; Sprint 1.
