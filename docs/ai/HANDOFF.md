@@ -22,7 +22,8 @@ regen and server magic skill cast wind-up) and level-one
 Novice Protection (2% real physical NPC mitigation until
 character level 20). Base Rojo now mounts the required
 CombatStatusService; old missing-Combat error is fixed.
-Focused tests PASS: Mage robe 38, novice 36, branch-tree 44,
+Focused tests PASS: Mage robe 38, novice 36, production
+isolated-profile trainer/save/reload 32, branch-tree 44,
 latest base audit 63, unified completion gate 7 assertions.
 Both Base/Dungeon TEMP Rojo compositions succeeded. No
 new full live-client, saved-profile trainer GUI or cloud
