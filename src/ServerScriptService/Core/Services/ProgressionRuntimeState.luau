@@ -28,6 +28,9 @@ local SkillProgressionDefinitions = require(
 local SkillUnlockRules = require(
     Shared:WaitForChild("SkillUnlockRules")
 )
+local PassiveSkillEffects = require(
+    Shared:WaitForChild("PassiveSkillEffects")
+)
 
 local ProgressionRuntimeState = {}
 
@@ -363,7 +366,12 @@ function ProgressionRuntimeState.get_physical_multiplier(
     local equipment_bonus = equipment_effects_for(user_id)
         .PhysicalDamageBonus
 
-    return math.max(0, base_multiplier + equipment_bonus)
+    local passive_bonus = PassiveSkillEffects.damage_bonus(
+        state_for(user_id), "IronDiscipline"
+    )
+    return math.max(
+        0, base_multiplier + equipment_bonus + passive_bonus
+    )
 end
 
 --[[
@@ -412,9 +420,13 @@ Returns the Phase 2C.D Intellect-based magical-damage multiplier.
 function ProgressionRuntimeState.get_magical_multiplier(
     user_id: number
 ): number
-    return AttributeConfig.magical_multiplier(
+    local baseline = AttributeConfig.magical_multiplier(
         ProgressionRuntimeState.get_attribute(user_id, "Intellect")
     )
+    local passive_bonus = PassiveSkillEffects.damage_bonus(
+        state_for(user_id), "ArcaneDiscipline"
+    )
+    return math.max(0, baseline + passive_bonus)
 end
 
 --[[
