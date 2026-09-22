@@ -1,5 +1,29 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — focused C4 rank-density baseline
+
+- [x] `29d117a`: one Base Rojo build and affected
+  `skill_mastery_gates_tests.luau` PASS after
+  aligning Fighter-style 5/10/15 and Mage
+  7/14/20 new basic rank milestones.
+- [x] Read-only `c4_skill_volume_audit.luau`
+  executed. Initial 16 source-backed Human/Elf
+  Fighter/Mystic early-level rows: **16 mismatched**,
+  **14 unmapped legacy-skill family entries** across
+  those four race/class audits. This is a working
+  gap report, NOT a passing volume-parity test.
+- [ ] Source count mapping for other class branches,
+  levels and races; genuine active/passive/utility
+  rank effects and source-equivalent skill volume.
+  Do not mark v1.65 accepted until real content
+  makes relevant source rows match.
+
+Source targets and count-method limitations:
+`docs/design/C4_Skill_Count_Parity_20260922.md`.
+No dungeon wipe/aggro/revive/Play Again tests were
+repeated for this content/audit change.
+
+
 ## 22 September 2026 — earned skill mastery / level gates
 
 - [x] `bf93f07`: focused `skill_mastery_gates_tests.luau`
