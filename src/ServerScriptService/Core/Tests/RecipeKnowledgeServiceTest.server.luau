@@ -17,6 +17,9 @@ local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RecipeKnowledgeService = require(
     Services:WaitForChild("RecipeKnowledgeService")
 )
+local ProfessionService = require(
+    Services:WaitForChild("ProfessionService")
+)
 
 local assertions = 0
 
@@ -37,6 +40,8 @@ local profiles = ProfileService.new(InMemoryProfileAdapter.new())
 assert(profiles:load(8501))
 local inventory = InventoryService.new(profiles)
 local knowledge = RecipeKnowledgeService.new(profiles, inventory)
+local professions = ProfessionService.new(profiles, inventory)
+assert(professions:choose_profession(8501, "Blacksmithing").ok)
 
 local default_known = knowledge:knows_recipe(8501, "forge_ironbound_gloves")
 check(
@@ -175,6 +180,9 @@ local missing_profession_character = assert(
     profiles:get_character(8501, 1)
 )
 missing_profession_character.Professions.Alchemy = nil
+-- Detached fixture explicitly selects Alchemy so the missing state,
+-- rather than an absent profession choice, is the rejection under test.
+missing_profession_character.ProfessionSlots.Creation = "Alchemy"
 
 local missing_profession_profiles = {}
 
@@ -234,6 +242,7 @@ check(
 
 -- Repeated attempts model the serial mutation race boundary: only one can learn.
 assert(profiles:load(8502))
+assert(professions:choose_profession(8502, "Blacksmithing").ok)
 local inventory2 = InventoryService.new(profiles)
 local knowledge2 = RecipeKnowledgeService.new(profiles, inventory2)
 assert(inventory2:add_item(8502, "blacksmith_iron_guard_blueprint", 1).ok)
