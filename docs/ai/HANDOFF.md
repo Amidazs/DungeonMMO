@@ -1,5 +1,42 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.71 Ranger/Rogue control slice verified
+
+Read `docs/testing/c4-ranger-rogue-control-skills-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_71_Ranger_Rogue_Control_20260922.md`.
+Latest gameplay source: `f927f0d`. Two rank-1/2/3
+abilities are actual server-owned combat, not inert
+catalogue entries. Ranger BriarVolley uses a two-target
+penetrating projectile and 1.5/2/2.5 s Human or
+2/2.5/3 s Elf slow; Rogue DisruptingCut applies
+0.35/0.50/0.70 s stagger after confirmed melee
+damage. New ranks unlock at 5/10/15 and require
+40/110 earned proficiency for ranks 2/3. Both are
+owned class/trainer/weapon-gated.
+
+Evidence: 41 focused class/effect assertions, 46
+real isolated SkillProgressionService purchase/persistence
+assertions, and a real unpublished Play client slowing
+TWO tagged targets and staggering one; final live
+fixture `19cfeb5` PASS. Stale RogueDefinitionsTest
+now asserts raw five-skill catalogue vs gated visible
+offers; isolated test 45 assertions PASS. Prior
+auto-run Rogue error came from older TEMP binary;
+the separate Phase2A paid-revive test is still open.
+
+**NEXT:** source-map C4 Human Rogue/Elven Scout level-20
+shared and divergent ranks without doubling reference
+counts for both current Ranger and Rogue; implement
+additional real control/utility/passive content with
+focused tests and later a real saved-character trainer
+GUI-to-combat test. Do not claim exact C4 parity,
+real-client trainer purchase or general Dungeon green.
+All edits via GitHub ONLY. Remote access only for
+clean pull/TEMP build/Studio test/logs. No publish,
+`main` merge, force-push, production data or old
+Dungeon wipe/revive/aggro/replay regression cycle.
+
+
 ## 22 September 2026 — real-client C4 skill effects verified
 
 Read `docs/testing/c4-new-skill-live-client-2026-09-22.md`.
