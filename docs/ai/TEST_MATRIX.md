@@ -1,5 +1,42 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — v1.75 Scout evasion and Mystic healing
+
+- [x] Scout standing/running chance/race/class/level
+  passives 286 assertions PASS; Human source ranks 77/99,
+  Elf ranks 104/129, source-audit 1070 assertions PASS.
+- [x] Battle Heal 3 source ranks, legitimate MageHeal
+  server effects/prerequisites: 28 assertions PASS.
+- [x] Human Life Drain 2 source ranks, Human-only class
+  gate, real NPC-hit heal fraction: 11 assertions PASS.
+- [x] New actual production SkillProgressionService
+  trainer purchases, earned rank thresholds, foreign-race
+  denial and profile save/release/reload in isolated
+  memory: 37 assertions PASS.
+- [x] Latest first-tier base-source audit 57 assertions:
+  Human Fighter 36/39, Elf Fighter 41/43,
+  Human Mage 36/44, Elf Mage 34/42.
+- [x] Unified C4 completion audit 7 assertions:
+  base 147/168, two mapped Scout source classes
+  181/228, original first-transfer classes 0/9
+  fully complete, seven class inventories not mapped.
+  Overall `Completed=false` is CORRECT.
+- [x] Both unpublished Base and Dungeon Rojo builds
+  succeeded and real Dungeon Studio client passed
+  16 actual hotbar combat effects including Battle
+  Heal and Life Drain.
+- [ ] Deterministic end-to-end actual enemy-melee evasion
+  roll, real saved-player trainer GUI, real multiplayer
+  party healer and one full milestone-wide regression.
+- [ ] 68 missing source rank entries in six inventoried
+  classes and entire separate skill catalogues for
+  seven other C4 first-transfer paths remain OPEN.
+
+[Focused receipts](../testing/c4-scout-evasion-base-healing-2026-09-22.md).
+All project changes through GitHub; remote only for
+clean pull, TEMP builds, unpublished tests and logs.
+
+
 ## 22 September 2026 — v1.74 C4 strict coverage and source gaps
 
 - [x] 152 sourced four-class base rank assertions PASS;
