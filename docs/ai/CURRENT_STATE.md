@@ -1,5 +1,22 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — v1.67 physical/magic passives focused PASS
+
+At gameplay source `08710c1`, Fighter Iron Discipline
+and Mage Arcane Discipline now have six SP-purchased
+passive ranks each. Rank levels 5/10 and 7/14 produce
+server-authoritative physical and magical multiplier
+bonuses; a non-owning class receives no benefit.
+One Base Rojo build + 64 focused assertions PASS.
+C4 source-rank volume remains incomplete in all 16
+mapped brackets. Live combat impact/balance and
+broader source-level class rank content remain
+separate. No old dungeon regression loop was run.
+
+[Roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_67_C4_Passive_Ranks_20260922.md).
+[Focused acceptance](docs/testing/c4-passive-rank-effects-2026-09-22.md).
+
+
 ## 22 September 2026 — v1.66 C4 RANK CONTENT (STILL NOT PARITY)
 
 Read
