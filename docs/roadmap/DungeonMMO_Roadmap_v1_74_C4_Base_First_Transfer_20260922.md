@@ -32,8 +32,9 @@ Branch: `wip/phase-4-test-hud-integration-v1`
   are incomplete. Current class paths COMPLETE: 0/9.
 - [x] Focused Studio: 152 source inventory, 88 Fighter bow/dagger,
   52 Mystic wind/heal, 72 Fighter passives, 38 Mage robe,
-  36 novice defense, 44 first-transfer source, 63 latest
-  base mapping, 7 unified strict-coverage assertions PASS.
+  36 novice defense, 32 real isolated trainer/persistence,
+  44 first-transfer source, 63 latest base mapping and
+  7 unified strict-coverage assertions PASS.
 
 ## Required work before even this scoped C4 milestone is complete
 
