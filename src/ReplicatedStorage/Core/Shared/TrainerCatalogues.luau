@@ -10,6 +10,12 @@ local Shared = ReplicatedStorage
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
+local SkillDefinitions = require(
+    Shared:WaitForChild("SkillProgressionDefinitions")
+)
+local SkillUnlockRules = require(
+    Shared:WaitForChild("SkillUnlockRules")
+)
 
 local DEFINITIONS = table.freeze({
     FighterTrainer = table.freeze({
@@ -208,15 +214,21 @@ local function allowed(whitelist: any, value: any): boolean
     return false
 end
 
-local function copy_trainer(definition: any): any
+local function copy_trainer(
+    definition: any,
+    character: any
+): any
     local skills = {}
 
     for _, entry in ipairs(definition.Skills) do
-        table.insert(skills, {
-            SkillId = entry.SkillId,
-            Mode = entry.Mode,
-            SourceItemId = entry.SourceItemId,
-        })
+        local skill = SkillDefinitions.get(entry.SkillId)
+        if skill and SkillUnlockRules.can_show(character, skill) then
+            table.insert(skills, {
+                SkillId = entry.SkillId,
+                Mode = entry.Mode,
+                SourceItemId = entry.SourceItemId,
+            })
+        end
     end
 
     return {
@@ -268,7 +280,7 @@ function TrainerCatalogues.resolve_for_character(
         return failure("TrainerRestricted")
     end
 
-    local trainer_copy = copy_trainer(definition)
+    local trainer_copy = copy_trainer(definition, character)
 
     return {
         ok = true,
