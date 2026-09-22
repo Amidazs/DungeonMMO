@@ -134,7 +134,51 @@ local duelist_trainer = TrainerCatalogues.resolve_for_character(
     rogue_character
 )
 check(duelist_trainer.ok == true, "Human Duelist must resolve DuelistTrainer.")
-check(#duelist_trainer.Skills == 5, "Duelist trainer must expose five branch families.")
+check(
+    #TrainerCatalogues.get("DuelistTrainer").Skills == 5,
+    "Duelist trainer must register five branch families."
+)
+check(
+    #duelist_trainer.Skills == 0,
+    "Level-one Rogue must not see unearned Duelist skills."
+)
+rogue_character.Level = 32
+rogue_character.ClassAdvancement.CompletedByRace = {
+    Human = {HumanRogueDuelist = true},
+}
+rogue_character.Progression = {Skills = {}}
+
+for _, entry in ipairs(
+    TrainerCatalogues.get("DuelistTrainer").Skills
+) do
+    local definition = assert(ProgressionDefinitions.get(
+        entry.SkillId
+    ))
+    for _, prerequisite in ipairs(definition.Prerequisites or {}) do
+        local existing = rogue_character.Progression.Skills[
+            prerequisite.SkillId
+        ] or {}
+        rogue_character.Progression.Skills[prerequisite.SkillId] = {
+            Known = true,
+            PurchasedRank = math.max(
+                existing.PurchasedRank or 0,
+                prerequisite.Rank
+            ),
+            Proficiency = math.max(
+                existing.Proficiency or 0,
+                prerequisite.Proficiency
+            ),
+        }
+    end
+end
+
+local earned_duelist = TrainerCatalogues.resolve_for_character(
+    "DuelistTrainer", rogue_character
+)
+check(
+    #earned_duelist.Skills == 5,
+    "Earned level-32 Duelist must see all five branch families."
+)
 check(
     TrainerCatalogues.resolve_for_character(
         "WindstalkerTrainer",
