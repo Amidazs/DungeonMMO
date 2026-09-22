@@ -1,5 +1,51 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.64 skill mastery and taunt XP: local PASS
+
+Primary [roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_64_Skill_Mastery_Level_Gates_20260922.md)
+and [focused acceptance](docs/testing/dungeon-skill-mastery-lineage-style-2026-09-22.md).
+Level/mastery source `bf93f07`; latest taunt XP source
+`e0e2f39`. All source and documentation edits via GitHub.
+
+The user wants an original Lineage II C4-inspired
+**earned skill ladder**, not skill access simply from
+choosing a class. Fighter/Mage/Ranger/Rogue gain one
+additional *real combat* basic skill at levels
+8/14/20. Initial class trial requires level 20 and
+two core skills at purchased rank 3 plus full earned
+proficiency. Specialist Fighter/Ranger skills require
+their specific active advanced class, basic mastery,
+level 24 to learn and levels 28/32 for later ranks.
+Unknown skills are hidden from trainer/journal until
+eligibility; the server independently guards purchase,
+class claim and combat use. The level cap is now 40,
+preserving the previous level-1-to-20 XP curve.
+
+After the preceding message timeout, checked the
+existing local focused receipts: 62 mastery assertions,
+44 level/XP assertions and five directly affected
+existing contracts PASS at `bf93f07`. Found that
+successful zero-health-damage Taunt/VanguardChallenge
+had generated threat but no proficiency, making later
+ranks unattainable through normal use. The combat server
+now awards meaningful capped control proficiency after
+a confirmed NPC taunt. A clean fast-forward, one Dungeon
+Rojo build and seven focused taunt mastery assertions
+passed at `e0e2f39`. No old Dungeon boss/wipe/revive
+matrix was rerun.
+
+**NEXT:** extend actual basic and specialist class
+skills, notably Mage/Rogue, while preserving the
+current profile's existing skill histories. Then make
+locked/available requirements readable in the player's
+trainer/advancement UI and run a *single targeted*
+real-input skill effect check. Do not assert a complete
+C4-sized skill tree, final progression balance,
+published network reconnect or cloud acceptance.
+No Roblox publishing, `main` merge, force-push or
+production data mutation was performed.
+
+
 ## 22 September 2026 — v1.63 NEW class/role skill content
 
 Latest gameplay/test source:
