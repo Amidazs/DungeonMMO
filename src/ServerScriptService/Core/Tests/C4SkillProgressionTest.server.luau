@@ -178,6 +178,9 @@ for _, case in ipairs(cases) do
         base_class .. ": advanced skills stay hidden before class change."
     )
     character.ClassAdvancement.ActiveClassId = advanced_class
+    character.ClassAdvancement.CompletedByRace = {
+        Human = {[advanced_class] = true},
+    }
     check(
         not Unlocks.can_show(character, advanced),
         base_class .. ": class at level 20 must not reveal level-24 skill."
