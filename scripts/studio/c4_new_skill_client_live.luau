@@ -95,6 +95,7 @@ local channel = RS:WaitForChild("C4ClientSkillProbe_TEMP")
 local Schema = require(RS.Core.Shared.ProfileSchema)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local Mana = require(SSS.Combat.ManaService)
+local SkillDefinitions = require(RS.Combat.Shared.SkillDefinitions)
 local cases = {
     {class = "Mage", skill = "DawnWard",
         weapon = "apprentice_arcane_wand", kind = "Ward"},
@@ -197,11 +198,16 @@ local function check_skill(player, target, case)
     channel:FireClient(player, "LOAD", case.skill)
     await_receipt(player, "LOADED", case.skill)
     local baseline_mana = Mana.get(player)
-    local lowest_mana = baseline_mana
+    local previous_mana = baseline_mana
+    local largest_spend = 0
     local mana_changed = player:GetAttributeChangedSignal(
         "CombatMana"
     ):Connect(function()
-        lowest_mana = math.min(lowest_mana, Mana.get(player))
+        local current = Mana.get(player)
+        largest_spend = math.max(
+            largest_spend, previous_mana - current
+        )
+        previous_mana = current
     end)
     receipts[player.UserId] = nil
     channel:FireClient(player, "CAST", case.skill)
@@ -220,14 +226,15 @@ local function check_skill(player, target, case)
         end, case.skill .. " real damage", 9)
     end
     if case.class == "Mage" then
-        print("[C4 Client] MANA_DIAGNOSTIC " .. case.skill
-            .. " baseline=" .. tostring(baseline_mana)
-            .. " minimum=" .. tostring(lowest_mana)
-            .. " current=" .. tostring(Mana.get(player))
-            .. " attribute=" .. tostring(player:GetAttribute("CombatMana")))
+        local definition = assert(SkillDefinitions.get_for_rank(
+            case.skill, 1
+        ))
         wait_for(function()
-            return lowest_mana < baseline_mana - 2
+            return largest_spend >= definition.MANA_COST - 1
         end, case.skill .. " server mana spend", 5)
+        print("[C4 Client] SERVER_MANA_SPEND_PASS " .. case.skill
+            .. " observed=" .. tostring(largest_spend)
+            .. " expected=" .. tostring(definition.MANA_COST))
     end
     mana_changed:Disconnect()
     print("[C4 Client] " .. case.skill .. " REAL_CLIENT_EFFECT_PASS")
