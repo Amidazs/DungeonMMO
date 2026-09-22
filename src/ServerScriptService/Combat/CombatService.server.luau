@@ -2046,7 +2046,8 @@ local function enter_skill_active(
                 local target_index = 0
                 return function(target: Model)
                     target_index += 1
-                    if skill_definition.ID == "Taunt" then
+                    if (skill_definition.TAUNT_BONUS_THREAT or 0) > 0
+                        and skill_definition.BASE_DAMAGE == 0 then
                         -- Only the first server-confirmed hostile target
                         -- receives threat. Taunt causes zero health damage
                         -- and cannot inflate reward contributions.
@@ -2062,7 +2063,8 @@ local function enter_skill_active(
                             sequence_id,
                             target_index
                         )
-                    elseif skill_definition.ID == "ShieldBash" then
+                    elseif skill_definition.ID == "ShieldBash"
+                        or skill_definition.ID == "ThornwardenBash" then
                         apply_shield_bash_target(
                             player,
                             character,
