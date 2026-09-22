@@ -302,4 +302,24 @@ function PassiveSkillEffects.movement_multiplier(
     )
 end
 
+--[[
+Returns Human first-transfer attack-rate training from purchased ranks.
+
+Args:
+    character (any): Server-owned race, combat class and skill states.
+
+Returns:
+    number: Additive attack-speed fraction from 0 through 0.06.
+]]
+function PassiveSkillEffects.attack_rate_bonus(
+    character: any
+): number
+    return math.clamp(
+        resolve_bonus(
+            character, "HumanScoutRapidHands", "AttackRateBonusPerRank"
+        ),
+        0, 0.06
+    )
+end
+
 return table.freeze(PassiveSkillEffects)
