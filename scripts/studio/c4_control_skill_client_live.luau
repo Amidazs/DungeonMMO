@@ -107,6 +107,12 @@ local cases = {
     {class = "Rogue", skill = "LaceratingCut",
         weapon = "scout_dagger", kind = "Bleed",
         level = 24},
+    {class = "Fighter", skill = "FighterBowShot",
+        weapon = "apprentice_longbow", kind = "Damage",
+        level = 5},
+    {class = "Fighter", skill = "FighterDaggerStrike",
+        weapon = "scout_dagger", kind = "Damage",
+        level = 5},
     {class = "Ranger", skill = "ScoutFocusedShot",
         weapon = "apprentice_longbow", kind = "Damage",
         level = 20},
@@ -204,7 +210,8 @@ local function position(player, target, case)
     local character = assert(player.Character)
     local root = assert(character:FindFirstChild("HumanoidRootPart"))
     local target_root = assert(target:FindFirstChild("HumanoidRootPart"))
-    local offset = if case.class == "Rogue" then 3.5 else -9
+    local offset = if case.class == "Rogue"
+        or case.weapon == "scout_dagger" then 3.5 else -9
     local location = target_root.Position + Vector3.new(0, 0, offset)
     root.CFrame = CFrame.lookAt(location, target_root.Position)
     root.AssemblyLinearVelocity = Vector3.zero
@@ -565,7 +572,7 @@ local function run()
     check_light_armor(player)
     check_scout_movement(player, dummy)
     check_scout_critical_damage(player, dummy)
-    print("[C4 Control Client] ALL_EIGHT_C4_SKILL_EFFECTS_PASS")
+    print("[C4 Control Client] ALL_TEN_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
