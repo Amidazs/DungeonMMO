@@ -519,11 +519,50 @@ local function apply_race_presentation(
 end
 
 
+-- Reconcile real character/CombatService eligibility with the current
+-- server-owned member mode, never with a newly loaded character alone.
+-- Args:
+--   user_id: number; authenticated dungeon member.
+--   mode: string; authoritative session member mode.
+-- Returns:
+--   nil: updates live player and character combat eligibility.
+local function set_member_combat_eligibility(
+    user_id: number,
+    mode: string
+)
+    local player = Players:GetPlayerByUserId(user_id)
+    if not player then
+        return
+    end
+    local session = current_session()
+    local member = session and session.Members[tostring(user_id)]
+    local eligible = session ~= nil
+        and session.State == "Active"
+        and member ~= nil
+        and member.Connected == true
+        and member.Abandoned ~= true
+        and mode == "Active"
+    player:SetAttribute("DungeonCombatAllowed", eligible)
+    local character = player.Character
+    if character then
+        character:SetAttribute(
+            CombatConfig.TRAINING_MARAUDER.RUN_PARTICIPANT_ATTRIBUTE,
+            eligible
+        )
+    end
+end
+
 local function set_character_encounter(player: Player, encounter_id: string)
     local character = player.Character
     if character then
-        character:SetAttribute(CombatConfig.TRAINING_MARAUDER.RUN_PARTICIPANT_ATTRIBUTE, true)
-        character:SetAttribute(CombatConfig.TRAINING_MARAUDER.ENCOUNTER_ATTRIBUTE, encounter_id)
+        character:SetAttribute(
+            CombatConfig.TRAINING_MARAUDER.RUN_PARTICIPANT_ATTRIBUTE,
+            player:GetAttribute("DungeonCombatAllowed") == true
+        )
+        character:SetAttribute(
+            CombatConfig.TRAINING_MARAUDER.ENCOUNTER_ATTRIBUTE,
+            encounter_id
+        )
     end
 end
 
@@ -1530,6 +1569,7 @@ local function initialize_session_services(session: any): (any?, boolean)
         end,
         on_member_mode = function(user_id: number, mode: string)
             encounter_service:mark_member_mode(user_id, mode)
+            set_member_combat_eligibility(user_id, mode)
         end,
         on_recoverable_wipe = reset_wiped_encounter,
     })
@@ -1568,8 +1608,7 @@ local function bind_character(player: Player, character: Model)
         player,
         character
     )
-    character:SetAttribute(CombatConfig.TRAINING_MARAUDER.RUN_PARTICIPANT_ATTRIBUTE, true)
-    character:SetAttribute(CombatConfig.TRAINING_MARAUDER.ENCOUNTER_ATTRIBUTE, current_encounter_id)
+    set_character_encounter(player, current_encounter_id)
     local humanoid = character:WaitForChild("Humanoid") :: Humanoid
     local root = character:WaitForChild("HumanoidRootPart") :: BasePart
     local handled = false
@@ -1625,6 +1664,8 @@ local function reconnect_objective(plan: any): (string, string)
 end
 
 local function admit_player(player: Player)
+    -- Deny combat until authoritative admission confirms Active mode.
+    player:SetAttribute("DungeonCombatAllowed", false)
     local session: any = nil
     local teleport_data: any = nil
 
@@ -1877,6 +1918,13 @@ local function admit_player(player: Player)
         if encounter_service then encounter_service:mark_member_mode(player.UserId, recovery_mode) end
     end
     loaded_users[player.UserId] = true
+    local admitted = sessions:get(session.SessionId)
+    local admitted_member = admitted
+        and admitted.Members[tostring(player.UserId)]
+    set_member_combat_eligibility(
+        player.UserId,
+        admitted_member and admitted_member.Mode or "Spectating"
+    )
     local loaded_character = profiles:get_character(player.UserId, 1)
     if loaded_character then ProgressionRuntimeState.set_character(player.UserId, loaded_character) end
     if encounter_service then
