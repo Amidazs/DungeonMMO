@@ -77,6 +77,14 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "ElvenFighterGuard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenFighterBattleCry",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "StalwartTraining",
                 Mode = "LearnOrRank",
             }),
@@ -130,6 +138,14 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "MysticSpellResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MysticBattleChant",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MysticStoneSkin",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
