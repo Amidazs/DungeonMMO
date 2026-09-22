@@ -19,6 +19,7 @@ local DEFINITIONS = table.freeze({
             "IronCleave",
             "PursuitStep",
             "IronDiscipline",
+            "StalwartTraining",
         }),
     }),
 
@@ -37,6 +38,7 @@ local DEFINITIONS = table.freeze({
             "AetherBolt",
             "RenewingLight",
             "ArcaneDiscipline",
+            "RestorativeTraining",
         }),
     }),
 
