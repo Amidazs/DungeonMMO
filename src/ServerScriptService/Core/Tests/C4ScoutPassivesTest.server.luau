@@ -182,4 +182,35 @@ for _, character in ipairs({ranger, rogue}) do
     Runtime.clear_character(user_id)
 end
 
+-- Range and arrow-speed passives must change actual server projectile inputs.
+check_ladder(ranger, "RangerLongRange", {20}, nil)
+check_ladder(ranger, "RangerArrowVelocity", {32}, nil)
+Runtime.set_character(77601, ranger)
+check(Runtime.get_ranged_range_bonus(77601) == 0,
+    "Unpurchased Longbow range must not be granted")
+check(Runtime.get_ranged_arrow_speed_bonus(77601) == 0,
+    "Unpurchased arrow velocity must not be granted")
+ranger.Progression.Skills.RangerLongRange = {
+    Known = true, PurchasedRank = 1, Proficiency = 0,
+}
+ranger.Progression.Skills.RangerArrowVelocity = {
+    Known = true, PurchasedRank = 1, Proficiency = 0,
+}
+Runtime.set_character(77601, ranger)
+check(Runtime.get_ranged_range_bonus(77601) == 12,
+    "Purchased long-range passive must add twelve actual studs")
+check(Runtime.get_ranged_arrow_speed_bonus(77601) == 18,
+    "Purchased arrow-speed passive must add real flight velocity")
+ranger.Equipment.Weapon = nil
+Runtime.set_character(77601, ranger)
+check(Runtime.get_ranged_range_bonus(77601) == 0,
+    "Unequipped Longbow must not grant projectile range")
+check(Runtime.get_ranged_arrow_speed_bonus(77601) == 0,
+    "Unequipped Longbow must not grant arrow velocity")
+Runtime.clear_character(77601)
+check(not Classes.can_teach("Rogue", "RangerLongRange"),
+    "Rogue cannot learn the Ranger-only range passive")
+check(not Classes.can_teach("Rogue", "RangerArrowVelocity"),
+    "Rogue cannot learn the Ranger-only arrow-speed passive")
+
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
