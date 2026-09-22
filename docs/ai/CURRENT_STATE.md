@@ -1,5 +1,35 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — latest C4 source-rank update (PARTIAL)
+
+The six currently enumerated original C4 Human/Elf base and
+partially mapped Scout class inventories have **331/396**
+functional DungeonMMO rank analogues: Human Fighter 36/39,
+Elf Fighter 41/43, Human Mystic 36/44, Elf Mystic 34/42,
+Human Rogue 78/99 and Elf Scout 106/129. **65** source ranks
+remain unimplemented, SEVEN further first-transfer class
+inventories remain unenumerated, and **0/9** original C4
+first-transfer branches have complete gameplay coverage.
+The strict source audit still returns `Completed=false`.
+
+Active melee evasion and Elf guard apply server-owned timed
+statuses after authentic hotbar casts. The accepted damage
+service combines purchased standing/running dodge with active
+dodge only for direct enemy melee; Elf guard reduces actual
+physical NPC damage. Three Mystic Battle Heal ranks deliver
+real mana-funded friendly healing. Focused assertions
+28/286/1073/24/57/7 and unpublished 18-effect client Play
+test passed. Obsolete Fighter trainer count test was fixed
+and passed 13 focused assertions.
+[Evidence](../testing/c4-source-catalogue-v1-75-2026-09-22.md).
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v1_75_C4_Status_Heal_20260922.md).
+
+No main merge, Roblox publish, production DataStore work,
+new normal saved-player trainer GUI acceptance, or milestone-
+wide dungeon regression has been claimed. Separate old
+Phase2A paid-revive automated failure remains open.
+
+
 ## 22 September 2026 — v1.75 C4 backend increment, NOT COMPLETE
 
 Latest source-backed six-class coverage: starting Human
