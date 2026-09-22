@@ -17,6 +17,8 @@ local ClassAdvancementService = require(
 )
 local RaceChangeService = require(Services:WaitForChild("RaceChangeService"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
+local QuestDefinitions = require(Shared:WaitForChild("QuestDefinitions"))
+
 
 local assertions = 0
 
@@ -24,6 +26,27 @@ local function check(condition: boolean, message: string)
     assertions += 1
     if not condition then
         error("[Class Advancement Tests] " .. message, 2)
+    end
+end
+
+-- Seeds legitimate fully purchased prerequisite ranks and proficiency
+-- without bypassing the production advancement or quest validators.
+--
+-- Args:
+--   character (any): Mutable test character profile.
+--   quest_id (string): Registered race/base-class advancement trial.
+-- Returns:
+--   nil: Creates earned skill states required by that class's quest.
+local function seed_trial_mastery(character: any, quest_id: string)
+    local trial = assert(QuestDefinitions.get(quest_id))
+    character.Progression.SkillPointEntitlement = 60
+    for _, requirement in ipairs(trial.SkillPrerequisites) do
+        character.Progression.Skills[requirement.SkillId] = {
+            Known = true,
+            StarterGranted = false,
+            PurchasedRank = requirement.Rank,
+            Proficiency = requirement.Proficiency,
+        }
     end
 end
 
@@ -42,6 +65,7 @@ local function set_mage(
             ClassId = "Mage",
             CreationStage = "Complete",
         }
+        seed_trial_mastery(character, "MageAdvancementTrial")
     end)
     check(ok == true, "Mage fixture mutation failed: " .. tostring(reason))
 end
@@ -63,6 +87,7 @@ local fixture_ok = profiles:mutate(5203, function(profile: any)
         ClassId = "Fighter",
         CreationStage = "Complete",
     }
+    seed_trial_mastery(character, "FighterAdvancementTrial")
 end)
 check(fixture_ok == true, "Fighter fixture mutation failed.")
 
@@ -245,6 +270,10 @@ local function seed_candidate(
             ClassId = base_class_id,
             CreationStage = "Complete",
         }
+        local quest_id = if base_class_id == "Fighter"
+            then "FighterAdvancementTrial"
+            else "RangerAdvancementTrial"
+        seed_trial_mastery(character, quest_id)
     end)
     check(mutated, "Advancement candidate profile mutation must succeed.")
 end
@@ -319,7 +348,7 @@ local level_check = profiles:mutate(5207, function(profile: any)
 end)
 check(level_check, "Level-19 Ranger must be seeded.")
 check(
-    base:start_trial(5207).quest_reason == "QuestUnavailable",
+    base:start_trial(5207).reason == "AdvancementRequirementsNotMet",
     "Advancement remains unavailable below level 20."
 )
 
