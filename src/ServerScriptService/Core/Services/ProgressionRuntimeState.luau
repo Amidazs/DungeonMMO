@@ -2,6 +2,8 @@
 -- Authoritative per-server combat/progression snapshot state.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local ServerScriptService = game:GetService("ServerScriptService")
 
 local Shared = ReplicatedStorage
     :WaitForChild("Core")
@@ -31,6 +33,27 @@ local SkillUnlockRules = require(
 local PassiveSkillEffects = require(
     Shared:WaitForChild("PassiveSkillEffects")
 )
+
+local CombatStatusService = require(
+    ServerScriptService.Combat.CombatStatusService
+)
+
+--[[
+Returns a live, server-owned buff value without trusting client metadata.
+
+Args:
+    user_id (number): Authenticated owner of an active Roblox character.
+    kind (string): One of the authored status service buff families.
+
+Returns:
+    number: Valid non-stacking buff magnitude or zero.
+]]
+local function active_buff(user_id: number, kind: string): number
+    local player = Players:GetPlayerByUserId(user_id)
+    return CombatStatusService.get(
+        player and player.Character, kind
+    )
+end
 
 local ProgressionRuntimeState = {}
 
@@ -380,6 +403,7 @@ function ProgressionRuntimeState.get_physical_multiplier(
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
+            + active_buff(user_id, "PhysicalPower")
     )
 end
 
@@ -563,7 +587,9 @@ function ProgressionRuntimeState.get_magical_multiplier(
     ) + PassiveSkillEffects.damage_bonus(
         character, "MysticWeaponTraining"
     )
-    return math.max(0, baseline + passive_bonus)
+    return math.max(
+        0, baseline + passive_bonus + active_buff(user_id, "MagicPower")
+    )
 end
 
 --[[
