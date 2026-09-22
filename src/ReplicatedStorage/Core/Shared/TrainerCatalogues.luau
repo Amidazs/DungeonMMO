@@ -160,6 +160,14 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "HumanScoutPrecision",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutPrecision",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ElvenRenewal",
                 Mode = "LearnOrRank",
             }),
@@ -217,6 +225,14 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "HumanScoutCriticalPower",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutPrecision",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutPrecision",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
