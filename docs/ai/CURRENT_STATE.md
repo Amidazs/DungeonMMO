@@ -1,5 +1,35 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — Ranger/Rogue control skills v1.71 LOCAL PASS
+
+At backend head `f927f0d`, two original C4-inspired
+Ranger/Rogue abilities were added without changing the
+accepted dungeon lifecycle. **BriarVolley** (levels 5/10/15)
+hits/slows two live targets; **DisruptingCut** (5/10/15)
+damages and staggers a live target. Both use owned class,
+trainer, weapon, SP, level and earned mastery gates.
+Focused Studio tests: 41 rank/content assertions, 46
+real isolated-profile training/persistence assertions;
+real-client two-target slow and stagger PASS. Corrected
+the stale RogueDefinitionsTest for hidden-before-earned
+advanced abilities; 45 focused assertions PASS.
+
+This remains a partial skill catalogue: Fighter/Mage
+reference brackets were historically 13/16 mismatched;
+Ranger/Rogue C4 counts and later specialist ranks
+remain unmapped. Live client tests seeded temporary
+character/loadout state and did not verify real trainer
+GUI purchase. The unrelated Phase2A paid-revive
+auto-test remains open; no general Dungeon regression
+or published/cloud release is claimed.
+
+[Working roadmap v1.71](../roadmap/DungeonMMO_Roadmap_v1_71_Ranger_Rogue_Control_20260922.md).
+[Focused proof](../testing/c4-ranger-rogue-control-skills-2026-09-22.md).
+No `main` merge, Roblox publish, production DataStore
+change or repeat of old Dungeon wipe/aggro/revive/replay
+tests occurred.
+
+
 ## 22 September 2026 — targeted live C4 skill effects PASS
 
 At gameplay build `755fab0`, final GitHub fixture `c944ddd`
