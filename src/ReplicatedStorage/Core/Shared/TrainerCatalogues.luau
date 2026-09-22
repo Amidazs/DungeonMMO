@@ -34,6 +34,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "Taunt",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "GuardBreaker",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -54,6 +58,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "MageHeal",
                 Mode = "Rank",
             }),
+            table.freeze({
+                SkillId = "AetherBolt",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -65,6 +73,10 @@ local DEFINITIONS = table.freeze({
             table.freeze({SkillId = "PiercingShot", Mode = "Rank"}),
             table.freeze({SkillId = "CripplingShot", Mode = "Rank"}),
             table.freeze({SkillId = "Volley", Mode = "Rank"}),
+            table.freeze({
+                SkillId = "TrackerShot",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -81,6 +93,10 @@ local DEFINITIONS = table.freeze({
             table.freeze({SkillId = "CriticalFocus", Mode = "LearnOrRank"}),
             table.freeze({SkillId = "LightFoot", Mode = "LearnOrRank"}),
             table.freeze({SkillId = "ThreatDrop", Mode = "LearnOrRank"}),
+            table.freeze({
+                SkillId = "ViperStrike",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
