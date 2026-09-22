@@ -155,6 +155,47 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- C4 Mystic physical/magic weapon mastery at levels 7 and 14.
+    MysticWeaponTraining = table.freeze({
+        Id = "MysticWeaponTraining",
+        Tier = "Common",
+        MaxRank = 2,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 7, [2] = 14}),
+        DamageBonusPerRank = 0.02,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 Mystic physical armour mastery at 7/14/14.
+    MysticArmorTraining = table.freeze({
+        Id = "MysticArmorTraining",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 14, [3] = 14,
+        }),
+        PhysicalReductionPerRank = 0.008,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 Mystic magic resistance 7/7/14/14; affects incoming
+    -- magical attacks, not generic physical NPC damage.
+    MysticSpellResistance = table.freeze({
+        Id = "MysticSpellResistance",
+        Tier = "Common",
+        MaxRank = 4,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 14, [4] = 14,
+        }),
+        MagicReductionPerRank = 0.015,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- L2 C4-inspired rank milestones: skills are taught at the
     -- trainer only after the character earns each level bracket.
     GuardBreaker = table.freeze({
