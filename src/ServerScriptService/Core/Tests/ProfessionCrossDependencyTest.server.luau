@@ -6,6 +6,8 @@ local RS = game:GetService("ReplicatedStorage")
 local Core = SSS.Core
 local Adapter = require(Core.Adapters.InMemoryProfileAdapter)
 local Profiles = require(Core.Services.ProfileService)
+local Market = require(Core.Services.MarketService)
+local MarketAdapter = require(Core.Adapters.InMemoryEntityAdapter)
 local Inventory = require(Core.Services.InventoryService)
 local Professions = require(Core.Services.ProfessionService)
 local Recipes = require(RS.Core.Shared.ProfessionRecipes)
@@ -19,18 +21,41 @@ end
 local source = Adapter.new()
 local profiles = Profiles.new(source)
 local user_id = 66081
-check(profiles:load(user_id), "disposable character loads")
+check(profiles:load(user_id), "disposable smith loads")
+local alchemist_id = 66082
+check(profiles:load(alchemist_id), "disposable alchemist loads")
 local inventory = Inventory.new(profiles)
 local crafting = Professions.new(profiles, inventory)
+for _, entry in {
+    {user_id, "Mining"}, {user_id, "Blacksmithing"},
+    {alchemist_id, "Herbalism"}, {alchemist_id, "Alchemy"},
+} do
+    check(crafting:choose_profession(entry[1], entry[2]).ok,
+        "Each character selects its own legal profession.")
+end
+for _, owner in {user_id, alchemist_id} do
+    check(profiles:mutate(owner, function(profile: any)
+        profile.Characters.Slot1.Gold = 500
+    end), "Trade buyer receives disposable gold.")
+end
+local next_listing = 0
+local market = Market.new(
+    MarketAdapter.new(), profiles, function(): number return 1000 end,
+    function(): string
+        next_listing += 1
+        return "cross-dependency-" .. tostring(next_listing)
+    end
+)
 local function quantity(id: string): number
     return Inventory.count_item(
         assert(profiles:get_character(user_id, 1)), id)
 end
-local function craft(recipe_id: string): any
-    local prepared = crafting:prepare_craft(user_id, recipe_id)
+local function craft(recipe_id: string, owner: number?): any
+    local actual_owner = owner or user_id
+    local prepared = crafting:prepare_craft(actual_owner, recipe_id)
     check(prepared.ok, recipe_id .. " must prepare")
     local result = crafting:complete_craft(
-        user_id, recipe_id,
+        actual_owner, recipe_id,
         Professions.foundation_success_outcome(prepared.minigame_id))
     check(result.ok, recipe_id .. " must commit")
     return result
@@ -70,22 +95,43 @@ check(not missing.ok and missing.reason == "MissingMaterials"
     and quantity("ironbound_gloves") == 1
     and quantity("iron_bar") == 2,
     "no flux must prevent runic forging without eating ingredients")
+local bar_sale = market:create_listing(
+    user_id, "iron_bar", 1, 100, "smith-bar"
+)
+check(bar_sale.ok, "Smith lists a bar after crafting gloves.")
+check(market:buy(
+    alchemist_id, bar_sale.listing.ListingId, "alchemist-buys-bar"
+).ok, "Alchemist purchases the required smith bar.")
+
 for _ = 1, 2 do
-    check(crafting:gather(user_id, {
+    check(crafting:gather(alchemist_id, {
         ProfessionId = "Herbalism", ItemId = "silverleaf",
         Quantity = 1, XP = 8,
     }).ok, "herb gather must use authoritative service")
 end
-craft(flux.Id)
+craft(flux.Id, alchemist_id)
+local flux_sale = market:create_listing(
+    alchemist_id, "forging_flux", 1, 100, "alchemist-flux"
+)
+check(flux_sale.ok, "Alchemist can sell its real produced reagent.")
+check(market:buy(
+    user_id, flux_sale.listing.ListingId, "smith-buys-flux"
+).ok, "Smith purchases the reagent to finish Runic Gloves.")
 check(quantity("iron_bar") == 1
-    and quantity("silverleaf") == 0
-    and quantity("forging_flux") == 1,
-    "alchemist consumes a smith-made bar and gathered herbs for flux")
+    and quantity("forging_flux") == 1
+    and Inventory.count_item(
+        assert(profiles:get_character(alchemist_id, 1)),
+        "silverleaf"
+    ) == 0,
+    "two distinct careers supply the exact mutually dependent inputs")
 local snapshot = crafting:build_snapshot(user_id)
+local alchemist_snapshot = crafting:build_snapshot(alchemist_id)
 check(snapshot.ok
     and snapshot.Recipes[runic.Id].Unlocked
-    and snapshot.Recipes[flux.Id].Unlocked,
-    "normal profession snapshot exposes two-way recipes")
+    and not snapshot.Recipes[flux.Id].Unlocked
+    and alchemist_snapshot.Recipes[flux.Id].Unlocked
+    and not alchemist_snapshot.Recipes[runic.Id].Unlocked,
+    "each character sees only its own crafting recipe as unlocked")
 check(profiles:mutate(user_id, function(profile: any)
     profile.Characters.Slot1.Equipment.Gloves = "ironbound_gloves"
 end), "test character equips the ingredient")
