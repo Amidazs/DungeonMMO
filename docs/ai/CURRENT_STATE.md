@@ -1,5 +1,60 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — same-server reconnect source STAGED, Studio OFFLINE
+
+Latest implementation/test source:
+`7d684f583020df64e2591a00acef14c90f35ecb1`.
+The previously proven multiplayer gameplay head is the
+older v1.59 increment. Do **not** carry its six-build or
+30/30 PASS labels forward to this new reconnect source.
+
+A real previously connected, now-disconnected Roblox
+member can pass a narrowly gated nonce-free **same active
+server** readmission check after their initial handoff
+nonce has been consumed. All initial Base-to-Dungeon
+handoffs still need a nonce, and the normal profile load
+must independently reacquire the profile writer lease.
+Abandoned, connected duplicate, unrecorded departure,
+foreign-server and terminal-run access is rejected.
+
+On admission the server now re-sends the player's actual
+revive state; the new client also requests a snapshot
+after wiring event listeners. This prevents a returning
+spectator from being presented with a refunded free revive
+solely because a new Character loaded. A new service
+regression covers authenticated same-UserId simulated
+readmission, prior room checkpoint, spectator/free-revive
+state, second party member and exclusive profile lease.
+
+**CURRENT BLOCKER:** Remote Desktop Commander reported
+no connected devices on 22 September. No Rojo builds,
+Studio tests or Luau parse check were completed for
+this source head. The new regression is written but
+**NOT EXECUTED**. The user's existing backend
+v1.59 accepted tests remain evidence only for the
+earlier head. GitHub showed no CI checks on the new
+source commit.
+
+**NEXT once online:** fast-forward a clean worktree;
+run all six Rojo builds, 30/30 Dungeon backend,
+`scripts/studio/dungeon_reconnect_admission_tests.luau`,
+and death/UI regressions, then a temporary same-user
+admission simulation. Genuine same-account cross-network
+return still needs a published TEST reserved-server
+experiment and confirmed platform TeleportData routing
+after separate approval; **do not** bypass missing
+routing with an untrusted client-supplied session ID.
+Check combat exclusion for returning Spectating members.
+
+Report:
+`docs/testing/dungeon-same-server-reconnect-stage-2026-09-22.md`.
+Roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md`.
+All code and document edits in GitHub only. No publish,
+main merge, force-push, paid product or production cloud
+data operation.
+
+
 ## 21 September 2026 — Four-client secret/Depth4/disconnect acceptance
 
 GitHub feature head with latest focused verification:
