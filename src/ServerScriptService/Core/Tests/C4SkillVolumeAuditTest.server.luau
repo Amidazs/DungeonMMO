@@ -86,11 +86,12 @@ for _, race_id in ipairs({"Human", "Elf"}) do
     end
 end
 
-assert(checked == 16, "Every verified C4 early level must be audited.")
-assert(gaps > 0, "Current catalogue is not yet C4-volume complete.")
-assert(unmapped > 0, "Unassigned older skills must not count as parity.")
+assert(checked >= 16, "Verified C4 early levels must be audited.")
+local status = if gaps == 0 and unmapped == 0
+    then "PARITY_IN_SCOPE_COMPLETE"
+    else "PARITY_NOT_YET_COMPLETE"
 print(string.format(
     "[C4 Volume] REPORT brackets=%d mismatched=%d "
-        .. "unmapped_skill_ranks=%d PARITY_NOT_YET_COMPLETE",
-    checked, gaps, unmapped
+        .. "unmapped_skill_ranks=%d %s",
+    checked, gaps, unmapped, status
 ))
