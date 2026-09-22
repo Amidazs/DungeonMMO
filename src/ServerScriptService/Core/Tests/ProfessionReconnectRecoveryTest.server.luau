@@ -56,6 +56,8 @@ local professions = Professions.new(profiles, inventory)
 local guard = Runtime.new_craft_request_guard()
 
 check(profiles:load(USER_ID) ~= nil, "initial account profile loads")
+check(professions:choose_profession(USER_ID, "Blacksmithing").ok,
+    "Original character must select its single crafting career")
 local initial_ore, initial_bars = count_materials(profiles)
 if initial_ore > 0 then
     check(inventory:consume_item(
