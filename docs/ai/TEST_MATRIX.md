@@ -1,5 +1,30 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — focused rank-passive acceptance
+
+- [x] `08710c1`: one Base Rojo build, one
+  `c4_passive_rank_effects_tests.luau` Studio run:
+  **64 assertions PASS**. Unknown skills remain
+  hidden below rank-one level; six passive ranks
+  require the correct level/SP and increase an
+  independently measured server physical/magic
+  multiplier; wrong-class bonus is zero and
+  ranks persist after save/reload.
+- [x] Read-only C4 audit: 16 brackets measured,
+  16 short; 14 older skill-rank families remain
+  unmapped across the four audited class/race
+  cases. **C4 parity is not accepted.**
+- [ ] One targeted normal-client passive combat
+  impact test later; this fixture checks the
+  authoritative multiplier but does not prove
+  player-facing balance.
+
+Receipt:
+`docs/testing/c4-passive-rank-effects-2026-09-22.md`.
+Do not rerun the entire dungeon/backend suite
+for an isolated new passive content increment.
+
+
 ## 22 September 2026 — v1.66 focused rank-content acceptance
 
 - [x] `d812a73`: Base Rojo build; nine-rank Fighter
