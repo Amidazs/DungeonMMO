@@ -1494,6 +1494,18 @@ local function initialize_session_services(session: any): (any?, boolean)
             return loaded_users[player.UserId] == true
                 and Players:GetPlayerByUserId(player.UserId) == player
         end,
+        validate_member = function(
+            player: Player,
+            dungeon_id: string,
+            difficulty_id: string
+        ): any
+            return runtime.DungeonDifficultyProgressionService
+                :validate_entry(
+                    player.UserId,
+                    dungeon_id,
+                    difficulty_id
+                )
+        end,
     })
 
     local death_ref: any = nil
