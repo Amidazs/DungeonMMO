@@ -40,6 +40,16 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "Rogue",
         DaggerEquipmentPending = true,
     }),
+    HPRegeneration = table.freeze({
+        SkillId = "ElvenRenewal",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    ThreatCharm = table.freeze({
+        SkillId = "ElvenCalmingShot",
+        Owner = "Ranger",
+        DaggerEquipmentPending = false,
+    }),
 })
 
 local SOURCES = table.freeze({
