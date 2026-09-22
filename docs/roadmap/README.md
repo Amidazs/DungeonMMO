@@ -1,5 +1,20 @@
 # Canonical Roadmap
 
+**Latest active requirement (v1.65): Chronicle 4 skill-RANK
+volume per corresponding class and level, not just a few
+additional active skills.**
+[Skill-volume roadmap](DungeonMMO_Roadmap_v1_65_C4_Skill_Volume_20260922.md)
+and [source-backed parity specification](
+../design/C4_Skill_Count_Parity_20260922.md).
+The first 16 verified Human/Elf Fighter/Mystic early-level
+brackets all show real authored-rank gaps, so C4 skill-volume
+parity is **NOT COMPLETE**. Fighter-style new basic rank
+milestones now begin 5/10/15 and Mystic-style 7/14/20,
+with focused level/mastery acceptance. Expand real,
+reachable active/passive/utility families and rank
+schedules; never pad quotas with inert catalogue entries.
+
+
 **Latest active work: v1.64 — earned skill mastery, level-bracket training
 and prerequisite-gated class advancement.**
 [Roadmap v1.64](DungeonMMO_Roadmap_v1_64_Skill_Mastery_Level_Gates_20260922.md)
