@@ -105,7 +105,7 @@ local DEFINITIONS = table.freeze({
         MaxRank = 3,
         Kind = "Control",
         AllowedBaseClasses = table.freeze({"Fighter"}),
-        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
         WeaponTags = table.freeze({}),
     }),
     AetherBolt = table.freeze({
@@ -114,7 +114,7 @@ local DEFINITIONS = table.freeze({
         MaxRank = 3,
         Kind = "Magic",
         AllowedBaseClasses = table.freeze({"Mage"}),
-        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        RankLevels = table.freeze({[1] = 7, [2] = 14, [3] = 20}),
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
     TrackerShot = table.freeze({
@@ -123,7 +123,7 @@ local DEFINITIONS = table.freeze({
         MaxRank = 3,
         Kind = "Physical",
         AllowedBaseClasses = table.freeze({"Ranger"}),
-        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
         WeaponTags = table.freeze({"Longbow"}),
     }),
     ViperStrike = table.freeze({
@@ -132,7 +132,7 @@ local DEFINITIONS = table.freeze({
         MaxRank = 3,
         Kind = "Physical",
         AllowedBaseClasses = table.freeze({"Rogue"}),
-        RankLevels = table.freeze({[1] = 8, [2] = 14, [3] = 20}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
 
