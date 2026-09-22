@@ -242,6 +242,43 @@ function PassiveSkillEffects.light_armor_reduction(
 end
 
 --[[
+Returns the Fighter's trained physical mitigation only while real light or
+heavy Body armour is equipped. Bare skin and invalid items grant nothing.
+
+Args:
+    character (any): Server-owned selected Fighter and equipped Body slot.
+
+Returns:
+    number: Non-negative physical NPC damage reduction up to 3.5%.
+]]
+function PassiveSkillEffects.fighter_armor_reduction(
+    character: any
+): number
+    if type(character) ~= "table"
+        or type(character.Equipment) ~= "table"
+    then
+        return 0
+    end
+    local body_id = character.Equipment.Body
+    local body = if type(body_id) == "string"
+        then ItemDefinitions.get(body_id) else nil
+    if not body or body.Kind ~= "Equipment" or body.Slot ~= "Body"
+        or (
+            body.Category ~= "LightArmor"
+            and body.Category ~= "HeavyArmor"
+        )
+    then
+        return 0
+    end
+    local bonus = resolve_bonus(
+        character,
+        "FighterArmorTraining",
+        "PhysicalReductionPerRank"
+    )
+    return math.clamp(bonus, 0, 0.035)
+end
+
+--[[
 Returns the real Human Scout critical-hit damage bonus from owned ranks.
 
 Args:
