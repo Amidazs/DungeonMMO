@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**Latest v1.69 — two real early Mage skills and honest unlock UI.**
+[Roadmap v1.69](DungeonMMO_Roadmap_v1_69_Mage_Starter_Unlock_Visibility_20260922.md)
+and [focused evidence](../testing/c4-mage-starter-ward-bolt-trainer-2026-09-22.md).
+Dawn Ward and Cinder Bolt now offer server-owned rank 1/2/3 at
+levels 1/7/14 and require mastery 35/100 for upgrades. The
+player's actual skill menu hides abilities absent from their
+authoritative unlocked snapshot; the trainer disables higher
+ranks and explains level/mastery requirements. One Base build,
+39 focused assertions and one read-only rank count audit ran.
+**13/16 mapped C4 level brackets still mismatch**; do not
+claim full rank parity or completed in-client visual verification.
+
+
 **Latest v1.68 — two more C4-style rank families with real HP/heal effects.**
 [Roadmap v1.68](DungeonMMO_Roadmap_v1_68_Vitality_Restoration_Ranks_20260922.md)
 and [focused test report](../testing/c4-vitality-restoration-rank-effects-2026-09-22.md).
