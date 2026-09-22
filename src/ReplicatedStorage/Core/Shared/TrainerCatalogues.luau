@@ -156,6 +156,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "ScoutFleetFoot",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "HumanScoutCriticalPower",
                 Mode = "LearnOrRank",
             }),
@@ -221,6 +225,10 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ScoutLightArmorMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFleetFoot",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
