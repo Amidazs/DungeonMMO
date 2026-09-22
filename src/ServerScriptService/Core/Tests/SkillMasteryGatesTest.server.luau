@@ -34,6 +34,9 @@ local Runtime = require(
     core.Services:WaitForChild("ProgressionRuntimeState")
 )
 local Dungeons = require(shared:WaitForChild("DungeonDefinitions"))
+local CombatSkills = require(
+    RS.Combat.Shared:WaitForChild("SkillDefinitions")
+)
 
 local USER_ID = 64001
 local assertions = 0
@@ -277,6 +280,61 @@ end
 -- Args:
 --   None.
 -- Returns:
+--   nil: Checks every base-class ability uses the same level-8 visibility
+--       and registered server-owned combat skill definition.
+local function test_all_basic_classes()
+    local examples = {
+        {"Fighter", "GuardBreaker", "FighterTrainer", "Melee"},
+        {"Mage", "AetherBolt", "MageTrainer", "MagicProjectile"},
+        {"Ranger", "TrackerShot", "RangerTrainer", "RangerProjectile"},
+        {"Rogue", "ViperStrike", "RogueTrainer", "Melee"},
+    }
+
+    for _, example in ipairs(examples) do
+        local class_id = example[1]
+        local skill_id = example[2]
+        local trainer_id = example[3]
+        local expected_kind = example[4]
+        local character = {
+            Level = 7,
+            Identity = {
+                Version = 1,
+                RaceId = "Human",
+                BaseClassId = class_id,
+                ClassId = class_id,
+                CreationStage = "Complete",
+            },
+            Progression = {Skills = {}},
+            ClassAdvancement = {},
+        }
+        local definition = assert(Definitions.get(skill_id))
+        check(
+            not Rules.can_show(character, definition),
+            "Each class's new basic ability must be hidden at level 7."
+        )
+        character.Level = 8
+        check(
+            Rules.can_show(character, definition)
+                and Trainers.can_offer(
+                    trainer_id, character, skill_id
+                ).ok,
+            "Each class must see its own base skill at level 8."
+        )
+        check(
+            CombatSkills.get(skill_id).KIND == expected_kind,
+            "Each class's base skill needs a real combat definition."
+        )
+        character.Identity.BaseClassId = "OtherClass"
+        check(
+            not Rules.can_show(character, definition),
+            "A different base class must not see the new skill."
+        )
+    end
+end
+
+-- Args:
+--   None.
+-- Returns:
 --   nil: Verifies first mastery progression without unrelated dungeon tests.
 local function main()
     local profiles = Profiles.new(Memory.new())
@@ -300,6 +358,7 @@ local function main()
     local quests = Quests.new(profiles)
     local advancement = Advancement.new(profiles, quests, "Base")
 
+    test_all_basic_classes()
     test_basic_levels(profiles, skills)
     test_advancement(profiles, quests, advancement)
     test_advanced_ability(profiles, skills)
