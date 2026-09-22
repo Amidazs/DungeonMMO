@@ -1,6 +1,44 @@
 # DungeonMMO Current Engineering State
 
-## 22 September 2026 — current v1.76 C4 source coverage PARTIAL
+## 22 September 2026 — current C4 backend v1.77, PARTIAL
+
+The latest current C4 backend roadmap is
+`docs/roadmap/DungeonMMO_Roadmap_v1_77_C4_Poison_Cure_20260922.md`.
+The separate recently updated humanoid animation roadmap
+remains authoritative for assets and visual acceptance.
+
+Current six source-mapped inventories: **340/396**
+functional DungeonMMO analogue ranks (56 missing);
+starting classes 151/168 and partial Rogue/Scout
+189/228. Human Fighter 37/39, Elf Fighter 41/43,
+Human Mystic 38/44, Elf Mystic 35/42, Human Rogue
+81/99, Elven Scout 108/129. SEVEN original C4
+first-transfer source class inventories still not mapped;
+ZERO of the nine first-transfer class paths complete.
+
+Human Mystic Poison Curse now deals actual delayed
+server-owned NPC damage after a true projectile hit.
+Mystic Cure Poison targets poisoned allies despite
+full health; Elf Scout Poison Recovery is self-only.
+Existing server DamageService handles authoritative
+poison ticks and cancellation after cure/expiry.
+Unpublished Play confirmed all three authentic hotbar
+effects and no post-cure tick. Focused source/skill 20,
+base 49, Scout 1080, strict coverage 7 assertions PASS;
+both Base/Dungeon TEMP Rojo builds PASS. No actual
+authored NPC attack yet applies poison in ordinary
+gameplay; that is new content, not an accepted feature.
+
+[Exact test record](../testing/c4-poison-status-v1-77-2026-09-22.md).
+[Current backend roadmap](../roadmap/DungeonMMO_Roadmap_v1_77_C4_Poison_Cure_20260922.md).
+Full saved-profile trainer GUI, source-equivalent class
+quests, published multiplayer and broad final regression
+are OPEN; separate Phase2A paid-revive auto-test remains
+unresolved. No main merge, Roblox publish, PROD saves
+or paid operations occurred.
+
+
+## 22 September 2026 — previous v1.76 C4 source coverage PARTIAL
 
 Six inventoried C4 source classes now have **336/396**
 functional analogue rank entries, 60 missing:
