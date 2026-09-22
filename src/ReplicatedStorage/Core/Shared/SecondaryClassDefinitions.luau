@@ -2,6 +2,42 @@
 local SecondaryClassDefinitions = {}
 
 local DEFINITIONS = table.freeze({
+    HumanVanguard = table.freeze({
+        Id = "HumanVanguard",
+        DisplayName = "Vanguard",
+        RaceId = "Human",
+        BaseClassId = "Fighter",
+        RoleId = "Tank",
+        QuestId = "FighterAdvancementTrial",
+    }),
+
+    ElfThornwarden = table.freeze({
+        Id = "ElfThornwarden",
+        DisplayName = "Thornwarden",
+        RaceId = "Elf",
+        BaseClassId = "Fighter",
+        RoleId = "Tank",
+        QuestId = "FighterAdvancementTrial",
+    }),
+
+    HumanSharpshooter = table.freeze({
+        Id = "HumanSharpshooter",
+        DisplayName = "Sharpshooter",
+        RaceId = "Human",
+        BaseClassId = "Ranger",
+        RoleId = "RangedDamage",
+        QuestId = "RangerAdvancementTrial",
+    }),
+
+    ElfWindrunner = table.freeze({
+        Id = "ElfWindrunner",
+        DisplayName = "Windrunner",
+        RaceId = "Elf",
+        BaseClassId = "Ranger",
+        RoleId = "RangedDamage",
+        QuestId = "RangerAdvancementTrial",
+    }),
+
     HumanArcanist = table.freeze({
         Id = "HumanArcanist",
         DisplayName = "Arcanist",
@@ -51,11 +87,15 @@ local DEFINITIONS = table.freeze({
 
 local BY_PATH = table.freeze({
     Human = table.freeze({
+        Fighter = DEFINITIONS.HumanVanguard,
         Mage = DEFINITIONS.HumanArcanist,
+        Ranger = DEFINITIONS.HumanSharpshooter,
         Rogue = DEFINITIONS.HumanRogueDuelist,
     }),
     Elf = table.freeze({
+        Fighter = DEFINITIONS.ElfThornwarden,
         Mage = DEFINITIONS.ElfSpellweaver,
+        Ranger = DEFINITIONS.ElfWindrunner,
         Rogue = DEFINITIONS.ElfRogueWindstalker,
     }),
 })
