@@ -996,7 +996,10 @@ local function sequence_is_current(
     sequence_id: number,
     expected_state: string
 ): boolean
-    return player_states[player] == record
+    return player:GetAttribute(
+            CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+        ) ~= false
+        and player_states[player] == record
         and record.sequence_id == sequence_id
         and record.state_name == expected_state
 end
@@ -1545,6 +1548,14 @@ local function handle_attack_request(
     player: Player,
     requested_action: any
 )
+    if player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) == false then
+        CombatValidationService.emit(
+            player, "ATTACK", "REJECT", "DungeonMemberNotActive", nil
+        )
+        return
+    end
     local record = player_states[player]
 
     if not record then
@@ -2535,6 +2546,14 @@ local function handle_skill_request(
     requested_skill_id: any,
     aim_intent: any
 )
+    if player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) == false then
+        CombatValidationService.emit(
+            player, "SKILL", "REJECT", "DungeonMemberNotActive", nil
+        )
+        return
+    end
     if type(requested_skill_id) ~= "string" then
         CombatValidationService.emit(
             player,
@@ -2826,6 +2845,14 @@ local function handle_defense_request(
     view_locked_intent: any,
     dodge_world_direction: any
 )
+    if player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) == false then
+        CombatValidationService.emit(
+            player, "DEFENSE", "REJECT", "DungeonMemberNotActive", nil
+        )
+        return
+    end
     local record = player_states[player]
 
     if not record then
