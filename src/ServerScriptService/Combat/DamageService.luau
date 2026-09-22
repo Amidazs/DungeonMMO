@@ -66,7 +66,11 @@ function DamageService.apply_damage(context: DamageContext): number
         -- unaffected; the defender's saved equipment/ranks own the value.
         local reduction = ProgressionRuntimeState
             .get_light_armor_reduction(defender.UserId)
-        damage *= 1 - reduction
+        local fighter_reduction = ProgressionRuntimeState
+            .get_fighter_armor_reduction(defender.UserId)
+        damage *= 1 - math.clamp(
+            reduction + fighter_reduction, 0, 0.50
+        )
     end
     local health_damage, ward_absorbed = WardService.absorb_damage(
         context.target, damage
