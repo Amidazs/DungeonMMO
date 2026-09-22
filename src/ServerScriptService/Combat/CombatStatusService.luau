@@ -13,6 +13,10 @@ local BUFFS = table.freeze({
         Magnitude = "C4PhysicalGuardBonus",
         ExpiresAt = "C4PhysicalGuardExpiresAt",
     }),
+    Evasion = table.freeze({
+        Magnitude = "C4EvasionBonus",
+        ExpiresAt = "C4EvasionExpiresAt",
+    }),
     MagicPower = table.freeze({
         Magnitude = "C4MagicPowerBonus",
         ExpiresAt = "C4MagicPowerExpiresAt",
