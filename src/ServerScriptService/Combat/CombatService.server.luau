@@ -57,6 +57,9 @@ local MendService = require(
 local StaggerService = require(
     script.Parent:WaitForChild("StaggerService")
 )
+local RogueBleedService = require(
+    script.Parent:WaitForChild("RogueBleedService")
+)
 local StaminaService = require(
     script.Parent:WaitForChild("StaminaService")
 )
@@ -1859,6 +1862,20 @@ local function apply_rogue_melee_target(
         critical_damage_multiplier = ProgressionRuntimeState
             .get_critical_damage_multiplier(player.UserId),
     })
+
+    -- Only a confirmed damaging melee hit may apply the periodic
+    -- effect. The service owns all later ticks and attribution.
+    local bleed_damage = tonumber(
+        skill_definition.BLEED_TICK_DAMAGE
+    ) or 0
+    if applied_damage > 0 and bleed_damage > 0 then
+        RogueBleedService.apply(
+            player, target, skill_definition.ID,
+            bleed_damage,
+            tonumber(skill_definition.BLEED_TICK_COUNT) or 0,
+            tonumber(skill_definition.BLEED_TICK_INTERVAL) or 0
+        )
+    end
 
     local expose_seconds = tonumber(skill_definition.EXPOSE_SECONDS) or 0
     if expose_seconds > 0 then
