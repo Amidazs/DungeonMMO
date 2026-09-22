@@ -377,9 +377,95 @@ local WINDSTALKER_SLIPSTREAM = rogue_melee("WindstalkerSlipstream", "Slipstream"
 local WINDSTALKER_BLUR = rogue_melee("WindstalkerBlur", "Blur", 16, 8.0, 0, 4.8, {EVASION_IFRAME_SECONDS = 0.28})
 local WINDSTALKER_QUICKSTEP = rogue_melee("WindstalkerQuickstep", "Quickstep", 10, 4.0, 4, 5.0, nil)
 
+-- Reuses verified hit, threat, projectile and volley executors. Advanced
+-- skills have different server-owned costs and ranks, not a second
+-- combat implementation or untested client-side effects.
+--
+-- Args:
+--   source (any): Existing validated combat skill definition.
+--   id (string): Stable advanced-class skill identifier.
+--   display_name (string): Player-facing ability name.
+--   overrides (any): Authoritative combat values and rank effects.
+-- Returns:
+--   any: Frozen definition with the original executor-compatible shape.
+local function specialize_skill(
+    source: any,
+    id: string,
+    display_name: string,
+    overrides: any
+): any
+    local definition = {}
+    for key, value in pairs(source) do
+        definition[key] = value
+    end
+    definition.ID = id
+    definition.DISPLAY_NAME = display_name
+    for key, value in pairs(overrides) do
+        definition[key] = value
+    end
+    return table.freeze(definition)
+end
+
+local VANGUARD_CHALLENGE = specialize_skill(
+    TAUNT, "VanguardChallenge", "Vanguard Challenge", {
+        COOLDOWN_SECONDS = 10,
+        REACH_STUDS = 14,
+        TAUNT_BONUS_THREAT = 22,
+        RANKS = table.freeze({
+            [1] = table.freeze({TAUNT_BONUS_THREAT = 22}),
+            [2] = table.freeze({TAUNT_BONUS_THREAT = 34}),
+            [3] = table.freeze({TAUNT_BONUS_THREAT = 48}),
+        }),
+    }
+)
+
+local THORNWARDEN_BASH = specialize_skill(
+    SHIELD_BASH, "ThornwardenBash", "Thornwarden Bash", {
+        COOLDOWN_SECONDS = 7,
+        BASE_DAMAGE = 3,
+        STAGGER_SECONDS = 1.5,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 3, STAGGER_SECONDS = 1.5}),
+            [2] = table.freeze({BASE_DAMAGE = 4, STAGGER_SECONDS = 1.8}),
+            [3] = table.freeze({BASE_DAMAGE = 5, STAGGER_SECONDS = 2.1}),
+        }),
+    }
+)
+
+local SHARPSHOOTER_PIERCE = specialize_skill(
+    PIERCING_SHOT, "SharpshooterPierce", "Sharpshooter Pierce", {
+        COOLDOWN_SECONDS = 9,
+        RANGE_STUDS = 95,
+        BASE_DAMAGE = 44,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 44}),
+            [2] = table.freeze({BASE_DAMAGE = 50}),
+            [3] = table.freeze({BASE_DAMAGE = 58}),
+        }),
+    }
+)
+
+local WINDRUNNER_VOLLEY = specialize_skill(
+    VOLLEY, "WindrunnerVolley", "Windrunner Volley", {
+        COOLDOWN_SECONDS = 7,
+        RADIUS_STUDS = 8,
+        INITIAL_DAMAGE = 12,
+        PULSE_DAMAGE = 7,
+        RANKS = table.freeze({
+            [1] = table.freeze({INITIAL_DAMAGE = 12, PULSE_DAMAGE = 7}),
+            [2] = table.freeze({INITIAL_DAMAGE = 14, PULSE_DAMAGE = 8}),
+            [3] = table.freeze({INITIAL_DAMAGE = 16, PULSE_DAMAGE = 9}),
+        }),
+    }
+)
+
 local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
     Taunt = TAUNT,
+    VanguardChallenge = VANGUARD_CHALLENGE,
+    ThornwardenBash = THORNWARDEN_BASH,
+    SharpshooterPierce = SHARPSHOOTER_PIERCE,
+    WindrunnerVolley = WINDRUNNER_VOLLEY,
     Mend = MEND,
     ArcSlash = ARC_SLASH,
     WindStrike = WIND_STRIKE,
