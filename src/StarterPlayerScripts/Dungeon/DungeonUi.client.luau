@@ -354,6 +354,7 @@ local return_server_time = 0
 local return_received_at = 0
 local revive_action: string? = nil
 local run_failed = false
+local terminal_view = false
 
 --[[
 Updates whether the full-screen modal backdrop is visible.
@@ -426,6 +427,14 @@ Returns:
 ]]
 local function apply_revive_state(payload: any)
     if type(payload) ~= "table" then
+        return
+    end
+
+    -- A delayed admission/revive snapshot cannot dismiss a terminal
+    -- result, party replay vote, or the Play again controls.
+    if terminal_view then
+        revive_panel.Visible = false
+        update_backdrop()
         return
     end
 
@@ -540,6 +549,7 @@ local function apply_dungeon_state(payload: any)
     end
 
     if state == "Complete" then
+        terminal_view = true
         run_failed = false
         complete_caption.Text = "EXPEDITION COMPLETE"
         complete_title.Text = "VICTORY"
@@ -572,6 +582,7 @@ local function apply_dungeon_state(payload: any)
             return_received_at = os.clock()
         end
     elseif state == "Failed" then
+        terminal_view = true
         run_failed = true
         return_at = nil
         revive_action = nil
