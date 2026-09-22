@@ -984,6 +984,21 @@ local MYSTIC_HEALING_PRAYER = specialize_skill(
     }
 )
 
+-- C4 level-14 Battle Heal acts on an actual selected friendly target
+-- through the existing server-only MageHeal service and spends mana.
+local MYSTIC_BATTLE_HEAL = specialize_skill(
+    MAGE_HEAL, "MysticBattleHeal", "Battle Heal", {
+        MANA_COST = 25,
+        COOLDOWN_SECONDS = 7,
+        TOTAL_HEAL = 78,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 78}),
+            [2] = table.freeze({TOTAL_HEAL = 92}),
+            [3] = table.freeze({TOTAL_HEAL = 108}),
+        }),
+    }
+)
+
 -- Each authentic server projectile applies a real non-stacking slow
 -- only after impact on a living NPC. All four source ranks improve it.
 local MYSTIC_FROST_BOLT = specialize_skill(
@@ -1223,6 +1238,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticBattleChant = MYSTICBATTLECHANT,
     MysticStoneSkin = MYSTICSTONESKIN,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
+    MysticBattleHeal = MYSTIC_BATTLE_HEAL,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
