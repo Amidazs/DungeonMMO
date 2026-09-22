@@ -214,6 +214,18 @@
       "ClassName": "RemoteEvent"
     },
     {
+      "Name": "QuestActionRequest",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "QuestActionResult",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "QuestSnapshot",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "RaceChangeActionResult",
       "ClassName": "RemoteEvent"
     }
