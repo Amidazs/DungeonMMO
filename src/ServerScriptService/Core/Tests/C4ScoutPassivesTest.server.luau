@@ -406,4 +406,53 @@ for _, class_id in ipairs({"Ranger", "Rogue"}) do
     Runtime.clear_character(user_id)
 end
 
+-- C4 source levels 24 and 28 grant two distinct direct-melee dodge
+-- mechanics. Moving-only ranks never apply when standing still.
+for _, race_id in ipairs({"Human", "Elf"}) do
+    for _, class_id in ipairs({"Ranger", "Rogue"}) do
+        local user_id = if race_id == "Human"
+            then (if class_id == "Ranger" then 77671 else 77672)
+            else (if class_id == "Ranger" then 77673 else 77674)
+        local character = make_character(class_id, user_id)
+        character.Identity.RaceId = race_id
+        local normal = assert(Skills.get("ScoutEvasion"))
+        local running = assert(Skills.get("ScoutRunningEvasion"))
+        character.Level = 23
+        check(not Unlocks.can_show(character, normal),
+            "Scout evasion appeared below source level 24")
+        character.Level = 24
+        check(Trainers.can_offer(
+            class_id .. "Trainer", character, "ScoutEvasion"
+        ).ok, "Source evasion is absent from Scout trainer")
+        character.Level = 27
+        check(not Unlocks.can_show(character, running),
+            "Moving evasion appeared below source level 28")
+        character.Level = 28
+        check(Trainers.can_offer(
+            class_id .. "Trainer", character, "ScoutRunningEvasion"
+        ).ok, "Moving evasion is absent from Scout trainer")
+        Runtime.set_character(user_id, character)
+        check(Runtime.get_scout_evasion_chance(user_id, true) == 0,
+            "Untrained Scout gained evasion chance")
+        character.Progression.Skills.ScoutEvasion = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+        character.Progression.Skills.ScoutRunningEvasion = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+        Runtime.set_character(user_id, character)
+        check(math.abs(
+            Runtime.get_scout_evasion_chance(user_id, false) - 0.03
+        ) < 0.0001, "Standing Scout incorrectly received moving bonus")
+        check(math.abs(
+            Runtime.get_scout_evasion_chance(user_id, true) - 0.055
+        ) < 0.0001, "Moving Scout did not gain both purchased bonuses")
+        character.Identity.BaseClassId = "Mage"
+        Runtime.set_character(user_id, character)
+        check(Runtime.get_scout_evasion_chance(user_id, true) == 0,
+            "Forged Scout ranks granted evasion to a Mage")
+        Runtime.clear_character(user_id)
+    end
+end
+
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
