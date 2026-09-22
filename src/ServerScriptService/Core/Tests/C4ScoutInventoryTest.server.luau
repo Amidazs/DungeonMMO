@@ -164,6 +164,18 @@ local function check_race(race_id: string)
     end
     check(audit.EquipmentMismatch <= audit.Functional,
         "Dagger equipment mismatch cannot exceed implemented volume")
+    local remaining = 0
+    for family, count in pairs(audit.MissingFamilies) do
+        check(Inventory.implementation(family, race_id) == nil,
+            race_id .. " missing inventory contains a mapped ability")
+        check(count > 0,
+            race_id .. " missing family " .. family .. " has zero ranks")
+        remaining += count
+    end
+    check(remaining == audit.Missing,
+        race_id .. " missing family ledger does not reconcile")
+    check(audit.Missing > 0,
+        "Incomplete C4 Scout catalogue must not be declared complete")
 end
 
 check_race("Human")
