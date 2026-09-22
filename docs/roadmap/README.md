@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**v1.60 same-server reconnect is now locally verified.**
+[Updated v1.60 roadmap](DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md)
+and [same-head Studio acceptance](../testing/dungeon-same-server-reconnect-local-acceptance-2026-09-22.md).
+At gameplay source `87a19ba`, all six Rojo builds, the
+30-assertion simulated same-user reconnect contract, Dungeon
+backend 30/30, death/revive 46, focused threat 51, Base
+professions 14/14, actual-client failed-run UI and real
+four-client Room1 recovery passed. A real Roblox same-account
+network return to the original published reserved server
+remains unverified. No place publish or main merge.
+
+
 **v1.60 same-server reconnect is staged in GitHub, not yet
 locally tested.** [Roadmap](DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md)
 and [pending acceptance report](../testing/dungeon-same-server-reconnect-stage-2026-09-22.md).
