@@ -279,6 +279,17 @@ local function check_skill(player, target, case)
         assert(target:GetAttribute("RogueBleedSourceUserId")
             == player.UserId, "Bleed damage lost attacker attribution")
         print("[C4 Control Client] SERVER_BLEED_TICK_PASS")
+        wait_for(function()
+            return (target:GetAttribute("RogueBleedRemainingTicks")
+                or 0) == 0
+        end, "Lacerating Cut all three server ticks complete", 5)
+        assert(humanoid.Health <= direct_hit_health - 8.5,
+            "Three scheduled rank-one bleed ticks did not deal damage")
+        local health_after_bleed = humanoid.Health
+        task.wait(0.8)
+        assert(math.abs(humanoid.Health - health_after_bleed) < 0.01,
+            "Expired bleed continued dealing damage")
+        print("[C4 Control Client] THREE_TICKS_AND_EXPIRY_PASS")
     end
     print("[C4 Control Client] " .. case.skill .. " REAL_CLIENT_EFFECT_PASS")
     task.wait(0.6)
