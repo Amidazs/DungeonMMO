@@ -366,8 +366,11 @@ function ProgressionRuntimeState.get_physical_multiplier(
     local equipment_bonus = equipment_effects_for(user_id)
         .PhysicalDamageBonus
 
+    local character = state_for(user_id)
     local passive_bonus = PassiveSkillEffects.damage_bonus(
-        state_for(user_id), "IronDiscipline"
+        character, "IronDiscipline"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "RogueBladeMastery"
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
@@ -386,15 +389,13 @@ Returns:
 function ProgressionRuntimeState.get_ranged_physical_multiplier(
     user_id: number
 ): number
-    return math.max(
-        0,
-        AttributeConfig.ranged_physical_multiplier(
-            ProgressionRuntimeState.get_attribute(
-                user_id,
-                "Dexterity"
-            )
-        )
+    local baseline = AttributeConfig.ranged_physical_multiplier(
+        ProgressionRuntimeState.get_attribute(user_id, "Dexterity")
     )
+    local mastery = PassiveSkillEffects.damage_bonus(
+        state_for(user_id), "RangerBowMastery"
+    )
+    return math.max(0, baseline + mastery)
 end
 
 --[[
