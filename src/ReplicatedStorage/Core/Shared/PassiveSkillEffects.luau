@@ -79,6 +79,39 @@ local function resolve_bonus(
     return purchased_rank(character, definition) * per_rank
 end
 
+--[[
+Checks the real equipped weapon's registered tags, not client-supplied tags.
+
+Args:
+    character (any): Server-owned character and Equipment slots.
+    required_tag (string): Dagger, Longbow, or another authoritative tag.
+
+Returns:
+    boolean: True only when an actual valid equipped weapon has the tag.
+]]
+local function equipped_weapon_has_tag(
+    character: any,
+    required_tag: string
+): boolean
+    local equipment = type(character) == "table"
+        and character.Equipment
+    local weapon_id = type(equipment) == "table"
+        and equipment.Weapon
+    local weapon = if type(weapon_id) == "string"
+        then ItemDefinitions.get(weapon_id) else nil
+    if not weapon or weapon.Kind ~= "Equipment"
+        or weapon.Slot ~= "Weapon"
+    then
+        return false
+    end
+    for _, tag in ipairs(weapon.WeaponTags or {}) do
+        if tag == required_tag then
+            return true
+        end
+    end
+    return false
+end
+
 -- Resolves a purchased physical or magical damage passive.
 --
 -- Args:
@@ -90,29 +123,10 @@ function PassiveSkillEffects.damage_bonus(
     character: any,
     skill_id: string
 ): number
-    if skill_id == "RogueEdgeDiscipline" then
-        -- Dagger mastery is an equipment-specific C4 analogue.
-        -- Retain legacy sword bonuses only for earlier sword skills.
-        local equipment = type(character) == "table"
-            and character.Equipment
-        local weapon_id = type(equipment) == "table"
-            and equipment.Weapon
-        local weapon = if type(weapon_id) == "string"
-            then ItemDefinitions.get(weapon_id) else nil
-        local dagger = false
-        if weapon and weapon.Kind == "Equipment"
-            and weapon.Slot == "Weapon"
-        then
-            for _, tag in ipairs(weapon.WeaponTags or {}) do
-                if tag == "Dagger" then
-                    dagger = true
-                    break
-                end
-            end
-        end
-        if not dagger then
-            return 0
-        end
+    if skill_id == "RogueEdgeDiscipline"
+        and not equipped_weapon_has_tag(character, "Dagger")
+    then
+        return 0
     end
     return resolve_bonus(character, skill_id, "DamageBonusPerRank")
 end
@@ -127,6 +141,9 @@ Returns:
     number: Added studs to accepted Ranger projectile maximum range.
 ]]
 function PassiveSkillEffects.bow_range_bonus(character: any): number
+    if not equipped_weapon_has_tag(character, "Longbow") then
+        return 0
+    end
     return math.max(0, resolve_bonus(
         character, "RangerLongRange", "BowRangeBonusStudsPerRank"
     ))
@@ -142,6 +159,9 @@ Returns:
     number: Added studs per second to actual Ranger arrows.
 ]]
 function PassiveSkillEffects.arrow_speed_bonus(character: any): number
+    if not equipped_weapon_has_tag(character, "Longbow") then
+        return 0
+    end
     return math.max(0, resolve_bonus(
         character, "RangerArrowVelocity", "ArrowSpeedBonusPerRank"
     ))
