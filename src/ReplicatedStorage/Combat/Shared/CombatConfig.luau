@@ -1,4 +1,5 @@
 local CombatConfig = {
+    DUNGEON_COMBAT_ALLOWED_ATTRIBUTE = "DungeonCombatAllowed",
     ARENA = {
         ROOT_NAME = "CombatPrototype",
 
