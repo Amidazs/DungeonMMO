@@ -1,5 +1,25 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — v1.69 early Mage spells / skill visibility
+
+Focused gameplay/test head `e6033e0`: two early Mage
+active abilities Dawn Ward (14/21/29 protection) and
+Cinder Bolt (12/18/25 magic damage) at rank levels
+1/7/14 with earned proficiency 35/100 and SP gates.
+The authoritative snapshot filters unknown unreached
+skills; SkillsMenu now hides those rows, while the
+trainer explains and disables a *known* skill's locked
+next rank. Existing learned skills remain visible.
+
+A Base Rojo build and 39 focused skill/level/visibility
+assertions passed. One read-only C4 audit reports
+13/16 mismatched level brackets and 14 unmapped older
+rank occurrences. The UI and actual player-input hit/
+protection effects require a separate focused client
+test; there was no published test or dungeon regression.
+[Roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_69_Mage_Starter_Unlock_Visibility_20260922.md).
+
+
 ## 22 September 2026 — v1.68 health/healing passive rank content
 
 Focused gameplay source `3be5de3`: Fighter
