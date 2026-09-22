@@ -68,6 +68,20 @@ local IMPLEMENTATIONS = table.freeze({
     }),
 })
 
+-- One source family has different purchase levels for Human and Elf.
+local PRECISION_BY_RACE = table.freeze({
+    Human = table.freeze({
+        SkillId = "HumanScoutPrecision",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    Elf = table.freeze({
+        SkillId = "ElvenScoutPrecision",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+})
+
 local SOURCES = table.freeze({
     Human = table.freeze({
         SourceUrl = "https://l2hub.info/c4/classes/rogue",
@@ -251,7 +265,13 @@ Args:
 Returns:
     any?: Skill ID, owned branch and dagger-equipment warning when mapped.
 ]]
-function C4ScoutSkillInventory.implementation(category: string): any?
+function C4ScoutSkillInventory.implementation(
+    category: string,
+    race_id: string?
+): any?
+    if category == "CriticalRatePassive" then
+        return PRECISION_BY_RACE[race_id]
+    end
     return IMPLEMENTATIONS[category]
 end
 
@@ -282,7 +302,9 @@ function C4ScoutSkillInventory.audit(race_id: string): any?
         local bracket = {Raw = 0, Functional = 0, Missing = 0}
         for category, count in pairs(categories) do
             bracket.Raw += count
-            local mapping = IMPLEMENTATIONS[category]
+            local mapping = C4ScoutSkillInventory.implementation(
+                category, race_id
+            )
             if mapping then
                 bracket.Functional += count
                 if mapping.DaggerEquipmentPending then
