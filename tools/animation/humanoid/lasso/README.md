@@ -75,5 +75,5 @@ compatible joints and validate them visually before reuse. The
 generator and replay intentionally refuse to operate in a published
 Roblox place; they are excluded from the production `src/` tree.
 
-See [humanoid animation production roadmap](../../../docs/roadmap/DungeonMMO_Humanoid_Animation_Pipeline_20260922.md)
+See [humanoid animation production roadmap](../../../../docs/roadmap/DungeonMMO_Humanoid_Animation_Pipeline_20260922.md)
 for the visual-quality and combat-integration acceptance gates.
