@@ -155,6 +155,29 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- C4 Mystic Ice Bolt first-tier source ranks: two at 7/14.
+    -- Server projectile impact applies real enemy movement impairment.
+    MysticFrostBolt = table.freeze({
+        Id = "MysticFrostBolt",
+        Tier = "Common",
+        MaxRank = 4,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 14, [4] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 100, [4] = 160,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "WindStrike", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Mystic physical/magic weapon mastery at levels 7 and 14.
     MysticWeaponTraining = table.freeze({
         Id = "MysticWeaponTraining",
