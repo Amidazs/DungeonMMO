@@ -110,6 +110,9 @@ local cases = {
     {class = "Mage", skill = "MysticWindBolt",
         weapon = "apprentice_arcane_wand", kind = "Damage",
         level = 7},
+    {class = "Mage", skill = "MysticFrostBolt",
+        weapon = "apprentice_arcane_wand", kind = "Frost",
+        level = 7},
     {class = "Mage", skill = "MysticHealingPrayer",
         weapon = "apprentice_arcane_wand", kind = "Heal",
         level = 7},
@@ -327,6 +330,14 @@ local function check_skill(player, target, case)
             target:GetPivot().Position + Vector3.new(25, 0, 0)
         ))
         print("[C4 Control Client] SERVER_SLOW_PASS")
+    elseif case.kind == "Frost" then
+        wait_for(function()
+            return (target:GetAttribute("RangerSlowMultiplier") or 1)
+                < 0.99
+        end, "Mystic Frost real server-owned NPC movement slow", 6)
+        assert((target:GetAttribute("RangerSlowEndsAt") or 0)
+            > os.clock(), "Mystic Frost slow did not persist")
+        print("[C4 Control Client] MYSTIC_FROST_REAL_SLOW_PASS")
     elseif case.kind == "Stagger" then
         wait_for(function()
             return (target:GetAttribute("CombatStaggeredUntil") or 0)
@@ -578,7 +589,7 @@ local function run()
     check_light_armor(player)
     check_scout_movement(player, dummy)
     check_scout_critical_damage(player, dummy)
-    print("[C4 Control Client] ALL_TWELVE_C4_SKILL_EFFECTS_PASS")
+    print("[C4 Control Client] ALL_THIRTEEN_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
