@@ -66,6 +66,16 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "RangerRogue",
         DaggerEquipmentPending = false,
     }),
+    SittingRecovery = table.freeze({
+        SkillId = "HumanScoutRestingRecovery",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    RunningRecovery = table.freeze({
+        SkillId = "ScoutRunningRecovery",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
     EvasionPassive = table.freeze({
         SkillId = "ScoutEvasion",
         Owner = "RangerRogue",
