@@ -2,6 +2,21 @@
 local SkillProgressionDefinitions = {}
 
 local DEFINITIONS = table.freeze({
+    -- C4 level-one starting-class protection analogue. The actual
+    -- server mitigation expires upon reaching first-transfer level 20.
+    NoviceProtection = table.freeze({
+        Id = "NoviceProtection",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter", "Mage"}),
+        RankLevels = table.freeze({[1] = 1}),
+        MaximumLevel = 19,
+        PhysicalReductionPerRank = 0.02,
+        WeaponTags = table.freeze({}),
+    }),
+
     Mend = table.freeze({
         Id = "Mend",
         Tier = "Common",
