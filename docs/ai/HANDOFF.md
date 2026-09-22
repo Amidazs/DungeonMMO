@@ -1,5 +1,37 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — consolidated backend gap audit / STOP repeated test loops
+
+Read `docs/roadmap/DungeonMMO_Consolidated_Backend_Audit_20260922.md`
+before proposing the next task. The user requested one
+remaining-work inventory rather than another cycle of
+wipe/aggro/revive/Play-again regression. Existing v1.61
+local acceptance remains valid at its recorded commits;
+no new gameplay source or tests were changed by this
+GitHub-only audit.
+
+Next: inspect for an **already existing** representative
+four-player normal-input dungeon clear → per-member
+reward/unlock → next-depth entry fixture. Create or
+complete only its genuinely missing integration parts;
+if adequate evidence already exists, do not rerun it.
+Then move to NEW MMO content: class/quest/loot
+progression, tiered professions/economy, weekly boss/raid
+mechanics, and separately scoped guild/castle competition.
+No new framework for already accepted session, reward,
+aggro or party authorities. Run focused tests per change,
+a relevant integrated test per milestone, broad regression
+only for closeout/merge/release. Published TEST, genuine
+same-account network rejoin and cloud persistence remain
+separate approval-gated activities.
+
+Audit scope is GitHub Markdown roadmap index/supplements,
+current-state and source inventory; the historical v1.47
+Word file was not independently parsed. No Remote Desktop,
+Roblox publish, `main` merge, force-push or production
+profile operation was performed.
+
+
 ## 22 September 2026 — all-member difficulty gate / spectator / replay PASS
 
 Accepted gameplay source `c6925c0`: six Rojo builds, focused
