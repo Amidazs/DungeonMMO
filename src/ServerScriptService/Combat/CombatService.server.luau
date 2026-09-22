@@ -2399,14 +2399,16 @@ local function start_skill(
     record.current_skill_id = skill_definition.ID
     record.skill_aim = skill_aim
 
+    local wind_up_seconds = ProgressionRuntimeState
+        .get_skill_wind_up_seconds(player.UserId, skill_definition)
+
     if skill_definition.ID == "WindStrike" then
         local character = player.Character
         if character then
             character:SetAttribute("WindStrikeCharging", true)
             character:SetAttribute(
                 "WindStrikeChargeEndsAt",
-                Workspace:GetServerTimeNow()
-                    + skill_definition.WIND_UP_SECONDS
+                Workspace:GetServerTimeNow() + wind_up_seconds
             )
         end
     end
@@ -2429,7 +2431,7 @@ local function start_skill(
         sequence_id
     )
 
-    task.delay(skill_definition.WIND_UP_SECONDS, function()
+    task.delay(wind_up_seconds, function()
         enter_skill_active(
             player,
             record,
