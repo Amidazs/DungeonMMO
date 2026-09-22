@@ -36,7 +36,8 @@ check(character.Identity.ClassId == "Rogue", "Rogue current identity must remain
 check(character.Progression.Skills.QuickStrike.Known == true, "Quick Strike starter missing.")
 check(character.Progression.Skills.Backstab.Known == true, "Backstab starter missing.")
 check(character.Progression.Skills.EvasiveStep.Known == true, "Evasive Step starter missing.")
-check(character.Equipment.Weapon == "marauder_sword", "Rogue starter sword must equip.")
+check(character.Equipment.Weapon == "scout_dagger",
+    "Rogue starter dagger must equip as an authentic weapon item.")
 
 assert(profiles:mutate(73101, function(profile: any)
     local live = profile.Characters.Slot1
