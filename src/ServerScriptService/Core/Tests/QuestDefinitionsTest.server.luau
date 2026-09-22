@@ -36,12 +36,32 @@ check(elf.DisplayName == "Spellweaver", "Elf class display name must be Spellwea
 check(elf.QuestId == "MageAdvancementTrial", "Elf advancement must use the Mage trial.")
 
 check(
-    SecondaryClassDefinitions.resolve("Human", "Fighter") == nil,
-    "Fighter must not gain an unapproved v1 secondary class."
+    SecondaryClassDefinitions.resolve("Human", "Fighter").Id
+        == "HumanVanguard",
+    "Human Fighter must resolve to its approved Vanguard class."
 )
 check(
-    SecondaryClassDefinitions.resolve("Elf", "Ranger") == nil,
-    "Ranger must not gain an unapproved v1 secondary class."
+    SecondaryClassDefinitions.resolve("Elf", "Ranger").Id
+        == "ElfWindrunner",
+    "Elf Ranger must resolve to its approved Windrunner class."
 )
+for _, trial_id in ipairs({
+    "FighterAdvancementTrial",
+    "MageAdvancementTrial",
+    "RangerAdvancementTrial",
+    "RogueAdvancementTrial",
+}) do
+    local trial = assert(QuestDefinitions.get(trial_id))
+    check(
+        trial.MinimumLevel == 20 and #trial.SkillPrerequisites == 2,
+        "Every first advancement requires level 20 and two mastered skills."
+    )
+    for _, requirement in ipairs(trial.SkillPrerequisites) do
+        check(
+            requirement.Rank == 3 and requirement.Proficiency >= 300,
+            "Each required basic skill needs full rank and earned mastery."
+        )
+    end
+end
 
 print(string.format("[Quest Definition Tests] PASS: %d assertions.", assertions))
