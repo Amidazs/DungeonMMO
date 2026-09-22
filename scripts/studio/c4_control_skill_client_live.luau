@@ -105,6 +105,12 @@ local cases = {
     {class = "Rogue", skill = "LaceratingCut",
         weapon = "marauder_sword", kind = "Bleed",
         level = 24},
+    {class = "Ranger", skill = "ScoutFocusedShot",
+        weapon = "apprentice_longbow", kind = "Damage",
+        level = 20},
+    {class = "Rogue", skill = "RogueFinishingCut",
+        weapon = "marauder_sword", kind = "Damage",
+        level = 20},
 }
 local receipts = {}
 channel.OnServerEvent:Connect(function(player, action, skill, sent)
@@ -265,7 +271,7 @@ local function check_skill(player, target, case)
                 > os.clock()
         end, case.skill .. " real target stagger", 6)
         print("[C4 Control Client] SERVER_STAGGER_PASS")
-    else
+    elseif case.kind == "Bleed" then
         wait_for(function()
             return (target:GetAttribute("RogueBleedRemainingTicks")
                 or 0) == 3
@@ -317,7 +323,7 @@ local function run()
     for _, case in ipairs(cases) do
         check_skill(player, dummy, case)
     end
-    print("[C4 Control Client] ALL_FOUR_CONTROL_SKILLS_PASS")
+    print("[C4 Control Client] ALL_SIX_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
