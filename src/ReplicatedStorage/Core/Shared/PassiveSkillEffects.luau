@@ -538,4 +538,30 @@ function PassiveSkillEffects.attack_rate_bonus(
     )
 end
 
+--[[
+Computes the chance that the current purchased Scout ranks evade a
+direct NPC melee hit. Running Evasion only applies while actually moving.
+
+Args:
+    character (any): Server-owned purchased ranks, race and class.
+    is_moving (boolean): Verified current server Humanoid motion state.
+
+Returns:
+    number: Evasion probability clamped to zero through 5.5 percent.
+]]
+function PassiveSkillEffects.scout_evasion_chance(
+    character: any,
+    is_moving: boolean
+): number
+    local chance = resolve_bonus(
+        character, "ScoutEvasion", "EvasionChancePerRank"
+    )
+    if is_moving == true then
+        chance += resolve_bonus(
+            character, "ScoutRunningEvasion", "EvasionChancePerRank"
+        )
+    end
+    return math.clamp(chance, 0, 0.055)
+end
+
 return table.freeze(PassiveSkillEffects)
