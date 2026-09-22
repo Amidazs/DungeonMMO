@@ -189,6 +189,26 @@ local function check_skill(player, target, case)
     local humanoid = assert(target:FindFirstChildOfClass("Humanoid"))
     humanoid.MaxHealth = 1000
     humanoid.Health = 1000
+    local secondary = nil
+    if case.kind == "Slow" then
+        secondary = assert(Workspace:FindFirstChild(
+            "TrainingDummyCleave"
+        ), "Second physical target is missing")
+        local second_humanoid = assert(
+            secondary:FindFirstChildOfClass("Humanoid")
+        )
+        second_humanoid.MaxHealth = 1000
+        second_humanoid.Health = 1000
+        local target_root = assert(target:FindFirstChild(
+            "HumanoidRootPart"
+        ))
+        -- Put the second dummy directly behind the first on the arrow
+        -- path; the server must hit/slow both rather than just accept
+        -- MAX_TARGETS metadata in an offline definition test.
+        secondary:PivotTo(CFrame.new(
+            target_root.Position + Vector3.new(0, 0, 4)
+        ))
+    end
     local initial_health = humanoid.Health
     receipts[player.UserId] = nil
     channel:FireClient(player, "LOAD", case.skill)
@@ -208,6 +228,18 @@ local function check_skill(player, target, case)
         end, "Briar Volley real target slow", 6)
         assert((target:GetAttribute("RangerSlowEndsAt") or 0)
             > os.clock(), "Briar Volley slow did not persist")
+        local second_humanoid = assert(
+            secondary:FindFirstChildOfClass("Humanoid")
+        )
+        wait_for(function()
+            return second_humanoid.Health < 1000
+                and (secondary:GetAttribute("RangerSlowMultiplier")
+                    or 1) < 0.99
+        end, "Briar Volley second real target slow", 7)
+        print("[C4 Control Client] TWO_TARGET_SLOW_PASS")
+        secondary:PivotTo(CFrame.new(
+            target:GetPivot().Position + Vector3.new(25, 0, 0)
+        ))
         print("[C4 Control Client] SERVER_SLOW_PASS")
     else
         wait_for(function()
