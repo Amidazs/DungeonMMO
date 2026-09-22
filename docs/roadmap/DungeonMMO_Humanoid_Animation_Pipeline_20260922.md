@@ -29,6 +29,29 @@ Studio test place; no manual Blender or keyframe work is required of
 the user. Do not treat the generator's existence as an accepted
 production animation, a rig migration, or permission to publish.
 
+## Additional isolated R15 motion proof: overhead lasso
+
+A separate humanoid mannequin was cloned from the unpublished
+`Place1` guardian without changing either hammer attack. The
+[test-only lasso generator](../../tools/animation/humanoid/lasso/LassoOverhead_Generator.luau)
+builds three editable R15 KeyframeSequences: a 0.6-second raise,
+a 1.5-second overhead looping swing, and a 0.6-second lower.
+The [separate visual replay](../../tools/animation/humanoid/lasso/LassoOverhead_Replay.server.lua)
+draws a continuous rotating rope loop, tether and knot above the
+character; this is **procedural test geometry, not a physically
+simulated rope, a lasso throw, or a server-side grab**.
+[Setup and reproduction instructions](../../tools/animation/humanoid/lasso/README.md)
+are stored with the generator in the project; no manual Blender,
+keyframe editing or user scripting is required.
+
+The clips loaded and played in isolated Studio, and 16 front/side
+frames across a full revolution were captured from actual playback.
+The final mannequin art and arm/body performance still require
+user visual approval before reuse. No live DungeonMMO source,
+combat effects, physics rope, published place or animation asset
+was changed. The preview and review materials remain in the
+connected PC's `Downloads\DMMO_Lasso_Preview\` directory.
+
 ## Goal and responsibilities
 
 Create readable, physically convincing normal-monster, mini-boss and
