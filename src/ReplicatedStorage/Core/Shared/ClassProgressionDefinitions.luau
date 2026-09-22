@@ -17,6 +17,8 @@ local DEFINITIONS = table.freeze({
             "Taunt",
             "GuardBreaker",
             "IronCleave",
+            "FighterBowShot",
+            "FighterDaggerStrike",
             "PursuitStep",
             "IronDiscipline",
             "StalwartTraining",
