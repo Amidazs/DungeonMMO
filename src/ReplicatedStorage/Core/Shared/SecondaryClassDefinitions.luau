@@ -9,6 +9,7 @@ local DEFINITIONS = table.freeze({
         BaseClassId = "Fighter",
         RoleId = "Tank",
         QuestId = "FighterAdvancementTrial",
+        TeachableSkills = table.freeze({"VanguardChallenge"}),
     }),
 
     ElfThornwarden = table.freeze({
@@ -18,6 +19,7 @@ local DEFINITIONS = table.freeze({
         BaseClassId = "Fighter",
         RoleId = "Tank",
         QuestId = "FighterAdvancementTrial",
+        TeachableSkills = table.freeze({"ThornwardenBash"}),
     }),
 
     HumanSharpshooter = table.freeze({
@@ -27,6 +29,7 @@ local DEFINITIONS = table.freeze({
         BaseClassId = "Ranger",
         RoleId = "RangedDamage",
         QuestId = "RangerAdvancementTrial",
+        TeachableSkills = table.freeze({"SharpshooterPierce"}),
     }),
 
     ElfWindrunner = table.freeze({
@@ -36,6 +39,7 @@ local DEFINITIONS = table.freeze({
         BaseClassId = "Ranger",
         RoleId = "RangedDamage",
         QuestId = "RangerAdvancementTrial",
+        TeachableSkills = table.freeze({"WindrunnerVolley"}),
     }),
 
     HumanArcanist = table.freeze({
