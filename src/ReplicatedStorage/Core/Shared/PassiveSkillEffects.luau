@@ -90,6 +90,30 @@ function PassiveSkillEffects.damage_bonus(
     character: any,
     skill_id: string
 ): number
+    if skill_id == "RogueEdgeDiscipline" then
+        -- Dagger mastery is an equipment-specific C4 analogue.
+        -- Retain legacy sword bonuses only for earlier sword skills.
+        local equipment = type(character) == "table"
+            and character.Equipment
+        local weapon_id = type(equipment) == "table"
+            and equipment.Weapon
+        local weapon = if type(weapon_id) == "string"
+            then ItemDefinitions.get(weapon_id) else nil
+        local dagger = false
+        if weapon and weapon.Kind == "Equipment"
+            and weapon.Slot == "Weapon"
+        then
+            for _, tag in ipairs(weapon.WeaponTags or {}) do
+                if tag == "Dagger" then
+                    dagger = true
+                    break
+                end
+            end
+        end
+        if not dagger then
+            return 0
+        end
+    end
     return resolve_bonus(character, skill_id, "DamageBonusPerRank")
 end
 
