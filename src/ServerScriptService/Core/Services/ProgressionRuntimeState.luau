@@ -370,6 +370,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
     local passive_bonus = PassiveSkillEffects.damage_bonus(
         character, "IronDiscipline"
     ) + PassiveSkillEffects.damage_bonus(
+        character, "FighterPhysicalTraining"
+    ) + PassiveSkillEffects.damage_bonus(
         character, "RogueBladeMastery"
     ) + PassiveSkillEffects.damage_bonus(
         character, "RogueEdgeDiscipline"
@@ -468,6 +470,23 @@ function ProgressionRuntimeState.get_light_armor_reduction(
     user_id: number
 ): number
     return PassiveSkillEffects.light_armor_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
+Returns the physical-damage reduction earned by an equipped Fighter.
+
+Args:
+    user_id (number): Authentic server-owned Fighter identity.
+
+Returns:
+    number: Worn Body armour reduction from zero to 3.5%.
+]]
+function ProgressionRuntimeState.get_fighter_armor_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.fighter_armor_reduction(
         state_for(user_id)
     )
 end
