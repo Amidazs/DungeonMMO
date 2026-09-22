@@ -79,7 +79,7 @@ local DEFINITIONS = table.freeze({
             "EvasiveStep",
         }),
         StarterEquipment = table.freeze({
-            Weapon = "marauder_sword",
+            Weapon = "scout_dagger",
             Body = "scout_leather_vest",
         }),
         TeachableSkills = table.freeze({
