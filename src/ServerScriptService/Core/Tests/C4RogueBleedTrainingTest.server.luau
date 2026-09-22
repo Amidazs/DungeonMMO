@@ -93,7 +93,7 @@ local function main()
             BaseClassId = "Rogue", ClassId = "Rogue",
             CreationStage = "Complete",
         }
-        character.Equipment.Weapon = "marauder_sword"
+        character.Equipment.Weapon = "scout_dagger"
         character.Progression.SkillPointEntitlement = 100
     end), "Test Rogue identity did not persist")
 
