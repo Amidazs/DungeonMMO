@@ -5,6 +5,7 @@ local FIGHTER = table.freeze({"Fighter"})
 local MAGE = table.freeze({"Mage"})
 local RANGER = table.freeze({"Ranger"})
 local FIGHTER_ROGUE = table.freeze({"Fighter", "Rogue"})
+local RANGER_ROGUE = table.freeze({"Ranger", "Rogue"})
 local ALL_CLASSES = table.freeze({"Fighter", "Mage", "Ranger", "Rogue"})
 local ELF = table.freeze({"Elf"})
 
@@ -62,6 +63,18 @@ local DEFINITIONS = table.freeze({
         CombatModifiers = table.freeze({
             MaxHealthFlat = 8,
         }),
+    }),
+
+    scout_leather_vest = table.freeze({
+        Id = "scout_leather_vest",
+        Name = "Scout Leather Vest",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body",
+        Category = "LightArmor",
+        AllowedBaseClasses = RANGER_ROGUE,
+        Rarity = "Basic",
+        Stackable = false,
     }),
 
     marauder_armor = table.freeze({
