@@ -78,7 +78,17 @@ export type RangerVolleySkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
+export type BuffSkillDefinition = {
+    KIND: "Buff", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, MANA_COST: number, COOLDOWN_SECONDS: number,
+    WIND_UP_SECONDS: number, ACTIVE_SECONDS: number, RECOVERY_SECONDS: number,
+    BUFF_KIND: string, BUFF_MAGNITUDE: number, BUFF_SECONDS: number,
+    MOVEMENT_SCALE: {WIND_UP: number, ACTIVE: number, RECOVERY: number},
+    RANKS: {[number]: any}?,
+}
+
 export type SkillDefinition = MeleeSkillDefinition
+    | BuffSkillDefinition
     | SupportSkillDefinition
     | MageHealSkillDefinition
     | MagicProjectileSkillDefinition
@@ -1214,6 +1224,35 @@ local function validate_melee(definition: MeleeSkillDefinition)
     end
 end
 
+--[[
+Validates the bounded self-buff contract before it reaches server combat.
+
+Args:
+    definition (BuffSkillDefinition): Authored rank-one combat buff.
+
+Returns:
+    nil: Raises on invalid kind, magnitude, expiry or resource costs.
+]]
+local function validate_buff(definition: BuffSkillDefinition)
+    validate_timed(definition)
+    assert(definition.MANA_COST >= 0,
+        "Combat buff Mana cost cannot be negative.")
+    assert(
+        definition.BUFF_KIND == "PhysicalPower"
+            or definition.BUFF_KIND == "PhysicalGuard"
+            or definition.BUFF_KIND == "MagicPower",
+        "Unknown authoritative combat buff kind."
+    )
+    assert(definition.BUFF_MAGNITUDE > 0
+        and definition.BUFF_MAGNITUDE <= 0.50,
+        "Combat buff magnitude must be bounded."
+    )
+    assert(definition.BUFF_SECONDS > 0
+        and definition.BUFF_SECONDS <= 60,
+        "Combat buff duration must be bounded."
+    )
+end
+
 local function validate_support(definition: SupportSkillDefinition)
     assert(definition.HEAL_AMOUNT > 0, "Support healing must be positive.")
     assert(definition.RANGE_STUDS > 0, "Support range must be positive.")
@@ -1345,6 +1384,8 @@ for _, definition in DEFINITIONS do
     validate_common(definition)
     if definition.KIND == "Melee" then
         validate_melee(definition)
+    elseif definition.KIND == "Buff" then
+        validate_buff(definition :: BuffSkillDefinition)
     elseif definition.KIND == "Support" then
         validate_support(definition :: SupportSkillDefinition)
     elseif definition.KIND == "MageHeal" then
