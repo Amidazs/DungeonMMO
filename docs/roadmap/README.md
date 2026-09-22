@@ -1,5 +1,25 @@
 # Canonical Roadmap
 
+**Latest v1.70 — all four current class families now have
+C4-inspired level, skill-rank and earned-proficiency gates.**
+[Roadmap v1.70](DungeonMMO_Roadmap_v1_70_All_Four_C4_Class_Families_20260922.md)
+and [focused acceptance](../testing/c4-all-four-class-families-2026-09-22.md).
+Fighter, Mage, Ranger and Rogue gained new actual
+role-appropriate combat/mastery content. Every current
+race-specific advanced class has progression-gated
+trainer skills; Mage gained two advanced skills and
+Rogue specialist skills require genuine prior mastery.
+The 74-assertion four-family contract passed, and
+Base/Dungeon Rojo builds passed after the main changes.
+The final metadata-only Rogue mastery change passed
+the same focused contract and Base build at `687e27c`.
+**Do not claim exact C4 completeness:** 13/16 measured
+Fighter/Mage source rank brackets still mismatch; Ranger/
+Rogue rank-volume reference mapping and real-client new
+skill impacts remain pending. No old dungeon recovery
+matrix was rerun.
+
+
 **Latest v1.69 — two real early Mage skills and honest unlock UI.**
 [Roadmap v1.69](DungeonMMO_Roadmap_v1_69_Mage_Starter_Unlock_Visibility_20260922.md)
 and [focused evidence](../testing/c4-mage-starter-ward-bolt-trainer-2026-09-22.md).
