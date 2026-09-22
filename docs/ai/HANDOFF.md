@@ -1,5 +1,43 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.63 NEW class/role skill content
+
+Latest gameplay/test source:
+`b017fbce6aceb2a9ba301057a145697a471320ab`.
+[Roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_63_Class_Progression_Role_Skills_20260922.md)
+and [evidence](docs/testing/dungeon-class-progression-expansion-2026-09-22.md).
+
+Lineage II/WoW design reference is earned class evolution
+and legible party roles, **not** reuse of their IP or
+an obligation to make more regression fixtures. New
+race-specific level-20 paths: Human Vanguard and
+Elf Thornwarden (tank), Human Sharpshooter and Elf
+Windrunner (ranged damage). Temple/Mine advancement
+trials persist through existing Quest/Class services.
+Base class advancement remotes expose Start/Claim/Snapshot.
+
+Four actual ranked skills now use the existing combat
+executors: Vanguard Challenge threat, Thornwarden
+Bash stagger, Sharpshooter Pierce and Windrunner Volley.
+Specialist trainers + server-side advanced-class gating
+deny cross-class use even after a learned skill persists.
+Generic client RangerVolley aim now supports the new
+skill. Base class advancement **66 assertions**, prior
+story quest **40 assertions** and advanced abilities
+**60 assertions** passed with focused local builds.
+No full room/aggro/revive/backend regression was run.
+
+**NEXT:** Implement/accept ONE targeted real-client
+specialist ability flow and the visible Base quest/
+class/trainer board, then continue real item and class
+content. New ability hit effects and balance are
+NOT proven merely by the data/service tests. No
+published cross-place travel/cloud acceptance,
+`main` merge or public game release. Any source/docs
+edits MUST stay in GitHub; remote use only for clean
+pull/build/Studio verification.
+
+
 ## 22 September 2026 — started NEW progression content (v1.62)
 
 Read:
