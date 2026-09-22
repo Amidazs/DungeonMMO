@@ -355,7 +355,7 @@ local DEFINITIONS = table.freeze({
                 Proficiency = 110,
             }),
         }),
-        WeaponTags = table.freeze({"OneHandedSword"}),
+        WeaponTags = table.freeze({"Dagger"}),
     }),
     DisruptingCut = table.freeze({
         Id = "DisruptingCut",
@@ -460,7 +460,7 @@ local DEFINITIONS = table.freeze({
                 SkillId = "RogueVitalBlow", Rank = 9, Proficiency = 350,
             }),
         }),
-        WeaponTags = table.freeze({"OneHandedSword"}),
+        WeaponTags = table.freeze({"Dagger"}),
     }),
 
     -- Fifteen C4 first-transfer bow-mastery brackets; real ranged damage.
@@ -543,7 +543,7 @@ local DEFINITIONS = table.freeze({
             }),
         }),
         DamageBonusPerRank = 0.01,
-        WeaponTags = table.freeze({"OneHandedSword"}),
+        WeaponTags = table.freeze({"Dagger"}),
     }),
     -- Ten light-body armour mastery ranks reduce actual incoming physical damage.
     ScoutLightArmorMastery = table.freeze({
