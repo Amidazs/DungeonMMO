@@ -48,6 +48,7 @@ local DEFINITIONS = table.freeze({
         RaceId = "Human",
         BaseClassId = "Mage",
         QuestId = "MageAdvancementTrial",
+        TeachableSkills = table.freeze({"ArcanistEmber"}),
     }),
 
     ElfSpellweaver = table.freeze({
@@ -56,6 +57,7 @@ local DEFINITIONS = table.freeze({
         RaceId = "Elf",
         BaseClassId = "Mage",
         QuestId = "MageAdvancementTrial",
+        TeachableSkills = table.freeze({"SpellweaverAegis"}),
     }),
 
     HumanRogueDuelist = table.freeze({
