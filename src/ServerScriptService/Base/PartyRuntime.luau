@@ -202,6 +202,8 @@ function PartyRuntime.attach(options: any): any
                 reason = result.reason,
                 DungeonId = result.DungeonId,
                 DifficultyId = result.DifficultyId,
+                MemberUserId = result.MemberUserId,
+                MemberName = result.MemberName,
             })
         end
     end)
