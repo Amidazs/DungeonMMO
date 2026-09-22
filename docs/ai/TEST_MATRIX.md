@@ -1,5 +1,41 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — v1.73 C4 Scout catalogue focus
+
+- [x] Source-accurate C4 Human Rogue (99) and Elven Scout
+  (129) level-20/24/28/32/36 rank inventory; 1065 focused
+  source/implementation assertions PASS. Functional analogue
+  ranks: Human 74/99, Elf 102/129. Remaining family counts
+  are printed by the source-audit test and preserved in
+  `audit(race_id).MissingFamilies`.
+- [x] Race/level/class/purchased-rank/passive-stat tests:
+  241 focused Base Studio assertions PASS, including actual
+  Human +0.08 per-rank critical power, +0.02 race-specific
+  critical chance, and level-28 Scout movement +6%.
+- [x] Real SkillProgressionService rank purchase, foreign-race
+  rejection and isolated saved-profile release/reload:
+  38 focused assertions PASS.
+- [x] Unpublished Dungeon Play client eight existing real
+  skill effects, earned light-armour physical mitigation,
+  actual movement-speed change after an authenticated
+  client combat input and actual server critical-hit
+  damage after purchased Human ranks:
+  `VERIFIED_PLAY_MODE_PASS`.
+- [ ] HUMAN 25 and ELF 27 source rank entries remain
+  **unimplemented** in the first-transfer inventory.
+  Historic Fighter/Mage rank-volume gaps, later class
+  transfers, accurate effect tuning and all other C4
+  classes are NOT marked complete.
+- [ ] Actual saved-character trainer GUI, normal physical
+  keyboard input, published/cloud multiplayer and
+  overall regression acceptance are still pending.
+  Separate Phase2A paid-revive auto-test remains open.
+
+[Detailed focused record](../testing/c4-scout-source-catalogue-2026-09-22.md).
+All source/docs edits via GitHub; only local TEMP build/tests
+through Remote Desktop. No old dungeon lifecycle suites rerun.
+
+
 ## 22 September 2026 — C4 Rogue bleed v1.72
 
 - [x] Rogue level-24/32 `LaceratingCut` two
