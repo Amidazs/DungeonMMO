@@ -19,6 +19,9 @@ local DungeonRuntimeContentReadiness = require(
 )
 
 local DungeonInstanceDirector = require(script.Parent:WaitForChild("DungeonInstanceDirector"))
+local DungeonDifficultyProgressionService = require(
+    script.Parent:WaitForChild("DungeonDifficultyProgressionService")
+)
 
 local TeleportCoordinator = {}
 TeleportCoordinator.__index = TeleportCoordinator
@@ -310,6 +313,32 @@ function TeleportCoordinator:start_dungeon(
             return response(false, "ActiveSessionExists", existing)
         end
         table.insert(member_user_ids, user_id)
+    end
+
+    -- A party never inherits the leader's unlock. Recheck every
+    -- selected character before reserving a server, including
+    -- Play again and any direct coordinator callers.
+    if difficulty.Order > 1 then
+        local progression = DungeonDifficultyProgressionService.new(
+            self._profiles,
+            self._content_readiness
+        )
+        for _, user_id in ipairs(member_user_ids) do
+            local eligibility = progression:validate_entry(
+                user_id,
+                dungeon_id,
+                difficulty.Id
+            )
+            if eligibility.ok ~= true then
+                return {
+                    ok = false,
+                    reason = eligibility.reason or "DifficultyLocked",
+                    MemberUserId = user_id,
+                    DungeonId = dungeon_id,
+                    DifficultyId = difficulty.Id,
+                }
+            end
+        end
     end
 
     local reserved_ok, reserved_or_error = self._teleport:reserve_server(dungeon_place_id)
