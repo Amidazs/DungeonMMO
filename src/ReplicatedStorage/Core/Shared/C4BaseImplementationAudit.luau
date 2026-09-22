@@ -62,6 +62,12 @@ local MAPPINGS = table.freeze({
         PoisonCurse = table.freeze({
             [7] = "MysticPoisonCurse",
         }),
+        PhysicalAttackDebuff = table.freeze({
+            [14] = "MysticFeebleCurse",
+        }),
+        AttackSpeedDebuff = table.freeze({
+            [14] = "ElvenMysticLanguor",
+        }),
         BattleHeal = table.freeze({
             [14] = "MysticBattleHeal",
         }),
@@ -218,6 +224,22 @@ function C4BaseImplementationAudit.audit(
             local actual = if skill_id then executable_ranks_at_level(
                 skill_id, level
             ) else 0
+            -- Direct spell damage alone cannot satisfy an enemy
+            -- weakening source family. Check the authored status too.
+            if skill_id and (family == "PhysicalAttackDebuff"
+                or family == "AttackSpeedDebuff") then
+                local effect = Combat.get_for_rank(skill_id, 1)
+                local fraction = effect and (
+                    if family == "PhysicalAttackDebuff"
+                    then effect.DEBUFF_POWER_FRACTION
+                    else effect.DEBUFF_RATE_FRACTION
+                )
+                if type(fraction) ~= "number" or fraction <= 0
+                    or not effect or (effect.DEBUFF_SECONDS or 0) <= 0
+                then
+                    actual = 0
+                end
+            end
             if actual == count then
                 bracket.Functional += count
             else
