@@ -53,6 +53,9 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        RobeCasting = table.freeze({
+            [1] = "MysticRobeCasting",
+        }),
         NewbieProtection = table.freeze({
             [1] = "NoviceProtection",
         }),
@@ -127,6 +130,7 @@ local function executable_ranks_at_level(
             local passive = definition.DamageBonusPerRank
                 or definition.PhysicalReductionPerRank
                 or definition.MagicReductionPerRank
+                or definition.CastingRateBonusPerRank
                 or definition.ManaRegenBonusPerRank
                 or definition.AttackRateBonusPerRank
             if (type(damage) == "number" and damage > 0)
