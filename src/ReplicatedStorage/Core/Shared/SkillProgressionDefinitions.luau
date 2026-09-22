@@ -176,6 +176,68 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 base Fighter source: three bow ranks at levels 5/10/15.
+    FighterBowShot = table.freeze({
+        Id = "FighterBowShot",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5,
+            [2] = 5,
+            [3] = 5,
+            [4] = 10,
+            [5] = 10,
+            [6] = 10,
+            [7] = 15,
+            [8] = 15,
+            [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40,
+            [3] = 80,
+            [4] = 120,
+            [5] = 160,
+            [6] = 200,
+            [7] = 240,
+            [8] = 280,
+            [9] = 320,
+        }),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+
+    -- C4 base Fighter source: three dagger ranks at levels 5/10/15.
+    FighterDaggerStrike = table.freeze({
+        Id = "FighterDaggerStrike",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5,
+            [2] = 5,
+            [3] = 5,
+            [4] = 10,
+            [5] = 10,
+            [6] = 10,
+            [7] = 15,
+            [8] = 15,
+            [9] = 15,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40,
+            [3] = 80,
+            [4] = 120,
+            [5] = 160,
+            [6] = 200,
+            [7] = 240,
+            [8] = 280,
+            [9] = 320,
+        }),
+        WeaponTags = table.freeze({"Dagger"}),
+    }),
+
     -- The shield-line counterpart to Iron Discipline: purchased ranks
     -- add real maximum HP without creating an inert combat action.
     StalwartTraining = table.freeze({
