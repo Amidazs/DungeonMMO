@@ -4,6 +4,31 @@ Date: 22 September 2026
 Status: **proof of concept demonstrated in isolated, unpublished Roblox Studio `Place1`; production animation quality and DungeonMMO integration remain OPEN.**  
 Working roadmap: [index](README.md) and [v1.76 backend status](DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md).
 
+## Canonical generator location (GitHub and local DungeonMMO project)
+
+Astra's **original, unmodified** overhead-strike generator is now kept
+in the repository, **not only in Downloads**:
+
+- [Generator ModuleScript source](../../tools/animation/humanoid/AstraCrushingStrike_Generator.luau):
+  `tools/animation/humanoid/AstraCrushingStrike_Generator.luau`.
+- [Original control poses](../../tools/animation/humanoid/AstraCrushingStrike_Controls.json):
+  `tools/animation/humanoid/AstraCrushingStrike_Controls.json`.
+- [Setup and verification instructions](../../tools/animation/humanoid/README.md):
+  `tools/animation/humanoid/README.md`.
+
+After the active development worktree is brought up to date, the
+corresponding local folder is
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_Phase4_HUD_Integration_v1\tools\animation\humanoid\`.
+**Both** the Luau source and the original 10-pose JSON are required:
+the generator reads those poses from the Studio ModuleScript's string
+`Controls` attribute. Merely moving the source file without that
+attribute would make the generator unusable. These `tools/` files
+are development-only, not part of the Rojo `src/` gameplay builds.
+The assistant should install/preview them in an unpublished isolated
+Studio test place; no manual Blender or keyframe work is required of
+the user. Do not treat the generator's existence as an accepted
+production animation, a rig migration, or permission to publish.
+
 ## Goal and responsibilities
 
 Create readable, physically convincing normal-monster, mini-boss and
