@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**Latest v1.67 — C4-style class passives with actual damage effects.**
+[Roadmap](DungeonMMO_Roadmap_v1_67_C4_Passive_Ranks_20260922.md)
+and [focused acceptance](../testing/c4-passive-rank-effects-2026-09-22.md).
+Six rank- and level-gated Fighter Iron Discipline and
+Mage Arcane Discipline passives now modify authoritative
+physical/magical damage multipliers, respectively.
+One Base build and 64 focused assertions passed at
+`08710c1`. The source-mapped audit still reports
+16/16 C4 brackets short; do not claim parity. Next
+work is genuine early skill/utility/crafting content,
+not a repeat of old dungeon recovery tests.
+
+
 **Latest active C4 skill-volume increment: v1.66.**
 [Updated content roadmap](DungeonMMO_Roadmap_v1_66_C4_Early_Rank_Content_20260922.md)
 and [focused acceptance](../testing/c4-early-fighter-mage-skill-ranks-2026-09-22.md).
