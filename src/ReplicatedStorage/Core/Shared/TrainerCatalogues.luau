@@ -139,6 +139,14 @@ local DEFINITIONS = table.freeze({
                 SkillId = "RangerBowMastery",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "ScoutBowDiscipline",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLightArmorMastery",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -177,6 +185,14 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "RogueBladeMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RogueEdgeDiscipline",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLightArmorMastery",
                 Mode = "LearnOrRank",
             }),
         }),
