@@ -460,6 +460,48 @@ local VIPER_STRIKE = specialize_skill(
     }
 )
 
+-- Nine effective sword strikes spanning the first three Fighter brackets.
+local IRON_CLEAVE = specialize_skill(
+    ARC_SLASH, "IronCleave", "Iron Cleave", {
+        STAMINA_COST = 12,
+        COOLDOWN_SECONDS = 4,
+        FORWARD_STEP_STUDS = 1.4,
+        BASE_DAMAGE = 6,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 6}),
+            [2] = table.freeze({BASE_DAMAGE = 8}),
+            [3] = table.freeze({BASE_DAMAGE = 10}),
+            [4] = table.freeze({BASE_DAMAGE = 12}),
+            [5] = table.freeze({BASE_DAMAGE = 14}),
+            [6] = table.freeze({BASE_DAMAGE = 16}),
+            [7] = table.freeze({BASE_DAMAGE = 18}),
+            [8] = table.freeze({BASE_DAMAGE = 20}),
+            [9] = table.freeze({BASE_DAMAGE = 22}),
+        }),
+    }
+)
+
+-- A mobile, lower-damage strike: longer forward step than Iron Cleave.
+local PURSUIT_STEP = specialize_skill(
+    QUICK_STRIKE, "PursuitStep", "Pursuit Step", {
+        STAMINA_COST = 15,
+        COOLDOWN_SECONDS = 6,
+        FORWARD_STEP_STUDS = 4.5,
+        BASE_DAMAGE = 4,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 4}),
+            [2] = table.freeze({BASE_DAMAGE = 5}),
+            [3] = table.freeze({BASE_DAMAGE = 6}),
+            [4] = table.freeze({BASE_DAMAGE = 7}),
+            [5] = table.freeze({BASE_DAMAGE = 8}),
+            [6] = table.freeze({BASE_DAMAGE = 9}),
+            [7] = table.freeze({BASE_DAMAGE = 10}),
+            [8] = table.freeze({BASE_DAMAGE = 11}),
+            [9] = table.freeze({BASE_DAMAGE = 12}),
+        }),
+    }
+)
+
 local VANGUARD_CHALLENGE = specialize_skill(
     TAUNT, "VanguardChallenge", "Vanguard Challenge", {
         COOLDOWN_SECONDS = 10,
@@ -516,6 +558,8 @@ local WINDRUNNER_VOLLEY = specialize_skill(
 local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
     GuardBreaker = GUARD_BREAKER,
+    IronCleave = IRON_CLEAVE,
+    PursuitStep = PURSUIT_STEP,
     AetherBolt = AETHER_BOLT,
     TrackerShot = TRACKER_SHOT,
     ViperStrike = VIPER_STRIKE,
