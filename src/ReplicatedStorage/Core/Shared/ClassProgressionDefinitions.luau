@@ -85,6 +85,7 @@ local DEFINITIONS = table.freeze({
             "ViperStrike",
             "DisruptingCut",
             "LaceratingCut",
+            "RogueFinishingCut",
             "RogueVitalBlow",
             "RogueBladeMastery",
         }),
