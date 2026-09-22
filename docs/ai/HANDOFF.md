@@ -17,8 +17,8 @@ completed the newer exact-volume user request.
 Initial GitHub count manifest contains 16 verified
 Human/Elf Fighter/Mystic level brackets, including
 race-specific differences; `c4_skill_volume_audit.luau`
-reports all **16 mismatched** and **14 unmapped
-existing skill families** at first source
+reports all **16 mismatched** and **14 race/class occurrences of unmapped skills
+(7 distinct existing skill families)** at first source
 `29d117a`. The report is intentionally conservative
 because legacy skills lack explicit rank-level data.
 No source gaps should be padded with nonexistent or
