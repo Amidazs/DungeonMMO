@@ -136,4 +136,69 @@ check(briar.HUMAN_SLOW_FRACTION > 0 and briar.ELF_SLOW_FRACTION > 0,
 local cut = assert(Combat.get_for_rank("DisruptingCut", 1))
 check(cut.KIND == "Melee" and cut.STAGGER_SECONDS > 0,
     "Disrupting Cut must execute the real melee stagger pipeline")
+
+local reference = require(shared.C4ScoutReferenceTargets)
+local expected = {
+    Human = {20, 19, 20, 19, 21},
+    Elf = {26, 25, 26, 25, 27},
+}
+for race, totals in pairs(expected) do
+    local source = assert(reference.get(race))
+    check(string.find(source.SourceUrl, "/c4/classes/", 1, true)
+        ~= nil, race .. " must use the C4, not a later Chronicle")
+    for index, level in ipairs({20, 24, 28, 32, 36}) do
+        check(source.Levels[level] == totals[index],
+            race .. " scout reference count at level "
+                .. tostring(level) .. " has changed")
+    end
+end
+check(reference.get("Orc") == nil,
+    "Unmapped race must not be presented as source-verified")
+
+local thunder = assert(Skills.get("ThunderShot"))
+local ranger = character_for("Ranger")
+ranger.Level = 36
+check(not Unlocks.can_show(ranger, thunder),
+    "Thunder Shot must stay hidden without prior mastered skills")
+for _, required in ipairs(thunder.Prerequisites) do
+    ranger.Progression.Skills[required.SkillId] = {
+        Known = true, PurchasedRank = required.Rank - 1,
+        Proficiency = required.Proficiency,
+    }
+end
+check(not Unlocks.can_show(ranger, thunder),
+    "Proficiency cannot replace required purchased bow ranks")
+for _, required in ipairs(thunder.Prerequisites) do
+    ranger.Progression.Skills[required.SkillId] = {
+        Known = true, PurchasedRank = required.Rank,
+        Proficiency = required.Proficiency - 1,
+    }
+end
+check(not Unlocks.can_show(ranger, thunder),
+    "Purchased basic ranks cannot bypass earned mastery")
+for _, required in ipairs(thunder.Prerequisites) do
+    ranger.Progression.Skills[required.SkillId] = {
+        Known = true, PurchasedRank = required.Rank,
+        Proficiency = required.Proficiency,
+    }
+end
+check(Unlocks.can_show(ranger, thunder),
+    "Mastered Ranger should see level-36 Thunder Shot")
+check(Trainers.can_offer("RangerTrainer", ranger, "ThunderShot").ok,
+    "Mastered Ranger trainer must offer real Thunder Shot")
+check(not Unlocks.can_train(ranger, thunder, 1 + thunder.MaxRank),
+    "Thunder Shot cannot buy an undefined fourth rank")
+local previous_stagger = 0
+for rank = 1, 3 do
+    local effect = assert(Combat.get_for_rank("ThunderShot", rank))
+    check(effect.KIND == "RangerProjectile"
+        and effect.MAX_TARGETS == 1,
+        "Thunder Shot must use real single-target Ranger delivery")
+    check(effect.STAGGER_SECONDS > previous_stagger,
+        "Every Thunder Shot rank must increase actual server stagger")
+    check(effect.HUMAN_SLOW_SECONDS == 0
+        and effect.ELF_SLOW_SECONDS == 0,
+        "Thunder Shot must not inherit unrelated slow effects")
+    previous_stagger = effect.STAGGER_SECONDS
+end
 print(("[C4 Control Skills] PASS: %d assertions."):format(assertions))
