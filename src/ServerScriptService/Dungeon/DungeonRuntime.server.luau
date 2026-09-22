@@ -542,7 +542,7 @@ local function set_member_combat_eligibility(
         and member.Connected == true
         and member.Abandoned ~= true
         and mode == "Active"
-    player:SetAttribute("DungeonCombatAllowed", eligible)
+    player:SetAttribute(CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE, eligible)
     local character = player.Character
     if character then
         character:SetAttribute(
@@ -557,7 +557,7 @@ local function set_character_encounter(player: Player, encounter_id: string)
     if character then
         character:SetAttribute(
             CombatConfig.TRAINING_MARAUDER.RUN_PARTICIPANT_ATTRIBUTE,
-            player:GetAttribute("DungeonCombatAllowed") == true
+            player:GetAttribute(CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE) == true
         )
         character:SetAttribute(
             CombatConfig.TRAINING_MARAUDER.ENCOUNTER_ATTRIBUTE,
@@ -1665,7 +1665,7 @@ end
 
 local function admit_player(player: Player)
     -- Deny combat until authoritative admission confirms Active mode.
-    player:SetAttribute("DungeonCombatAllowed", false)
+    player:SetAttribute(CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE, false)
     local session: any = nil
     local teleport_data: any = nil
 
