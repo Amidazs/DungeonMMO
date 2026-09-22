@@ -68,9 +68,16 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_light_armor_reduction(defender.UserId)
         local fighter_reduction = ProgressionRuntimeState
             .get_fighter_armor_reduction(defender.UserId)
+        local mystic_reduction = ProgressionRuntimeState
+            .get_mystic_armor_reduction(defender.UserId)
         damage *= 1 - math.clamp(
-            reduction + fighter_reduction, 0, 0.50
+            reduction + fighter_reduction + mystic_reduction,
+            0, 0.50
         )
+    elseif defender and context.source_kind == "EnemyMagic" then
+        local magic_reduction = ProgressionRuntimeState
+            .get_mystic_magic_reduction(defender.UserId)
+        damage *= 1 - magic_reduction
     end
     local health_damage, ward_absorbed = WardService.absorb_damage(
         context.target, damage
