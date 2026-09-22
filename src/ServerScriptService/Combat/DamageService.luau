@@ -76,9 +76,11 @@ function DamageService.apply_damage(context: DamageContext): number
         local guard_bonus = CombatStatusService.get(
             context.target, "PhysicalGuard"
         )
+        local novice_reduction = ProgressionRuntimeState
+            .get_novice_physical_reduction(defender.UserId)
         damage *= 1 - math.clamp(
             reduction + fighter_reduction + mystic_reduction
-                + guard_bonus,
+                + guard_bonus + novice_reduction,
             0, 0.50
         )
     elseif defender and context.source_kind == "EnemyMagic" then
