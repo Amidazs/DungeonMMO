@@ -1,5 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local ServerScriptService = game:GetService("ServerScriptService")
+local ProgressionRuntimeState = require(
+    ServerScriptService.Core.Services.ProgressionRuntimeState
+)
 
 local shared_folder = ReplicatedStorage
     :WaitForChild("Combat")
@@ -252,6 +257,38 @@ function StaminaService.is_regen_paused(
 end
 
 
+--[[
+Returns the earned regeneration multiplier from the actual seated or
+moving Humanoid, never a client-claimed condition or skill preview.
+
+Args:
+    subject (Instance): Authenticated live player resource owner.
+
+Returns:
+    number: Bounded Stamina regen multiplier; neutral for nonplayers.
+]]
+function StaminaService.get_regen_multiplier(
+    subject: Instance
+): number
+    if not subject:IsA("Player") or subject.Parent ~= Players then
+        return 1
+    end
+    local player = subject :: Player
+    local character = player.Character
+    local humanoid = character
+        and character:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        return 1
+    end
+    local sitting = humanoid.Sit == true
+    local moving = not sitting and humanoid.WalkSpeed > 0
+        and humanoid.MoveDirection.Magnitude > 0.1
+    return ProgressionRuntimeState.get_stamina_recovery_multiplier(
+        player.UserId, sitting, moving
+    )
+end
+
+
 RunService.Heartbeat:Connect(function(delta_time: number)
     local now = os.clock()
 
@@ -273,6 +310,7 @@ RunService.Heartbeat:Connect(function(delta_time: number)
             StaminaConfig.MAX,
             record.current
                 + StaminaConfig.REGEN_PER_SECOND
+                * StaminaService.get_regen_multiplier(subject)
                 * delta_time
         )
 
