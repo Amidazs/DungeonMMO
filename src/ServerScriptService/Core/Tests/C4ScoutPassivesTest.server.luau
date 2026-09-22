@@ -213,4 +213,55 @@ check(not Classes.can_teach("Rogue", "RangerLongRange"),
 check(not Classes.can_teach("Rogue", "RangerArrowVelocity"),
     "Rogue cannot learn the Ranger-only arrow-speed passive")
 
+-- Human Rogue/Scout critical-damage power exists at C4 levels 24/32.
+-- Its purchased rank must change the actual critical multiplier, not
+-- a display-only inventory value; Elf and wrong-class data fail closed.
+local critical = assert(Skills.get("HumanScoutCriticalPower"))
+check(critical.MaxRank == 2
+    and critical.RankLevels[1] == 24
+    and critical.RankLevels[2] == 32,
+    "Human critical-power source levels must be 24 and 32")
+for _, character in ipairs({ranger, rogue}) do
+    local user_id = if character == ranger then 77601 else 77602
+    character.Identity.RaceId = "Human"
+    character.Level = 24
+    check(Unlocks.can_show(character, critical),
+        "Eligible Human scout cannot see level-24 critical power")
+    check(Trainers.can_offer(
+        character.Identity.BaseClassId .. "Trainer",
+        character,
+        "HumanScoutCriticalPower"
+    ).ok, "Human critical-power rank missing from the trainer")
+    character.Progression.Skills.HumanScoutCriticalPower = nil
+    Runtime.set_character(user_id, character)
+    local baseline = Runtime.get_critical_damage_multiplier(user_id)
+    for rank = 1, 2 do
+        character.Level = critical.RankLevels[rank] - 1
+        check(not Unlocks.can_train(character, critical, rank),
+            "Critical rank may not bypass its character level")
+        character.Level = critical.RankLevels[rank]
+        check(Unlocks.can_train(character, critical, rank),
+            "Eligible critical rank was incorrectly locked")
+        character.Progression.Skills.HumanScoutCriticalPower = {
+            Known = true, PurchasedRank = rank, Proficiency = 0,
+        }
+        Runtime.set_character(user_id, character)
+        local expected = baseline + rank * 0.08
+        check(math.abs(
+            Runtime.get_critical_damage_multiplier(user_id) - expected
+        ) < 0.0001, "Critical power failed to alter real combat stats")
+    end
+    character.Identity.RaceId = "Elf"
+    Runtime.set_character(user_id, character)
+    check(not Unlocks.can_show(character, critical),
+        "Human-only critical power leaked to Elf trainer")
+    check(math.abs(
+        Runtime.get_critical_damage_multiplier(user_id)
+        - 1.5
+    ) > 0, "Race-specific critical damage must remain well-defined")
+    check(Passive.critical_damage_bonus(character) == 0,
+        "Forged Human passive must not boost an Elf")
+    Runtime.clear_character(user_id)
+end
+
 print(("[C4 Scout Passives] PASS: %d assertions."):format(assertions))
