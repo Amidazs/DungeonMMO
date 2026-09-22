@@ -1,5 +1,29 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — advanced class/skill backend (v1.63)
+
+Gameplay/test source `b017fbce6aceb2a9ba301057a145697a471320ab`.
+Human Vanguard / Elf Thornwarden (tank) and Human
+Sharpshooter / Elf Windrunner (ranged damage) join
+the existing Mage and Rogue race-specific paths.
+Their level-20 Temple/Mine trials and Base remotes
+reuse current per-character progression. Four new
+exclusive trainers teach four ranked, server-authoritative
+combat skills with threat/stagger/piercing/area
+differences. Skill use now checks the currently
+active advanced class; ranger volley ground aim
+dispatch is data-driven by skill kind.
+
+Focused Base and Dungeon Rojo builds; 66 class,
+40 quest and 60 advanced ability assertions passed.
+Actual in-client hits and new quest/class board UI
+still need targeted integration; no full Dungeon
+regression or published server tests were run.
+
+[Roadmap v1.63](docs/roadmap/DungeonMMO_Roadmap_v1_63_Class_Progression_Role_Skills_20260922.md).
+[Acceptance](docs/testing/dungeon-class-progression-expansion-2026-09-22.md).
+
+
 ## 22 September 2026 — story quest backend slice locally PASS
 
 Gameplay/test source `89d8e7e`: first two one-time
