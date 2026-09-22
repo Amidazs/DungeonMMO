@@ -107,6 +107,29 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- C4 base Mystic level-one robe passives. These are purchased
+    -- through the existing trainer and require a real equipped robe.
+    MysticRobeManaRecovery = table.freeze({
+        Id = "MysticRobeManaRecovery",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 1}),
+        ManaRegenBonusPerRank = 0.15,
+        WeaponTags = table.freeze({}),
+    }),
+    MysticRobeAttackSpeed = table.freeze({
+        Id = "MysticRobeAttackSpeed",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 1}),
+        AttackRateBonusPerRank = 0.06,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Source C4 Mystic Wind Strike continuation: two ranks at 7,
     -- two at 14; the base WindStrike remains the level-one starter.
     MysticWindBolt = table.freeze({
