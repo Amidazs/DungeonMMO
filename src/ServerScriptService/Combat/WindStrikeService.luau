@@ -19,6 +19,9 @@ local RangerSlowService = require(
 local PoisonStatusService = require(
     script.Parent:WaitForChild("PoisonStatusService")
 )
+local EnemyWeakeningService = require(
+    script.Parent:WaitForChild("EnemyWeakeningService")
+)
 
 local WindStrikeService = {}
 
@@ -181,6 +184,19 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                             context.skill_definition.POISON_TIER
                         ) or 0,
                         context.skill_definition.ID
+                    )
+                end
+                -- Only positive, server-confirmed NPC projectile damage
+                -- can apply bounded non-stacking hostile weakening.
+                if applied_damage > 0 then
+                    EnemyWeakeningService.apply(
+                        target,
+                        tonumber(context.skill_definition
+                            .DEBUFF_POWER_FRACTION) or 0,
+                        tonumber(context.skill_definition
+                            .DEBUFF_RATE_FRACTION) or 0,
+                        tonumber(context.skill_definition
+                            .DEBUFF_SECONDS) or 0
                     )
                 end
                 -- An authenticated, damaging magic projectile may
