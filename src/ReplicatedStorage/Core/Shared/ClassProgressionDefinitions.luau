@@ -21,6 +21,8 @@ local DEFINITIONS = table.freeze({
             "FighterDaggerStrike",
             "PursuitStep",
             "IronDiscipline",
+            "FighterPhysicalTraining",
+            "FighterArmorTraining",
             "StalwartTraining",
         }),
     }),
