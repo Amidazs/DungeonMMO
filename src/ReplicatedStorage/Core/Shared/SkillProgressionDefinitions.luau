@@ -569,8 +569,8 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
         Prerequisites = table.freeze({
             table.freeze({
-                SkillId = "RogueVitalBlow", Rank = 3,
-                Proficiency = 300,
+                SkillId = "RogueVitalBlow", Rank = 9,
+                Proficiency = 350,
             }),
             table.freeze({
                 SkillId = "Backstab", Rank = 3,
@@ -589,8 +589,8 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
         Prerequisites = table.freeze({
             table.freeze({
-                SkillId = "RogueVitalBlow", Rank = 3,
-                Proficiency = 300,
+                SkillId = "RogueVitalBlow", Rank = 9,
+                Proficiency = 350,
             }),
             table.freeze({
                 SkillId = "Backstab", Rank = 3,
@@ -670,8 +670,8 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 24, [2] = 28, [3] = 32}),
         Prerequisites = table.freeze({
             table.freeze({
-                SkillId = "RogueVitalBlow", Rank = 3,
-                Proficiency = 300,
+                SkillId = "RogueVitalBlow", Rank = 9,
+                Proficiency = 350,
             }),
             table.freeze({
                 SkillId = "Backstab", Rank = 3,
