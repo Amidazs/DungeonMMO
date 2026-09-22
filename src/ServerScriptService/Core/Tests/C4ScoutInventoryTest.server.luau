@@ -12,9 +12,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 72, Missing = 27,
+    Human = {Raw = 99, Functional = 73, Missing = 26,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 100, Missing = 29,
+    Elf = {Raw = 129, Functional = 101, Missing = 28,
         EquipmentMismatch = 0},
 }
 
@@ -68,7 +68,7 @@ Returns:
 local function check_implementation(
     race_id: string, category: string, level: number, count: number
 )
-    local mapping = Inventory.implementation(category)
+    local mapping = Inventory.implementation(category, race_id)
     if not mapping then
         return
     end
@@ -97,6 +97,7 @@ local function check_implementation(
         local bonus = definition.DamageBonusPerRank
             or definition.PhysicalReductionPerRank
             or definition.CriticalDamageBonusPerRank
+            or definition.CriticalChanceBonusPerRank
             or definition.BowRangeBonusStudsPerRank
             or definition.ArrowSpeedBonusPerRank
         check(type(bonus) == "number" and bonus > 0,
