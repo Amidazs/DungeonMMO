@@ -606,9 +606,13 @@ Returns:
 function ProgressionRuntimeState.get_basic_attack_rate(
     user_id: number
 ): number
-    return CharacterCombatStats.basic_attack_rate(
+    local baseline = CharacterCombatStats.basic_attack_rate(
         ProgressionRuntimeState.get_race_id(user_id)
     )
+    local earned_bonus = PassiveSkillEffects.attack_rate_bonus(
+        state_for(user_id)
+    )
+    return math.clamp(baseline * (1 + earned_bonus), 0.1, 2.0)
 end
 
 --[[
