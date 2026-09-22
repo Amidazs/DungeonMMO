@@ -1,5 +1,32 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — exact C4 skill-volume goal OPEN (v1.65)
+
+Previously completed v1.64 mastery prerequisites and
+level gating do **not** satisfy the new exact number
+of C4 skill ranks offered at every mapped class level.
+First 16 source-verified Human/Elf Fighter/Mystic
+early-level entries recorded in
+`src/ReplicatedStorage/Core/Shared/C4SkillVolumeTargets.luau`.
+Read-only focused Studio volume audit at `29d117a`
+found **16/16 unmatched level brackets** and existing
+skills without authored level-to-rank schedules.
+It deliberately does not count unimplemented abilities,
+unmapped old ranks or skill icons as source-equivalent
+gameplay.
+
+New basic milestones are aligned to first C4 Fighter
+5/10/15 and Mystic 7/14/20 training brackets.
+One Base build and focused SkillMasteryGates and C4
+volume report both executed. Actual broad C4 skill
+catalogue, passives, utility, multi-rank rank-effects
+and post-20 class-tree mappings remain to be BUILT.
+[Source-backed gap spec](
+docs/design/C4_Skill_Count_Parity_20260922.md).
+[Active roadmap v1.65](
+docs/roadmap/DungeonMMO_Roadmap_v1_65_C4_Skill_Volume_20260922.md).
+
+
 ## 22 September 2026 — skill mastery ladder / level-40 cap (v1.64)
 
 Gameplay source `bf93f07`: four additional rankable
