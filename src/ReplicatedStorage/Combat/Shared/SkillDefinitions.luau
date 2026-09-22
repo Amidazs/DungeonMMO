@@ -862,6 +862,84 @@ local ELVEN_CALMING_SHOT = specialize_skill(
     }
 )
 
+-- First-tier Fighter bow and dagger ranks share the accepted
+-- authoritative ranged/melee executors and have distinct real damage.
+local FIGHTER_BOW_SHOT = specialize_skill(
+    PIERCING_SHOT, "FighterBowShot", "Fighter Bow Shot", {
+        STAMINA_COST = 13,
+        COOLDOWN_SECONDS = 5,
+        MAX_TARGETS = 1,
+        BASE_DAMAGE = 11,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 11,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 14,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 17,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 20,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 23,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 26,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 29,
+            }),
+            [8] = table.freeze({
+                BASE_DAMAGE = 32,
+            }),
+            [9] = table.freeze({
+                BASE_DAMAGE = 35,
+            }),
+        }),
+    }
+)
+
+local FIGHTER_DAGGER_STRIKE = specialize_skill(
+    BACKSTAB, "FighterDaggerStrike", "Fighter Dagger Strike", {
+        STAMINA_COST = 12,
+        COOLDOWN_SECONDS = 5,
+        BASE_DAMAGE = 12,
+        REAR_MULTIPLIER = 1,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 12,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 15,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 18,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 21,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 24,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 27,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 30,
+            }),
+            [8] = table.freeze({
+                BASE_DAMAGE = 33,
+            }),
+            [9] = table.freeze({
+                BASE_DAMAGE = 36,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -946,6 +1024,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ShieldBash = SHIELD_BASH,
     GuardBreaker = GUARD_BREAKER,
     IronCleave = IRON_CLEAVE,
+    FighterBowShot = FIGHTER_BOW_SHOT,
+    FighterDaggerStrike = FIGHTER_DAGGER_STRIKE,
     PursuitStep = PURSUIT_STEP,
     DawnWard = DAWN_WARD,
     CinderBolt = CINDER_BOLT,
