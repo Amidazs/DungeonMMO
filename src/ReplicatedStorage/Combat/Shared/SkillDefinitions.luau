@@ -1038,6 +1038,94 @@ local ELVEN_FIGHTER_RENEWAL = specialize_skill(
     }
 )
 
+local ELVENFIGHTERGUARD = specialize_skill(
+    MAGE_HEAL, "ElvenFighterGuard", "Elven Guard Aura", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 12,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 15,
+        BUFF_KIND = "PhysicalGuard",
+        BUFF_MAGNITUDE = 0.035,
+        BUFF_SECONDS = 12,
+        WIND_UP_SECONDS = 0.20,
+        ACTIVE_SECONDS = 0.10,
+        RECOVERY_SECONDS = 0.25,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.035,
+                BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
+local ELVENFIGHTERBATTLECRY = specialize_skill(
+    MAGE_HEAL, "ElvenFighterBattleCry", "Elven Battle Cry", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 10,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 15,
+        BUFF_KIND = "PhysicalPower",
+        BUFF_MAGNITUDE = 0.05,
+        BUFF_SECONDS = 12,
+        WIND_UP_SECONDS = 0.20,
+        ACTIVE_SECONDS = 0.10,
+        RECOVERY_SECONDS = 0.25,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.05,
+                BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
+local MYSTICBATTLECHANT = specialize_skill(
+    MAGE_HEAL, "MysticBattleChant", "Mystic Battle Chant", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 12,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 15,
+        BUFF_KIND = "PhysicalPower",
+        BUFF_MAGNITUDE = 0.05,
+        BUFF_SECONDS = 12,
+        WIND_UP_SECONDS = 0.20,
+        ACTIVE_SECONDS = 0.10,
+        RECOVERY_SECONDS = 0.25,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.05,
+                BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
+local MYSTICSTONESKIN = specialize_skill(
+    MAGE_HEAL, "MysticStoneSkin", "Mystic Stone Skin", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 12,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 15,
+        BUFF_KIND = "PhysicalGuard",
+        BUFF_MAGNITUDE = 0.06,
+        BUFF_SECONDS = 12,
+        WIND_UP_SECONDS = 0.20,
+        ACTIVE_SECONDS = 0.10,
+        RECOVERY_SECONDS = 0.25,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.06,
+                BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1130,6 +1218,10 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticWindBolt = MYSTIC_WIND_BOLT,
     MysticFrostBolt = MYSTIC_FROST_BOLT,
     ElvenFighterRenewal = ELVEN_FIGHTER_RENEWAL,
+    ElvenFighterGuard = ELVENFIGHTERGUARD,
+    ElvenFighterBattleCry = ELVENFIGHTERBATTLECRY,
+    MysticBattleChant = MYSTICBATTLECHANT,
+    MysticStoneSkin = MYSTICSTONESKIN,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
