@@ -1,6 +1,37 @@
 # DungeonMMO Current Engineering State
 
-## 22 September 2026 — latest C4 source-rank update (PARTIAL)
+## 22 September 2026 — current v1.76 C4 source coverage PARTIAL
+
+Six inventoried C4 source classes now have **336/396**
+functional analogue rank entries, 60 missing:
+Human Fighter 37/39; Elven Fighter 41/43; Human
+Mystic 36/44; Elven Mystic 34/42; Human Rogue
+81/99; Elven Scout 107/129. Original C4 first-transfer
+paths fully complete: **0/9**. Seven independent
+first-transfer class source skill inventories remain
+to be created and implemented.
+
+Purchased seated/running recovery passives now multiply
+REAL StaminaService regen Heartbeat output subject
+to actual seated/moving Humanoid checks and normal
+resource pause/delay. Focused 42 recovery, 1079 Scout,
+55 base, 7 overall strict audit assertions PASS. Actual
+unpublished Play user physically sat in a TEMP Seat and
+showed increased post-spend Stamina recovery with a
+bought Human Fighter skill. Running resource effects
+have focused runtime tests but not yet client movement
+sampling. Both Base and Dungeon TEMP Rojo builds PASS.
+[Current receipts](../testing/c4-conditional-recovery-v1-76-2026-09-22.md).
+[Current roadmap](../roadmap/DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md).
+
+Strict `C4CatalogueCoverage.report().Completed=false`
+remains correct. No full persisted-player class/trainer
+flow, cloud publishing, general dungeon release
+regression or production DataStore change was claimed.
+Prior Phase2A paid-revive automated failure is separate.
+
+
+## 22 September 2026 — previous C4 source-rank update (PARTIAL)
 
 The six currently enumerated original C4 Human/Elf base and
 partially mapped Scout class inventories have **331/396**
