@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**Latest focused backend increment: v1.74 C4 base + first
+transfer source coverage.** [Working roadmap](DungeonMMO_Roadmap_v1_74_C4_Base_First_Transfer_20260922.md)
+and [audited test receipts](../testing/c4-base-first-transfer-coverage-2026-09-22.md).
+The six enumerated Human/Elf base and partial Scout
+source classes currently have 316/396 functional analogue
+rank entries, with 80 missing. Only two of NINE original
+first-transfer classes even have partial source skill
+inventories; NONE is complete. New starting Mystic
+worn-robe casting/mana/basic-attack passives and novice
+level-limited damage protection are real backend effects.
+Focused tests and Base/Dungeon TEMP builds passed;
+`C4CatalogueCoverage.report().Completed == false`
+correctly prevents a false full-catalogue claim.
+No `main` merge, publish or production DataStore edits.
+
+
 **Latest working C4 backend increment: v1.73.**
 [Roadmap and exact completion gates](DungeonMMO_Roadmap_v1_73_Scout_Catalogue_20260922.md)
 and [Studio test receipts](../testing/c4-scout-source-catalogue-2026-09-22.md).
