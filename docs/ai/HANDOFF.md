@@ -1,5 +1,52 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.66 C4 RANK CONTENT (STILL NOT PARITY)
+
+Read
+`docs/roadmap/DungeonMMO_Roadmap_v1_66_C4_Early_Rank_Content_20260922.md`
+and
+`docs/testing/c4-early-fighter-mage-skill-ranks-2026-09-22.md`.
+Focused tested source `cdecfc76ff4450dc329c1612e7834b8042f9b98b`.
+
+The user's C4 goal is **equal skill-RANK volume per mapped
+class/training level**, with real combat/passive/craft effects,
+not just a few new skill IDs. This increment adds:
+- Fighter Iron Cleave and Pursuit Step: **nine actual combat ranks
+  EACH**, three at levels 5/10/15, with own SP/proficiency
+  thresholds and genuinely increasing server damage.
+- Mage Renewing Light: **six actual heal ranks**, three at
+  levels 7 and 14, using existing MageHeal executor.
+- Per-skill proficiency thresholds in rank purchase, caps,
+  snapshot and ProfileMigration. Initial focused test exposed
+  old tier-only migration truncating long-rank proficiency;
+  fixed in production while retaining three-rank legacy caps.
+
+One Base Rojo build and focused 133 Fighter assertions passed
+at `d812a73`. At `cdecfc7`, one Base build, 37 Mage
+assertions, affected existing skill/class/quest contracts 5/5
+and **read-only 16-bracket C4 gap audit** all completed.
+The new measured counts are Fighter 7 authored ranks at
+each 5/10/15 bracket and Mage 4 at 7/14. **All 16 mapped
+source brackets STILL fall short**. Levels 1/5, legacy
+rank mappings, passives and wider race/class coverage
+are open. Never label this C4 parity or full class
+content. The focused skill tests cover effects in
+server combat definitions and profiles, not normal
+player-input fight/heal balancing.
+
+NEXT CONTENT: implement real passive/utility/crafting
+effects and mapped rank families at verified C4 level
+brackets; extend source mapping across corresponding
+class/race paths without double-counting Ranger/Rogue.
+Use data-driven authoring and keep unlocks server-owned.
+Do not restart old dungeon wipes/aggro/revive/multiplayer
+test loops. Real-network reconnection, published TEST
+travel and cloud continuity remain separately gated.
+All scripts/docs GitHub-only; remote only clean pull,
+one local Base build and focused new-feature acceptance;
+no Roblox publish or main merge.
+
+
 ## 22 September 2026 — C4 EXACT SKILL VOLUME IS A NEW, OPEN REQUIREMENT
 
 User requests Lineage II **Chronicle 4**, specifically
