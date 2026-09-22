@@ -1143,6 +1143,15 @@ entry_result.OnClientEvent:Connect(function(result: any)
             .. tostring(result.DungeonId)
     elseif result.ok then
         status.Text = "Entering dungeon..."
+    elseif result.reason == "DifficultyLocked"
+        and type(result.MemberUserId) == "number"
+    then
+        local member_name = result.MemberName
+            or ("Player " .. tostring(result.MemberUserId))
+        status.Text = tostring(member_name)
+            .. " has not unlocked "
+            .. tostring(result.DifficultyId or "this difficulty")
+            .. ". Every party member must clear the previous difficulty."
     else
         status.Text = "Entry blocked: "
             .. tostring(result.reason)
