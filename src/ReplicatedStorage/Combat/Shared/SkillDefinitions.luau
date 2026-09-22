@@ -999,6 +999,25 @@ local MYSTIC_BATTLE_HEAL = specialize_skill(
     }
 )
 
+-- Real server-confirmed human Mystic life drain. The NPC must lose
+-- health before the attacker receives any heal from the same hit.
+local MYSTIC_LIFE_DRAIN = specialize_skill(
+    WIND_STRIKE, "MysticLifeDrain", "Life Drain", {
+        MANA_COST = 17,
+        COOLDOWN_SECONDS = 5,
+        BASE_DAMAGE = 17,
+        LIFE_DRAIN_FRACTION = 0.20,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 17, LIFE_DRAIN_FRACTION = 0.20,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 23, LIFE_DRAIN_FRACTION = 0.30,
+            }),
+        }),
+    }
+)
+
 -- Each authentic server projectile applies a real non-stacking slow
 -- only after impact on a living NPC. All four source ranks improve it.
 local MYSTIC_FROST_BOLT = specialize_skill(
@@ -1239,6 +1258,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticStoneSkin = MYSTICSTONESKIN,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     MysticBattleHeal = MYSTIC_BATTLE_HEAL,
+    MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
