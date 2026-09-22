@@ -59,6 +59,7 @@ local DEFINITIONS = table.freeze({
             "TrackerShot",
             "BriarVolley",
             "ThunderShot",
+            "ScoutFocusedShot",
             "ArcherDraw",
             "RangerBowMastery",
         }),
