@@ -1,5 +1,48 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — v1.68 NEW MAX-HP / HEAL PASSIVES PASS
+
+Read:
+`docs/roadmap/DungeonMMO_Roadmap_v1_68_Vitality_Restoration_Ranks_20260922.md`
+and
+`docs/testing/c4-vitality-restoration-rank-effects-2026-09-22.md`.
+
+Focused tested gameplay source
+`3be5de3316c16a531537feb175d119f171a44b67`.
+Two **new actual rank/effect families**: Fighter
+Stalwart Training (six ranks at 5/10, +5 flat maximum
+HP per rank) and Mage Restorative Training (six
+ranks at 7/14, +0.012 additive healing multiplier
+per rank). They are server-owned, require each
+player's class, SP and level, and do not require
+proficiency from impossible passive casts. The
+existing Base progression refresh applies their
+stats after training.
+
+The first focused test exposed missing
+`ClassProgressionDefinitions.TeachableSkills`
+entries. Those were fixed directly in GitHub,
+without bypassing training guards. One clean
+Base build, 64 NEW HP/heal assertions and
+64 EXISTING damage-passive assertions passed.
+The read-only reference audit showed 13/16 C4
+brackets mismatched and 14 unmapped skill-rank
+occurrences, including Human Fighter level-10
+13 authored versus 12 C4 reference. Count equality
+at other brackets does NOT prove equivalent skill
+content or real client balance.
+
+**NEXT:** source-align missing starter-rank families
+and create genuinely usable early defensive/utility/
+support content and an honest player-facing trainer
+preview. Preserve saved characters/legacy skill
+ranks and test only the new feature's focused
+contract. Do NOT run the full dungeon
+wipe/aggro/Play Again matrix or publish Roblox.
+GitHub-only code/docs edits; Remote Desktop
+restricted to clean pulls, builds and test logs.
+
+
 ## 22 September 2026 — v1.67 C4-STYLE PASSIVE SKILLS PASS
 
 Read:
