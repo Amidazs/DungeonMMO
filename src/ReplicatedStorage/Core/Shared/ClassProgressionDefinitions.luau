@@ -44,6 +44,7 @@ local DEFINITIONS = table.freeze({
             Body = "apprentice_mystic_robe",
         }),
         TeachableSkills = table.freeze({
+            "NoviceProtection",
             "DawnWard",
             "CinderBolt",
             "MysticWindBolt",
