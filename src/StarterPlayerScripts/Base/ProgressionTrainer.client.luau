@@ -194,6 +194,43 @@ local function clear_skill_rows()
     end
 end
 
+-- Explains the next rank's authoritative unlock instead of letting
+-- a disabled button silently imply that the player has too little SP.
+--
+-- Args:
+--   state (any): Server-owned progression snapshot for one visible skill.
+-- Returns:
+--   string?: Missing level or prerequisite; nil when rank can be trained.
+local function next_rank_blocker(state: any): string?
+    if state.NextRankUnlocked == true then
+        return nil
+    end
+    if state.NextRankLockReason == "CharacterLevelTooLow" then
+        return "Unlocks at level "
+            .. tostring(state.NextRequiredLevel or "?")
+    end
+    local missing = state.NextMissingRequirement
+    if type(missing) == "table" then
+        if state.NextRankLockReason == "PrerequisiteSkillRank" then
+            return string.format(
+                "Requires %s rank %d",
+                tostring(missing.SkillId),
+                tonumber(missing.Rank) or 1
+            )
+        end
+        if state.NextRankLockReason
+            == "PrerequisiteSkillProficiency"
+        then
+            return string.format(
+                "Requires %s proficiency %d",
+                tostring(missing.SkillId),
+                tonumber(missing.Proficiency) or 0
+            )
+        end
+    end
+    return "This rank is not yet unlocked"
+end
+
 local function render_skills()
     clear_skill_rows()
 
@@ -231,6 +268,7 @@ local function render_skills()
         local max_rank = tonumber(state.MaxRank) or 3
         local proficiency = tonumber(state.Proficiency) or 0
         local threshold = tonumber(state.NextThreshold)
+        local blocker = next_rank_blocker(state)
 
         local requirement = if threshold
             then string.format(
@@ -267,7 +305,9 @@ local function render_skills()
                 source_ok = state.BookOwned == true
             end
 
-            if source_ok then
+            if blocker then
+                button.Text = blocker
+            elseif source_ok then
                 button.Text = string.format(
                     "Learn • %d SP%s",
                     cost,
@@ -277,20 +317,20 @@ local function render_skills()
                 button.Text = "Required Skill Book not owned"
             end
 
-            button.Active = source_ok
+            button.Active = not blocker and source_ok
                 and (tonumber(latest.SPAvailable) or 0) >= cost
 
         elseif known and can_rank and rank < max_rank then
             local cost = tonumber(state.NextCost) or 0
             local eligible = threshold == nil or proficiency >= threshold
 
-            button.Text = string.format(
+            button.Text = if blocker then blocker else string.format(
                 "Purchase Rank %d • %d SP",
                 rank + 1,
                 cost
             )
 
-            button.Active = eligible
+            button.Active = not blocker and eligible
                 and (tonumber(latest.SPAvailable) or 0) >= cost
 
         elseif rank >= max_rank then
