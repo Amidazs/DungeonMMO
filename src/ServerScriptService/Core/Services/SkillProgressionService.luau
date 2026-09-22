@@ -594,8 +594,8 @@ function SkillProgressionService:purchase_rank(
 
                 local threshold =
                     SkillProgressionConfig
-                        .get_threshold(
-                            definition.Tier,
+                        .get_skill_threshold(
+                            definition,
                             target
                         )
 
