@@ -52,10 +52,10 @@ replace_once(
     runtime_script,
     '        if not replay.ok then\n'
         .. '            local recipients = if replay.votes_reset == true',
-    '        warn("[Dungeon Replay Request] SERVER_REPLAY_RESULT "
-        .. "ok=" .. tostring(replay.ok)
-        .. " reason=" .. tostring(replay.reason)
-        .. " waiting=" .. tostring(replay.waiting))\n'
+    '        warn("[Dungeon Replay Request] SERVER_REPLAY_RESULT "'
+        .. ' .. tostring(replay.ok)'
+        .. ' .. " " .. tostring(replay.reason)'
+        .. ' .. " " .. tostring(replay.waiting))\n'
         .. '        if not replay.ok then\n'
         .. '            local recipients = if replay.votes_reset == true'
 )
