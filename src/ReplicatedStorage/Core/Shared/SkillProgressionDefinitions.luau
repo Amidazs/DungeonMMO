@@ -694,6 +694,21 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Longbow"}),
     }),
 
+    -- Human first-transfer critical power (C4 levels 24 and 32).
+    -- Purchased ranks affect real critical-hit damage, not raw attack.
+    HumanScoutCriticalPower = table.freeze({
+        Id = "HumanScoutCriticalPower",
+        Tier = "Common",
+        MaxRank = 2,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 32}),
+        RankThresholds = table.freeze({[2] = 0}),
+        CriticalDamageBonusPerRank = 0.08,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
