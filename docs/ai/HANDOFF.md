@@ -1,5 +1,44 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — C4 Scout catalogue v1.73, PARTIAL and tested
+
+Read `docs/testing/c4-scout-source-catalogue-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_73_Scout_Catalogue_20260922.md`
+before changing more source or trainer data. The complete *first-transfer*
+C4 Human Rogue (99 rows) and Elven Scout (129 rows) inventories at
+20/24/28/32/36 are in `C4ScoutSkillInventory.luau`. Functional
+DungeonMMO analogue coverage is currently Human **74/99**, Elf
+**102/129**, with **25 Human + 27 Elf source ranks still missing**.
+The inventory's `audit(race_id).MissingFamilies` lists every
+unimplemented source family and exact rank count. Its test explicitly
+fails completion while any source ranks are missing. These figures
+are source FIRST-TRANSFER coverage, not the whole C4 game.
+
+Latest additions: Human critical-power rank 1/2 at level 24/32,
+Human critical-rate rank at 28, Elf critical-rate at 32, shared
+Scout Fleet Foot at level 28. Race/class/level/actual purchased
+rank gate and real server crit damage/chance and Humanoid movement
+are wired. Focused tests: **241 passive**, **1065 source-audit**,
+**38 actual trainer/save-reload** assertions, plus actual
+unpublished Play client eight skill effects, light armour,
+`SCOUT_REAL_MOVEMENT_SPEED_PASS`,
+`HUMAN_CRIT_REAL_DAMAGE_PASS` and
+`VERIFIED_PLAY_MODE_PASS`.
+All project scripts/docs/fixtures were changed in GitHub;
+remote connection only clean-pulled and ran TEMP builds/tests.
+
+**NEXT:** implement remaining missing source families as *real*
+server behaviours with their own focused tests, not dummy ranks:
+continuous-MP toggles, genuine evasion/recovery, support cleanses,
+movement debuffs, key/door and crafting systems. Then reconcile
+historic Fighter/Mage 13/16 mismatched base-class brackets and
+source-map later class paths. FULL C4 CATALOGUE IS NOT COMPLETE.
+The old Phase2A paid-revive automatic regression is separate and
+unresolved; do not claim full Dungeon green. No `main` merge,
+Roblox publish, real DataStore operations or repeat of old dungeon
+wipe/aggro/revive/Play Again tests.
+
+
 ## 22 September 2026 — v1.72 Rogue bleeding backend
 
 Read `docs/testing/c4-rogue-bleed-2026-09-22.md`
