@@ -117,6 +117,36 @@ function PassiveSkillEffects.damage_bonus(
     return resolve_bonus(character, skill_id, "DamageBonusPerRank")
 end
 
+--[[
+Returns real earned longbow range, not merely an unlocked skill button.
+
+Args:
+    character (any): Server-authoritative character and purchased skills.
+
+Returns:
+    number: Added studs to accepted Ranger projectile maximum range.
+]]
+function PassiveSkillEffects.bow_range_bonus(character: any): number
+    return math.max(0, resolve_bonus(
+        character, "RangerLongRange", "BowRangeBonusStudsPerRank"
+    ))
+end
+
+--[[
+Returns real earned arrow travel speed on server projectile delivery.
+
+Args:
+    character (any): Server-owned Ranger with its purchased skill ranks.
+
+Returns:
+    number: Added studs per second to actual Ranger arrows.
+]]
+function PassiveSkillEffects.arrow_speed_bonus(character: any): number
+    return math.max(0, resolve_bonus(
+        character, "RangerArrowVelocity", "ArrowSpeedBonusPerRank"
+    ))
+end
+
 -- Resolves the Fighter's trained, flat maximum-health increase.
 --
 -- Args:
