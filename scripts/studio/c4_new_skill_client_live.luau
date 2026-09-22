@@ -220,6 +220,11 @@ local function check_skill(player, target, case)
         end, case.skill .. " real damage", 9)
     end
     if case.class == "Mage" then
+        print("[C4 Client] MANA_DIAGNOSTIC " .. case.skill
+            .. " baseline=" .. tostring(baseline_mana)
+            .. " minimum=" .. tostring(lowest_mana)
+            .. " current=" .. tostring(Mana.get(player))
+            .. " attribute=" .. tostring(player:GetAttribute("CombatMana")))
         wait_for(function()
             return lowest_mana < baseline_mana - 2
         end, case.skill .. " server mana spend", 5)
