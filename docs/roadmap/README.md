@@ -1,5 +1,18 @@
 # Canonical Roadmap
 
+**v1.60 same-server reconnect is staged in GitHub, not yet
+locally tested.** [Roadmap](DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md)
+and [pending acceptance report](../testing/dungeon-same-server-reconnect-stage-2026-09-22.md).
+Remote Desktop reported no online device, so no Rojo
+build or Studio regression was run for the new source
+head. The accepted v1.59 physical multiplayer tests
+belong to earlier gameplay code. Initial handoff still
+requires a nonce; returning members require an
+already-bound server, persisted disconnect and a
+separate profile writer lease. Published same-account
+network reconnect and routing remain unverified.
+
+
 **Latest GitHub roadmap supplement: v1.59 — physical
 four-player SecretArena boss, Depth4 mini-boss and live
 boss peer-disconnect recovery.** See
