@@ -1,5 +1,39 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — v1.75 C4 backend increment, NOT COMPLETE
+
+Latest source-backed six-class coverage: starting Human
+Fighter 36/39, Elf Fighter 41/43, Human Mage 36/44,
+Elf Mage 34/42, first-transfer Human Rogue 77/99 and
+Elf Scout 104/129 functional analogue ranks. Total
+328/396 mapped ranks, 68 still missing, and SEVEN
+other C4 Human/Elf first-transfer classes not source
+mapped or implemented. All nine first-transfer paths
+are still INCOMPLETE by the strict audit.
+
+Live server now computes bought Scout standing/running
+direct-melee evasion, executes three-rank level-14
+Battle Heal on a genuine friendly humanoid, and
+returns 20/30% of actual hostile NPC Life Drain
+projectile damage as healing to its authenticated
+Human Mystic caster. No free effects on mere skill
+visibility. New actual in-memory trainer save/reload
+and level/rank denial tests passed (37 assertions).
+Focused 286 Scout passive, 1070 Scout inventory,
+28 Battle Heal, 11 Life Drain, 57 base audit,
+7 overall coverage assertions PASS. Unpublished
+Studio Play client 16 real hotbar skill effects PASS.
+No actual random-dodge-rate live sample or normal
+persisted-player trainer UI assertion was made.
+
+[Detailed evidence](../testing/c4-scout-evasion-base-healing-2026-09-22.md).
+[Current roadmap](../roadmap/DungeonMMO_Roadmap_v1_75_C4_Scout_Evasion_Mystic_20260922.md).
+Both Base/Dungeon TEMP Rojo builds passed. Old
+Phase2A paid-revive auto-test is still unresolved.
+No main merge, publish, production DataStore or
+paid operation occurred.
+
+
 ## 22 September 2026 — C4 base/first-transfer v1.74 PARTIAL
 
 The new strict `C4CatalogueCoverage.report()` source audit
