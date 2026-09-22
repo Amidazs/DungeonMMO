@@ -166,6 +166,45 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- The shield-line counterpart to Iron Discipline: purchased ranks
+    -- add real maximum HP without creating an inert combat action.
+    StalwartTraining = table.freeze({
+        Id = "StalwartTraining",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({
+            [1] = 5, [2] = 5, [3] = 5,
+            [4] = 10, [5] = 10, [6] = 10,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        HealthBonusPerRank = 5,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- An early Mystic support line, with a real heal multiplier.
+    RestorativeTraining = table.freeze({
+        Id = "RestorativeTraining",
+        Tier = "Common",
+        MaxRank = 6,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 7, [2] = 7, [3] = 7,
+            [4] = 14, [5] = 14, [6] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0,
+        }),
+        HealBonusPerRank = 0.012,
+        WeaponTags = table.freeze({}),
+    }),
+
     ArcaneDiscipline = table.freeze({
         Id = "ArcaneDiscipline",
         Tier = "Common",
