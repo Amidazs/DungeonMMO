@@ -3,6 +3,9 @@
 local SkillDefinitions = require(
     script.Parent:WaitForChild("SkillProgressionDefinitions")
 )
+local ItemDefinitions = require(
+    script.Parent:WaitForChild("ItemDefinitions")
+)
 
 local PassiveSkillEffects = {}
 
@@ -112,6 +115,42 @@ function PassiveSkillEffects.heal_bonus(character: any): number
     return resolve_bonus(
         character, "RestorativeTraining", "HealBonusPerRank"
     )
+end
+
+--[[
+Returns earned physical mitigation only while a valid light-body armour is
+actually equipped. Unknown/wrong-slot/heavy armour never earns this bonus.
+
+Args:
+    character (any): Authoritative character with real Equipment and Skills.
+
+Returns:
+    number: Clamped physical reduction in the interval 0 through 0.08.
+]]
+function PassiveSkillEffects.light_armor_reduction(
+    character: any
+): number
+    if type(character) ~= "table"
+        or type(character.Equipment) ~= "table"
+    then
+        return 0
+    end
+
+    local body_id = character.Equipment.Body
+    local body = if type(body_id) == "string"
+        then ItemDefinitions.get(body_id)
+        else nil
+    if not body or body.Kind ~= "Equipment"
+        or body.Slot ~= "Body"
+        or body.Category ~= "LightArmor"
+    then
+        return 0
+    end
+
+    local bonus = resolve_bonus(
+        character, "ScoutLightArmorMastery", "PhysicalReductionPerRank"
+    )
+    return math.clamp(bonus, 0, 0.08)
 end
 
 return table.freeze(PassiveSkillEffects)
