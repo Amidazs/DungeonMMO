@@ -7,6 +7,9 @@ local Services = ServerScriptService:WaitForChild("Core"):WaitForChild("Services
 
 local ItemDefinitions = require(Shared:WaitForChild("ItemDefinitions"))
 local ProfessionDefinitions = require(Shared:WaitForChild("ProfessionDefinitions"))
+local ProfessionSelectionRules = require(
+    Shared:WaitForChild("ProfessionSelectionRules")
+)
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RecipeKnowledgeService = require(
@@ -83,6 +86,12 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
         return "CharacterMissing"
     end
 
+    if not ProfessionSelectionRules.can_use(
+        character.ProfessionSlots, recipe.ProfessionId
+    ) then
+        return "ProfessionNotSelected"
+    end
+
     local professions = ensure_professions(character)
     local state = professions[recipe.ProfessionId]
     local level = ProfessionDefinitions.level_from_xp(
@@ -129,6 +138,69 @@ function ProfessionService.new(profile_service: any, inventory_service: any): an
     }, ProfessionService)
 end
 
+--[[
+Selects a gathering or crafting profession in one profile mutation.
+
+Args:
+    user_id (number): Loaded player's authoritative profile key.
+    profession_id (any): Untrusted choice validated against the catalogue.
+
+Returns:
+    any: Success with both slots, or a fail-closed rejection reason.
+]]
+function ProfessionService:choose_profession(
+    user_id: number,
+    profession_id: any
+): any
+    local result: any = nil
+    local rejection: string? = nil
+    local ok, err = self._profiles:mutate(user_id, function(profile: any)
+        local character = selected_character(profile)
+        if not character then
+            rejection = "CharacterMissing"
+            error(rejection)
+        end
+        local slots, reason = ProfessionSelectionRules.choose(
+            character.ProfessionSlots, profession_id
+        )
+        if not slots then
+            rejection = reason or "ProfessionSelectionRejected"
+            error(rejection)
+        end
+        character.ProfessionSlots = slots
+        result = {
+            ok = true,
+            profession_id = profession_id,
+            ProfessionSlots = slots,
+        }
+    end)
+    if not ok then
+        return {ok = false, reason = rejection or err
+            or "ProfileMutationFailed"}
+    end
+    return result
+end
+
+--[[
+Tests whether an existing choice authorizes a requested profession.
+
+Args:
+    user_id (number): Loaded player to query.
+    profession_id (string): Registered gathering or crafting ID.
+
+Returns:
+    boolean: True only for the character's selected profession.
+]]
+function ProfessionService:can_use(
+    user_id: number,
+    profession_id: string
+): boolean
+    local character = self._profiles:get_character(user_id, 1)
+    return character ~= nil and ProfessionSelectionRules.can_use(
+        character.ProfessionSlots, profession_id
+    )
+end
+
 function ProfessionService:build_snapshot(user_id: number): any
     local character = self._profiles:get_character(user_id, 1)
     if not character then
@@ -136,6 +208,9 @@ function ProfessionService:build_snapshot(user_id: number): any
     end
 
     local professions = {}
+    local slots = ProfessionSelectionRules.normalize(
+        character.ProfessionSlots
+    )
     local source = if type(character.Professions) == "table"
         then character.Professions
         else {}
@@ -153,6 +228,9 @@ function ProfessionService:build_snapshot(user_id: number): any
             Progress = progress,
             XPToNext = needed,
             CraftingMinigameId = crafting_minigame_id(profession_id),
+            Selected = ProfessionSelectionRules.can_use(
+                slots, profession_id
+            ),
         }
     end
 
@@ -168,7 +246,10 @@ function ProfessionService:build_snapshot(user_id: number): any
             state ~= nil and state.Level >= recipe.RequiredLevel
 
         recipes[recipe_id] = {
-            Unlocked = level_unlocked and knowledge_rejection == nil,
+            Unlocked = level_unlocked and knowledge_rejection == nil
+                and ProfessionSelectionRules.can_use(
+                    slots, recipe.ProfessionId
+                ),
             Known = knowledge_rejection == nil,
             RequiredLevel = recipe.RequiredLevel,
             CraftingMinigameId = crafting_minigame_id(recipe.ProfessionId),
@@ -178,6 +259,7 @@ function ProfessionService:build_snapshot(user_id: number): any
     return {
         ok = true,
         Professions = professions,
+        ProfessionSlots = slots,
         Inventory = inventory_counts(character),
         Recipes = recipes,
     }
@@ -199,8 +281,12 @@ function ProfessionService:gather(
     local awarded_quantity = quantity + bonus
     local xp = math.floor(tonumber(node.XP) or 0)
 
-    if not ProfessionDefinitions.get(profession_id) then
+    local definition = ProfessionDefinitions.get(profession_id)
+    if not definition or definition.Kind ~= "Gathering" then
         return {ok = false, reason = "UnknownProfession"}
+    end
+    if not self:can_use(user_id, profession_id) then
+        return {ok = false, reason = "ProfessionNotSelected"}
     end
     if not ItemDefinitions.get(item_id) or quantity < 1 or xp < 0 then
         return {ok = false, reason = "InvalidNodeDefinition"}
@@ -213,6 +299,13 @@ function ProfessionService:gather(
             error("CharacterMissing")
         end
 
+        -- Recheck inside the same atomic profile mutation, in case
+        -- the selected character changed after the preliminary read.
+        if not ProfessionSelectionRules.can_use(
+            character.ProfessionSlots, profession_id
+        ) then
+            error("ProfessionNotSelected")
+        end
         local professions = ensure_professions(character)
         local state = professions[profession_id]
         local before_level, after_level = add_xp(state, xp)
