@@ -16,6 +16,9 @@ local Leases = require(
 local Admission = require(
     Dungeon:WaitForChild("DungeonAdmissionRules")
 )
+local DeathService = require(
+    Dungeon:WaitForChild("DungeonDeathService")
+)
 local Recovery = require(
     Dungeon:WaitForChild("DungeonRecoveryRules")
 )
@@ -186,6 +189,35 @@ check(
         resumed, USER_ID, session_id
     ).ok,
     "An admitted member cannot immediately reuse the reconnect gate."
+)
+local revive_payload = nil
+local death = DeathService.new(
+    sessions,
+    {
+        get_active_checkpoint = function()
+            return {
+                Id = resumed.Checkpoint.Id,
+                CFrame = CFrame.new(3, 4, 5),
+            }
+        end,
+    },
+    session_id,
+    {
+        emit_state = function(_user_id: number, payload: any)
+            revive_payload = payload
+        end,
+    }
+)
+check(
+    death:send_member_state({UserId = USER_ID}).ok == true
+        and revive_payload.member_mode == "Spectating"
+        and revive_payload.free_available == false
+        and revive_payload.session_state == "Active",
+    "The returning member must receive the persisted spectator UI state."
+)
+check(
+    not death:send_member_state({UserId = 987654}).ok,
+    "A nonmember cannot request a connected player's revive state."
 )
 check(dungeon_lease:release(USER_ID).ok,
     "The fixture must leave its in-memory profile lease released.")
