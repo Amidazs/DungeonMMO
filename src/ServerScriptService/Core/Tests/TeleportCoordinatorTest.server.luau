@@ -194,4 +194,70 @@ check(failing_lease.cancelled == true, "Failed outbound teleport must cancel the
 check(failing_sessions.failed == true, "Failed fresh outbound teleport must fail its newly-created session.")
 check(failing:is_pending(42) == false, "Failed outbound teleport must restore source runtime availability.")
 
+-- The coordinator is a second, server-owned enforcement point:
+-- a party leader's Depth2 clear cannot carry even one locked member.
+local unlocked_users = {[42] = true, [43] = false, [44] = true}
+function fake_profile:get_character(user_id: number, _slot: number): any
+    return {
+        DungeonDifficultyProgress = {
+            Dungeons = {
+                TestDungeon = {
+                    Completed = {
+                        Depth1 = unlocked_users[user_id] == true,
+                    },
+                },
+            },
+        },
+    }
+end
+
+local ready_depth2 = {
+    analyze = function(_dungeon_id: string, _difficulty_id: string)
+        return {ok = true, Ready = true}
+    end,
+}
+local gated = TeleportCoordinator.new(
+    fake_adapter, fake_profile, fake_lease, fake_sessions,
+    ready_depth2
+)
+local before_reserve = #calls
+local locked_member = gated:start_dungeon(
+    {{UserId = 42}, {UserId = 43}, {UserId = 44}},
+    "TestDungeon", 987654, "Depth2"
+)
+check(
+    locked_member.ok == false
+        and locked_member.reason == "DifficultyLocked"
+        and locked_member.MemberUserId == 43,
+    "The coordinator must name a locked party member, not use leader unlock."
+)
+check(
+    #calls == before_reserve,
+    "A locked party must be rejected before any server is reserved."
+)
+unlocked_users[42] = false
+unlocked_users[43] = true
+local locked_leader = gated:start_dungeon(
+    {{UserId = 42}, {UserId = 43}, {UserId = 44}},
+    "TestDungeon", 987654, "Depth2"
+)
+check(
+    locked_leader.reason == "DifficultyLocked"
+        and locked_leader.MemberUserId == 42
+        and #calls == before_reserve,
+    "The leader must also own their own difficulty unlock."
+)
+unlocked_users[42] = true
+unlocked_users[43] = nil
+local missing_progress = gated:start_dungeon(
+    {{UserId = 42}, {UserId = 43}, {UserId = 44}},
+    "TestDungeon", 987654, "Depth2"
+)
+check(
+    missing_progress.reason == "DifficultyLocked"
+        and missing_progress.MemberUserId == 43
+        and #calls == before_reserve,
+    "Missing proof of an unlock must fail closed for the entire party."
+)
+
 print(string.format("[Teleport Coordinator Tests] PASS: %d assertions.", assertions))
