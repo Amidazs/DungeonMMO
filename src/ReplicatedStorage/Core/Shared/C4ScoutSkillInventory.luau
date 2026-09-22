@@ -261,6 +261,7 @@ Returns the DungeonMMO functional analogue for one source family.
 
 Args:
     category (string): Source-family category from an authored level.
+    race_id (string?): Optional source race for differing purchase levels.
 
 Returns:
     any?: Skill ID, owned branch and dagger-equipment warning when mapped.
@@ -283,7 +284,7 @@ Args:
 
 Returns:
     any?: Raw total, functional analogue, equipment-mismatch and
-        not-yet-implemented source rank counts by bracket.
+        not-yet-implemented source rank counts and missing families.
 ]]
 function C4ScoutSkillInventory.audit(race_id: string): any?
     local source = SOURCES[race_id]
@@ -296,6 +297,7 @@ function C4ScoutSkillInventory.audit(race_id: string): any?
         Functional = 0,
         EquipmentMismatch = 0,
         Missing = 0,
+        MissingFamilies = {},
         Levels = {},
     }
     for level, categories in pairs(source.Levels) do
@@ -312,6 +314,9 @@ function C4ScoutSkillInventory.audit(race_id: string): any?
                 end
             else
                 bracket.Missing += count
+                result.MissingFamilies[category] = (
+                    result.MissingFamilies[category] or 0
+                ) + count
             end
         end
         result.Levels[level] = bracket
