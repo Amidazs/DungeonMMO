@@ -131,15 +131,17 @@ local function handle_projectile_skill_hit(
         target_index
     )
 
-    if definition.ID ~= "CripplingShot" then
-        return
-    end
-
-    local before_multiplier = RangerSlowService.get_multiplier(target)
+    -- Server-authored control fields select slow-capable projectile
+    -- skills. Never infer control effects from a client-supplied ID.
     local slow_fraction, slow_seconds = crippling_slow_values(
         player,
         definition
     )
+    if slow_fraction <= 0 or slow_seconds <= 0 then
+        return
+    end
+
+    local before_multiplier = RangerSlowService.get_multiplier(target)
     local applied = RangerSlowService.apply(
         target,
         slow_fraction,
