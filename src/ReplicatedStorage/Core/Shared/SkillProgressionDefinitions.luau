@@ -219,6 +219,48 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    ElvenFighterGuard = table.freeze({
+        Id = "ElvenFighterGuard",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        RankLevels = table.freeze({[1] = 5}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    ElvenFighterBattleCry = table.freeze({
+        Id = "ElvenFighterBattleCry",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        RankLevels = table.freeze({[1] = 10}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    MysticBattleChant = table.freeze({
+        Id = "MysticBattleChant",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 7}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    MysticStoneSkin = table.freeze({
+        Id = "MysticStoneSkin",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 7}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- L2 C4-inspired rank milestones: skills are taught at the
     -- trainer only after the character earns each level bracket.
     GuardBreaker = table.freeze({
