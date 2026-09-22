@@ -1,5 +1,25 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — story quest backend slice locally PASS
+
+Gameplay/test source `89d8e7e`: first two one-time
+cross-class Adventure quests, sequential Temple -> Mine
+prerequisites, one bound Worldroot relic and usable ore/Gold
+rewards, persisted one-time claims through existing
+QuestService/ProfileService/InventoryService. Base now
+accepts authenticated adventure Start/Claim/Snapshot remotes,
+but a real-client quest board and NPC interaction are not
+implemented.
+
+**Focused evidence only:** one clean Base Rojo build and
+40 QuestService assertions passed in unpublished Studio.
+This is not published or final game content, nor evidence
+of unassisted four-player dungeon combat. Historical local
+dungeon acceptance is retained rather than rerun.
+[Roadmap v1.62](docs/roadmap/DungeonMMO_Roadmap_v1_62_Story_Quest_Backend_20260922.md).
+[Acceptance](docs/testing/story-quest-backend-slice-2026-09-22.md).
+
+
 ## 22 September 2026 — all-member difficulty gate / spectator / replay PASS
 
 Accepted gameplay source `c6925c0`: six Rojo builds, focused
