@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**Humanoid creature-animation production workflow (22 September 2026):**
+[Authoring, Studio validation, and rollout roadmap](DungeonMMO_Humanoid_Animation_Pipeline_20260922.md).
+Astra's isolated R15 guardian overhead strike and a separate
+ChatGPT-authored horizontal sweep demonstrate distinct editable
+KeyframeSequences, an Impact marker, real Studio playback,
+foot/grip checks and neutral-pose reset. This is an **unpublished
+proof of authoring**, not an approved production animation or
+DungeonMMO combat integration. Next: a visually finished, correctly
+skinned humanoid and user-approved normal-monster/mini-boss/boss
+moves; separate rig-family proofs for wolves, birds and harpies.
+
+
 **Latest C4 backend increment: v1.76 conditional recovery.**
 [Roadmap](DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md)
 and [focused source/test receipts](../testing/c4-conditional-recovery-v1-76-2026-09-22.md).
