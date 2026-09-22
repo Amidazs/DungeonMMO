@@ -13,6 +13,7 @@ local DEFINITIONS = table.freeze({
         }),
         StarterEquipment = table.freeze({}),
         TeachableSkills = table.freeze({
+            "NoviceProtection",
             "ArcSlash",
             "Taunt",
             "GuardBreaker",
