@@ -394,6 +394,28 @@ function PassiveSkillEffects.novice_physical_reduction(
 end
 
 --[[
+Returns a bought robe-only magical casting-rate bonus. Other gear,
+foreign classes and untrained characters retain their normal cast time.
+
+Args:
+    character (any): Authentic selected Mage and real equipped Body item.
+
+Returns:
+    number: Casting-rate bonus from zero to six percent.
+]]
+function PassiveSkillEffects.robe_casting_rate_bonus(
+    character: any
+): number
+    return math.clamp(
+        robe_bonus(
+            character,
+            "MysticRobeCasting",
+            "CastingRateBonusPerRank"
+        ), 0, 0.06
+    )
+end
+
+--[[
 Returns the C4 starting Mystic's real mana-regeneration bonus.
 
 Args:
