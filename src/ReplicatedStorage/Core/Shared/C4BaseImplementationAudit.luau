@@ -56,6 +56,12 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        CurePoison = table.freeze({
+            [7] = "MysticCurePoison",
+        }),
+        PoisonCurse = table.freeze({
+            [7] = "MysticPoisonCurse",
+        }),
         BattleHeal = table.freeze({
             [14] = "MysticBattleHeal",
         }),
@@ -145,6 +151,9 @@ local function executable_ranks_at_level(
                 or definition.AttackRateBonusPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
+                or (effect and effect.KIND == "MageHeal"
+                    and type(effect.CURE_POISON_TIER) == "number"
+                    and effect.CURE_POISON_TIER > 0)
                 or (type(slow) == "number" and slow > 0)
                 or (effect and effect.KIND == "Buff"
                     and type(buff) == "number" and buff > 0)
