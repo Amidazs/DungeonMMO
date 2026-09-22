@@ -123,6 +123,32 @@ check(
     ).ok,
     "The returning user must satisfy the regular admission contract."
 )
+check(
+    Admission.validate(
+        departed, {SessionId = "ForgedRun", DungeonId = departed.DungeonId},
+        USER_ID, departed.DungeonId
+    ).reason == "SessionIdMismatch",
+    "A returning player cannot route into a different run."
+)
+check(
+    Admission.validate(
+        departed, {SessionId = session_id, DungeonId = "AbandonedMine"},
+        USER_ID, departed.DungeonId
+    ).reason == "DungeonIdMismatch",
+    "Reconnection must preserve the server-authoritative dungeon."
+)
+local no_departure_stamp = table.clone(departed)
+no_departure_stamp.Members = table.clone(departed.Members)
+no_departure_stamp.Members[tostring(USER_ID)] = table.clone(
+    departed.Members[tostring(USER_ID)]
+)
+no_departure_stamp.Members[tostring(USER_ID)].LastDisconnectedAt = nil
+check(
+    not Admission.same_server_reconnect(
+        no_departure_stamp, USER_ID, session_id
+    ).ok,
+    "An unrecorded departure cannot unlock the nonce-free route."
+)
 
 local forbidden = table.clone(departed)
 forbidden.Members = table.clone(departed.Members)
@@ -183,6 +209,12 @@ check(
         and resumed.Checkpoint.Sequence == departed.Checkpoint.Sequence
         and resumed.Members[tostring(OTHER_USER_ID)].Connected,
     "Rejoining must not replace the run, checkpoint or remaining party."
+)
+check(
+    Recovery.member_mode_on_reconnect({
+        Mode = "Reviving", FreeReviveUsed = true,
+    }) == "Active",
+    "Interrupted automatic revive restores Active without a free-life refund."
 )
 check(
     not Admission.same_server_reconnect(
