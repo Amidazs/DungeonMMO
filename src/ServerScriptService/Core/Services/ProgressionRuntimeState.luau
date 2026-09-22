@@ -404,6 +404,40 @@ function ProgressionRuntimeState.get_ranged_physical_multiplier(
 end
 
 --[[
+Returns actual server-owned studs added to Ranger projectile maximum range.
+
+Args:
+    user_id (number): Ranger player with authoritative owned skill ranks.
+
+Returns:
+    number: Non-negative Longbow range increase.
+]]
+function ProgressionRuntimeState.get_ranged_range_bonus(
+    user_id: number
+): number
+    return PassiveSkillEffects.bow_range_bonus(
+        state_for(user_id)
+    )
+end
+
+--[[
+Returns actual server-owned arrow flight-speed increase.
+
+Args:
+    user_id (number): Ranger player with authoritative purchased ranks.
+
+Returns:
+    number: Non-negative studs per second to add to real projectiles.
+]]
+function ProgressionRuntimeState.get_ranged_arrow_speed_bonus(
+    user_id: number
+): number
+    return PassiveSkillEffects.arrow_speed_bonus(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns the passive mitigation earned by a character wearing light
 Body armour. This is a server-side defense against physical NPC hits.
 
