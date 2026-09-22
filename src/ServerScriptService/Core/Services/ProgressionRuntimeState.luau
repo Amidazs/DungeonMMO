@@ -372,6 +372,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
     ) + PassiveSkillEffects.damage_bonus(
         character, "FighterPhysicalTraining"
     ) + PassiveSkillEffects.damage_bonus(
+        character, "MysticWeaponTraining"
+    ) + PassiveSkillEffects.damage_bonus(
         character, "RogueBladeMastery"
     ) + PassiveSkillEffects.damage_bonus(
         character, "RogueEdgeDiscipline"
@@ -492,6 +494,40 @@ function ProgressionRuntimeState.get_fighter_armor_reduction(
 end
 
 --[[
+Returns physical-damage reduction from an actual equipped Mystic robe.
+
+Args:
+    user_id (number): Server-owned selected Mage identity.
+
+Returns:
+    number: Purchased robe mastery reduction from zero through 2.4%.
+]]
+function ProgressionRuntimeState.get_mystic_armor_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.mystic_armor_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
+Returns the magic mitigation earned through Mystic anti-magic ranks.
+
+Args:
+    user_id (number): Server-owned selected Mage identity.
+
+Returns:
+    number: Purchased magic resistance from zero through 6%.
+]]
+function ProgressionRuntimeState.get_mystic_magic_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.mystic_magic_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns the accepted Spirit-based healing multiplier unchanged by 2C.C gear.
 
 Args:
@@ -521,8 +557,11 @@ function ProgressionRuntimeState.get_magical_multiplier(
     local baseline = AttributeConfig.magical_multiplier(
         ProgressionRuntimeState.get_attribute(user_id, "Intellect")
     )
+    local character = state_for(user_id)
     local passive_bonus = PassiveSkillEffects.damage_bonus(
-        state_for(user_id), "ArcaneDiscipline"
+        character, "ArcaneDiscipline"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "MysticWeaponTraining"
     )
     return math.max(0, baseline + passive_bonus)
 end
