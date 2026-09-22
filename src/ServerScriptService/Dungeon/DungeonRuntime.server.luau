@@ -1931,6 +1931,18 @@ local function admit_player(player: Player)
             recovery_objective(first_binding)
         send_objective(objective, state_name)
     end
+
+    -- Rehydrate the new client from the server-owned member record.
+    -- A reconnecting spectator must see their existing revive decision,
+    -- not a new free revive just because LoadCharacter created a model.
+    if death_service then
+        local refreshed = death_service:send_member_state(player)
+        if not refreshed.ok then
+            warn("[Dungeon Runtime] Revive-state sync failed: "
+                .. tostring(refreshed.reason))
+        end
+    end
+
     print(string.format("[Dungeon Runtime] %s admitted to %s.", player.Name, session.SessionId))
 end
 
