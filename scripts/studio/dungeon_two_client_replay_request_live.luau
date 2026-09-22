@@ -55,7 +55,9 @@ replace_once(
     '        warn("[Dungeon Replay Request] SERVER_REPLAY_RESULT "'
         .. ' .. tostring(replay.ok)'
         .. ' .. " " .. tostring(replay.reason)'
-        .. ' .. " " .. tostring(replay.waiting))\n'
+        .. ' .. " " .. tostring(replay.waiting)'
+        .. ' .. " simulated=" .. tostring(replay.simulated)'
+        .. ' .. " members=" .. tostring(#connected_loaded_players()))\n'
         .. '        if not replay.ok then\n'
         .. '            local recipients = if replay.votes_reset == true'
 )
@@ -110,6 +112,22 @@ local panel = wait_for(function()
     return dungeon and dungeon:FindFirstChild("CompletePanel")
 end, "real Dungeon completion panel")
 local replay = assert(panel:FindFirstChild("PlayAgainButton"))
+state_changed.OnClientEvent:Connect(function(payload)
+    if type(payload) ~= "table" then
+        return
+    end
+    if payload.state == "ReplaySimulated"
+        or payload.state == "ReplayWaiting"
+        or payload.state == "ReplayError"
+    then
+        task.delay(0.2, function()
+            warn("[Dungeon Replay Client] UI_STATE "
+                .. tostring(payload.state)
+                .. " visible=" .. tostring(panel.Visible)
+                .. " button=" .. tostring(replay.Text))
+        end)
+    end
+end)
 channel.OnClientEvent:Connect(function(command)
     if command == "Vote" then
         channel:FireServer("VOTE_RECEIVED")
