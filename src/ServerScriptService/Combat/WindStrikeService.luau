@@ -9,6 +9,9 @@ local CombatTargetRules = require(
 local DamageService = require(
     script.Parent:WaitForChild("DamageService")
 )
+local RangerSlowService = require(
+    script.Parent:WaitForChild("RangerSlowService")
+)
 
 local WindStrikeService = {}
 
@@ -119,7 +122,7 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
         if result then
             local target = resolve_target_model(result.Instance)
             if target and CombatTargetRules.is_damageable(context.character, target) then
-                DamageService.apply_damage({
+                local applied_damage = DamageService.apply_damage({
                     attacker = context.attacker,
                     attacker_character = context.character,
                     target = target,
@@ -133,6 +136,24 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                     critical_chance = context.critical_chance,
                     critical_damage_multiplier = context.critical_damage_multiplier,
                 })
+                -- An authenticated, damaging magic projectile may
+                -- apply non-stacking server NPC movement impairment.
+                -- No client-passed target or duration is accepted.
+                local fraction = tonumber(
+                    context.skill_definition.MAGIC_SLOW_FRACTION
+                ) or 0
+                local duration = tonumber(
+                    context.skill_definition.MAGIC_SLOW_SECONDS
+                ) or 0
+                local humanoid = target:FindFirstChildOfClass("Humanoid")
+                if applied_damage > 0 and fraction > 0
+                    and duration > 0 and humanoid
+                    and humanoid.Health > 0
+                then
+                    RangerSlowService.apply(
+                        target, fraction, duration
+                    )
+                end
                 target:SetAttribute(
                     "LastMagicSkillId", context.skill_definition.ID
                 )
