@@ -102,6 +102,9 @@ fail-closed contract and the current raw/implemented totals.
   **38 assertions PASS** at final cast-speed source.
 - Novice level/defense/expired rank test:
   **36 assertions PASS**.
+- Real SkillProgressionService purchase, max-rank, save/release/
+  reload of three Mage robe passives and Fighter novice rank:
+  **32 assertions PASS** using isolated in-memory profiles.
 - Original C4 nine-branch class-tree audit:
   **44 assertions PASS**.
 - Final base functional/source audit:
