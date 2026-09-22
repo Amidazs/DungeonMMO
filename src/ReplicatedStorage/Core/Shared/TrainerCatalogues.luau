@@ -160,6 +160,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "LaceratingCut",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "RogueVitalBlow",
                 Mode = "LearnOrRank",
             }),
