@@ -97,6 +97,45 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Advanced skill purchase and combat use require the same
+    -- persisted, race-specific advanced class, not just a base class.
+    VanguardChallenge = table.freeze({
+        Id = "VanguardChallenge",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedAdvancedClasses = table.freeze({"HumanVanguard"}),
+        WeaponTags = table.freeze({}),
+    }),
+    ThornwardenBash = table.freeze({
+        Id = "ThornwardenBash",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedAdvancedClasses = table.freeze({"ElfThornwarden"}),
+        WeaponTags = table.freeze({}),
+    }),
+    SharpshooterPierce = table.freeze({
+        Id = "SharpshooterPierce",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        AllowedAdvancedClasses = table.freeze({"HumanSharpshooter"}),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    WindrunnerVolley = table.freeze({
+        Id = "WindrunnerVolley",
+        Tier = "Rare",
+        MaxRank = 3,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        AllowedAdvancedClasses = table.freeze({"ElfWindrunner"}),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+
     QuickStrike = table.freeze({Id="QuickStrike",Tier="Common",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
     Backstab = table.freeze({Id="Backstab",Tier="Uncommon",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
     Feint = table.freeze({Id="Feint",Tier="Common",MaxRank=3,Kind="Physical",WeaponTags=table.freeze({"OneHandedSword"})}),
