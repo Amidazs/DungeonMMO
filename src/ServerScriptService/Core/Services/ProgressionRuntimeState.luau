@@ -695,6 +695,25 @@ function ProgressionRuntimeState.get_skill_wind_up_seconds(
 end
 
 --[[
+Returns owned and race/class-validated Scout dodge probability.
+
+Args:
+    user_id (number): Server-authenticated defender identity.
+    is_moving (boolean): Server-measured Humanoid movement.
+
+Returns:
+    number: Chance to evade a direct enemy melee hit.
+]]
+function ProgressionRuntimeState.get_scout_evasion_chance(
+    user_id: number,
+    is_moving: boolean
+): number
+    return PassiveSkillEffects.scout_evasion_chance(
+        state_for(user_id), is_moving
+    )
+end
+
+--[[
 Returns race/attribute crit chance plus the approved Equipment crit bonus.
 
 Args:
