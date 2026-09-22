@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v13 adds independent persistent dungeon-difficulty progression.
+-- Schema v14 adds exclusive per-character profession selection slots.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 13
+ProfileSchema.VERSION = 14
 
 local function deep_clone(
     value: any,
@@ -84,6 +84,10 @@ function ProfileSchema.create_default(_user_id: number): any
                 Level = 1,
                 XP = 0,
                 Gold = 0,
+                ProfessionSlots = {
+                    Gathering = "",
+                    Creation = "",
+                },
                 Professions = {
                     Mining = {Level = 1, XP = 0},
                     Blacksmithing = {Level = 1, XP = 0},
