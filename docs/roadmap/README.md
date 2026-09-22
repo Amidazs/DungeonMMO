@@ -1,5 +1,19 @@
 # Canonical Roadmap
 
+**Latest working C4 backend increment: v1.73.**
+[Roadmap and exact completion gates](DungeonMMO_Roadmap_v1_73_Scout_Catalogue_20260922.md)
+and [Studio test receipts](../testing/c4-scout-source-catalogue-2026-09-22.md).
+C4 first-transfer Human Rogue 74/99, Elven Scout 102/129
+source ranks now have DungeonMMO functional analogues.
+Real Human critical power and Human/Elf critical rate,
+shared level-28 Scout movement, both class/race trainer
+gates and actual combat/client effects passed focused tests.
+The remaining **25 Human + 27 Elf first-transfer ranks**,
+earlier Fighter/Mage rank gaps and advanced-class trees
+remain OPEN. This is **not a completed C4 catalogue**.
+No `main` merge, Roblox publish or production DataStore change.
+
+
 **Latest working backend increment: v1.72 Rogue
 bleeding.** [Working roadmap](DungeonMMO_Roadmap_v1_72_Rogue_Bleed_20260922.md)
 and [focused Studio receipt](../testing/c4-rogue-bleed-2026-09-22.md).
