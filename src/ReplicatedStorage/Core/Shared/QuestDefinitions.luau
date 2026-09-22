@@ -1,6 +1,7 @@
 --!strict
 local DungeonDefinitions = require(script.Parent.DungeonDefinitions)
 local CharacterIdentityRules = require(script.Parent.CharacterIdentityRules)
+local SkillUnlockRules = require(script.Parent.SkillUnlockRules)
 
 local QuestDefinitions = {}
 
@@ -10,6 +11,14 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Trial of the Vanguard",
         Kind = "ClassAdvancement",
         MinimumLevel = 20,
+        SkillPrerequisites = table.freeze({
+            table.freeze({
+                SkillId = "ShieldBash", Rank = 3, Proficiency = 400,
+            }),
+            table.freeze({
+                SkillId = "Mend", Rank = 3, Proficiency = 300,
+            }),
+        }),
         AllowedRaces = table.freeze({"Human", "Elf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         Objectives = table.freeze({
@@ -27,6 +36,14 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Trial of the Far Path",
         Kind = "ClassAdvancement",
         MinimumLevel = 20,
+        SkillPrerequisites = table.freeze({
+            table.freeze({
+                SkillId = "PiercingShot", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "CripplingShot", Rank = 3, Proficiency = 300,
+            }),
+        }),
         AllowedRaces = table.freeze({"Human", "Elf"}),
         AllowedBaseClasses = table.freeze({"Ranger"}),
         Objectives = table.freeze({
@@ -44,6 +61,14 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Mage Advancement Trial",
         Kind = "ClassAdvancement",
         MinimumLevel = 20,
+        SkillPrerequisites = table.freeze({
+            table.freeze({
+                SkillId = "WindStrike", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "ArcaneWard", Rank = 3, Proficiency = 300,
+            }),
+        }),
         AllowedRaces = table.freeze({"Human", "Elf"}),
         AllowedBaseClasses = table.freeze({"Mage"}),
         Objectives = table.freeze({
@@ -110,6 +135,14 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Rogue Advancement Trial",
         Kind = "ClassAdvancement",
         MinimumLevel = 20,
+        SkillPrerequisites = table.freeze({
+            table.freeze({
+                SkillId = "QuickStrike", Rank = 3, Proficiency = 300,
+            }),
+            table.freeze({
+                SkillId = "Backstab", Rank = 3, Proficiency = 400,
+            }),
+        }),
         AllowedRaces = table.freeze({"Human", "Elf"}),
         AllowedBaseClasses = table.freeze({"Rogue"}),
         Objectives = table.freeze({
@@ -176,6 +209,12 @@ function QuestDefinitions.is_character_eligible(
         and level >= (tonumber(definition.MinimumLevel) or 1)
         and list_contains(definition.AllowedRaces, race_id)
         and list_contains(definition.AllowedBaseClasses, base_class_id)
+        and (
+            definition.Kind ~= "ClassAdvancement"
+            or select(1, SkillUnlockRules.can_start_trial(
+                character, definition
+            ))
+        )
         and (
             definition.PrerequisiteQuestId == nil
             or (
