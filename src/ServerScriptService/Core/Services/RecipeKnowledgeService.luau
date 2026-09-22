@@ -7,6 +7,9 @@ local Services = ServerScriptService:WaitForChild("Core"):WaitForChild("Services
 
 local ItemDefinitions = require(Shared:WaitForChild("ItemDefinitions"))
 local ProfessionDefinitions = require(Shared:WaitForChild("ProfessionDefinitions"))
+local ProfessionSelectionRules = require(
+    Shared:WaitForChild("ProfessionSelectionRules")
+)
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
 local ProfileSchema = require(Shared:WaitForChild("ProfileSchema"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
@@ -111,6 +114,11 @@ local function profession_rejection(
         return "ProfessionUnavailable"
     end
 
+    if not ProfessionSelectionRules.can_use(
+        character.ProfessionSlots, profession_id
+    ) then
+        return "ProfessionNotSelected"
+    end
     local state = character.Professions[profession_id]
     if type(state) ~= "table" then
         return "ProfessionUnavailable"
