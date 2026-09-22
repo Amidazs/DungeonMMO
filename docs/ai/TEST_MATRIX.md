@@ -1,5 +1,36 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — earned skill mastery / level gates
+
+- [x] `bf93f07`: focused `skill_mastery_gates_tests.luau`
+  passed **62 assertions**, covering hidden/new
+  level-bracket basic skills in all four classes,
+  earned full-mastery trial requirements, specialist
+  level/class/prerequisite checks and combat-use denial
+  after a required skill rank is lost.
+- [x] `bf93f07`: focused `extended_level_contract_tests.luau`
+  passed **44 assertions**, covering reachable level
+  24/28/32, level 40 cap, old early XP, AP/SP and
+  DEV-only level commands.
+- [x] `bf93f07`: directly affected existing quest
+  definitions, Rogue class advancement, trainer,
+  progression snapshot and skill progression
+  contracts passed **5/5** in unpublished Studio.
+- [x] `e0e2f39`: one clean Dungeon Rojo build plus
+  `dungeon_taunt_mastery_tests.luau` passed
+  **7 assertions** on zero-damage taunt proficiency,
+  active member eligibility, anti-farm encounter
+  cap and new-encounter earning.
+- [ ] ONE real-input tank/ranger/mage/rogue basic
+  skill progression balance check remains; do
+  not rerun old room-reset/aggro/revive suite.
+- [ ] Full specialist class catalogue, visible
+  locked requirement previews and published
+  cloud/cross-place acceptance remain separate.
+
+[Focused acceptance](docs/testing/dungeon-skill-mastery-lineage-style-2026-09-22.md).
+
+
 ## 22 September 2026 — focused class and ability acceptance
 
 - [x] `e73f9ef`: Base build, **66 class advancement**
