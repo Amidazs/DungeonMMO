@@ -76,10 +76,12 @@ check(
     "Advancement trial must not start in Dungeon context."
 )
 
-local unavailable = base:start_trial(5203)
+local fighter_start = base:start_trial(5203)
 check(
-    unavailable.ok == false and unavailable.reason == "AdvancementUnavailable",
-    "Unapproved Fighter advancement must reject."
+    fighter_start.ok and fighter_start.class_id == "HumanVanguard"
+        and fighter_start.quest_id == "FighterAdvancementTrial"
+        and fighter_start.role_id == "Tank",
+    "Human Fighter must receive the Vanguard tank trial at level 20."
 )
 
 local human_start = base:start_trial(5201)
@@ -180,5 +182,157 @@ check(race_change:apply(5201, "Human", human_preview.Hash, "adv-elf-to-human").o
 local restored_snapshot = base:build_snapshot(5201)
 check(restored_snapshot.ActiveClassId == "HumanArcanist" and restored_snapshot.Completed == true,
     "Returning race must reactivate historical Human advancement without re-claiming.")
+
+-- Four new race-specific advancement paths reuse the original
+-- quest, profile, race history and ClassAdvancementService authority.
+local fighter_early = base:claim(5203)
+check(
+    fighter_early.reason == "AdvancementQuestNotReady",
+    "A Fighter cannot claim an uncompleted Temple trial."
+)
+check(
+    quests:record_event(5203, {
+        EventId = "fighter-wrong-mine:DungeonClear",
+        Type = "DungeonClear",
+        TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+        Amount = 1,
+    }).ok,
+    "A Mine clear is unrelated to the Fighter Temple trial."
+)
+check(
+    base:claim(5203).reason == "AdvancementQuestNotReady",
+    "Wrong-dungeon completion must not advance a Fighter."
+)
+check(
+    quests:record_event(5203, {
+        EventId = "fighter-temple:DungeonClear",
+        Type = "DungeonClear",
+        TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+        Amount = 1,
+    }).ok,
+    "The trusted Temple clear must ready the Fighter trial."
+)
+local fighter_claim = base:claim(5203)
+check(
+    fighter_claim.ok and fighter_claim.class_id == "HumanVanguard"
+        and fighter_claim.role_id == "Tank",
+    "The Vanguard must claim only after completing its own trial."
+)
+check(
+    base:claim(5203).reason == "AdvancementAlreadyCompleted",
+    "Vanguard advancement cannot be claimed twice."
+)
+
+-- Args:
+--   user_id (number): Test character's stable user identity.
+--   race_id (string): Supported Human or Elf race.
+--   base_class_id (string): Supported Fighter or Ranger class.
+-- Returns:
+--   nil: Seeds one independent level-20 advancement candidate.
+local function seed_candidate(
+    user_id: number,
+    race_id: string,
+    base_class_id: string
+)
+    assert(profiles:load(user_id), "Candidate profile must load.")
+    local mutated = profiles:mutate(user_id, function(profile: any)
+        local character = profile.Characters.Slot1
+        character.Level = 20
+        character.Identity = {
+            Version = 1,
+            RaceId = race_id,
+            BaseClassId = base_class_id,
+            ClassId = base_class_id,
+            CreationStage = "Complete",
+        }
+    end)
+    check(mutated, "Advancement candidate profile mutation must succeed.")
+end
+
+local additional_paths = {
+    {5204, "Elf", "Fighter", "ElfThornwarden", "Tank",
+        DungeonDefinitions.TEST_DUNGEON.Id},
+    {5205, "Human", "Ranger", "HumanSharpshooter",
+        "RangedDamage", DungeonDefinitions.ABANDONED_MINE.Id},
+    {5206, "Elf", "Ranger", "ElfWindrunner",
+        "RangedDamage", DungeonDefinitions.ABANDONED_MINE.Id},
+}
+for _, path in ipairs(additional_paths) do
+    local user_id = path[1]
+    local race_id = path[2]
+    local base_class_id = path[3]
+    local class_id = path[4]
+    local role_id = path[5]
+    local dungeon_id = path[6]
+    seed_candidate(user_id, race_id, base_class_id)
+
+    local candidate = base:build_snapshot(user_id)
+    check(
+        candidate.CandidateClassId == class_id
+            and candidate.CandidateRoleId == role_id
+            and candidate.Completed == false,
+        "Race and base class must select their own advanced role."
+    )
+    local started = base:start_trial(user_id)
+    check(
+        started.ok and started.class_id == class_id
+            and started.role_id == role_id,
+        "An eligible character must start only its own class trial."
+    )
+    check(
+        base:claim(user_id).reason == "AdvancementQuestNotReady",
+        "A class path cannot skip its required dungeon clear."
+    )
+    check(
+        quests:record_event(user_id, {
+            EventId = "advanced-path-" .. tostring(user_id),
+            Type = "DungeonClear",
+            TargetId = dungeon_id,
+            Amount = 1,
+        }).ok,
+        "The chosen dungeon must progress this class's trial."
+    )
+    local claim = base:claim(user_id)
+    local character = assert(profiles:get_character(user_id, 1))
+    check(
+        claim.ok and claim.class_id == class_id
+            and character.ClassAdvancement.ActiveClassId == class_id
+            and character.ClassAdvancement.CompletedByRace[
+                race_id
+            ][class_id] == true,
+        "Every advanced path must persist its own race-bound class."
+    )
+    check(
+        character.Identity.BaseClassId == base_class_id
+            and character.Identity.ClassId == base_class_id,
+        "Advancement must preserve the existing base combat family."
+    )
+    check(
+        base:claim(user_id).reason == "AdvancementAlreadyCompleted",
+        "Every new path must be claimable only once."
+    )
+end
+
+seed_candidate(5207, "Human", "Ranger")
+local level_check = profiles:mutate(5207, function(profile: any)
+    profile.Characters.Slot1.Level = 19
+end)
+check(level_check, "Level-19 Ranger must be seeded.")
+check(
+    base:start_trial(5207).quest_reason == "QuestUnavailable",
+    "Advancement remains unavailable below level 20."
+)
+
+-- Saving and reloading a class must preserve the advanced role identity.
+check(profiles:save(5206, "AdvancedClassTest"),
+    "Advanced Ranger must persist to profile storage.")
+check(profiles:release(5206, "AdvancedClassTest"),
+    "Advanced Ranger profile must release cleanly.")
+check(profiles:load(5206) ~= nil, "Advanced Ranger must reload.")
+check(
+    base:build_snapshot(5206).ActiveClassId == "ElfWindrunner"
+        and base:build_snapshot(5206).Completed == true,
+    "Reload must retain the Elf Ranger's completed class path."
+)
 
 print(string.format("[Class Advancement Tests] PASS: %d assertions.", assertions))
