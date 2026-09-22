@@ -15,6 +15,9 @@ local DamageService = require(script.Parent:WaitForChild("DamageService"))
 local EnemyDamageMultiplierRules = require(
     script.Parent:WaitForChild("EnemyDamageMultiplierRules")
 )
+local EnemyWeakeningService = require(
+    script.Parent:WaitForChild("EnemyWeakeningService")
+)
 local DefenseService = require(script.Parent:WaitForChild("DefenseService"))
 local CombatValidationService = require(
     script.Parent:WaitForChild("CombatValidationService")
@@ -637,7 +640,9 @@ local function attack(runtime: MarauderRuntime, player: Player)
 
     runtime.pattern_index = MarauderAttackRules.get_next_pattern_index(runtime.pattern_index)
     runtime.attacking = true
-    runtime.next_attack_at = os.clock() + attack_definition.ATTACK_INTERVAL_SECONDS
+    runtime.next_attack_at = os.clock()
+        + attack_definition.ATTACK_INTERVAL_SECONDS
+            * EnemyWeakeningService.get_interval_multiplier(runtime.model)
     set_ai_state(runtime, "Attacking")
     face_target(runtime, target_root)
 
