@@ -41,6 +41,10 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        IceSlow = table.freeze({
+            [7] = "MysticFrostBolt",
+            [14] = "MysticFrostBolt",
+        }),
         PhysicalMagicAttackMastery = table.freeze({
             [7] = "MysticWeaponTraining",
             [14] = "MysticWeaponTraining",
@@ -91,11 +95,13 @@ local function executable_ranks_at_level(
             local effect = Combat.get_for_rank(skill_id, rank)
             local damage = effect and effect.BASE_DAMAGE or 0
             local heal = effect and effect.TOTAL_HEAL or 0
+            local slow = effect and effect.MAGIC_SLOW_FRACTION or 0
             local passive = definition.DamageBonusPerRank
                 or definition.PhysicalReductionPerRank
                 or definition.MagicReductionPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
+                or (type(slow) == "number" and slow > 0)
                 or (definition.Kind == "Passive"
                     and type(passive) == "number" and passive > 0)
             then
