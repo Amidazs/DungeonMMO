@@ -1,5 +1,53 @@
 # DungeonMMO Development Handoff
 
+## 22 September 2026 — C4 EXACT SKILL VOLUME IS A NEW, OPEN REQUIREMENT
+
+User requests Lineage II **Chronicle 4**, specifically
+the **same number of skill rank offerings per level
+and corresponding class**, not just structural inspiration
+or four new basic ability icons. Read
+`docs/design/C4_Skill_Count_Parity_20260922.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_65_C4_Skill_Volume_20260922.md`
+first. Level-5 C4 Human Fighter has 13 listed rank
+entries, many multiple ranks of the SAME ability.
+The original 3-rank DungeonMMO prototype is nowhere
+near complete C4 density. Do not claim that v1.64
+completed the newer exact-volume user request.
+
+Initial GitHub count manifest contains 16 verified
+Human/Elf Fighter/Mystic level brackets, including
+race-specific differences; `c4_skill_volume_audit.luau`
+reports all **16 mismatched** and **14 unmapped
+existing skill families** at first source
+`29d117a`. The report is intentionally conservative
+because legacy skills lack explicit rank-level data.
+No source gaps should be padded with nonexistent or
+effectless skills. The Ranger/Rogue level-one split
+does NOT correspond one-to-one to C4's level-20
+Rogue/Elven Scout hybrid bow/dagger class; document
+shared skill trunks before copying counts.
+
+New basic Fighter/Ranger/Rogue rank milestones aligned
+to C4-style levels 5/10/15; Mage Aether Bolt to
+7/14/20. One Base Rojo build, focused level/mastery
+test and read-only volume audit executed successfully.
+The auditer is forward-compatible and should
+eventually report parity for each completed source
+slice, not require the gap to remain positive.
+
+**NEXT CONTENT WORK:** build full original class
+skill rank inventories at verified C4 brackets;
+implement active, passive, craft and utility effects
+with level-gated rank upgrades; expand the reference
+count manifest to all branches and levels. Preserve
+existing progression/proficiency/profile services,
+no invented rank offerings, and no old dungeon-wide
+test loops. Exact full C4 parity is NOT YET DELIVERED.
+All script and doc edits MUST be made in GitHub;
+remote access is for clean pull/build/focused tests,
+never file editing. No place publish or main merge.
+
+
 ## 22 September 2026 — v1.64 skill mastery and taunt XP: local PASS
 
 Primary [roadmap](docs/roadmap/DungeonMMO_Roadmap_v1_64_Skill_Mastery_Level_Gates_20260922.md)
