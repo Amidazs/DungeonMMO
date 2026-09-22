@@ -27,6 +27,9 @@ local RangerProjectileService = require(
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
+local StaggerService = require(
+    script.Parent:WaitForChild("StaggerService")
+)
 local RangerVolleyService = require(
     script.Parent:WaitForChild("RangerVolleyService")
 )
@@ -137,6 +140,22 @@ local function handle_projectile_skill_hit(
         player,
         definition
     )
+    -- The same confirmed server projectile hit can apply a timed
+    -- stagger to a living NPC. This is exclusive of slow-only arrows
+    -- because both effect fields are authored in combat definitions.
+    local stagger_seconds = tonumber(definition.STAGGER_SECONDS) or 0
+    if stagger_seconds > 0 then
+        local humanoid = target:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            local already_staggered = StaggerService.is_staggered(target)
+            StaggerService.apply(target, stagger_seconds)
+            DungeonProgressionBridge.award_control(
+                player, definition.ID, target,
+                "Stagger", not already_staggered
+            )
+        end
+    end
+
     if slow_fraction <= 0 or slow_seconds <= 0 then
         return
     end
