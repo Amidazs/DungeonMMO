@@ -14,7 +14,7 @@ local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
     Human = {Raw = 99, Functional = 68, Missing = 31,
         EquipmentMismatch = 25},
-    Elf = {Raw = 129, Functional = 68, Missing = 61,
+    Elf = {Raw = 129, Functional = 98, Missing = 31,
         EquipmentMismatch = 25},
 }
 
@@ -91,12 +91,25 @@ local function check_implementation(
         check(type(bonus) == "number" and bonus > 0,
             mapping.SkillId .. " has no real passive stat effect")
     else
+        local previous_effect = 0
         for rank = 1, definition.MaxRank do
             local effect = assert(Combat.get_for_rank(
                 mapping.SkillId, rank
             ))
-            check(effect.BASE_DAMAGE > 0,
-                mapping.SkillId .. " has a rank with no actual damage")
+            local magnitude = if definition.Kind == "Support"
+                then effect.TOTAL_HEAL else effect.BASE_DAMAGE
+            check(type(magnitude) == "number"
+                and magnitude > previous_effect,
+                mapping.SkillId .. " has an unimplemented effect rank")
+            if category == "HPRegeneration" then
+                check(effect.SELF_ONLY == true,
+                    "Elven regeneration must never heal a selected ally")
+            elseif category == "ThreatCharm" then
+                check(effect.THREAT_REDUCTION_FRACTION > 0
+                    and effect.THREAT_REDUCTION_FRACTION <= 0.85,
+                    "Elven charm must actually reduce server threat")
+            end
+            previous_effect = magnitude
         end
     end
 end
