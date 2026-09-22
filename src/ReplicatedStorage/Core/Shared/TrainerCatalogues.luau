@@ -135,10 +135,12 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "MysticHealingPrayer",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "MysticBattleHeal",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "MysticLifeDrain",
                 Mode = "LearnOrRank",
             }),
@@ -246,7 +248,8 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "ScoutFleetFoot",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "ScoutEvasion",
                 Mode = "LearnOrRank",
             }),
@@ -330,7 +333,8 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "ScoutFleetFoot",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "ScoutEvasion",
                 Mode = "LearnOrRank",
             }),
