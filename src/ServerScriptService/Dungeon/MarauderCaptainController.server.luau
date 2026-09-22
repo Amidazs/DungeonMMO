@@ -11,6 +11,9 @@ local DamageService = require(Combat:WaitForChild("DamageService"))
 local EnemyDamageMultiplierRules = require(
     Combat:WaitForChild("EnemyDamageMultiplierRules")
 )
+local EnemyWeakeningService = require(
+    Combat:WaitForChild("EnemyWeakeningService")
+)
 local DefenseService = require(Combat:WaitForChild("DefenseService"))
 local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
@@ -203,7 +206,9 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
     runtime.attacking = true
     runtime.attackSequence += 1
     local sequence = runtime.attackSequence
-    runtime.nextAttackAt = os.clock() + definition.ATTACK_INTERVAL_SECONDS
+    runtime.nextAttackAt = os.clock()
+        + definition.ATTACK_INTERVAL_SECONDS
+            * EnemyWeakeningService.get_interval_multiplier(runtime.model)
     runtime.model:SetAttribute("MarauderAIState", "Attacking")
     runtime.model:SetAttribute("AttackName", attack_name)
     runtime.model:SetAttribute("AttackTelegraph", true)
