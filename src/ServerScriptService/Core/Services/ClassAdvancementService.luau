@@ -141,6 +141,7 @@ function ClassAdvancementService:start_trial(user_id: number): any
 
     return result(true, nil, {
         class_id = candidate.Id,
+        role_id = candidate.RoleId,
         quest_id = candidate.QuestId,
     })
 end
@@ -232,6 +233,7 @@ function ClassAdvancementService:claim(user_id: number): any
     return result(true, nil, {
         class_id = candidate.Id,
         display_name = candidate.DisplayName,
+        role_id = candidate.RoleId,
     })
 end
 
@@ -255,6 +257,7 @@ function ClassAdvancementService:build_snapshot(user_id: number): any
         ActiveClassId = advancement.ActiveClassId,
         CandidateClassId = if candidate then candidate.Id else nil,
         CandidateDisplayName = if candidate then candidate.DisplayName else nil,
+        CandidateRoleId = if candidate then candidate.RoleId else nil,
         QuestId = if candidate then candidate.QuestId else nil,
         QuestReady = type(quest_state) == "table"
             and quest_state.Ready == true,
