@@ -1,5 +1,53 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — all-member difficulty gate / spectator / replay PASS
+
+Accepted gameplay source `c6925c0`: six Rojo builds, focused
+four-player Base party unlock test, TeleportCoordinator
+**23 assertions**, DungeonReplayService **28 assertions**,
+Dungeon backend **30/30**, real two-client spectator combat
+and two-client Play again UI fixtures passed in unpublished
+Studio. The four-client physical room wipe/re-entry also
+passed earlier after the combat gate was introduced.
+At final gameplay source `b6fe3be` (Base entry UI
+identifies the locked party member), all six compositions
+rebuilt and the Base party unlock test passed again.
+
+**Player rule:** For Depth2+, every single selected character
+must personally have completed the previous depth in the
+selected dungeon. Base validates each party member and the
+TeleportCoordinator rechecks all before server reservation.
+Neither a leader's unlock nor another dungeon's clear grants
+access. A locked party member blocks everyone, including
+during Play again, and the failure identifies the member.
+Replay invalidates previous votes when an unlock fails.
+
+**Combat rule:** Spectating, dead and disconnected players
+cannot attack, cast, defend, deal delayed damage, contribute
+damage or be targeted as active dungeon participants.
+Creating a new character cannot reset the server-owned
+spectator mode; live two-client Studio verified the exclusion
+and that the still-Active peer could damage targets.
+
+**UI regression:** A late revive snapshot previously
+interfered with visible Play again after two accepted
+client votes. The UI now preserves terminal replay state.
+Two genuine Studio clients demonstrated the waiting and
+successful replay screens at the same gameplay head.
+
+**Boundaries:** No genuine same-account network reconnect
+into a published reserved server, real cross-place routing,
+durable cloud replay, or full ordinary boss-reward reattempt
+was established by the local fixtures. A published TEST
+experiment still requires separate user approval.
+
+[Acceptance evidence](docs/testing/dungeon-party-unlock-spectator-replay-2026-09-22.md).
+[Roadmap v1.61](docs/roadmap/DungeonMMO_Roadmap_v1_61_Party_Unlock_Spectator_Replay_20260922.md).
+All source/docs edits GitHub-only; remote access was used
+for read-only diagnostics, clean pulls, local builds/tests.
+No publish, `main` merge, force-push or production cloud mutation.
+
+
 ## 22 September 2026 — same-server reconnect local testing PASSED
 
 Tested gameplay/test source:
