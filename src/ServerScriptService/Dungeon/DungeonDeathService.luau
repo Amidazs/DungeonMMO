@@ -88,6 +88,27 @@ function DungeonDeathService:_emit(user_id:number)
     })
 end
 
+-- Sends authoritative revive UI state after initial admission or
+-- reconnection. The client must not infer its previous death mode
+-- from a newly loaded character or an earlier RemoteEvent.
+--
+-- Args:
+--   player: Player; currently connected run member.
+-- Returns:
+--   any: operation result indicating whether state was sent.
+function DungeonDeathService:send_member_state(player: any): any
+    local session = self._sessions:get(self._session_id)
+    if not session then
+        return operation(false, "SessionNotFound")
+    end
+    local member = session.Members[tostring(player.UserId)]
+    if not member or member.Connected ~= true then
+        return operation(false, "MemberNotConnected")
+    end
+    self:_emit(player.UserId)
+    return operation(true, nil)
+end
+
 -- Args:
 --   session: any; authoritative session membership snapshot.
 -- Returns:
