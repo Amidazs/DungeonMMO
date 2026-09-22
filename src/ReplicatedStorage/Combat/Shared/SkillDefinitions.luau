@@ -30,6 +30,7 @@ export type MageHealSkillDefinition = {
     STAMINA_COST: number, MANA_COST: number, COOLDOWN_SECONDS: number,
     WIND_UP_SECONDS: number, ACTIVE_SECONDS: number, RECOVERY_SECONDS: number,
     RANGE_STUDS: number, TOTAL_HEAL: number,
+    CURE_POISON_TIER: number?,
     HUMAN_INSTANT_FRACTION: number, HUMAN_HOT_SECONDS: number,
     ELF_INSTANT_FRACTION: number, ELF_HOT_SECONDS: number,
     HOT_TICK_SECONDS: number,
@@ -999,6 +1000,35 @@ local MYSTIC_BATTLE_HEAL = specialize_skill(
     }
 )
 
+-- The source C4 Mage level-seven cure spends mana and removes only
+-- an authenticated friendly poison at or below the authored tier.
+local MYSTIC_CURE_POISON = specialize_skill(
+    MAGE_HEAL, "MysticCurePoison", "Cure Poison", {
+        MANA_COST = 10,
+        COOLDOWN_SECONDS = 5,
+        TOTAL_HEAL = 0,
+        CURE_POISON_TIER = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({CURE_POISON_TIER = 3}),
+        }),
+    }
+)
+
+-- Elven Scout Poison Recovery uses the same authenticated cleanse
+-- executor but cannot be redirected to another player's character.
+local ELVEN_SCOUT_POISON_RECOVERY = specialize_skill(
+    MAGE_HEAL, "ElvenScoutPoisonRecovery", "Poison Recovery", {
+        SELF_ONLY = true,
+        MANA_COST = 10,
+        COOLDOWN_SECONDS = 6,
+        TOTAL_HEAL = 0,
+        CURE_POISON_TIER = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({CURE_POISON_TIER = 3}),
+        }),
+    }
+)
+
 -- Real server-confirmed human Mystic life drain. The NPC must lose
 -- health before the attacker receives any heal from the same hit.
 local MYSTIC_LIFE_DRAIN = specialize_skill(
@@ -1331,6 +1361,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ElvenScoutGuard = ELVEN_SCOUT_GUARD,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
+    MysticCurePoison = MYSTIC_CURE_POISON,
+    ElvenScoutPoisonRecovery = ELVEN_SCOUT_POISON_RECOVERY,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
@@ -1479,7 +1511,13 @@ local function validate_mage_heal(definition: MageHealSkillDefinition)
     validate_timed(definition)
     assert(definition.MANA_COST > 0, "Mage Heal must cost Mana.")
     assert(definition.RANGE_STUDS > 0, "Mage Heal range must be positive.")
-    assert(definition.TOTAL_HEAL > 0, "Mage Heal total must be positive.")
+    local cure_tier = definition.CURE_POISON_TIER or 0
+    assert(
+        definition.TOTAL_HEAL > 0
+            or (definition.TOTAL_HEAL == 0
+                and cure_tier >= 1 and cure_tier <= 7),
+        "Mage support requires positive healing or authored poison cure."
+    )
     assert(
         definition.HUMAN_INSTANT_FRACTION >= 0
             and definition.HUMAN_INSTANT_FRACTION <= 1,
