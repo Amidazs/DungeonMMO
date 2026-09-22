@@ -1,6 +1,43 @@
 # DungeonMMO Development Handoff
 
-## 22 September 2026 — latest C4 status/heal follow-up, PARTIAL
+## 22 September 2026 — current v1.76 C4 recovery, PARTIAL
+
+Read `docs/testing/c4-conditional-recovery-v1-76-2026-09-22.md`
+and `docs/roadmap/DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md`.
+The six currently source-inventoried original C4 Human/Elf
+basic/partial-first-transfer classes now have **336/396**
+functional DungeonMMO analogue rank entries; **60** are missing.
+Base 148/168; partial Scout inventories 188/228. Exactly
+**0/9** original first-transfer paths are complete and
+SEVEN source career inventories have not been enumerated.
+
+New: Human Fighter bought seated recovery at level 5;
+Human Rogue seated recovery at 24/32; both Scout races'
+moving recovery at 36. Genuine server StaminaService
+Heartbeat now applies bounded rank bonuses only when
+the actual Humanoid is seated or moving. Normal Stamina
+regen pause/delay/maximum are preserved; unrelated or
+foreign-race/class ownership fails closed. Focused
+42 recovery, 1079 Scout inventory, 55 base-source
+and 7 overall C4 assertions PASS. Disposable real
+Studio Play client physically occupied a Seat and
+recovered spent Stamina faster with its purchased rank;
+`REAL_SEATED_STAMINA_PASS` and
+`VERIFIED_PLAY_MODE_PASS`. Actual client running
+movement recovery is not yet independently Play tested.
+
+NEXT: finish 20 basic + 40 Scout source rank gaps,
+then source-map and implement the seven entirely
+missing original C4 first-transfer career inventories.
+Overall completion flag remains FALSE. Prior unrelated
+Phase2A paid-revive automated failure remains open.
+All source/test/docs edits via GitHub; remote only
+clean pull, TEMP builds, unpublished Studio/tests/logs.
+No `main` merge, Roblox publish, production saves or
+paid operations.
+
+
+## 22 September 2026 — previous C4 status/heal follow-up, PARTIAL
 
 Read `docs/testing/c4-source-catalogue-v1-75-2026-09-22.md`
 and `docs/roadmap/DungeonMMO_Roadmap_v1_75_C4_Status_Heal_20260922.md`.
