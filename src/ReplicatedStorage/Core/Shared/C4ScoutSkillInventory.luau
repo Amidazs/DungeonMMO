@@ -10,6 +10,17 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "Ranger",
         DaggerEquipmentPending = false,
     }),
+    BowRange = table.freeze({
+        SkillId = "RangerLongRange",
+        Owner = "Ranger",
+        DaggerEquipmentPending = false,
+    }),
+    ArrowSpeed = table.freeze({
+        SkillId = "RangerArrowVelocity",
+        Owner = "Ranger",
+        DaggerEquipmentPending = false,
+    }),
+
     DaggerAttack = table.freeze({
         SkillId = "RogueFinishingCut",
         Owner = "Rogue",
