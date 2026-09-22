@@ -533,6 +533,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- First-tier Human Fighter's level-five resting recovery.
+    -- DungeonMMO analogue: purchased stamina regen while truly seated.
+    FighterRestingRecovery = table.freeze({
+        Id = "FighterRestingRecovery",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        RankLevels = table.freeze({[1] = 5}),
+        RestingStaminaBonusPerRank = 0.15,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The shield-line counterpart to Iron Discipline: purchased ranks
     -- add real maximum HP without creating an inert combat action.
     StalwartTraining = table.freeze({
@@ -1168,6 +1182,34 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Elf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
         RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 first-transfer Human Rogue seated-recovery ranks 24/32.
+    -- Stamina regeneration is the functional DungeonMMO analogue.
+    HumanScoutRestingRecovery = table.freeze({
+        Id = "HumanScoutRestingRecovery",
+        Tier = "Common",
+        MaxRank = 2,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 32}),
+        RestingStaminaBonusPerRank = 0.10,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Both C4 Scout source classes gain a level-36 moving recovery
+    -- rank. This does not shorten the normal post-spend regen delay.
+    ScoutRunningRecovery = table.freeze({
+        Id = "ScoutRunningRecovery",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 36}),
+        RunningStaminaBonusPerRank = 0.10,
         WeaponTags = table.freeze({}),
     }),
 
