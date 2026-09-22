@@ -53,6 +53,9 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        BattleHeal = table.freeze({
+            [14] = "MysticBattleHeal",
+        }),
         RobeCasting = table.freeze({
             [1] = "MysticRobeCasting",
         }),
