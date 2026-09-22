@@ -1,5 +1,17 @@
 # Canonical Roadmap
 
+**Latest v1.62 — new story quest backend content, NOT another
+dungeon recovery-test cycle.**
+[Roadmap v1.62](DungeonMMO_Roadmap_v1_62_Story_Quest_Backend_20260922.md)
+and [focused acceptance](../testing/story-quest-backend-slice-2026-09-22.md).
+Two one-time cross-class Temple → Mine story quests, one bound
+relic and server-authoritative atomic Gold/item claims were
+implemented with Base quest remotes. One Base build and 40
+QuestService assertions passed at `89d8e7e`; there was no
+full Dungeon regression. A visible quest board and targeted
+real-client remote interaction are **still pending**.
+
+
 **Consolidated active backend backlog (22 September 2026):**
 [Gap audit and stop-retesting plan](DungeonMMO_Consolidated_Backend_Audit_20260922.md).
 This is the practical NEXT-WORK list across dungeon, progression,
