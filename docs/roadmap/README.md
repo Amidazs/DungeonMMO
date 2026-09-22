@@ -1,5 +1,21 @@
 # Canonical Roadmap
 
+**Latest working backend increment: v1.72 Rogue
+bleeding.** [Working roadmap](DungeonMMO_Roadmap_v1_72_Rogue_Bleed_20260922.md)
+and [focused Studio receipt](../testing/c4-rogue-bleed-2026-09-22.md).
+Two genuine level-24/32 bleed ranks now deliver
+server-owned, non-stacking delayed NPC damage;
+19 rank gates, 20 real isolated trainer purchases/
+reload assertions and three actual real-client
+bleed ticks with expiry passed. C4's equivalent
+requires a dagger whereas our temporary Rogue
+equipment is still a sword. Exact rank/equipment
+parity and the overall C4 catalogue remain OPEN;
+the separate Phase2A paid-revive auto-test failure
+also remains unresolved. No `main` merge, Roblox
+publish or production DataStore change.
+
+
 **Latest working backend increment: v1.71 —
 real Ranger/Rogue control progression.**
 [Working roadmap v1.71](DungeonMMO_Roadmap_v1_71_Ranger_Rogue_Control_20260922.md)
