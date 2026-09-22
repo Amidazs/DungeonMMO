@@ -1,5 +1,38 @@
 # DungeonMMO Current Engineering State
 
+## 22 September 2026 — same-server reconnect local testing PASSED
+
+Tested gameplay/test source:
+`87a19ba6ac112f8fd3850d01f271538067286d72`.
+Desktop Commander reconnected, and the clean feature worktree was
+fast-forwarded to the GitHub reconnect implementation. The six
+Rojo compositions built and `git diff --check` passed.
+The focused production-service simulated same-UserId return suite
+passed **30 assertions**; Dungeon backend **30/30** including
+DungeonDeathService **46 assertions**; real-client failed-return UI
+Play passed; focused ThreatService **51 assertions**; Base professions
+**14/14**; and a real four-client physical Room1 wipe/re-entry
+fixture passed, all at the **same** tested gameplay source.
+
+**Boundary:** this proves the local reconnect contract and
+non-regression, not a genuine Roblox account disconnecting and
+network-rejoining its original reserved server. The existing
+admission requires valid platform join routing; a direct return
+without platform TeleportData fails closed. Published TEST
+same-account routing, lease reacquisition, spectator combat exclusion
+and persisted rewards remain outstanding and need separate
+publishing approval.
+
+The earlier "Studio OFFLINE" note below is historical and
+superseded for local testing, not for the real-network gate.
+Receipt:
+`docs/testing/dungeon-same-server-reconnect-local-acceptance-2026-09-22.md`.
+Updated roadmap:
+`docs/roadmap/DungeonMMO_Roadmap_v1_60_Same_Server_Reconnect_20260922.md`.
+All source/docs edits GitHub-only; no `main` merge, publish,
+force-push or production data operation.
+
+
 ## 22 September 2026 — same-server reconnect source STAGED, Studio OFFLINE
 
 Latest implementation/test source:
