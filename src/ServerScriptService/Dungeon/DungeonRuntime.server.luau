@@ -2066,6 +2066,11 @@ return_request.OnServerEvent:Connect(function(
                     objective = "Unable to start replay: "
                         .. tostring(replay.reason),
                     replay_error = replay.reason,
+                    MemberUserId = replay.MemberUserId,
+                    DifficultyId = if current_session()
+                        and current_session().Difficulty
+                        then current_session().Difficulty.Id
+                        else nil,
                 })
             end
         elseif replay.waiting then
