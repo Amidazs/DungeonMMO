@@ -101,12 +101,14 @@ end, "real Dungeon completion panel")
 local replay = assert(panel:FindFirstChild("PlayAgainButton"))
 channel.OnClientEvent:Connect(function(command)
     if command == "Vote" then
+        channel:FireServer("VOTE_RECEIVED")
         wait_for(function()
             return panel.Visible and replay.Text == "Play again"
         end, "failed run offers Play again")
         -- This is the same authenticated client remote sent by the button;
         -- no server-side replay service method is invoked by the fixture.
         return_request:FireServer("PlayAgain")
+        channel:FireServer("VOTE_SENT")
     end
 end)
 channel:FireServer("READY")
@@ -223,6 +225,13 @@ local function run()
     print("[Dungeon Replay Request] FIRST_CLIENT_WAITING_PASS")
 
     channel:FireClient(players[2], "Vote")
+    wait_for(function()
+        return acknowledged(players[2], "VOTE_RECEIVED")
+    end, "second client received replay instruction", 8)
+    wait_for(function()
+        return acknowledged(players[2], "VOTE_SENT")
+    end, "second client sent its authenticated replay request", 8)
+    print("[Dungeon Replay Request] SECOND_CLIENT_VOTED_PASS")
     wait_for(function()
         return acknowledged(players[1], "SIMULATED")
             and acknowledged(players[2], "SIMULATED")
