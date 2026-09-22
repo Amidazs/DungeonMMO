@@ -649,6 +649,52 @@ function ProgressionRuntimeState.get_mana_regen_per_second(
 end
 
 --[[
+Returns an eligible Mystic's purchased robe-only casting-rate multiplier.
+
+Args:
+    user_id (number): Server-authoritative selected character.
+
+Returns:
+    number: Casting rate from one through 1.06.
+]]
+function ProgressionRuntimeState.get_casting_rate_multiplier(
+    user_id: number
+): number
+    local earned = PassiveSkillEffects.robe_casting_rate_bonus(
+        state_for(user_id)
+    )
+    return 1 + earned
+end
+
+--[[
+Calculates the real server magic wind-up from an authored skill and
+earned robe-only casting speed; physical, control and channel timings
+are unaffected.
+
+Args:
+    user_id (number): Authenticated caster whose equipment is checked.
+    definition (any): Authoritative rank-resolved ability definition.
+
+Returns:
+    number: Non-negative actual wind-up delay for the current cast.
+]]
+function ProgressionRuntimeState.get_skill_wind_up_seconds(
+    user_id: number,
+    definition: any
+): number
+    local base_seconds = math.max(
+        0, tonumber(definition.WIND_UP_SECONDS) or 0
+    )
+    if definition.KIND ~= "MagicProjectile"
+        and definition.KIND ~= "MageHeal"
+    then
+        return base_seconds
+    end
+    return base_seconds
+        / ProgressionRuntimeState.get_casting_rate_multiplier(user_id)
+end
+
+--[[
 Returns race/attribute crit chance plus the approved Equipment crit bonus.
 
 Args:
