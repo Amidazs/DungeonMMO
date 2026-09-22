@@ -544,7 +544,13 @@ function ProgressionRuntimeState.get_critical_chance(
     local equipment_bonus = equipment_effects_for(user_id)
         .CriticalChanceBonus
 
-    return math.clamp(base_chance + equipment_bonus, 0, 1)
+    local passive_bonus = PassiveSkillEffects.critical_chance_bonus(
+        state_for(user_id)
+    )
+    return math.clamp(
+        base_chance + equipment_bonus + passive_bonus,
+        0, 1
+    )
 end
 
 --[[
