@@ -27,6 +27,9 @@ local SkillDefinitions = require(
         "SkillProgressionDefinitions"
     )
 )
+local SkillUnlockRules = require(
+    Shared:WaitForChild("SkillUnlockRules")
+)
 
 local ClassDefinitions = require(
     Shared:WaitForChild(
@@ -287,9 +290,13 @@ function SkillProgressionService:learn_skill(
                 end
 
                 if not class_can_teach(character, skill_id) then
-                    failure =
-                        "ClassCannotTeachSkill"
-
+                    failure = "ClassCannotTeachSkill"
+                    error(failure)
+                end
+                local can_train, locked_reason =
+                    SkillUnlockRules.can_train(character, definition, 1)
+                if not can_train then
+                    failure = locked_reason or "SkillLocked"
                     error(failure)
                 end
 
@@ -436,6 +443,12 @@ function SkillProgressionService:learn_trainer_skill(
                 failure = "ClassCannotTeachSkill"
                 error(failure)
             end
+            local can_train, locked_reason =
+                SkillUnlockRules.can_train(character, definition, 1)
+            if not can_train then
+                failure = locked_reason or "SkillLocked"
+                error(failure)
+            end
 
             local progression = character.Progression
             local existing = progression.Skills[skill_id]
@@ -562,6 +575,20 @@ function SkillProgressionService:purchase_rank(
 
                 if target > definition.MaxRank then
                     failure = "MaxRank"
+                    error(failure)
+                end
+                if definition.AllowedAdvancedClasses
+                    and not class_can_teach(character, skill_id)
+                then
+                    failure = "ClassCannotTeachSkill"
+                    error(failure)
+                end
+                local can_train, locked_reason =
+                    SkillUnlockRules.can_train(
+                        character, definition, target
+                    )
+                if not can_train then
+                    failure = locked_reason or "SkillLocked"
                     error(failure)
                 end
 
