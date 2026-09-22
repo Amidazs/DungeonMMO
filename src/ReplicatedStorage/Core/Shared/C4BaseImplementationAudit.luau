@@ -50,6 +50,12 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        RobeAttackSpeed = table.freeze({
+            [1] = "MysticRobeAttackSpeed",
+        }),
+        RobeManaRecovery = table.freeze({
+            [1] = "MysticRobeManaRecovery",
+        }),
         AttackBuff = table.freeze({
             [7] = "MysticBattleChant",
         }),
@@ -115,6 +121,8 @@ local function executable_ranks_at_level(
             local passive = definition.DamageBonusPerRank
                 or definition.PhysicalReductionPerRank
                 or definition.MagicReductionPerRank
+                or definition.ManaRegenBonusPerRank
+                or definition.AttackRateBonusPerRank
             if (type(damage) == "number" and damage > 0)
                 or (type(heal) == "number" and heal > 0)
                 or (type(slow) == "number" and slow > 0)
