@@ -301,6 +301,29 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
 
+    -- Control alternatives to raw damage: a two-target slowing arrow and
+    -- a close-range disruption strike. Rank upgrades improve actual control.
+    BriarVolley = table.freeze({
+        Id = "BriarVolley",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
+        RankThresholds = table.freeze({[2] = 40, [3] = 110}),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    DisruptingCut = table.freeze({
+        Id = "DisruptingCut",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({[1] = 5, [2] = 10, [3] = 15}),
+        RankThresholds = table.freeze({[2] = 40, [3] = 110}),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
