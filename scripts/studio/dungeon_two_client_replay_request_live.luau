@@ -48,6 +48,17 @@ replace_once(
         .. '        local studio = StudioSessionFactory.create_for_players(\n'
         .. '            Players:GetPlayers(),'
 )
+replace_once(
+    runtime_script,
+    '        if not replay.ok then\n'
+        .. '            local recipients = if replay.votes_reset == true',
+    '        warn("[Dungeon Replay Request] SERVER_REPLAY_RESULT "
+        .. "ok=" .. tostring(replay.ok)
+        .. " reason=" .. tostring(replay.reason)
+        .. " waiting=" .. tostring(replay.waiting))\n'
+        .. '        if not replay.ok then\n'
+        .. '            local recipients = if replay.votes_reset == true'
+)
 Workspace:SetAttribute("DungeonMMOStudioDungeonId", "TestDungeon")
 Workspace:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
 Workspace:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled", true)
@@ -102,6 +113,9 @@ local replay = assert(panel:FindFirstChild("PlayAgainButton"))
 channel.OnClientEvent:Connect(function(command)
     if command == "Vote" then
         channel:FireServer("VOTE_RECEIVED")
+        warn("[Dungeon Replay Client] VOTE_PANEL visible="
+            .. tostring(panel.Visible)
+            .. " button=" .. tostring(replay.Text))
         wait_for(function()
             return panel.Visible and replay.Text == "Play again"
         end, "failed run offers Play again")
@@ -142,6 +156,8 @@ local acknowledgements = {}
 
 channel.OnServerEvent:Connect(function(player, message)
     acknowledgements[tostring(player.UserId) .. ":" .. message] = true
+    print("[Dungeon Replay Request] CLIENT_ACK "
+        .. tostring(player.UserId) .. " " .. tostring(message))
 end)
 
 -- Args:
