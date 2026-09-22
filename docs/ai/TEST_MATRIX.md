@@ -38,8 +38,10 @@ No old Dungeon wipe/aggro/revive/replay matrix rerun.
   **13/16 mismatched**, no claim of parity.
 - [x] `687e27c`: Final Rogue full-nine-rank
   requirement: Base build and same 74 assertions PASS.
-- [ ] One real-client Mage projectile/ward and
-  Ranger/Rogue new-skill hit/UI check.
+- [x] One real-client Mage projectile/ward and Ranger/Rogue
+  new-skill impact/UI check: Play fixture c944ddd PASS.
+  UI snapshot and class state were synthetic; real profile
+  trainer transaction and physical input remain separate.
 - [ ] Map Ranger/Rogue source-rank counts and fill
   remaining mechanics genuinely, not dummy ranks.
 - [ ] Published cross-place/cloud acceptance remains
