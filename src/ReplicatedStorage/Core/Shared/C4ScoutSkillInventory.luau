@@ -13,7 +13,7 @@ local IMPLEMENTATIONS = table.freeze({
     DaggerAttack = table.freeze({
         SkillId = "RogueFinishingCut",
         Owner = "Rogue",
-        DaggerEquipmentPending = true,
+        DaggerEquipmentPending = false,
     }),
     BowMastery = table.freeze({
         SkillId = "ScoutBowDiscipline",
@@ -23,7 +23,7 @@ local IMPLEMENTATIONS = table.freeze({
     DaggerMastery = table.freeze({
         SkillId = "RogueEdgeDiscipline",
         Owner = "Rogue",
-        DaggerEquipmentPending = true,
+        DaggerEquipmentPending = false,
     }),
     LightArmorMastery = table.freeze({
         SkillId = "ScoutLightArmorMastery",
@@ -38,7 +38,7 @@ local IMPLEMENTATIONS = table.freeze({
     Bleed = table.freeze({
         SkillId = "LaceratingCut",
         Owner = "Rogue",
-        DaggerEquipmentPending = true,
+        DaggerEquipmentPending = false,
     }),
     HPRegeneration = table.freeze({
         SkillId = "ElvenRenewal",
