@@ -113,6 +113,9 @@ local cases = {
     {class = "Mage", skill = "MysticFrostBolt",
         weapon = "apprentice_arcane_wand", kind = "Frost",
         level = 7},
+    {class = "Mage", skill = "MysticLifeDrain",
+        weapon = "apprentice_arcane_wand", kind = "Drain",
+        level = 14},
     {class = "Mage", skill = "MysticHealingPrayer",
         weapon = "apprentice_arcane_wand", kind = "Heal",
         level = 7},
@@ -266,7 +269,7 @@ local function check_skill(player, target, case)
     local initial_health = humanoid.Health
     local health_before_heal = 0
     local threat_before = 0
-    if case.kind == "Heal" then
+    if case.kind == "Heal" or case.kind == "Drain" then
         local player_humanoid = assert(
             player.Character:FindFirstChildOfClass("Humanoid")
         )
@@ -307,6 +310,22 @@ local function check_skill(player, target, case)
         assert(target.Humanoid.Health == initial_health,
             "Elf self-heal incorrectly damaged the training NPC")
         print("[C4 Control Client] ELF_SELF_RENEWAL_PASS")
+    elseif case.kind == "Drain" then
+        local caster = assert(player.Character)
+        local caster_humanoid = assert(
+            caster:FindFirstChildOfClass("Humanoid")
+        )
+        wait_for(function()
+            return caster_humanoid.Health > health_before_heal
+                and (caster:GetAttribute("MageHealLastAmount") or 0) > 0
+        end, "Life Drain must heal the real living caster on impact", 7)
+        local damage = initial_health - humanoid.Health
+        local last_heal = caster:GetAttribute("MageHealLastAmount")
+        assert(math.abs(last_heal - damage * 0.20) < 0.1,
+            "Life Drain heal must equal a fraction of actual NPC damage")
+        assert(target:GetAttribute("LastMagicSkillId") == case.skill,
+            "Life Drain healed without a matching real projectile hit")
+        print("[C4 Control Client] LIFE_DRAIN_REAL_DAMAGE_HEAL_PASS")
     elseif case.kind == "Charm" then
         local applied = initial_health - humanoid.Health
         wait_for(function()
@@ -593,7 +612,7 @@ local function run()
     check_light_armor(player)
     check_scout_movement(player, dummy)
     check_scout_critical_damage(player, dummy)
-    print("[C4 Control Client] ALL_FOURTEEN_C4_SKILL_EFFECTS_PASS")
+    print("[C4 Control Client] ALL_FIFTEEN_C4_SKILL_EFFECTS_PASS")
 end
 
 task.spawn(function()
