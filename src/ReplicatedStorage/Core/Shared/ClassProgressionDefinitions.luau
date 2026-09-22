@@ -23,6 +23,7 @@ local DEFINITIONS = table.freeze({
             "IronDiscipline",
             "FighterPhysicalTraining",
             "FighterArmorTraining",
+            "ElvenFighterRenewal",
             "StalwartTraining",
         }),
     }),
