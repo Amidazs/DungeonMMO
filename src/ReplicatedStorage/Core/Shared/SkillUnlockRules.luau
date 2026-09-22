@@ -81,7 +81,7 @@ function SkillUnlockRules.can_train(
     local required_level = if type(rank_levels) == "table"
         then rank_levels[target_rank]
         else definition.MinimumLevel or 1
-    if (tonumber(character.Level) or 0) < required_level then
+    if (tonumber(character.Level) or 1) < required_level then
         return false, "CharacterLevelTooLow", {
             RequiredLevel = required_level,
         }
@@ -107,7 +107,7 @@ function SkillUnlockRules.can_start_trial(
         return false, "InvalidTrial", nil
     end
     local required_level = quest.MinimumLevel or 1
-    if (tonumber(character.Level) or 0) < required_level then
+    if (tonumber(character.Level) or 1) < required_level then
         return false, "CharacterLevelTooLow", {
             RequiredLevel = required_level,
         }
