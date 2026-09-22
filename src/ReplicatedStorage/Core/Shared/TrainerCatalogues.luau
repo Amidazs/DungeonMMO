@@ -24,6 +24,10 @@ local DEFINITIONS = table.freeze({
         AllowedBaseClasses = table.freeze({"Fighter"}),
         Skills = table.freeze({
             table.freeze({
+                SkillId = "NoviceProtection",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ShieldBash",
                 Mode = "Rank",
             }),
