@@ -1771,6 +1771,14 @@ local function apply_skill_threat(
     end
 
     ThreatService.taunt(target, player, bonus)
+    -- Successful zero-damage taunts must earn skill mastery through
+    -- meaningful server-confirmed control, not damage or spam.
+    -- The encounter bridge enforces active membership and its per-skill cap.
+    if (skill_definition.BASE_DAMAGE or 0) == 0 then
+        DungeonProgressionBridge.award_control(
+            player, skill_definition.ID, target, "Taunt", true
+        )
+    end
     CombatValidationService.emit(
         player,
         "THREAT",
