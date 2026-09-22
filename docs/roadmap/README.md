@@ -12,7 +12,23 @@ skinned humanoid and user-approved normal-monster/mini-boss/boss
 moves; separate rig-family proofs for wolves, birds and harpies.
 
 
-**Latest C4 backend increment: v1.76 conditional recovery.**
+**Current C4 backend increment: v1.77 poison and curing.**
+[Backend roadmap](DungeonMMO_Roadmap_v1_77_C4_Poison_Cure_20260922.md)
+and [unpublished Studio evidence](../testing/c4-poison-status-v1-77-2026-09-22.md).
+Human Mystic gained an actual projectile-delivered three-tick
+poison curse and both original Human/Elf Mystic sources gained
+real friendly poison cleansing. The Elven Scout first-transfer
+inventory gained self-only Poison Recovery. All three skills
+passed authentic client hotbar-to-server effect tests.
+Six inventoried classes have **340/396** functional analogue
+rank entries, **56** missing, and all nine original first-transfer
+paths remain incomplete; seven source skill inventories are still
+unmapped. The latest separate humanoid animation authoring
+roadmap above remains authoritative for art/rig/animation work.
+No `main` merge, Roblox publish or production save change.
+
+
+**Previous C4 backend increment: v1.76 conditional recovery.**
 [Roadmap](DungeonMMO_Roadmap_v1_76_C4_Recovery_20260922.md)
 and [focused source/test receipts](../testing/c4-conditional-recovery-v1-76-2026-09-22.md).
 Six inventoried original Human/Elf basic and partial
