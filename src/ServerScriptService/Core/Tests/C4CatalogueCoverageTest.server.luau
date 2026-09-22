@@ -38,12 +38,12 @@ local function main()
     local branches = report.Branches
 
     check(base.Raw == 168
-        and base.Functional == 148
-        and base.Missing == 20,
+        and base.Functional == 151
+        and base.Missing == 17,
         "Original Fighter/Mystic first-tier rank inventory diverged")
     check(scout.Raw == 228
-        and scout.Functional == 188
-        and scout.Missing == 40,
+        and scout.Functional == 189
+        and scout.Missing == 39,
         "Human Rogue and Elven Scout partial-rank totals diverged")
     check(branches.Total == 9 and branches.Partial == 2
         and branches.Complete == 0,
