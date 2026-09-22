@@ -39,6 +39,14 @@ local function resolve_critical_multiplier(context: DamageContext): number
 end
 
 function DamageService.apply_damage(context: DamageContext): number
+    -- Projectile or delayed-hit callbacks may arrive after the attacker
+    -- dies or returns as a spectator. No damage or reward then applies.
+    local attacker = context.attacker
+    if attacker and attacker:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) == false then
+        return 0
+    end
     local humanoid = context.target:FindFirstChildOfClass("Humanoid")
     if not humanoid or humanoid.Health <= 0 then return 0 end
     local normal_damage = DamageService.calculate_damage(context.base_damage, context.multiplier)
