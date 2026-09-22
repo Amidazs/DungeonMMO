@@ -22,6 +22,55 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    WorldrootRelic = table.freeze({
+        Id = "WorldrootRelic",
+        DisplayName = "A Relic Beneath the World Tree",
+        Kind = "Adventure",
+        MinimumLevel = 1,
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearTemple",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 25,
+            ItemId = "worldroot_relic",
+            Quantity = 1,
+        }),
+    }),
+
+    MineEchoes = table.freeze({
+        Id = "MineEchoes",
+        DisplayName = "Echoes from the Abandoned Mine",
+        Kind = "Adventure",
+        MinimumLevel = 1,
+        PrerequisiteQuestId = "WorldrootRelic",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearAbandonedMine",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 50,
+            ItemId = "iron_ore",
+            Quantity = 5,
+        }),
+    }),
+
     RogueAdvancementTrial = table.freeze({
         Id = "RogueAdvancementTrial",
         DisplayName = "Rogue Advancement Trial",
@@ -58,6 +107,19 @@ function QuestDefinitions.get(quest_id: string): any?
     return DEFINITIONS[quest_id]
 end
 
+-- Returns available non-advancement quest definitions in story order.
+--
+-- Args:
+--   None.
+-- Returns:
+--   {any}: Frozen quest catalogue for server-authorized board snapshots.
+function QuestDefinitions.adventures(): {any}
+    return table.freeze({
+        DEFINITIONS.WorldrootRelic,
+        DEFINITIONS.MineEchoes,
+    })
+end
+
 function QuestDefinitions.is_character_eligible(
     character: any,
     definition: any
@@ -80,6 +142,16 @@ function QuestDefinitions.is_character_eligible(
         and level >= (tonumber(definition.MinimumLevel) or 1)
         and list_contains(definition.AllowedRaces, race_id)
         and list_contains(definition.AllowedBaseClasses, base_class_id)
+        and (
+            definition.PrerequisiteQuestId == nil
+            or (
+                type(character.Quests) == "table"
+                and type(character.Quests.Completed) == "table"
+                and character.Quests.Completed[
+                    definition.PrerequisiteQuestId
+                ] == true
+            )
+        )
     )
 end
 
