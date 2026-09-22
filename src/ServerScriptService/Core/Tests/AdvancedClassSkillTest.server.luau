@@ -139,8 +139,11 @@ for _, path in ipairs(cases) do
     )
 
     local unlocked = profiles:mutate(user_id, function(profile: any)
-        profile.Characters.Slot1.ClassAdvancement.ActiveClassId =
-            path.ClassId
+        local advancement = profile.Characters.Slot1.ClassAdvancement
+        advancement.CompletedByRace[path.RaceId] = {
+            [path.ClassId] = true,
+        }
+        advancement.ActiveClassId = path.ClassId
     end)
     check(unlocked, "Advanced class must be activated in test profile.")
     local advanced = profiles:get_character(user_id)
