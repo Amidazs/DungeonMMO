@@ -152,11 +152,12 @@ end)
 MageHealService.set_heal_callback(function(
     caster: Player,
     target: Player,
-    healed: number
+    healed: number,
+    skill_id: string
 )
     DungeonProgressionBridge.award_heal(
         caster,
-        "MageHeal",
+        skill_id,
         target,
         healed
     )
@@ -164,7 +165,7 @@ MageHealService.set_heal_callback(function(
         caster,
         target,
         healed,
-        "MageHeal"
+        skill_id
     )
     ThreatService.record_support(caster, target, healed)
 end)
@@ -1976,6 +1977,37 @@ end
 
 
 --[[
+Resolves a heal target from the server's current character state. An
+explicit self-renewal cannot be redirected to an ally by the client.
+
+Args:
+    player (Player): Server-authenticated skill caster.
+    skill_definition (any): Authoritative rank-resolved heal definition.
+
+Returns:
+    Player?: Injured caster for self-only skills, or normal allied target.
+]]
+local function resolve_skill_heal_target(
+    player: Player,
+    skill_definition: any
+): Player?
+    if skill_definition.SELF_ONLY ~= true then
+        return MageHealService.find_target(
+            player, skill_definition.RANGE_STUDS
+        )
+    end
+    local character = player.Character
+    local humanoid = character
+        and character:FindFirstChildOfClass("Humanoid")
+    if humanoid and humanoid.Health > 0
+        and humanoid.Health < humanoid.MaxHealth
+    then
+        return player
+    end
+    return nil
+end
+
+--[[
 Enters Shield Bash active frames and starts authoritative melee acquisition.
 
 Args:
@@ -2261,9 +2293,8 @@ local function enter_skill_active(
             sequence_id
         )
     elseif character and skill_definition.KIND == "MageHeal" then
-        local target = MageHealService.find_target(
-            player,
-            skill_definition.RANGE_STUDS
+        local target = resolve_skill_heal_target(
+            player, skill_definition
         )
         local total_heal =
             skill_definition.TOTAL_HEAL
@@ -2794,9 +2825,8 @@ local function handle_skill_request(
     end
 
     if skill_definition.KIND == "MageHeal" then
-        local target = MageHealService.find_target(
-            player,
-            skill_definition.RANGE_STUDS
+        local target = resolve_skill_heal_target(
+            player, skill_definition
         )
 
         if not target then
