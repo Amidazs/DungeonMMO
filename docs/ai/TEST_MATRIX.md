@@ -1,5 +1,23 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — v1.69 focused Mage rank and visibility
+
+- [x] `e6033e0`: one Base Rojo build plus 39 focused
+  `c4_starter_mage_skill_tests.luau` assertions PASS.
+  Learned ranks, 1/7/14 level gates, 35/100 mastery,
+  two real ward/damage rank effects, class restriction,
+  snapshot/trainer hiding and profile reload checked.
+- [x] One read-only source-rank audit: 13/16 mapped C4
+  brackets still mismatch and 14 unmapped older ranks.
+- [ ] New Mage skill-menu/trainer GUI and actual normal
+  client Ward/Bolt effects need *one* targeted live
+  client test; service assertions alone do not prove it.
+
+Receipt:
+`docs/testing/c4-mage-starter-ward-bolt-trainer-2026-09-22.md`.
+No old dungeon wipe/aggro/revive suite was rerun.
+
+
 ## 22 September 2026 — targeted vitality/restoration passives
 
 - [x] `3be5de3`: Base Rojo build and **64 focused
