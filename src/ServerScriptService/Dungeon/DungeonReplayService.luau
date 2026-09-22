@@ -37,6 +37,7 @@ function DungeonReplayService.new(
         _coordinator = coordinator,
         _is_studio = options.is_studio == true,
         _is_player_ready = options.is_player_ready,
+        _validate_member = options.validate_member,
         _destination_place_id = options.destination_place_id,
         _votes = {},
         _launching = false,
@@ -129,6 +130,36 @@ function DungeonReplayService:request(
     end
     if not requester_is_member then
         return result(false, "NotConnectedMember")
+    end
+
+    -- Replay is a fresh dungeon entry, not an exception to the
+    -- difficulty progression rules. Validate every participant,
+    -- including in Studio where the actual teleport is simulated.
+    if type(self._validate_member) == "function" then
+        local difficulty_id = session.Difficulty
+            and session.Difficulty.Id
+        if type(difficulty_id) ~= "string" then
+            return result(false, "UnknownDifficulty")
+        end
+        for _, member in ipairs(party) do
+            local eligibility = self._validate_member(
+                member,
+                session.DungeonId,
+                difficulty_id
+            )
+            if not eligibility or eligibility.ok ~= true then
+                self._votes = {}
+                return result(
+                    false,
+                    eligibility and eligibility.reason
+                        or "DifficultyLocked",
+                    {
+                        MemberUserId = member.UserId,
+                        votes_reset = true,
+                    }
+                )
+            end
+        end
     end
 
     self._votes[player.UserId] = true
