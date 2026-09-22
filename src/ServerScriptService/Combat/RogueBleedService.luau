@@ -22,6 +22,7 @@ local BleedService = {}
 local MAX_TICKS = 6
 local MAX_TICK_DAMAGE = 50
 local MIN_INTERVAL = 0.2
+local MAX_INTERVAL = 5
 local records: {[Model]: any} = {}
 
 --[[
@@ -56,6 +57,7 @@ local function can_tick(record: any, target: Model): boolean
     local player = record.player
     local character = record.character
     if player.Parent ~= Players
+        or not target:IsDescendantOf(workspace)
         or player.Character ~= character
         or not character.Parent
         or player:GetAttribute(
@@ -165,7 +167,8 @@ function BleedService.apply(
         or tick_count ~= math.floor(tick_count)
         or type(interval) ~= "number"
         or interval < MIN_INTERVAL
-        or interval >= math.huge
+        or interval > MAX_INTERVAL
+        or interval ~= interval
         or not character
     then
         return false
