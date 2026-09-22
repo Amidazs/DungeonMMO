@@ -9,7 +9,8 @@
 - [x] Read-only `c4_skill_volume_audit.luau`
   executed. Initial 16 source-backed Human/Elf
   Fighter/Mystic early-level rows: **16 mismatched**,
-  **14 unmapped legacy-skill family entries** across
+  **14 race/class occurrences of unmapped legacy skills
+  (7 distinct skill families)** across
   those four race/class audits. This is a working
   gap report, NOT a passing volume-parity test.
 - [ ] Source count mapping for other class branches,
