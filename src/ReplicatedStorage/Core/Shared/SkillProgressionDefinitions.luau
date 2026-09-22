@@ -1144,6 +1144,33 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 first-transfer level-28 active evasive concentration. A
+    -- server-owned timed status is required; learning alone does not
+    -- permanently grant its additional melee dodge chance.
+    ScoutEvasiveFocus = table.freeze({
+        Id = "ScoutEvasiveFocus",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 28}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- C4 Elven Scout level-20 self-defense skill. The combat status
+    -- only applies after an authenticated cast by its actual owner.
+    ElvenScoutGuard = table.freeze({
+        Id = "ElvenScoutGuard",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
