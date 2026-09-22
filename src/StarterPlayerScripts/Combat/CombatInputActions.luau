@@ -11,6 +11,9 @@ local shared_folder = combat_folder:WaitForChild("Shared")
 local CombatConfig = require(shared_folder:WaitForChild("CombatConfig"))
 local CombatTypes = require(shared_folder:WaitForChild("CombatTypes"))
 local HotbarConfig = require(shared_folder:WaitForChild("HotbarConfig"))
+local SkillDefinitions = require(
+    shared_folder:WaitForChild("SkillDefinitions")
+)
 local UserInputService = game:GetService("UserInputService")
 local core_shared = ReplicatedStorage
     :WaitForChild("Core")
@@ -203,7 +206,8 @@ function CombatInputActions.request_skill_slot(slot: number): boolean
         return false
     end
 
-    if skill_id == "Volley" then
+    local skill_definition = SkillDefinitions.get(skill_id)
+    if skill_definition and skill_definition.KIND == "RangerVolley" then
         skill_request:FireServer(
             skill_id,
             get_world_aim_intent()
