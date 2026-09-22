@@ -940,6 +940,40 @@ local FIGHTER_DAGGER_STRIKE = specialize_skill(
     }
 )
 
+-- C4 first-tier Mystic Wind Strike ranks after the owned starter.
+-- Uses the real server MagicProjectile executor and four increasing hits.
+local MYSTIC_WIND_BOLT = specialize_skill(
+    WIND_STRIKE, "MysticWindBolt", "Mystic Wind Bolt", {
+        MANA_COST = 11,
+        COOLDOWN_SECONDS = 4,
+        BASE_DAMAGE = 13,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 13}),
+            [2] = table.freeze({BASE_DAMAGE = 15}),
+            [3] = table.freeze({BASE_DAMAGE = 18}),
+            [4] = table.freeze({BASE_DAMAGE = 21}),
+        }),
+    }
+)
+
+-- Human/Elven first-tier healing ranks after the owned starter.
+-- The accepted MageHeal executor handles the target and HoT on server.
+local MYSTIC_HEALING_PRAYER = specialize_skill(
+    MAGE_HEAL, "MysticHealingPrayer", "Healing Prayer", {
+        MANA_COST = 12,
+        COOLDOWN_SECONDS = 6,
+        TOTAL_HEAL = 49,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 49}),
+            [2] = table.freeze({TOTAL_HEAL = 58}),
+            [3] = table.freeze({TOTAL_HEAL = 67}),
+            [4] = table.freeze({TOTAL_HEAL = 83}),
+            [5] = table.freeze({TOTAL_HEAL = 95}),
+            [6] = table.freeze({TOTAL_HEAL = 107}),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1029,6 +1063,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     PursuitStep = PURSUIT_STEP,
     DawnWard = DAWN_WARD,
     CinderBolt = CINDER_BOLT,
+    MysticWindBolt = MYSTIC_WIND_BOLT,
+    MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     AetherBolt = AETHER_BOLT,
     RenewingLight = RENEWING_LIGHT,
     TrackerShot = TRACKER_SHOT,
