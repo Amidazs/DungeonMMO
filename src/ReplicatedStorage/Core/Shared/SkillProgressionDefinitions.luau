@@ -734,6 +734,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Both C4 Rogue and Elven Scout learn movement speed at level 28.
+    -- The purchased passive increases real server-owned Humanoid speed.
+    ScoutFleetFoot = table.freeze({
+        Id = "ScoutFleetFoot",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 28}),
+        MovementBonusPerRank = 0.06,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Repeated early bow and dagger training (C4-inspired effects):
     -- a stronger single-target shot/blow and weapon damage masteries.
     ArcherDraw = table.freeze({
