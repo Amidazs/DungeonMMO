@@ -54,6 +54,7 @@ local DEFINITIONS = table.freeze({
         }),
         StarterEquipment = table.freeze({
             Weapon = "apprentice_longbow",
+            Body = "scout_leather_vest",
         }),
         TeachableSkills = table.freeze({
             "TrackerShot",
@@ -62,6 +63,8 @@ local DEFINITIONS = table.freeze({
             "ScoutFocusedShot",
             "ArcherDraw",
             "RangerBowMastery",
+            "ScoutBowDiscipline",
+            "ScoutLightArmorMastery",
         }),
     }),
 
@@ -75,6 +78,7 @@ local DEFINITIONS = table.freeze({
         }),
         StarterEquipment = table.freeze({
             Weapon = "marauder_sword",
+            Body = "scout_leather_vest",
         }),
         TeachableSkills = table.freeze({
             "Feint",
@@ -88,6 +92,8 @@ local DEFINITIONS = table.freeze({
             "RogueFinishingCut",
             "RogueVitalBlow",
             "RogueBladeMastery",
+            "RogueEdgeDiscipline",
+            "ScoutLightArmorMastery",
         }),
     }),
 })
