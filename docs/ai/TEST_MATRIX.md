@@ -1,5 +1,27 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — v1.66 focused rank-content acceptance
+
+- [x] `d812a73`: Base Rojo build; nine-rank Fighter
+  skill progression test **133 assertions PASS**,
+  including a production ProfileMigration cap fix.
+- [x] `cdecfc7`: Base build; Mage six-rank actual
+  healing/proficiency and save/reload **37 assertions PASS**.
+- [x] `cdecfc7`: five directly affected pre-existing
+  skill/class/quest/trainer contract tests **5/5 PASS**.
+- [x] `cdecfc7`: C4 read-only source-volume report
+  checked **16/16** mapped brackets; **16 STILL MISS
+  parity**. Explicit Fighter 5/10/15 counts 7 each,
+  Mage 7/14 counts 4 each, no source fabrication.
+- [ ] A targeted normal-client rank-nine strike and
+  rank-six healing impact check is future *new-feature*
+  acceptance; these tests alone don't prove live balance.
+
+No old Dungeon wipe, boss, Play Again or world-boss
+matrix rerun. Receipt:
+`docs/testing/c4-early-fighter-mage-skill-ranks-2026-09-22.md`.
+
+
 ## 22 September 2026 — focused C4 rank-density baseline
 
 - [x] `29d117a`: one Base Rojo build and affected
