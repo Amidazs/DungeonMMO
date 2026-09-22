@@ -203,6 +203,31 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- C4 base Mystic Battle Heal: three ranks at source level 14.
+    -- Requires purchased intermediate healing proficiency first.
+    MysticBattleHeal = table.freeze({
+        Id = "MysticBattleHeal",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 14, [2] = 14, [3] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 55, [3] = 125,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MysticHealingPrayer",
+                Rank = 3,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Mystic Ice Bolt first-tier source ranks: two at 7/14.
     -- Server projectile impact applies real enemy movement impairment.
     MysticFrostBolt = table.freeze({
