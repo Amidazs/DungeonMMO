@@ -84,6 +84,7 @@ end
 --   skill_id (string): Known passive being trained.
 --   multiplier (string): The physical or magical getter to check.
 --   per_rank (number): Server-authored bonus earned at each rank.
+--   baseline (number): Measured no-passive server damage multiplier.
 -- Returns:
 --   nil: Verifies rank 1-6 grant real damage, not inert metadata.
 local function verify_effects(
@@ -91,13 +92,13 @@ local function verify_effects(
     user_id: number,
     skill_id: string,
     multiplier: string,
-    per_rank: number
+    per_rank: number,
+    baseline: number
 )
     local character = assert(profiles:get_character(user_id))
     Runtime.set_character(user_id, character)
     local actual = Runtime[multiplier](user_id)
     local rank = character.Progression.Skills[skill_id].PurchasedRank
-    local baseline = actual - rank * per_rank
     check(
         math.abs(Passive.damage_bonus(character, skill_id)
             - rank * per_rank) < 0.00001,
@@ -121,6 +122,12 @@ local function test_passive(profiles: any, skills: any, entry: any)
     seed_player(profiles, user_id, entry.ClassId, entry.FirstLevel - 1)
 
     local character = assert(profiles:get_character(user_id))
+    Runtime.set_character(user_id, character)
+    local baseline = Runtime[entry.Multiplier](user_id)
+    check(
+        Passive.damage_bonus(character, skill_id) == 0,
+        "Unlearned passive must not modify damage."
+    )
     check(
         not Trainers.can_offer(
             entry.TrainerId, character, skill_id
@@ -161,7 +168,7 @@ local function test_passive(profiles: any, skills: any, entry: any)
         )
         verify_effects(
             profiles, user_id, skill_id, entry.Multiplier,
-            entry.PerRank
+            entry.PerRank, baseline
         )
     end
     check(
