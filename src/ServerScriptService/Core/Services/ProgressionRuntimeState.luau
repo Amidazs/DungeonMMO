@@ -105,6 +105,7 @@ local function state_for(user_id: number): any
 
     return {
         Identity = default_identity(),
+        ClassAdvancement = {},
         Progression = default_progression(),
         Equipment = equipment,
         EquipmentEffects = EquipmentStatResolver.resolve(equipment),
@@ -164,6 +165,7 @@ function ProgressionRuntimeState.set_character(
     character_or_progression: any
 )
     local identity: any
+    local advancement: any
     local progression: any
     local equipment: any
 
@@ -173,16 +175,22 @@ function ProgressionRuntimeState.set_character(
         identity = if type(character_or_progression.Identity) == "table"
             then character_or_progression.Identity
             else default_identity()
+        advancement = if type(character_or_progression.ClassAdvancement)
+            == "table"
+            then character_or_progression.ClassAdvancement
+            else {}
         progression = character_or_progression.Progression
         equipment = if type(character_or_progression.Equipment) == "table"
             then character_or_progression.Equipment
             else default_equipment()
     elseif type(character_or_progression) == "table" then
         identity = default_identity()
+        advancement = {}
         progression = character_or_progression
         equipment = default_equipment()
     else
         identity = default_identity()
+        advancement = {}
         progression = default_progression()
         equipment = default_equipment()
     end
@@ -191,6 +199,7 @@ function ProgressionRuntimeState.set_character(
 
     states[user_id] = {
         Identity = ProfileSchema.deep_clone(identity),
+        ClassAdvancement = ProfileSchema.deep_clone(advancement),
         Progression = ProfileSchema.deep_clone(progression),
         Equipment = equipment_snapshot,
         EquipmentEffects = EquipmentStatResolver.resolve(
@@ -638,6 +647,23 @@ function ProgressionRuntimeState.is_skill_usable(
     end
     if not correct_class then
         return false, "WrongClass"
+    end
+
+    local advanced_classes = definition.AllowedAdvancedClasses
+    if type(advanced_classes) == "table" then
+        local advancement = state_for(user_id).ClassAdvancement
+        local active_class = advancement
+            and advancement.ActiveClassId
+        local matching = false
+        for _, class_id in ipairs(advanced_classes) do
+            if class_id == active_class then
+                matching = true
+                break
+            end
+        end
+        if not matching then
+            return false, "AdvancedClassRequired"
+        end
     end
 
     local authoritative_tags =
