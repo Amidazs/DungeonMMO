@@ -94,6 +94,7 @@ local Workspace = game:GetService("Workspace")
 local channel = RS:WaitForChild("C4ControlClientProbe_TEMP")
 local Schema = require(RS.Core.Shared.ProfileSchema)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
+local DamageService = require(SSS.Combat.DamageService)
 local cases = {
     {class = "Ranger", skill = "BriarVolley",
         weapon = "apprentice_longbow", kind = "Slow"},
@@ -301,6 +302,77 @@ local function check_skill(player, target, case)
     task.wait(0.6)
 end
 
+--[[
+Deals a test-only physical or magical enemy hit to the live player.
+
+Args:
+    player (Player): Disposable Studio player receiving the test hit.
+    source_kind (string): Server-owned damage classification.
+
+Returns:
+    number: Actual damage applied by the production damage service.
+]]
+local function hit_player(player, source_kind)
+    local target = assert(player.Character)
+    return DamageService.apply_damage({
+        attacker = nil,
+        attacker_character = Workspace.TrainingDummy,
+        target = target,
+        source_kind = source_kind,
+        source_id = "C4ScoutArmorFocus",
+        attack_id = nil,
+        base_damage = 20,
+        multiplier = 1,
+    })
+end
+
+--[[
+Checks that a purchased light-armour passive actually mitigates physical
+enemy damage, not magical damage or damage to an unarmoured player.
+
+Args:
+    player (Player): Living disposable Studio player.
+
+Returns:
+    nil: Verifies server-owned equipment/rank mitigation end-to-end.
+]]
+local function check_light_armor(player)
+    local humanoid = assert(
+        player.Character:FindFirstChildOfClass("Humanoid")
+    )
+    humanoid.MaxHealth = 1000
+    humanoid.Health = 1000
+    local character = Schema.create_default(player.UserId)
+        .Characters.Slot1
+    character.Identity.RaceId = "Human"
+    character.Identity.BaseClassId = "Ranger"
+    character.Identity.ClassId = "Ranger"
+    character.Identity.CreationStage = "Complete"
+    character.Level = 36
+    character.Equipment.Weapon = "apprentice_longbow"
+    character.Equipment.Body = "scout_leather_vest"
+    Runtime.set_character(player.UserId, character)
+    local baseline = hit_player(player, "EnemyMelee")
+    character.Progression.Skills.ScoutLightArmorMastery = {
+        Known = true, PurchasedRank = 10, Proficiency = 0,
+    }
+    Runtime.set_character(player.UserId, character)
+    local armoured = hit_player(player, "EnemyMelee")
+    local magic = hit_player(player, "MagicSkill")
+    character.Equipment.Body = nil
+    Runtime.set_character(player.UserId, character)
+    local unarmoured = hit_player(player, "EnemyMelee")
+    assert(math.abs(baseline - 20) < 0.01,
+        "Untrained player must take full physical NPC damage")
+    assert(math.abs(armoured - 18.4) < 0.01,
+        "Rank ten light armour must prevent 8% physical NPC damage")
+    assert(math.abs(magic - 20) < 0.01,
+        "Light armour must not incorrectly reduce magical damage")
+    assert(math.abs(unarmoured - 20) < 0.01,
+        "Unequipped light armour must not mitigate enemy damage")
+    print("[C4 Control Client] LIGHT_ARMOR_REAL_DAMAGE_PASS")
+end
+
 -- Args: None.
 -- Returns: nil: Runs the targeted sequential client combat contract.
 local function run()
@@ -323,6 +395,7 @@ local function run()
     for _, case in ipairs(cases) do
         check_skill(player, dummy, case)
     end
+    check_light_armor(player)
     print("[C4 Control Client] ALL_SIX_C4_SKILL_EFFECTS_PASS")
 end
 
