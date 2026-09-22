@@ -12,9 +12,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 75, Missing = 24,
+    Human = {Raw = 99, Functional = 77, Missing = 22,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 102, Missing = 27,
+    Elf = {Raw = 129, Functional = 104, Missing = 25,
         EquipmentMismatch = 0},
 }
 
@@ -98,6 +98,7 @@ local function check_implementation(
             or definition.PhysicalReductionPerRank
             or definition.CriticalDamageBonusPerRank
             or definition.CriticalChanceBonusPerRank
+            or definition.EvasionChancePerRank
             or definition.MovementBonusPerRank
             or definition.AttackRateBonusPerRank
             or definition.BowRangeBonusStudsPerRank
