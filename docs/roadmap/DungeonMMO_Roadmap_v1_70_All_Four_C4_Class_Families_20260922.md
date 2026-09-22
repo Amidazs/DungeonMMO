@@ -91,3 +91,22 @@ Testing policy: focused new-feature test; broad regression
 only at a meaningful milestone closeout or release.
 No published server, production data change,
 `main` merge or force-push.
+
+## Targeted real-client effect gate — verified locally
+
+Unpublished Dungeon Studio Play at game composition `755fab0`
+with final GitHub fixture `c944ddd` confirmed real client-hotbar
+Dawn Ward (server ward, 12 mana), Cinder Bolt (actual target damage,
+10 mana), Ranger Archer Draw (target damage) and Rogue Vital Blow
+(rear-positioned target damage). The actual SkillsMenu displayed
+rank one and hid a foreign-class row from **temporary simulated**
+client snapshots. This is not real saved-profile trainer purchase,
+physical keypress, proven rear damage bonus or cloud acceptance.
+The automatic boot also produced unrelated Phase2A Failure Path
+and Rogue Definitions test failures requiring separate follow-up.
+[Focused test record](../testing/c4-new-skill-live-client-2026-09-22.md).
+
+**Next content gate:** expand authentic role-based skill/rank
+catalogues and reference mapping across Fighter/Mage/Ranger/Rogue,
+then validate real saved-profile training and distinct rear-attack
+bonus without repeating unrelated dungeon lifecycle suites.
