@@ -124,6 +124,16 @@ local DEFINITIONS = table.freeze({
 
     -- C4 base Mystic level-one robe passives. These are purchased
     -- through the existing trainer and require a real equipped robe.
+    MysticRobeCasting = table.freeze({
+        Id = "MysticRobeCasting",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({[1] = 1}),
+        CastingRateBonusPerRank = 0.06,
+        WeaponTags = table.freeze({}),
+    }),
     MysticRobeManaRecovery = table.freeze({
         Id = "MysticRobeManaRecovery",
         Tier = "Common",
