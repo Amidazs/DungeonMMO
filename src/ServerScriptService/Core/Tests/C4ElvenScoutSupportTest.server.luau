@@ -50,7 +50,7 @@ local function make_character(
     character.Identity.CreationStage = "Complete"
     character.Level = 36
     character.Equipment.Weapon = if class_id == "Ranger"
-        then "apprentice_longbow" else "marauder_sword"
+        then "apprentice_longbow" else "scout_dagger"
     return character
 end
 
