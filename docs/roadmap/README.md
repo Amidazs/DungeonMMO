@@ -1,3 +1,18 @@
+**Current C4 backend implementation: v1.78 enemy weakening.**
+[Backend roadmap](DungeonMMO_Roadmap_v1_78_C4_Enemy_Weakening_20260923.md).
+Human/Elf first-tier Mystics now have authored level-14
+hostile physical-attack weakening; Elf Mystics also gain
+attack-rate impairment. The implementation is wired into
+genuine NPC damage and future attack intervals. Base/Dungeon
+Rojo builds passed, but the new focused Studio tests and
+real-client combat acceptance are **still pending**.
+The 340/396 tested ledger from v1.77 remains authoritative
+until the three new candidate rank entries are executed
+and audited. Seven original first-transfer inventories
+remain unmapped and 0/9 original paths are complete.
+The separate newest humanoid animation roadmap retains
+all its visual gates. No publish or main merge.
+
 # Canonical Roadmap
 
 **Humanoid creature-animation production workflow (22 September 2026):**
