@@ -118,9 +118,12 @@ for _, case in ipairs(cases) do
             ).ok,
         base_class .. ": the correct level must reveal its skill."
     )
+    local next_bracket_rank = if basic.RankLevels[2]
+            > basic.RankLevels[1]
+        then 2 else 4
     check(
-        not Unlocks.can_train(character, basic, 2),
-        base_class .. ": second rank must obey its level bracket."
+        not Unlocks.can_train(character, basic, next_bracket_rank),
+        base_class .. ": later training must obey its level bracket."
     )
 
     character.Level = 20
