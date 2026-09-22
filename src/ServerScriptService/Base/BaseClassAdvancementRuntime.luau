@@ -1,0 +1,110 @@
+--!strict
+-- Base-only entry point for quest-gated class advancement.
+local Players = game:GetService("Players")
+
+local BaseClassAdvancementRuntime = {}
+BaseClassAdvancementRuntime.__index = BaseClassAdvancementRuntime
+
+local ACTION_COOLDOWN_SECONDS = 0.25
+
+-- Returns the authenticated character's server-owned advancement state.
+--
+-- Args:
+--   player (Player): The current profile owner.
+-- Returns:
+--   nil: Sends the current advancement state to the player.
+function BaseClassAdvancementRuntime:send_snapshot(player: Player)
+    self._snapshot:FireClient(
+        player,
+        self._advancement:build_snapshot(player.UserId)
+    )
+end
+
+-- Starts or claims the existing class-specific advancement trial.
+--
+-- Args:
+--   player (Player): The authenticated requesting character.
+--   action (any): Snapshot, StartTrial or ClaimTrial.
+-- Returns:
+--   nil: Sends the action result and authoritative progression state.
+function BaseClassAdvancementRuntime:handle_action(
+    player: Player,
+    action: any
+)
+    if not self._is_ready(player) then
+        self._result:FireClient(player, {
+            ok = false,
+            reason = "ProfileNotReady",
+        })
+        return
+    end
+
+    if action == "Snapshot" then
+        self:send_snapshot(player)
+        return
+    end
+
+    if action ~= "StartTrial" and action ~= "ClaimTrial" then
+        self._result:FireClient(player, {
+            ok = false,
+            reason = "InvalidAdvancementAction",
+        })
+        return
+    end
+
+    local now = os.clock()
+    local last = self._last_request[player.UserId] or -math.huge
+    if now - last < ACTION_COOLDOWN_SECONDS then
+        self._result:FireClient(player, {
+            ok = false,
+            reason = "AdvancementRequestCooldown",
+        })
+        return
+    end
+    self._last_request[player.UserId] = now
+
+    local result = if action == "StartTrial"
+        then self._advancement:start_trial(player.UserId)
+        else self._advancement:claim(player.UserId)
+
+    self._result:FireClient(player, result)
+    self:send_snapshot(player)
+end
+
+-- Connects advancement requests to the existing profile-backed service.
+--
+-- Args:
+--   options (any): Remotes, ClassAdvancementService and readiness guard.
+-- Returns:
+--   any: Server-owned handler retained by its remote event connections.
+function BaseClassAdvancementRuntime.attach(options: any): any
+    assert(
+        options.remotes and options.advancement and options.is_ready,
+        "Base class advancement dependencies are required"
+    )
+
+    local self = setmetatable({
+        _advancement = options.advancement,
+        _is_ready = options.is_ready,
+        _request = options.remotes:WaitForChild(
+            "ClassAdvancementRequest"
+        ),
+        _result = options.remotes:WaitForChild(
+            "ClassAdvancementResult"
+        ),
+        _snapshot = options.remotes:WaitForChild(
+            "ClassAdvancementSnapshot"
+        ),
+        _last_request = {},
+    }, BaseClassAdvancementRuntime)
+
+    self._request.OnServerEvent:Connect(function(player, action)
+        self:handle_action(player, action)
+    end)
+    Players.PlayerRemoving:Connect(function(player)
+        self._last_request[player.UserId] = nil
+    end)
+    return self
+end
+
+return table.freeze(BaseClassAdvancementRuntime)
