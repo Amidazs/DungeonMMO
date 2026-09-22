@@ -999,6 +999,16 @@ function ProfessionRuntime.attach(config: any): any
     snapshot_remote.OnServerEvent:Connect(function(player: Player, action: any)
         if action == "Request" then
             send_snapshot(player)
+        elseif type(action) == "table"
+            and action.Action == "ChooseProfession"
+        then
+            -- A shared choice remote is safe in both Base and Dungeon.
+            -- The service validates the real profile and refuses any
+            -- attempt to overwrite an occupied profession slot.
+            local result = professions:choose_profession(
+                player.UserId, action.ProfessionId
+            )
+            finish_action(player, "ChooseProfession", result)
         end
     end)
 
