@@ -78,6 +78,9 @@ local WardService = require(
 local MageHealService = require(
     script.Parent:WaitForChild("MageHealService")
 )
+local PoisonStatusService = require(
+    script.Parent:WaitForChild("PoisonStatusService")
+)
 local CombatStatusService = require(
     script.Parent:WaitForChild("CombatStatusService")
 )
@@ -1998,16 +2001,23 @@ local function resolve_skill_heal_target(
     player: Player,
     skill_definition: any
 ): Player?
+    local cure_tier = tonumber(
+        skill_definition.CURE_POISON_TIER
+    ) or 0
     if skill_definition.SELF_ONLY ~= true then
         return MageHealService.find_target(
-            player, skill_definition.RANGE_STUDS
+            player, skill_definition.RANGE_STUDS,
+            cure_tier > 0
         )
     end
     local character = player.Character
     local humanoid = character
         and character:FindFirstChildOfClass("Humanoid")
     if humanoid and humanoid.Health > 0
-        and humanoid.Health < humanoid.MaxHealth
+        and ((cure_tier > 0
+            and PoisonStatusService.is_poisoned(character))
+            or (cure_tier <= 0
+                and humanoid.Health < humanoid.MaxHealth))
     then
         return player
     end
@@ -2321,7 +2331,22 @@ local function enter_skill_active(
                     player.UserId
                 )
 
-        if target then
+        if target and (tonumber(
+            skill_definition.CURE_POISON_TIER
+        ) or 0) > 0 then
+            local removed = PoisonStatusService.cure(
+                target.Character,
+                skill_definition.CURE_POISON_TIER
+            )
+            CombatValidationService.emit(
+                player,
+                "MAGE_CURE",
+                if removed then "APPLIED" else "REJECT",
+                if removed then skill_definition.ID
+                    else "PoisonUnavailable",
+                sequence_id
+            )
+        elseif target then
             local cast_ok, immediate_heal =
                 MageHealService.cast(
                     player,
