@@ -12,6 +12,7 @@ local InMemoryProfileAdapter = require(
 )
 local ProfileService = require(Services:WaitForChild("ProfileService"))
 local QuestService = require(Services:WaitForChild("QuestService"))
+local InventoryService = require(Services:WaitForChild("InventoryService"))
 local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
 
 local assertions = 0
@@ -44,7 +45,8 @@ local function set_identity(
     check(ok == true, "Test identity mutation failed: " .. tostring(reason))
 end
 
-local profiles = ProfileService.new(InMemoryProfileAdapter.new())
+local store = InMemoryProfileAdapter.new()
+local profiles = ProfileService.new(store)
 assert(profiles:load(5101))
 assert(profiles:load(5102))
 assert(profiles:load(5103))
@@ -136,6 +138,136 @@ local invalid = quests:record_event(5102, {
 check(
     invalid.ok == false and invalid.reason == "InvalidQuestEvent",
     "Missing stable EventId must be rejected."
+)
+
+-- New story content reuses the existing trusted DungeonClear event, the
+-- persisted quest state and the atomic inventory/profile mutation.
+local premature = quests:start(5103, "MineEchoes")
+check(
+    premature.reason == "QuestUnavailable",
+    "Mine follow-up must require the character's own completed relic quest."
+)
+check(
+    quests:start(5103, "WorldrootRelic").ok,
+    "Fighter must be able to start the first cross-class story quest."
+)
+check(
+    quests:claim_reward(5103, "WorldrootRelic").reason == "QuestNotReady",
+    "Starting a quest must never immediately grant its reward."
+)
+check(
+    not quests:claim_reward(5103, "MageAdvancementTrial").ok,
+    "The adventure reward API must never complete class advancement."
+)
+local wrong_story_clear = quests:record_event(5103, {
+    EventId = "story:mine-first",
+    Type = "DungeonClear",
+    TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+    Amount = 1,
+})
+check(wrong_story_clear.ok, "Unrelated trusted events must be harmless.")
+check(
+    quests:claim_reward(5103, "WorldrootRelic").reason == "QuestNotReady",
+    "Mine completion must not count as Temple story progress."
+)
+local temple_story_clear = quests:record_event(5103, {
+    EventId = "story:temple-first",
+    Type = "DungeonClear",
+    TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+    Amount = 1,
+})
+check(temple_story_clear.ok, "Temple clear must ready the relic quest.")
+local relic_claim = quests:claim_reward(5103, "WorldrootRelic")
+check(
+    relic_claim.ok and relic_claim.gold_granted == 25
+        and relic_claim.item_id == "worldroot_relic",
+    "Relic claim must grant the configured server-owned reward."
+)
+local rewarded = profiles:get_character(5103)
+check(
+    rewarded.Gold == 25
+        and InventoryService.count_item(
+            rewarded, "worldroot_relic"
+        ) == 1,
+    "Relic and gold must be committed to the same character."
+)
+check(
+    quests:claim_reward(5103, "WorldrootRelic").reason
+        == "QuestAlreadyCompleted",
+    "Repeating an already-claimed story quest cannot grant more loot."
+)
+check(
+    quests:start(5103, "WorldrootRelic").reason
+        == "QuestAlreadyCompleted",
+    "The one-time relic quest cannot be restarted for extra rewards."
+)
+check(
+    quests:start(5103, "MineEchoes").ok,
+    "Completing the first quest must unlock its follow-up."
+)
+check(
+    quests:claim_reward(5103, "MineEchoes").reason == "QuestNotReady",
+    "Follow-up must require a new valid Mine clear after it was started."
+)
+local mine_story_clear = quests:record_event(5103, {
+    EventId = "story:mine-after-unlock",
+    Type = "DungeonClear",
+    TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+    Amount = 1,
+})
+check(mine_story_clear.ok, "Mine clear must ready the follow-up quest.")
+local mine_claim = quests:claim_reward(5103, "MineEchoes")
+check(
+    mine_claim.ok and mine_claim.gold_granted == 50
+        and mine_claim.item_id == "iron_ore"
+        and mine_claim.quantity == 5,
+    "Mine follow-up must grant its own server-defined materials and gold."
+)
+rewarded = profiles:get_character(5103)
+check(
+    rewarded.Gold == 75
+        and InventoryService.count_item(rewarded, "iron_ore") == 5
+        and InventoryService.count_item(
+            rewarded, "worldroot_relic"
+        ) == 1,
+    "Both one-time quest rewards must coexist without duplicating items."
+)
+check(
+    quests:claim_reward(5103, "MineEchoes").reason
+        == "QuestAlreadyCompleted",
+    "A second Mine reward request must not double-pay the quest."
+)
+
+local saved, save_error = profiles:save(5103, "StoryQuestTest")
+check(saved, "Story quest rewards must save: " .. tostring(save_error))
+local released, release_error = profiles:release(
+    5103, "StoryQuestTest"
+)
+check(
+    released, "Story quest profile must release: "
+        .. tostring(release_error)
+)
+check(profiles:load(5103) ~= nil, "Claimed quest profile must reload.")
+local restored = profiles:get_character(5103)
+check(
+    restored.Quests.Completed.WorldrootRelic == true
+        and restored.Quests.Completed.MineEchoes == true
+        and restored.Gold == 75
+        and InventoryService.count_item(
+            restored, "worldroot_relic"
+        ) == 1,
+    "Both story completions and the relic must persist after reload."
+)
+check(
+    quests:claim_reward(5103, "WorldrootRelic").reason
+        == "QuestAlreadyCompleted"
+        and quests:claim_reward(5103, "MineEchoes").reason
+            == "QuestAlreadyCompleted",
+    "Reloading a profile must never reset either claimed reward."
+)
+check(
+    profiles:get_character(5102).Quests.Completed.MineEchoes ~= true,
+    "Quest completion must remain independent for each party member."
 )
 
 print(string.format("[Quest Service Tests] PASS: %d assertions.", assertions))
