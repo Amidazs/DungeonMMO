@@ -38,8 +38,8 @@ local function main()
     local branches = report.Branches
 
     check(base.Raw == 168
-        and base.Functional == 139
-        and base.Missing == 29,
+        and base.Functional == 145
+        and base.Missing == 23,
         "Original Fighter/Mystic first-tier rank inventory diverged")
     check(scout.Raw == 228
         and scout.Functional == 181
