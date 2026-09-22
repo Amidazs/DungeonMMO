@@ -1,5 +1,23 @@
 # Canonical Roadmap
 
+**Latest working backend increment: v1.71 —
+real Ranger/Rogue control progression.**
+[Working roadmap v1.71](DungeonMMO_Roadmap_v1_71_Ranger_Rogue_Control_20260922.md)
+and [focused acceptance](../testing/c4-ranger-rogue-control-skills-2026-09-22.md).
+Briar Volley hits and slows two physical targets;
+Disrupting Cut actually staggers. Both have three
+5/10/15 level-gated ranks, 40/110 earned mastery
+requirements and class/trainer/weapon authority.
+Unpublished live-client effect, 41 focused content,
+46 production service purchase/persistence and 45
+corrected Rogue trainer assertions passed. The C4
+source-volume manifest is still incomplete, real
+saved-character trainer GUI remains untested, and
+the separate Phase2A auto-test failure remains open.
+Do not merge to `main` or publish merely because
+this focused backend slice passed.
+
+
 **C4 client-effects focus (22 September 2026):**
 [Focused Studio Play acceptance](../testing/c4-new-skill-live-client-2026-09-22.md)
 verifies Dawn Ward, Cinder Bolt, Archer Draw and Vital Blow
