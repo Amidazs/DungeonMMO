@@ -600,8 +600,19 @@ local function apply_dungeon_state(payload: any)
     elseif state == "ReplayError" then
         replay_button.Text = "Retry Play again"
         UiTheme.set_button_enabled(replay_button, true)
-        reward_label.Text = "Replay could not start: "
-            .. tostring(payload.replay_error)
+        if payload.replay_error == "DifficultyLocked"
+            and type(payload.MemberUserId) == "number"
+        then
+            reward_label.Text = string.format(
+                "Party member %d has not unlocked %s. "
+                    .. "Every member must clear the previous difficulty.",
+                payload.MemberUserId,
+                tostring(payload.DifficultyId or "this difficulty")
+            )
+        else
+            reward_label.Text = "Replay could not start: "
+                .. tostring(payload.replay_error)
+        end
     end
 end
 
