@@ -2,12 +2,16 @@
 local Debris = game:GetService("Debris")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
 
 local CombatTargetRules = require(
     script.Parent:WaitForChild("CombatTargetRules")
 )
 local DamageService = require(
     script.Parent:WaitForChild("DamageService")
+)
+local MageHealService = require(
+    script.Parent:WaitForChild("MageHealService")
 )
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
@@ -136,6 +140,24 @@ function WindStrikeService.fire(context: WindStrikeContext): boolean
                     critical_chance = context.critical_chance,
                     critical_damage_multiplier = context.critical_damage_multiplier,
                 })
+                -- Life Drain can heal only the still-authenticated
+                -- original caster after actual positive NPC damage.
+                local drain_fraction = math.clamp(
+                    tonumber(context.skill_definition
+                        .LIFE_DRAIN_FRACTION) or 0,
+                    0, 0.30
+                )
+                if applied_damage > 0 and drain_fraction > 0
+                    and context.attacker.Parent == Players
+                    and context.attacker.Character == context.character
+                then
+                    MageHealService.apply_heal(
+                        context.attacker,
+                        context.attacker,
+                        applied_damage * drain_fraction,
+                        context.skill_definition.ID
+                    )
+                end
                 -- An authenticated, damaging magic projectile may
                 -- apply non-stacking server NPC movement impairment.
                 -- No client-passed target or duration is accepted.
