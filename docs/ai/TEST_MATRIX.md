@@ -1,5 +1,26 @@
 # DungeonMMO Test and Acceptance Matrix
 
+## 22 September 2026 — new story quest focused test
+
+- [x] `89d8e7e`: Base Rojo build and one focused
+  `story_quest_backend_tests.luau` Studio runner:
+  **40 QuestService assertions PASS**. Covers same-user
+  Temple -> Mine prerequisite, unrelated DungeonClear,
+  one-time Gold/relic/ore claims, duplicate denial,
+  independent characters, profile save/reload and
+  class-advancement isolation.
+- [ ] A single targeted real Base client quest-board
+  Start -> legitimate dungeon clear -> Claim flow is
+  still pending; this increment is backend-only.
+- [ ] Published TEST reserved-server/cloud continuity
+  remains separate and requires approval.
+
+No old aggro/wipe/revive/30-suite Dungeon matrix reruns
+were necessary for this isolated new quest-content change.
+Receipt:
+`docs/testing/story-quest-backend-slice-2026-09-22.md`.
+
+
 ## 22 September 2026 — all-member difficulty gate / spectator / replay PASS
 
 Accepted gameplay source `c6925c0`: six Rojo builds, focused
