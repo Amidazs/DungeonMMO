@@ -28,18 +28,42 @@ local function fighter(race_id: string): any
     }
 end
 
+--[[
+Finds a registered trainer skill without relying on a fixed UI row order.
+
+Args:
+    skills (any): Actual class-filtered trainer skill catalogue.
+    skill_id (string): Expected permanent skill identifier.
+
+Returns:
+    any?: Registered trainer entry or nil when absent.
+]]
+local function find_skill(skills: any, skill_id: string): any?
+    for _, entry in ipairs(skills) do
+        if entry.SkillId == skill_id then
+            return entry
+        end
+    end
+    return nil
+end
+
 local human = TrainerCatalogues.resolve_for_character("FighterTrainer", fighter("Human"))
 local elf = TrainerCatalogues.resolve_for_character("FighterTrainer", fighter("Elf"))
 check(human.ok == true, "Human Fighter must resolve FighterTrainer.")
 check(elf.ok == true, "Elf Fighter must resolve FighterTrainer.")
 check(type(human.Trainer) == "table", "trainer snapshot must exist.")
 check(human.Trainer.DisplayName == "Fighter Trainer", "trainer display name mismatch.")
-check(#human.Trainer.Skills == 4, "Fighter trainer must expose four combat skills including Taunt.")
-check(human.Trainer.Skills[1].SkillId == "ShieldBash", "Shield Bash order mismatch.")
-check(human.Trainer.Skills[2].SkillId == "Mend", "Mend order mismatch.")
-check(human.Trainer.Skills[3].SkillId == "ArcSlash", "Arc Slash order mismatch.")
-check(human.Trainer.Skills[3].SourceItemId == "arc_slash_book_bound", "Arc Slash book source mismatch.")
-check(human.Trainer.Skills[4].SkillId == "Taunt", "Taunt order mismatch.")
+check(#human.Trainer.Skills >= 5,
+    "Fighter trainer must expose novice and starter combat skills.")
+for _, skill_id in ipairs({
+    "NoviceProtection", "ShieldBash", "Mend", "ArcSlash", "Taunt",
+}) do
+    check(find_skill(human.Trainer.Skills, skill_id) ~= nil,
+        skill_id .. " missing from starting Fighter trainer.")
+end
+local arc_slash = find_skill(human.Trainer.Skills, "ArcSlash")
+check(arc_slash.SourceItemId == "arc_slash_book_bound",
+    "Arc Slash book source mismatch.")
 check(
     TrainerCatalogues.can_offer(
         "FighterTrainer", fighter("Human"), "Taunt"
