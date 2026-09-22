@@ -1,6 +1,40 @@
 # DungeonMMO Test and Acceptance Matrix
 
-## 22 September 2026 — latest C4 healing and active-status focus
+## 22 September 2026 — current v1.76 C4 conditional recovery focus
+
+- [x] Human Fighter sitting level-5 rank; Human Scout
+  sitting level-24/32 ranks; both Scout races' level-36
+  running rank: **42** race/class/level/effect assertions PASS.
+- [x] Source-volume inventory after recovery: Scout **1079**
+  assertions PASS (Human 81/99; Elf 107/129), basic-class
+  **55** assertions PASS (Human Fighter 37/39,
+  Elf Fighter 41/43, Human Mystic 36/44,
+  Elf Mystic 34/42).
+- [x] Strict overall completion audit **7** assertions PASS:
+  Base=148/168, Scouts=188/228, 0/9 original
+  first-transfer classes fully complete,
+  seven unenumerated; `Completed=false`.
+- [x] Both disposable unpublished Base and Dungeon Rojo
+  builds PASS. Independent live Studio player sat in an
+  actual Seat and a purchased Human Fighter rank
+  increased real server Heartbeat Stamina recovery
+  after an identical Stamina spend:
+  `REAL_SEATED_STAMINA_PASS`.
+- [ ] Real client moving Stamina recovery check, 60
+  remaining ranks across the six currently mapped
+  source classes and seven entirely missing original
+  first-transfer career catalogues still OPEN.
+- [ ] Saved-player original C4 class-transfer/quest/GUI,
+  multiplayer gameplay and one release regression
+  remain unverified. Separate Phase2A paid-revive
+  automated failure remains open.
+
+[Current test ledger](../testing/c4-conditional-recovery-v1-76-2026-09-22.md).
+All code/tests/docs changed in GitHub only; remote
+only clean pull, TEMP builds, unpublished Studio tests.
+
+
+## 22 September 2026 — previous C4 healing and active-status focus
 
 - [x] Mystic Battle Heal: **28** assertions; genuine server
   healing with earned prerequisite and all three source ranks.
