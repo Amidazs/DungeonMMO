@@ -77,6 +77,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "FighterRestingRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ElvenFighterRenewal",
                 Mode = "LearnOrRank",
             }),
@@ -256,6 +260,14 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "ScoutRunningEvasion",
                 Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutRestingRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutRunningRecovery",
+                Mode = "LearnOrRank",
             }),            table.freeze({
                 SkillId = "ScoutEvasiveFocus",
                 Mode = "LearnOrRank",
@@ -348,6 +360,14 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ScoutRunningEvasion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutRestingRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutRunningRecovery",
                 Mode = "LearnOrRank",
             }),            table.freeze({
                 SkillId = "ScoutEvasiveFocus",
