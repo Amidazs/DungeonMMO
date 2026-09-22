@@ -57,12 +57,12 @@ channel.OnClientEvent:Connect(function(action, skill_id)
             },
             Loadout = {[1] = skill_id},
         })
-        local row = wait_for(function()
+        wait_for(function()
             local button = list:FindFirstChild(skill_id)
-            return button and button.Visible and button
-        end, "visible " .. skill_id, 12)
-        assert(string.find(row.Text, "Rank 1", 1, true),
-            "Known skill row did not show trained rank")
+            return button and button.Visible
+                and string.find(button.Text, "Rank 1", 1, true)
+                and button
+        end, "visible learned rank " .. skill_id, 12)
         local foreign = if skill_id == "CinderBolt"
             then "ArcherDraw" else "CinderBolt"
         local hidden = list:FindFirstChild(foreign)
