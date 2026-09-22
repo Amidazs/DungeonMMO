@@ -409,8 +409,12 @@ Returns:
 function ProgressionRuntimeState.get_heal_multiplier(
     user_id: number
 ): number
-    return AttributeConfig.heal_multiplier(
+    local baseline = AttributeConfig.heal_multiplier(
         ProgressionRuntimeState.get_attribute(user_id, "Spirit")
+    )
+    return math.max(
+        0,
+        baseline + PassiveSkillEffects.heal_bonus(state_for(user_id))
     )
 end
 
@@ -535,7 +539,12 @@ function ProgressionRuntimeState.get_max_health(user_id: number): number
     )
     local equipment_health = equipment_effects_for(user_id).MaxHealthFlat
 
-    return math.max(1, base_health + equipment_health)
+    local trained_health = PassiveSkillEffects.health_bonus(
+        state_for(user_id)
+    )
+    return math.max(
+        1, base_health + equipment_health + trained_health
+    )
 end
 
 --[[
