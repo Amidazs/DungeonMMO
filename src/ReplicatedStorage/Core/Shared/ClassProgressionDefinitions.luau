@@ -55,7 +55,11 @@ local DEFINITIONS = table.freeze({
         StarterEquipment = table.freeze({
             Weapon = "apprentice_longbow",
         }),
-        TeachableSkills = table.freeze({"TrackerShot"}),
+        TeachableSkills = table.freeze({
+            "TrackerShot",
+            "ArcherDraw",
+            "RangerBowMastery",
+        }),
     }),
 
     Rogue = table.freeze({
@@ -76,6 +80,8 @@ local DEFINITIONS = table.freeze({
             "LightFoot",
             "ThreatDrop",
             "ViperStrike",
+            "RogueVitalBlow",
+            "RogueBladeMastery",
         }),
     }),
 })
