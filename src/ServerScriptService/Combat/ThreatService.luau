@@ -125,6 +125,41 @@ function ThreatService.get_threat(
     return if ledger then ledger[user_id] or 0 else 0
 end
 
+--[[
+Removes a fraction of the authenticated caster's existing threat on one NPC.
+
+Args:
+    enemy (Model): Server-confirmed NPC with a threat ledger.
+    player (Player): Original attacking player.
+    fraction (number): Authoritative positive reduction fraction.
+
+Returns:
+    number: Threat removed, or zero when the player had no threat.
+]]
+function ThreatService.reduce_threat(
+    enemy: Model,
+    player: Player,
+    fraction: number
+): number
+    assert(enemy:IsA("Model"), "Threat target must be an NPC Model")
+    assert(player:IsA("Player") and valid_user_id(player.UserId),
+        "Threat-reduction caster must have a valid player identity")
+    assert(type(fraction) == "number"
+        and fraction == fraction
+        and fraction > 0 and fraction < math.huge,
+        "Threat reduction must be positive and finite")
+
+    local ledger = ledgers[enemy]
+    local before = if ledger then ledger[player.UserId] or 0 else 0
+    if before <= 0 then
+        return 0
+    end
+
+    local after = before * (1 - math.clamp(fraction, 0, 0.85))
+    ledger[player.UserId] = after
+    return before - after
+end
+
 -- Args:
 --   caster: Player; authenticated player creating effective support.
 --   target: Player; living ally who received healing or ward absorption.
