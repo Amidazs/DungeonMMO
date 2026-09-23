@@ -1485,6 +1485,68 @@ local WAYFINDER_CUT = specialize_skill(
     }
 )
 
+-- The authenticated existing bleed executor applies wound ticks
+-- only after a real dagger hit; a missed swing cannot apply the status.
+local WAYFINDER_WOUND = specialize_skill(
+    LACERATING_CUT, "WayfinderWound", "Wayfinder Wound", {
+        BASE_DAMAGE = 8,
+        BLEED_TICK_DAMAGE = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 8, BLEED_TICK_DAMAGE = 3,
+            }),
+        }),
+    }
+)
+
+-- The original Greenward calming arrow preserves the server-owned
+-- threat-reduction-on-hit contract in nine independently bought ranks.
+local GREENWARD_CALMING_ARROW = specialize_skill(
+    ELVEN_CALMING_SHOT, "GreenwardCalmingArrow",
+    "Greenward Calming Arrow", {
+        BASE_DAMAGE = 9,
+        THREAT_REDUCTION_FRACTION = 0.10,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 9,
+                THREAT_REDUCTION_FRACTION = 0.100,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 10,
+                THREAT_REDUCTION_FRACTION = 0.125,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 11,
+                THREAT_REDUCTION_FRACTION = 0.150,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 12,
+                THREAT_REDUCTION_FRACTION = 0.175,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 13,
+                THREAT_REDUCTION_FRACTION = 0.200,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 14,
+                THREAT_REDUCTION_FRACTION = 0.225,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 15,
+                THREAT_REDUCTION_FRACTION = 0.250,
+            }),
+            [8] = table.freeze({
+                BASE_DAMAGE = 16,
+                THREAT_REDUCTION_FRACTION = 0.275,
+            }),
+            [9] = table.freeze({
+                BASE_DAMAGE = 17,
+                THREAT_REDUCTION_FRACTION = 0.300,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1645,6 +1707,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GreenwardRenewal = GREENWARD_RENEWAL,
     WayfinderArrow = WAYFINDER_ARROW,
     WayfinderCut = WAYFINDER_CUT,
+    WayfinderWound = WAYFINDER_WOUND,
+    GreenwardCalmingArrow = GREENWARD_CALMING_ARROW,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
