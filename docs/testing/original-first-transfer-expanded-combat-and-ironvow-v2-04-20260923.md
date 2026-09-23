@@ -80,6 +80,18 @@ claimed or provided yet. These 15 authored ranks are an
 initial **subset**, not a complete C4-through-30 Warrior
 training catalogue or an additional playable class.
 
+## Focused existing-class regression after Warrior changes
+
+The unchanged existing
+`scripts/studio/c4_original_first_transfer_focus.luau`
+was executed once against the new Ironvow Base build:
+**2/2 PASS**, with **459 existing original first-transfer assertions**
+and **8 adjacent profile/quest migration assertions**. This confirms
+that merely registering the locked Human Warrior skill foundation
+has not broken the previously accepted two existing class award/
+skill and migration tests. The separate two-client physical
+mentor/trainer or entire source-quest journey was not rerun here.
+
 ## Remaining acceptance
 
 Implement and playtest the independently authored Human Warrior
