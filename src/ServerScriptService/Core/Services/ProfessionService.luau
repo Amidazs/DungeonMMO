@@ -11,6 +11,9 @@ local ProfessionSelectionRules = require(
     Shared:WaitForChild("ProfessionSelectionRules")
 )
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
+local C4ProfessionSkillRules = require(
+    Shared:WaitForChild("C4ProfessionSkillRules")
+)
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 local RecipeKnowledgeService = require(
     Services:WaitForChild("RecipeKnowledgeService")
@@ -90,6 +93,14 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
         character.ProfessionSlots, recipe.ProfessionId
     ) then
         return "ProfessionNotSelected"
+    end
+
+    if recipe.RequiredSkillId == "C4CommonItemCreation"
+        and not C4ProfessionSkillRules.can_make_common(
+            character, recipe.ProfessionId
+        )
+    then
+        return "CommonItemCreationNotLearned"
     end
 
     local professions = ensure_professions(character)
@@ -245,8 +256,14 @@ function ProfessionService:build_snapshot(user_id: number): any
         local level_unlocked =
             state ~= nil and state.Level >= recipe.RequiredLevel
 
+        local common_skill_unlocked =
+            recipe.RequiredSkillId ~= "C4CommonItemCreation"
+                or C4ProfessionSkillRules.can_make_common(
+                    character, recipe.ProfessionId
+                )
         recipes[recipe_id] = {
             Unlocked = level_unlocked and knowledge_rejection == nil
+                and common_skill_unlocked
                 and ProfessionSelectionRules.can_use(
                     slots, recipe.ProfessionId
                 ),
