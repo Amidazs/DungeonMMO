@@ -64,7 +64,8 @@ Returns:
     any: Service with only server-registered physical lock targets.
 ]]
 function ScoutLockpickingService.new(
-    sessions: any, profiles: any, session_id: string, dungeon_id: string
+    sessions: any, profiles: any, session_id: string,
+    dungeon_id: string, on_open: ((Player) -> ())?
 ): any
     assert(type(session_id) == "string" and session_id ~= "")
     assert(type(dungeon_id) == "string" and dungeon_id ~= "")
@@ -74,6 +75,7 @@ function ScoutLockpickingService.new(
         _session_id = session_id,
         _dungeon_id = dungeon_id,
         _locks = {},
+        _on_open = on_open,
     }, ScoutLockpickingService)
 end
 
@@ -131,7 +133,10 @@ function ScoutLockpickingService:register(definition: any): any
         QuestId = definition.QuestId,
     })
     prompt.Triggered:Connect(function(player: Player)
-        self:try_open(player, id)
+        local opened = self:try_open(player, id)
+        if opened.ok and self._on_open then
+            self._on_open(player)
+        end
     end)
     return {ok = true, reason = "Registered", prompt = prompt}
 end
@@ -278,6 +283,10 @@ function ScoutLockpickingService:try_open(
     )
     if not claim.ok and claim.reason ~= "ResourceAlreadyClaimed" then
         return result(false, claim.reason or "LockClaimFailed")
+    end
+    local latest_rejection = self:_rejection(player, lock)
+    if latest_rejection then
+        return result(false, latest_rejection)
     end
     return self:_award(player.UserId, lock)
 end
