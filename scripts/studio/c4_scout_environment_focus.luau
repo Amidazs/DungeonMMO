@@ -6,6 +6,7 @@ assert(game.PlaceId == 0 and game.GameId == 0,
 local tests = game:GetService("ServerScriptService").Core.Tests
 local test_names = {
     "C4ScoutEnvironmentEquipmentTest",
+    "C4ScoutExpertGearTradeTest",
     "C4ScoutInventoryTest",
     "C4CatalogueCoverageTest",
     "EquipmentServiceTest",
