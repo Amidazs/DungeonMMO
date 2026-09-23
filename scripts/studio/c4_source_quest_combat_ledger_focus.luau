@@ -10,6 +10,10 @@ local fixtures = {
         Name = "C4QuestMonsterCombatLedgerTest",
     },
     {
+        Folder = sss.Dungeon.Tests,
+        Name = "C4QuestEncounterSpawnsTest",
+    },
+    {
         Folder = sss.Combat.Tests,
         Name = "ContributionDamageBridgeTest",
     },
