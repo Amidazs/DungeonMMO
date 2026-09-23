@@ -13,6 +13,20 @@ local Runtime = {}
 Runtime.__index = Runtime
 local MAX_RANGE = 10
 local NPCS = table.freeze({
+    HumanKnight = table.freeze({
+        table.freeze({
+            TargetId = "CaptainRowan",
+            Name = "Captain Rowan",
+            Offset = Vector3.new(4, 2.5, -34),
+            Color = Color3.fromRGB(102, 107, 136),
+        }),
+        table.freeze({
+            TargetId = "QuartermasterDena",
+            Name = "Quartermaster Dena",
+            Offset = Vector3.new(14, 2.5, -34),
+            Color = Color3.fromRGB(134, 113, 77),
+        }),
+    }),
     HumanWarrior = table.freeze({
         table.freeze({
             TargetId = "MarshalTorren",
@@ -138,7 +152,9 @@ function Runtime.attach(options: any): any
             -- The Ironroot NPCs sit beside unfinished hub geometry.
             -- Server-side proximity still requires a living owner
             -- within ten studs; terrain must not hide a valid prompt.
-            prompt.RequiresLineOfSight = branch_id ~= "HumanWarrior"
+            prompt.RequiresLineOfSight =
+                branch_id ~= "HumanWarrior"
+                and branch_id ~= "HumanKnight"
             prompt.Parent = part
             self._step_parts[branch_id][step_index] = part
             if step_index == 1 then
@@ -152,7 +168,9 @@ function Runtime.attach(options: any): any
         -- this character has actually earned its ordered stage-four proof.
         self._step_parts[branch_id][4] =
             self._step_parts[branch_id][2]
-        if branch_id == "HumanWarrior" then
+        if branch_id == "HumanWarrior"
+            or branch_id == "HumanKnight"
+        then
             self._step_parts[branch_id][6] =
                 self._step_parts[branch_id][1]
         elseif branch_id == "HumanRogue" then
@@ -261,13 +279,15 @@ function Runtime:_talk(
         and (branch_id == "HumanRogue"
             and (current.Step == 5 or current.Step == 7)
             or branch_id == "ElvenScout" and current.Step == 9
-            or branch_id == "HumanWarrior" and current.Step == 6)
+            or (branch_id == "HumanWarrior"
+                or branch_id == "HumanKnight") and current.Step == 6)
     then
         index = current.Step
     end
     local source_index = if index == 4 or index == 8
         then 2 elseif index == 5 or index == 7 or index == 9
-            or branch_id == "HumanWarrior" and index == 6
+            or (branch_id == "HumanWarrior"
+                or branch_id == "HumanKnight") and index == 6
         then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
