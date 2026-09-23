@@ -436,6 +436,27 @@ function PassiveSkillEffects.mystic_magic_reduction(
 end
 
 --[[
+Returns purchased original Knight mitigation against real enemy magic only.
+
+Args:
+    character (any): Genuine original Human Oathguard and bought ranks.
+
+Returns:
+    number: Bounded mitigation from zero to 4.8% across eight ranks.
+]]
+function PassiveSkillEffects.oathguard_magic_reduction(
+    character: any
+): number
+    return math.clamp(
+        resolve_bonus(
+            character, "OathguardRunicResistance",
+            "MagicReductionPerRank"
+        ),
+        0, 0.048
+    )
+end
+
+--[[
 Returns the earned rank bonus only while a legitimate Mystic robe is worn.
 
 Args:
