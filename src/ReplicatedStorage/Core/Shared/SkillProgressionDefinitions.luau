@@ -1245,6 +1245,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Real dungeon/world lock interaction skill, not a loot multiplier.
+    -- Every purchased rank opens only authored locks at or below that tier.
+    ScoutLockpicking = table.freeze({
+        Id = "ScoutLockpicking",
+        Tier = "Common",
+        MaxRank = 5,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28,
+            [4] = 32, [5] = 36,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0, [5] = 0,
+        }),
+        WorldLockpickingEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
