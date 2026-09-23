@@ -11,10 +11,10 @@ local LETTER_IDS = table.freeze({
 })
 
 local STAGE_PROOFS = table.freeze({
-    RogueTrialSkeleton = table.freeze({SpartoiBone = true}),
-    OlMahumPatrol = LETTER_IDS,
-    OlMahumSentry = table.freeze({RustedKey = true}),
-    CatsEyeBandit = table.freeze({
+    CryptSentinel = table.freeze({crypt sentinelBone = true}),
+    BrackenRaider = LETTER_IDS,
+    BrackenWarden = table.freeze({RustedKey = true}),
+    CinderBrigand = table.freeze({
         StolenJewelry = true, StolenTomes = true,
         StolenRing = true, StolenNecklace = true,
     }),
@@ -132,24 +132,24 @@ function Rules.can_progress(
     if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
         return false, "OriginalTrialWeaponRequired"
     end
-    if step.TargetId == "Neti" and current.Step == 2
+    if step.TargetId == "Vela" and current.Step == 2
         and event.TrialWeaponsGranted ~= true
     then
         return false, "OriginalTrialWeaponRequired"
     end
-    if step.TargetId == "RogueTrialSkeleton"
+    if step.TargetId == "CryptSentinel"
         and (type(event.VerifiedProofIds) ~= "table"
-            or event.VerifiedProofIds.SpartoiBone ~= true)
+            or event.VerifiedProofIds.crypt sentinelBone ~= true)
     then
         return false, "OriginalQuestLootProofRequired"
     end
-    if step.TargetId == "Neti" and current.Step == 4
+    if step.TargetId == "Vela" and current.Step == 4
         and (type(current.Proofs) ~= "table"
-            or current.Proofs.SpartoiBone10 ~= true)
+            or current.Proofs.crypt sentinelBone10 ~= true)
     then
         return false, "OriginalQuestLootProofRequired"
     end
-    if step.TargetId == "GuardMoretti" and current.Step == 4 then
+    if step.TargetId == "WardenThorne" and current.Step == 4 then
         for letter_id in pairs(LETTER_IDS) do
             if type(current.Proofs) ~= "table"
                 or current.Proofs[letter_id] ~= true
@@ -158,7 +158,7 @@ function Rules.can_progress(
             end
         end
     end
-    if step.TargetId == "OlMahumPatrol" then
+    if step.TargetId == "BrackenRaider" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
         local fresh_count = 0
@@ -179,7 +179,7 @@ function Rules.can_progress(
     end
     -- Loot proof is checked against the *actual* server-authored item
     -- set, not merely kill count. Missing item bindings cannot finish it.
-    if step.TargetId == "CatsEyeBandit" then
+    if step.TargetId == "CinderBrigand" then
         local required = {
             "StolenJewelry", "StolenTomes",
             "StolenRing", "StolenNecklace",
@@ -193,7 +193,7 @@ function Rules.can_progress(
             end
         end
     end
-    if step.TargetId == "OlMahumSentry"
+    if step.TargetId == "BrackenWarden"
         and (type(event.VerifiedProofIds) ~= "table"
             or event.VerifiedProofIds.RustedKey ~= true)
     then
@@ -228,11 +228,11 @@ function Rules.advance(quest: any, current: any, event: any): any
         if verified == true then current.Proofs[id] = true end
     end
     current.Count = math.min(step.Required, (current.Count or 0) + 1)
-    if step.TargetId == "RogueTrialSkeleton"
+    if step.TargetId == "CryptSentinel"
         and current.Count == step.Required
     then
         -- Never accept an aggregate ten-bone proof from an incoming event.
-        current.Proofs.SpartoiBone10 = true
+        current.Proofs.crypt sentinelBone10 = true
     end
     if current.Count >= step.Required then
         current.Step += 1
