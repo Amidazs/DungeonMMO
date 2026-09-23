@@ -1712,6 +1712,25 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Two independently earned Knight shield-mastery ranks protect only
+    -- when the server owns a valid shield in the OffHand equipment slot.
+    OathguardShieldMastery = table.freeze({
+        Id = "OathguardShieldMastery",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "ShieldBash", Rank = 3, Proficiency = 0,
+            }),
+        }),
+        PhysicalReductionPerRank = 0.008,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Authenticated Knight-specific magical mitigation. Each historical
     -- 20/24/28 rank is bought independently; no physical-damage bonus
     -- or free mitigation is attached to a bare Oathguard class label.
