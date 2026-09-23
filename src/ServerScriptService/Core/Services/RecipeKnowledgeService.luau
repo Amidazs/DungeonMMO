@@ -11,6 +11,9 @@ local ProfessionSelectionRules = require(
     Shared:WaitForChild("ProfessionSelectionRules")
 )
 local ProfessionRecipes = require(Shared:WaitForChild("ProfessionRecipes"))
+local C4ProfessionSkillRules = require(
+    Shared:WaitForChild("C4ProfessionSkillRules")
+)
 local ProfileSchema = require(Shared:WaitForChild("ProfileSchema"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
 
@@ -130,6 +133,11 @@ local function profession_rejection(
 
     if level < required_level then
         return "ProfessionLevelTooLow"
+    end
+    if not C4ProfessionSkillRules.can_read(
+        character, profession_id
+    ) then
+        return "RecipeReadingNotLearned"
     end
 
     return nil
