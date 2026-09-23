@@ -172,7 +172,8 @@ Returns:
     nil: A genuine ProximityPrompt.Triggered receipt on the server.
 ]]
 local function talk(player, part)
-    local is_transfer = part:GetAttribute("TrainerId") ~= nil
+    local is_transfer =
+        part:FindFirstChild("FirstTransferMentorPrompt") ~= nil
     local prompt_name = if is_transfer
         then "FirstTransferMentorPrompt" else "C4SourceQuestPrompt"
     local prompt = assert(part:FindFirstChild(prompt_name))
@@ -706,9 +707,16 @@ local function verify_physical_transfer(
     local prompt = assert(actor:FindFirstChild(
         "FirstTransferMentorPrompt"
     ))
+    local training_station = assert(
+        workspace.OriginalFirstTransferMentors
+            :FindFirstChild(definition.TrainerId)
+    )
     assert(prompt.ObjectText == definition.MentorName
-        and actor:GetAttribute("TrainerId") == definition.TrainerId,
-        "The first-transfer mentor must use original names and a real rig")
+        and training_station:GetAttribute("TrainerId")
+            == definition.TrainerId
+        and training_station:FindFirstChild("ProgressionTrainerPrompt")
+        and training_station ~= actor,
+        "Original advancement mentor and skill trainer must be separate")
     local before = profiles:get_character(player.UserId)
     assert(before.ClassAdvancement.OriginalFirstTransferQuest.Ready
         and before.Identity.ClassId == "Fighter",
