@@ -6,6 +6,7 @@ assert(game.PlaceId == 0 and game.GameId == 0,
 local tests = game:GetService("ServerScriptService").Core.Tests
 local names = {
     "C4FirstTransferBranchesTest",
+    "C4ClassPathRulesTest",
     "C4CatalogueCoverageTest",
 }
 local passed = 0
