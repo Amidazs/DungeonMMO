@@ -992,3 +992,104 @@ tail-base fur for seams and actual 3D bending. Restore correct tail
 skin topology and hind-leg anatomy independently. Then re-establish
 a neutral grounded idle and bake an editable non-IK clip for actual
 Roblox Animator verification. Do not merge or publish this QA motion.
+
+
+## WalkV9–V13: shoulder-driven canine gait experiments — 23 September 2026
+
+**Stage 1 remains OPEN. WalkV13 is the latest isolated Blender QA
+candidate, not a proven natural canine walk or a Roblox animation.**
+At this checkpoint the latest separate gameplay/backend roadmap on
+this branch is **v1.99**. None of these art-only experiments modify
+the live DungeonMMO game, original GLB, saved Studio QA places,
+production Rojo tree or published assets.
+
+### Rig anatomy and rejected first attempt
+
+Read-only examination of the actual WalkV8 rig found separate
+`DEF_shoulder.L/R` joints parented under
+`DEF_spine.008`, each parenting its own front-thigh chain.
+Critically, **neither shoulder bone had direct mesh skin weights**.
+A canine shoulder cannot visibly move the overlying fur simply by
+rotating these unweighted pivots.
+
+WalkV9 keyed opposite-phased shoulder sweeps, chest counter-roll and
+pelvis motion on an isolated copy. **Rejected as a gait candidate**:
+the front elbows approached **179.7 degrees** and the largest
+measured inter-frame elbow change rose to approximately **12.4
+degrees**; real weighted paw stance drift increased slightly to
+**0.003772 source units**. This candidate was not promoted.
+
+### Reach-limited, mesh-weighted shoulder and supported stance
+
+- **V10** gates the independently keyed shoulder pitch against
+  evaluated front-leg elbow reach, using a smooth four-beat stance
+  and swing phase with original paw IK targets unchanged.
+  Its largest recorded elbow jumps were ~**8.84 degrees (left)**
+  and **9.24 degrees (right)**. This is a conservative structural
+  improvement, not a visibly approved walk.
+- **V11** copies V10 and assigns carefully tapered local upper-chest
+  skin to the existing real shoulder bones on the *separate*
+  experimental mesh: **1,169 left and 1,230 right vertices**,
+  **2,399 total**, zero vertices above the four-influence budget.
+  The shoulders now have actual mesh influence. This is experimental
+  fur weighting and has not passed all-edge / multi-angle skin QA.
+- **V12** retains the skinned shoulders and adds a **0.014
+  source-unit supported torso drop**, **0.002-unit step bob** and
+  subtle additional chest pitch while preserving the existing
+  world-space stance target keys. The actual 72-frame mesh audit
+  recorded worst designated-stance toe horizontal-centroid drift
+  **0.002045 source units** and highest sampled stance toe height
+  **0.003987 source units** above test Z=0. The sampled hind-right
+  lowest toe points recorded zero elevation during its designated
+  stance intervals, compared with up to **0.007032 units** in V8.
+  This does NOT prove every mesh point is grounded or that the
+  previously asymmetric hind anatomy has been repaired. Measured
+  largest elbow jumps were ~**5.37 degrees left / 5.17 right**.
+- **V13** uses V12's new bend/reach allowance to increase independent
+  left/right scapular pitch (requested max **5.5 degrees**) while
+  limiting actual elbow extension. Saved per-frame pose metadata
+  recorded left shoulder approximately **-5.499 to +5.018 degrees**
+  and right shoulder **-5.499 to +3.797 degrees**, with 50 frames
+  over one degree on each side. The 72-frame constrained-joint
+  audit reported largest elbow jumps **5.792 left / 5.634 right**,
+  both smaller than V8's ~8.406 / 9.114 degrees. Worst sampled
+  stance drift remained **0.002045 units**, and the largest sampled
+  stance toe height **0.003987 units**. The old dog/fox rig and
+  WolfFactory placeholder were not substituted.
+
+WalkV13 is an **actual saved editable skinned Blender animation**:
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\WalkV13_ScapularGlide\\Frostfang_WalkV13_UNAPPROVED.blend`
+
+A separate genuine weighted-mesh side/three-quarter preview was
+rendered to 74 PNGs and compiled into the independently verified
+1,520 × 510 animated GIF (34 optimized display frames; 2,970 ms;
+9,043,745 bytes):
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\WalkV13_ScapularGlide\\preview\\Frostfang_WalkV13_Review_UNAPPROVED.gif`
+
+New experimental GitHub scripts under
+`tools/animation/quadruped/qa/` include
+`FrostfangWalkV9RigInspection.py`,
+`FrostfangWalkV9ShoulderGait.py`,
+`FrostfangWalkV10ReachAwareShoulders.py`,
+`FrostfangWalkV11ShoulderSkin.py`,
+`FrostfangWalkV12WeightShift.py`,
+`FrostfangWalkV13Scapula.py` and their corresponding
+`JointTailAudit`, `MeshAudit`, `FullPreview` and `Gif`
+QA scripts where present. The separate V9–V13 Blends are
+preserved; none overwrite WalkV8 or any original master.
+
+**Remaining visual/technical blockers:** full-speed visual assessment
+of V13 may still show stiff shoulder fur, straight-looking legs,
+small stride/limited body mass transfer, unnatural rear-leg posture
+and the source tail's underlying skin topology. V7's local
+tail-hindleg isolation experiment is retained in these copies,
+but independent tail bending/tearing has not been certified.
+The source muzzle remains closed and is not bite-ready.
+The animated IK authoring controls are **not baked/editable
+Roblox Animator FK keys**, and this new motion has **not been
+imported or playtested in Roblox Studio**. Do not describe
+Blender mesh-pose checks as accepted continuous in-game animation.
+Next: user reviews V13 against WalkV8, then resolve any visible
+canine gait defects and the source anatomy/skin limitations before
+baking a separate animation and verifying actual Studio playback.
