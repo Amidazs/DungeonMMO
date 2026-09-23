@@ -10,6 +10,35 @@ local LETTER_ITEMS = table.freeze({
     PriasLetter3 = "prias_letter_3",
     PriasLetter4 = "prias_letter_4",
 })
+-- Proof keys are legacy save identifiers; the actual equipment and quest
+-- item names presented to the player are original DungeonMMO terminology.
+local CINDER_ITEMS = table.freeze({
+    StolenJewelry = "cinder_cipher",
+    StolenTomes = "cinder_route_map",
+    StolenRing = "cinder_ward_seal",
+    StolenNecklace = "cinder_tideglass_lens",
+})
+
+--[[
+Validates that every independent cached supply item has expected ownership.
+
+Args:
+    character (any): Current authoritative quest owner's inventory.
+    expected (number): Exact count required for each bound item.
+
+Returns:
+    boolean: True only when all four source items have this count.
+]]
+local function owns_cinder_items(
+    character: any, expected: number
+): boolean
+    for _, item_id in pairs(CINDER_ITEMS) do
+        if Inventory.count_item(character, item_id) ~= expected then
+            return false
+        end
+    end
+    return true
+end
 
 --[[
 Checks real inventory and one equipped original trial weapon.
@@ -83,6 +112,11 @@ function Drops.validate(
         then
             return false, "OriginalQuestProofOwnershipInvalid"
         end
+        if state.Step == 6 and not owns_cinder_items(character, 0)
+            or state.Step == 7 and not owns_cinder_items(character, 1)
+        then
+            return false, "OriginalQuestProofOwnershipInvalid"
+        end
     elseif state.BranchId == "ElvenScout" then
         if state.Step == 3 then
             local item_id = letter_item(event)
@@ -134,6 +168,39 @@ local function consume_return_items(
 end
 
 --[[
+Grants or consumes each separate Cinder cache item as one profile mutation.
+
+Args:
+    character (any): Current authoritative source quest owner.
+    consume (boolean): True on captain turn-in, false on genuine kill.
+
+Returns:
+    (boolean, string?): Full cache mutation eligibility or grant failure.
+]]
+local function apply_cinder_items(
+    character: any, consume: boolean
+): (boolean, string?)
+    for _, item_id in pairs(CINDER_ITEMS) do
+        local before = Inventory.count_item(character, item_id)
+        local applied = if consume
+            then Inventory.apply_remove_from_character(
+                character, item_id, 1
+            )
+            else Inventory.apply_item_to_character(
+                character, item_id, 1
+            )
+        local expected = if consume then before - 1 else before + 1
+        if not applied.ok
+            or Inventory.count_item(character, item_id) ~= expected
+        then
+            return false,
+                applied.reason or "OriginalQuestCacheTransferFailed"
+        end
+    end
+    return true, nil
+end
+
+--[[
 Commits a real owner-bound quest drop or consumes a verified NPC turn-in.
 
 Args:
@@ -151,6 +218,12 @@ function Drops.apply(
     if not valid then return false, refusal end
     if state.Step == 4 then
         return consume_return_items(character, state.BranchId)
+    end
+    if state.BranchId == "HumanRogue" and state.Step == 6 then
+        return apply_cinder_items(character, false)
+    end
+    if state.BranchId == "HumanRogue" and state.Step == 7 then
+        return apply_cinder_items(character, true)
     end
     local item_id: string? = nil
     if state.Step == 3 and state.BranchId == "HumanRogue" then
