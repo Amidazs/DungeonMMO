@@ -231,6 +231,23 @@ local function exercise(
                 "Monster victory alone cannot replace required original loot")
             event.VerifiedProofIds = proofs
         end
+        if index == 7 and branch_id == "ElvenScout" then
+            check(profiles:mutate(user_id, function(profile: any)
+                local owner = profile.Characters.Slot1
+                assert(Inventory.apply_remove_from_character(
+                    owner, "bracken_ward_sigil", 1
+                ).ok)
+            end), "Prepare disposable missing ward sigil denial")
+            check(service:record_world_event(
+                user_id, event
+            ).reason == "OriginalQuestProofOwnershipInvalid",
+                "Cael cannot be rescued without the owner's actual sigil")
+            check(profiles:mutate(user_id, function(profile: any)
+                assert(Inventory.apply_item_to_character(
+                    profile.Characters.Slot1, "bracken_ward_sigil", 1
+                ).ok)
+            end), "Restore disposable owner's exact rescue sigil")
+        end
         check(service:record_world_event(user_id, event).ok,
             "Authoritative source stage " .. tostring(index)
                 .. " must advance with verified original evidence")
@@ -319,6 +336,17 @@ local function exercise(
                     current, "prias_letter_" .. tostring(fragment)
                 ) == 0, "Actual warden consumes each owned report fragment")
             end
+        elseif index == 6 and branch_id == "ElvenScout" then
+            check(Inventory.count_item(
+                current, "bracken_ward_sigil"
+            ) == 1
+                and not TransferRules.can_trade("bracken_ward_sigil")
+                and not TransferRules.can_bank("bracken_ward_sigil"),
+                "Distinct Warden kill grants only a personally bound sigil")
+        elseif index == 7 and branch_id == "ElvenScout" then
+            check(Inventory.count_item(
+                current, "bracken_ward_sigil"
+            ) == 0, "Cael rescue consumes the real owned ward sigil")
         end
     end
     local state = assert(profiles:get_character(user_id, 1))
