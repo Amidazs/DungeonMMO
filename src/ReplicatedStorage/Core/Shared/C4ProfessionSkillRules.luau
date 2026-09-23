@@ -60,4 +60,56 @@ function C4ProfessionSkillRules.can_make_common(
         and owns_rank(character, "C4CommonItemCreation")
 end
 
+--[[
+Authorizes one of the three genuinely purchased first-transfer crafting ranks.
+
+Args:
+    character (any): Current authoritative Rogue/Ranger character.
+    profession_id (string): Its one selected creation profession.
+    required_rank (number): Authored recipe tier, from one to three.
+
+Returns:
+    boolean: True only when literacy, source class/level and purchased
+        creation rank all authorize this specific career and tier.
+]]
+function C4ProfessionSkillRules.can_make_scout_common(
+    character: any, profession_id: string, required_rank: number
+): boolean
+    if type(character) ~= "table"
+        or type(required_rank) ~= "number"
+        or required_rank % 1 ~= 0
+        or required_rank < 1 or required_rank > 3
+        or not C4ProfessionSkillRules.can_read(
+            character, profession_id
+        )
+    then
+        return false
+    end
+
+    local identity = character.Identity or {}
+    if identity.BaseClassId ~= "Ranger"
+        and identity.BaseClassId ~= "Rogue"
+    then
+        return false
+    end
+    if identity.RaceId ~= "Human" and identity.RaceId ~= "Elf" then
+        return false
+    end
+
+    local source_levels = {20, 28, 36}
+    local level = tonumber(character.Level) or 0
+    if level < source_levels[required_rank] then
+        return false
+    end
+
+    local state = character.Progression
+        and character.Progression.Skills
+        and character.Progression.Skills.ScoutCommonItemCreation
+    return type(state) == "table"
+        and state.Known == true
+        and type(state.PurchasedRank) == "number"
+        and state.PurchasedRank >= required_rank
+        and state.PurchasedRank <= 3
+end
+
 return table.freeze(C4ProfessionSkillRules)
