@@ -40,6 +40,16 @@ local ELF = table.freeze({
     AttackBuff = "ElvenScoutBattleFocus",
 })
 
+-- Warrior mapping is deliberately partial. Sword/blunt, polearm,
+-- critical, health and equipment source families require their own
+-- genuine implemented effects before any rank coverage can be claimed.
+local WARRIOR = table.freeze({
+    SwordPowerAttack = "IronvowDrivingStrike",
+    LightArmorMastery = "IronvowLightArmorTraining",
+    HeavyArmorMastery = "IronvowHeavyArmorTraining",
+    BattleCry = "IronvowBattleCall",
+})
+
 --[[
 Resolves the explicitly reviewed source family without legacy class aliases.
 
@@ -53,6 +63,9 @@ Returns:
 function SkillMap.get(
     branch_id: string, source_category: string
 ): string?
+    if branch_id == "HumanWarrior" then
+        return WARRIOR[source_category]
+    end
     if branch_id ~= "HumanRogue" and branch_id ~= "ElvenScout"
     then
         return nil
