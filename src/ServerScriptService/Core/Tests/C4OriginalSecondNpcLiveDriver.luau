@@ -756,8 +756,102 @@ local function verify_physical_transfer(
         and TrainerCatalogues.can_offer(
             definition.TrainerId, awarded, definition.SkillId
         ).ok, "Awarded class must unlock only its registered skill")
+    approach(player, training_station)
+    assert(mentors:nearby_trainer(player, definition.TrainerId),
+        "Only the real corresponding nearby trainer may teach this skill")
+    local runtime = assert(_G.C4OriginalNpcLiveRuntime_TEMP)
+    local learned = runtime.SkillProgressionService:learn_trainer_skill(
+        player.UserId, definition.SkillId
+    )
+    assert(learned.ok, "Actual level-20 skill purchase was rejected: "
+        .. tostring(learned.reason))
+    local skill_state = profiles:get_character(player.UserId)
+        .Progression.Skills[definition.SkillId]
+    assert(skill_state and skill_state.Known == true
+        and skill_state.PurchasedRank == 1,
+        "Original transfer trainer must grant a purchased rank, not free XP")
     print("[C4 Original Second NPC Live] REAL_FIRST_TRANSFER_"
         .. definition.Id .. "_PASS")
+end
+
+--[[
+Seeds only completed original quests for a fast dedicated physical mentor
+regression; the separate earlier two-client source NPC tests are unchanged.
+
+Args:
+    profiles (any): Real disposable Base exclusive profile writer.
+    player (Player): Live client assigned its own test-only source branch.
+    branch_id (string): Human Rogue or Elven Scout source quest.
+
+Returns:
+    nil: Completes the source stage without granting any class or skill.
+]]
+local function seed_completed_source(profiles, player, branch_id)
+    local sources = require(game:GetService("ReplicatedStorage")
+        .Core.Shared.C4OriginalFirstTransferQuestStages)
+    local source = assert(sources.get(branch_id))
+    local selection = require(game:GetService("ServerScriptService")
+        .Core.Services.C4FirstTransferSelectionService)
+    assert(selection.new(profiles, "Base"):choose(
+        player.UserId, branch_id
+    ).ok, "Test-only selected first-transfer branch must be saved")
+    assert(profiles:mutate(player.UserId, function(profile)
+        local owner = profile.Characters.Slot1
+        local proofs = {}
+        for _, key in ipairs(source.RequiredProofIds) do
+            proofs[key] = true
+        end
+        owner.ClassAdvancement.OriginalFirstTransferQuest = {
+            QuestId = source.Id,
+            BranchId = branch_id,
+            Step = #source.Steps + 1,
+            Count = 0,
+            Ready = true,
+            AppliedEvents = {},
+            Proofs = proofs,
+        }
+    end), "Test-only completed source quest could not be seeded")
+end
+
+--[[
+Executes only the genuine physical original level-20 transfer mentors.
+
+Args:
+    human (Player): Real Human Fighter test avatar.
+    elf (Player): Real Elf Fighter test avatar.
+    profiles (any): Actual server-owned live Base profile service.
+
+Returns:
+    nil: Tests genuine two-client transfer and purchased skill isolation.
+]]
+local function run_transfer_only(human, elf, profiles)
+    seed(profiles, human, "Human")
+    seed(profiles, elf, "Elf")
+    seed_completed_source(profiles, human, "HumanRogue")
+    seed_completed_source(profiles, elf, "ElvenScout")
+    local mentors = wait_for(function()
+        return _G.C4OriginalTransferMentors_TEMP
+    end, "actual live first-transfer mentor runtime", 12)
+    local definitions = require(game:GetService("ReplicatedStorage")
+        .Core.Shared.OriginalFirstTransferDefinitions)
+    local rogue = assert(definitions.for_branch("HumanRogue"))
+    local scout = assert(definitions.for_branch("ElvenScout"))
+    local actors = workspace.OriginalFirstTransferMentors
+    verify_physical_transfer(
+        human, profiles, mentors, rogue,
+        assert(actors:FindFirstChild(scout.MentorId))
+    )
+    assert(profiles:get_character(elf.UserId)
+        .Identity.ClassId == "Fighter",
+        "Human-only first transfer must not advance an unrelated Elf")
+    verify_physical_transfer(
+        elf, profiles, mentors, scout,
+        assert(actors:FindFirstChild(rogue.MentorId))
+    )
+    assert(profiles:get_character(human.UserId)
+        .Identity.ClassId == "Ashenblade",
+        "Elven transfer must not change Human's previously earned class")
+    print("[C4 Original Second NPC Live] TWO_CLIENT_FIRST_TRANSFER_PASS")
 end
 
 --[[
@@ -791,6 +885,11 @@ local function main()
     local human = users[1]
     local elf = users[2]
     local profiles = runtime.ProfileService
+    if workspace:GetAttribute("DungeonMMOStudioTransferFocus") == true
+    then
+        run_transfer_only(human, elf, profiles)
+        return
+    end
     local world_parts = workspace:WaitForChild("C4OriginalSourceQuestNPCs")
     local original_labels = {
         CaptainAshford = "Captain Ashford",
