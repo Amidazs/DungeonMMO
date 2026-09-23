@@ -1510,6 +1510,61 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Longbow"}),
     }),
 
+    -- Human Warrior first-transfer BACKEND FOUNDATION. The Ironvow
+    -- career is not yet claimable: its distinct source quest and real
+    -- world evidence must be authored before any rank can be trained.
+    IronvowDrivingStrike = table.freeze({
+        Id = "IronvowDrivingStrike",
+        Tier = "Common", MaxRank = 9, Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "IronCleave", Rank = 9,
+                Proficiency = 350,
+            }),
+        }),
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+    IronvowBladeTraining = table.freeze({
+        Id = "IronvowBladeTraining",
+        Tier = "Common", MaxRank = 3, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 24, [3] = 28}),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        DamageBonusPerRank = 0.014,
+        WeaponTags = table.freeze({"OneHandedSword"}),
+    }),
+    IronvowBattleCall = table.freeze({
+        Id = "IronvowBattleCall",
+        Tier = "Common", MaxRank = 3, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 24, [3] = 28}),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterPhysicalTraining",
+                Rank = 3, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
