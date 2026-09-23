@@ -13,6 +13,8 @@ local LETTER_IDS = table.freeze({
 local STAGE_PROOFS = table.freeze({
     CryptSentinel = table.freeze({SpartoiBone = true}),
     RidgeMarauder = table.freeze({IronrootToken = true}),
+    GloamStriker = table.freeze({StonewatchBadge = true}),
+    GloamBulwark = table.freeze({GloamBulwarkSeal = true}),
     Ridgebreaker = table.freeze({RidgebreakerSigil = true}),
     BrackenRaider = LETTER_IDS,
     BrackenWarden = table.freeze({RustedKey = true}),
@@ -211,6 +213,33 @@ function Rules.can_progress(
             return false, "OriginalQuestLootProofRequired"
         end
     end
+    if quest.BranchId == "HumanKnight" then
+        if step.TargetId == "GloamStriker"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.StonewatchBadge ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "QuartermasterDena"
+            and current.Step == 4
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.StonewatchBadge3 ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "GloamBulwark"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.GloamBulwarkSeal ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "CaptainRowan" and current.Step == 6
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.GloamBulwarkSeal ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+    end
     if step.TargetId == "BrackenRaider" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
@@ -285,6 +314,11 @@ function Rules.advance(quest: any, current: any, event: any): any
         and current.Count == step.Required
     then
         current.Proofs.IronrootToken4 = true
+    end
+    if step.TargetId == "GloamStriker"
+        and current.Count == step.Required
+    then
+        current.Proofs.StonewatchBadge3 = true
     end
     if step.TargetId == "CryptSentinel"
         and current.Count == step.Required
