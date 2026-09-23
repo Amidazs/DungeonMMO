@@ -7,6 +7,7 @@ local event_serial = 0
 local bound_service: any = nil
 local recorder_override: ((number, any) -> any)? = nil
 local damage_target_validator: ((any) -> boolean)? = nil
+local quest_damage_observer: any? = nil
 
 local function next_event_id(
     kind: string,
@@ -71,6 +72,25 @@ function DungeonContributionBridge.bind_damage_target_validator(
     validator: ((any) -> boolean)?
 )
     damage_target_validator = validator
+end
+
+--[[
+Installs the optional server-only quest kill ledger without replacing the
+normal damage, threat or contribution subscriber.
+
+Args:
+    observer (any?): Ledger with record_damage, or nil to unbind it.
+
+Returns:
+    nil: Subsequent accepted combat hits reach the quest observer.
+]]
+function DungeonContributionBridge.bind_quest_damage_observer(
+    observer: any?
+)
+    assert(observer == nil
+        or (type(observer) == "table"
+            and type(observer.record_damage) == "function"))
+    quest_damage_observer = observer
 end
 
 function DungeonContributionBridge.set_recorder_for_test(
@@ -151,7 +171,7 @@ function DungeonContributionBridge.record_damage(
             or "Damage"
     )
 
-    return record(
+    local credited = record(
         attacker_id,
         "DamageDealt",
         applied_damage,
@@ -165,6 +185,18 @@ function DungeonContributionBridge.record_damage(
             VerifiedLethalHit = lethal_hit == true,
         }
     )
+    if credited.ok == true and quest_damage_observer then
+        local observed, reason = pcall(function()
+            quest_damage_observer:record_damage(
+                context, applied_damage, lethal_hit == true
+            )
+        end)
+        if not observed then
+            warn("[C4 Quest Combat] Damage observer failed: "
+                .. tostring(reason))
+        end
+    end
+    return credited
 end
 
 function DungeonContributionBridge.record_heal(
