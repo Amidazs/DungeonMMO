@@ -160,8 +160,8 @@ local function main()
     local cinder = Spawns.augment(
         options, {create = mock_create}
     )
-    check(cinder.ok and #cinder.registrations == 2
-        and #execution.Enemies == 7,
+    check(cinder.ok and #cinder.registrations == 1
+        and #execution.Enemies == 6,
         "Only eligible Rogue stage six spawns its own Cinder challenge")
     for _, registration in ipairs(cinder.registrations) do
         check(registration.branch_id == "HumanRogue"
