@@ -392,20 +392,6 @@ local function build_keyframe(jointMap, frameIndex)
     return key
 end
 
--- Args: sequence (KeyframeSequence), spec (table), frame (number).
--- Returns: nil - adds semantic markers at their sampled action frames.
-local function attach_markers(sequence, spec, frame)
-    for _, markerSpec in spec.markers or {} do
-        if markerSpec.frame == frame then
-            local marker = Instance.new("KeyframeMarker")
-            marker.Name = markerSpec.name
-            marker.Value = markerSpec.value
-            local key = sequence:GetKeyframes()[frame + 1]
-            marker.Parent = key
-        end
-    end
-end
-
 -- Args: name (string) - one of the six supported motion names.
 -- Returns: KeyframeSequence - new editable sequence on the test rig.
 function M.Build(name)
@@ -450,8 +436,31 @@ function M.BuildAll()
     return sequences
 end
 
+-- Args: name (string) - clip whose visible test weapon should be shown.
+-- Returns: nil - chooses only the matching test props, never gameplay weapons.
+function M.Equip(name)
+    assert(SPECS[name], "Unknown preview weapon action: " .. tostring(name))
+    local selected = {
+        Sword = {"DMMO_TestSword_Right"},
+        Daggers = {"DMMO_TestDagger_Left", "DMMO_TestDagger_Right"},
+        Bow = {
+            "DMMO_TestBowGrip", "DMMO_TestBowUpper",
+            "DMMO_TestBowLower", "DMMO_TestArrow",
+        },
+    }
+    local visible = {}
+    for _, propName in selected[name] or {} do
+        visible[propName] = true
+    end
+    for _, part in rig:GetDescendants() do
+        if part:IsA("BasePart") and part.Name:match("^DMMO_Test") then
+            part.Transparency = visible[part.Name] and 0 or 1
+        end
+    end
+end
+
 -- Args: None.
--- Returns: nil - stops only this generator's active track and reset poses.
+-- Returns: nil - stops this generator's track and clears transient transforms.
 function M.Stop()
     if activeTrack then
         activeTrack:Stop(0)
@@ -475,14 +484,15 @@ function M.Stop()
     end
 end
 
--- Args: name (string), speed (number?) - named built clip/playback speed.
--- Returns: AnimationTrack - real Studio animator preview of selected clip.
+-- Args: name (string), speed (number?) - built clip and playback speed.
+-- Returns: AnimationTrack - actual R15 Studio Animator preview track.
 function M.Play(name, speed)
     M.Stop()
     local _, animator = validate_rig()
     local sequence = rig:FindFirstChild(NAME_PREFIX .. name .. "_v1")
     assert(sequence and sequence:IsA("KeyframeSequence"),
-        "Build the requested motion before preview: " .. tostring(name))
+        "Build the motion before preview: " .. tostring(name))
+    M.Equip(name)
     local animation = Instance.new("Animation")
     animation.Name = sequence.Name .. "_Preview"
     animation.AnimationId = Provider:RegisterKeyframeSequence(sequence)
@@ -490,6 +500,19 @@ function M.Play(name, speed)
     track.Looped = SPECS[name].looped
     track.Priority = SPECS[name].priority
     activeTrack = track
+    M.markerCounts = {Impact = 0, ArrowRelease = 0}
+    track:GetMarkerReachedSignal("Impact"):Connect(function(value)
+        M.markerCounts.Impact += 1
+        rig:SetAttribute("DMMO_LastImpact", value)
+    end)
+    track:GetMarkerReachedSignal("ArrowRelease"):Connect(function(value)
+        M.markerCounts.ArrowRelease += 1
+        rig:SetAttribute("DMMO_LastArrowRelease", value)
+        local arrow = rig:FindFirstChild("DMMO_TestArrow")
+        if arrow then
+            arrow.Transparency = 1
+        end
+    end)
     track:Play(0.08, 1, speed or 1)
     if not RunService:IsRunning() then
         activeConnection = RunService.Heartbeat:Connect(function(dt)
