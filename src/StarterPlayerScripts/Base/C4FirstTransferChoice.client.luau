@@ -138,7 +138,7 @@ Returns:
 local function add_option(entry: any, state: any)
     local button = Instance.new("TextButton")
     button.Name = entry.Id .. "Choice"
-    button.Size = UDim2.new(1, -6, 0, 79)
+    button.Size = UDim2.new(1, -6, 0, 105)
     button.TextWrapped = true
     button.TextXAlignment = Enum.TextXAlignment.Left
     button.Font = Enum.Font.Gotham
@@ -148,12 +148,18 @@ local function add_option(entry: any, state: any)
     button.BackgroundColor3 = if selected
         then Color3.fromRGB(55, 74, 69)
         else Color3.fromRGB(42, 51, 63)
+    local skills_note = if entry.SkillInventoryStatus
+        == "DungeonMMOAnaloguesMapped"
+        then tostring(entry.MappedAnalogueRanks)
+            .. " DungeonMMO skill-rank analogues; exact C4 audit pending"
+        else "Original C4 class skills not yet inventoried"
     button.Text = "  " .. entry.DisplayName
         .. (if selected then "  — SELECTED" else "")
         .. "\n  " .. entry.QuestName
-        .. "\n  Required quest: "
-        .. (if entry.QuestImplemented then "Available"
-            else "Not yet implemented")
+        .. "\n  Skills: " .. skills_note
+        .. "\n  Advancement quest: "
+        .. (if entry.QuestWorldReady and entry.QuestImplemented
+            then "Available" else "Not yet playable")
     button.Active = state.CanChoose == true and not pending
     button.AutoButtonColor = button.Active
     button.Parent = options
