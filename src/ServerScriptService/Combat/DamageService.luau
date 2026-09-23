@@ -123,6 +123,8 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_light_armor_reduction(defender.UserId)
         local fighter_reduction = ProgressionRuntimeState
             .get_fighter_armor_reduction(defender.UserId)
+        local shield_reduction = ProgressionRuntimeState
+            .get_oathguard_shield_reduction(defender.UserId)
         local mystic_reduction = ProgressionRuntimeState
             .get_mystic_armor_reduction(defender.UserId)
         local guard_bonus = CombatStatusService.get(
@@ -131,8 +133,8 @@ function DamageService.apply_damage(context: DamageContext): number
         local novice_reduction = ProgressionRuntimeState
             .get_novice_physical_reduction(defender.UserId)
         damage *= 1 - math.clamp(
-            reduction + fighter_reduction + mystic_reduction
-                + guard_bonus + novice_reduction,
+            reduction + fighter_reduction + shield_reduction
+                + mystic_reduction + guard_bonus + novice_reduction,
             0, 0.50
         )
     elseif defender and context.source_kind == "EnemyMagic" then
