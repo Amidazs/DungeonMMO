@@ -37,7 +37,7 @@ def generate(rig, config):
     for limb in config["limbs"]:
         target=bpy.data.objects[limb["target"]]
         reference=bpy.data.objects[limb["orientation"]]
-        controls[limb["id"]]=(target,reference,target.location.copy(),reference.rotation_quaternion.copy())
+        controls[limb["id"]]=(target,reference,target.location.copy()-Vector((0,0,limb.get("ground_offset",0))),reference.rotation_quaternion.copy())
     rig.animation_data_clear()
     for target,reference,_,_ in controls.values():
         target.animation_data_clear();reference.animation_data_clear()
