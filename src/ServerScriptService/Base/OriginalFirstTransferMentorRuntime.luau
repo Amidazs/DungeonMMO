@@ -116,7 +116,9 @@ local function make_mentor(
     prompt.ObjectText = definition.MentorName
     prompt.ActionText = "Advance"
     prompt.HoldDuration = 0.4
-    prompt.RequiresLineOfSight = true
+    -- Temporary hub geometry can block an otherwise reachable mentor.
+    -- Server-side proximity and live-player checks still grant authority.
+    prompt.RequiresLineOfSight = false
     prompt.MaxActivationDistance = MAX_RANGE
     prompt.Parent = part
     prompt.Triggered:Connect(function(player: Player)
