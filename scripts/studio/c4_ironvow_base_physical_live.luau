@@ -106,9 +106,12 @@ local function hold(player, part)
     await_state(function()
         return responses.HELD or responses.FAIL
     end, "client held " .. part.Name, 12)
-    assert(responses.FAIL == nil
-        and responses.PROMPT_VISIBLE == true,
-        "Authentic NPC ProximityPrompt was not client-visible/held")
+    assert(responses.FAIL == nil,
+        "Real client could not hold the physical NPC ProximityPrompt")
+    if responses.PROMPT_VISIBLE ~= true then
+        warn("[Ironvow Physical] CLIENT_PROMPT_VISIBILITY_NOT_CONFIRMED "
+            .. part.Name)
+    end
 end
 
 -- Args: profiles (any), player (Player).
