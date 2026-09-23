@@ -8,7 +8,7 @@ sys.path.insert(0,str(ENGINE))
 from quadruped_blender.refine_walk import generate
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
 SOURCE=ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend"
-OUTPUT=ROOT/"ForelegRefinement_20260923_D"
+OUTPUT=ROOT/"ForelegRefinement_20260923_E"
 CONFIG=ENGINE/"profiles/frostfang_v16_refinement.json"
 def main():
     args=sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else []
