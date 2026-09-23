@@ -11,7 +11,10 @@ SOURCE=ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend"
 OUTPUT=ROOT/"ForelegRefinement_20260923_E"
 CONFIG=ENGINE/"profiles/frostfang_v16_refinement.json"
 def main():
+    global OUTPUT,CONFIG
     args=sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else []
+    if "--output" in args:OUTPUT=Path(args[args.index("--output")+1]).resolve()
+    if "--settings" in args:CONFIG=Path(args[args.index("--settings")+1]).resolve()
     OUTPUT.mkdir(parents=True,exist_ok=True)
     dest=OUTPUT/"Frostfang_ForelegRefinement_REVIEW.blend"
     if "render" not in args:
