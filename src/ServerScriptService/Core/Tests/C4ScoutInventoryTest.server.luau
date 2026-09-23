@@ -14,7 +14,7 @@ local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
     Human = {Raw = 99, Functional = 81, Missing = 18,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 108, Missing = 21,
+    Elf = {Raw = 129, Functional = 112, Missing = 17,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +93,32 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "CurePoison" then
+    if category == "CureWounds" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        check(effect.KIND == "MageHeal"
+            and effect.SELF_ONLY == true
+            and effect.TOTAL_HEAL > 0
+            and effect.MANA_COST > 0,
+            "Elf Cure Wounds requires real paid self-only healing")
+    elseif category == "AttackBuff" or category == "SpeedBuff" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        local kind = if category == "AttackBuff"
+            then "PhysicalPower" else "Movement"
+        check(effect.KIND == "Buff" and effect.BUFF_KIND == kind
+            and effect.BUFF_MAGNITUDE > 0
+            and effect.BUFF_SECONDS > 0
+            and effect.COOLDOWN_SECONDS > 0
+            and effect.STAMINA_COST > 0,
+            "Elven Scout buff must cost stamina and execute a timed status")
+    elseif category == "MovementSlow" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        check(effect.KIND == "RangerProjectile"
+            and effect.ELF_SLOW_FRACTION > 0
+            and effect.ELF_SLOW_SECONDS > 0
+            and effect.BASE_DAMAGE > 0
+            and effect.MAX_TARGETS == 1,
+            "Elven Scout snare must slow only after real bow impact")
+    elseif category == "CurePoison" then
         local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
         check(effect.KIND == "MageHeal"
             and effect.TOTAL_HEAL == 0
