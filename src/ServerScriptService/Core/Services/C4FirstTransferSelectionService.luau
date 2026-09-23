@@ -7,6 +7,7 @@ local Paths = require(Shared.C4ClassPathRules)
 local Branches = require(Shared.C4FirstTransferBranches)
 local SkillCoverage = require(Shared.C4OriginalClassSkillCoverage)
 local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
+local FirstTransfers = require(Shared.OriginalFirstTransferDefinitions)
 
 local Selection = {}
 Selection.__index = Selection
@@ -91,7 +92,16 @@ function Selection:build_snapshot(user_id: number): any
     if not character then
         return result(false, "ProfileNotLoaded")
     end
+    local awarded = FirstTransfers.awarded(character)
     local available = Paths.options(character)
+    if awarded then
+        available = {
+            ok = true,
+            branches = Branches.get(
+                character.Identity.RaceId, character.Identity.BaseClassId
+            ) or {},
+        }
+    end
     if not available.ok then
         return result(false, available.reason, {Options = {}})
     end
@@ -126,8 +136,9 @@ function Selection:build_snapshot(user_id: number): any
     return result(true, nil, {
         Options = options,
         SelectedClassId = choice_id,
+        OriginalTransferClassId = if awarded then awarded.Id else nil,
         CanChoose = (tonumber(character.Level) or 0) >= 18
-            and choice_id == nil and not legacy,
+            and choice_id == nil and not legacy and not awarded,
         LegacyAdvancementNeedsMigration = legacy,
         QuestImplemented = false,
         MinimumLevel = 18,
