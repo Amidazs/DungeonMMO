@@ -68,7 +68,9 @@ client.Source = [==[
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local input = require(
-    script.Parent.Combat:WaitForChild("CombatInputActions")
+    script.Parent:WaitForChild("Combat"):WaitForChild(
+        "CombatInputActions"
+    )
 )
 local channel = RS:WaitForChild("C4SourceLiveChannel_TEMP")
 channel.OnClientEvent:Connect(function(command)
