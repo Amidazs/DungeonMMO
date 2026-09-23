@@ -15,7 +15,7 @@ ROOT = (
     "DungeonMMO_CanineRig_QA" / "Frostfang_20260923" /
     "GroundedWalkTrial_20260923" / "WalkV8_ForelegTail"
 )
-SOURCE = ROOT / "Frostfang_WalkV8_ForelegTail_UNAPPROVED.blend"
+SOURCE = ROOT / "Frostfang_WalkV8_UNAPPROVED.blend"
 GROUP_NAMES = {
     "FrontLeft": "DEF_front_toe.L",
     "FrontRight": "DEF_front_toe.R",
