@@ -275,6 +275,18 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "ScoutEquipmentExpertise",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLungCapacity",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFallResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "C4RecipeReading",
                 Mode = "LearnOrRank",
             }),
@@ -422,6 +434,22 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ScoutLockpicking",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEquipmentExpertise",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLungCapacity",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFallResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutSprint",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
