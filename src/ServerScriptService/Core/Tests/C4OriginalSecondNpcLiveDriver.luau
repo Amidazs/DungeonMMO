@@ -473,6 +473,100 @@ local function verify_captain_report(player, npc_runtime)
 end
 
 --[[
+Seeds one completed stage-six cache in disposable Base test profiles only.
+
+Args:
+    profiles (any): Actual two-client Base character authority.
+    user_id (number): Genuine Rogue player's loaded profile owner.
+
+Returns:
+    nil: Isolates a future Dungeon reward for physical captain turn-in.
+]]
+local function seed_final_cinder_cache(profiles, user_id)
+    local inventory = require(game:GetService("ServerScriptService")
+        .Core.Services.InventoryService)
+    local ok, why = profiles:mutate(user_id, function(profile)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state.Step == 6 and state.BranchId == "HumanRogue")
+        state.Step = 7
+        state.Count = 0
+        for proof_id, item_id in pairs({
+            StolenJewelry = "cinder_cipher",
+            StolenTomes = "cinder_route_map",
+            StolenRing = "cinder_ward_seal",
+            StolenNecklace = "cinder_tideglass_lens",
+        }) do
+            state.Proofs[proof_id] = true
+            assert(inventory.apply_item_to_character(
+                owner, item_id, 1
+            ).ok)
+        end
+    end)
+    assert(ok, "Disposable complete Cinder cache setup failed: "
+        .. tostring(why))
+end
+
+--[[
+Verifies the real captain refuses missing ownership and consumes the full
+individually owned supply records without granting an unfinished class.
+
+Args:
+    player (Player): Genuine authenticated Human Rogue Base avatar.
+    profiles (any): Real Base profile writer and inventory owner.
+    npc_runtime (any): Existing physical single-use source NPC binder.
+
+Returns:
+    nil: Real stage-seven prompt completes source quest, but not class award.
+]]
+local function verify_captain_final(player, profiles, npc_runtime)
+    local captain = assert(workspace.C4OriginalSourceQuestNPCs
+        :FindFirstChild("CaptainAshford"))
+    local inventory = require(game:GetService("ServerScriptService")
+        .Core.Services.InventoryService)
+    seed_final_cinder_cache(profiles, player.UserId)
+    local cache_items = {
+        "cinder_cipher", "cinder_route_map",
+        "cinder_ward_seal", "cinder_tideglass_lens",
+    }
+    assert(profiles:mutate(player.UserId, function(profile)
+        assert(inventory.apply_remove_from_character(
+            profile.Characters.Slot1, cache_items[4], 1
+        ).ok)
+    end), "Unable to prepare missing cache-material refusal")
+    approach(player, captain)
+    talk(player, captain)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 7, "Captain must deny a proof claim with missing owner item")
+    assert(profiles:mutate(player.UserId, function(profile)
+        assert(inventory.apply_item_to_character(
+            profile.Characters.Slot1, cache_items[4], 1
+        ).ok)
+    end), "Unable to restore exact owner cache material")
+    talk(player, captain)
+    local returned = wait_for(function()
+        local snapshot = npc_runtime:quest_service()
+            :build_snapshot(player.UserId)
+        return if snapshot.ok and snapshot.Ready
+            then snapshot else nil
+    end, "genuine final captain supply-record handoff", 12)
+    local owner = profiles:get_character(player.UserId)
+    assert(returned.Step == 8 and not returned.ClassAwarded
+        and owner.Identity.ClassId == "Fighter"
+        and owner.ClassAdvancement.ActiveClassId == nil,
+        "Source quest completion cannot grant missing level-20 class")
+    for _, item_id in ipairs(cache_items) do
+        assert(inventory.count_item(owner, item_id) == 0,
+            "Real captain failed to consume one bound supply item")
+    end
+    talk(player, captain)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 8, "Captain replay cannot repeat final loot handoff")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -587,6 +681,11 @@ local function main()
         elf.UserId
     ).Step == 5, "Captain report must not advance the other quest branch")
     print("[C4 Original Second NPC Live] REAL_CAPTAIN_REPORT_PASS")
+    verify_captain_final(human, profiles, npcs)
+    assert(npcs:quest_service():build_snapshot(
+        elf.UserId
+    ).Step == 5, "Rogue final report cannot complete Elf's separate quest")
+    print("[C4 Original Second NPC Live] REAL_FINAL_CAPTAIN_TURNIN_PASS")
 end
 
 task.spawn(function()
@@ -615,3 +714,4 @@ assert(ok and value == "PASS",
 print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
+print("[C4 Original Second NPC Live] VERIFIED_ROGUE_FINAL_SOURCE_PASS")
