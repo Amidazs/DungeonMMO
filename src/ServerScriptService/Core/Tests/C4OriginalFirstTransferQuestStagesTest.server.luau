@@ -16,6 +16,10 @@ local Adapter = require(SSS.Core.Adapters.InMemoryProfileAdapter)
 local Profiles = require(SSS.Core.Services.ProfileService)
 local Selection = require(SSS.Core.Services.C4FirstTransferSelectionService)
 local Service = require(SSS.Core.Services.C4OriginalFirstTransferQuestService)
+local Inventory = require(SSS.Core.Services.InventoryService)
+local EquipmentRules = require(Shared.EquipmentRules)
+local ItemDefinitions = require(Shared.ItemDefinitions)
+local TransferRules = require(Shared.ItemTransferRules)
 local assertions = 0
 
 --[[
@@ -195,6 +199,27 @@ local function exercise(
         check(service:record_world_event(user_id, event).ok,
             "Authoritative source stage " .. tostring(index)
                 .. " must advance with verified original evidence")
+        if branch_id == "HumanRogue" and index == 2 then
+            local owner = assert(profiles:get_character(user_id, 1))
+            for _, item_id in ipairs({
+                "neti_trial_dagger", "neti_trial_bow",
+            }) do
+                local item = assert(ItemDefinitions.get(item_id))
+                check(Inventory.count_item(owner, item_id) == 1,
+                    "Only the authenticated Rogue owns Neti's real weapon")
+                check(EquipmentRules.validate(
+                    owner, item, "Weapon"
+                ).ok, "Original Human Fighter may equip its quest-only gear")
+                check(not TransferRules.can_trade(item_id)
+                    and not TransferRules.can_bank(item_id),
+                    "Original trial gear may not enter market or shared bank")
+            end
+        elseif branch_id == "ElvenScout" and index == 2 then
+            local elf = assert(profiles:get_character(user_id, 1))
+            check(Inventory.count_item(elf, "neti_trial_dagger") == 0
+                and Inventory.count_item(elf, "neti_trial_bow") == 0,
+                "Elven Moretti meeting cannot grant Human Rogue weapons")
+        end
         check(service:record_world_event(
             user_id, event
         ).reason == "OriginalQuestEventAlreadyApplied",
