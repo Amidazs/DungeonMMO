@@ -149,6 +149,12 @@ function Rules.can_progress(
     then
         return false, "OriginalQuestLootProofRequired"
     end
+    if step.TargetId == "CaptainAshford" and current.Step == 5
+        and (type(current.Proofs) ~= "table"
+            or current.Proofs.SpartoiBone10 ~= true)
+    then
+        return false, "OriginalQuestLootProofRequired"
+    end
     if step.TargetId == "WardenThorne" and current.Step == 4 then
         for letter_id in pairs(LETTER_IDS) do
             if type(current.Proofs) ~= "table"
