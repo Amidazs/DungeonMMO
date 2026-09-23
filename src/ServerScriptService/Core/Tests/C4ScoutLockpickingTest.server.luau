@@ -10,6 +10,8 @@ local Schema = require(Shared.ProfileSchema)
 local Inventory = require(SSS.Core.Services.InventoryService)
 local Adapter = require(SSS.Core.Adapters.InMemoryProfileAdapter)
 local Profiles = require(SSS.Core.Services.ProfileService)
+local Skills = require(SSS.Core.Services.SkillProgressionService)
+local Loadout = require(SSS.Core.Services.LoadoutService)
 local Locks = require(SSS.Dungeon.ScoutLockpickingService)
 
 local LEVELS = {20, 24, 28, 32, 36}
@@ -107,7 +109,8 @@ Returns:
     nil: Rejects bad world registration and duplicate reward grants.
 ]]
 local function check_real_reward_ledger()
-    local profiles = Profiles.new(Adapter.new())
+    local adapter = Adapter.new()
+    local profiles = Profiles.new(adapter)
     local owner = 99731
     check(profiles:load(owner), "Isolated reward profile loads")
     local part = Instance.new("Part")
@@ -141,20 +144,75 @@ local function check_real_reward_ledger()
     local character = assert(profiles:get_character(owner, 1))
     check(Inventory.count_item(character, "captain_emblem") == 1,
         "One opened cache grants exactly one legitimate reward")
+    check(profiles:save(owner, "ScoutLockFixture"),
+        "Reward profile must save the per-session loot ledger")
+    profiles:release(owner, "ScoutLockFixture")
+    local reopened_profiles = Profiles.new(adapter)
+    check(reopened_profiles:load(owner),
+        "Previously granted Scout lock profile must reload")
     local reloaded = Locks.new(
-        {}, profiles, "C4LockFixtureRun", "TestDungeon"
+        {}, reopened_profiles, "C4LockFixtureRun", "TestDungeon"
     )
     check(not reloaded:_award(owner, lock).ok,
-        "Recreated server service cannot replay persisted loot")
+        "Reconnected character cannot replay persisted lock rewards")
     local new_session = Locks.new(
-        {}, profiles, "DifferentValidRun", "TestDungeon"
+        {}, reopened_profiles, "DifferentValidRun", "TestDungeon"
     )
     check(new_session:_award(owner, lock).ok,
         "A truly different dungeon run may award its own cache once")
-    character = assert(profiles:get_character(owner, 1))
+    character = assert(reopened_profiles:get_character(owner, 1))
     check(Inventory.count_item(character, "captain_emblem") == 2,
         "The new dungeon's reward does not erase old inventory")
     part:Destroy()
+end
+
+--[[
+Purchases all five real class-trainer ranks in their original order.
+
+Args:
+    None.
+
+Returns:
+    nil: Rejects early purchases and proves actual sequential rank gains.
+]]
+local function verify_sequential_purchase()
+    local profiles = Profiles.new(Adapter.new())
+    local inventory = Inventory.new(profiles)
+    local service = Skills.new(
+        profiles, inventory, Loadout.new(profiles)
+    )
+    local owner = 99732
+    check(profiles:load(owner), "Sequential test profile loads")
+    check(profiles:mutate(owner, function(profile: any)
+        local character = profile.Characters.Slot1
+        character.Identity = {
+            Version = 1, RaceId = "Elf",
+            BaseClassId = "Ranger", ClassId = "Ranger",
+            CreationStage = "Complete",
+        }
+        character.Progression.SkillPointEntitlement = 300
+        character.Level = 20
+    end), "Actual trainer character is valid")
+    for rank, level in ipairs(LEVELS) do
+        if rank > 1 then
+            check(profiles:mutate(owner, function(profile: any)
+                profile.Characters.Slot1.Level = level - 1
+            end), "Earlier source training level saves")
+            check(not service:purchase_rank(
+                owner, "ScoutLockpicking"
+            ).ok, "Next source rank cannot be bought early")
+            check(profiles:mutate(owner, function(profile: any)
+                profile.Characters.Slot1.Level = level
+            end), "Authentic source rank level saves")
+        end
+        local purchased = if rank == 1
+            then service:learn_trainer_skill(owner, "ScoutLockpicking")
+            else service:purchase_rank(owner, "ScoutLockpicking")
+        check(purchased.ok and purchased.rank == rank,
+            "Actual class trainer must purchase the sequential source rank")
+    end
+    check(not service:purchase_rank(owner, "ScoutLockpicking").ok,
+        "An unregistered sixth source rank must be refused")
 end
 
 --[[
@@ -172,6 +230,7 @@ local function main()
     check_source(99723, "Human", "Ranger")
     check_source(99724, "Elf", "Rogue")
     check_real_reward_ledger()
+    verify_sequential_purchase()
     print(("[C4 Scout Lockpicking] PASS: %d assertions")
         :format(checks))
 end
