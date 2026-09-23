@@ -102,6 +102,9 @@ local ReturnPortalService = require(Dungeon:WaitForChild("ReturnPortalService"))
 local ScoutLockpickingService = require(
     Dungeon:WaitForChild("ScoutLockpickingService")
 )
+local ScoutEnvironmentService = require(
+    Dungeon:WaitForChild("ScoutEnvironmentService")
+)
 local DungeonReplayService = require(Dungeon:WaitForChild("DungeonReplayService"))
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
@@ -136,6 +139,7 @@ DungeonContributionBridge.bind_service(
     runtime.ContributionService
 )
 local profiles = runtime.ProfileService
+local scout_environment = ScoutEnvironmentService.new(profiles)
 local leases = runtime.LeaseService
 local sessions = runtime.SessionService
 local secret_discovery = DungeonSecretDiscoveryService.new(sessions)
@@ -1692,6 +1696,7 @@ local function bind_character(player: Player, character: Model)
     set_character_encounter(player, current_encounter_id)
     local humanoid = character:WaitForChild("Humanoid") :: Humanoid
     local root = character:WaitForChild("HumanoidRootPart") :: BasePart
+    scout_environment:bind(player, character)
     local handled = false
     humanoid.Died:Connect(function()
         if handled or not death_service then
@@ -2254,6 +2259,7 @@ Players.PlayerAdded:Connect(function(player) task.spawn(admit_player, player) en
 for _, player in ipairs(Players:GetPlayers()) do task.spawn(admit_player, player) end
 
 Players.PlayerRemoving:Connect(function(player)
+    scout_environment:remove(player)
     local user_id = player.UserId
     if not loaded_users[user_id] then return end
     loaded_users[user_id] = nil
