@@ -47,6 +47,15 @@ client.Name = "C4ScoutLockGenuineClient_TEMP"
 client.Source = [==[
 local RS = game:GetService("ReplicatedStorage")
 local channel = RS:WaitForChild("C4ScoutLockLiveChannel_TEMP")
+local Players = game:GetService("Players")
+local PromptService = game:GetService("ProximityPromptService")
+local visible = {}
+PromptService.PromptShown:Connect(function(prompt)
+    visible[prompt] = true
+end)
+PromptService.PromptHidden:Connect(function(prompt)
+    visible[prompt] = nil
+end)
 channel.OnClientEvent:Connect(function(action, lock_part)
     if action ~= "HoldPrompt" then
         return
@@ -56,6 +65,20 @@ channel.OnClientEvent:Connect(function(action, lock_part)
         channel:FireServer("PromptError", "Missing actual lock prompt")
         return
     end
+    local deadline = os.clock() + 5
+    repeat
+        if visible[prompt] then break end
+        task.wait(0.1)
+    until os.clock() >= deadline
+    local avatar = Players.LocalPlayer.Character
+    local root = avatar and avatar:FindFirstChild("HumanoidRootPart")
+    channel:FireServer("PromptVisibility", {
+        Visible = visible[prompt] == true,
+        Enabled = prompt.Enabled,
+        Distance = if root
+            then (root.Position - lock_part.Position).Magnitude
+            else math.huge,
+    })
     local ok, reason = pcall(function()
         prompt:InputHoldBegin()
         task.wait(0.65)
@@ -83,11 +106,14 @@ local channel = RS:WaitForChild("C4ScoutLockLiveChannel_TEMP")
 local connected = {}
 local errors = {}
 local held = {}
+local visibility = {}
 channel.OnServerEvent:Connect(function(player, action, data)
     if action == "Ready" then
         connected[player.UserId] = true
     elseif action == "PromptError" then
         errors[player.UserId] = tostring(data)
+    elseif action == "PromptVisibility" then
+        visibility[player.UserId] = data
     elseif action == "Held" then
         held[player.UserId] = (held[player.UserId] or 0) + 1
     end
@@ -173,8 +199,11 @@ local function press_prompt(player, lock)
         until os.clock() >= deadline
     end
     listener:Disconnect()
-    error("[C4 Scout Lock Live] Real prompt never triggered the "
-        .. "server after three genuine client attempts")
+    local diagnostic = visibility[player.UserId] or {}
+    error("[C4 Scout Lock Live] Real prompt never triggered: "
+        .. "visible=" .. tostring(diagnostic.Visible)
+        .. " enabled=" .. tostring(diagnostic.Enabled)
+        .. " client_distance=" .. tostring(diagnostic.Distance))
 end
 
 --[[
