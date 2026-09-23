@@ -18,6 +18,27 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    -- No physical Knight trainer is spawned until an authentic
+    -- personally earned quest and first-transfer mentor are added.
+    OathguardTrainer = table.freeze({
+        Id = "OathguardTrainer",
+        DisplayName = "Oathguard Shield Training",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Oathguard"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "OathguardShieldImpact", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "OathguardChallenge", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "OathguardHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     IronvowTrainer = table.freeze({
         Id = "IronvowTrainer",
         DisplayName = "Marshal Torren's Ironvow Training",
