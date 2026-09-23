@@ -231,7 +231,11 @@ Args:
 Returns:
     nil: Confirms award, skills, class and proof survive migration.
 ]]
-local function verify_reload(store: any, owner: any)
+local function verify_reload(
+    store: any, owner: any, previous_writer: any
+)
+    check(previous_writer:forget_for_handoff(owner.UserId),
+        "Saved original class safely releases its exclusive writer cache")
     local loaded = Profiles.new(store)
     check(loaded:load(owner.UserId) ~= nil,
         "Fresh profile service loads awarded transfer")
@@ -292,7 +296,7 @@ local function main()
         seed_source(profiles, owner)
         verify_denials(profiles, transfer, owner, pending)
         verify_award(profiles, transfer, owner, pending)
-        verify_reload(store, owner)
+        verify_reload(store, owner, profiles)
     end
     verify_forged_migration()
     print(("[Original First Transfer] PASS: %d assertions")
