@@ -148,9 +148,10 @@ function ScoutEnvironmentService:_breathe(
         return
     end
     local head = record.Character:FindFirstChild("Head")
-    local swimming = record.Humanoid:GetState()
-        == Enum.HumanoidStateType.Swimming
-    local submerged = swimming and head and head:IsA("BasePart")
+    -- Only physical server Terrain at the actual head can remove air.
+    -- Humanoid swimming state is not a prerequisite: underwater avatars
+    -- may briefly still report Freefall when entering flooded caverns.
+    local submerged = head and head:IsA("BasePart")
         and head_in_terrain_water(head)
     record.Oxygen = Rules.next_oxygen(
         record.Oxygen, delta_seconds, submerged == true, character
