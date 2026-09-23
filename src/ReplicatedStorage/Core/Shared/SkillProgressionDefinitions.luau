@@ -262,6 +262,30 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"ArcaneWand"}),
     }),
 
+    -- C4 party heal is a genuine multi-target party-only spell,
+    -- not a second single-target Healing Prayer or free raid-wide heal.
+    MysticPartyHeal = table.freeze({
+        Id = "MysticPartyHeal",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        RankLevels = table.freeze({
+            [1] = 14, [2] = 14, [3] = 14,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 65, [3] = 140,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "MysticHealingPrayer", Rank = 3,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"ArcaneWand"}),
+    }),
+
     -- C4 Human Mystic first-tier draining spell, two level-14 ranks.
     -- On a confirmed NPC projectile hit, part of dealt damage heals
     -- the living authentic caster; no heal occurs on misses or blocks.
