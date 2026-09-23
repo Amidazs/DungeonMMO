@@ -114,7 +114,7 @@ local function evidence(
     local step = quest.Steps[step_index]
     local proofs = {}
     if step.TargetId == "CryptSentinel" then
-        proofs.crypt sentinelBone = true
+        proofs.SpartoiBone = true
     elseif step.TargetId == "BrackenRaider" then
         proofs["PriasLetter" .. tostring(count)] = true
     elseif step.TargetId == "BrackenWarden" then
@@ -277,7 +277,7 @@ local function exercise(
             local quest_state =
                 current.ClassAdvancement.OriginalFirstTransferQuest
             check(Inventory.count_item(current, "spartoi_bone") == 10
-                and quest_state.Proofs.crypt sentinelBone10 == true,
+                and quest_state.Proofs.SpartoiBone10 == true,
                 "Ten distinct receipts must mint ten owned bones and proof")
             check(not TransferRules.can_trade("spartoi_bone")
                 and not TransferRules.can_bank("spartoi_bone"),
@@ -324,7 +324,7 @@ local function exercise(
             and Inventory.count_item(reloaded, "neti_trial_bow") == 1
             and Inventory.count_item(reloaded, "spartoi_bone") == 10
             and reloaded.ClassAdvancement.OriginalFirstTransferQuest
-                .Proofs.crypt sentinelBone10 == true,
+                .Proofs.SpartoiBone10 == true,
             "Original Rogue equipment, ten earned bones and aggregate proof "
                 .. "must survive save/reload without duplicate rewards")
     else
