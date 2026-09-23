@@ -17,6 +17,7 @@ local Profiles = require(SSS.Core.Services.ProfileService)
 local Selection = require(SSS.Core.Services.C4FirstTransferSelectionService)
 local Service = require(SSS.Core.Services.C4OriginalFirstTransferQuestService)
 local Inventory = require(SSS.Core.Services.InventoryService)
+local Equipment = require(SSS.Core.Services.EquipmentService)
 local EquipmentRules = require(Shared.EquipmentRules)
 local ItemDefinitions = require(Shared.ItemDefinitions)
 local TransferRules = require(Shared.ItemTransferRules)
@@ -129,6 +130,11 @@ local function evidence(
             .. "-" .. tostring(step_index) .. "-" .. tostring(count),
         ActorUserId = user_id, ServerVerified = true,
         Kind = step.Kind, TargetId = step.TargetId,
+        MonsterReceiptId = if step.Kind == "QuestMonsterDefeat"
+            then "session-1:encounter-" .. tostring(step_index)
+                .. ":owner-" .. tostring(user_id)
+                .. ":enemy-" .. tostring(count) .. ":life-1"
+            else nil,
         TrialWeaponsGranted = step.TargetId == "Neti",
         TrialWeaponVerified = step.RequiresTrialWeapon == true,
         VerifiedProofIds = proofs,
@@ -176,6 +182,35 @@ local function exercise(
 
     for index, step in ipairs(quest.Steps) do
         local event = evidence(user_id, quest, index, 1)
+        if index == 3 and branch_id == "HumanRogue" then
+            check(service:record_world_event(
+                user_id, event
+            ).reason == "OriginalTrialWeaponNotEquipped",
+                "Owning Neti's trial items is not enough to earn bone proof")
+            check(Equipment.new(profiles, "Base"):equip(
+                user_id, "neti_trial_dagger", "Weapon"
+            ).ok, "Actual authoritative equipment service equips trial dagger")
+        end
+        if index == 3 and branch_id == "ElvenScout" then
+            event.VerifiedProofIds = {
+                PriasLetter1 = true, PriasLetter2 = true,
+                PriasLetter3 = true, PriasLetter4 = true,
+            }
+            check(service:record_world_event(
+                user_id, event
+            ).reason == "OriginalQuestDistinctLetterRequired",
+                "One monster death cannot fabricate all four distinct letters")
+            event.VerifiedProofIds = {PriasLetter1 = true}
+        end
+        if step.Kind == "QuestMonsterDefeat" then
+            local receipt = event.MonsterReceiptId
+            event.MonsterReceiptId = nil
+            check(service:record_world_event(
+                user_id, event
+            ).reason == "OriginalQuestMonsterReceiptRequired",
+                "A monster victory without stable life receipt cannot count")
+            event.MonsterReceiptId = receipt
+        end
         if step.RequiresTrialWeapon then
             event.TrialWeaponVerified = false
             check(service:record_world_event(
@@ -224,10 +259,37 @@ local function exercise(
             user_id, event
         ).reason == "OriginalQuestEventAlreadyApplied",
             "Replayed server event cannot award source progress twice")
+        if step.Kind == "QuestMonsterDefeat" and step.Required > 1 then
+            local duplicate = evidence(user_id, quest, index, 2)
+            duplicate.MonsterReceiptId = event.MonsterReceiptId
+            check(service:record_world_event(
+                user_id, duplicate
+            ).reason == "OriginalQuestMonsterAlreadyCredited",
+                "A new event ID cannot credit the same monster life twice")
+        end
         for count = 2, step.Required do
             local next_event = evidence(user_id, quest, index, count)
             check(service:record_world_event(user_id, next_event).ok,
                 "Each distinct source monster/drop needs its own proof")
+        end
+        local current = assert(profiles:get_character(user_id, 1))
+        if index == 3 and branch_id == "HumanRogue" then
+            local quest_state =
+                current.ClassAdvancement.OriginalFirstTransferQuest
+            check(Inventory.count_item(current, "spartoi_bone") == 10
+                and quest_state.Proofs.SpartoiBone10 == true,
+                "Ten distinct receipts must mint ten owned bones and proof")
+            check(not TransferRules.can_trade("spartoi_bone")
+                and not TransferRules.can_bank("spartoi_bone"),
+                "Bound source bones cannot be traded or banked")
+        elseif index == 3 and branch_id == "ElvenScout" then
+            for fragment = 1, 4 do
+                local item_id = "prias_letter_" .. tostring(fragment)
+                check(Inventory.count_item(current, item_id) == 1
+                    and not TransferRules.can_trade(item_id)
+                    and not TransferRules.can_bank(item_id),
+                    "Each letter is a separately owned, bound source drop")
+            end
         end
     end
     local state = assert(profiles:get_character(user_id, 1))
@@ -259,9 +321,19 @@ local function exercise(
     if branch_id == "HumanRogue" then
         local reloaded = assert(profiles:get_character(user_id, 1))
         check(Inventory.count_item(reloaded, "neti_trial_dagger") == 1
-            and Inventory.count_item(reloaded, "neti_trial_bow") == 1,
-            "Neti's personal trial weapons must survive migration/reload "
-                .. "without duplicate rewards")
+            and Inventory.count_item(reloaded, "neti_trial_bow") == 1
+            and Inventory.count_item(reloaded, "spartoi_bone") == 10
+            and reloaded.ClassAdvancement.OriginalFirstTransferQuest
+                .Proofs.SpartoiBone10 == true,
+            "Original Rogue equipment, ten earned bones and aggregate proof "
+                .. "must survive save/reload without duplicate rewards")
+    else
+        local reloaded = assert(profiles:get_character(user_id, 1))
+        for fragment = 1, 4 do
+            check(Inventory.count_item(
+                reloaded, "prias_letter_" .. tostring(fragment)
+            ) == 1, "Each separately owned Elven letter survives reload")
+        end
     end
 end
 
