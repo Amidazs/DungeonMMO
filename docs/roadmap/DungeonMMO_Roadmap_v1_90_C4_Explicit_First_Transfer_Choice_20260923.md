@@ -209,3 +209,38 @@ Original level-20 quests and class awards complete: **0/18**.
 Original class selection at level 18: **implemented and tested**.
 Existing old custom class histories: **preserved**.
 Full original C4 class progression and catalogue: **INCOMPLETE**.
+
+
+## Final v1.90 QA closeout after interrupted response
+
+The interrupted focused Studio attempt exposed an
+incorrect historical advanced-class test fixture.
+It was corrected and the affected tests were
+re-executed from a clean local fast-forward pull.
+**Final targeted Studio result: 8/8 PASS, zero
+failures**, covering the five initial source/
+choice/legacy fixtures plus existing quest
+advancement migration, race-change migration
+and actual race-change service regression tests.
+A further genuine **one-client Base playtest PASS**
+confirmed the real Human Fighter choice window
+shows Warrior, Knight and Rogue, refuses a
+cross-race Elven Scout request, persists a
+client-requested Human Rogue choice and updates
+the actual visible choice/status UI without
+awarding any class. This adds to, rather than
+replaces, the previously passing **two-client
+independent Rogue/Human Knight** playtest.
+See the appended final acceptance evidence in
+[the v1.90 testing record](
+../testing/c4-explicit-first-transfer-choice-v1-90-20260923.md).
+
+The roadmap's original 5/5 report remains an
+earlier acceptance snapshot; **8/8 is the final
+expanded closeout result**. All original
+branch-specific level-18 quests, their
+level-20 atomic class awards and the
+versioned opt-in legacy-class conversion
+remain pending. Do not mark any of the
+18 original first-transfer paths complete
+merely because a player can save a choice.
