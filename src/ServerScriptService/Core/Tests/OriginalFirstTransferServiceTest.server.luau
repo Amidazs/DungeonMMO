@@ -16,6 +16,10 @@ local SkillRules = require(Shared.SkillUnlockRules)
 local Skills = require(Shared.SkillProgressionDefinitions)
 local Catalogues = require(Shared.TrainerCatalogues)
 local Classes = require(Shared.ClassProgressionDefinitions)
+local Inventory = require(Services.InventoryService)
+local Loadout = require(Services.LoadoutService)
+local SkillService = require(Services.SkillProgressionService)
+local Combat = require(RS.Combat.Shared.SkillDefinitions)
 
 local assertions = 0
 local OWNERS = table.freeze({
@@ -222,6 +226,91 @@ local function verify_award(
 end
 
 --[[
+Verifies two additional actual combat effects with purchase and mastery.
+
+Args:
+    profiles (any): Real test ProfileService and owner state.
+    owner (any): The already awarded Human/Elf first-transfer owner.
+
+Returns:
+    nil: Checks both level/rank restrictions and persistent bought rank.
+]]
+local function verify_next_skill(profiles: any, owner: any)
+    local definition = assert(FirstTransfers.for_branch(owner.BranchId))
+    local skill_id = if owner.RaceId == "Human"
+        then "AshenbladeOpening" else "GreenwardRenewal"
+    local prerequisite = if owner.RaceId == "Human"
+        then "FighterDaggerStrike" else "ElvenFighterRenewal"
+    local required_rank = if owner.RaceId == "Human" then 3 else 1
+    local required_proficiency = if owner.RaceId == "Human"
+        then 80 else 30
+    local skill_definition = assert(Skills.get(skill_id))
+    local service = SkillService.new(
+        profiles, Inventory.new(profiles), Loadout.new(profiles)
+    )
+    local owner_before = profiles:get_character(owner.UserId)
+    check(not SkillRules.can_show(owner_before, skill_definition),
+        "Level-24 advanced ability is invisible at level twenty")
+    check(not service:learn_trainer_skill(owner.UserId, skill_id).ok,
+        "Level-20 character cannot buy a level-24 class skill")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        profile.Characters.Slot1.Level = 24
+        profile.Characters.Slot1.Progression.SkillPointEntitlement = 1000
+    end), "Test character reaches next real level bracket")
+    check(not SkillRules.can_show(
+        profiles:get_character(owner.UserId), skill_definition
+    ), "Missing earned starter mastery must hide advanced ability")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[prerequisite] = {
+            Known = true, PurchasedRank = required_rank,
+            Proficiency = required_proficiency - 1,
+        }
+    end), "Test fixture seeds purchased starter ranks only")
+    check(not service:learn_trainer_skill(owner.UserId, skill_id).ok,
+        "Advanced training must refuse missing use proficiency")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            prerequisite
+        ].Proficiency = required_proficiency
+    end), "Test fixture reaches earned mastery threshold")
+    local owner_ready = profiles:get_character(owner.UserId)
+    check(SkillRules.can_show(owner_ready, skill_definition)
+        and Catalogues.can_offer(
+            definition.TrainerId, owner_ready, skill_id
+        ).ok, "Only the correct earned career may train its new skill")
+    local learned = service:learn_trainer_skill(owner.UserId, skill_id)
+    check(learned.ok and learned.rank == 1,
+        "Real skill service must purchase level-24 first rank")
+    local first = assert(Combat.get_for_rank(skill_id, 1))
+    local second = assert(Combat.get_for_rank(skill_id, 2))
+    local attribute = if owner.RaceId == "Human"
+        then "BASE_DAMAGE" else "TOTAL_HEAL"
+    check(first[attribute] < second[attribute],
+        "Bought second rank must have a stronger real combat effect")
+    check(not service:purchase_rank(owner.UserId, skill_id).ok,
+        "Level-24 advanced rank cannot skip level-28 requirement")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        local character = profile.Characters.Slot1
+        character.Level = 28
+        character.Progression.Skills[skill_id].Proficiency = 79
+    end), "Test fixture prepares level-28 skill-use threshold")
+    check(not service:purchase_rank(owner.UserId, skill_id).ok,
+        "Rank-two purchase must reject incomplete use proficiency")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            skill_id
+        ].Proficiency = 80
+    end), "Test fixture completes rank-two mastery")
+    check(service:purchase_rank(owner.UserId, skill_id).rank == 2,
+        "Real trainer service must purchase stronger second rank")
+    check(profiles:get_character(owner.UserId).Progression.Skills[
+        skill_id
+    ].PurchasedRank == 2, "Actual advanced ability rank is saved")
+    check(profiles:save(owner.UserId, "OriginalClassSkillTest"),
+        "New purchased advanced skill and class identity both save")
+end
+
+--[[
 Verifies a completely new profile cache loads exactly the earned class.
 
 Args:
@@ -252,6 +341,10 @@ local function verify_reload(
     check(SkillRules.can_train(
         character, assert(Skills.get(definition.SkillId)), 1
     ), "Reloaded earned character retains advanced trainer entitlement")
+    local next_id = if owner.RaceId == "Human"
+        then "AshenbladeOpening" else "GreenwardRenewal"
+    check(character.Progression.Skills[next_id].PurchasedRank == 2,
+        "Fresh profile retains two purchased advanced combat ranks")
 end
 
 --[[
@@ -296,6 +389,7 @@ local function main()
         seed_source(profiles, owner)
         verify_denials(profiles, transfer, owner, pending)
         verify_award(profiles, transfer, owner, pending)
+        verify_next_skill(profiles, owner)
         verify_reload(store, owner, profiles)
     end
     verify_forged_migration()
