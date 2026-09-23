@@ -55,6 +55,11 @@ local player = Players.LocalPlayer
 local channel = RS:WaitForChild("C4OriginalSecondNpcTestChannel_TEMP")
 local requests = RS.Core.Remotes:WaitForChild("ClassAdvancementRequest")
 local snapshots = RS.Core.Remotes:WaitForChild("ClassAdvancementSnapshot")
+local trainer_snapshots = RS.Core.Remotes:WaitForChild("TrainerSnapshot")
+local skill_learn = RS.Core.Remotes:WaitForChild("SkillLearnRequest")
+local progression_results = RS.Core.Remotes:WaitForChild(
+    "ProgressionActionResult"
+)
 local shown = {}
 PromptService.PromptShown:Connect(function(prompt)
     shown[prompt] = true
@@ -75,10 +80,53 @@ snapshots.OnClientEvent:Connect(function(snapshot)
         })
     end
 end)
+trainer_snapshots.OnClientEvent:Connect(function(payload)
+    if payload then
+        channel:FireServer("TrainerSnapshotObserved", {
+            ok = payload.ok,
+            TrainerId = payload.TrainerId,
+            reason = payload.reason,
+            Skills = payload.Skills,
+        })
+    end
+end)
+progression_results.OnClientEvent:Connect(function(payload)
+    if payload and payload.action == "SkillLearn" then
+        channel:FireServer("SkillPurchaseObserved", payload)
+    end
+end)
 channel.OnClientEvent:Connect(function(action, part)
-    if action ~= "Talk" and action ~= "Transfer" then return end
+    if action == "LearnAdvanced" then
+        skill_learn:FireServer(part.TrainerId, part.SkillId)
+        return
+    end
+    if action == "InspectTrainerUi" then
+        local deadline = os.clock() + 6
+        local seen_row = false
+        repeat
+            local gui = player.PlayerGui:FindFirstChild("ProgressionTrainerUi")
+            local panel = gui and gui:FindFirstChildOfClass("Frame")
+            if panel and panel.Visible then
+                for _, node in ipairs(panel:GetDescendants()) do
+                    if node:IsA("TextLabel")
+                        and string.find(node.Text, part, 1, true)
+                    then
+                        seen_row = true
+                        break
+                    end
+                end
+            end
+            if not seen_row then task.wait(0.1) end
+        until seen_row or os.clock() >= deadline
+        channel:FireServer("TrainerUiObserved", seen_row)
+        return
+    end
+    if action ~= "Talk" and action ~= "Transfer"
+        and action ~= "Train" then return end
     local prompt_name = if action == "Transfer"
-        then "FirstTransferMentorPrompt" else "C4SourceQuestPrompt"
+        then "FirstTransferMentorPrompt"
+        elseif action == "Train"
+        then "ProgressionTrainerPrompt" else "C4SourceQuestPrompt"
     local prompt = part:WaitForChild(prompt_name, 12)
     if not prompt then
         channel:FireServer("Error", "Actual original quest NPC prompt absent")
@@ -124,6 +172,9 @@ local ready = {}
 local held = {}
 local seen = {}
 local actual_ui = {}
+local trainer_snapshots = {}
+local trainer_ui = {}
+local skill_purchases = {}
 local failures = {}
 channel.OnServerEvent:Connect(function(player, action, data)
     if action == "Ready" then
@@ -134,6 +185,12 @@ channel.OnServerEvent:Connect(function(player, action, data)
         seen[player.UserId] = data
     elseif action == "QuestUi" then
         actual_ui[player.UserId] = data
+    elseif action == "TrainerSnapshotObserved" then
+        trainer_snapshots[player.UserId] = data
+    elseif action == "TrainerUiObserved" then
+        trainer_ui[player.UserId] = data
+    elseif action == "SkillPurchaseObserved" then
+        skill_purchases[player.UserId] = data
     elseif action == "Error" then
         failures[player.UserId] = tostring(data)
     end
@@ -174,8 +231,12 @@ Returns:
 local function talk(player, part)
     local is_transfer =
         part:FindFirstChild("FirstTransferMentorPrompt") ~= nil
+    local is_training =
+        part:FindFirstChild("ProgressionTrainerPrompt") ~= nil
     local prompt_name = if is_transfer
-        then "FirstTransferMentorPrompt" else "C4SourceQuestPrompt"
+        then "FirstTransferMentorPrompt"
+        elseif is_training
+        then "ProgressionTrainerPrompt" else "C4SourceQuestPrompt"
     local prompt = assert(part:FindFirstChild(prompt_name))
     local triggered = false
     local listener = prompt.Triggered:Connect(function(actor)
@@ -185,7 +246,10 @@ local function talk(player, part)
         local old = held[player.UserId] or 0
         task.wait(1.2)
         channel:FireClient(
-            player, if is_transfer then "Transfer" else "Talk", part
+            player,
+            if is_transfer then "Transfer"
+                elseif is_training then "Train" else "Talk",
+            part
         )
         wait_for(function()
             assert(not failures[player.UserId],
@@ -775,6 +839,102 @@ local function verify_physical_transfer(
 end
 
 --[[
+Sends a real client skill-learn remote and reads the actual server result.
+
+Args:
+    player (Player): Live test client issuing the request.
+    definition (any): Immutable matching original advanced class.
+    skill_id (string): Skill to request through the production remote.
+
+Returns:
+    any: Observed actual ProgressionActionResult for this request.
+]]
+local function request_client_training(player, definition, skill_id)
+    skill_purchases[player.UserId] = nil
+    channel:FireClient(player, "LearnAdvanced", {
+        TrainerId = definition.TrainerId,
+        SkillId = skill_id,
+    })
+    return wait_for(function()
+        return skill_purchases[player.UserId]
+    end, "real client SkillLearnRequest response", 12)
+end
+
+--[[
+Uses the physical advanced trainer and tests the live UI and remote gates.
+
+Args:
+    player (Player): Authentic client already transferred at level twenty.
+    profiles (any): Real Base ProfileService authority.
+    definition (any): The single earned first-transfer career.
+    mentors (any): Registered physical transfer mentor/trainer actors.
+
+Returns:
+    nil: Confirms out-of-range remote refusal and in-range UI-backed buy.
+]]
+local function verify_client_training(
+    player, profiles, definition, mentors
+)
+    local skill_id = if definition.RaceId == "Human"
+        then "AshenbladeOpening" else "GreenwardRenewal"
+    local prerequisite = if definition.RaceId == "Human"
+        then "FighterDaggerStrike" else "ElvenFighterRenewal"
+    local required_rank = if definition.RaceId == "Human" then 3 else 1
+    local required_proficiency = if definition.RaceId == "Human"
+        then 80 else 30
+    assert(profiles:mutate(player.UserId, function(profile)
+        local owner = profile.Characters.Slot1
+        owner.Level = 24
+        owner.Progression.SkillPointEntitlement = 1000
+        owner.Progression.Skills[prerequisite] = {
+            Known = true, PurchasedRank = required_rank,
+            Proficiency = required_proficiency,
+        }
+    end), "Disposable level-24 original class mastery preparation failed")
+    local station = assert(workspace.OriginalFirstTransferMentors
+        :FindFirstChild(definition.TrainerId))
+    assert(not profiles:get_character(player.UserId)
+        .Progression.Skills[skill_id],
+        "Real client must buy its advanced skill, not receive it for free")
+    local root = assert(player.Character.HumanoidRootPart)
+    root.CFrame = station.CFrame * CFrame.new(0, 0, 50)
+    task.wait(0.4)
+    assert(not mentors:nearby_trainer(player, definition.TrainerId),
+        "Trainer must reject clients beyond the actual ten-stud range")
+    local denied = request_client_training(player, definition, skill_id)
+    assert(not denied.ok
+        and denied.reason == "InvalidTrainerSkillRequest",
+        "Actual remote must reject out-of-range class skill purchases")
+    assert(not profiles:get_character(player.UserId)
+        .Progression.Skills[skill_id],
+        "Rejected remote cannot learn skill or spend any skill points")
+    approach(player, station)
+    trainer_snapshots[player.UserId] = nil
+    trainer_ui[player.UserId] = nil
+    talk(player, station)
+    local catalogue = wait_for(function()
+        return trainer_snapshots[player.UserId]
+    end, "actual trainer ProximityPrompt to catalogue remote", 12)
+    assert(catalogue.ok and catalogue.TrainerId
+        == definition.TrainerId,
+        "Physical station must open only the correct server trainer")
+    channel:FireClient(player, "InspectTrainerUi", skill_id)
+    assert(wait_for(function()
+        return trainer_ui[player.UserId] == true
+    end, "real client trainer UI showing its advanced skill", 12),
+        "Physical trainer UI omitted the available advanced skill")
+    local learned = request_client_training(player, definition, skill_id)
+    assert(learned.ok, "Real client could not buy its advanced skill: "
+        .. tostring(learned.reason))
+    local state = profiles:get_character(player.UserId)
+        .Progression.Skills[skill_id]
+    assert(state and state.Known and state.PurchasedRank == 1,
+        "Actual client-purchased skill must persist in owner profile")
+    print("[C4 Original Second NPC Live] REAL_CLIENT_TRAINER_"
+        .. definition.Id .. "_PASS")
+end
+
+--[[
 Seeds only completed original quests for a fast dedicated physical mentor
 regression; the separate earlier two-client source NPC tests are unchanged.
 
@@ -841,6 +1001,7 @@ local function run_transfer_only(human, elf, profiles)
         human, profiles, mentors, rogue,
         assert(actors:FindFirstChild(scout.MentorId))
     )
+    verify_client_training(human, profiles, rogue, mentors)
     assert(profiles:get_character(elf.UserId)
         .Identity.ClassId == "Fighter",
         "Human-only first transfer must not advance an unrelated Elf")
@@ -848,6 +1009,7 @@ local function run_transfer_only(human, elf, profiles)
         elf, profiles, mentors, scout,
         assert(actors:FindFirstChild(rogue.MentorId))
     )
+    verify_client_training(elf, profiles, scout, mentors)
     assert(profiles:get_character(human.UserId)
         .Identity.ClassId == "Ashenblade",
         "Elven transfer must not change Human's previously earned class")
