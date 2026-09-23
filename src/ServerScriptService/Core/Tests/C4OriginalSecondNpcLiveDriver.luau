@@ -269,7 +269,9 @@ local function talk(player, part)
     listener:Disconnect()
     local state = seen[player.UserId] or {}
     error("[C4 Original NPC Live] Real NPC prompt did not trigger: "
-        .. "shown=" .. tostring(state.Visible)
+        .. tostring(part.Name) .. "/" .. tostring(prompt.Name)
+        .. " enabled=" .. tostring(prompt.Enabled)
+        .. " shown=" .. tostring(state.Visible)
         .. " distance=" .. tostring(state.Distance))
 end
 
