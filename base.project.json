@@ -25,6 +25,9 @@
         "$className": "Folder",
         "CombatStatusService": {
           "$path": "src/ServerScriptService/Combat/CombatStatusService.luau"
+        },
+        "ScoutCriticalToggleService": {
+          "$path": "src/ServerScriptService/Combat/ScoutCriticalToggleService.luau"
         }
       },
       "Base": {
