@@ -3,7 +3,7 @@
   "root_stride": 0.07,
   "settle": 1.2,
   "timeline": {
-    "idle": 2,
+    "idle": 2.25,
     "cycles": 4,
     "cadence": 0.75,
     "ramp": 0.6
@@ -14,7 +14,8 @@
     "stance": 0.6,
     "joint_limit": 165,
     "paw_flex": 5,
-    "shoulder_sweep": 3
+    "shoulder_sweep": 3,
+    "paw_ground_offset": 0.0036364
   },
   "hind": {
     "stride": 0.07,
@@ -22,7 +23,8 @@
     "stance": 0.67,
     "joint_limit": 175,
     "paw_flex": 7,
-    "shoulder_sweep": 0
+    "shoulder_sweep": 0,
+    "paw_ground_offset": 0
   },
   "limbs": [
     {
@@ -40,7 +42,8 @@
         0
       ],
       "target": "DMMO_WalkV3_FrontLeft",
-      "orientation": "DMMO_WalkV5_PawWorld_FrontLeft"
+      "orientation": "DMMO_WalkV5_PawWorld_FrontLeft",
+      "ground_offset": 0.0036364
     },
     {
       "id": "FrontRight",
@@ -57,7 +60,8 @@
         0
       ],
       "target": "DMMO_WalkV3_FrontRight",
-      "orientation": "DMMO_WalkV5_PawWorld_FrontRight"
+      "orientation": "DMMO_WalkV5_PawWorld_FrontRight",
+      "ground_offset": 0.0039869
     },
     {
       "id": "HindLeft",
@@ -74,7 +78,8 @@
         0
       ],
       "target": "DMMO_WalkV3_HindLeft",
-      "orientation": "DMMO_WalkV5_PawWorld_HindLeft"
+      "orientation": "DMMO_WalkV5_PawWorld_HindLeft",
+      "ground_offset": 0.0036395
     },
     {
       "id": "HindRight",
@@ -91,7 +96,8 @@
         0
       ],
       "target": "DMMO_WalkV3_HindRight",
-      "orientation": "DMMO_WalkV5_PawWorld_HindRight"
+      "orientation": "DMMO_WalkV5_PawWorld_HindRight",
+      "ground_offset": 0
     }
   ],
   "body_drop": 0.014,
