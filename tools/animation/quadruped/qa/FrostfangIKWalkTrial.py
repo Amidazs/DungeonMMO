@@ -134,7 +134,8 @@ def prepare_scene():
         bone.rotation_quaternion = (1.0, 0.0, 0.0, 0.0)
         bone.location = (0.0, 0.0, 0.0)
         bone.scale = (1.0, 1.0, 1.0)
-        bone.constraints.clear()
+        for constraint in list(bone.constraints):
+            bone.constraints.remove(constraint)
     records = [
         (name, phase, *create_target(rig, name, shin, foot))
         for name, shin, foot, phase in LEGS
