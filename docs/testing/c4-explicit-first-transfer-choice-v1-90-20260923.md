@@ -134,3 +134,51 @@ used only for clean fast-forward pull, disposable Luau/Rojo
 builds and unpublished real Studio tests. No `main` merge,
 Roblox publishing, production DataStore mutation, forced
 repository reset or paid operation took place.
+
+
+## Post-interruption closeout: migration and actual-client checks
+
+The first focused run after the interrupted message
+returned **4/5**, because its old advanced-class fixture
+failed the migration-protection assertion. This was
+not treated as a pass. The fixture's historical
+`CompletedByRace`/active-class state was corrected
+through GitHub and re-executed with no local source
+editing. The final clean-pull unpublished Base run
+of `c4_explicit_first_transfer_focus.luau` returned
+**8/8 PASS, 0 failed**. This included the five v1.90
+fixtures above plus the directly affected
+`ProfileMigrationQuestAdvancementV8Test`,
+`ProfileMigrationRaceChangeV12Test`
+(13 assertions) and `RaceChangeServiceTest`
+(23 assertions). The original class-selection
+fixture passed **46 assertions**, and the
+old-class claim fixture passed **40**.
+The seven newly parsed key sources plus affected
+client/service/test files parsed successfully,
+and both Base and Dungeon disposable Rojo
+builds passed. Previously accepted unrelated
+dungeon combat/wipe/revive suites were not repeated.
+
+A further genuine unpublished **one-client Base
+GUI playtest** using
+`scripts/studio/c4_first_transfer_client_live.luau`
+returned
+`[C4 First Transfer Live] VERIFIED_REAL_CLIENT_CHOICE_PASS`.
+A real client observed the actual original Human
+Fighter three-option GUI, the server refused a
+forged Elven Scout choice from that Human account,
+and a genuine client remote selected Human Rogue.
+The selected branch appeared in the actual client
+UI; the real profile retained Fighter and its
+original gold without granting an advanced class.
+This test verified GUI rendering and actual
+client-to-server remotes, not an automated
+mouse-click on the visual card. Its coverage
+supplements rather than replaces the earlier
+genuine **two-client** selection playtest.
+
+**Final v1.90 closeout: focused 8/8 PASS,
+one-client GUI/remote PASS, earlier two-client
+independent branch-selection PASS, original
+branch quest/class award still not implemented.**
