@@ -439,6 +439,40 @@ local function verify_return(
 end
 
 --[[
+Verifies that the original captain accepts only the ordered fifth stage.
+
+Args:
+    player (Player): Real authenticated Human Rogue source owner.
+    npc_runtime (any): Existing physical source NPC binder and quest service.
+
+Returns:
+    nil: Confirms real report to Captain Ashford unlocks stage six only.
+]]
+local function verify_captain_report(player, npc_runtime)
+    local captain = assert(workspace.C4OriginalSourceQuestNPCs
+        :FindFirstChild("CaptainAshford"))
+    local before = npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    )
+    assert(before.Step == 5 and before.WorldReady,
+        "Stage-five captain must be a real physical quest return target")
+    approach(player, captain)
+    talk(player, captain)
+    local accepted = wait_for(function()
+        local snapshot = npc_runtime:quest_service()
+            :build_snapshot(player.UserId)
+        return if snapshot.ok and snapshot.Step == 6
+            then snapshot else nil
+    end, "genuine fifth-stage captain report", 12)
+    assert(not accepted.ClassAwarded and not accepted.Ready,
+        "Captain report must not skip the later challenge or class transfer")
+    talk(player, captain)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 6, "Replaying captain must not skip the next monster challenge")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -548,6 +582,11 @@ local function main()
     ).Step == 3, "Human return modified the independent Elf's quest")
     verify_return(elf, profiles, npcs, "ElvenScout", "WardenThorne")
     print("[C4 Original Second NPC Live] REAL_STAGE_FOUR_TURNIN_PASS")
+    verify_captain_report(human, npcs)
+    assert(npcs:quest_service():build_snapshot(
+        elf.UserId
+    ).Step == 5, "Captain report must not advance the other quest branch")
+    print("[C4 Original Second NPC Live] REAL_CAPTAIN_REPORT_PASS")
 end
 
 task.spawn(function()
@@ -575,3 +614,4 @@ assert(ok and value == "PASS",
     "Original C4 second NPC two-client playtest failed: " .. tostring(value))
 print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
+print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
