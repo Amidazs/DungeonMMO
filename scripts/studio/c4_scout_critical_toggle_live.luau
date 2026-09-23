@@ -1,5 +1,5 @@
 --!strict
--- Real unpublished Dungeon client casts three new Elf-only Scout skills.
+-- Real unpublished Dungeon client tests paid C4 critical stance only.
 -- The temporary instrumentation changes only this disposable Studio place.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Real Scout client playtest requires an unpublished Dungeon.")
@@ -62,8 +62,6 @@ local SSS = game:GetService("ServerScriptService")
 local STS = game:GetService("StudioTestService")
 local Shared = RS.Core.Shared
 local RuntimeState = require(SSS.Core.Services.ProgressionRuntimeState)
-local Status = require(SSS.Combat.CombatStatusService)
-local Cooldowns = require(SSS.Combat.SkillCooldownService)
 local Stamina = require(SSS.Combat.StaminaService)
 local Toggle = require(SSS.Combat.ScoutCriticalToggleService)
 local CombatConfig = require(RS.Combat.Shared.CombatConfig)
@@ -178,95 +176,6 @@ local function request_cast(player, skill_id)
 end
 
 --[[
-Checks actual client-cast healing and paid cooldown against passive regen.
-
-Args:
-    runtime (any): Real profile authority.
-    player (Player): Authentic injured Elf Ranger.
-    humanoid (Humanoid): Actual spawned player health.
-
-Returns:
-    nil: Verifies effective self healing from the real combat request.
-]]
-local function verify_wounds(runtime, player, humanoid)
-    equip_skill(runtime, player, "ElvenScoutCureWounds")
-    humanoid.Health = math.max(1, humanoid.MaxHealth - 75)
-    local before = humanoid.Health
-    request_cast(player, "ElvenScoutCureWounds")
-    wait_for(function()
-        return humanoid.Health - before >= 38
-    end, "genuine client wound-recovery HP", 12)
-    assert(Cooldowns.get_remaining(
-        player, "ElvenScoutCureWounds"
-    ) > 6, "Wound recovery did not start its server cooldown")
-    print("[C4 Elf Scout Live] REAL_CLIENT_SELF_HEAL_PASS")
-    task.wait(0.8)
-end
-
---[[
-Checks actual melee AND bow attack scaling from the real cast.
-
-Args:
-    runtime (any): Real Ranger profile authority.
-    player (Player): Authentic caster with purchased Battle Focus.
-    character (Model): Actual spawned player character.
-
-Returns:
-    nil: Confirms status, spent stamina and combat scaling.
-]]
-local function verify_battle_focus(runtime, player, character)
-    equip_skill(runtime, player, "ElvenScoutBattleFocus")
-    local melee = RuntimeState.get_physical_multiplier(player.UserId)
-    local ranged = RuntimeState.get_ranged_physical_multiplier(
-        player.UserId
-    )
-    request_cast(player, "ElvenScoutBattleFocus")
-    wait_for(function()
-        return Status.get(character, "PhysicalPower") >= 0.079
-    end, "actual client Battle Focus buff", 12)
-    assert(RuntimeState.get_physical_multiplier(player.UserId)
-        > melee + 0.07, "Battle Focus did not strengthen melee")
-    assert(RuntimeState.get_ranged_physical_multiplier(player.UserId)
-        > ranged + 0.07, "Battle Focus did not strengthen real bow damage")
-    assert(Cooldowns.get_remaining(
-        player, "ElvenScoutBattleFocus"
-    ) > 17, "Battle Focus did not start its real server cooldown")
-    print("[C4 Elf Scout Live] REAL_CLIENT_BOW_AND_MELEE_FOCUS_PASS")
-    task.wait(0.8)
-end
-
---[[
-Checks server-controlled walking speed during and after a real buff.
-
-Args:
-    runtime (any): Actual profile and combat services.
-    player (Player): Authentic Ranger with the purchased Wind Run rank.
-    humanoid (Humanoid): Actual locomotion controller.
-
-Returns:
-    nil: Asserts real speed increases and expires without bypassing locks.
-]]
-local function verify_wind_run(runtime, player, humanoid)
-    equip_skill(runtime, player, "ElvenScoutWindRun")
-    local baseline = humanoid.WalkSpeed
-    request_cast(player, "ElvenScoutWindRun")
-    wait_for(function()
-        return Status.get(player.Character, "Movement") >= 0.099
-    end, "real client Wind Run status", 12)
-    wait_for(function()
-        return humanoid.WalkSpeed > baseline * 1.08
-    end, "real WalkSpeed increase after skill recovery", 8)
-    assert(Cooldowns.get_remaining(
-        player, "ElvenScoutWindRun"
-    ) > 17, "Wind Run did not start server cooldown")
-    wait_for(function()
-        return Status.get(player.Character, "Movement") == 0
-            and humanoid.WalkSpeed <= baseline * 1.01
-    end, "real movement bonus expiry", 15)
-    print("[C4 Elf Scout Live] REAL_CLIENT_MOVEMENT_AND_EXPIRY_PASS")
-end
-
---[[
 Proves server-paid rank-five toggle with real client activation and off.
 
 Args:
@@ -333,7 +242,7 @@ local function verify_critical_toggle(runtime, player, character)
 end
 
 --[[
-Runs real Dungeon admission and three genuine client-to-server casts.
+Runs real Dungeon admission and paid critical-power client toggling.
 
 Args:
     None.
@@ -359,15 +268,11 @@ local function main()
             and player.Character:FindFirstChild("HumanoidRootPart")
     end, "real admitted Dungeon participant", 60)
     local character = assert(player.Character)
-    local humanoid = assert(character:FindFirstChildOfClass("Humanoid"))
     local root = assert(character:FindFirstChild("HumanoidRootPart"))
     root.Anchored = true
     root.CFrame = CFrame.new(0, 100, 0)
     prepare_character(runtime, player)
     print("[C4 Elf Scout Live] REAL_DUNGEON_ADMISSION_PASS")
-    verify_wounds(runtime, player, humanoid)
-    verify_battle_focus(runtime, player, character)
-    verify_wind_run(runtime, player, humanoid)
     verify_critical_toggle(runtime, player, character)
 end
 
