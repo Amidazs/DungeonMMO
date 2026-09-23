@@ -1,3 +1,36 @@
+**Current C4 backend: v1.86 — secure Rogue/Scout Lockpicking.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_86_C4_Scout_Lockpicking_20260923.md)
+and [actual focused Studio / physical one-client test record](
+../testing/c4-scout-lockpicking-v1-86-2026-09-23.md).
+Human Rogue and Elven Scout each gained all five
+separately purchased source Lockpicking ranks at
+levels **20/24/28/32/36**. The real Dungeon runtime
+registers server-owned physical room cache prompts
+with authenticated party/session/class/rank, living
+player, proximity and checkpoint gates, and
+once-per-member-per-run personal inventory loot.
+The targeted unpublished Studio suite passed **3/3**,
+including **104** skill/loot and **1,176** strict source
+inventory assertions. The actual one-client Dungeon
+playtest passed genuine ProximityPrompt rank-one
+and rank-two interactions, persistent replay
+prevention, server checkpoint and spectator/distance
+security. The test advanced room two via a
+disposable server checkpoint operation; it did
+not visually clear all five rooms. Six-inventory
+original C4 coverage is now **389/396**: starting
+classes **168/168**, Human Rogue **95/99**, Elven
+Scout **126/129**. Seven remaining ranks are
+Equipment Expertise, Lung Capacity and Fall
+Resistance for each class plus Human Rogue
+Sprint. **Seven additional original first-transfer
+class inventories remain wholly unmapped and
+0/9 first-transfer paths are completely finished.**
+The one-Gathering-plus-one-Crafting rule, separate
+humanoid/quadruped animation roadmap and no-publish
+policy remain unchanged.
+
 **Current C4 backend: v1.85 — tested Rogue/Scout ranked crafting.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_85_C4_Scout_Ranked_Crafting_20260923.md)
