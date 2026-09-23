@@ -12,9 +12,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 81, Missing = 18,
+    Human = {Raw = 99, Functional = 86, Missing = 13,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 112, Missing = 17,
+    Elf = {Raw = 129, Functional = 117, Missing = 12,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +93,20 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "CureWounds" then
+    if category == "CriticalPowerToggle" then
+        local rank = table.find(LEVELS, level)
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, rank))
+        local before = if rank > 1
+            then assert(Combat.get_for_rank(mapping.SkillId, rank - 1))
+                .CRITICAL_DAMAGE_BONUS else 0
+        check(definition.Kind == "Support"
+            and definition.MaxRank == 5
+            and effect.KIND == "ScoutToggle"
+            and effect.STAMINA_COST > 0
+            and effect.UPKEEP_STAMINA_PER_SECOND > 0
+            and effect.CRITICAL_DAMAGE_BONUS > before,
+            "Critical Power must be a real bought rank-scaling upkeep toggle")
+    elseif category == "CureWounds" then
         local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
         check(effect.KIND == "MageHeal"
             and effect.SELF_ONLY == true
