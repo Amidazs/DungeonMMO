@@ -1,0 +1,148 @@
+--!strict
+-- Ordered original C4 quest evidence contract; no client-sent event is proof.
+local SourceQuests = require(
+    script.Parent.C4OriginalFirstTransferQuestStages
+)
+local Rules = {}
+
+--[[
+Starts a source quest only for a saved original branch choice and starter.
+
+Args:
+    character (any): Authoritative character and saved class choice.
+    branch_id (string): Exact requested source first-transfer ID.
+
+Returns:
+    (boolean, string?, any?): Eligibility, refusal or source quest.
+]]
+function Rules.can_start(
+    character: any, branch_id: string
+): (boolean, string?, any?)
+    local definition = SourceQuests.get(branch_id)
+    if not definition then return false, "OriginalQuestNotMapped", nil end
+    if type(character) ~= "table"
+        or type(character.Identity) ~= "table"
+        or type(character.ClassAdvancement) ~= "table"
+    then
+        return false, "OriginalCharacterUnavailable", nil
+    end
+    local identity = character.Identity
+    local expected_race = if branch_id == "HumanRogue"
+        then "Human" else "Elf"
+    if identity.RaceId ~= expected_race
+        or identity.BaseClassId ~= "Fighter"
+        or identity.ClassId ~= "Fighter"
+        or identity.CreationStage ~= "Complete"
+        or character.ClassAdvancement.OriginalFirstTransferChoiceId
+            ~= branch_id
+    then
+        return false, "OriginalClassChoiceRequired", nil
+    end
+    if (tonumber(character.Level) or 0) < definition.StartLevel then
+        return false, "OriginalQuestLevelTooLow", nil
+    end
+    if character.ClassAdvancement.ActiveClassId ~= nil then
+        return false, "LegacyClassMigrationRequired", nil
+    end
+    return true, nil, definition
+end
+
+--[[
+Checks a single server-authored action against the one current quest step.
+
+Args:
+    quest (any): Exact original source quest blueprint.
+    current (any): Current server-owned saved step and event state.
+    event (any): Trusted world actor's stable event/monster/quest proof.
+
+Returns:
+    (boolean, string?): Whether this specific ordered action counts.
+]]
+function Rules.can_progress(
+    quest: any, current: any, event: any
+): (boolean, string?)
+    if type(quest) ~= "table"
+        or type(current) ~= "table"
+        or type(event) ~= "table"
+        or current.QuestId ~= quest.Id
+        or current.BranchId ~= quest.BranchId
+        or current.Ready == true
+        or type(current.Step) ~= "number"
+        or current.Step % 1 ~= 0
+    then
+        return false, "OriginalQuestStateInvalid"
+    end
+    local step = quest.Steps[current.Step]
+    if not step then return false, "OriginalQuestStageUnavailable" end
+    if event.Kind ~= step.Kind or event.TargetId ~= step.TargetId then
+        return false, "OriginalQuestWrongStage"
+    end
+    if type(event.EventId) ~= "string" or event.EventId == ""
+        or #event.EventId > 120
+    then
+        return false, "OriginalQuestEventIdInvalid"
+    end
+    if type(current.AppliedEvents) ~= "table"
+        or current.AppliedEvents[event.EventId] == true
+    then
+        return false, "OriginalQuestEventAlreadyApplied"
+    end
+    if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
+        return false, "OriginalTrialWeaponRequired"
+    end
+    -- Loot proof is checked against the *actual* server-authored item
+    -- set, not merely kill count. Missing item bindings cannot finish it.
+    if step.TargetId == "CatsEyeBandit" then
+        local required = {
+            "StolenJewelry", "StolenTomes",
+            "StolenRing", "StolenNecklace",
+        }
+        if type(event.VerifiedProofIds) ~= "table" then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        for _, id in ipairs(required) do
+            if event.VerifiedProofIds[id] ~= true then
+                return false, "OriginalQuestLootProofRequired"
+            end
+        end
+    end
+    if step.TargetId == "OlMahumSentry"
+        and (type(event.VerifiedProofIds) ~= "table"
+            or event.VerifiedProofIds.RustedKey ~= true)
+    then
+        return false, "OriginalQuestLootProofRequired"
+    end
+    return true, nil
+end
+
+--[[
+Advances one verified world action without awarding an advanced class.
+
+Args:
+    quest (any): Exact class-specific source quest.
+    current (any): Exclusive profile-mutation quest state.
+    event (any): Previously verified server-owned world action.
+
+Returns:
+    any: Updated quest progress with ordered action deduplication.
+]]
+function Rules.advance(quest: any, current: any, event: any): any
+    local ok, reason = Rules.can_progress(quest, current, event)
+    if not ok then return {ok = false, reason = reason} end
+    local step = quest.Steps[current.Step]
+    current.AppliedEvents[event.EventId] = true
+    current.Count = math.min(step.Required, (current.Count or 0) + 1)
+    if current.Count >= step.Required then
+        current.Step += 1
+        current.Count = 0
+    end
+    if current.Step > #quest.Steps then
+        current.Ready = true
+    end
+    return {
+        ok = true, reason = nil, Step = current.Step,
+        Count = current.Count, Ready = current.Ready,
+    }
+end
+
+return table.freeze(Rules)
