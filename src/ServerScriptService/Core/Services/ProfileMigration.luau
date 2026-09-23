@@ -32,6 +32,9 @@ local RaceDefinitions = require(
 local C4FirstTransferBranches = require(
     shared:WaitForChild("C4FirstTransferBranches")
 )
+local C4OriginalFirstTransferQuestStages = require(
+    shared:WaitForChild("C4OriginalFirstTransferQuestStages")
+)
 
 local ClassProgressionDefinitions = require(
     shared:WaitForChild("ClassProgressionDefinitions")
@@ -726,6 +729,43 @@ local function sanitize_class_advancement(
         ) ~= nil
     then
         result.OriginalFirstTransferChoiceId = choice
+        local raw_quest = value.OriginalFirstTransferQuest
+        local quest = C4OriginalFirstTransferQuestStages.get(choice)
+        if quest and type(raw_quest) == "table"
+            and raw_quest.QuestId == quest.Id
+            and raw_quest.BranchId == choice
+            and type(raw_quest.Step) == "number"
+            and raw_quest.Step % 1 == 0
+            and raw_quest.Step >= 1
+            and raw_quest.Step <= #quest.Steps + 1
+            and type(raw_quest.Count) == "number"
+            and raw_quest.Count % 1 == 0
+            and raw_quest.Count >= 0
+            and type(raw_quest.AppliedEvents) == "table"
+        then
+            local step = quest.Steps[raw_quest.Step]
+            local progress = if step
+                then math.min(raw_quest.Count, step.Required - 1)
+                else 0
+            local applied = {}
+            local kept = 0
+            for event_id, claimed in pairs(raw_quest.AppliedEvents) do
+                if kept >= 64 then break end
+                if type(event_id) == "string"
+                    and #event_id > 0 and #event_id <= 120
+                    and claimed == true
+                then
+                    applied[event_id] = true
+                    kept += 1
+                end
+            end
+            result.OriginalFirstTransferQuest = {
+                QuestId = quest.Id, BranchId = choice,
+                Step = raw_quest.Step, Count = progress,
+                Ready = step == nil, AppliedEvents = applied,
+                Proofs = {},
+            }
+        end
     end
     return result
 end
