@@ -15,6 +15,8 @@ local Transfer = require(SSS.Core.Services.OriginalFirstTransferService)
 local SkillService = require(SSS.Core.Services.SkillProgressionService)
 local Inventory = require(SSS.Core.Services.InventoryService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
+local Equipment = require(SSS.Core.Services.EquipmentService)
+local Passives = require(Shared.PassiveSkillEffects)
 
 local USER_ID = 837921
 local CHECKS = 0
@@ -182,6 +184,114 @@ local function verify_skill_purchase(profiles: any)
 end
 
 --[[
+Buys each independently priced original level-20/24/28 armour or
+sword mastery rank through the actual server trainer authority.
+
+Args:
+    profiles (any): Awarded Ironvow owner's exclusive profile writer.
+    service (any): Genuine skill progression purchase service.
+    skill_id (string): Author-authored earned-only Warrior passive.
+
+Returns:
+    nil: Verifies all scheduled training bands and actual paid rank state.
+]]
+local function purchase_full_line(
+    profiles: any, service: any, skill_id: string
+)
+    local definition = assert(Skills.get(skill_id))
+    for rank = 1, definition.MaxRank do
+        check(profiles:mutate(USER_ID, function(profile: any)
+            profile.Characters.Slot1.Level = definition.RankLevels[rank]
+        end), "Owner must enter this skill rank's real training bracket")
+        local purchased = if rank == 1
+            then service:learn_trainer_skill(USER_ID, skill_id)
+            else service:purchase_rank(USER_ID, skill_id)
+        check(purchased.ok and purchased.rank == rank,
+            "Original Warrior trainer refused valid separate rank "
+                .. skill_id .. ":" .. tostring(rank))
+    end
+    check(profiles:get_character(USER_ID).Progression.Skills[
+        skill_id
+    ].PurchasedRank == definition.MaxRank,
+        "Every purchased original armour/sword rank must stay saved")
+end
+
+--[[
+Validates exact equipment categories and ranked defensive combat effects.
+
+Args:
+    profiles (any): Real awarded Ironvow owner and item writer.
+
+Returns:
+    nil: Tests actual owned equipment and class-only paid mitigations.
+]]
+local function verify_armour_training(profiles: any)
+    local inventory = Inventory.new(profiles)
+    local equipment = Equipment.new(profiles, "Base")
+    local service = SkillService.new(
+        profiles, inventory, Loadout.new(profiles)
+    )
+    check(profiles:mutate(USER_ID, function(profile: any)
+        local owner = profile.Characters.Slot1
+        owner.Progression.SkillPointEntitlement = 6000
+        for _, item_id in ipairs({
+            "marauder_sword", "apprentice_longbow",
+            "ironroot_light_vest", "marauder_armor",
+        }) do
+            assert(Inventory.apply_item_to_character(
+                owner, item_id, 1
+            ).ok, "Disposable owner must hold actual registered equipment")
+        end
+    end), "Test owner purchases/registers distinct legitimate gear")
+    check(equipment:equip(
+        USER_ID, "marauder_sword", "Weapon"
+    ).ok, "Real equipment service equips a permitted Fighter sword")
+    purchase_full_line(
+        profiles, service, "IronvowBladeTraining"
+    )
+    local trained = assert(profiles:get_character(USER_ID))
+    check(Passives.damage_bonus(
+        trained, "IronvowBladeTraining"
+    ) > 0, "Fourth paid sword rank changes real server melee multiplier")
+    check(equipment:equip(
+        USER_ID, "apprentice_longbow", "Weapon"
+    ).ok, "The real Fighter can switch to an owned legal longbow")
+    check(Passives.damage_bonus(
+        profiles:get_character(USER_ID), "IronvowBladeTraining"
+    ) == 0, "Sword-only mastery never buffs an equipped bow")
+
+    purchase_full_line(
+        profiles, service, "IronvowLightArmorTraining"
+    )
+    purchase_full_line(
+        profiles, service, "IronvowHeavyArmorTraining"
+    )
+    check(equipment:equip(
+        USER_ID, "ironroot_light_vest", "Body"
+    ).ok, "Earned Ironvow can equip actual class-restricted light armour")
+    local light = Passives.fighter_armor_reduction(
+        profiles:get_character(USER_ID)
+    )
+    check(light >= 0.049,
+        "All seven paid light-armour ranks mitigate actual NPC damage")
+    check(equipment:equip(
+        USER_ID, "marauder_armor", "Body"
+    ).ok, "Earned Fighter can equip registered heavy body armour")
+    local heavy = Passives.fighter_armor_reduction(
+        profiles:get_character(USER_ID)
+    )
+    check(heavy >= 0.049,
+        "All seven paid heavy-armour ranks mitigate actual NPC damage")
+    check(equipment:unequip(USER_ID, "Body").ok,
+        "Authentic armour unequip must update owned equipment")
+    check(Passives.fighter_armor_reduction(
+        profiles:get_character(USER_ID)
+    ) == 0, "No body armour means no Warrior armour mitigation")
+    check(profiles:save(USER_ID, "IronvowArmourRankTraining"),
+        "Earned class, paid armour ranks and item state all persist")
+end
+
+--[[
 Proves a fresh profile service accepts the exact earned class and rank.
 
 Args:
@@ -199,7 +309,13 @@ local function verify_reload(store: any, profiles: any)
     local character = assert(reopened:get_character(USER_ID))
     check(Careers.awarded(character) == Careers.for_class("Ironvow")
         and character.Progression.Skills
-            .IronvowDrivingStrike.PurchasedRank == 1,
+            .IronvowDrivingStrike.PurchasedRank == 1
+        and character.Progression.Skills
+            .IronvowLightArmorTraining.PurchasedRank == 7
+        and character.Progression.Skills
+            .IronvowHeavyArmorTraining.PurchasedRank == 7
+        and character.Progression.Skills
+            .IronvowBladeTraining.PurchasedRank == 4,
         "Original earned class, receipt and bought first skill persist")
 end
 
@@ -221,6 +337,7 @@ local function main()
         profiles, Transfer.new(profiles, "Base", world), pending
     )
     verify_skill_purchase(profiles)
+    verify_armour_training(profiles)
     verify_reload(store, profiles)
     print(("[Ironvow Award] PASS: %d assertions"):format(CHECKS))
 end
