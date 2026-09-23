@@ -21,6 +21,9 @@ function BaseClassAdvancementRuntime:send_snapshot(player: Player)
     snapshot.OriginalQuest = if self._original_quest
         then self._original_quest:build_snapshot(player.UserId)
         else {ok = false, reason = "OriginalQuestWorldNotReady"}
+    snapshot.OriginalTransfer = if self._original_transfer
+        then self._original_transfer:build_snapshot(player.UserId)
+        else {ok = false, reason = "OriginalTransferMentorNotReady"}
     self._snapshot:FireClient(player, snapshot)
 end
 
@@ -93,6 +96,22 @@ function BaseClassAdvancementRuntime:set_original_quest_service(
 )
     assert(quest_service)
     self._original_quest = quest_service
+end
+
+--[[
+Attaches authenticated physical first-transfer mentor snapshot authority.
+
+Args:
+    mentors (any): Actual registered Base original-transfer mentor runtime.
+
+Returns:
+    nil: Adds verified award and level-20 mentor status to future snapshots.
+]]
+function BaseClassAdvancementRuntime:set_original_transfer_service(
+    mentors: any
+)
+    assert(mentors and type(mentors.build_snapshot) == "function")
+    self._original_transfer = mentors
 end
 
 -- Connects advancement requests to the existing profile-backed service.
