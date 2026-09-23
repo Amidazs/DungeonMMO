@@ -1,3 +1,41 @@
+**Current C4 backend: v1.91 — original class QUESTS and SKILLS are both active workstreams.**
+[Newest C4 quest and skill roadmap](
+DungeonMMO_Roadmap_v1_91_C4_Quest_And_Skills_20260923.md)
+and [actual focused Studio test evidence](
+../testing/c4-original-quest-skill-scope-v1-91-20260923.md).
+The [previous v1.90 client-tested level-18 class choice](
+DungeonMMO_Roadmap_v1_90_C4_Explicit_First_Transfer_Choice_20260923.md)
+remains accepted; it has not been repeated. In v1.91
+the source-specific Human Rogue and Elven Scout quests
+were researched and converted into separate **ordered
+server-authoritative original C4 stage and loot-proof
+rules**, with protected character progress and
+save/reload. A missing real NPC/monster/quest-item
+world binding causes the live service to **fail closed**;
+both paths are source-authored and testable through
+a simulated server-only world fixture but **not yet
+playable**. Skill coverage now audits all 18 original
+first transfers separately from the old six-list
+**396/396 DungeonMMO analogue rank** figure.
+The first **28 original C4 level-20 rank entries**
+have been individually inventoried for Human Warrior
+(12) and Human Knight (16), with none falsely
+marked functional. Original Rogue/Elven Scout
+analogues still require exact source parity
+verification and post-transfer trainer gates.
+Targeted unpublished Studio quest/skill and
+profile regressions **5/5 PASS**, including
+**117** new quest/skill assertions; Base and
+Dungeon disposable builds and Luau parse PASS.
+Original C4 first transfers fully playable:
+**0/18**, original first-transfer class
+catalogue incomplete. Keep Fighter/Mystic
+fresh starting classes, explicit quests
+and original branch skill gates together.
+Preserve the independent humanoid/quadruped
+animation roadmap, one Gathering plus
+one Crafting profession and no-publish rule.
+
 **Current C4 class backend: v1.90 — real first-transfer choice, quests still pending.**
 [Newest C4 class roadmap](
 DungeonMMO_Roadmap_v1_90_C4_Explicit_First_Transfer_Choice_20260923.md)
