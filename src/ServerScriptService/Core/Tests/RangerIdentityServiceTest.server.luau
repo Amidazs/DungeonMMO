@@ -1,162 +1,115 @@
 --!strict
+-- Fresh C4 characters must start as Fighter or Mystic only.
+-- Ranger/Rogue remain loadable legacy/internal combat families until migrated.
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Core = ServerScriptService:WaitForChild("Core")
 local ProfileService = require(
-    Core:WaitForChild("Services")
-        :WaitForChild("ProfileService")
+    Core:WaitForChild("Services"):WaitForChild("ProfileService")
 )
 local IdentityService = require(
-    Core:WaitForChild("Services")
-        :WaitForChild("IdentityService")
+    Core:WaitForChild("Services"):WaitForChild("IdentityService")
 )
 local InMemoryProfileAdapter = require(
-    Core:WaitForChild("Adapters")
-        :WaitForChild("InMemoryProfileAdapter")
+    Core:WaitForChild("Adapters"):WaitForChild("InMemoryProfileAdapter")
 )
 
-local assertions = 0
+local checks = 0
 
 --[[
-Records one assertion with a Ranger-specific failure prefix.
+Records one exact starter-class or legacy-compatibility assertion.
 
 Args:
-    value (boolean): Condition that must be true.
-    message (string): Failure detail.
+    condition (boolean): Required fresh/legacy identity behavior.
+    description (string): Precise class-selection regression message.
 
 Returns:
-    None.
+    nil: Increments the verified assertion count or raises.
 ]]
-local function check(value: boolean, message: string)
-    assertions += 1
-
-    if not value then
-        error("[Ranger Identity Tests] " .. message, 2)
-    end
+local function check(condition: boolean, description: string)
+    checks += 1
+    assert(condition, "[C4 Starter Identity] " .. description)
 end
 
 --[[
-Counts one item ID in a character inventory.
+Verifies a new character cannot start directly as Ranger or Rogue.
 
 Args:
-    character (any): Persistent character table.
-    item_id (string): Item ID to count.
+    race_id (string): Currently playable Human or Elf race.
+    user_id (number): Isolated in-memory profile identity.
 
 Returns:
-    number: Total owned quantity for the requested item.
+    nil: Leaves the fresh character at ClassSelection after both refusals.
 ]]
-local function count_item(character: any, item_id: string): number
-    local count = 0
+local function reject_advanced_starters(
+    race_id: string, user_id: number
+)
+    local profiles = ProfileService.new(InMemoryProfileAdapter.new())
+    check(profiles:load(user_id), "Fresh profile must load")
+    local identity = IdentityService.new(profiles)
+    check(identity:select_race(user_id, race_id).ok,
+        race_id .. " race selection must succeed")
 
-    for _, entry in ipairs(character.Inventory or {}) do
-        if entry.ItemId == item_id then
-            count += tonumber(entry.Quantity) or 0
-        end
+    for _, class_id in ipairs({"Ranger", "Rogue"}) do
+        local result = identity:select_base_class(user_id, class_id)
+        check(not result.ok
+            and result.reason == "OriginalC4StartingClassRequired",
+            "Fresh " .. race_id .. " cannot begin directly as " .. class_id)
     end
 
-    return count
+    local character = assert(profiles:get_character(user_id, 1))
+    check(character.Identity.CreationStage == "ClassSelection"
+        and character.Identity.BaseClassId == nil
+        and character.Identity.ClassId == nil,
+        "Rejected advanced starter choices must not mutate identity")
 end
 
 --[[
-Runs fresh-character Ranger identity acceptance for one race.
+Verifies the actual two C4 starting families remain selectable.
 
 Args:
     race_id (string): Human or Elf.
-    user_id (number): Isolated in-memory profile user ID.
+    user_id (number): Isolated profile identity.
+    class_id (string): Fighter or Mage internal Mystic family ID.
 
 Returns:
-    None.
+    nil: Confirms only an allowed starting family completes creation.
 ]]
-local function run(race_id: string, user_id: number)
-    local profiles = ProfileService.new(
-        InMemoryProfileAdapter.new()
-    )
-    local loaded, load_error = profiles:load(user_id)
-
-    check(
-        loaded ~= nil and load_error == nil,
-        "profile must load"
-    )
-
+local function accept_original_starter(
+    race_id: string, user_id: number, class_id: string
+)
+    local profiles = ProfileService.new(InMemoryProfileAdapter.new())
+    check(profiles:load(user_id), "Starter profile must load")
     local identity = IdentityService.new(profiles)
-
-    check(
-        identity:select_race(user_id, race_id).ok == true,
-        race_id .. " race selection must succeed"
-    )
-    check(
-        identity:select_base_class(user_id, "Ranger").ok == true,
-        race_id .. " Ranger selection must succeed"
-    )
-
-    local character = assert(
-        profiles:get_character(user_id, 1)
-    )
-
-    check(
-        character.Identity.RaceId == race_id
-            and character.Identity.BaseClassId == "Ranger"
-            and character.Identity.ClassId == "Ranger"
-            and character.Identity.CreationStage == "Complete",
-        "Ranger identity must complete"
-    )
-
-    local expected_skills = {
-        "PiercingShot",
-        "CripplingShot",
-        "Volley",
-    }
-
-    for slot, skill_id in ipairs(expected_skills) do
-        local state = character.Progression.Skills[skill_id]
-
-        check(
-            type(state) == "table"
-                and state.Known == true
-                and state.StarterGranted == true
-                and state.PurchasedRank == 1,
-            skill_id .. " exact starter state"
-        )
-        check(
-            character.Progression.Loadout[slot] == skill_id,
-            skill_id .. " must occupy its starter loadout slot"
-        )
-    end
-
-    check(
-        character.Equipment.Weapon == "apprentice_longbow",
-        "Ranger Longbow must be persistently equipped"
-    )
-    check(
-        character.Equipment.OffHand == nil,
-        "Ranger starter loadout must leave reserved OffHand empty"
-    )
-    check(
-        count_item(character, "apprentice_longbow") == 1,
-        "Ranger must receive exactly one Apprentice Longbow"
-    )
-
-    local duplicate = identity:select_base_class(
-        user_id,
-        "Ranger"
-    )
-    check(
-        duplicate.ok == false
-            and duplicate.reason == "ClassSelectionNotAllowed",
-        "duplicate class selection must reject"
-    )
-    check(
-        count_item(character, "apprentice_longbow") == 1,
-        "duplicate selection must not duplicate Longbow"
-    )
+    check(identity:select_race(user_id, race_id).ok,
+        "Original race selection must succeed")
+    local result = identity:select_base_class(user_id, class_id)
+    check(result.ok, "Original " .. class_id .. " starter must succeed")
+    local character = assert(profiles:get_character(user_id, 1))
+    check(character.Identity.BaseClassId == class_id
+        and character.Identity.ClassId == class_id
+        and character.Identity.CreationStage == "Complete",
+        "Original starter must become authoritative identity")
 end
 
-run("Human", 7511)
-run("Elf", 7512)
+--[[
+Runs the fresh-character C4 starter-class contract for both playable races.
 
-print(
-    string.format(
-        "[Ranger Identity Tests] PASS: %d assertions.",
-        assertions
-    )
-)
+Args:
+    None.
+
+Returns:
+    nil: Prints actual selection assertions after all checks pass.
+]]
+local function main()
+    reject_advanced_starters("Human", 7511)
+    reject_advanced_starters("Elf", 7512)
+    accept_original_starter("Human", 7513, "Fighter")
+    accept_original_starter("Human", 7514, "Mage")
+    accept_original_starter("Elf", 7515, "Fighter")
+    accept_original_starter("Elf", 7516, "Mage")
+    print(("[C4 Starter Identity] PASS: %d assertions")
+        :format(checks))
+end
+
+main()
