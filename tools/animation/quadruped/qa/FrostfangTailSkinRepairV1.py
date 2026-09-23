@@ -48,7 +48,7 @@ def tail_weights(mesh):
     weights = []
     for vertex in mesh.data.vertices:
         weights.append({
-            indices[item.group]: item.weight
+            item.group: item.weight
             for item in vertex.groups
             if item.group in indices and item.weight > 0.0
         })
