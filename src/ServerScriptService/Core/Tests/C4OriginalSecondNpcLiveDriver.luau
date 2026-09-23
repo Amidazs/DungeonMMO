@@ -392,6 +392,24 @@ local function verify_return(
     )
     assert(available.Step == 4 and available.WorldReady,
         "Earned source proof must expose the real return mentor")
+    local items = require(game:GetService("ServerScriptService")
+        .Core.Services.InventoryService)
+    local missing_id = if branch_id == "HumanRogue"
+        then "spartoi_bone" else "prias_letter_4"
+    assert(profiles:mutate(player.UserId, function(profile)
+        assert(items.apply_remove_from_character(
+            profile.Characters.Slot1, missing_id, 1
+        ).ok)
+    end), "Unable to prepare missing-owner-item rejection")
+    talk(player, mentor)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 4, "NPC advanced from a claimed proof with missing owned loot")
+    assert(profiles:mutate(player.UserId, function(profile)
+        assert(items.apply_item_to_character(
+            profile.Characters.Slot1, missing_id, 1
+        ).ok)
+    end), "Unable to restore owner-owned return material")
     talk(player, mentor)
     local returned = wait_for(function()
         local snapshot = npc_runtime:quest_service()
@@ -400,6 +418,16 @@ local function verify_return(
             then snapshot else nil
     end, "real authenticated stage-four return", 12)
     local owner = profiles:get_character(player.UserId)
+    if branch_id == "HumanRogue" then
+        assert(items.count_item(owner, "spartoi_bone") == 0,
+            "Actual mentor did not consume all ten owned crypt fragments")
+    else
+        for index = 1, 4 do
+            assert(items.count_item(
+                owner, "prias_letter_" .. tostring(index)
+            ) == 0, "Actual warden did not consume the personal field report")
+        end
+    end
     assert(not returned.ClassAwarded
         and owner.Identity.ClassId == "Fighter"
         and owner.ClassAdvancement.ActiveClassId == nil,
