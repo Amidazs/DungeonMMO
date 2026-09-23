@@ -58,6 +58,9 @@ local C4OriginalQuestNpcRuntime = require(
 local OriginalFirstTransferMentorRuntime = require(
     Base:WaitForChild("OriginalFirstTransferMentorRuntime")
 )
+local OriginalFirstTransferDefinitions = require(
+    SharedCore:WaitForChild("OriginalFirstTransferDefinitions")
+)
 local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -495,6 +498,24 @@ c4_class_advancement_controller:set_original_transfer_service(
     original_transfer_mentors
 )
 
+--[[
+Identifies real earned-first-transfer stations without a hardcoded class list.
+
+Args:
+    trainer_id (string): Exact physical progression station identifier.
+
+Returns:
+    boolean: Whether current earned class requires server-side proximity.
+]]
+local function original_trainer_requires_proximity(
+    trainer_id: string
+): boolean
+    for _, definition in ipairs(OriginalFirstTransferDefinitions.all()) do
+        if definition.TrainerId == trainer_id then return true end
+    end
+    return false
+end
+
 local function route_recoverable_session(player: Player, session: any): boolean
     local decision = BaseReconnectRouting.decide(session, player.UserId, os.time())
     if decision.route ~= "Dungeon" then
@@ -898,8 +919,7 @@ trainer_snapshot_request.OnServerEvent:Connect(function(
         return
     end
 
-    if (trainer_id == "AshenbladeTrainer"
-        or trainer_id == "GreenwardScoutTrainer")
+    if original_trainer_requires_proximity(trainer_id)
         and not original_transfer_mentors:nearby_trainer(
             player, trainer_id
         )
@@ -1190,8 +1210,7 @@ skill_learn_request.OnServerEvent:Connect(function(
     local result
 
     if type(trainer_id) == "string" and type(skill_id) == "string"
-        and (trainer_id ~= "AshenbladeTrainer"
-            and trainer_id ~= "GreenwardScoutTrainer"
+        and (not original_trainer_requires_proximity(trainer_id)
             or original_transfer_mentors:nearby_trainer(
                 player, trainer_id
             ))
@@ -1220,8 +1239,7 @@ skill_rank_request.OnServerEvent:Connect(function(
     local result
 
     if type(trainer_id) == "string" and type(skill_id) == "string"
-        and (trainer_id ~= "AshenbladeTrainer"
-            and trainer_id ~= "GreenwardScoutTrainer"
+        and (not original_trainer_requires_proximity(trainer_id)
             or original_transfer_mentors:nearby_trainer(
                 player, trainer_id
             ))
