@@ -6,6 +6,9 @@ local Shared = RS.Core.Shared
 local Branches = require(Shared.C4FirstTransferBranches)
 local Stages = require(Shared.C4OriginalFirstTransferQuestStages)
 local Skills = require(Shared.C4OriginalClassSkillCoverage)
+local OriginalSkillSources = require(
+    Shared.C4OriginalFirstTransferSkillSources
+)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
 local SkillRules = require(Shared.SkillUnlockRules)
 local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
@@ -244,6 +247,8 @@ local function check_skill_scope()
     check(report.OriginalFirstTransferClasses == 18
         and report.AnalogueRankInventoriesMapped == 2
         and report.OriginalInventoriesNotAudited == 16
+        and report.OriginalClassLevel20SourcesInventoried == 2
+        and report.OriginalLevel20RankEntriesCatalogued == 28
         and report.ExactC4FirstTransferSkillCatalogueComplete == false,
         "396 analogue ranks cannot be mistaken for all eighteen C4 trees")
     local rogue = assert(Branches.find(
@@ -259,6 +264,26 @@ local function check_skill_scope()
     ))
     check(Skills.for_branch(warrior).MappedAnalogueRanks == 0,
         "The unimplemented Warrior source skills must not be invented")
+    for _, record in ipairs({
+        {Id = "HumanWarrior", Count = 12},
+        {Id = "HumanKnight", Count = 16},
+    }) do
+        local source = assert(OriginalSkillSources.get(record.Id))
+        local seen = {}
+        check(source.SourceChronicle == "C4"
+            and source.Coverage == "Level20Only"
+            and #source.Level20 == record.Count,
+            "Real Warrior/Knight level-20 C4 rank inventory is incomplete")
+        for _, rank in ipairs(source.Level20) do
+            local key = rank.Name .. ":" .. tostring(rank.SourceRank)
+            check(rank.SourceLevel == 20 and not seen[key]
+                and rank.DungeonSkillId == nil
+                and rank.GameplayStatus == "NotImplemented",
+                "Source rank must be distinct, source-level accurate and "
+                    .. "not falsely advertised as an implemented ability")
+            seen[key] = true
+        end
+    end
     check(Stages.get("HumanWarrior") == nil,
         "A named Warrior source quest is not a completed implemented quest")
 end
