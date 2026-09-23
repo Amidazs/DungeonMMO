@@ -86,6 +86,9 @@ local DungeonContributionBridge = require(
 local C4QuestMonsterCombatLedger = require(
     Dungeon:WaitForChild("C4QuestMonsterCombatLedger")
 )
+local C4QuestEncounterSpawns = require(
+    Dungeon:WaitForChild("C4QuestEncounterSpawns")
+)
 local C4OriginalFirstTransferQuestService = require(
     Services:WaitForChild("C4OriginalFirstTransferQuestService")
 )
@@ -968,6 +971,32 @@ local function start_executed_slot(room_slot_id: string): any?
         return nil
     end
 
+    local quest_registrations = {}
+    if binding.Encounter
+        and binding.Encounter.ExecutorId == "CombatPack"
+    then
+        local quest_spawns = C4QuestEncounterSpawns.augment({
+            profiles = profiles,
+            user_ids = connected_member_user_ids(),
+            execution = execution,
+            encounter_id = encounter_id,
+            folder = enemies_folder,
+            health_multiplier =
+                context.Tuning.EnemyHealthMultiplier,
+            damage_multiplier =
+                context.Tuning.EnemyDamageMultiplier,
+        })
+        if quest_spawns.ok ~= true then
+            encounter_execution_controller:abort_slot(
+                room_slot_id, execution, context
+            )
+            warn("[C4 Quest] Source enemy creation failed: "
+                .. tostring(quest_spawns.reason))
+            return nil
+        end
+        quest_registrations = quest_spawns.registrations
+    end
+
     sync_all_character_encounters(encounter_id)
     sessions:set_runtime_progress(
         active_session_id,
@@ -1000,6 +1029,16 @@ local function start_executed_slot(room_slot_id: string): any?
 
     active_execution = started
     sync_encounter_members_from_session()
+    for _, registration in ipairs(quest_registrations) do
+        if not c4_quest_combat_ledger:register_enemy(
+            registration.enemy,
+            registration.branch_id,
+            encounter_id
+        ) then
+            warn("[C4 Quest] Rejected generated challenge enemy: "
+                .. registration.enemy.Name)
+        end
+    end
     for _, enemy in ipairs(enemies) do
         connect_enemy(enemy, encounter_id)
     end
