@@ -887,3 +887,108 @@ result has not been accepted by the user. No Studio Animator playback,
 animation export, production asset replacement or publishing occurred.
 All older experimental versions, original source assets and Studio QA
 places are retained.
+
+
+## WalkV7/V8 foreleg landing and tail-hindleg isolation — 23 September 2026
+
+**Stage 1 OPEN. WalkV8 is the current isolated Blender-only comparison
+candidate, not an approved gait or a Roblox Studio animation.** The
+latest backend roadmap visible during this art-only work was **v1.99**
+(original first transfers). No backend, original QA place, live
+dungeon asset, game, or user-authored rig was changed or published.
+
+The user reported a spring-like jump of Frostfang's front elbows and
+tail fur visibly expanding/contracting with rear-leg movement. A
+read-only evaluated-Bone/mesh diagnosis of saved WalkV6 found:
+
+- Fore-right elbow changed **23.163 degrees in one 24 FPS frame**,
+  fore-left **16.460 degrees** at their worst measured transitions.
+  At frame 29 the right foreleg's shoulder-to-ankle reach was
+  **0.999690** of its two segment lengths, effectively straightening
+  before abruptly bending at ground contact.
+- The tail-base source region contains skin assignments crossing
+  into the hind-leg chains, including `DEF_thigh.R`,
+  `DEF_shin.R`, and `DEF_thigh.L`. This is evidence of a
+  plausible pumping contributor, not proof that the entire
+  tail shape or prior source tearing is fixed by reweighting.
+
+**Separate experiments, no original overwrite:**
+
+- WalkV7 shifts each front paw's IK ankle target **0.015 source units
+  along world Y, toward its measured shoulder at the worst landing
+  frame**, and replaces the old abrupt sine vertical lift with a
+  shorter, zero-end-derivative squared-sine arc. Max measured
+  between-frame elbow change fell to **10.436 degrees (left)** and
+  **11.650 degrees (right)**. These remain possible visible catches
+  at 24 FPS; the shifted neutral paw position needs review.
+- A *separate copy* of WalkV7 removes the suspect hind-leg weights
+  from just **196 tail-dominant fur vertices** (355 hind influences),
+  redistributing their existing tail-chain weights while retaining
+  original mesh topology, all original bones and a maximum of four
+  vertex influences. The independent paired source-vs-modified
+  comparison measured at most **0.000000219 source units** difference
+  at frame 1. The sampled affected fur no longer moves relative to
+  the armature during the tested rear-leg cycle, whereas its old
+  maximum was **0.006189 source units**. This is diagnostic
+  suppression of hindleg-driven bulging, **not proof of natural
+  tail deformation**; it may over-stiffen that fur, and unrelated
+  previously documented tail-edge tearing remains unresolved.
+- WalkV8 adds a further modest 0.007 Y shift and reduces the
+  foreleg swing's squared-sine lift by 0.008 source units, on an
+  isolated copy retaining the V7 tail test. Worst measured elbow
+  change decreased to **8.406 degrees left / 9.114 degrees right**.
+  The right foreleg max measured angle was **169.037 degrees**,
+  down from **177.147 degrees** on WalkV6. The left max angle is
+  **170.917 degrees** and is not an improved left-extension metric.
+  These are computed joint-angle results, not visual gait approval.
+
+**Actual weighted-paw acceptance still FAILED:** The V7 and V8
+72-frame evaluated-toe audits both report greatest stance horizontal
+drift **0.003708 source units** and highest stance sole sample
+**0.007032 source units** above the test floor, still the hind-right
+leg. The improved front-elbow measurements did not make the rear
+contact or original asymmetric hind-leg anatomy correct. The
+altered foreleg idle paw positions also differ slightly from
+original JawV3 rest and require deliberate calibration.
+
+**Saved local QA files (experimental only):**
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\`
+
+- `WalkV7_Foreleg/Frostfang_WalkV7_Foreleg_UNAPPROVED.blend`
+  and `walk_v7_actual_mesh_audit.json`.
+- `WalkV7_TailIsolation/Frostfang_WalkV7_Tail_UNAPPROVED.blend`,
+  `tail_isolation_manifest.json`, `tail_shape_comparison.json`,
+  and `preview/Frostfang_WalkV7_Tail_Review_UNAPPROVED.gif`.
+- `WalkV8_ForelegTail/Frostfang_WalkV8_UNAPPROVED.blend`,
+  `walk_v8_actual_mesh_audit.json`, and
+  `preview/Frostfang_WalkV8_Review_UNAPPROVED.gif`.
+  The WalkV8 preview was rendered from 74 synchronized side/oblique
+  actual-skinned-mesh frames and assembled into a verified looping
+  1,520 x 510 GIF (34 optimized frames, 2,970 ms). Visual review
+  remains pending.
+
+New source-controlled scripts under
+`tools/animation/quadruped/qa/`:
+`FrostfangWalkV6JointTailAudit.py`,
+`FrostfangWalkV6ReachAudit.py`,
+`FrostfangWalkV7Foreleg.py`,
+`FrostfangWalkV7JointTailAudit.py`,
+`FrostfangWalkV7MeshAudit.py`,
+`FrostfangWalkV7TailIsolation.py`,
+`FrostfangWalkV7TailCompare.py`,
+`FrostfangWalkV7TailFullPreview.py`,
+`BuildFrostfangWalkV7TailGif.py`,
+`FrostfangWalkV8ForelegTail.py`,
+`FrostfangWalkV8JointTailAudit.py`,
+`FrostfangWalkV8MeshAudit.py`,
+`FrostfangWalkV8FullPreview.py`, and
+`BuildFrostfangWalkV8Gif.py`.
+
+**Next:** user compares V6 with V8 GIF in motion. If the elbow
+still catches, investigate the actual IK knee-plane and controlled
+two-bone pole, not only foot-path smoothing. Review the over-stiffened
+tail-base fur for seams and actual 3D bending. Restore correct tail
+skin topology and hind-leg anatomy independently. Then re-establish
+a neutral grounded idle and bake an editable non-IK clip for actual
+Roblox Animator verification. Do not merge or publish this QA motion.
