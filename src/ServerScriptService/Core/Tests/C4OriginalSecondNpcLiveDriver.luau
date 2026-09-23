@@ -348,6 +348,20 @@ local function main()
     local human = users[1]
     local elf = users[2]
     local profiles = runtime.ProfileService
+    local world_parts = workspace:WaitForChild("C4OriginalSourceQuestNPCs")
+    local original_labels = {
+        CaptainAshford = "Captain Ashford",
+        Vela = "Quartermaster Vela",
+        PathfinderElyra = "Pathfinder Elyra",
+        WardenThorne = "Warden Thorne",
+    }
+    for part_id, expected_label in pairs(original_labels) do
+        local actor = assert(world_parts:FindFirstChild(part_id))
+        local prompt = assert(actor:FindFirstChild("C4SourceQuestPrompt"))
+        assert(prompt.ObjectText == expected_label,
+            "Physical quest NPC used a non-original displayed name: "
+                .. part_id)
+    end
     seed(profiles, human, "Human")
     seed(profiles, elf, "Elf")
 
