@@ -1,3 +1,52 @@
+**Current C4 class backend: v1.88 — original C4 advancement paths confirmed.**
+[Newest original C4 class roadmap](
+DungeonMMO_Roadmap_v1_88_Original_C4_Class_Structure_20260923.md)
+and [source structure / Studio acceptance record](
+../testing/c4-original-five-race-class-structure-v1-88-20260923.md).
+The user's chosen design is to follow the
+**actual original Lineage 2 Chronicle 4
+race/class trees and first, second and third
+advancement paths**; similar custom
+DungeonMMO role names are not substitutes.
+Previous updates incorrectly treated the
+**nine** original Human/Elf first transfers
+as the full source scope. The complete
+original five-race source first-transfer
+tree contains **18 distinct branches**:
+nine Human/Elf, four Dark Elf,
+three Orc and two Dwarf. All eighteen
+are now explicitly catalogued and
+their distinct source quests/level-18
+start and level-20 transfer metadata
+recorded; an explicit source-class
+validator rejects wrong-race choices,
+legacy-class shortcuts, insufficient
+levels and unimplemented source quests.
+Focused unpublished Studio acceptance
+passed **3/3** (144 class-source, 14
+choice/quest and 7 strict coverage
+assertions). Source rank mapping of
+**396/396** refers *only* to the
+four existing Human/Elf starter lists
+and the currently mapped Human Rogue/
+Elven Scout lists. It is **not** the
+whole original C4 catalogue: only
+Human and Elf profiles are playable,
+the other sixteen first-transfer
+branches have no completed original
+gameplay implementations, and the
+aggregate complete flag remains
+**0/18**. The current legacy custom
+secondary-class runtime and starting
+role profiles must still undergo
+explicit backwards-compatible
+migration before the actual original
+class-choice quest UI is live.
+Preserve the separate latest
+humanoid/quadruped animation roadmap,
+the one-Gathering/one-Crafting career
+rule and no-publish policy.
+
 **Current C4 backend: v1.87 — all 396 ranks in six audited source inventories now implemented.**
 [Latest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_87_C4_Scout_Source_Environment_20260923.md)
