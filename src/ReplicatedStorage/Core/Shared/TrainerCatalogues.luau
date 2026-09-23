@@ -159,7 +159,8 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "MysticLifeDrain",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "MysticPoisonCurse",
                 Mode = "LearnOrRank",
             }),
@@ -262,6 +263,10 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "ElvenScoutSnaringShot",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ArcherDraw",
                 Mode = "LearnOrRank",
             }),
@@ -304,7 +309,8 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "ScoutRunningRecovery",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "ScoutEvasiveFocus",
                 Mode = "LearnOrRank",
             }),
@@ -314,6 +320,18 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ElvenScoutPoisonRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutCureWounds",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutBattleFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutWindRun",
                 Mode = "LearnOrRank",
             }),
 
@@ -409,7 +427,8 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "ScoutRunningRecovery",
                 Mode = "LearnOrRank",
-            }),            table.freeze({
+            }),
+            table.freeze({
                 SkillId = "ScoutEvasiveFocus",
                 Mode = "LearnOrRank",
             }),
@@ -419,6 +438,18 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ElvenScoutPoisonRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutCureWounds",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutBattleFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutWindRun",
                 Mode = "LearnOrRank",
             }),
 
