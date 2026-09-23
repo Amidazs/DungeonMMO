@@ -1644,8 +1644,8 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
-    -- Original Human Knight Oathguard: prepared, NOT earnable until its
-    -- independent world quest, mentor and personal proof items exist.
+    -- Original Human Knight Oathguard skills are earnable only after
+    -- the independent physical quest, mentor and personal proof items.
     OathguardShieldImpact = table.freeze({
         Id = "OathguardShieldImpact",
         Tier = "Common", MaxRank = 9, Kind = "Physical",
