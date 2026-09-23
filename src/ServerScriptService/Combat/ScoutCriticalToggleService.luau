@@ -115,7 +115,7 @@ Returns:
     string: Stable result reason for combat diagnostics.
 ]]
 function ScoutCriticalToggleService.toggle(
-    player: Player, definition: any
+    player: Player, definition: any, rank: number
 ): (boolean, boolean, string)
     if active[player] then
         ScoutCriticalToggleService.stop(player)
@@ -136,6 +136,7 @@ function ScoutCriticalToggleService.toggle(
         Bonus = definition.CRITICAL_DAMAGE_BONUS,
         Upkeep = definition.UPKEEP_STAMINA_PER_SECOND,
         Definition = definition,
+        Rank = rank,
         Elapsed = 0,
     }
     if not is_valid(player, record) then
