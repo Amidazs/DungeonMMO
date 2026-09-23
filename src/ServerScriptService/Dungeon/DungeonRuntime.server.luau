@@ -749,7 +749,11 @@ local function connected_member_user_ids(): {number}
     if not session then return ids end
     for _, player in ipairs(Players:GetPlayers()) do
         local member = session.Members and session.Members[tostring(player.UserId)]
-        if loaded_users[player.UserId] and member and member.Connected == true then
+        if loaded_users[player.UserId] and member
+            and member.Connected == true
+            and member.Mode == "Active"
+            and member.Abandoned ~= true
+        then
             table.insert(ids, player.UserId)
         end
     end
