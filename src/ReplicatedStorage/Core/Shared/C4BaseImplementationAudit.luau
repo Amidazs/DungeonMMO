@@ -7,6 +7,9 @@ local Shared = RS.Core.Shared
 local Source = require(Shared.C4BaseSkillInventory)
 local Progression = require(Shared.SkillProgressionDefinitions)
 local Combat = require(RS.Combat.Shared.SkillDefinitions)
+local Recipes = require(Shared.ProfessionRecipes)
+local Professions = require(Shared.ProfessionDefinitions)
+local C4Crafting = require(Shared.C4ProfessionSkillRules)
 
 local C4BaseImplementationAudit = {}
 
@@ -14,6 +17,12 @@ local C4BaseImplementationAudit = {}
 -- same source family but two different DungeonMMO authored skills.
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
+        RecipeReading = table.freeze({
+            [1] = "C4RecipeReading",
+        }),
+        CommonItemCreation = table.freeze({
+            [5] = "C4CommonItemCreation",
+        }),
         SittingRecovery = table.freeze({
             [5] = "FighterRestingRecovery",
         }),
@@ -56,6 +65,12 @@ local MAPPINGS = table.freeze({
         }),
     }),
     Mage = table.freeze({
+        RecipeReading = table.freeze({
+            [1] = "C4RecipeReading",
+        }),
+        CommonItemCreation = table.freeze({
+            [5] = "C4CommonItemCreation",
+        }),
         CurePoison = table.freeze({
             [7] = "MysticCurePoison",
         }),
@@ -174,6 +189,65 @@ local function executable_ranks_at_level(
 end
 
 --[[
+Checks source-ranked recipe literacy or real common recipe execution.
+
+The recipe-reading rank must power actual blueprint authorization; the
+creation rank must authorize material-consuming recipes at all four
+registered creation stations, never add another profession selection.
+
+Args:
+    skill_id (string): Registered C4 recipe passive skill.
+    level (number): Source character level of this rank.
+
+Returns:
+    number: One genuinely authored utility rank or zero on missing effects.
+]]
+local function crafting_ranks_at_level(
+    skill_id: string, level: number
+): number
+    local skill = Progression.get(skill_id)
+    if not skill or skill.MaxRank ~= 1
+        or skill.RankLevels[1] ~= level
+        or skill.Kind ~= "Passive"
+        or skill.RequiresCraftingProfessionChoice ~= true
+    then
+        return 0
+    end
+
+    if skill_id == "C4RecipeReading" then
+        return if skill.RecipeReadingEnabled == true
+            and type(C4Crafting.can_read) == "function" then 1 else 0
+    end
+    if skill_id ~= "C4CommonItemCreation"
+        or skill.CommonItemCreationEnabled ~= true
+        or type(C4Crafting.can_make_common) ~= "function"
+    then
+        return 0
+    end
+
+    local careers = {}
+    for _, recipe in pairs(Recipes.all()) do
+        local profession = Professions.get(recipe.ProfessionId)
+        if recipe.RequiredSkillId == skill_id
+            and profession and profession.Kind == "Creation"
+            and recipe.StationId == recipe.ProfessionId
+            and type(recipe.Inputs) == "table" and #recipe.Inputs > 0
+            and recipe.Output and recipe.Output.Quantity > 0
+        then
+            careers[recipe.ProfessionId] = true
+        end
+    end
+    for _, id in ipairs(Professions.order()) do
+        local profession = Professions.get(id)
+        if profession and profession.Kind == "Creation"
+            and not careers[id] then
+            return 0
+        end
+    end
+    return 1
+end
+
+--[[
 Returns source-validated combat mappings for the given base class.
 
 Args:
@@ -221,9 +295,13 @@ function C4BaseImplementationAudit.audit(
         for family, count in pairs(families) do
             bracket.Raw += count
             local skill_id = mapped[family] and mapped[family][level]
-            local actual = if skill_id then executable_ranks_at_level(
-                skill_id, level
-            ) else 0
+            local actual = 0
+            if skill_id then
+                actual = if family == "RecipeReading"
+                    or family == "CommonItemCreation"
+                    then crafting_ranks_at_level(skill_id, level)
+                    else executable_ranks_at_level(skill_id, level)
+            end
             -- Direct spell damage alone cannot satisfy an enemy
             -- weakening source family. Check the authored status too.
             if skill_id and (family == "PhysicalAttackDebuff"
