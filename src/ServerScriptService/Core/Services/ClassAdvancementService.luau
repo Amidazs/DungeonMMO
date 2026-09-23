@@ -64,6 +64,32 @@ local function resolve_candidate(character: any): any?
     )
 end
 
+--[[
+Only an existing accepted legacy trial may still be claimed. New Fighter/
+Mystic characters must choose an original branch, never auto-Vanguard.
+
+Args:
+    character (any): Loaded, selected profile character.
+    candidate (any): Previously authored legacy advancement class.
+
+Returns:
+    boolean: Whether an existing player has an unfinished old quest.
+]]
+local function has_legacy_trial(character: any, candidate: any): boolean
+    local quests = character and character.Quests
+    return type(quests) == "table"
+        and type(quests.Active) == "table"
+        and type(quests.Active[candidate.QuestId]) == "table"
+end
+
+local function is_original_starter(character: any): boolean
+    local identity = character and character.Identity
+    return type(identity) == "table"
+        and (identity.BaseClassId == "Fighter"
+            or identity.BaseClassId == "Mage")
+        and identity.ClassId == identity.BaseClassId
+end
+
 local function ensure_advancement(character: any): any
     if type(character.ClassAdvancement) ~= "table" then
         character.ClassAdvancement = {}
@@ -134,6 +160,12 @@ function ClassAdvancementService:start_trial(user_id: number): any
         return result(false, "AdvancementAlreadyCompleted")
     end
 
+    -- Existing already-started trial claims are preserved in claim, but no
+    -- new one-choice custom trial may start on an original C4 character.
+    if is_original_starter(character) then
+        return result(false, "OriginalC4BranchChoiceRequired")
+    end
+
     local trial = QuestDefinitions.get(candidate.QuestId)
     local ready, missing_reason, missing_requirement =
         SkillUnlockRules.can_start_trial(character, trial)
@@ -185,6 +217,13 @@ function ClassAdvancementService:claim(user_id: number): any
         return result(false, "AdvancementAlreadyCompleted")
     end
 
+    -- Grandfather only quests actually started before the C4 migration.
+    if is_original_starter(character)
+        and not has_legacy_trial(character, candidate)
+    then
+        return result(false, "OriginalC4BranchChoiceRequired")
+    end
+
     local trial = QuestDefinitions.get(candidate.QuestId)
     local ready, missing_reason, missing_requirement =
         SkillUnlockRules.can_start_trial(character, trial)
@@ -225,6 +264,13 @@ function ClassAdvancementService:claim(user_id: number): any
 
             if completed_for(live_character, live_candidate) then
                 error("AdvancementAlreadyCompleted")
+            end
+            if is_original_starter(live_character)
+                and not has_legacy_trial(
+                    live_character, live_candidate
+                )
+            then
+                error("OriginalC4BranchChoiceRequired")
             end
             local current_trial = QuestDefinitions.get(
                 live_candidate.QuestId
@@ -283,6 +329,15 @@ function ClassAdvancementService:build_snapshot(user_id: number): any
 
     local candidate = resolve_candidate(character)
     local advancement = ensure_advancement(character)
+    -- Do not advertise automatic legacy Vanguard/Arcanist candidates
+    -- to fresh C4 Fighter/Mystic characters. Existing completed legacy
+    -- histories and in-progress trial claims remain visible.
+    if candidate and is_original_starter(character)
+        and not completed_for(character, candidate)
+        and not has_legacy_trial(character, candidate)
+    then
+        candidate = nil
+    end
     local quest_state = if candidate
         then QuestService.character_state(character, candidate.QuestId)
         else nil
