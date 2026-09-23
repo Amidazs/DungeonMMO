@@ -29,6 +29,9 @@ local SkillProgressionConfig = require(
 local RaceDefinitions = require(
     shared:WaitForChild("RaceDefinitions")
 )
+local C4FirstTransferBranches = require(
+    shared:WaitForChild("C4FirstTransferBranches")
+)
 
 local ClassProgressionDefinitions = require(
     shared:WaitForChild("ClassProgressionDefinitions")
@@ -684,7 +687,10 @@ local function sanitize_race_change(value: any): any
     return result
 end
 
-local function sanitize_class_advancement(value: any, current_race_id: any): any
+local function sanitize_class_advancement(
+    value: any, identity: any
+): any
+    local current_race_id = identity and identity.RaceId
     local result = {Version = 1, CompletedByRace = {}}
     if type(value) ~= "table" then return result end
     if type(value.CompletedByRace) == "table" then
@@ -708,6 +714,18 @@ local function sanitize_class_advancement(value: any, current_race_id: any): any
         if definition and definition.RaceId == current_race_id and completed and completed[active] == true then
             result.ActiveClassId = active
         end
+    end
+    -- A first-transfer choice is not an awarded class, so its original
+    -- race/family must still match the current unadvanced character.
+    local choice = value.OriginalFirstTransferChoiceId
+    if type(choice) == "string" and type(identity) == "table"
+        and identity.CreationStage == "Complete"
+        and identity.ClassId == identity.BaseClassId
+        and C4FirstTransferBranches.find(
+            identity.RaceId, identity.BaseClassId, choice
+        ) ~= nil
+    then
+        result.OriginalFirstTransferChoiceId = choice
     end
     return result
 end
@@ -809,8 +827,7 @@ function ProfileMigration.migrate(raw: any): any
     slot1.Gold = nonnegative_integer(slot1.Gold, 0)
 
     slot1.ClassAdvancement = sanitize_class_advancement(
-        slot1.ClassAdvancement,
-        slot1.Identity and slot1.Identity.RaceId or nil
+        slot1.ClassAdvancement, slot1.Identity
     )
 
     if type(slot1.Inventory) ~= "table" then
