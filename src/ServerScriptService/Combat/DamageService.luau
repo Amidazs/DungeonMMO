@@ -5,10 +5,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local shared_folder = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 local CombatConfig = require(shared_folder:WaitForChild("CombatConfig"))
 local CriticalHitRules = require(shared_folder:WaitForChild("CriticalHitRules"))
+local ScoutAccuracyRules = require(
+    shared_folder:WaitForChild("ScoutAccuracyRules")
+)
+local CollectionService = game:GetService("CollectionService")
 local CombatValidationService = require(script.Parent:WaitForChild("CombatValidationService"))
 local WardService = require(script.Parent:WaitForChild("WardService"))
 local CombatStatusService = require(
     script.Parent:WaitForChild("CombatStatusService")
+)
+local ScoutAccuracyToggleService = require(
+    script.Parent:WaitForChild("ScoutAccuracyToggleService")
 )
 local ProgressionRuntimeState = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
@@ -21,7 +28,8 @@ export type DamageContext = {
     attacker: Player?, attacker_character: Model?, target: Model,
     source_kind: string, source_id: string, attack_id: string?,
     base_damage: number, multiplier: number, sequence_id: number?,
-    critical_chance: number?, critical_damage_multiplier: number?, critical_roll: number?,
+    critical_chance: number?, critical_damage_multiplier: number?,
+    critical_roll: number?, accuracy_roll: number?,
 }
 
 local damage_callback:
@@ -58,6 +66,31 @@ function DamageService.apply_damage(context: DamageContext): number
     if not humanoid or humanoid.Health <= 0 then return 0 end
     local normal_damage = DamageService.calculate_damage(context.base_damage, context.multiplier)
     if normal_damage <= 0 then return 0 end
+    -- Only actual player-owned physical attacks against server-tagged NPCs
+    -- with authored evasiveness can miss. An ordinary NPC with no
+    -- evasiveness attribute retains the existing guaranteed contact hit.
+    if attacker and (context.source_kind == "Melee"
+        or context.source_kind == "RangedPhysical")
+        and CollectionService:HasTag(
+            context.target, CombatConfig.TARGETS.NPC_TAG
+        )
+    then
+        local evasion = context.target:GetAttribute("CombatEvasionChance")
+        if type(evasion) == "number" and evasion > 0 then
+            local accuracy = ScoutAccuracyToggleService.get_bonus(attacker)
+            local roll = context.accuracy_roll
+            if type(roll) ~= "number" then
+                roll = critical_random:NextNumber()
+            end
+            if not ScoutAccuracyRules.is_hit(evasion, accuracy, roll) then
+                CombatValidationService.emit(
+                    attacker, "DAMAGE", "MISSED",
+                    context.source_id, context.sequence_id
+                )
+                return 0
+            end
+        end
+    end
     local damage = normal_damage * resolve_critical_multiplier(context)
     local defender = Players:GetPlayerFromCharacter(context.target)
     if defender and context.source_kind == "EnemyMelee" then
