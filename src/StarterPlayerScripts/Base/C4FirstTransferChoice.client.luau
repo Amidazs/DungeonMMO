@@ -205,13 +205,13 @@ local function render(snapshot: any)
             if quest.WorldReady and quest.Step == 2
                 and quest.BranchId == "HumanRogue"
             then
-                status.Text = "Visit Neti near the hub arrival point to "
+                status.Text = "Visit Vela near the hub arrival point to "
                     .. "receive your personal trial dagger and bow. "
                     .. "Later quest battles and class transfer remain locked."
             elseif quest.WorldReady and quest.Step == 2
                 and quest.BranchId == "ElvenScout"
             then
-                status.Text = "Visit Guard Moretti near the hub arrival "
+                status.Text = "Visit Warden Thorne near the hub arrival "
                     .. "point. Later letter-fragment combat and "
                     .. "class transfer remain locked."
             else
