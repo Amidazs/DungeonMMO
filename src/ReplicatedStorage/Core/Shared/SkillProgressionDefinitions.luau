@@ -17,6 +17,40 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Chronicle 4 starting-class literacy is useful only after the
+    -- character has actually chosen its one crafting profession.
+    C4RecipeReading = table.freeze({
+        Id = "C4RecipeReading",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter", "Mage"}),
+        RankLevels = table.freeze({[1] = 1}),
+        RequiresCraftingProfessionChoice = true,
+        RecipeReadingEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
+    C4CommonItemCreation = table.freeze({
+        Id = "C4CommonItemCreation",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter", "Mage"}),
+        RankLevels = table.freeze({[1] = 5}),
+        RequiresCraftingProfessionChoice = true,
+        CommonItemCreationEnabled = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4RecipeReading", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     Mend = table.freeze({
         Id = "Mend",
         Tier = "Common",
