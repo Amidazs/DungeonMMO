@@ -1265,6 +1265,49 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original first-transfer source 20: equips the crafted Scout vest.
+    ScoutEquipmentExpertise = table.freeze({
+        Id = "ScoutEquipmentExpertise",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 20}),
+        AdvancedEquipmentEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Original source 20: extra real submerged breathing time.
+    ScoutLungCapacity = table.freeze({
+        Id = "ScoutLungCapacity",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 20}),
+        OxygenSecondsBonusPerRank = 15,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Original source 20: less server-computed hard-landing damage.
+    ScoutFallResistance = table.freeze({
+        Id = "ScoutFallResistance",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 20}),
+        FallDamageReductionPerRank = 0.40,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Human Rogue's separate active C4 source Sprint at level 20.
+    HumanScoutSprint = table.freeze({
+        Id = "HumanScoutSprint",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Rogue"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
