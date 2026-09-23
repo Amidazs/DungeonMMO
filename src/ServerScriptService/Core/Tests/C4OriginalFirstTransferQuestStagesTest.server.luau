@@ -290,6 +290,17 @@ local function exercise(
                     and not TransferRules.can_bank(item_id),
                     "Each letter is a separately owned, bound source drop")
             end
+        elseif index == 4 and branch_id == "HumanRogue" then
+            check(Inventory.count_item(current, "spartoi_bone") == 0
+                and current.ClassAdvancement.OriginalFirstTransferQuest
+                    .Proofs.SpartoiBone10 == true,
+                "Actual mentor turn-in consumes ten bones but keeps proof")
+        elseif index == 4 and branch_id == "ElvenScout" then
+            for fragment = 1, 4 do
+                check(Inventory.count_item(
+                    current, "prias_letter_" .. tostring(fragment)
+                ) == 0, "Actual warden consumes each owned report fragment")
+            end
         end
     end
     local state = assert(profiles:get_character(user_id, 1))
@@ -322,17 +333,17 @@ local function exercise(
         local reloaded = assert(profiles:get_character(user_id, 1))
         check(Inventory.count_item(reloaded, "neti_trial_dagger") == 1
             and Inventory.count_item(reloaded, "neti_trial_bow") == 1
-            and Inventory.count_item(reloaded, "spartoi_bone") == 10
+            and Inventory.count_item(reloaded, "spartoi_bone") == 0
             and reloaded.ClassAdvancement.OriginalFirstTransferQuest
                 .Proofs.SpartoiBone10 == true,
-            "Original Rogue equipment, ten earned bones and aggregate proof "
-                .. "must survive save/reload without duplicate rewards")
+            "Rogue trial weapons and spent bone-proof state survive "
+                .. "save/reload without restoring consumed quest items")
     else
         local reloaded = assert(profiles:get_character(user_id, 1))
         for fragment = 1, 4 do
             check(Inventory.count_item(
                 reloaded, "prias_letter_" .. tostring(fragment)
-            ) == 1, "Each separately owned Elven letter survives reload")
+            ) == 0, "Spent Elven report fragments cannot reappear on reload")
         end
     end
 end
