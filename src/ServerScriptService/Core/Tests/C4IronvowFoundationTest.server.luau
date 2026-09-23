@@ -109,8 +109,13 @@ local function main()
         "Battle call must have a real rank-scaled server self-buff")
 
     local unearned = forged_character()
-    check(FirstTransfers.for_branch("HumanWarrior") == nil,
-        "Unbound original Warrior quest may not grant any class receipt")
+    check(FirstTransfers.for_branch("HumanWarrior") ~= nil,
+        "Warrior career must require a separately earned original quest")
+    local eligible = FirstTransfers.can_transfer(
+        unearned, "HumanWarrior"
+    )
+    check(not eligible,
+        "Forged saved career without a true completed quest is refused")
     check(FirstTransfers.awarded(unearned) == nil
         and Identity.get_class_id(unearned) == nil,
         "Forging a raw Ironvow ClassId cannot produce an earned identity")
