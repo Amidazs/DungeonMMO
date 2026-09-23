@@ -150,6 +150,11 @@ function ClassAdvancementService:start_trial(user_id: number): any
     if not CharacterIdentityRules.is_complete(character) then
         return result(false, "IdentityIncomplete")
     end
+    if type(character.ClassAdvancement) == "table"
+        and character.ClassAdvancement.OriginalFirstTransferClassId ~= nil
+    then
+        return result(false, "OriginalFirstTransferAlreadyCompleted")
+    end
 
     local candidate = resolve_candidate(character)
     if not candidate then
@@ -206,6 +211,11 @@ function ClassAdvancementService:claim(user_id: number): any
 
     if not CharacterIdentityRules.is_complete(character) then
         return result(false, "IdentityIncomplete")
+    end
+    if type(character.ClassAdvancement) == "table"
+        and character.ClassAdvancement.OriginalFirstTransferClassId ~= nil
+    then
+        return result(false, "OriginalFirstTransferAlreadyCompleted")
     end
 
     local candidate = resolve_candidate(character)
@@ -264,6 +274,12 @@ function ClassAdvancementService:claim(user_id: number): any
 
             if completed_for(live_character, live_candidate) then
                 error("AdvancementAlreadyCompleted")
+            end
+            if type(live_character.ClassAdvancement) == "table"
+                and live_character.ClassAdvancement
+                    .OriginalFirstTransferClassId ~= nil
+            then
+                error("OriginalFirstTransferAlreadyCompleted")
             end
             if is_original_starter(live_character)
                 and not has_legacy_trial(
