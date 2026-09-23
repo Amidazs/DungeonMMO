@@ -134,9 +134,10 @@ local function purchase_rank(
     check(context.Profiles:mutate(user_id, function(profile: any)
         profile.Characters.Slot1.Level = level - 1
     end), "Character must remain authoritative")
-    check(not context.Skills:purchase_rank(
-        user_id, SKILL_ID
-    ).ok or rank == 1,
+    local early = if rank == 1
+        then context.Skills:learn_trainer_skill(user_id, SKILL_ID)
+        else context.Skills:purchase_rank(user_id, SKILL_ID)
+    check(not early.ok,
         "Cannot buy a rank before its original source level")
     check(context.Profiles:mutate(user_id, function(profile: any)
         profile.Characters.Slot1.Level = level
@@ -314,6 +315,30 @@ local function main()
     trade(context, 99702, 99703, "tempering_oil")
     trade(context, 99703, 99704, "cured_leather")
     trade(context, 99704, 99701, "warding_rune")
+
+    -- Purchased materials now supply the *next actual recipe*, rather
+    -- than merely being listed and received after all crafting is over.
+    -- For each chosen career the server consumes the traded input.
+    for _, dependency in ipairs({
+        {99701, "warding_rune", "scout_forge_bars_rank_3"},
+        {99702, "iron_bar", "scout_distill_oil_rank_2"},
+        {99703, "tempering_oil", "scout_cure_leather_rank_2"},
+        {99704, "cured_leather", "scout_inscribe_runes_rank_3"},
+    }) do
+        local owner = dependency[1]
+        local ingredient = dependency[2]
+        local recipe = assert(Recipes.get(dependency[3]))
+        local current = Inventory.count_item(
+            assert(context.Profiles:get_character(owner, 1)), ingredient
+        )
+        check(current >= 1, "Other career's actual traded input exists")
+        craft_recipe(context, owner, recipe)
+        local after = Inventory.count_item(
+            assert(context.Profiles:get_character(owner, 1)), ingredient
+        )
+        check(after == current - 1,
+            "Ranked recipe consumed the other player's traded input")
+    end
     print(("[C4 Scout Ranked Craft] PASS: %d assertions")
         :format(checks))
 end
