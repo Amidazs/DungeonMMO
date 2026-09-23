@@ -59,6 +59,7 @@ Args:
     profiles (any): Exclusive writer-owned ProfileService.
     session_id (string): Admitted reserved dungeon session ID.
     dungeon_id (string): Exact server-selected dungeon content ID.
+    on_open ((Player) -> ()?): Optional server inventory refresh callback.
 
 Returns:
     any: Service with only server-registered physical lock targets.
@@ -185,7 +186,7 @@ function ScoutLockpickingService:_rejection(
         return "LockOutOfReach"
     end
 
-    local character = self._profiles:get_character(player.UserId, 1)
+    local character = self._profiles:get_character(player.UserId)
     local identity = character and character.Identity
     local state = character and character.Progression
         and character.Progression.Skills
