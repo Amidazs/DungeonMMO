@@ -1,3 +1,22 @@
+**Current C4 and professions backend: v1.80 — verified craft skills.**
+[Latest backend roadmap](
+DungeonMMO_Roadmap_v1_80_C4_Crafting_Playtest_20260923.md)
+and [executed Studio + two-client gameplay evidence](
+../testing/c4-exclusive-professions-v1-80-2026-09-23.md).
+Purchased level-one C4 RecipeReading and level-five
+CommonItemCreation now authorize actual blueprint study and
+four material-backed recipes **only for the character's single
+selected crafting profession**. The final unpublished Studio
+focused run passed 12/12 cases and an independent actual two-client
+Base playtest verified UI choices, client/server craft rejection
+and live market delivery. Source inventory is now 351/396,
+with six Mystic PartyHeal and 39 Rogue/Scout ranks outstanding
+within the currently mapped six inventories; seven additional
+original first-transfer catalogues remain unmapped and 0/9
+paths are complete. The prior Mystic weakening in-combat
+client check and the independent humanoid animation roadmap
+remain open. No main merge or publishing took place.
+
 **Current professions/economy backend: v1.79 exclusive careers.**
 [Latest roadmap and acceptance gates](
 DungeonMMO_Roadmap_v1_79_Exclusive_Professions_20260923.md).
