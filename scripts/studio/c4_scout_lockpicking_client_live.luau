@@ -142,6 +142,7 @@ Returns:
 ]]
 local function press_prompt(player, lock)
     local before = held[player.UserId] or 0
+    task.wait(0.4)
     channel:FireClient(player, "HoldPrompt", lock.Part)
     wait_for(function()
         assert(not errors[player.UserId],
@@ -244,7 +245,18 @@ local function verify_actual_prompts(runtime, player, service)
     assert(reward_count(runtime, player) == 0,
         "A genuine prompt granted loot without any purchased lock rank")
     purchase(runtime, player, 1)
+    local prompt = lock_one.Part:FindFirstChild("ScoutLockpickPrompt")
+    prompt.Triggered:Connect(function(trigger_player)
+        print("[C4 Scout Lock Live] PROMPT_TRIGGERED "
+            .. tostring(trigger_player.UserId))
+    end)
+    print("[C4 Scout Lock Live] PRE_TRIGGER_CHECK "
+        .. tostring(service:_rejection(player, lock_one)))
     press_prompt(player, lock_one)
+    task.wait(0.4)
+    print("[C4 Scout Lock Live] POST_TRIGGER_COUNT "
+        .. tostring(reward_count(runtime, player))
+        .. " check " .. tostring(service:_rejection(player, lock_one)))
     wait_for(function()
         return reward_count(runtime, player) == 1
     end, "actual purchased rank-one client prompt awarded personal loot", 12)
