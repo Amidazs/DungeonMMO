@@ -201,3 +201,70 @@ Use the connected desktop only for live/visual Studio checks and
 asset import/export as necessary; do not rewrite the DungeonMMO
 repository via Remote Desktop Commander. Do not publish, merge
 `main` or alter production assets/DataStores without approval.
+
+
+## Six-clip humanoid starter library — 23 September 2026
+
+**Current checkpoint: authoring source committed in GitHub;
+new six-clip Studio generation, real motion playback, visual review,
+and Roblox asset publishing have NOT occurred.** Existing original
+guardian/lasso clips remain unchanged. The latest separate backend
+roadmap on this branch is v1.99; do not silently replace its class
+development requirements with animation progress.
+
+The user paused Frostfang/quadruped animation after repeated
+unnatural shuffling and selected humanoids as the active animation
+family. A new, isolated R15 starter library was authored directly
+in GitHub at
+`tools/animation/humanoid/starter/` using the already demonstrated
+native Studio `KeyframeSequence` approach. It reuses the existing
+R15 Motor6D hierarchy and source guardian clone contract, not a new
+mesh, arbitrary skeleton or downloaded preset.
+
+The authored set comprises: neutral **Idle** (2.0 s loop),
+**Walk** (1.0 s loop), **Run** (0.7 s loop), **Sword** (1.2 s
+single-sword right-hand strike, `Impact` 0.6 s),
+**Daggers** (1.2 s alternating two-hand strikes,
+`Impact` 0.45 s and 0.85 s), and **Bow** (1.5 s
+raise/draw/release/recover, `ArrowRelease` 1.05 s).
+All are authored as independently named 60-Hz editable
+`KeyframeSequence` clip definitions. The library requires actual
+Studio execution of its source-controlled generator on the
+isolated unpublished test mannequin to instantiate the six
+sequences; do **not** report them as already created animation assets
+on the PC. Test-only weapon parts are connected to the appropriate
+hands for future visual playback; gameplay hitboxes, projectile
+spawning, damage and publishing are not enabled.
+
+The six new authoring/test sources and reproduction instructions are
+documented in [the humanoid starter README](
+../../tools/animation/humanoid/starter/README.md).
+The isolated test-rig setup clones
+`Workspace.DMMO_Astra_Guardian_Test` to
+`Workspace.DMMO_Humanoid_Starter_Test`, removing only the
+clone's original hammer and attack scripts. The six-clip QA
+authoring script checks separate editable clips, exact sample
+counts, declared loop flags and event counts; the separate replay
+is intended to exercise the real Animator and animation events
+with front/side/player-camera visual review.
+
+**Studio environment verification:** At the time of the authoring
+work, no `RobloxStudioBeta` process was running, the dedicated
+local Studio bridge on loopback port 8765 was unreachable, and no
+saved isolated `Place1` test file was found in the inspected
+project/temporary paths. Therefore no claim of live animation
+generation, clip-load acceptance, visual quality, neutral
+reset, marker emission or correct weapon grip alignment can be
+made. The scripts and roadmap were edited in GitHub; the local
+desktop was inspected for testing access only.
+
+**Next acceptance gate:** Reopen the original *unpublished*
+R15 guardian test place; connect the existing Studio bridge;
+use the new starter setup and generator to create the six
+editable sequences on the cloned mannequin, then replay
+every motion at natural speed and capture actual front/side/player
+camera previews. Correct visible foot sliding, phase/stride timing,
+hand/weapon grip intersections and bow/arrow geometry before
+treating any clip as usable game art. Check and retain all original
+humanoid generator files. Keep all clips out of production game
+code and do not publish until the user separately approves them.
