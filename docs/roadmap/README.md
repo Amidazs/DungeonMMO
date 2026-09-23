@@ -1,3 +1,39 @@
+**Current C4 backend: v1.92 — genuine first-stage original C4 quest NPCs.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_92_C4_Original_NPC_Quest_20260923.md)
+and [actual one-client physical NPC and backend test record](
+../testing/c4-original-first-npc-v1-92-20260923.md).
+The live Base now contains server-controlled
+Captain Bezique and Master Reisa source
+quest prompts. A genuine Human Fighter
+client at disposable test level 18 explicitly
+chose Human Rogue, physically interacted
+with Bezique, started and saved only the
+first authentic original C4 quest step
+and observed the correct pending-stage
+status in the actual class GUI. Unchosen
+NPC visits, replayed first NPC and
+forged future dungeon quest events
+were rejected. Original class remains
+Fighter; **no original level-20
+class transfer or unearned skill rank
+was awarded**. The separately authored
+full Rogue/Elven Scout original quests
+still need their actual Neti/Moretti
+actors, instanced source monsters,
+quest-only items, transfer NPCs and
+atomic class/skill authorization.
+Original first-transfer paths fully
+playable: **0/18**. Current 396
+functional analogue ranks across
+six partial inventories are NOT
+proof of complete original C4
+source skill parity. Preserve
+Fighter/Mystic original starts,
+one-Gathering/one-Crafting careers,
+the separate humanoid/quadruped
+art roadmap and no-publish policy.
+
 **Current C4 backend: v1.91 — original class QUESTS and SKILLS are both active workstreams.**
 [Newest C4 quest and skill roadmap](
 DungeonMMO_Roadmap_v1_91_C4_Quest_And_Skills_20260923.md)
