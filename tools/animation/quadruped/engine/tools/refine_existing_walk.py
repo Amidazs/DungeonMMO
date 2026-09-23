@@ -8,7 +8,7 @@ sys.path.insert(0,str(ENGINE))
 from quadruped_blender.refine_walk import generate
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
 SOURCE=ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend"
-OUTPUT=ROOT/"ForelegRefinement_20260923_C"
+OUTPUT=ROOT/"ForelegRefinement_20260923_D"
 CONFIG=ENGINE/"profiles/frostfang_v16_refinement.json"
 def main():
     args=sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else []
@@ -21,6 +21,8 @@ def main():
         rig=bpy.data.objects["Frostfang_Canine_CompactRig"]
         mesh=bpy.data.objects["Frostfang_Canine_ExperimentalMesh"]
         config=json.loads(CONFIG.read_text())
+        from quadruped_blender.skin_transition import smooth_transition
+        skin=smooth_transition(mesh,config["skin_transition"])
         records=generate(rig,config)
         scene=bpy.context.scene
         # Measure evaluated joints and weighted paw surface throughout every frame.
@@ -28,7 +30,7 @@ def main():
         pads={}
         for limb in config["limbs"]:
             pads[limb["id"]]=[v.index for v in mesh.data.vertices if any(groups[g.group] in (limb["toe"],limb["foot"]) and g.weight>.4 for g in v.groups)]
-        result={"source":str(SOURCE),"source_sha256":source_hash,"mesh_vertices":len(mesh.data.vertices),"mesh_polygons":len(mesh.data.polygons),"frames":records,"limits":["Hind asymmetry and closed muzzle remain.","Blender authoring only; native Roblox playback not yet verified."]}
+        result={"skin_correction":skin,"source":str(SOURCE),"source_sha256":source_hash,"mesh_vertices":len(mesh.data.vertices),"mesh_polygons":len(mesh.data.polygons),"frames":records,"limits":["Hind asymmetry and closed muzzle remain.","Blender authoring only; native Roblox playback not yet verified."]}
         for record in records:
             scene.frame_set(record["frame"]);bpy.context.view_layer.update()
             dg=bpy.context.evaluated_depsgraph_get()
