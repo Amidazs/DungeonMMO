@@ -1,3 +1,25 @@
+**Current C4 class backend: v1.89 — Fighter/Mystic-only fresh starters confirmed.**
+[Newest C4 starter-class roadmap](
+DungeonMMO_Roadmap_v1_89_C4_Starter_Classes_20260923.md).
+Fresh DungeonMMO characters now follow the user's
+chosen Chronicle 4 starting-class rule: choose race,
+then begin as **Fighter or Mystic** (the current
+internal compatibility ID for Mystic remains
+`Mage`). Fresh Ranger and Rogue selection is
+rejected; those definitions stay loadable only for
+legacy saves and migration. Existing Human/Elf
+identity UI already exposes Fighter/Mystic only.
+Focused unpublished Studio identity acceptance
+passed **3/3**: 58 existing identity assertions,
+26 Mystic assertions and 26 fresh-starter assertions.
+The full v1.88 original five-race / 18 first-transfer
+source structure remains authoritative for later
+advancement. Legacy Ranger/Rogue saves must be
+migrated without deleting progression or awarding
+an unearned original branch. Preserve one
+Gathering + one Crafting profession, no publish,
+and the separate animation/art roadmap.
+
 **Current C4 class backend: v1.88 — original C4 advancement paths confirmed.**
 [Newest original C4 class roadmap](
 DungeonMMO_Roadmap_v1_88_Original_C4_Class_Structure_20260923.md)
