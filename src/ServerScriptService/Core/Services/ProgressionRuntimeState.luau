@@ -405,6 +405,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
         character, "RogueEdgeDiscipline"
     ) + PassiveSkillEffects.damage_bonus(
         character, "WayfinderDaggerMastery"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "IronvowBladeTraining"
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
