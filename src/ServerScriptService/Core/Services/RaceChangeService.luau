@@ -77,11 +77,22 @@ function RaceChangeService:_guard(): any?
     return nil
 end
 
+-- A pending original C4 class choice belongs to the chosen race.
+-- Do not allow development-only race change to strand a foreign branch.
+local function has_original_c4_choice(character: any): boolean
+    local advancement = character and character.ClassAdvancement
+    return type(advancement) == "table"
+        and type(advancement.OriginalFirstTransferChoiceId) == "string"
+end
+
 function RaceChangeService:preview(user_id: number, target_race_id: string): any
     local blocked = self:_guard()
     if blocked then return blocked end
     local character = self._profiles:get_character(user_id, 1)
     if not character then return result(false, "ProfileNotLoaded") end
+    if has_original_c4_choice(character) then
+        return result(false, "OriginalClassRaceLocked")
+    end
     return RaceChangePlanner.preview(character, target_race_id)
 end
 
@@ -155,6 +166,9 @@ function RaceChangeService:apply(
 
     local current = self._profiles:get_character(user_id, 1)
     if not current then return result(false, "ProfileNotLoaded") end
+    if has_original_c4_choice(current) then
+        return result(false, "OriginalClassRaceLocked")
+    end
     local current_state = ensure_state(current)
     local prior = current_state.History[transaction_id]
     if type(prior) == "table" then
@@ -175,6 +189,10 @@ function RaceChangeService:apply(
     local newly_applied = false
     local mutated, mutate_error = self._profiles:mutate(user_id, function(profile: any)
         local character = profile.Characters.Slot1
+        if has_original_c4_choice(character) then
+            failure = "OriginalClassRaceLocked"
+            error(failure)
+        end
         local state = ensure_state(character)
         local replay = state.History[transaction_id]
         if type(replay) == "table" then
