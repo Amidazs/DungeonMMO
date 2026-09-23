@@ -1415,6 +1415,35 @@ local HUMAN_SCOUT_SPRINT = specialize_skill(
     }
 )
 
+-- Independently authored first-transfer blade strike shares the
+-- server-side dagger hit window; rank two increases actual hit damage.
+local ASHENBLADE_OPENING = specialize_skill(
+    FIGHTER_DAGGER_STRIKE, "AshenbladeOpening", "Ashen Opening", {
+        STAMINA_COST = 19,
+        COOLDOWN_SECONDS = 8,
+        BASE_DAMAGE = 20,
+        REAR_MULTIPLIER = 1.1,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 20}),
+            [2] = table.freeze({BASE_DAMAGE = 27}),
+        }),
+    }
+)
+
+-- Greenward's two purchased renewal ranks perform a real personal
+-- health restore through the established server-owned heal executor.
+local GREENWARD_RENEWAL = specialize_skill(
+    ELVEN_SCOUT_CURE_WOUNDS, "GreenwardRenewal", "Greenward Renewal", {
+        MANA_COST = 16,
+        COOLDOWN_SECONDS = 16,
+        TOTAL_HEAL = 35,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 35}),
+            [2] = table.freeze({TOTAL_HEAL = 52}),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1571,6 +1600,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ElvenScoutBattleFocus = ELVEN_SCOUT_BATTLE_FOCUS,
     ElvenScoutWindRun = ELVEN_SCOUT_WIND_RUN,
     HumanScoutSprint = HUMAN_SCOUT_SPRINT,
+    AshenbladeOpening = ASHENBLADE_OPENING,
+    GreenwardRenewal = GREENWARD_RENEWAL,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
