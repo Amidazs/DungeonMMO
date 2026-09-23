@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "kind": "profile",
+  "id": "frostfang_v3",
+  "family": "canine",
+  "forward": [
+    0,
+    -1,
+    0
+  ],
+  "up": [
+    0,
+    0,
+    1
+  ],
+  "units": "metres",
+  "roles": {
+    "Root": "DEF_spine.004",
+    "Pelvis": "DEF_spine.005",
+    "Chest": "DEF_spine.008",
+    "Head": "DEF_spine.011",
+    "Jaw": "DEF_jaw"
+  },
+  "groups": {
+    "spine": [
+      "DEF_spine.004",
+      "DEF_spine.005",
+      "DEF_spine.006",
+      "DEF_spine.007",
+      "DEF_spine.008"
+    ],
+    "neck": [
+      "DEF_spine.009",
+      "DEF_spine.010"
+    ],
+    "head": [
+      "DEF_spine.011"
+    ],
+    "tail": [
+      "DEF_spine.003",
+      "DEF_spine.002",
+      "DEF_spine.001",
+      "DEF_spine"
+    ],
+    "jaw": [
+      "DEF_jaw"
+    ]
+  },
+  "limbs": {
+    "FrontLeft": {
+      "anatomy": "front",
+      "chain": [
+        "DEF_front_thigh.L",
+        "DEF_front_shin.L"
+      ],
+      "paw": "DEF_front_foot.L",
+      "toe": "DEF_front_toe.L",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "limits": [
+        [
+          -0.8,
+          0.8
+        ],
+        [
+          -0.8,
+          1.3
+        ]
+      ],
+      "enabled": true,
+      "weight": 1
+    },
+    "FrontRight": {
+      "anatomy": "front",
+      "chain": [
+        "DEF_front_thigh.R",
+        "DEF_front_shin.R"
+      ],
+      "paw": "DEF_front_foot.R",
+      "toe": "DEF_front_toe.R",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "limits": [
+        [
+          -0.8,
+          0.8
+        ],
+        [
+          -0.8,
+          1.3
+        ]
+      ],
+      "enabled": true,
+      "weight": 1
+    },
+    "HindLeft": {
+      "anatomy": "hind",
+      "chain": [
+        "DEF_thigh.L",
+        "DEF_shin.L",
+        "DEF_foot.L"
+      ],
+      "paw": "DEF_toe.L",
+      "toe": "DEF_toe.L",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "limits": [
+        [
+          -0.8,
+          0.8
+        ],
+        [
+          -1.2,
+          0.8
+        ],
+        [
+          -0.8,
+          1.2
+        ]
+      ],
+      "enabled": true,
+      "weight": 1
+    },
+    "HindRight": {
+      "anatomy": "hind",
+      "chain": [
+        "DEF_thigh.R",
+        "DEF_shin.R",
+        "DEF_foot.R"
+      ],
+      "paw": "DEF_toe.R",
+      "toe": "DEF_toe.R",
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "limits": [
+        [
+          -0.8,
+          0.8
+        ],
+        [
+          -1.2,
+          0.8
+        ],
+        [
+          -0.8,
+          1.2
+        ]
+      ],
+      "enabled": true,
+      "weight": 1
+    }
+  }
+}
