@@ -1056,6 +1056,133 @@ local function run_transfer_only(human, elf, profiles)
 end
 
 --[[
+Uses a genuine client's physical Ironvow training prompt and authenticated
+skill purchase remote, with out-of-range and wrong-class denials.
+
+Args:
+    human (Player): Actual owner with completed Ironroot source/mentor.
+    elf (Player): Different real party member with no Warrior award.
+    profiles (any): Actual loaded exclusive Base profile writer.
+    mentors (any): Real physical mentor and trainer runtime.
+    definition (any): The independently earned Ironvow career.
+
+Returns:
+    nil: Verifies UI-visible mastery rank and server-owned SP purchase.
+]]
+local function verify_ironvow_client_training(
+    human, elf, profiles, mentors, definition
+)
+    local skill_id = "IronvowBladeTraining"
+    local station = assert(workspace.OriginalFirstTransferMentors
+        :FindFirstChild(definition.TrainerId))
+    local root = assert(human.Character.HumanoidRootPart)
+    root.CFrame = station.CFrame * CFrame.new(0, 0, 50)
+    task.wait(0.4)
+    assert(not mentors:nearby_trainer(human, definition.TrainerId),
+        "A distant Ironvow client must fail actual trainer proximity")
+    local denied = request_client_training(human, definition, skill_id)
+    assert(not denied.ok
+        and denied.reason == "InvalidTrainerSkillRequest",
+        "Actual remote bought Warrior mastery without nearby mentor")
+    assert(not profiles:get_character(human.UserId)
+        .Progression.Skills[skill_id],
+        "Out-of-range skill request spent points or awarded mastery")
+    approach(elf, station)
+    assert(mentors:nearby_trainer(elf, definition.TrainerId),
+        "Other client must be within real physical trainer range")
+    local other_result = request_client_training(elf, definition, skill_id)
+    assert(not other_result.ok
+        and not profiles:get_character(elf.UserId)
+            .Progression.Skills[skill_id],
+        "Another unadvanced class learned Human Warrior mastery")
+    approach(human, station)
+    trainer_snapshots[human.UserId] = nil
+    trainer_ui[human.UserId] = nil
+    talk(human, station)
+    local snapshot = wait_for(function()
+        return trainer_snapshots[human.UserId]
+    end, "real Ironvow trainer prompt opens the correct catalogue", 12)
+    assert(snapshot.ok and snapshot.TrainerId == definition.TrainerId,
+        "Physical trainer opened wrong/unauthorized class catalogue")
+    channel:FireClient(human, "InspectTrainerUi", skill_id)
+    assert(wait_for(function()
+        return trainer_ui[human.UserId] == true
+    end, "new Warrior skill appears in real trainer window", 12),
+        "Client's Ironvow skill UI did not show sword mastery")
+    local learned = request_client_training(human, definition, skill_id)
+    assert(learned.ok, "Genuine client could not purchase Ironvow mastery: "
+        .. tostring(learned.reason))
+    assert(profiles:get_character(human.UserId)
+        .Progression.Skills[skill_id].PurchasedRank == 1,
+        "Client-bought Ironvow mastery was not saved to owner's state")
+    print("[Ironvow Physical Live] REAL_CLIENT_IRONVOW_TRAINER_PASS")
+end
+
+--[[
+Accepts two genuinely separate Ironroot source NPCs and physical mentor.
+
+Args:
+    human (Player): Real authenticated Human Fighter client.
+    elf (Player): Other genuine, unadvanced Elf party member.
+    profiles (any): Actual current Base profile and progression writer.
+    npcs (any): Existing real physical original source NPC binder.
+
+Returns:
+    nil: Saves real first-stage prompts and awarded original Warrior class.
+]]
+local function run_ironvow_only(human, elf, profiles, npcs)
+    seed(profiles, human, "Human")
+    seed(profiles, elf, "Elf")
+    advance_two_stages(
+        human, profiles, npcs,
+        "HumanWarrior", "MarshalTorren", "SmithOrla"
+    )
+    print("[Ironvow Physical Live] REAL_IRONROOT_TWO_NPCS_PASS")
+    local definition = assert(require(
+        game:GetService("ReplicatedStorage").Core.Shared
+            .OriginalFirstTransferDefinitions
+    ).for_branch("HumanWarrior"))
+    local source = assert(require(
+        game:GetService("ReplicatedStorage").Core.Shared
+            .C4OriginalFirstTransferQuestStages
+    ).get("HumanWarrior"))
+    assert(profiles:mutate(human.UserId, function(profile)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state and state.BranchId == source.BranchId
+            and state.Step == 3)
+        -- Monster/loot stages are separately tested in live Dungeon.
+        -- Only earlier proofs are prepared for this isolated Base test.
+        state.Step = #source.Steps + 1
+        state.Count = 0
+        state.Ready = true
+        state.Proofs = {
+            IronrootToken4 = true, RidgebreakerSigil = true,
+        }
+        owner.Progression.SkillPointEntitlement = 1600
+        owner.Progression.Skills.IronCleave = {
+            Known = true, PurchasedRank = 9, Proficiency = 350,
+        }
+    end), "Prior Warrior dungeon stages cannot be prepared in Base test")
+    local mentors = wait_for(function()
+        return _G.C4OriginalTransferMentors_TEMP
+    end, "genuine physical Warrior mentor runtime", 12)
+    local parts = workspace.OriginalFirstTransferMentors
+    local other_mentor = assert(parts:FindFirstChild(
+        "PathwardenSiora"
+    ))
+    verify_physical_transfer(
+        human, profiles, mentors, definition, other_mentor
+    )
+    assert(profiles:get_character(elf.UserId).Identity.ClassId
+        == "Fighter", "Human mentor must not advance unrelated Elf")
+    verify_ironvow_client_training(
+        human, elf, profiles, mentors, definition
+    )
+    print("[Ironvow Physical Live] VERIFIED_WARRIOR_BASE_PASS")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -1086,6 +1213,11 @@ local function main()
     local human = users[1]
     local elf = users[2]
     local profiles = runtime.ProfileService
+    if workspace:GetAttribute("DungeonMMOStudioIronvowFocus") == true
+    then
+        run_ironvow_only(human, elf, profiles, npcs)
+        return
+    end
     if workspace:GetAttribute("DungeonMMOStudioTransferFocus") == true
     then
         run_transfer_only(human, elf, profiles)
