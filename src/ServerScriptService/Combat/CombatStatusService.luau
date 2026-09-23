@@ -21,6 +21,10 @@ local BUFFS = table.freeze({
         Magnitude = "C4MagicPowerBonus",
         ExpiresAt = "C4MagicPowerExpiresAt",
     }),
+    Movement = table.freeze({
+        Magnitude = "C4MovementBonus",
+        ExpiresAt = "C4MovementExpiresAt",
+    }),
 })
 
 --[[
