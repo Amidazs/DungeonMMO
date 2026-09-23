@@ -66,14 +66,21 @@ function Service:build_snapshot(user_id: number): any
         return result(false, "OriginalQuestNotMapped")
     end
     local state = advancement.OriginalFirstTransferQuest
+    local stage_index = if type(state) == "table"
+        then state.Step else 1
+    local first_npc_ready = self._world ~= nil
+        and self._world:available(quest, 1) == true
     local world_ready = self._world ~= nil
-        and self._world:available(quest) == true
+        and self._world:available(quest, stage_index) == true
     return result(true, nil, {
         BranchId = branch_id,
         QuestId = quest.Id,
         QuestTitle = quest.SourceTitle,
         SourceUrl = quest.SourceUrl,
         WorldReady = world_ready,
+        FirstNpcReady = first_npc_ready,
+        FullWorldReady = quest.WorldBindingStatus == "Implemented"
+            and world_ready,
         Started = type(state) == "table"
             and state.BranchId == branch_id,
         Step = if type(state) == "table"
@@ -156,9 +163,10 @@ function Service:record_world_event(
     end
     local allowed, refusal = Rules.can_start(character, state.BranchId)
     if not allowed then return result(false, refusal) end
-    if self._world:available(quest) ~= true
-        or self._world:verify(user_id, evidence, quest, state) ~= true
-    then
+    if self._world:available(quest, state.Step) ~= true then
+        return result(false, "OriginalQuestWorldNotReady")
+    end
+    if self._world:verify(user_id, evidence, quest, state) ~= true then
         return result(false, "OriginalQuestWorldEvidenceUnverified")
     end
     local permitted, rejection = Rules.can_progress(quest, state, evidence)
