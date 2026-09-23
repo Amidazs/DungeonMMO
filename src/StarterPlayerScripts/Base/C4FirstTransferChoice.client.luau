@@ -229,6 +229,21 @@ local function render(snapshot: any)
             then
                 status.Text = "Report your completed Crypt Sentinel "
                     .. "trial to Captain Ashford in the hub."
+            elseif quest.Step == 6
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Defeat a Cinder Brigand in an instanced "
+                    .. "dungeon room to recover four bound supply records."
+            elseif quest.WorldReady and quest.Step == 7
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Deliver the four personally earned supply "
+                    .. "records to Captain Ashford in the hub."
+            elseif quest.Ready and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Your Ashen Blade trial is complete. "
+                    .. "The level-20 transfer mentor and advanced "
+                    .. "class award are still in development."
             elseif quest.WorldReady and quest.Step == 4
                 and quest.BranchId == "HumanRogue"
             then
