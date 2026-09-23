@@ -16,7 +16,7 @@ Runtime.__index = Runtime
 
 local MAX_RANGE = 10
 local OFFSETS = table.freeze({
-    HumanKnight = Vector3.new(4, 2.5, -54),
+    HumanKnight = Vector3.new(-64, 2.5, 8),
     HumanWarrior = Vector3.new(-64, 2.5, -17),
     HumanRogue = Vector3.new(-31, 2.5, 17),
     ElvenScout = Vector3.new(31, 2.5, 17),
