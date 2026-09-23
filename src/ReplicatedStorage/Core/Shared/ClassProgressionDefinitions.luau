@@ -174,6 +174,23 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Planned original Human Knight. Fresh creation and actual class
+    -- claims are disabled until the independent physical quest exists.
+    Oathguard = table.freeze({
+        Id = "Oathguard",
+        DisplayName = "Oathguard",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Human"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "OathguardShieldImpact",
+            "OathguardChallenge",
+            "OathguardHeavyArmorTraining",
+        }),
+    }),
+
     Ranger = table.freeze({
         Id = "Ranger",
         DisplayName = "Ranger",
