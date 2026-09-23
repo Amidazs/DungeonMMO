@@ -6,6 +6,7 @@ assert(game.PlaceId == 0 and game.GameId == 0,
 local server = game:GetService("ServerScriptService")
 local sources = {
     {server.Core.Tests, "C4ElvenScoutNewSkillsTest"},
+    {server.Core.Tests, "C4ScoutCriticalPowerToggleTest"},
     {server.Core.Tests, "C4ScoutInventoryTest"},
     {server.Core.Tests, "C4CatalogueCoverageTest"},
     {server.Core.Tests, "C4ElvenScoutSupportTest"},
