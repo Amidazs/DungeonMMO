@@ -1606,6 +1606,74 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original Human Knight Oathguard: prepared, NOT earnable until its
+    -- independent world quest, mentor and personal proof items exist.
+    OathguardShieldImpact = table.freeze({
+        Id = "OathguardShieldImpact",
+        Tier = "Common", MaxRank = 9, Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "ShieldBash", Rank = 3, Proficiency = 0,
+            }),
+        }),
+        RequiresShield = true,
+        WeaponTags = table.freeze({}),
+    }),
+    OathguardChallenge = table.freeze({
+        Id = "OathguardChallenge",
+        Tier = "Common", MaxRank = 6, Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 24, [2] = 24, [3] = 24,
+            [4] = 28, [5] = 28, [6] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "Taunt", Rank = 3, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+    OathguardHeavyArmorTraining = table.freeze({
+        Id = "OathguardHeavyArmorTraining",
+        Tier = "Common", MaxRank = 9, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+            [8] = 0, [9] = 0,
+        }),
+        PhysicalReductionPerRank = 0.006,
+        ArmorCategory = "HeavyArmor",
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
