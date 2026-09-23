@@ -66,16 +66,10 @@ function Rules.can_progress(
         or type(event) ~= "table"
         or current.QuestId ~= quest.Id
         or current.BranchId ~= quest.BranchId
-        or current.Ready == true
         or type(current.Step) ~= "number"
         or current.Step % 1 ~= 0
     then
         return false, "OriginalQuestStateInvalid"
-    end
-    local step = quest.Steps[current.Step]
-    if not step then return false, "OriginalQuestStageUnavailable" end
-    if event.Kind ~= step.Kind or event.TargetId ~= step.TargetId then
-        return false, "OriginalQuestWrongStage"
     end
     if type(event.EventId) ~= "string" or event.EventId == ""
         or #event.EventId > 120
@@ -86,6 +80,14 @@ function Rules.can_progress(
         or current.AppliedEvents[event.EventId] == true
     then
         return false, "OriginalQuestEventAlreadyApplied"
+    end
+    if current.Ready == true then
+        return false, "OriginalQuestAlreadyComplete"
+    end
+    local step = quest.Steps[current.Step]
+    if not step then return false, "OriginalQuestStageUnavailable" end
+    if event.Kind ~= step.Kind or event.TargetId ~= step.TargetId then
+        return false, "OriginalQuestWrongStage"
     end
     if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
         return false, "OriginalTrialWeaponRequired"
