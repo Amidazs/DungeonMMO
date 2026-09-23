@@ -1,4 +1,46 @@
-**Current original first-transfer class backend: v1.99 — genuine level-20 careers and physical mentors.**
+**Current DungeonMMO class backend: v2.00 — original level-24/28 skill progression and live trainer safeguards.**
+[Latest backend roadmap](
+DungeonMMO_Roadmap_v2_00_First_Transfer_Skills_20260923.md)
+and [actual focused/real-client Studio acceptance](
+../testing/c4-original-first-transfer-v2-00-20260923.md).
+Original **Ashenblade** and **Greenward Scout** still
+require their genuine earned level-20 class transfer.
+Each now has **two implemented trainable abilities**:
+the class's earlier level-20 ability plus the new
+level-24/28 ranked Ashenblade Opening or Greenward
+Renewal. Their unique trainer catalogues and combat
+runtime require the matching persisted class,
+correct player race/level, purchased starting-skill
+ranks, earned proficiency and, for Ashenblade
+Opening, a real equipped dagger. The new abilities
+use the existing authoritative damage/healing
+executors with actual stronger rank-two effects,
+not client-supplied HP or damage. Actual Base/Dungeon
+Rojo builds passed; focused Base Studio **2/2 PASS**
+(93 original class/skill/runtime/persistence
+assertions and 8 adjacent migration checks).
+Unpublished real **two-client trainer PASS**:
+each client saw the actual in-game physical
+trainer catalogue and purchased the appropriate
+new level-24 skill using a real client remote.
+Out-of-range requests, a foreign trainer ID and
+exhausted legitimately earned SP were rejected.
+Earlier quest completion and prerequisite mastery
+were prepared within this disposable test to avoid
+replaying earlier accepted quest stages. A new
+skill's actual live enemy hit/self-heal cast and
+an uninterrupted cross-place journey are **not**
+yet accepted. **2/18** original first-transfer
+identities have physical award and two trainable
+skills each; **0/18** are complete entire class
+catalogues or full real cross-place acceptance.
+Keep the separate humanoid/quadruped animation
+roadmaps current and independent. No Roblox
+publication, `main` merge, source edits using
+Remote Desktop Commander or production DataStore
+mutation.
+
+**Previous original first-transfer class backend: v1.99 — genuine level-20 careers and physical mentors.**
 [Latest class backend roadmap](
 DungeonMMO_Roadmap_v1_99_Original_First_Transfers_20260923.md)
 and [executed unpublished Studio tests](
