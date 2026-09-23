@@ -87,6 +87,7 @@ local definitions = require(
 local responses = {}
 signal.OnServerEvent:Connect(function(player, action, payload)
     responses[action] = if payload == nil then true else payload
+    responses[action .. ":" .. tostring(player.UserId)] = true
 end)
 
 -- Args: predicate (() -> any), label (string), seconds (number).
@@ -161,7 +162,12 @@ end
 -- Returns: nil; complete actual player physical source and class prompts.
 local function run()
     local player = await_state(function()
-        return Players:GetPlayers()[1]
+        local users = Players:GetPlayers()
+        if #users ~= 2 then return nil end
+        table.sort(users, function(a, b)
+            return a.UserId < b.UserId
+        end)
+        return users[1]
     end, "actual client", 40)
     local runtime = await_state(function()
         return _G.IronvowPhysicalRuntime_TEMP
@@ -171,7 +177,9 @@ local function run()
         return profiles:get_character(player.UserId)
             and player.Character
             and player.Character:FindFirstChild("HumanoidRootPart")
-            and responses.READY
+            and responses[
+                "READY:" .. tostring(player.UserId)
+            ]
     end, "admitted Base player", 60)
     assert(profiles:mutate(player.UserId, function(profile)
         local owner = profile.Characters.Slot1
@@ -273,7 +281,7 @@ end)
 driver.Parent = SSS
 local ok, result = pcall(function()
     return STS:ExecuteMultiplayerTestAsync(
-        1, "IronvowActualPhysicalBase_TEMP"
+        2, "IronvowActualPhysicalBase_TEMP"
     )
 end)
 driver:Destroy()
