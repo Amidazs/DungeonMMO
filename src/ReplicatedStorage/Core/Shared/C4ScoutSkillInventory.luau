@@ -116,6 +116,11 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "RangerRogue",
         DaggerEquipmentPending = false,
     }),
+    CommonItemCreation = table.freeze({
+        SkillId = "ScoutCommonItemCreation",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
     AccuracyToggle = table.freeze({
         SkillId = "ScoutAccuracyToggle",
         Owner = "RangerRogue",
