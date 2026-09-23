@@ -276,6 +276,8 @@ end
 function PassiveSkillEffects.health_bonus(character: any): number
     return resolve_bonus(
         character, "StalwartTraining", "HealthBonusPerRank"
+    ) + resolve_bonus(
+        character, "IronvowFortitude", "HealthBonusPerRank"
     )
 end
 
@@ -691,6 +693,9 @@ function PassiveSkillEffects.stamina_recovery_multiplier(
         ) + resolve_bonus(
             character,
             "HumanScoutRestingRecovery",
+            "RestingStaminaBonusPerRank"
+        ) + resolve_bonus(
+            character, "IronvowRestRecovery",
             "RestingStaminaBonusPerRank"
         )
     elseif is_moving == true then
