@@ -129,6 +129,10 @@ local function handle_projectile_skill_hit(
     target_index: number,
     applied_damage: number
 )
+    if applied_damage <= 0 then
+        -- Evaded arrows must never also stagger, calm or snare an NPC.
+        return
+    end
     DungeonProgressionBridge.award_damage(
         player,
         definition.ID,
