@@ -1,5 +1,5 @@
 --!strict
--- Two real clients: physical original C4 Neti/Moretti stage two,
+-- Two real clients: physical original C4 Vela/Thorne stage two,
 -- atomic owner-bound trial weapon award and stage-three combat fail-closed.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Original C4 physical quest NPC test needs an unpublished place")
@@ -162,7 +162,7 @@ calling the production quest service directly as a substitute for input.
 
 Args:
     player (Player): Actual connected original-class client.
-    part (BasePart): Server-owned Captain Bezique world actor.
+    part (BasePart): Server-owned Captain Ashford world actor.
 
 Returns:
     nil: A genuine ProximityPrompt.Triggered receipt on the server.
@@ -290,7 +290,7 @@ local function advance_two_stages(
     )
     assert(not forged.ok
         and forged.reason == "OriginalQuestWorldEvidenceUnverified",
-        "Forged Neti/Moretti event bypassed authenticated NPC receipt")
+        "Forged Vela/Thorne event bypassed authenticated NPC receipt")
     approach(player, second)
     talk(player, second)
     local stage_three = wait_for(function()
@@ -307,7 +307,7 @@ local function advance_two_stages(
     local after = profiles:get_character(player.UserId)
     assert(after.Identity.ClassId == "Fighter"
         and after.ClassAdvancement.ActiveClassId == nil,
-        "Original Neti/Moretti meeting awarded an unearned C4 class")
+        "Original Vela/Thorne meeting awarded an unearned C4 class")
     local step = stage_three.Step
     task.wait(0.8)
     talk(player, second)
@@ -354,7 +354,7 @@ local function main()
     -- Neither another race's NPC nor a bare item-grant claim may advance
     -- the unchosen original first-transfer branch.
     local stranger = assert(workspace.C4OriginalSourceQuestNPCs
-        :FindFirstChild("GuardMoretti"))
+        :FindFirstChild("WardenThorne"))
     approach(human, stranger)
     talk(human, stranger)
     assert(profiles:get_character(human.UserId)
@@ -362,7 +362,7 @@ local function main()
         "Human Fighter started an unselected Elf class quest")
 
     advance_two_stages(
-        human, profiles, npcs, "HumanRogue", "CaptainBezique", "Neti"
+        human, profiles, npcs, "HumanRogue", "CaptainAshford", "Vela"
     )
     local Inventory = require(game:GetService("ServerScriptService")
         .Core.Services.InventoryService)
@@ -373,10 +373,10 @@ local function main()
         "neti_trial_dagger", "neti_trial_bow",
     }) do
         assert(Inventory.count_item(human_owner, item_id) == 1,
-            "Human's actual Neti prompt did not grant one owned trial item")
+            "Human's actual Vela prompt did not grant one owned trial item")
         assert(not Trade.can_trade(item_id)
             and not Trade.can_bank(item_id),
-            "Neti trial weapon escaped its personal quest binding")
+            "Vela trial weapon escaped its personal quest binding")
     end
     -- The trial weapons are real equippable Fighter inventory gear,
     -- not inert quest flags or a client-side icon.
@@ -386,26 +386,26 @@ local function main()
         local equipped = runtime.EquipmentService:equip(
             human.UserId, weapon_id, "Weapon"
         )
-        assert(equipped.ok, "Owner could not equip real Neti trial weapon "
+        assert(equipped.ok, "Owner could not equip real Vela trial weapon "
             .. weapon_id .. ": " .. tostring(equipped.reason))
         local after_equip = profiles:get_character(human.UserId)
         assert(after_equip.Equipment.Weapon == weapon_id,
-            "Neti trial weapon did not become actual equipped item")
+            "Vela trial weapon did not become actual equipped item")
     end
-    print("[C4 Original Second NPC Live] REAL_NETI_ATOMIC_WEAPONS_PASS")
+    print("[C4 Original Second NPC Live] REAL_VELA_ATOMIC_WEAPONS_PASS")
 
     advance_two_stages(
         elf, profiles, npcs,
-        "ElvenScout", "MasterReisa", "GuardMoretti"
+        "ElvenScout", "PathfinderElyra", "WardenThorne"
     )
     local elf_owner = profiles:get_character(elf.UserId)
     assert(Inventory.count_item(elf_owner, "neti_trial_dagger") == 0
         and Inventory.count_item(elf_owner, "neti_trial_bow") == 0,
-        "Elf Moretti talk duplicated Human Rogue trial weapons")
+        "Elf Thorne talk duplicated Human Rogue trial weapons")
     assert(Inventory.count_item(
         profiles:get_character(human.UserId), "neti_trial_dagger"
     ) == 1, "The second client's NPC modified the first client's loot")
-    print("[C4 Original Second NPC Live] REAL_MORETTI_ISOLATED_PASS")
+    print("[C4 Original Second NPC Live] REAL_THORNE_ISOLATED_PASS")
     print("[C4 Original Second NPC Live] TWO_CLIENT_STAGE_TWO_PASS")
 end
 
@@ -424,7 +424,7 @@ driver.Parent = SSS
 
 local ok, value = pcall(function()
     return STS:ExecuteMultiplayerTestAsync(
-        2, "C4OriginalPhysicalNetiMorettiTwoClients_TEMP"
+        2, "C4OriginalPhysicalVelaThorneTwoClients_TEMP"
     )
 end)
 driver:Destroy()
