@@ -55,6 +55,9 @@ local C4FirstTransferSelectionService = require(
 local C4OriginalQuestNpcRuntime = require(
     Base:WaitForChild("C4OriginalQuestNpcRuntime")
 )
+local OriginalFirstTransferMentorRuntime = require(
+    Base:WaitForChild("OriginalFirstTransferMentorRuntime")
+)
 local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -470,6 +473,28 @@ c4_class_advancement_controller:set_original_quest_service(
     c4_source_npcs:quest_service()
 )
 
+local original_transfer_mentors =
+    OriginalFirstTransferMentorRuntime.attach({
+        environment = base_environment,
+        profiles = profiles,
+        is_ready = function(player: Player): boolean
+            return loaded_users[player.UserId] == true
+                and profiles:get_profile(player.UserId) ~= nil
+                and not coordinator:is_pending(player.UserId)
+        end,
+        on_progress = function(player: Player)
+            ProgressionRuntimeState.set_character(
+                player.UserId,
+                assert(profiles:get_character(player.UserId, 1))
+            )
+            send_profile(player)
+            c4_class_advancement_controller:send_snapshot(player)
+        end,
+    })
+c4_class_advancement_controller:set_original_transfer_service(
+    original_transfer_mentors
+)
+
 local function route_recoverable_session(player: Player, session: any): boolean
     local decision = BaseReconnectRouting.decide(session, player.UserId, os.time())
     if decision.route ~= "Dungeon" then
@@ -873,6 +898,18 @@ trainer_snapshot_request.OnServerEvent:Connect(function(
         return
     end
 
+    if (trainer_id == "AshenbladeTrainer"
+        or trainer_id == "GreenwardScoutTrainer")
+        and not original_transfer_mentors:nearby_trainer(
+            player, trainer_id
+        )
+    then
+        trainer_snapshot:FireClient(player, {
+            ok = false,
+            reason = "TransferTrainerNotNearby",
+        })
+        return
+    end
     send_trainer(player, trainer_id)
 end)
 
@@ -1152,7 +1189,13 @@ skill_learn_request.OnServerEvent:Connect(function(
 
     local result
 
-    if type(trainer_id) == "string" and type(skill_id) == "string" then
+    if type(trainer_id) == "string" and type(skill_id) == "string"
+        and (trainer_id ~= "AshenbladeTrainer"
+            and trainer_id ~= "GreenwardScoutTrainer"
+            or original_transfer_mentors:nearby_trainer(
+                player, trainer_id
+            ))
+    then
         result = progression_controller:learn_skill(
             player.UserId,
             trainer_id,
@@ -1176,7 +1219,13 @@ skill_rank_request.OnServerEvent:Connect(function(
 
     local result
 
-    if type(trainer_id) == "string" and type(skill_id) == "string" then
+    if type(trainer_id) == "string" and type(skill_id) == "string"
+        and (trainer_id ~= "AshenbladeTrainer"
+            and trainer_id ~= "GreenwardScoutTrainer"
+            or original_transfer_mentors:nearby_trainer(
+                player, trainer_id
+            ))
+    then
         result = progression_controller:purchase_rank(
             player.UserId,
             trainer_id,
