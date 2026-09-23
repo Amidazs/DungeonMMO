@@ -1,3 +1,31 @@
+**Current C4 backend: v1.85 — tested Rogue/Scout ranked crafting.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_85_C4_Scout_Ranked_Crafting_20260923.md)
+and [actual focused Studio and two-client test evidence](
+../testing/c4-scout-ranked-crafting-v1-85-2026-09-23.md).
+The original Human Rogue and Elven Scout each gained three
+separately purchased crafting ranks at levels 20/28/36
+behind actual Recipe Reading and **one selected crafting
+profession per character**. Four creation careers now
+have twelve genuine tiered material-consuming alternate
+recipes with atomic server validation, profession XP
+and cross-career marketplace dependencies. The unpublished
+focused Studio run passed **5/5**, including **290**
+new crafting and **1,150** strict source-inventory
+assertions. A separate real **two-client Base gameplay**
+test verified an actual Rogue smith crafting two bars,
+the Elf Alchemist's forged Smithing request being denied,
+genuine Smith-to-Alchemist market purchase, and the
+Alchemist's real client crafting a rank-two recipe
+consuming the traded bar. Current six-class original
+C4 source coverage: **379/396**. Four starting classes
+remain complete, Human Rogue **90/99**, Elven Scout
+**121/129**; seven other original first-transfer
+class inventories remain entirely unmapped and **0/9**
+first-transfer paths are complete. Preserve the
+separate humanoid/quadruped animation roadmap,
+no-publish policy and one-Gathering/one-Crafting rule.
+
 **Current C4 backend: v1.84 — real Scout Accuracy toggle.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_84_C4_Scout_Accuracy_20260923.md)
