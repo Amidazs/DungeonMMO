@@ -18,6 +18,9 @@ function BaseClassAdvancementRuntime:send_snapshot(player: Player)
     snapshot.OriginalFirstTransfer = self._selection:build_snapshot(
         player.UserId
     )
+    snapshot.OriginalQuest = if self._original_quest
+        then self._original_quest:build_snapshot(player.UserId)
+        else {ok = false, reason = "OriginalQuestWorldNotReady"}
     self._snapshot:FireClient(player, snapshot)
 end
 
@@ -74,6 +77,22 @@ function BaseClassAdvancementRuntime:handle_action(
 
     self._result:FireClient(player, result)
     self:send_snapshot(player)
+end
+
+--[[ 
+Attaches real source quest snapshot authority after Base NPC registration.
+
+Args:
+    quest_service (any): Server-only original C4 quest service.
+
+Returns:
+    nil: Subsequent GUI snapshots include live original quest stage.
+]]
+function BaseClassAdvancementRuntime:set_original_quest_service(
+    quest_service: any
+)
+    assert(quest_service)
+    self._original_quest = quest_service
 end
 
 -- Connects advancement requests to the existing profile-backed service.
