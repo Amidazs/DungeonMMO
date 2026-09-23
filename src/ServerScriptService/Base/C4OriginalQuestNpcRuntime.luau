@@ -140,6 +140,8 @@ function Runtime.attach(options: any): any
             -- not a replay of the stage-one quest-start interaction.
             self._step_parts[branch_id][5] =
                 self._step_parts[branch_id][1]
+            self._step_parts[branch_id][7] =
+                self._step_parts[branch_id][1]
         end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
@@ -228,12 +230,14 @@ function Runtime:_talk(
     if current and index == 2 and current.Step == 4 then
         index = 4
     elseif current and branch_id == "HumanRogue"
-        and index == 1 and current.Step == 5
+        and index == 1
+        and (current.Step == 5 or current.Step == 7)
     then
-        index = 5
+        index = current.Step
     end
     local source_index = if index == 4
-        then 2 elseif index == 5 then 1 else index
+        then 2 elseif index == 5 or index == 7
+        then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
         and self._step_parts[branch_id][index]
