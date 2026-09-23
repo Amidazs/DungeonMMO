@@ -45,12 +45,17 @@ local function check_branch(branch_id: string, expected: any)
     end
     check(audit.SourceRankEntriesByLevel[32] == nil,
         "Level-32 reference ranks belong in postlaunch updates")
-    check(#audit.AuthoredClassSkillsThroughCap == 2,
-        "Both earned careers still have only two own-class skills")
+    check(#audit.AuthoredClassSkillsThroughCap > 20,
+        "Earned first-transfer career offers original shared and class skills")
+    check(audit.TrainerMappedRankEntries == expected.total
+        and audit.MissingRankScheduleEntries == 0
+        and audit.SourceRankScheduleMapped,
+        "Every recorded source rank must have a correctly gated real "
+            .. "trainer entry at its exact reference level")
     check(audit.SourceInventoryAuditedThroughCap
         and not audit.ExactSourceRankCoverageCertified
         and not audit.LaunchSkillCatalogueReady,
-        "A legacy analogue or incomplete class must not pass parity")
+        "Matching training rows cannot certify every live combat effect")
 end
 
 --[[
@@ -77,6 +82,7 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(report.SourceAuditedBranches == 2
+        and report.RankSchedulesMappedBranches == 2
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
