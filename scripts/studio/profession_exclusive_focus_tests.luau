@@ -16,6 +16,10 @@ local names = {
     "RecipeKnowledgeCraftingGateTest",
     "RecipeKnowledgeServiceTest",
     "ProfileMigrationDungeonDifficultyV13Test",
+    "C4ProfessionCraftSkillsTest",
+    "C4BaseImplementationAuditTest",
+    "C4CatalogueCoverageTest",
+    "C4BaseSourceInventoryTest",
 }
 local passed = 0
 local failed = 0
