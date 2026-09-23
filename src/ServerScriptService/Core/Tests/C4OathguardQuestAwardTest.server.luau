@@ -16,6 +16,12 @@ local Transfer = require(SSS.Core.Services.OriginalFirstTransferService)
 local Inventory = require(SSS.Core.Services.InventoryService)
 local SkillService = require(SSS.Core.Services.SkillProgressionService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
+local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
+local PassiveEffects = require(Shared.PassiveSkillEffects)
+local RuntimeState = require(
+    SSS.Core.Services.ProgressionRuntimeState
+)
+local Schema = require(Shared.ProfileSchema)
 
 local USER_ID = 837931
 local CHECKS = 0
@@ -244,8 +250,43 @@ local function award(profiles: any, pending: any)
     check(service:learn_trainer_skill(
         USER_ID, "OathguardShieldImpact"
     ).ok, "Actual server trainer sells an independently purchased Knight rank")
+    -- This client-independent fixture tests every genuine rank purchase
+    -- with prepared character levels, not a naturally earned level grind.
+    local levels = {20, 20, 24, 24, 24, 28, 28, 28}
+    local magic_id = "OathguardRunicResistance"
+    local definition = assert(SkillDefinitions.get(magic_id))
+    check(definition.MaxRank == #levels,
+        "Knight rune resistance has eight separately purchasable ranks")
+    for rank, level in ipairs(levels) do
+        check(profiles:mutate(USER_ID, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Level = level
+            owner.Progression.SkillPointEntitlement = 12000
+        end), "Test Knight enters the exact earned magical rank bracket")
+        local result = if rank == 1
+            then service:learn_trainer_skill(USER_ID, magic_id)
+            else service:purchase_rank(USER_ID, magic_id)
+        check(result.ok and result.rank == rank,
+            "Actual Knight trainer must purchase every separate rune "
+                .. tostring(rank) .. " " .. tostring(result.reason))
+    end
+    local trained = assert(profiles:get_character(USER_ID))
+    check(math.abs(PassiveEffects.oathguard_magic_reduction(
+        trained
+    ) - 0.048) < 1e-6,
+        "Eight authentic paid Knight rune ranks mitigate enemy magic")
+    RuntimeState.set_character(USER_ID, trained)
+    check(math.abs(
+        RuntimeState.get_oathguard_magic_reduction(USER_ID) - 0.048
+    ) < 1e-6,
+        "Live combat's actual Knight resistance uses current owner state")
+    local forged = Schema.deep_clone(trained)
+    forged.Identity.ClassId = "Fighter"
+    check(PassiveEffects.oathguard_magic_reduction(forged) == 0,
+        "A forged Fighter with copied rune ranks has no magic resistance")
+    RuntimeState.clear_character(USER_ID)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
-        "Original Knight class, loot turn-in and purchased rank save")
+        "Original Knight quest, class and eight paid rune ranks persist")
 end
 
 --[[
