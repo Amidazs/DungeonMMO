@@ -103,6 +103,14 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
         return "CommonItemCreationNotLearned"
     end
 
+    if recipe.RequiredSkillId == "ScoutCommonItemCreation"
+        and not C4ProfessionSkillRules.can_make_scout_common(
+            character, recipe.ProfessionId, recipe.RequiredSkillRank
+        )
+    then
+        return "ScoutCommonItemCreationNotLearned"
+    end
+
     local professions = ensure_professions(character)
     local state = professions[recipe.ProfessionId]
     local level = ProfessionDefinitions.level_from_xp(
@@ -261,9 +269,15 @@ function ProfessionService:build_snapshot(user_id: number): any
                 or C4ProfessionSkillRules.can_make_common(
                     character, recipe.ProfessionId
                 )
+        local scout_skill_unlocked =
+            recipe.RequiredSkillId ~= "ScoutCommonItemCreation"
+                or C4ProfessionSkillRules.can_make_scout_common(
+                    character, recipe.ProfessionId,
+                    recipe.RequiredSkillRank
+                )
         recipes[recipe_id] = {
             Unlocked = level_unlocked and knowledge_rejection == nil
-                and common_skill_unlocked
+                and common_skill_unlocked and scout_skill_unlocked
                 and ProfessionSelectionRules.can_use(
                     slots, recipe.ProfessionId
                 ),
