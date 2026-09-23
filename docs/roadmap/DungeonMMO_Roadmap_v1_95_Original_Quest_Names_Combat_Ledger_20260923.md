@@ -54,16 +54,21 @@ a guarantee against intellectual-property issues.
   one unique enemy-life receipt, live qualified
   contributor, appropriate selected quest stage
   and equipped trial weapon when applicable.
-  It will issue owner-specific receipts once
-  wired to genuine server DamageService callbacks.
-  **It is not registered to live dungeon encounters yet.**
+  It now observes accepted server DamageService
+  callbacks through the existing contribution bridge
+  and has its own Dungeon-only source-quest service.
+  **No physical source quest monster is registered
+  in the live dungeon encounter yet.**
 - [x] Actual unpublished Base focused
   original-quest/skill suite **5/5 PASS**, including
   **148** quest/naming assertions.
-- [x] Actual unpublished Dungeon physical-model
-  ledger fixture **1/1 PASS**, **10 assertions**,
-  including wrong branch/room, duplicate life,
-  fake attacker, stage availability and wipe cleanup.
+- [x] Actual unpublished Dungeon focused combat
+  suite **2/2 PASS**: physical-model ledger
+  **10 assertions** and existing contribution/
+  quest-observer fan-out **13 assertions**,
+  including accepted/lethal damage forwarding,
+  zero/ownerless damage refusal and unchanged
+  ordinary contribution recording.
 - [x] Actual unpublished Base **two-client**
   physical-NPC stage-one/two playtest PASS,
   including four original displayed NPC names,
@@ -83,12 +88,15 @@ a guarantee against intellectual-property issues.
   enemies. Use registered NPC factories and
   genuine damage/death callbacks. A normal dungeon
   Marauder/Wolf kill must never count as a source quest.
-- [ ] Bind the new ledger to the trusted existing
-  `DamageService` callback **without replacing**
-  world boss/party contribution or threat handling.
-  Attach its one-use world verifier to the actual
-  Dungeon C4 quest service and to registered room
-  enemy models. Prevent outsider, spectator,
+- [x] The existing contribution bridge forwards
+  accepted DamageService hits to the optional
+  original quest ledger without replacing
+  threat or ordinary party/world-boss contribution.
+  The Dungeon session attaches its own original
+  source-quest service and wipes old receipts.
+- [ ] Register actual dedicated room enemy models
+  and test the one-use world verifier with genuine
+  players. Prevent outsider, spectator,
   disconnected, wrong-branch, stale-session
   and unequipped-trial-weapon evidence.
 - [ ] Source-item grant, receipt and stage-three
@@ -123,9 +131,10 @@ Authentic original first-transfer classes fully
 playable: **0/18**. Human/Elf Fighter/Mystic starters
 and explicit class choices remain supported.
 Live NPC steps one/two for Human Rogue and
-Elven Scout are accepted. Stage three has a
-tested **disconnected server ledger only**;
-real instanced source monsters, combat binding,
+Elven Scout are accepted. Stage three now
+has a tested ledger wired to accepted Dungeon
+damage callbacks but **no registered live
+quest-monster encounter**. Actual quest enemies,
 drops earned through real client attacks,
 late quest turn-in and final class awards
 remain unavailable. Exactly one Gathering
