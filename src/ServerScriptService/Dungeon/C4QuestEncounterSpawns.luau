@@ -145,7 +145,7 @@ function Spawns.augment(options: any, factory: any?): any
     local registrations = {}
     for branch_index, branch in ipairs(branches) do
         local challenge = CHALLENGES[branch]
-        local count = if challenge_id == "ElvenScoutSix"
+        local count = if branch == "ElvenScoutSix"
             then 1 else PER_BRANCH_PER_ROOM
         for index = 1, count do
             local name = challenge.SourceId
