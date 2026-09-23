@@ -436,6 +436,35 @@ function PassiveSkillEffects.mystic_magic_reduction(
 end
 
 --[[
+Returns earned Knight physical reduction with a registered shield equipped.
+
+Args:
+    character (any): Genuine Knight profile and server-owned OffHand item.
+
+Returns:
+    number: Zero without a valid shield; up to 1.6% with both paid ranks.
+]]
+function PassiveSkillEffects.oathguard_shield_reduction(
+    character: any
+): number
+    local equipment = type(character) == "table"
+        and character.Equipment
+    local offhand_id = type(equipment) == "table"
+        and equipment.OffHand
+    local shield = if type(offhand_id) == "string"
+        then ItemDefinitions.get(offhand_id) else nil
+    if not shield or shield.Kind ~= "Equipment"
+        or shield.Slot ~= "OffHand"
+        or shield.Category ~= "Shield"
+    then
+        return 0
+    end
+    return math.clamp(resolve_bonus(
+        character, "OathguardShieldMastery", "PhysicalReductionPerRank"
+    ), 0, 0.016)
+end
+
+--[[
 Returns purchased original Knight mitigation against real enemy magic only.
 
 Args:
