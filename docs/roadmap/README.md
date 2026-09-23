@@ -1,3 +1,26 @@
+**Current C4 backend: v1.94 — source-monster quest drop foundation (not live combat).**
+[Newest original C4 backend roadmap](
+DungeonMMO_Roadmap_v1_94_C4_Quest_Drop_Foundation_20260923.md).
+The server-only source quest service now binds unique
+monster-life receipts to exactly one character's
+stage-three progress and owner-bound Spartoi bones
+or four individually earned Prias letter fragments.
+Rogue skeleton proof requires the actual Neti trial
+weapon equipped, ten distinct receipts and ten
+personally owned bones. The ordered Neti/Moretti
+return stages require corresponding personally
+owned evidence. The focused source fixture has
+been extended, and disposable Base/Dungeon Rojo
+builds succeeded. **Actual Studio verification of
+the new fixture remains pending; the genuine
+instanced skeleton/Ol Mahum monsters and real
+combat/death receipt adapter are not yet wired.**
+The already verified v1.93 physical hub NPC stages
+remain the last genuine two-client source quest
+playtest. Original C4 complete class paths:
+**0/18**. No original level-20 transfer, main
+merge or Roblox publish.
+
 **Current C4 backend: v1.93 — real Neti and Guard Moretti original quest stage two.**
 [Newest original C4 class backend roadmap](
 DungeonMMO_Roadmap_v1_93_C4_Neti_Moretti_Quest_20260923.md)
