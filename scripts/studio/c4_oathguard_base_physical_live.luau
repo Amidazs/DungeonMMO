@@ -43,14 +43,8 @@ signal.OnClientEvent:Connect(function(action, part)
         return
     end
     if action ~= "HOLD" then return end
-    local camera = workspace.CurrentCamera
-    if camera then
-        camera.CameraType = Enum.CameraType.Scriptable
-        camera.CFrame = CFrame.lookAt(
-            part.Position + Vector3.new(0, 5, 9),
-            part.Position
-        )
-    end
+    -- Follow the actual player's default camera. A detached scriptable
+    -- camera can display a prompt that the client cannot really trigger.
     local prompt = part:FindFirstChildOfClass("ProximityPrompt")
     if not prompt then signal:FireServer("FAIL", "No prompt") return end
     local deadline = os.clock() + 6
@@ -137,7 +131,12 @@ local function hold(player, part)
         or os.clock() >= deadline
     connection:Disconnect()
     assert(confirmed,
-        "Client hold never triggered actual server NPC " .. part.Name)
+        "Client hold never triggered actual server NPC " .. part.Name
+            .. ", visible=" .. tostring(responses.PROMPT_VISIBLE)
+            .. ", enabled=" .. tostring(prompt.Enabled)
+            .. ", distance=" .. tostring(
+                (root.Position - part.Position).Magnitude
+            ))
 end
 
 -- Args: profiles (any), player (Player).
