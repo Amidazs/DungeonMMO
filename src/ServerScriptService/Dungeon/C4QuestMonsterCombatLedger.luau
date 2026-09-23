@@ -34,6 +34,7 @@ function Ledger.new(options: any): any
         _enemies = {},
         _pending = {},
         _quest_service = nil,
+        _scout_actor = nil,
     }, Ledger)
 end
 
@@ -49,6 +50,21 @@ Returns:
 function Ledger:attach_quest_service(service: any)
     assert(service and type(service.record_world_event) == "function")
     self._quest_service = service
+end
+
+--[[
+Registers the server-only physical rescue actor with this quest world binder.
+
+Args:
+    actor (any): Authenticated live Dungeon scout prompt authority.
+
+Returns:
+    nil: The quest service can verify either real combat or NPC interaction.
+]]
+function Ledger:attach_scout_actor(actor: any)
+    assert(actor and type(actor.verify) == "function"
+        and type(actor.available) == "function")
+    self._scout_actor = actor
 end
 
 --[[
@@ -202,7 +218,9 @@ local function event_for_owner(
         or state.BranchId ~= record.BranchId then
         return nil
     end
-    local proof_ids = if record.TargetId == "CinderBrigand"
+    local proof_ids = if record.TargetId == "BrackenWarden"
+        then {RustedKey = true}
+        elseif record.TargetId == "CinderBrigand"
         then {
             StolenJewelry = true, StolenTomes = true,
             StolenRing = true, StolenNecklace = true,
@@ -321,6 +339,10 @@ Returns:
 ]]
 function Ledger:available(quest: any, step_index: number?): boolean
     if not quest or type(step_index) ~= "number" then return false end
+    if self._scout_actor and (step_index == 5 or step_index == 7)
+    then
+        return self._scout_actor:available(quest, step_index)
+    end
     for _, record in pairs(self._enemies) do
         if record.BranchId == quest.BranchId
             and record.Step == step_index
@@ -346,6 +368,10 @@ Returns:
 function Ledger:verify(
     user_id: number, event: any, quest: any, state: any
 ): boolean
+    if type(event) == "table" and event.Kind == "NpcTalk" then
+        return self._scout_actor ~= nil
+            and self._scout_actor:verify(user_id, event, quest, state)
+    end
     local pending = self._pending[user_id]
     self._pending[user_id] = nil
     return pending ~= nil and pending.Event == event
@@ -367,6 +393,9 @@ Returns:
 function Ledger:clear()
     table.clear(self._enemies)
     table.clear(self._pending)
+    if self._scout_actor then
+        self._scout_actor:clear()
+    end
 end
 
 return table.freeze(Ledger)
