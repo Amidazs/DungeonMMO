@@ -455,6 +455,9 @@ function M.Equip(name)
     for _, part in rig:GetDescendants() do
         if part:IsA("BasePart") and part.Name:match("^DMMO_Test") then
             part.Transparency = visible[part.Name] and 0 or 1
+        elseif part:IsA("Beam")
+            and part.Name:match("^DMMO_TestBowString") then
+            part.Enabled = name == "Bow"
         end
     end
 end
