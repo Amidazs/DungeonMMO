@@ -6,6 +6,9 @@ local SkillDefinitions = require(
 local Classes = require(
     script.Parent:WaitForChild("SecondaryClassDefinitions")
 )
+local ProfessionSelectionRules = require(
+    script.Parent:WaitForChild("ProfessionSelectionRules")
+)
 
 local SkillUnlockRules = {}
 
@@ -106,6 +109,17 @@ function SkillUnlockRules.can_train(
         end
         if not correct_race then
             return false, "WrongRace", nil
+        end
+    end
+
+    -- C4 recipe literacy cannot be purchased as a free crafting
+    -- career before the character has chosen its one creation slot.
+    if definition.RequiresCraftingProfessionChoice == true then
+        local slots = ProfessionSelectionRules.normalize(
+            character.ProfessionSlots
+        )
+        if slots.Creation == "" then
+            return false, "CraftingProfessionNotSelected", nil
         end
     end
 
