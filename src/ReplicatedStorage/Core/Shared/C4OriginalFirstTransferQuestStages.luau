@@ -23,6 +23,29 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    -- Independent DungeonMMO Warrior route. These identifiers belong
+    -- to original game actors and owned loot, not third-party content.
+    HumanWarrior = table.freeze({
+        Id = "IronvowTrial", BranchId = "HumanWarrior",
+        SourceTitle = "The Ironroot Oath",
+        StartLevel = 18, TransferLevel = 20,
+        TransferNpcId = "MarshalTorren",
+        Recommendation = "IronrootOathToken",
+        Steps = table.freeze({
+            talk("MarshalTorren", "Hear the Ironroot watcher's request."),
+            talk("SmithOrla", "Learn where the raiders broke the line."),
+            defeat("RidgeMarauder", 4,
+                "Recover four separate Ironroot dispatch markers."),
+            talk("SmithOrla", "Return the four earned markers."),
+            defeat("Ridgebreaker", 1,
+                "Recover the ridgebreaker's personal oath seal."),
+            talk("MarshalTorren", "Present the recovered oath seal."),
+        }),
+        RequiredProofIds = table.freeze({
+            "IronrootToken4", "RidgebreakerSigil",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanRogue = table.freeze({
         Id = "C4PathToRogue", BranchId = "HumanRogue",
         SourceQuestId = 403, SourceTitle = "The Ashen Blade Trial",
@@ -97,7 +120,9 @@ Returns:
     {any}: Source quest data only, not a completed in-world encounter.
 ]]
 function SourceQuests.inventoried(): {any}
-    return table.freeze({QUESTS.HumanRogue, QUESTS.ElvenScout})
+    return table.freeze({
+        QUESTS.HumanWarrior, QUESTS.HumanRogue, QUESTS.ElvenScout,
+    })
 end
 
 return table.freeze(SourceQuests)
