@@ -108,6 +108,25 @@ local DEFINITIONS = table.freeze({
         Stackable = false,
     }),
 
+    -- Craftable first-transfer light vest. Without paid equipment
+    -- expertise it cannot be equipped, including through old profiles.
+    scout_expert_leather_vest = table.freeze({
+        Id = "scout_expert_leather_vest",
+        Name = "Expert Scout Leather Vest",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body",
+        Category = "LightArmor",
+        AllowedBaseClasses = RANGER_ROGUE,
+        RequiredSkillId = "ScoutEquipmentExpertise",
+        RequiredSkillRank = 1,
+        Rarity = "Uncommon",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 12,
+        }),
+    }),
+
     marauder_armor = table.freeze({
         Id = "marauder_armor",
         Name = "Marauder Armour",
