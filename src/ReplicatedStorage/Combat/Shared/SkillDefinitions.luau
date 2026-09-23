@@ -1317,6 +1317,86 @@ local ELVEN_SCOUT_GUARD = specialize_skill(
     }
 )
 
+-- Real Elf Scout self-heal: no friendly-player selection or free HoT.
+local ELVEN_SCOUT_CURE_WOUNDS = specialize_skill(
+    MAGE_HEAL, "ElvenScoutCureWounds", "Cure Wounds", {
+        SELF_ONLY = true,
+        MANA_COST = 12,
+        COOLDOWN_SECONDS = 10,
+        RANGE_STUDS = 12,
+        TOTAL_HEAL = 42,
+        HUMAN_INSTANT_FRACTION = 1,
+        ELF_INSTANT_FRACTION = 1,
+        HUMAN_HOT_SECONDS = 0,
+        ELF_HOT_SECONDS = 0,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 42}),
+        }),
+    }
+)
+
+-- The existing authoritative buff executor consumes resources on use.
+local ELVEN_SCOUT_BATTLE_FOCUS = specialize_skill(
+    MAGE_HEAL, "ElvenScoutBattleFocus", "Battle Focus", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 0,
+        STAMINA_COST = 14,
+        COOLDOWN_SECONDS = 22,
+        BUFF_KIND = "PhysicalPower",
+        BUFF_MAGNITUDE = 0.08,
+        BUFF_SECONDS = 10,
+        WIND_UP_SECONDS = 0.14,
+        ACTIVE_SECONDS = 0.08,
+        RECOVERY_SECONDS = 0.22,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.08,
+                BUFF_SECONDS = 10,
+            }),
+        }),
+    }
+)
+
+-- A distinct cast-only movement buff, never a second speed passive.
+local ELVEN_SCOUT_WIND_RUN = specialize_skill(
+    MAGE_HEAL, "ElvenScoutWindRun", "Wind Run", {
+        KIND = "Buff",
+        SELF_ONLY = true,
+        MANA_COST = 0,
+        STAMINA_COST = 16,
+        COOLDOWN_SECONDS = 24,
+        BUFF_KIND = "Movement",
+        BUFF_MAGNITUDE = 0.10,
+        BUFF_SECONDS = 10,
+        WIND_UP_SECONDS = 0.14,
+        ACTIVE_SECONDS = 0.08,
+        RECOVERY_SECONDS = 0.22,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.10,
+                BUFF_SECONDS = 10,
+            }),
+        }),
+    }
+)
+
+-- A genuine longbow impact applies slow through RangerCombatService.
+local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
+    CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
+        STAMINA_COST = 24,
+        COOLDOWN_SECONDS = 11,
+        BASE_DAMAGE = 14,
+        HUMAN_SLOW_FRACTION = 0,
+        HUMAN_SLOW_SECONDS = 0,
+        ELF_SLOW_FRACTION = 0.35,
+        ELF_SLOW_SECONDS = 4,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 14}),
+        }),
+    }
+)
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1418,6 +1498,10 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticPartyHeal = MYSTIC_PARTY_HEAL,
     ScoutEvasiveFocus = SCOUT_EVASIVE_FOCUS,
     ElvenScoutGuard = ELVEN_SCOUT_GUARD,
+    ElvenScoutCureWounds = ELVEN_SCOUT_CURE_WOUNDS,
+    ElvenScoutBattleFocus = ELVEN_SCOUT_BATTLE_FOCUS,
+    ElvenScoutWindRun = ELVEN_SCOUT_WIND_RUN,
+    ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
     MysticFeebleCurse = MYSTIC_FEEBLE_CURSE,
@@ -1534,7 +1618,8 @@ local function validate_buff(definition: BuffSkillDefinition)
         definition.BUFF_KIND == "PhysicalPower"
             or definition.BUFF_KIND == "PhysicalGuard"
             or definition.BUFF_KIND == "MagicPower"
-            or definition.BUFF_KIND == "Evasion",
+            or definition.BUFF_KIND == "Evasion"
+            or definition.BUFF_KIND == "Movement",
         "Unknown authoritative combat buff kind."
     )
     assert(definition.BUFF_MAGNITUDE > 0
