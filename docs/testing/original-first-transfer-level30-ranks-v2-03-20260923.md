@@ -113,6 +113,13 @@ real mentor, trainer, equipment rules and actual
 skills remain unimplemented. Remaining 14 source
 branch reference catalogues require separate audits.
 
+**Additional boundary:** 59/77 measures the recorded original
+first-transfer 20/24/28 training entries. A separate historical
+starter-class level-1–19 skill-rank audit is still needed for
+full level-1–30 catalogue acceptance. The actual authored names,
+effects and progression are DungeonMMO adaptations; training-row
+matching alone is not complete class-mechanics acceptance.
+
 ## Outstanding release acceptance
 
 **2/18** first transfers still have actual physical
