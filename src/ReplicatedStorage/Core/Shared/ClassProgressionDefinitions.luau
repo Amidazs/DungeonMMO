@@ -91,7 +91,10 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Human"}),
         StarterSkills = table.freeze({}),
         StarterEquipment = table.freeze({}),
-        TeachableSkills = table.freeze({"HumanScoutSprint"}),
+        TeachableSkills = table.freeze({
+            "HumanScoutSprint",
+            "AshenbladeOpening",
+        }),
     }),
 
     GreenwardScout = table.freeze({
@@ -102,7 +105,10 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Elf"}),
         StarterSkills = table.freeze({}),
         StarterEquipment = table.freeze({}),
-        TeachableSkills = table.freeze({"ElvenScoutGuard"}),
+        TeachableSkills = table.freeze({
+            "ElvenScoutGuard",
+            "GreenwardRenewal",
+        }),
     }),
 
     Ranger = table.freeze({
