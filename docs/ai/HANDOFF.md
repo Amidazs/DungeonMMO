@@ -1,3 +1,25 @@
+## 24 September 2026 — v2.08 Knight shield GitHub candidate
+
+Resume from [v2.08 roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md)
+and [test checklist](
+../testing/oathguard-shield-mastery-github-candidate-v2-08-20260924.md).
+Committed two genuinely bought Oathguard shield ranks (20/28),
+class/trainer/quest receipt gates, equipment-dependent server
+physical reduction, damage bridge and focused automated test
+fixtures. Actual Studio tests and Rojo builds were **not run**
+because remote desktop is unavailable. Source-mapped Oathguard
+training candidate: 37/54, 17 missing; Ironvow: 27/62, 35
+missing. Run `scripts/studio/c4_oathguard_quest_focus.luau`
+and `scripts/studio/c4_level30_launch_coverage_focus.luau`
+on the next fast-forward pulled disposable Base; then verify
+equipped shield physical hits and previously pending client
+Knight heal/magic effects. Do not imply Studio PASS based on
+GitHub edits or old logs. Keep all source/doc changes in GitHub,
+desktop for fast-forward pull, disposable builds, unpublished
+Studio tests and logs only. Never merge main or publish without
+owner approval. Separate animation roadmap is unaffected.
+
 ## 23 September 2026 — approved quadruped engine work in progress
 
 Owner approved reusable quadruped design, GitHub source/docs commits on
