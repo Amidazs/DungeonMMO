@@ -1,5 +1,5 @@
 /**
- * Capture frames from a real unpublished Roblox Studio Animator preview.
+ * Capture frames from a real unpublished Studio Play-session Animator.
  *
  * Usage:
  *   node CaptureStudioClip.mjs <studio-id> <clip-name> <output-folder>
@@ -102,7 +102,15 @@ function poseCommand(clip, seconds, isFirst) {
         assert(track and track.IsPlaying, "No preview track is playing")
         track:AdjustSpeed(0)
         track.TimePosition = ${seconds.toFixed(6)}
-        animator:StepAnimations(0)
+        if not game:GetService("RunService"):IsRunning() then
+            animator:StepAnimations(0)
+        end
+        if "${clip}" == "Bow" then
+            local arrow = rig:FindFirstChild("DMMO_TestArrow")
+            if arrow then
+                arrow.Transparency = ${seconds.toFixed(6)} >= 1.05 and 1 or 0
+            end
+        end
         task.wait(0.025)
         return {
             time = track.TimePosition,
@@ -129,7 +137,7 @@ async function captureFrame(client, studioId, clip, frame, folder) {
     const seconds = frame * DURATION_SECONDS[clip] / FRAME_COUNT;
     const executed = await client.callTool("execute_luau", {
         studio_id: studioId,
-        datamodel_type: "Edit",
+        datamodel_type: "Server",
         code: poseCommand(clip, seconds, frame === 0),
     });
     if (executed.isError) {
@@ -141,7 +149,7 @@ async function captureFrame(client, studioId, clip, frame, folder) {
     const capture = await client.callTool("screen_capture", {
         studio_id: studioId,
         capture_id: `DMMO_${clip}_${frame}`,
-        camera_position: isMoving ? [6.2, 3.7, 0] : [4, 3.8, 8],
+        camera_position: isMoving ? [6.2, 3.7, 0] : [5, 4, -7],
         look_at_position: [0, 2.8, 0],
     });
     const image = capture.content?.find((item) => item.type === "image");
@@ -168,7 +176,7 @@ async function captureFrame(client, studioId, clip, frame, folder) {
 async function resetPreview(client, studioId) {
     const response = await client.callTool("execute_luau", {
         studio_id: studioId,
-        datamodel_type: "Edit",
+        datamodel_type: "Server",
         code: `
             local rig = workspace:FindFirstChild("${TEST_RIG}")
             assert(rig and game.PlaceId == 0)
@@ -219,7 +227,7 @@ async function main() {
         clip,
         frameCount: FRAME_COUNT,
         durationSeconds: DURATION_SECONDS[clip],
-        sampleType: "real unpublished Roblox Studio Animator playback",
+        sampleType: "real unpublished Studio Play server Animator playback",
         frames,
         visualApproval: "pending user review",
     };
