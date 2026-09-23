@@ -11,7 +11,7 @@ local LETTER_IDS = table.freeze({
 })
 
 local STAGE_PROOFS = table.freeze({
-    CryptSentinel = table.freeze({crypt sentinelBone = true}),
+    CryptSentinel = table.freeze({SpartoiBone = true}),
     BrackenRaider = LETTER_IDS,
     BrackenWarden = table.freeze({RustedKey = true}),
     CinderBrigand = table.freeze({
@@ -139,13 +139,13 @@ function Rules.can_progress(
     end
     if step.TargetId == "CryptSentinel"
         and (type(event.VerifiedProofIds) ~= "table"
-            or event.VerifiedProofIds.crypt sentinelBone ~= true)
+            or event.VerifiedProofIds.SpartoiBone ~= true)
     then
         return false, "OriginalQuestLootProofRequired"
     end
     if step.TargetId == "Vela" and current.Step == 4
         and (type(current.Proofs) ~= "table"
-            or current.Proofs.crypt sentinelBone10 ~= true)
+            or current.Proofs.SpartoiBone10 ~= true)
     then
         return false, "OriginalQuestLootProofRequired"
     end
@@ -232,7 +232,7 @@ function Rules.advance(quest: any, current: any, event: any): any
         and current.Count == step.Required
     then
         -- Never accept an aggregate ten-bone proof from an incoming event.
-        current.Proofs.crypt sentinelBone10 = true
+        current.Proofs.SpartoiBone10 = true
     end
     if current.Count >= step.Required then
         current.Step += 1
