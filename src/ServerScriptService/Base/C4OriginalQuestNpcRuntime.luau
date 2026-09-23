@@ -230,6 +230,19 @@ function Runtime:_talk(player: Player, branch_id: string): any
 end
 
 --[[
+Exposes the actual private quest authority only to server-side Base wiring.
+
+Args:
+    None.
+
+Returns:
+    any: Source quest state service for existing class-choice snapshots.
+]]
+function Runtime:quest_service(): any
+    return self._quest_service
+end
+
+--[[
 Releases per-player provisional proof on disconnect or profile teardown.
 
 Args:
