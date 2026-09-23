@@ -17,13 +17,13 @@ local NPCS = table.freeze({
         table.freeze({
             TargetId = "CaptainRowan",
             Name = "Captain Rowan",
-            Offset = Vector3.new(-57, 2.5, -17),
+            Offset = Vector3.new(-34, 2.5, -42),
             Color = Color3.fromRGB(102, 107, 136),
         }),
         table.freeze({
             TargetId = "QuartermasterDena",
             Name = "Quartermaster Dena",
-            Offset = Vector3.new(-68, 2.5, -17),
+            Offset = Vector3.new(-47, 2.5, -42),
             Color = Color3.fromRGB(134, 113, 77),
         }),
     }),
