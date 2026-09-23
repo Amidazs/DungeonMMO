@@ -11,10 +11,14 @@ without changing the underlying saved legacy inventory/quest keys.
 The Base focused source/skill suite passed **5/5** (148 original
 quest/naming assertions); the actual **two-client physical Base NPC**
 playtest passed with all four new prompt labels; the separate
-Dungeon real-model/forge-denial combat-ledger fixture passed
-**1/1** (10 assertions). Both unpublished local Rojo
-compositions built. **The ledger is not bound to an actual
-instanced quest room or genuine player-to-monster combat yet**;
+Dungeon focused combat-ledger and damage-observer suites
+passed **2/2** (10 registration and 13 contribution/fan-out
+assertions). The optional original quest ledger is now
+connected to the real Dungeon session's accepted server
+damage callback without replacing ordinary combat rewards.
+Both unpublished local Rojo compositions built. **No actual
+source quest monster has been registered in a playable
+instanced room yet, so genuine quest combat remains untested**;
 no completed quest or original level-20 class award is claimed,
 and fully playable original first-transfer branches remain
 **0/18**. Preserve independent game art/writing, one Gathering
