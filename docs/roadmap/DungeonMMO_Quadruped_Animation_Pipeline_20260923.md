@@ -196,6 +196,87 @@ The earlier source GLBs and the separate Rigify controls
 remain untouched; no Roblox place was published and
 nothing was merged into production gameplay.
 
+## JawV3 import follow-up — 23 September 2026
+
+**Stage 1 remains OPEN; this is not a validated master rig.**
+Continuing from the initial Studio import, a newer **independent
+jaw-skinned experimental variant** was prepared from
+`Frostfang_Canine_ExperimentalMaster_JawV3.blend`.
+It retains the same intact source geometry across 12 skinned
+sections (161,948 triangles total; <=13,496 per section), adds
+lower-muzzle skin weights and exports a single shared compact
+rig in separate FBX/GLB files. Blender round-trip checks
+confirmed 12 sections, one 34-bone armature (including the
+non-deforming Root), <=4 vertex influences and the imported
+jaw `DEF_jaw` retaining ~2,453 weighted section vertices.
+A controlled ±24° jaw test displaced selected vertices up to
+~0.022 source-space units; **this does not show a real opening
+mouth** on Frostfang's single closed muzzle.
+
+**Local PC assets (experimental; not game-production assets):**
+
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\JawV3_Import_Candidate\`
+
+- `Frostfang_Roblox_SectionedRig_JawV3_QA.blend`
+- `Frostfang_Roblox_SectionedRig_JawV3_QA.fbx`
+- `Frostfang_Roblox_SectionedRig_JawV3_QA.glb`
+- `sectioned_jawv3_jawv3_roundtrip_validation.json`
+- `jawv3_skin_roundtrip_validation.json`
+- `Studio_JawV3_Rest.png` and
+  `Studio_JawV3_Bend_Xminus24.png`
+- QA scripts in the parent `DungeonMMO_CanineRig_QA`
+  working directory.
+
+**Actual isolated Studio import:** With
+`Upload to Roblox` unchecked, `Frostfang_JawV3_QA`
+was imported *alongside* the original saved reference into
+the unpublished local QA place. It has 12 MeshParts,
+12 Motor6Ds, 33 imported Bone instances **including
+`DEF_jaw`** (the zero-influence legacy import had only
+32), and an Animator created in the isolated QA model
+because Studio did not supply one. `Model:ScaleTo(0.06)`
+matched the original QA wolf's size. Separate front-left
+and hind-right shin articulations displaced the paw
+~0.706 and ~0.529 studs, respectively, and each was
+explicitly reset (recorded rest error 0). Jaw rotation
+visibly affects only a small area of the lower muzzle;
+**the source geometry remains closed and the bite is
+not visually approved.**
+
+The original reference was retained and
+`Frostfang_StudioRig_Import_QA_PreJawV3.rbxl` was saved
+as a separate copy of the earlier, independently verified
+original QA place. The newer JawV3 variant was tested in
+Studio's **Edit session but a new .rbxl checkpoint for it
+has NOT yet been verified saved**. A second Studio session
+intermittently opened on the shared Windows desktop during
+Save As attempts. Those UI operations were halted rather
+than risk saving or running commands against another
+DungeonMMO place. The Blender/FBX/GLB and screenshot QA
+artifacts above *are* saved; do not conflate them with a
+saved JawV3 Roblox place.
+
+**Still blocking handoff to Astra:** a real, separately
+opening lower jaw and inner-mouth geometry; correction of
+source hindleg asymmetry and shoulder fur; consistent
+four-paw floor contact; continuous, editable
+idle–walk–idle tested with the actual Studio animator
+from multiple views; user visual approval. Static bone
+motion and geometry round trips are not gait acceptance.
+No production DungeonMMO place, scripts or gameplay
+were changed or published. Roblox importer assigned
+numeric MeshIds even with `Upload to Roblox` unchecked;
+account asset creation cannot be ruled out.
+
+**Safe resume:** first confirm only the isolated
+`Frostfang_StudioRig_Import_QA.rbxl` is open, inspect its
+Edit-mode `Frostfang_JawV3_QA` model, reset every Bone
+Transform and save a *separately named* local .rbxl,
+verifying its modified timestamp and re-opened contents.
+Do not touch a different Studio session. Prioritize
+correcting real muzzle topology rather than repeating
+numeric `DEF_jaw` tests on closed mesh.
+
 ## Stage 1 — approve the canine master rig [OPEN]
 
 - [ ] Find/import a genuinely standing, properly rigged and
