@@ -84,7 +84,7 @@ def add_weight_transfer(rig, scene):
             -BODY_DROP +
             BOB_HEIGHT * (1.0 - math.cos(2.0 * phase)) / 2.0
         )
-        rig.location = baseline + (0.0, 0.0, drop)
+        rig.location = (baseline.x, baseline.y, baseline.z + drop)
         rig.keyframe_insert(data_path="location", frame=frame)
         chest.rotation_euler.x = math.radians(
             CHEST_PITCH * math.sin(2.0 * phase) * strength
