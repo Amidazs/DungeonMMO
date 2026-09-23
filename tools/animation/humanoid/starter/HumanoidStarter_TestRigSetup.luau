@@ -122,6 +122,38 @@ local function make_dagger(character, handName, sideName)
     return blade
 end
 
+-- Args: character (Model), upper (Part), lower (Part) - attached bow limbs.
+-- Returns: nil - adds two visual bowstring spans linked to the draw hand.
+local function make_bowstring(character, upper, lower)
+    local upperTip = Instance.new("Attachment")
+    upperTip.Name = "DMMO_TestBowUpperTip"
+    upperTip.Position = Vector3.new(0, 0.78, 0)
+    upperTip.Parent = upper
+    local lowerTip = Instance.new("Attachment")
+    lowerTip.Name = "DMMO_TestBowLowerTip"
+    lowerTip.Position = Vector3.new(0, -0.78, 0)
+    lowerTip.Parent = lower
+    local nock = Instance.new("Attachment")
+    nock.Name = "DMMO_TestBowNock"
+    nock.Position = Vector3.new(0, -0.07, -0.18)
+    nock.Parent = character.RightHand
+    for _, pair in {
+        {"DMMO_TestBowStringUpper", upperTip},
+        {"DMMO_TestBowStringLower", lowerTip},
+    } do
+        local strand = Instance.new("Beam")
+        strand.Name = pair[1]
+        strand.Attachment0 = pair[2]
+        strand.Attachment1 = nock
+        strand.Width0 = 0.025
+        strand.Width1 = 0.025
+        strand.FaceCamera = true
+        strand.Enabled = false
+        strand.Color = ColorSequence.new(Color3.fromRGB(216, 205, 181))
+        strand.Parent = character
+    end
+end
+
 -- Args: character (Model) - separate test mannequin.
 -- Returns: {Part} - left-hand bow limbs and visible right-hand arrow.
 local function make_bow(character)
@@ -144,6 +176,7 @@ local function make_bow(character)
     )
     attach_part(left, lower, CFrame.new(0, -0.83, -0.38)
         * CFrame.Angles(math.rad(-11), 0, 0))
+    make_bowstring(character, upper, lower)
     local arrow = make_part(
         character, "DMMO_TestArrow",
         Vector3.new(0.08, 0.08, 2.1), Color3.fromRGB(205, 188, 152)
