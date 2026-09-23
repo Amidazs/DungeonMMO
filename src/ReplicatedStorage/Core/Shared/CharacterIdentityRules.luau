@@ -5,6 +5,10 @@ local ClassProgressionDefinitions = require(
     script.Parent.ClassProgressionDefinitions
 )
 
+local FirstTransfers = require(
+    script.Parent.OriginalFirstTransferDefinitions
+)
+
 local CharacterIdentityRules = {}
 
 local STAGES = table.freeze({
@@ -95,6 +99,15 @@ function CharacterIdentityRules.get_class_id(
     end
 
     if not ClassProgressionDefinitions.get(class_id) then
+        return nil
+    end
+
+    -- Legacy specialists have a starting class equal to BaseClassId.
+    -- A new first-transfer identity is valid only alongside the same
+    -- character's persisted mentor receipt and completed source proof.
+    if class_id ~= identity.BaseClassId
+        and not FirstTransfers.awarded(character)
+    then
         return nil
     end
 
