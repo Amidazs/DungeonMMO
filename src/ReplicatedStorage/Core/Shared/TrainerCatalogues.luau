@@ -18,6 +18,24 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    IronvowTrainer = table.freeze({
+        Id = "IronvowTrainer",
+        DisplayName = "Marshal Torren's Ironvow Training",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Ironvow"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "IronvowDrivingStrike", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "IronvowBladeTraining", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "IronvowBattleCall", Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     AshenbladeTrainer = table.freeze({
         Id = "AshenbladeTrainer",
         DisplayName = "Marshal Briar's Ashenblade Training",
