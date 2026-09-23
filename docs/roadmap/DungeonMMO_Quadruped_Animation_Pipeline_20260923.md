@@ -1093,3 +1093,108 @@ Blender mesh-pose checks as accepted continuous in-game animation.
 Next: user reviews V13 against WalkV8, then resolve any visible
 canine gait defects and the source anatomy/skin limitations before
 baking a separate animation and verifying actual Studio playback.
+
+
+## Natural canine walk research and V14–V16 low-lift trials — 23 September 2026
+
+**Stage 1 OPEN. None of these are a natural or accepted canine
+walk, an approved master rig, or an exported Roblox animation.**
+The newest separate gameplay roadmap checked for this work was
+v1.99; the following experiments leave that development track intact.
+
+### Research applied to the requested walk
+
+- The University of Minnesota veterinary gait reference describes
+  normal walking as a four-beat sequence, with support lasting longer
+  than swing, generally two or three feet supporting the body, and
+  coordinated head, trunk and tail movements:
+  https://vanat.ahc.umn.edu/gaits/walk.html
+- A canine limb function review discusses considerable contribution
+  of shoulder-blade movement to forelimb reach; the existing wolf
+  source required independently weighted shoulder bones in V11:
+  https://pmc.ncbi.nlm.nih.gov/articles/PMC7606876/
+- Dogs are digitigrade, but **digital and metacarpal/metatarsal
+  pads** (not only claw/toe tips) bear ground contact. A pointed
+  or hovering pad does not count as a grounded walk:
+  https://pmc.ncbi.nlm.nih.gov/articles/PMC5769641/
+- Normal joint motion is not a simple sinusoidal upper- and lower-
+  leg hinge, and walking forelimb posture includes shoulder,
+  elbow, carpal and metacarpophalangeal joint dynamics:
+  https://pubmed.ncbi.nlm.nih.gov/8669773/
+  https://pubmed.ncbi.nlm.nih.gov/12755302/
+
+### Discarded unsupported longer-stride variants
+
+**WalkV14** attempted an independent 0.105-source-unit stride,
+synchronized root travel and a low 0.019-unit swing arc on the V13
+mesh. **Rejected:** the right elbow extended to ~179.749° and
+changed ~20.107° between consecutive 24-FPS frames. Maximum
+designated-stance toe drift rose to 0.009349 source units, and
+highest toe elevation to 0.026412. Both exceed V13's accepted
+*numeric comparison values*; neither V13 nor V14 passed overall
+visual gait acceptance.
+
+**WalkV15** added 0.040 units of extra torso drop and reduced
+stride to 0.100 and paw lift to 0.012. **Rejected as a natural
+walk:** the front-right elbow still reached ~179.734° and jumped
+~20.962° over one frame. The 72-frame sampled stance drift was
+0.003011 and highest toe elevation 0.003987. A nicer ground
+height alone does not repair an unstable foreleg IK chain.
+
+The trials confirm that simply extending the old target stride
+while moving the existing body pushes this particular source rig
+into near-straight foreleg singularities. Do not promote the V14
+or V15 motion to production or represent either as authentic
+four-beat wolf walking.
+
+### WalkV16 — conservative lower-lift paw-flex comparison
+
+WalkV16 starts afresh from the intact V13 *copy* and preserves the
+tested lower torso, existing shoulder skin experiment, four-beat
+stance intervals and short original stride. Each swing is lowered
+to a 0.012 forepaw / 0.014 hindpaw clearance target from the
+original 0.020 / 0.035, and the separate paw-world-reference controls
+allow at most 7° foot flexion while airborne, returning to neutral
+world orientation at stance. No production source mesh or original
+master has been touched.
+
+The independent 72-frame actual-joint check measured largest
+between-frame elbow changes **3.748° left / 4.053° right**, versus
+V13's 5.792° / 5.634°. The sampled toe-mesh stance audit remained
+**0.002045 source units** worst horizontal drift and **0.003987
+source units** greatest stance elevation. This is a conservative
+numerical improvement, **not proof of natural footpad loading**.
+The source paws still have uncorrected sole/pad joint anatomy and
+the original short walk has too little rear-to-front foot
+progression to be considered convincing natural travel. Side
+and three-quarter rendered snapshots were inspected; the whole
+gait still shows visible front-leg rigidity and constrained
+paw movement. User visual acceptance is pending.
+
+Source-controlled experimental scripts under
+`tools/animation/quadruped/qa/`:
+`FrostfangWalkV14NaturalStride.py`,
+`FrostfangWalkV15SupportedStride.py`,
+`FrostfangWalkV16PawPad.py` and their `JointTailAudit`,
+`MeshAudit`, `FullPreview` and `Gif` scripts.
+All three experiments have their own local folder below
+`GroundedWalkTrial_20260923`; only the V16 current
+comparison has been fully rendered into a verified 1,520 × 510
+34-frame animated two-view GIF:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\WalkV16_PawPadGait\\preview\\Frostfang_WalkV16_Review_UNAPPROVED.gif`
+
+Editable candidate:
+`WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend`.
+
+**Important next gate:** stop tuning gait timing as if that alone can
+fix the original anatomical limitations. Rebuild the experimental
+front and rear limb joint positions and IK bend planes on a distinct
+source copy, correctly define footpad and toe-ground contact geometry
+and weight the shoulder, carpus, hock and toe joints for full
+range-of-motion. Only then author a longer supported stride and
+record real pad contact + continuous front/side/rear visual QA.
+Retain V13 and V16 for honest before/after visual comparison. The
+still-unfixed jaw and original tail under-fur tearing remain separate
+issues. Do not publish, import into production or claim Roblox
+Animator validation.
