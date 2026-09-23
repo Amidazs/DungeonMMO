@@ -186,11 +186,13 @@ function DungeonContributionBridge.record_damage(
         }
     )
     if credited.ok == true and quest_damage_observer then
-        local observed, reason = pcall(function()
-            quest_damage_observer:record_damage(
-                context, applied_damage, lethal_hit == true
-            )
-        end)
+        local observed, reason = pcall(
+            quest_damage_observer.record_damage,
+            quest_damage_observer,
+            context,
+            applied_damage,
+            lethal_hit == true
+        )
         if not observed then
             warn("[C4 Quest Combat] Damage observer failed: "
                 .. tostring(reason))
