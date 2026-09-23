@@ -1510,9 +1510,8 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Longbow"}),
     }),
 
-    -- Human Warrior first-transfer BACKEND FOUNDATION. The Ironvow
-    -- career is not yet claimable: its distinct source quest and real
-    -- world evidence must be authored before any rank can be trained.
+    -- Original Human Warrior first transfer. Every rank requires
+    -- a personally earned Ironroot Oath and a registered trainer.
     IronvowDrivingStrike = table.freeze({
         Id = "IronvowDrivingStrike",
         Tier = "Common", MaxRank = 9, Kind = "Physical",
@@ -1539,15 +1538,57 @@ local DEFINITIONS = table.freeze({
     }),
     IronvowBladeTraining = table.freeze({
         Id = "IronvowBladeTraining",
-        Tier = "Common", MaxRank = 3, Kind = "Passive",
+        Tier = "Common", MaxRank = 4, Kind = "Passive",
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
-        RankLevels = table.freeze({[1] = 20, [2] = 24, [3] = 28}),
-        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28, [4] = 28,
+        }),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0, [4] = 0}),
         DamageBonusPerRank = 0.014,
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
+    -- Light and heavy body-armour training require the corresponding
+    -- currently equipped server-registered Body item. Bought ranks
+    -- alone must not shield a naked player or a caster in robes.
+    IronvowLightArmorTraining = table.freeze({
+        Id = "IronvowLightArmorTraining",
+        Tier = "Common", MaxRank = 7, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 24, [4] = 24,
+            [5] = 28, [6] = 28, [7] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+        }),
+        PhysicalReductionPerRank = 0.007,
+        ArmorCategory = "LightArmor",
+        WeaponTags = table.freeze({}),
+    }),
+    IronvowHeavyArmorTraining = table.freeze({
+        Id = "IronvowHeavyArmorTraining",
+        Tier = "Common", MaxRank = 7, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 24, [4] = 24,
+            [5] = 28, [6] = 28, [7] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+        }),
+        PhysicalReductionPerRank = 0.007,
+        ArmorCategory = "HeavyArmor",
+        WeaponTags = table.freeze({}),
+    }),
+
     IronvowBattleCall = table.freeze({
         Id = "IronvowBattleCall",
         Tier = "Common", MaxRank = 3, Kind = "Support",
