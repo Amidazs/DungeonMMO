@@ -121,6 +121,50 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    cinder_cipher = table.freeze({
+        Id = "cinder_cipher",
+        Name = "Cinder Supply Cipher",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    cinder_route_map = table.freeze({
+        Id = "cinder_route_map",
+        Name = "Ashen Route Map",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    cinder_ward_seal = table.freeze({
+        Id = "cinder_ward_seal",
+        Name = "Cinder Ward Seal",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    cinder_tideglass_lens = table.freeze({
+        Id = "cinder_tideglass_lens",
+        Name = "Tideglass Lens",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     scout_dagger = table.freeze({
         Id = "scout_dagger",
         Name = "Scout Dagger",
