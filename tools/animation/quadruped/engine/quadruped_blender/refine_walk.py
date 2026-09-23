@@ -4,9 +4,9 @@ Mapping and separate fore/hind settings are JSON data. Existing hind IK and
 world paw controls are retained. Forelegs use measured two-link, pole-directed
 IK with continuous scapular support. Operates on an already opened COPY.
 """
-import math
+import math,json
 import bpy
-from mathutils import Vector, Quaternion
+from mathutils import Vector, Quaternion, Matrix
 from quadruped_core.refinement import timeline, contact, smooth, two_bone
 
 def key_pose(bone, frame):
@@ -31,13 +31,19 @@ def generate(rig, config):
     scene=bpy.context.scene
     scene.frame_set(1)
     bpy.context.view_layer.update()
-    origin=rig.location.copy()
-    bases={b.name:b.matrix_basis.copy() for b in rig.pose.bones}
+    if "qae_refinement_neutral" not in rig:
+        rig["qae_refinement_neutral"]=json.dumps(dict(origin=list(rig.location),
+            bases={b.name:[list(row) for row in b.matrix_basis] for b in rig.pose.bones},
+            controls={limb["id"]:dict(position=list(bpy.data.objects[limb["target"]].location),
+                rotation=list(bpy.data.objects[limb["orientation"]].rotation_quaternion)) for limb in config["limbs"]}))
+    neutral=json.loads(rig["qae_refinement_neutral"])
+    origin=Vector(neutral["origin"])
+    bases={name:Matrix(value) for name,value in neutral["bases"].items()}
     controls={}
     for limb in config["limbs"]:
         target=bpy.data.objects[limb["target"]]
         reference=bpy.data.objects[limb["orientation"]]
-        controls[limb["id"]]=(target,reference,target.location.copy()-Vector((0,0,limb.get("ground_offset",0))),reference.rotation_quaternion.copy())
+        controls[limb["id"]]=(target,reference,Vector(neutral["controls"][limb["id"]]["position"])-Vector((0,0,limb.get("ground_offset",0))),Quaternion(neutral["controls"][limb["id"]]["rotation"]))
     rig.animation_data_clear()
     for target,reference,_,_ in controls.values():
         target.animation_data_clear();reference.animation_data_clear()
@@ -131,6 +137,12 @@ def generate(rig, config):
         rig.keyframe_insert(data_path="location",frame=frame)
         records.append(frame_record)
     if rig.animation_data and rig.animation_data.action:
-        rig.animation_data.action.name="QAE_Foreleg_Refinement_Idle_Walk4_Idle"
+        action=rig.animation_data.action
+        action.name="QAE_Foreleg_Refinement_Idle_Walk4_Idle"
+        action.use_fake_user=True
+        action.use_frame_range=True;action.frame_start=1;action.frame_end=scene.frame_end
+        action["quadruped_refinement"]=json.dumps(config)
+        action["quadruped_definition"]=json.dumps(dict(version=1,kind="animation",id="Frostfang_Foreleg_Refinement",type="Walk",
+            duration=(scene.frame_end-1)/fps,fps=fps,loop=False,rootMotion="translate",parameters={},layers=[],markers=[]))
     scene.frame_set(1)
     return records
