@@ -266,7 +266,15 @@ local function verify_human_sprint()
         human.UserId, "HumanScoutSprint"
     ).ok, "Human Rogue must buy real Sprint at its class trainer")
     local character = assert(human.Profiles:get_character(human.UserId, 1))
-    Runtime.set_character(human.UserId, character)
+    -- The trainer may auto-equip a newly purchased active skill.
+    -- Explicitly empty its loadout to prove equipped ownership is required.
+    check(human.Profiles:mutate(human.UserId, function(profile: any)
+        profile.Characters.Slot1.Progression.Loadout = {}
+    end), "Unequipped skill state must persist")
+    Runtime.set_character(
+        human.UserId,
+        assert(human.Profiles:get_character(human.UserId, 1))
+    )
     check(not Runtime.is_skill_usable(
         human.UserId, "HumanScoutSprint"
     ), "Purchased but unequipped Sprint cannot be invoked for free")
