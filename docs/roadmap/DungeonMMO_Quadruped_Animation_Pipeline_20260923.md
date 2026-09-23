@@ -121,6 +121,72 @@ Astra authoring engine compatibility; visual user approval.
 No live dungeon monster, gameplay script, mesh or Roblox
 asset was replaced or published.
 
+## Isolated Studio import and four-leg gate — 23 September 2026
+
+**Stage 1 remains OPEN, despite successful import and static bone
+deformation.** Imported
+`Frostfang_Roblox_SectionedRig_QA.fbx` into a **new, unpublished
+local Baseplate place** with Import Preview's `Upload to Roblox`
+option unchecked. Studio nevertheless assigned numeric MeshIds
+to the imported MeshParts; do not claim no mesh asset was created
+in account inventory. No DungeonMMO game or place was published.
+
+Actual imported `Workspace.Frostfang_Roblox_SectionedRig_QA`:
+**12 skinned MeshParts**, **12 Motor6Ds**, **32 Bone instances**
+(including Root), and an `AnimationController`. Studio did not
+create an `Animator`, so the isolated test added one. Scale
+corrected via `Model:ScaleTo(0.06)`; the resulting bounding
+box is approximately 3.53 × 6.13 × 9.20 studs and its bottom
+rests ~0.05 studs above the local Baseplate. The imported
+sections look continuous in the saved Studio rest screenshots.
+
+**Actual Studio bone/skin deformation check:** independent
+front-left shin 30° -> paw displacement ~0.756 studs;
+front-right shin 24° -> ~0.607 studs; hind-left and
+hind-right shin -22° -> ~0.463 studs each. Skin visibly
+followed the tested bone motions, but these are **individual
+static bend poses, NOT walking animations**, and they do not
+prove planted paws or good continuous gait. Both hind legs'
+rest shape and shoulder fur still need visual refinement.
+All test Bone.Transform values were reset to identity;
+an Edit-mode audit confirmed 12 meshes, 32 bones, 12 motors,
+Animator present, scale 0.06 and a missing jaw.
+
+**Blocking facial-rig finding:** Blender's compact master has
+`DEF_jaw` with **zero assigned mesh vertices**. Roblox
+omitted that bone during import. Meshy Frostfang's original
+80,974-vertex mesh is a **single connected, closed-mouth
+geometry island**. A separately saved `JawV3` skinning
+experiment added lower-muzzle weights and demonstrated small
+vertex movement, but its side/face previews still show
+**no convincing mouth opening**: pulling lower-muzzle fur
+is not an acceptable bite. Do not promote JawV3 or pass
+this wolf to Astra as a complete bite-ready master.
+Proper mouth/jaw topology and inner-mouth geometry or an
+alternative properly skinned canine with working jaw
+are required before custom bite authoring.
+
+**Alternative inspected:** the local Mesh2Motion fox GLB
+has a 49-bone canine rig and imported walk/bite actions;
+the bone list includes Chin, but the audit did not find
+Chin-weighted mesh vertices. It is a possible locomotion
+*reference*, not a proven complete replacement for a
+wolf with a working jaw or an approved walking cycle.
+
+**Persistent isolated Studio place:**
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\Frostfang_StudioRig_Import_QA.rbxl`.
+Its neighboring `studio_rest_side.png`,
+`studio_left_front_flex.png`,
+`studio_bend_FrontRight.png`,
+`studio_bend_HindLeft.png` and
+`studio_bend_HindRight.png` show the actual import and
+static tests. `Frostfang_Canine_ExperimentalMaster_JawV3.blend`,
+`jaw_v3_report.json` and the `jaw_v3_*.png` images
+record the failed independent jaw experiment.
+The earlier source GLBs and the separate Rigify controls
+remain untouched; no Roblox place was published and
+nothing was merged into production gameplay.
+
 ## Stage 1 — approve the canine master rig [OPEN]
 
 - [ ] Find/import a genuinely standing, properly rigged and
@@ -204,10 +270,12 @@ Use the test place and source-controlled development tools;
 no publish, production rig substitution or live place changes
 without explicit approval.
 
-**Next actionable step:** import the experimental sectioned
-FBX into an unpublished Studio test place. Verify that all
-12 sections share one animatable rig, inspect four paws and
-upper-foreleg skin under real limb motion, then fix the
-remaining shoulder, hindleg and facial-control issues before
-attempting one natural idle/walk cycle. Neither this mesh nor
-the mathematical helper is an approved quadruped master yet.
+**Next actionable step:** repair or replace the source wolf's
+mouth and lower jaw so an independent jaw bone opens an actual
+mouth in Blender and survives Studio import. In parallel,
+repair the asymmetrical hindleg/shoulder fur; then author
+one reversible idle–walk–idle clip on the approved real
+mesh with grounded paw contact, test continuous playback
+from all sides in the isolated Studio place and obtain
+user visual approval before assigning Astra the full
+quadruped engine. The current model is still experimental.
