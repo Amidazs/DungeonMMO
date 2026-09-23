@@ -42,9 +42,15 @@ assert(professions:choose_profession(8602, "Alchemy").ok)
 assert(profiles:mutate(8601, function(profile: any)
     local character = profile.Characters.Slot1
     character.Professions.Blacksmithing.XP = level_two
+    character.Progression.Skills.C4RecipeReading = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
 end))
 assert(profiles:mutate(8602, function(profile: any)
     profile.Characters.Slot1.Professions.Alchemy.XP = level_two
+    profile.Characters.Slot1.Progression.Skills.C4RecipeReading = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
 end))
 
 assert(inventory:add_item(8601, "iron_bar", 6).ok)
