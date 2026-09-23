@@ -63,6 +63,9 @@ def render(stills):
     scene.display.shading.light="STUDIO";scene.display.shading.color_type="MATERIAL"
     scene.display.shading.show_shadows=True
     scene.display.shading.show_cavity=True
+    scene.display.shading.background_type="VIEWPORT"
+    scene.display.shading.background_color=(.14,.16,.19)
+    scene.render.film_transparent=False
     scene.render.resolution_x=700;scene.render.resolution_y=480;scene.render.resolution_percentage=100
     scene.render.image_settings.file_format="PNG"
     bpy.ops.mesh.primitive_plane_add(size=20,location=(0,0,0))
