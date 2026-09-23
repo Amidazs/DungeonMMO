@@ -325,14 +325,20 @@ local function render()
         button.Size = UDim2.fromOffset(132, 52)
         button.Parent = row
 
+        local recipe_state = latest.Recipes
+            and latest.Recipes[recipe.Id]
         local unlocked = level >= recipe.RequiredLevel
             and slots.Creation == recipe.ProfessionId
+            and recipe_state ~= nil
+            and recipe_state.Unlocked == true
         if slots.Creation ~= recipe.ProfessionId then
             button.Text = "Not Your Craft"
             button.Active = false
             button.AutoButtonColor = false
         elseif not unlocked then
-            button.Text = "Level " .. tostring(recipe.RequiredLevel)
+            button.Text = if level < recipe.RequiredLevel
+                then "Level " .. tostring(recipe.RequiredLevel)
+                else "Skill/Recipe Locked"
             button.Active = false
             button.AutoButtonColor = false
         elseif not has_materials then
@@ -437,6 +443,10 @@ action_result.OnClientEvent:Connect(function(payload: any)
             reason = "Profession level is too low"
         elseif reason == "ProfessionNotSelected" then
             reason = "This is not your selected profession. Trade for its goods."
+        elseif reason == "CommonItemCreationNotLearned" then
+            reason = "Learn Common Item Creation at your class trainer."
+        elseif reason == "RecipeReadingNotLearned" then
+            reason = "Learn Recipe Reading at your class trainer."
         elseif reason == "NotAtRequiredStation" then
             reason = "Move closer to the required station"
         elseif reason == "IngredientEquipped" then
