@@ -52,6 +52,9 @@ local BaseClassAdvancementRuntime = require(
 local C4FirstTransferSelectionService = require(
     Services:WaitForChild("C4FirstTransferSelectionService")
 )
+local C4OriginalQuestNpcRuntime = require(
+    Base:WaitForChild("C4OriginalQuestNpcRuntime")
+)
 local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -437,7 +440,7 @@ BaseQuestRuntime.attach({
     end,
 })
 
-BaseClassAdvancementRuntime.attach({
+local c4_class_advancement_controller = BaseClassAdvancementRuntime.attach({
     remotes = remotes,
     advancement = runtime.ClassAdvancementService,
     selection = C4FirstTransferSelectionService.new(profiles, "Base"),
@@ -447,6 +450,25 @@ BaseClassAdvancementRuntime.attach({
             and not coordinator:is_pending(player.UserId)
     end,
 })
+
+-- Original quest stage one is a REAL hub NPC ProximityPrompt, not a
+-- client-submitted quest event. Later monsters/drops/transfer NPCs are
+-- deliberately unbound and cannot be bypassed through this starter.
+local c4_source_npcs = C4OriginalQuestNpcRuntime.attach({
+    environment = base_environment,
+    profiles = profiles,
+    is_ready = function(player: Player): boolean
+        return loaded_users[player.UserId] == true
+            and profiles:get_profile(player.UserId) ~= nil
+            and not coordinator:is_pending(player.UserId)
+    end,
+    on_progress = function(player: Player)
+        c4_class_advancement_controller:send_snapshot(player)
+    end,
+})
+c4_class_advancement_controller:set_original_quest_service(
+    c4_source_npcs:quest_service()
+)
 
 local function route_recoverable_session(player: Player, session: any): boolean
     local decision = BaseReconnectRouting.decide(session, player.UserId, os.time())
