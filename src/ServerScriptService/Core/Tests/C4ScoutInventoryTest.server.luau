@@ -12,9 +12,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 86, Missing = 13,
+    Human = {Raw = 99, Functional = 87, Missing = 12,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 117, Missing = 12,
+    Elf = {Raw = 129, Functional = 118, Missing = 11,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +93,17 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "CriticalPowerToggle" then
+    if category == "AccuracyToggle" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        check(level == 24
+            and definition.MaxRank == 1
+            and definition.Kind == "Support"
+            and effect.KIND == "ScoutAccuracyToggle"
+            and effect.STAMINA_COST > 0
+            and effect.UPKEEP_STAMINA_PER_SECOND > 0
+            and effect.ACCURACY_BONUS > 0,
+            "C4 Accuracy must really be a paid active source-level stance")
+    elseif category == "CriticalPowerToggle" then
         local rank = table.find(LEVELS, level)
         local effect = assert(Combat.get_for_rank(mapping.SkillId, rank))
         local before = if rank > 1
