@@ -696,3 +696,143 @@ The GitHub backend baseline remains **v1.89** and has not been
 modified by the experimental art work. No live dungeon place,
 Studio QA snapshot, original GLB, or gameplay scripts were changed
 or published.
+
+## Stage 1 rig-only articulation and tail-weight repair — 23 September 2026
+
+**Stage 1 remains OPEN. These are new isolated Blender rigging tests,
+NOT gait approval or a production master.** The newest separately
+maintained backend roadmap on this branch is **v1.90 — explicit C4
+first-transfer choice**. Its game/class/quest state is unaffected by
+any work described here. No further gait animation was promoted.
+
+### Independent body/joint tests
+
+The actual source-weighted JawV3 Frostfang was posed in an independent
+61-frame Blender study: neutral, head yaw, neck/head pitch, tail yaw,
+tail pitch, spine flex, and return to neutral. The source mesh was
+rendered from side and oblique views, and actual weighted vertex
+displacement was measured rather than inferred from bone rotations.
+
+- Head yaw (~11 degrees) deformed sampled head vertices by up to
+  **0.066729 source units** without independently moving paw regions.
+- Neck/head pitch (~9 degrees) moved sampled head vertices by up to
+  **0.056114** source units; small front-paw influence was observed
+  (**0.01243** maximum) and is not accepted as perfectly isolated.
+- Tail yaw (~12 degrees) moved sampled tail fur up to **0.084477**
+  source units without sampled head/paw displacement.
+- Spine flex (~7 degrees) moved sampled torso and head as expected,
+  but also displaced the front paws: **body movement must eventually
+  be coordinated with grounded leg targets**.
+- Every measured anatomical region returned to its original neutral
+  sampled position at the final test frame.
+
+The tail-lift test exposed severe *real-mesh tearing*, not a missing
+animation: nearby connected fur vertices had inconsistent bone
+weights. Some adjacent vertices were nearly 100% weighted to
+`DEF_spine.004` and the next nearly 100% to
+`DEF_spine.003` or another downstream tail segment. The
+last bone `DEF_spine` had **zero substantial source weights**
+and could not independently flex the tail tip.
+
+Source-controlled read-only tests:
+`FrostfangRigFunctionAudit.py`,
+`FrostfangTailWeightAudit.py`, and
+`FrostfangTailEdgeWeights.py`.
+
+### Non-destructive tail repair experiments
+
+The first V1 tail-smoothing run made no changes because original
+weight dictionaries accidentally mixed group names and indices.
+The code was corrected in GitHub, then rerun on a fresh untouched
+JawV3 copy. The corrected **V1** altered 20,413 source vertices
+in the tail area; the severe six-degree bending stretch decreased
+from **44.85647×** maximum to **5.23332×**. The 12-degree
+test still showed visible pointed fur/folds. V1 was **not promoted**.
+
+A wider/stronger **V2** copy was created independently from the
+original JawV3 model. It altered 21,382 tail-area vertices. On
+the identical first-tail-segment bend test, the observed largest
+source-tail edge stretch fell from **44.85647× to 3.93866× at 6°**,
+and from **88.75961× to 7.12904× at 12°**. Side/oblique actual
+skinned-mesh renders show smoother movement than the unrepaired
+tail, but there is **still an unnatural fold and pointed hanging
+fur beneath a lifted tail**. V2 is experimental, not accepted.
+
+A third independent **V3 terminal-tail** candidate starts from
+the saved V2 copy (not the original) and gradually assigns weight
+to the existing previously unused `DEF_spine` terminal bone.
+It modified 4,782 terminal-region vertices. Independent
+read-only structural comparison found:
+
+- **Exactly the same skeleton and mesh topology** as the V2 base;
+  the evaluated neutral shape changed by at most **0.00000008**
+  source units.
+- At most **four nonzero skin influences per vertex**, with zero
+  vertices above that budget.
+- **4,268 terminal-tail vertices** now have measurable tip-bone
+  skin weight; the preceding V2 had zero.
+- A controlled 6°/12° isolated terminal-bone pitch moved actual
+  terminal fur up to **0.031581 / 0.063139** source units;
+  the same isolated tip movement in V2 was exactly zero.
+- Subsequent full-chain V3 tail-bend checks at 6°/12° recorded
+  maximum local mesh-edge stretch of **3.1021× / 5.6092×** for
+  the first tested tail segment, **2.6043× / 4.64×** for the
+  next, and **2.3346× / 3.7004×** for the following segment.
+  These remain **deformation failures for acceptance**, despite
+  improved articulation and numerical results.
+
+These QA copies are deliberately independent. Local paths:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\RigFunctionQA_20260923\\`
+
+- `Frostfang_RigFunction_UNAPPROVED.blend` and
+  `rig_function_audit.json`: original anatomy isolation test.
+- `TailRepairV1\\Frostfang_TailSkinV1_UNAPPROVED.blend` and
+  `TailRepairV2\\Frostfang_TailSkinV2_UNAPPROVED.blend`:
+  two separate tail smoothing candidates, with bend reports
+  `tail_skin_v1_audit.json` / `tail_skin_v2_audit.json`.
+- `TailRepairV3_Tip\\Frostfang_TailSkinV3_Tip_UNAPPROVED.blend`:
+  current **tail articulation experiment**, including
+  `tail_skin_v3_tip_audit.json`,
+  `tail_skin_v3_structural_validation.json`, and
+  `pose_review\\` side/oblique neutral, head, spine,
+  tail-base, and independently animated tail-tip PNGs.
+  `TailRepairV3_Tip\\pose_review\\
+  Frostfang_TailSkinV3_Tip_Poses_UNAPPROVED.blend`
+  contains the separate reversible joint test sequence.
+
+New code and audit scripts committed to
+`tools/animation/quadruped/qa/`:
+`FrostfangTailSkinRepairV1.py`,
+`FrostfangTailSkinRepairV2.py`,
+`FrostfangTailSkinV1PoseReview.py`,
+`FrostfangTailSkinV2PoseReview.py`,
+`FrostfangTailTipV3.py`,
+`FrostfangTailV3PoseReview.py`,
+`FrostfangTailV3StructuralQA.py`,
+`FrostfangTailV3BendAudit.py`.
+The original source GLB and JawV3 Blender master were not overwritten;
+no Roblox production place, script, asset or Studio QA snapshot was
+changed or published.
+
+### Remaining Stage 1 blockers
+
+- **Tail:** Improve actual 3D fur continuity during tail-base,
+  mid-tail and tip movement, especially the under-tail pointed fold,
+  before marking tail skinning acceptable. A 12° bend currently
+  produces unacceptable localized stretch. Confirm a repaired
+  source is preserved through a skinned 12-section Roblox import;
+  no V3 Studio import has been performed.
+- **Hind legs and shoulder:** Correct measured source anatomy and
+  skin-weight issues on a further separate master candidate.
+  WalkV5's foot-contact statistics do not prove these are solved.
+- **Mouth:** Original Frostfang muzzle is one closed geometry
+  island; adding JawV3 weights did not create an opening mouth.
+  Actual split lower-jaw/topology and inside-mouth work (or an
+  independently approved alternative) remains necessary.
+- **Final rig handoff:** After corrected tail, jaw, leg and neck
+  flex pass real multi-angle mesh QA, validate the whole skinned
+  candidate in an *isolated single* Studio QA instance. Only then
+  pass the master to Astra for an actual reusable canine animation
+  system. Do not mistake these discrete pose tests for finished
+  head/tail motion during walking or a published Roblox clip.
