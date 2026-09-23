@@ -77,9 +77,8 @@ local function main()
         print("DMMO_HUMANOID_REPLAY",
             HttpService:JSONEncode(result))
     end
-    assert(workspace:FindFirstChild(
-        "DMMO_Astra_Guardian_Test"
-    ), "The original guardian disappeared during replay")
+    assert(workspace:FindFirstChild(RIG_NAME) == rig,
+        "The independent test performer disappeared during replay")
     rig:SetAttribute("DMMO_HumanoidStarterQA", "PLAYBACK_MARKERS_CHECKED")
     print("DMMO_HUMANOID_REPLAY_COMPLETE",
         HttpService:JSONEncode(summary))
