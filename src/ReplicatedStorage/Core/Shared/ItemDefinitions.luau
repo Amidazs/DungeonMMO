@@ -298,6 +298,22 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Original light-armour proof item for the independent Warrior career.
+    -- Definition alone does not mint a free item; acquisition remains
+    -- a separately tested trading, loot or crafting integration task.
+    ironroot_light_vest = table.freeze({
+        Id = "ironroot_light_vest",
+        Name = "Ironroot Light Vest",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body",
+        Category = "LightArmor",
+        AllowedBaseClasses = FIGHTER,
+        AllowedClasses = table.freeze({"Ironvow"}),
+        Rarity = "Basic",
+        Stackable = false,
+    }),
+
     marauder_armor = table.freeze({
         Id = "marauder_armor",
         Name = "Marauder Armour",
