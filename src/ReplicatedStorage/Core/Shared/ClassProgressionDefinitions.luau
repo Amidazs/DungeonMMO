@@ -14,6 +14,8 @@ local DEFINITIONS = table.freeze({
         StarterEquipment = table.freeze({}),
         TeachableSkills = table.freeze({
             "NoviceProtection",
+            "C4RecipeReading",
+            "C4CommonItemCreation",
             "ArcSlash",
             "Taunt",
             "GuardBreaker",
@@ -46,6 +48,8 @@ local DEFINITIONS = table.freeze({
         }),
         TeachableSkills = table.freeze({
             "NoviceProtection",
+            "C4RecipeReading",
+            "C4CommonItemCreation",
             "DawnWard",
             "CinderBolt",
             "MysticWindBolt",
