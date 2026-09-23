@@ -15,28 +15,28 @@ local MAX_RANGE = 10
 local NPCS = table.freeze({
     HumanRogue = table.freeze({
         table.freeze({
-            TargetId = "CaptainBezique",
-            Name = "Captain Bezique",
+            TargetId = "CaptainAshford",
+            Name = "Captain Ashford",
             Offset = Vector3.new(-12, 2.5, 10),
             Color = Color3.fromRGB(118, 78, 53),
         }),
         table.freeze({
-            TargetId = "Neti",
-            Name = "Neti",
+            TargetId = "Vela",
+            Name = "Quartermaster Vela",
             Offset = Vector3.new(-21, 2.5, 10),
             Color = Color3.fromRGB(114, 89, 142),
         }),
     }),
     ElvenScout = table.freeze({
         table.freeze({
-            TargetId = "MasterReisa",
-            Name = "Master Reisa",
+            TargetId = "PathfinderElyra",
+            Name = "Pathfinder Elyra",
             Offset = Vector3.new(12, 2.5, 10),
             Color = Color3.fromRGB(58, 121, 94),
         }),
         table.freeze({
-            TargetId = "GuardMoretti",
-            Name = "Guard Moretti",
+            TargetId = "WardenThorne",
+            Name = "Warden Thorne",
             Offset = Vector3.new(21, 2.5, 10),
             Color = Color3.fromRGB(75, 110, 130),
         }),
@@ -255,7 +255,7 @@ function Runtime:_talk(
         TargetId = source.TargetId,
         ActorUserId = player.UserId,
         EventId = event_id,
-        -- Only the real ordered Neti stage may enter the transaction that
+        -- Only the real ordered Vela stage may enter the transaction that
         -- atomically mints both owner-bound quest trial weapons.
         TrialWeaponsGranted = branch_id == "HumanRogue" and index == 2,
     }
