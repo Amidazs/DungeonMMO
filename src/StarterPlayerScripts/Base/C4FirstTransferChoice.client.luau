@@ -214,6 +214,18 @@ local function render(snapshot: any)
                 status.Text = "Visit Warden Thorne near the hub arrival "
                     .. "point. Later letter-fragment combat and "
                     .. "class transfer remain locked."
+            elseif quest.WorldReady and quest.Step == 4
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Return to Quartermaster Vela with "
+                    .. "your ten personally earned crypt fragments. "
+                    .. "Later trial stages remain in development."
+            elseif quest.WorldReady and quest.Step == 4
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Return to Warden Thorne with your "
+                    .. "four field-report fragments. "
+                    .. "Later trial stages remain in development."
             else
                 status.Text = "Advancement trial stage "
                     .. tostring(quest.Step)
