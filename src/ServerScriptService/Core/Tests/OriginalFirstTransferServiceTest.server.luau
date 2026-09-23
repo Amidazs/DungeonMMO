@@ -21,6 +21,9 @@ local Loadout = require(Services.LoadoutService)
 local SkillService = require(Services.SkillProgressionService)
 local Combat = require(RS.Combat.Shared.SkillDefinitions)
 local Runtime = require(Services.ProgressionRuntimeState)
+local SourceInventory = require(Shared.C4ScoutSkillInventory)
+local SkillMap = require(Shared.C4Level30ClassSkillMap)
+local LaunchAudit = require(Shared.C4Level30LaunchCoverage)
 
 local assertions = 0
 local OWNERS = table.freeze({
@@ -440,6 +443,120 @@ local function verify_weapon_skill_catalogue(
 end
 
 --[[
+Prepares only a disposable crafting slot and its mastered starter literacy.
+
+Args:
+    profiles (any): Exclusive profile writer in the isolated Studio test.
+    user_id (number): Already awarded first-transfer character owner.
+
+Returns:
+    nil: Tests that crafting choices remain required for source utility.
+]]
+local function seed_crafting_choice(profiles: any, user_id: number)
+    check(profiles:mutate(user_id, function(profile: any)
+        local owner = profile.Characters.Slot1
+        owner.ProfessionSlots.Creation = "Blacksmithing"
+        owner.Progression.SkillPointEntitlement = 3000
+        owner.Progression.Skills.C4RecipeReading = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+    end), "Test-only Blacksmithing selection and recipe literacy accepted")
+end
+
+--[[
+Buys every verified source-rank family via real SkillProgressionService.
+
+Args:
+    profiles (any): Actual original test character profile writer.
+    service (any): Genuine class- and SP-gated purchase authority.
+    user_id (number): Current selected owner of one original career.
+    skill_id (string): Explicit source-mapped authored DungeonMMO skill.
+
+Returns:
+    nil: Verifies all capped rank purchases, no invented level-32 grants.
+]]
+local function purchase_source_family(
+    profiles: any, service: any, user_id: number, skill_id: string
+)
+    local definition = assert(Skills.get(skill_id))
+    local max_rank = 0
+    for rank, required in pairs(definition.RankLevels or {}) do
+        if required <= 30 then max_rank = math.max(max_rank, rank) end
+    end
+    local current = profiles:get_character(user_id)
+        .Progression.Skills[skill_id]
+    local first = if current and current.Known
+        then current.PurchasedRank else 0
+    for rank = first + 1, max_rank do
+        check(profiles:mutate(user_id, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Level = definition.RankLevels[rank]
+            local known = owner.Progression.Skills[skill_id]
+            if known then
+                known.Proficiency =
+                    (definition.RankThresholds or {})[rank] or 0
+            end
+        end), "Prepared only this rank's exact character level")
+        local purchased = if rank == 1
+            then service:learn_trainer_skill(user_id, skill_id)
+            else service:purchase_rank(user_id, skill_id)
+        check(purchased.ok and purchased.rank == rank,
+            "Source family could not purchase own correctly gated rank "
+                .. skill_id .. ":" .. tostring(rank))
+    end
+    check(profiles:get_character(user_id).Progression.Skills[
+        skill_id
+    ].PurchasedRank == max_rank,
+        "Capped source family retains exactly its purchased rank")
+end
+
+--[[
+Exercises every first-transfer source family against the actual skill store.
+
+Args:
+    profiles (any): Authenticated first-transfer profile writer.
+    owner (any): Human/Elf source quest branch with earned level-20 class.
+
+Returns:
+    nil: Buys unique categories without pretending to test every effect.
+]]
+local function verify_source_skill_purchases(
+    profiles: any, owner: any
+)
+    seed_crafting_choice(profiles, owner.UserId)
+    local service = SkillService.new(
+        profiles, Inventory.new(profiles), Loadout.new(profiles)
+    )
+    local source = assert(SourceInventory.get(owner.RaceId))
+    local skills_seen = {}
+    for level, categories in pairs(source.Levels) do
+        if level <= 30 then
+            for category in pairs(categories) do
+                local skill_id = assert(
+                    SkillMap.get(owner.BranchId, category)
+                )
+                if not skills_seen[skill_id] then
+                    skills_seen[skill_id] = true
+                    purchase_source_family(
+                        profiles, service, owner.UserId, skill_id
+                    )
+                end
+            end
+        end
+    end
+    local audit = assert(LaunchAudit.for_branch(owner.BranchId))
+    check(audit.TrainerMappedRankEntries
+        == audit.SourceRankEntriesThroughCap
+        and audit.MissingRankScheduleEntries == 0,
+        "Source schedule and actual purchase tests cover all recorded ranks")
+    check(profiles:mutate(owner.UserId, function(profile: any)
+        profile.Characters.Slot1.Level = 28
+    end), "Restore appropriate purchased first-transfer combat level")
+    check(profiles:save(owner.UserId, "OriginalLevel30CatalogueTest"),
+        "Entire tested source-rank catalogue survives actual profile save")
+end
+
+--[[
 Checks the dungeon runtime, weapon tag and earned-class cast barriers.
 
 Args:
@@ -562,6 +679,7 @@ local function main()
         verify_award(profiles, transfer, owner, pending)
         verify_next_skill(profiles, owner)
         verify_weapon_skill_catalogue(profiles, owner)
+        verify_source_skill_purchases(profiles, owner)
         verify_runtime_skill(profiles, owner)
         verify_reload(store, owner, profiles)
     end
