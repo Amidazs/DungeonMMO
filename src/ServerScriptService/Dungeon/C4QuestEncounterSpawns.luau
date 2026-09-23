@@ -23,6 +23,13 @@ local CHALLENGES = table.freeze({
         SourceId = "BrackenRaider",
         Health = 65,
     }),
+    HumanRogueSix = table.freeze({
+        Name = "Cinder Brigand",
+        SourceId = "CinderBrigand",
+        BranchId = "HumanRogue",
+        Step = 6,
+        Health = 95,
+    }),
 })
 
 --[[
@@ -33,7 +40,7 @@ Args:
     user_ids ({number}): Server-owned active encounter member roster.
 
 Returns:
-    {string}: Sorted eligible, distinct stage-three branch IDs.
+    {string}: Sorted eligible branch/stage challenge identifiers.
 ]]
 function Spawns.eligible_branches(
     profiles: any, user_ids: {number}
@@ -46,14 +53,20 @@ function Spawns.eligible_branches(
             and advancement.OriginalFirstTransferQuest
         local branch = state and state.BranchId
         local quest = branch and Source.get(branch)
-        if quest and CHALLENGES[branch]
-            and state.Step == 3 and state.Ready ~= true
+        local challenge_id = if branch == "HumanRogue"
+            and state and state.Step == 6
+            then "HumanRogueSix" else branch
+        local challenge = CHALLENGES[challenge_id]
+        local step = quest and quest.Steps[state.Step]
+        if quest and challenge and state.Ready ~= true
+            and step and step.Kind == "QuestMonsterDefeat"
+            and step.TargetId == challenge.SourceId
             and advancement.OriginalFirstTransferChoiceId == branch
             and character.Level >= quest.StartLevel
             and character.Identity
             and character.Identity.ClassId == "Fighter"
         then
-            found[branch] = true
+            found[challenge_id] = true
         end
     end
     local branches = {}
@@ -150,7 +163,8 @@ function Spawns.augment(options: any, factory: any?): any
             end
             table.insert(registrations, {
                 enemy = enemy,
-                branch_id = branch,
+                branch_id = challenge.BranchId or branch,
+                step_index = challenge.Step or 3,
             })
         end
     end
