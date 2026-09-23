@@ -29,6 +29,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "HumanScoutSprint",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "AshenbladeOpening",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -41,6 +45,10 @@ local DEFINITIONS = table.freeze({
         Skills = table.freeze({
             table.freeze({
                 SkillId = "ElvenScoutGuard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardRenewal",
                 Mode = "LearnOrRank",
             }),
         }),
