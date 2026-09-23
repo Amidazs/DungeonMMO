@@ -13,9 +13,12 @@ PASS results as verification of these new shield changes.
   forged/unawarded character must receive zero purchased protection;
   copied shield ranks may not bypass own-class trainer authority.
 - `C4OathguardQuestAwardTest.server.luau`: purchases two ranks on a
-  genuinely quest-awarded Oathguard, verifies zero without shield and
-  1.6% with registered `marauder_shield`; reads the authenticated
-  combat snapshot and denies the same copied ranks to a raw Fighter.
+  genuinely quest-awarded Oathguard, verifies 0.8% at rank one,
+  zero without shield and 1.6% at rank two with registered
+  `marauder_shield`; rejects unknown and wrong-slot items, reads the
+  authenticated combat snapshot and denies copied ranks to a Fighter.
+  The fixture sets a registered OffHand item ID directly in an isolated
+  test profile; it does **not** prove normal inventory/equip UI flow.
 - `C4Level30LaunchCoverageTest.server.luau`: asserts 37/54 mapped
   Knight source-rank opportunities and 17 unmapped, while the
   release-complete flag remains false.
