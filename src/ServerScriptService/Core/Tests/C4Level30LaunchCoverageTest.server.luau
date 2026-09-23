@@ -93,6 +93,12 @@ local function main()
         and warrior.SourceRankEntriesByLevel[24] == 19
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
+    check(warrior.TrainerMappedRankEntries == 24
+        and warrior.MissingRankScheduleEntries == 38
+        and not warrior.SourceRankScheduleMapped
+        and not warrior.LaunchSkillCatalogueReady,
+        "Ironvow has only four fully scheduled real trainer families; "
+            .. "blunt, polearm, HP and utility rows must remain outstanding")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "SkillRankParityOutstanding"
         and knight.SourceRankEntriesThroughCap == 54
