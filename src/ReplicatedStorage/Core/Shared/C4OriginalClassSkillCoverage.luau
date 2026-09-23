@@ -4,6 +4,7 @@
 local Shared = script.Parent
 local Branches = require(Shared.C4FirstTransferBranches)
 local Scout = require(Shared.C4ScoutSkillInventory)
+local SourceSkills = require(Shared.C4OriginalFirstTransferSkillSources)
 
 local SkillCoverage = {}
 
@@ -34,12 +35,19 @@ function SkillCoverage.for_branch(branch: any): any
     local inventory = if mapped
         then Scout.audit(branch.SourceRace)
         else nil
+    local original_level20 = SourceSkills.get(branch.Id)
     return {
         ClassId = branch.Id,
-        SourceUrl = SOURCES[branch.Id] or branch.SourceQuestUrl,
+        SourceUrl = if original_level20
+            then original_level20.SourceUrl
+            else SOURCES[branch.Id] or branch.SourceQuestUrl,
         SourceInventoryStatus = if mapped
             then "DungeonMMOAnaloguesMapped"
+            elseif original_level20 then "OriginalC4Level20SourceMapped"
             else "OriginalC4InventoryNotYetAudited",
+        ExactOriginalLevel20RankEntries = if original_level20
+            then #original_level20.Level20 else 0,
+        ImplementedOriginalLevel20Ranks = 0,
         MappedAnalogueRanks = if inventory then inventory.Functional else 0,
         InventoriedAnalogueRanks = if inventory then inventory.Raw else 0,
         ExactC4RankParityCertified = false,
@@ -62,6 +70,8 @@ function SkillCoverage.report(): any
     local total = 0
     local mapped = 0
     local not_inventoried = {}
+    local source_20 = 0
+    local level20_ranks = 0
     for _, race in ipairs(Branches.races()) do
         for _, base in ipairs({"Fighter", "Mage"}) do
             for _, branch in ipairs(Branches.get(race, base) or {}) do
@@ -73,6 +83,12 @@ function SkillCoverage.report(): any
                     mapped += 1
                 else
                     table.insert(not_inventoried, branch.Id)
+                    if record.SourceInventoryStatus
+                        == "OriginalC4Level20SourceMapped"
+                    then
+                        source_20 += 1
+                        level20_ranks += record.ExactOriginalLevel20RankEntries
+                    end
                 end
             end
         end
@@ -81,6 +97,8 @@ function SkillCoverage.report(): any
         OriginalFirstTransferClasses = total,
         AnalogueRankInventoriesMapped = mapped,
         OriginalInventoriesNotAudited = #not_inventoried,
+        OriginalClassLevel20SourcesInventoried = source_20,
+        OriginalLevel20RankEntriesCatalogued = level20_ranks,
         NotAuditedClassIds = not_inventoried,
         ExactC4FirstTransferSkillCatalogueComplete = false,
     }
