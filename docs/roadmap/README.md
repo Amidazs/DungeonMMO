@@ -1,4 +1,64 @@
-**Current DungeonMMO class backend: v2.05 — Ironroot original Warrior quest, personally owned monster drops and server-authorized Ironvow class transfer.**
+**Current DungeonMMO class backend: v2.06 — real physical Warrior/Knight class-trainer acceptance and explicit level-30 remaining ranks.**
+[Latest class/skill roadmap](
+DungeonMMO_Roadmap_v2_06_Original_Warrior_Knight_Physical_Acceptance_20260923.md)
+and [executed Studio tests and limits](
+../testing/ironvow-oathguard-physical-and-rank-audit-v2-06-20260923.md).
+The intended initial release level cap stays
+**30** (not yet server enforced). The original
+Human Warrior → **Ironvow** and Human Knight
+→ **Oathguard** careers now have real
+unpublished two-client **physical Base**
+quest NPC, personally owned proof-item
+turn-in, level-20 mentor-award and
+client skill-purchase acceptance. Knight's
+prior incorrect badge and skill test IDs
+were fixed and its temporary hub prompts
+separated from Ironvow; both physical
+runs finally **PASS**. The Base now applies
+a **server-side nearby trainer check**
+for *every* registered original advanced
+career on trainer snapshots and both
+learn/rank requests, not just the two
+previously supported Scout classes.
+Both Warrior and Knight separately passed
+real two-client instanced Dungeon
+source enemy hit and owner-specific
+item-drop acceptance; their test driver
+provided the lethal finishing blows.
+Ironvow's earned-only fortitude and
+seated stamina recovery ranks now
+affect actual server HP and stamina,
+persist through save/reload and cannot
+be gained from a forged class identity.
+The actual focused Knight tests passed
+**29 + 38** and world binding **11**;
+focused Warrior tests passed
+**31 + 79 + 58**. Launch inventory
+audit **27 assertions PASS**:
+the repository's source training-row
+counts are Ashenblade **59/59**,
+Greenward Scout **77/77**,
+Ironvow **27/62**, Oathguard **24/54**
+mapped ranks at levels 20/24/28.
+These numbers are *purchase schedules*,
+not all C4 source effects or starter
+levels 1–19 accepted. **4/18**
+authentic original class-award
+backends and physical Base/client
+trainer paths now have dedicated
+live acceptance; **0/18** have
+an entire natural level-1→30
+career and uninterrupted real
+cross-place gameplay accepted.
+No Roblox publish, production
+DataStore mutation, `main` merge
+or permanent code/document edits
+through Desktop Commander. The
+independently maintained humanoid
+and quadruped animation roadmaps
+remain intact.
+
+**Previous DungeonMMO class backend: v2.05 — Ironroot original Warrior quest, personally owned monster drops and server-authorized Ironvow class transfer.**
 [Latest active class roadmap](
 DungeonMMO_Roadmap_v2_05_Ironroot_Quest_And_Ironvow_Transfer_20260923.md)
 and [executed v2.05 acceptance / limitations](
