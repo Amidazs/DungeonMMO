@@ -47,7 +47,7 @@ local function test_world(): any
         available = function(
             _self: any, _quest: any, step: number
         ): boolean
-            return step == 3
+            return step == 3 or step == 6
         end,
         verify = function(
             _self: any, user_id: number, event: any,
@@ -224,6 +224,78 @@ local function verify_destination(base: any, owner: any)
 end
 
 --[[
+Verifies all four later Cinder items survive a second save/handoff/reload.
+
+Args:
+    shared_store (any): Same real in-memory persisted profile adapter.
+    source (any): Loaded first destination's original ProfileService.
+
+Returns:
+    nil: No duplicate cached loot or advanced-class award after transfer.
+]]
+local function verify_cinder_handoff(shared_store: any, source: any)
+    local user_id = OWNERS[1].UserId
+    check(source:mutate(user_id, function(profile: any)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state.Step == 4 and state.Proofs.SpartoiBone10)
+        assert(Inventory.apply_remove_from_character(
+            owner, "spartoi_bone", 10
+        ).ok)
+        -- The future stage-four/five NPC interactions are tested in a
+        -- separate live Base fixture, not bypassed in production here.
+        state.Step = 6
+    end), "Test-only later-stage setup uses the actual source profile")
+
+    local cinder = Quest.new(source, "Dungeon", test_world())
+    local earned = cinder:record_world_event(user_id, {
+        ServerVerified = true,
+        EventId = "CinderHandoff:Kill1",
+        MonsterReceiptId = "CinderHandoff:Life1",
+        ActorUserId = user_id,
+        Kind = "QuestMonsterDefeat",
+        TargetId = "CinderBrigand",
+        TrialWeaponVerified = true,
+        VerifiedProofIds = {
+            StolenJewelry = true, StolenTomes = true,
+            StolenRing = true, StolenNecklace = true,
+        },
+    })
+    check(earned.ok and earned.Step == 7,
+        "Authenticated fixture Cinder defeat earns distinct source items")
+
+    local coordinator, transport = create_return_coordinator(source)
+    check(coordinator:return_to_base(
+        {{UserId = user_id}}, {
+            SessionId = "LaterCinderHandoff",
+            DungeonId = "TestDungeon",
+            ReturnPlaceId = 42,
+        }
+    ).ok, "Actual return coordinator saves later source loot")
+    check(transport.routing.Inventory == nil
+        and transport.routing.Proofs == nil,
+        "Second transport never trusts client-supplied quest inventory")
+    check(source:forget_for_handoff(user_id),
+        "Second source cache closes after the saved coordinator handoff")
+
+    local destination = Profiles.new(shared_store)
+    check(destination:load(user_id) ~= nil,
+        "Fresh post-Cinder destination reloads shared persisted profile")
+    local owner = assert(destination:get_character(user_id))
+    local quest = owner.ClassAdvancement.OriginalFirstTransferQuest
+    check(quest.Step == 7 and owner.Identity.ClassId == "Fighter"
+        and owner.ClassAdvancement.ActiveClassId == nil,
+        "Later-stage saved Cinder proof cannot grant an advanced class")
+    for _, item_id in ipairs({
+        "cinder_cipher", "cinder_route_map",
+        "cinder_ward_seal", "cinder_tideglass_lens",
+    }) do
+        check(Inventory.count_item(owner, item_id) == 1,
+            "Each separately earned Cinder item survives destination load")
+    end
+end
+
+--[[
 Tests both actual source profile save/handoff and fresh destination loads.
 
 Args:
@@ -265,6 +337,7 @@ local function main()
     for _, owner in ipairs(OWNERS) do
         verify_destination(base, owner)
     end
+    verify_cinder_handoff(shared_store, base)
     print(("[C4 Quest Handoff] PASS: %d assertions")
         :format(assertions))
 end
