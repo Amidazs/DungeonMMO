@@ -115,6 +115,10 @@ function Selection:build_snapshot(user_id: number): any
                 and quest_source.WorldBindingStatus == "Implemented",
             SkillInventoryStatus = skill_status.SourceInventoryStatus,
             MappedAnalogueRanks = skill_status.MappedAnalogueRanks,
+            ExactOriginalLevel20RankEntries =
+                skill_status.ExactOriginalLevel20RankEntries,
+            ImplementedOriginalLevel20Ranks =
+                skill_status.ImplementedOriginalLevel20Ranks,
             ExactC4SkillParityCertified =
                 skill_status.ExactC4RankParityCertified,
         })
