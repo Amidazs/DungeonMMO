@@ -90,6 +90,34 @@ function Rules.can_progress(
     if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
         return false, "OriginalTrialWeaponRequired"
     end
+    if step.TargetId == "Neti" and current.Step == 2
+        and event.TrialWeaponsGranted ~= true
+    then
+        return false, "OriginalTrialWeaponRequired"
+    end
+    if step.TargetId == "RogueTrialSkeleton"
+        and (type(event.VerifiedProofIds) ~= "table"
+            or event.VerifiedProofIds.SpartoiBone ~= true)
+    then
+        return false, "OriginalQuestLootProofRequired"
+    end
+    if step.TargetId == "OlMahumPatrol" then
+        local ids = {"PriasLetter1", "PriasLetter2",
+            "PriasLetter3", "PriasLetter4"}
+        local fresh = false
+        for _, id in ipairs(ids) do
+            if type(event.VerifiedProofIds) == "table"
+                and event.VerifiedProofIds[id] == true
+                and type(current.Proofs) == "table"
+                and current.Proofs[id] ~= true
+            then
+                fresh = true
+            end
+        end
+        if not fresh then
+            return false, "OriginalQuestDistinctLetterRequired"
+        end
+    end
     -- Loot proof is checked against the *actual* server-authored item
     -- set, not merely kill count. Missing item bindings cannot finish it.
     if step.TargetId == "CatsEyeBandit" then
@@ -131,6 +159,12 @@ function Rules.advance(quest: any, current: any, event: any): any
     if not ok then return {ok = false, reason = reason} end
     local step = quest.Steps[current.Step]
     current.AppliedEvents[event.EventId] = true
+    if type(current.Proofs) ~= "table" then
+        current.Proofs = {}
+    end
+    for id, verified in pairs(event.VerifiedProofIds or {}) do
+        if verified == true then current.Proofs[id] = true end
+    end
     current.Count = math.min(step.Required, (current.Count or 0) + 1)
     if current.Count >= step.Required then
         current.Step += 1
