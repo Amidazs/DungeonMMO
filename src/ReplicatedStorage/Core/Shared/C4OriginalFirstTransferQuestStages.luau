@@ -25,6 +25,30 @@ end
 local QUESTS = table.freeze({
     -- Independent DungeonMMO Warrior route. These identifiers belong
     -- to original game actors and owned loot, not third-party content.
+    -- Independent Human Knight story; no borrowed NPC, item or
+    -- protected source-game dialogue/monster artwork is required.
+    HumanKnight = table.freeze({
+        Id = "StonewatchVigil", BranchId = "HumanKnight",
+        SourceTitle = "The Stonewatch Vigil",
+        StartLevel = 18, TransferLevel = 20,
+        TransferNpcId = "CaptainRowan",
+        Recommendation = "StonewatchOathSeal",
+        Steps = table.freeze({
+            talk("CaptainRowan", "Answer the Stonewatch call."),
+            talk("QuartermasterDena", "Learn the watch-post signals."),
+            defeat("GloamStriker", 3,
+                "Recover three personally earned watch-post badges."),
+            talk("QuartermasterDena", "Return the three watch badges."),
+            defeat("GloamBulwark", 1,
+                "Defeat the gate-breaker and recover its ward seal."),
+            talk("CaptainRowan", "Present the ward seal and take the oath."),
+        }),
+        RequiredProofIds = table.freeze({
+            "StonewatchBadge3", "GloamBulwarkSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
+
     HumanWarrior = table.freeze({
         Id = "IronvowTrial", BranchId = "HumanWarrior",
         SourceTitle = "The Ironroot Oath",
@@ -121,7 +145,8 @@ Returns:
 ]]
 function SourceQuests.inventoried(): {any}
     return table.freeze({
-        QUESTS.HumanWarrior, QUESTS.HumanRogue, QUESTS.ElvenScout,
+        QUESTS.HumanKnight, QUESTS.HumanWarrior,
+        QUESTS.HumanRogue, QUESTS.ElvenScout,
     })
 end
 
