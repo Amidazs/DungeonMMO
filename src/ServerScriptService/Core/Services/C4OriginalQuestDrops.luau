@@ -130,6 +130,14 @@ function Drops.validate(
                     return false, "OriginalQuestProofOwnershipInvalid"
                 end
             end
+        elseif state.Step == 6
+            and Inventory.count_item(character, "bracken_ward_sigil") ~= 0
+        then
+            return false, "OriginalQuestProofOwnershipInvalid"
+        elseif state.Step == 7
+            and Inventory.count_item(character, "bracken_ward_sigil") ~= 1
+        then
+            return false, "OriginalQuestProofOwnershipInvalid"
         end
     end
     return true, nil
@@ -225,11 +233,19 @@ function Drops.apply(
     if state.BranchId == "HumanRogue" and state.Step == 7 then
         return apply_cinder_items(character, true)
     end
+    if state.BranchId == "ElvenScout" and state.Step == 7 then
+        local removed = Inventory.apply_remove_from_character(
+            character, "bracken_ward_sigil", 1
+        )
+        return removed.ok, removed.reason
+    end
     local item_id: string? = nil
     if state.Step == 3 and state.BranchId == "HumanRogue" then
         item_id = "spartoi_bone"
     elseif state.Step == 3 and state.BranchId == "ElvenScout" then
         item_id = letter_item(event)
+    elseif state.Step == 6 and state.BranchId == "ElvenScout" then
+        item_id = "bracken_ward_sigil"
     end
     if not item_id then return true, nil end
     local before = Inventory.count_item(character, item_id)
