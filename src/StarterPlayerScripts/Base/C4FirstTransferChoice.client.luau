@@ -72,7 +72,7 @@ description.TextYAlignment = Enum.TextYAlignment.Top
 description.TextColor3 = Color3.fromRGB(201, 208, 217)
 description.Font = Enum.Font.Gotham
 description.TextSize = 14
-description.Text = "At level 18, select an original C4 advancement path."
+description.Text = "At level 18, choose your DungeonMMO advancement path."
 description.Parent = panel
 
 local options = Instance.new("ScrollingFrame")
@@ -151,12 +151,12 @@ local function add_option(entry: any, state: any)
     local skills_note = if entry.SkillInventoryStatus
         == "DungeonMMOAnaloguesMapped"
         then tostring(entry.MappedAnalogueRanks)
-            .. " DungeonMMO rank analogues; exact C4 audit pending"
+            .. " available skill ranks; further class skills in development"
         elseif entry.SkillInventoryStatus
             == "OriginalC4Level20SourceMapped"
         then tostring(entry.ExactOriginalLevel20RankEntries)
-            .. " original C4 level-20 ranks documented; not yet playable"
-        else "Original C4 class skills not yet inventoried"
+            .. " advancement ranks planned; not yet playable"
+        else "Advanced class skills are in development"
     button.Text = "  " .. entry.DisplayName
         .. (if selected then "  — SELECTED" else "")
         .. "\n  " .. entry.QuestName
@@ -170,7 +170,7 @@ local function add_option(entry: any, state: any)
     button.Activated:Connect(function()
         if not state.CanChoose or pending then return end
         pending = true
-        status.Text = "Saving your chosen C4 class path..."
+        status.Text = "Saving your advancement path..."
         requests:FireServer("SelectFirstTransfer", entry.Id)
     end)
 end
@@ -215,13 +215,13 @@ local function render(snapshot: any)
                     .. "point. Later letter-fragment combat and "
                     .. "class transfer remain locked."
             else
-                status.Text = "Original quest stage "
+                status.Text = "Advancement trial stage "
                     .. tostring(quest.Step)
                     .. " reached. The remaining dungeon stages and "
                     .. "class transfer are still in development."
             end
         elseif quest and quest.ok and quest.WorldReady then
-            status.Text = "Visit your original C4 quest NPC near the "
+            status.Text = "Visit your advancement mentor near the "
                 .. "hub arrival point. The full advancement quest is still "
                 .. "in development; no advanced class is awarded yet."
         else
@@ -231,7 +231,7 @@ local function render(snapshot: any)
     elseif state.CanChoose then
         status.Text = "Select one path. Selection does not award a class or bypass its quest."
     else
-        status.Text = "Original class choices open at level 18."
+        status.Text = "First class choices open at level 18."
     end
     if state.CanChoose and not dismissed then
         panel.Visible = true
