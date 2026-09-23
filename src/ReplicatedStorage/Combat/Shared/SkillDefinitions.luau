@@ -1398,6 +1398,23 @@ local ELVEN_SCOUT_WIND_RUN = specialize_skill(
     }
 )
 
+-- Human Rogue source Sprint runs through actual combat movement and
+-- stamina/cooldown authorization, not client-written WalkSpeed.
+local HUMAN_SCOUT_SPRINT = specialize_skill(
+    ELVEN_SCOUT_WIND_RUN, "HumanScoutSprint", "Sprint", {
+        STAMINA_COST = 20,
+        COOLDOWN_SECONDS = 28,
+        BUFF_MAGNITUDE = 0.18,
+        BUFF_SECONDS = 7,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.18,
+                BUFF_SECONDS = 7,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1553,6 +1570,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ElvenScoutCureWounds = ELVEN_SCOUT_CURE_WOUNDS,
     ElvenScoutBattleFocus = ELVEN_SCOUT_BATTLE_FOCUS,
     ElvenScoutWindRun = ELVEN_SCOUT_WIND_RUN,
+    HumanScoutSprint = HUMAN_SCOUT_SPRINT,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
