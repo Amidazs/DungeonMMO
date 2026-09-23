@@ -79,7 +79,9 @@ local function make_trainer(
     prompt.ObjectText = definition.MentorName
     prompt.ActionText = "Train"
     prompt.HoldDuration = 0.4
-    prompt.RequiresLineOfSight = true
+    -- Some outer original-class trainers sit beside temporary hub walls.
+    -- Server-owned proximity and authenticated class checks still apply.
+    prompt.RequiresLineOfSight = false
     prompt.MaxActivationDistance = MAX_RANGE
     prompt.Parent = part
 
