@@ -46,7 +46,8 @@ end
 -- Args: character (Model) - R15 test target.
 -- Returns: Model - separate anchored and original-preserving performer.
 local function clone_performer(character)
-    character.Archivable = true
+    assert(character.Archivable,
+        "The source mannequin must already allow independent cloning")
     local model = character:Clone()
     assert(model, "Cannot clone the original R15 test mannequin")
     model.Name = TARGET_NAME
