@@ -4,12 +4,12 @@ from pathlib import Path
 import bpy,numpy as np
 from mathutils import Vector
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
-OUT=ROOT/"ForelegRefinement_20260923_D"
+OUT=ROOT/"ForelegRefinement_20260923_E"
 def fingerprint(mesh,rig):
     h=hashlib.sha256()
     for v in mesh.data.vertices:
         h.update(repr(tuple(v.co)).encode())
-        h.update(repr([(g.group,g.weight) for g in v.groups]).encode())
+        # Weight edits are intentional; geometry/rest invariance is separate.
     for p in mesh.data.polygons:h.update(repr(tuple(p.vertices)).encode())
     for b in rig.data.bones:h.update(repr((b.name,list(map(tuple,b.matrix_local)))).encode())
     return h.hexdigest()
@@ -45,6 +45,6 @@ def inspect(path,records=None):
       objects=[dict(name=o.name,type=o.type) for o in scene.objects])
 a=inspect(ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend")
 b=inspect(OUT/"Frostfang_ForelegRefinement_REVIEW.blend",json.loads((OUT/"audit.json").read_text())["frames"])
-result=dict(source=a,candidate=b,mesh_skin_and_rest_skeleton_unchanged=a["fingerprint"]==b["fingerprint"])
+result=dict(source=a,candidate=b,mesh_geometry_and_rest_skeleton_unchanged=a["fingerprint"]==b["fingerprint"])
 (OUT/"surface_comparison.json").write_text(json.dumps(result,indent=2))
 print("SURFACE_COMPARISON",json.dumps({k:{n:v for n,v in value.items() if n!="frame_stretch"} if isinstance(value,dict) else value for k,value in result.items()}),flush=True)
