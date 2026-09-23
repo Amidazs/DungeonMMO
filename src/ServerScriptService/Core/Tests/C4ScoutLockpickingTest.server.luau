@@ -93,8 +93,8 @@ local function check_source(
     end
     character.Identity.BaseClassId = "Mage"
     character.Identity.ClassId = "Mage"
-    check(not Rules.can_show(character, definition),
-        "An unqualified Mage cannot learn the Scout world skill")
+    check(not Rules.can_train(character, definition, 1),
+        "An unqualified Mage cannot train the Scout world skill")
 end
 
 --[[
