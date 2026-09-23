@@ -68,23 +68,31 @@ def tail_vertex_indices(mesh):
     group_ids = {
         mesh.vertex_groups[name].index for name in TAIL_NAMES
     }
-    regions = {"base": [], "middle": [], "tip": []}
+    indices = []
     for vertex in mesh.data.vertices:
         tail_weight = sum(
             item.weight for item in vertex.groups
             if item.group in group_ids
         )
-        if vertex.co.y <= 0.38 or tail_weight < 0.5:
-            continue
-        if vertex.co.y < 0.56:
-            region = "base"
-        elif vertex.co.y < 0.76:
-            region = "middle"
-        else:
-            region = "tip"
-        regions[region].append(vertex.index)
+        if vertex.co.y > 0.35 and tail_weight >= 0.3:
+            indices.append(vertex.index)
+    if not indices:
+        raise RuntimeError("No tail-influenced source vertices found")
+    start = min(mesh.data.vertices[index].co.y for index in indices)
+    end = max(mesh.data.vertices[index].co.y for index in indices)
+    if end - start < 0.03:
+        raise RuntimeError("Tail source span too short to classify")
+    regions = {"base": [], "middle": [], "tip": []}
+    for index in indices:
+        ratio = (
+            mesh.data.vertices[index].co.y - start
+        ) / (end - start)
+        region = "base" if ratio < 1 / 3 else (
+            "middle" if ratio < 2 / 3 else "tip"
+        )
+        regions[region].append(index)
     if not all(regions.values()):
-        raise RuntimeError("Cannot identify three nonempty tail regions")
+        raise RuntimeError("Tail thirds are not all represented")
     return regions
 
 
