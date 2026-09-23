@@ -1000,6 +1000,28 @@ local MYSTIC_BATTLE_HEAL = specialize_skill(
     }
 )
 
+-- Genuine C4 level-fourteen party healing. Each target receives
+-- the authored per-member rank amount and shares one mana/cooldown.
+-- No free extra heal-over-time ticks may bypass party revalidation.
+local MYSTIC_PARTY_HEAL = specialize_skill(
+    MAGE_HEAL, "MysticPartyHeal", "Party Heal", {
+        PARTY_HEAL = true,
+        MANA_COST = 28,
+        COOLDOWN_SECONDS = 12,
+        RANGE_STUDS = 24,
+        TOTAL_HEAL = 34,
+        HUMAN_INSTANT_FRACTION = 1,
+        ELF_INSTANT_FRACTION = 1,
+        HUMAN_HOT_SECONDS = 0,
+        ELF_HOT_SECONDS = 0,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 34}),
+            [2] = table.freeze({TOTAL_HEAL = 44}),
+            [3] = table.freeze({TOTAL_HEAL = 56}),
+        }),
+    }
+)
+
 -- The source C4 Mage level-seven cure spends mana and removes only
 -- an authenticated friendly poison at or below the authored tier.
 local MYSTIC_CURE_POISON = specialize_skill(
@@ -1393,6 +1415,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     MysticStoneSkin = MYSTICSTONESKIN,
     MysticHealingPrayer = MYSTIC_HEALING_PRAYER,
     MysticBattleHeal = MYSTIC_BATTLE_HEAL,
+    MysticPartyHeal = MYSTIC_PARTY_HEAL,
     ScoutEvasiveFocus = SCOUT_EVASIVE_FOCUS,
     ElvenScoutGuard = ELVEN_SCOUT_GUARD,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
