@@ -349,6 +349,8 @@ local function verify_runtime_skill(profiles: any, owner: any)
     check(Runtime.is_skill_usable(owner.UserId, skill_id, {}),
         "Restoring the earned class restores its legal combat ability")
     Runtime.clear_character(owner.UserId)
+    check(profiles:save(owner.UserId, "OriginalClassEquipmentTest"),
+        "Actual owned dagger setup and earned advanced skills save")
 end
 
 --[[
