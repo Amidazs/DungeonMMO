@@ -88,7 +88,16 @@ export type BuffSkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
-export type SkillDefinition = MeleeSkillDefinition
+export type ScoutToggleSkillDefinition = {
+    KIND: "ScoutToggle", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, COOLDOWN_SECONDS: number,
+    CRITICAL_DAMAGE_BONUS: number,
+    UPKEEP_STAMINA_PER_SECOND: number,
+    RANKS: {[number]: any}?,
+}
+
+export type SkillDefinition = ScoutToggleSkillDefinition
+    | MeleeSkillDefinition
     | BuffSkillDefinition
     | SupportSkillDefinition
     | MageHealSkillDefinition
@@ -1397,6 +1406,26 @@ local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     }
 )
 
+-- Genuine on/off C4 power stance: source-banded critical damage
+-- and continuous stamina upkeep, not a one-off timed buff.
+local SCOUT_CRITICAL_POWER_TOGGLE: ScoutToggleSkillDefinition =
+    table.freeze({
+        KIND = "ScoutToggle",
+        ID = "ScoutCriticalPowerToggle",
+        DISPLAY_NAME = "Critical Power",
+        STAMINA_COST = 3,
+        COOLDOWN_SECONDS = 0,
+        CRITICAL_DAMAGE_BONUS = 0.06,
+        UPKEEP_STAMINA_PER_SECOND = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({CRITICAL_DAMAGE_BONUS = 0.06}),
+            [2] = table.freeze({CRITICAL_DAMAGE_BONUS = 0.08}),
+            [3] = table.freeze({CRITICAL_DAMAGE_BONUS = 0.10}),
+            [4] = table.freeze({CRITICAL_DAMAGE_BONUS = 0.12}),
+            [5] = table.freeze({CRITICAL_DAMAGE_BONUS = 0.14}),
+        }),
+    })
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1515,6 +1544,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ThunderShot = THUNDER_SHOT,
     ArcherDraw = ARCHER_DRAW,
     ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
+    ScoutCriticalPowerToggle = SCOUT_CRITICAL_POWER_TOGGLE,
     ElvenRenewal = ELVEN_RENEWAL,
     ElvenCalmingShot = ELVEN_CALMING_SHOT,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
@@ -1630,6 +1660,34 @@ local function validate_buff(definition: BuffSkillDefinition)
         and definition.BUFF_SECONDS <= 60,
         "Combat buff duration must be bounded."
     )
+end
+
+--[[
+Validates an authoritatively purchased rank and bounded upkeep contract.
+
+Args:
+    definition (ScoutToggleSkillDefinition): Real source-level stance.
+
+Returns:
+    nil: Rejects cosmetic or resource-free toggle definitions.
+]]
+local function validate_scout_toggle(definition: ScoutToggleSkillDefinition)
+    assert(definition.STAMINA_COST > 0
+        and definition.STAMINA_COST <= 20,
+        "Scout toggle must cost stamina on activation.")
+    assert(definition.UPKEEP_STAMINA_PER_SECOND >= 1
+        and definition.UPKEEP_STAMINA_PER_SECOND <= 10,
+        "Scout toggle requires bounded continuous stamina upkeep.")
+    assert(definition.CRITICAL_DAMAGE_BONUS > 0
+        and definition.CRITICAL_DAMAGE_BONUS <= 0.20,
+        "Scout toggle requires bounded critical damage scaling.")
+    local previous = 0
+    for rank = 1, 5 do
+        local value = definition.RANKS[rank].CRITICAL_DAMAGE_BONUS
+        assert(value > previous and value <= 0.20,
+            "Five critical-power source ranks must increase the bonus.")
+        previous = value
+    end
 end
 
 local function validate_support(definition: SupportSkillDefinition)
@@ -1769,6 +1827,8 @@ for _, definition in DEFINITIONS do
     validate_common(definition)
     if definition.KIND == "Melee" then
         validate_melee(definition)
+    elseif definition.KIND == "ScoutToggle" then
+        validate_scout_toggle(definition :: ScoutToggleSkillDefinition)
     elseif definition.KIND == "Buff" then
         validate_buff(definition :: BuffSkillDefinition)
     elseif definition.KIND == "Support" then
