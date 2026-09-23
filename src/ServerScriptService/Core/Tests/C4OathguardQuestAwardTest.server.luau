@@ -210,6 +210,14 @@ local function verify_shield_mastery(profiles: any, service: any)
     local first_shield = service:learn_trainer_skill(USER_ID, shield_id)
     check(first_shield.ok and first_shield.rank == 1,
         "Earned Knight buys its own first shield-training rank")
+    local first_owned = Schema.deep_clone(assert(
+        profiles:get_character(USER_ID)
+    ))
+    first_owned.Equipment.OffHand = "marauder_shield"
+    check(math.abs(PassiveEffects.oathguard_shield_reduction(
+        first_owned
+    ) - 0.008) < 1e-6,
+        "Only first purchased Knight shield rank gives 0.8% reduction")
     local second_shield = service:purchase_rank(USER_ID, shield_id)
     check(second_shield.ok and second_shield.rank == 2,
         "Knight separately buys the level-28 shield-training rank")
