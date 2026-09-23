@@ -202,10 +202,24 @@ local function render(snapshot: any)
         status.Text = "Existing class progression is preserved; migration is pending."
     elseif state.SelectedClassId then
         if quest and quest.ok and quest.Started then
-            status.Text = "Original quest stage "
-                .. tostring(quest.Step)
-                .. " started. The remaining dungeon stages and full "
-                .. "advancement quest are still in development."
+            if quest.WorldReady and quest.Step == 2
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Visit Neti near the hub arrival point to "
+                    .. "receive your personal trial dagger and bow. "
+                    .. "Later quest battles and class transfer remain locked."
+            elseif quest.WorldReady and quest.Step == 2
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Visit Guard Moretti near the hub arrival "
+                    .. "point. Later letter-fragment combat and "
+                    .. "class transfer remain locked."
+            else
+                status.Text = "Original quest stage "
+                    .. tostring(quest.Step)
+                    .. " reached. The remaining dungeon stages and "
+                    .. "class transfer are still in development."
+            end
         elseif quest and quest.ok and quest.WorldReady then
             status.Text = "Visit your original C4 quest NPC near the "
                 .. "hub arrival point. The full advancement quest is still "
