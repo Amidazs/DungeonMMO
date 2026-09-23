@@ -285,8 +285,33 @@ local function award(profiles: any, pending: any)
     check(PassiveEffects.oathguard_magic_reduction(forged) == 0,
         "A forged Fighter with copied rune ranks has no magic resistance")
     RuntimeState.clear_character(USER_ID)
+    check(profiles:mutate(USER_ID, function(profile: any)
+        local character = profile.Characters.Slot1
+        character.Progression.Skills.FighterRestingRecovery = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+    end), "Earned Fighter endurance is present before advanced self-heal")
+    local recovery_id = "OathguardMendingOath"
+    for rank = 1, 3 do
+        if rank > 1 then
+            check(profiles:mutate(USER_ID, function(profile: any)
+                profile.Characters.Slot1.Progression.Skills[
+                    recovery_id
+                ].Proficiency = if rank == 2 then 40 else 80
+            end), "Actually earned rank threshold is prepared for this test")
+        end
+        local result = if rank == 1
+            then service:learn_trainer_skill(USER_ID, recovery_id)
+            else service:purchase_rank(USER_ID, recovery_id)
+        check(result.ok and result.rank == rank,
+            "Knight bought valid independently ranked personal recovery "
+                .. tostring(rank) .. " " .. tostring(result.reason))
+    end
+    check(profiles:get_character(USER_ID)
+        .Progression.Skills[recovery_id].PurchasedRank == 3,
+        "Three source-level-28 personal recovery ranks remain purchased")
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
-        "Original Knight quest, class and eight paid rune ranks persist")
+        "Knight quest, class, rune defence and personal heal ranks persist")
 end
 
 --[[
