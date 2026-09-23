@@ -20,6 +20,7 @@ local Inventory = require(Services.InventoryService)
 local Loadout = require(Services.LoadoutService)
 local SkillService = require(Services.SkillProgressionService)
 local Combat = require(RS.Combat.Shared.SkillDefinitions)
+local Runtime = require(Services.ProgressionRuntimeState)
 
 local assertions = 0
 local OWNERS = table.freeze({
@@ -311,6 +312,46 @@ local function verify_next_skill(profiles: any, owner: any)
 end
 
 --[[
+Checks the dungeon runtime, weapon tag and earned-class cast barriers.
+
+Args:
+    profiles (any): Real test ProfileService with purchased advanced skill.
+    owner (any): The respective personally earned original career.
+
+Returns:
+    nil: Purchased abilities remain unusable with forged identity or gear.
+]]
+local function verify_runtime_skill(profiles: any, owner: any)
+    local skill_id = if owner.RaceId == "Human"
+        then "AshenbladeOpening" else "GreenwardRenewal"
+    local character = profiles:get_character(owner.UserId)
+    Runtime.set_character(owner.UserId, character)
+    local usable, reason = Runtime.is_skill_usable(
+        owner.UserId, skill_id, {}
+    )
+    if owner.RaceId == "Human" then
+        check(not usable and reason == "WrongWeapon",
+            "Ashenblade strike must require a real equipped dagger")
+        check(profiles:mutate(owner.UserId, function(profile: any)
+            profile.Characters.Slot1.Equipment.Weapon = "scout_dagger"
+        end), "Disposable Human weapon preparation succeeded")
+        character = profiles:get_character(owner.UserId)
+        Runtime.set_character(owner.UserId, character)
+    end
+    check(Runtime.is_skill_usable(owner.UserId, skill_id, {}),
+        "Real earned first-transfer ability must be usable in combat")
+    local forged = Schema.deep_clone(character)
+    forged.Identity.ClassId = "Fighter"
+    Runtime.set_character(owner.UserId, forged)
+    check(not Runtime.is_skill_usable(owner.UserId, skill_id, {}),
+        "Unawarded starter cannot cast bought first-transfer skill")
+    Runtime.set_character(owner.UserId, character)
+    check(Runtime.is_skill_usable(owner.UserId, skill_id, {}),
+        "Restoring the earned class restores its legal combat ability")
+    Runtime.clear_character(owner.UserId)
+end
+
+--[[
 Verifies a completely new profile cache loads exactly the earned class.
 
 Args:
@@ -390,6 +431,7 @@ local function main()
         verify_denials(profiles, transfer, owner, pending)
         verify_award(profiles, transfer, owner, pending)
         verify_next_skill(profiles, owner)
+        verify_runtime_skill(profiles, owner)
         verify_reload(store, owner, profiles)
     end
     verify_forged_migration()
