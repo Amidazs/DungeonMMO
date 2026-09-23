@@ -17,6 +17,8 @@ local Inventory = require(SSS.Core.Services.InventoryService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
 local Equipment = require(SSS.Core.Services.EquipmentService)
 local Passives = require(Shared.PassiveSkillEffects)
+local Schema = require(Shared.ProfileSchema)
+local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
 local USER_ID = 837921
 local CHECKS = 0
@@ -233,7 +235,13 @@ local function verify_armour_training(profiles: any)
     )
     check(profiles:mutate(USER_ID, function(profile: any)
         local owner = profile.Characters.Slot1
-        owner.Progression.SkillPointEntitlement = 6000
+        owner.Progression.SkillPointEntitlement = 12000
+        owner.Progression.Skills.StalwartTraining = {
+            Known = true, PurchasedRank = 6, Proficiency = 0,
+        }
+        owner.Progression.Skills.FighterRestingRecovery = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
         for _, item_id in ipairs({
             "marauder_sword", "apprentice_longbow",
             "ironroot_light_vest", "marauder_armor",
@@ -287,6 +295,40 @@ local function verify_armour_training(profiles: any)
     check(Passives.fighter_armor_reduction(
         profiles:get_character(USER_ID)
     ) == 0, "No body armour means no Warrior armour mitigation")
+    local before = profiles:get_character(USER_ID)
+    Runtime.set_character(USER_ID, before)
+    local original_max = Runtime.get_max_health(USER_ID)
+    local original_rest = Passives.stamina_recovery_multiplier(
+        before, true, false
+    )
+    purchase_full_line(
+        profiles, service, "IronvowFortitude"
+    )
+    purchase_full_line(
+        profiles, service, "IronvowRestRecovery"
+    )
+    local recovered = assert(profiles:get_character(USER_ID))
+    Runtime.set_character(USER_ID, recovered)
+    check(Runtime.get_max_health(USER_ID) == original_max + 16,
+        "Two bought fortitude ranks increase real server maximum HP")
+    check(Passives.stamina_recovery_multiplier(
+        recovered, true, false
+    ) > original_rest
+        and Passives.stamina_recovery_multiplier(
+            recovered, false, true
+        ) == 1,
+        "Warrior's paid rest rank improves genuine seated stamina only")
+    local forged = Schema.deep_clone(recovered)
+    forged.Identity.ClassId = "Fighter"
+    check(Passives.health_bonus(forged) + 16
+        == Passives.health_bonus(recovered)
+        and Passives.stamina_recovery_multiplier(
+            forged, true, false
+        ) < Passives.stamina_recovery_multiplier(
+            recovered, true, false
+        ),
+        "An unawarded Fighter cannot inherit Warrior HP or rest bonuses")
+    Runtime.clear_character(USER_ID)
     check(profiles:save(USER_ID, "IronvowArmourRankTraining"),
         "Earned class, paid armour ranks and item state all persist")
 end
@@ -315,7 +357,11 @@ local function verify_reload(store: any, profiles: any)
         and character.Progression.Skills
             .IronvowHeavyArmorTraining.PurchasedRank == 7
         and character.Progression.Skills
-            .IronvowBladeTraining.PurchasedRank == 4,
+            .IronvowBladeTraining.PurchasedRank == 4
+        and character.Progression.Skills
+            .IronvowFortitude.PurchasedRank == 2
+        and character.Progression.Skills
+            .IronvowRestRecovery.PurchasedRank == 1,
         "Original earned class, receipt and bought first skill persist")
 end
 
