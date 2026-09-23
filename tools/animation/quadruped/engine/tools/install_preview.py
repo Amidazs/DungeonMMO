@@ -15,7 +15,7 @@ s.bone="DEF_spine.011"
 for area in bpy.context.screen.areas:
     if area.type=="VIEW_3D":
         area.spaces.active.show_region_ui=True
-        area.spaces.active.shading.type="MATERIAL"
+        area.spaces.active.shading.type="SOLID"
         area.spaces.active.region_3d.view_distance=2.3
         area.spaces.active.region_3d.view_location=(0,0,.5)
         from mathutils import Quaternion
