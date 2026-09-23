@@ -365,10 +365,16 @@ function PassiveSkillEffects.fighter_armor_reduction(
     local advanced = resolve_bonus(
         character, career_skill, "PhysicalReductionPerRank"
     )
-    -- Both branches use the existing server-side incoming NPC damage
-    -- resolver. Unlike base Fighter armour, an original class must be
-    -- personally awarded and wear the corresponding real Body category.
-    return math.clamp(base + advanced, 0, 0.085)
+    if body.Category == "HeavyArmor" then
+        advanced += resolve_bonus(
+            character, "OathguardHeavyArmorTraining",
+            "PhysicalReductionPerRank"
+        )
+    end
+    -- Every original class passive requires the saved, verified personal
+    -- advancement receipt and matching registered Body-armour category.
+    -- A raw class ID, robe or unequipped shield never provides mitigation.
+    return math.clamp(base + advanced, 0, 0.10)
 end
 
 --[[
