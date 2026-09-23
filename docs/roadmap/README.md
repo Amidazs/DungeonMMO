@@ -1,3 +1,26 @@
+**Current C4 backend: v1.95 — original DungeonMMO advancement quest names and combat ledger.**
+[Newest class/quest backend roadmap](
+DungeonMMO_Roadmap_v1_95_Original_Quest_Names_Combat_Ledger_20260923.md)
+and [executed unpublished Studio tests](
+../testing/c4-original-naming-and-monster-ledger-v1-95-20260923.md).
+The player-facing source quest mentors and enemies now have
+distinct DungeonMMO names (Captain Ashford, Quartermaster Vela,
+Pathfinder Elyra, Warden Thorne, Crypt Sentinel and Bracken Raider).
+The two quest titles, visible item labels and class UI were updated
+without changing the underlying saved legacy inventory/quest keys.
+The Base focused source/skill suite passed **5/5** (148 original
+quest/naming assertions); the actual **two-client physical Base NPC**
+playtest passed with all four new prompt labels; the separate
+Dungeon real-model/forge-denial combat-ledger fixture passed
+**1/1** (10 assertions). Both unpublished local Rojo
+compositions built. **The ledger is not bound to an actual
+instanced quest room or genuine player-to-monster combat yet**;
+no completed quest or original level-20 class award is claimed,
+and fully playable original first-transfer branches remain
+**0/18**. Preserve independent game art/writing, one Gathering
+plus one Crafting profession, legacy saves, separate animation
+roadmaps and no `main` merge/Roblox publish.
+
 **Current C4 backend: v1.94 — source-monster quest drop foundation (not live combat).**
 [Newest original C4 backend roadmap](
 DungeonMMO_Roadmap_v1_94_C4_Quest_Drop_Foundation_20260923.md).
