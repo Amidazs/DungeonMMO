@@ -3606,6 +3606,12 @@ end
 -- This callback never trusts a client-supplied rank or toggle strength.
 -- Any respec, loadout change, class/race change or Dungeon exclusion
 -- invalidates the active effect and stops further upkeep.
+ScoutCriticalToggleService.set_stamina_spender(function(
+    player: Player, amount: number
+): boolean
+    return StaminaService.try_spend(player, amount)
+end)
+
 ScoutCriticalToggleService.set_authorizer(function(
     player: Player, toggle_record: any
 ): boolean
