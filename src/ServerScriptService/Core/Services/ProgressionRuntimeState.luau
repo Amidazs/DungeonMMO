@@ -403,6 +403,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
         character, "RogueBladeMastery"
     ) + PassiveSkillEffects.damage_bonus(
         character, "RogueEdgeDiscipline"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "WayfinderDaggerMastery"
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
@@ -430,6 +432,8 @@ function ProgressionRuntimeState.get_ranged_physical_multiplier(
         character, "RangerBowMastery"
     ) + PassiveSkillEffects.damage_bonus(
         character, "ScoutBowDiscipline"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "WayfinderBowMastery"
     )
     -- Scout physical-power skills also strengthen real bow projectiles,
     -- not just the Rogue's melee attacks.
