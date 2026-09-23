@@ -48,6 +48,8 @@ local WARRIOR = table.freeze({
     LightArmorMastery = "IronvowLightArmorTraining",
     HeavyArmorMastery = "IronvowHeavyArmorTraining",
     BattleCry = "IronvowBattleCall",
+    HealthTraining = "IronvowFortitude",
+    RestingRecovery = "IronvowRestRecovery",
 })
 
 --[[
