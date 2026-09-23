@@ -45,6 +45,11 @@ Branch: `wip/phase-4-test-hud-integration-v1`
   **7/7 passed, 0 failed**. This included the new
   `C4ScoutAccuracyToggleTest` (**39 assertions**) and
   strict Scout inventory audit (**1,112 assertions**).
+- A separate actual unpublished Studio execution of the pre-existing
+  `DamageServiceTest` passed **15/15 assertions** after this
+  integration. It verifies existing non-evasive attack damage,
+  deterministic critical damage and dead-target handling
+  remain unchanged for legacy combat contexts.
 - The real unpublished one-client Dungeon session ran
   `scripts/studio/c4_scout_accuracy_toggle_live.luau`.
   The actual client sent real Accuracy on/off requests;
