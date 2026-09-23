@@ -310,8 +310,36 @@ local function award(profiles: any, pending: any)
     check(profiles:get_character(USER_ID)
         .Progression.Skills[recovery_id].PurchasedRank == 3,
         "Three source-level-28 personal recovery ranks remain purchased")
+    local shield_id = "OathguardShieldMastery"
+    local first_shield = service:learn_trainer_skill(USER_ID, shield_id)
+    check(first_shield.ok and first_shield.rank == 1,
+        "Earned Knight buys its own first shield-training rank")
+    local second_shield = service:purchase_rank(USER_ID, shield_id)
+    check(second_shield.ok and second_shield.rank == 2,
+        "Knight separately buys the level-28 shield-training rank")
+    local bare = assert(profiles:get_character(USER_ID))
+    check(PassiveEffects.oathguard_shield_reduction(bare) == 0,
+        "Purchased shield ranks cannot defend without real shield gear")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Equipment.OffHand = "marauder_shield"
+    end), "Knight equips a registered server-owned shield")
+    local shield_owner = assert(profiles:get_character(USER_ID))
+    check(math.abs(PassiveEffects.oathguard_shield_reduction(
+        shield_owner
+    ) - 0.016) < 1e-6,
+        "Two bought ranks and a real shield give 1.6% NPC protection")
+    RuntimeState.set_character(USER_ID, shield_owner)
+    check(math.abs(
+        RuntimeState.get_oathguard_shield_reduction(USER_ID) - 0.016
+    ) < 1e-6,
+        "Server combat obtains only the authenticated shield mitigation")
+    local copied = Schema.deep_clone(shield_owner)
+    copied.Identity.ClassId = "Fighter"
+    check(PassiveEffects.oathguard_shield_reduction(copied) == 0,
+        "Forged class and copied ranks cannot activate shield protection")
+    RuntimeState.clear_character(USER_ID)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
-        "Knight quest, class, rune defence and personal heal ranks persist")
+        "Knight quest, class, rune, self-heal and shield ranks persist")
 end
 
 --[[
