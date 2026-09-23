@@ -144,7 +144,13 @@ For example:
 `Bow/DMMO_Humanoid_Bow_UNAPPROVED.gif`.
 Use the same `<Clip>/DMMO_Humanoid_<Clip>_UNAPPROVED.gif`
 pattern for Idle, Run, Sword and Daggers. The capture scripts
-and GIF builder are in [qa](qa/). The original guardian was not
+and GIF builder are in [qa](qa/). A single offline gallery of
+all six looping GIFs was also generated successfully at
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_Humanoid_Starter_QA_20260923\\HumanoidStarter_Review.html`.
+Open this local HTML file in a browser to compare all six motions
+without installing or editing any code; each card links to its
+full-size GIF. The gallery is generated reproducibly by
+[BuildPreviewGallery.py](qa/BuildPreviewGallery.py). The original guardian was not
 present in Place1; no user scripts/models were overwritten.
 The replay test Script was disabled and Studio restored to
 unpublished Edit mode with six editable clips still present.
