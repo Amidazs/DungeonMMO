@@ -428,7 +428,10 @@ function ProgressionRuntimeState.get_ranged_physical_multiplier(
     ) + PassiveSkillEffects.damage_bonus(
         character, "ScoutBowDiscipline"
     )
-    return math.max(0, baseline + mastery)
+    -- Scout physical-power skills also strengthen real bow projectiles,
+    -- not just the Rogue's melee attacks.
+    return math.max(0, baseline + mastery
+        + active_buff(user_id, "PhysicalPower"))
 end
 
 --[[
