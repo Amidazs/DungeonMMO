@@ -146,6 +146,66 @@ function PassiveSkillEffects.damage_bonus(
 end
 
 --[[
+Returns the equipped-gear permission earned through the purchased source rank.
+
+Args:
+    character (any): Authoritative race, base class, level and skill state.
+
+Returns:
+    boolean: Whether this character has earned source level-20 gear.
+]]
+function PassiveSkillEffects.has_scout_equipment_expertise(
+    character: any
+): boolean
+    return type(character) == "table"
+        and (tonumber(character.Level) or 0) >= 20
+        and purchased_rank(
+            character,
+            SkillDefinitions.get("ScoutEquipmentExpertise")
+        ) >= 1
+end
+
+--[[
+Computes the extra real underwater oxygen reserve from source training.
+
+Args:
+    character (any): Server-owned selected Scout/Rogue character.
+
+Returns:
+    number: Bounded earned seconds, zero for untrained/other classes.
+]]
+function PassiveSkillEffects.scout_oxygen_bonus(
+    character: any
+): number
+    if (tonumber(character and character.Level) or 0) < 20 then
+        return 0
+    end
+    return math.clamp(resolve_bonus(
+        character, "ScoutLungCapacity", "OxygenSecondsBonusPerRank"
+    ), 0, 15)
+end
+
+--[[
+Computes the earned reduction only for world-impact fall injuries.
+
+Args:
+    character (any): Real class/race and purchased environmental skill.
+
+Returns:
+    number: Damage reduction in the interval zero through 0.4.
+]]
+function PassiveSkillEffects.scout_fall_reduction(
+    character: any
+): number
+    if (tonumber(character and character.Level) or 0) < 20 then
+        return 0
+    end
+    return math.clamp(resolve_bonus(
+        character, "ScoutFallResistance", "FallDamageReductionPerRank"
+    ), 0, 0.4)
+end
+
+--[[
 Returns real earned longbow range, not merely an unlocked skill button.
 
 Args:
