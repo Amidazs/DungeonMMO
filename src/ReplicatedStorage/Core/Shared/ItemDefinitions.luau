@@ -63,6 +63,64 @@ local DEFINITIONS = table.freeze({
         ReservedSlots = table.freeze({"OffHand"}),
     }),
 
+    -- Original source-monster proofs belong to the character who earned
+    -- them. Live drops remain disabled until authentic dungeon combat
+    -- supplies a verified, one-use server-owned monster receipt.
+    spartoi_bone = table.freeze({
+        Id = "spartoi_bone",
+        Name = "Spartoi Bone (Rogue Trial)",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = true,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    prias_letter_1 = table.freeze({
+        Id = "prias_letter_1",
+        Name = "Prias's Letter Fragment 1",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    prias_letter_2 = table.freeze({
+        Id = "prias_letter_2",
+        Name = "Prias's Letter Fragment 2",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    prias_letter_3 = table.freeze({
+        Id = "prias_letter_3",
+        Name = "Prias's Letter Fragment 3",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
+    prias_letter_4 = table.freeze({
+        Id = "prias_letter_4",
+        Name = "Prias's Letter Fragment 4",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     scout_dagger = table.freeze({
         Id = "scout_dagger",
         Name = "Scout Dagger",
