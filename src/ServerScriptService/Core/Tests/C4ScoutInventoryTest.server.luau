@@ -5,6 +5,9 @@ local Shared = game:GetService("ReplicatedStorage").Core.Shared
 local Inventory = require(Shared.C4ScoutSkillInventory)
 local Targets = require(Shared.C4ScoutReferenceTargets)
 local Progression = require(Shared.SkillProgressionDefinitions)
+local Recipes = require(Shared.ProfessionRecipes)
+local Professions = require(Shared.ProfessionDefinitions)
+local Items = require(Shared.ItemDefinitions)
 local Combat = require(
     game:GetService("ReplicatedStorage").Combat.Shared.SkillDefinitions
 )
@@ -12,9 +15,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 87, Missing = 12,
+    Human = {Raw = 99, Functional = 90, Missing = 9,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 118, Missing = 11,
+    Elf = {Raw = 129, Functional = 121, Missing = 8,
         EquipmentMismatch = 0},
 }
 
@@ -93,7 +96,37 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "AccuracyToggle" then
+    if category == "CommonItemCreation" then
+        local rank = ({[20] = 1, [28] = 2, [36] = 3})[level]
+        check(definition.MaxRank == 3
+            and definition.Kind == "Passive"
+            and definition.RequiresCraftingProfessionChoice == true
+            and definition.RankLevels[rank] == level
+            and definition.Prerequisites[1].SkillId
+                == "C4RecipeReading",
+            "Rogue/Scout source crafting requires actual purchased literacy")
+        for _, entry in ipairs({
+            {"Blacksmithing", "scout_forge_bars"},
+            {"Alchemy", "scout_distill_oil"},
+            {"Leatherworking", "scout_cure_leather"},
+            {"Enchanting", "scout_inscribe_runes"},
+        }) do
+            local profession_id = entry[1]
+            local recipe = assert(Recipes.get(
+                entry[2] .. "_rank_" .. tostring(rank)
+            ))
+            check(Professions.get(profession_id).Kind == "Creation"
+                and recipe.ProfessionId == profession_id
+                and recipe.StationId == profession_id
+                and recipe.RequiredSkillId == mapping.SkillId
+                and recipe.RequiredSkillRank == rank
+                and recipe.RequiredLevel == rank
+                and recipe.Output.Quantity >= 2
+                and Items.get(recipe.Output.ItemId) ~= nil
+                and #recipe.Inputs > 0 and recipe.XP > 0,
+                "Each C4 craft rank must provide four real, paid recipes")
+        end
+    elseif category == "AccuracyToggle" then
         local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
         check(level == 24
             and definition.MaxRank == 1
