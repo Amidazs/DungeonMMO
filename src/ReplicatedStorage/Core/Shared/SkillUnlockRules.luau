@@ -10,6 +10,10 @@ local ProfessionSelectionRules = require(
     script.Parent:WaitForChild("ProfessionSelectionRules")
 )
 
+local FirstTransfers = require(
+    script.Parent:WaitForChild("OriginalFirstTransferDefinitions")
+)
+
 local SkillUnlockRules = {}
 
 -- Reads a purchased rank and earned proficiency, never client-supplied
@@ -95,6 +99,26 @@ function SkillUnlockRules.can_train(
         end
         if not matches then
             return false, "WrongClass", nil
+        end
+    end
+
+    -- Fighter-family characters cannot train a transfer skill merely
+    -- because the normal legacy Ranger/Rogue definition permits it.
+    -- Purchased advanced abilities require an actual saved mentor receipt.
+    local first_transfer_classes = definition.AllowedFirstTransferClasses
+    if identity.BaseClassId == "Fighter"
+        and type(first_transfer_classes) == "table"
+    then
+        local earned = FirstTransfers.awarded(character)
+        local authorized = false
+        for _, class_id in ipairs(first_transfer_classes) do
+            if earned and earned.Id == class_id then
+                authorized = true
+                break
+            end
+        end
+        if not authorized then
+            return false, "OriginalFirstTransferRequired", nil
         end
     end
 
