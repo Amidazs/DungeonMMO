@@ -45,6 +45,54 @@ local DEFINITIONS = table.freeze({
             table.freeze({
                 SkillId = "WayfinderDaggerMastery", Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "ScoutEquipmentExpertise", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCommonItemCreation", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLightArmorMastery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCriticalPowerToggle", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RangerLongRange", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLungCapacity", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFallResistance", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLockpicking", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasion", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutAccuracyToggle", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFleetFoot", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutRunningEvasion", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasiveFocus", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutCriticalPower", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutRestingRecovery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "HumanScoutPrecision", Mode = "LearnOrRank",
+            }),
         }),
     }),
 
@@ -74,6 +122,57 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "WayfinderDaggerMastery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEquipmentExpertise", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCommonItemCreation", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLightArmorMastery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCriticalPowerToggle", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RangerLongRange", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLungCapacity", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFallResistance", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLockpicking", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasion", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutAccuracyToggle", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFleetFoot", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutRunningEvasion", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasiveFocus", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenRenewal", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutCureWounds", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutPoisonRecovery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ElvenScoutBattleFocus", Mode = "LearnOrRank",
             }),
         }),
     }),
