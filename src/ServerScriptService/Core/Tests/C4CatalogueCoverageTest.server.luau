@@ -42,8 +42,8 @@ local function main()
         and base.Missing == 0,
         "Original Fighter/Mystic first-tier rank inventory diverged")
     check(scout.Raw == 228
-        and scout.Functional == 193
-        and scout.Missing == 35,
+        and scout.Functional == 203
+        and scout.Missing == 25,
         "Human Rogue and Elven Scout partial-rank totals diverged")
     check(branches.Total == 9 and branches.Partial == 2
         and branches.Complete == 0,
