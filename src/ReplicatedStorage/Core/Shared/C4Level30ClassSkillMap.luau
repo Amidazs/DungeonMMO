@@ -52,6 +52,14 @@ local WARRIOR = table.freeze({
     RestingRecovery = "IronvowRestRecovery",
 })
 
+-- Knight mapping is partial: the remaining distinct protection,
+-- resistance, drain, shield and common-utility effects still need work.
+local KNIGHT = table.freeze({
+    ShieldControl = "OathguardShieldImpact",
+    HeavyArmorMastery = "OathguardHeavyArmorTraining",
+    TargetTaunt = "OathguardChallenge",
+})
+
 --[[
 Resolves the explicitly reviewed source family without legacy class aliases.
 
@@ -67,6 +75,9 @@ function SkillMap.get(
 ): string?
     if branch_id == "HumanWarrior" then
         return WARRIOR[source_category]
+    end
+    if branch_id == "HumanKnight" then
+        return KNIGHT[source_category]
     end
     if branch_id ~= "HumanRogue" and branch_id ~= "ElvenScout"
     then
