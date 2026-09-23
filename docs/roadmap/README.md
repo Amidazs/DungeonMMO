@@ -1,3 +1,36 @@
+**Current DungeonMMO C4-inspired backend: v1.97 — source quest handoff, original Cinder recovery and physical captain final report.**
+[Newest source quest backend roadmap](
+DungeonMMO_Roadmap_v1_97_Source_Cinder_Quest_Handoff_20260923.md)
+and [executed Studio acceptance record](
+../testing/c4-original-quest-stage5-7-handoff-v1-97-20260923.md).
+The first real extended two-client Dungeon test exposed a
+zero-XP/empty-bestiary quest-enemy reward error that blocked
+room clearing; this was fixed in GitHub. The subsequent
+two-client live combat test passed first-room physical
+Crypt Sentinel/Bracken Raider progression and a later
+registered Cinder Brigand fight in the next room,
+including a genuine client normal-attack hit and
+server-authenticated lethal proof granting all four
+personally owned original supply items. The Base two-client
+physical NPC test passed ordered Captain Ashford stage
+five and seven prompts, missing-item rejection,
+atomic four-item consumption and the original
+Human Rogue **source quest Ready** state, without
+granting an unfinished advanced class. Real coordinator
+save and fresh destination-profile handoff fixtures passed
+**58 assertions**, preserving Human ten fragments,
+Elf four report pieces and subsequent Cinder supplies
+on two separate mocked returns. Focused Base **5/5 PASS**
+(165 source assertions); Dungeon **3/3 PASS**
+(10 ledger, 24 physical quest pack/reward, 13 contribution
+assertions). **Real continuous cross-place transport,
+all ten/four player-controlled kills, late Elven rescue,
+level-20 trainer/skill/class awards and full advanced
+classes are not accepted. Fully playable original
+first-transfer classes: 0/18.** All scripts, tests
+and documents changed only in GitHub. No `main`
+merge, Roblox publish or production DataStore edit.
+
 **Current C4 backend: v1.96 — physical stage-three quest fights and original stage-four NPC turn-ins.**
 [Latest backend roadmap](
 DungeonMMO_Roadmap_v1_96_Source_Quest_Combat_And_Return_20260923.md)
