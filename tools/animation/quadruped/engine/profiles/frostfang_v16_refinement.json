@@ -1,0 +1,97 @@
+{
+  "fps": 24,
+  "root_stride": 0.07,
+  "settle": 1.2,
+  "timeline": {
+    "idle": 2,
+    "cycles": 4,
+    "cadence": 1,
+    "ramp": 0.6
+  },
+  "front": {
+    "stride": 0.07,
+    "lift": 0.023,
+    "stance": 0.67,
+    "joint_limit": 165,
+    "paw_flex": 5,
+    "shoulder_sweep": 3
+  },
+  "hind": {
+    "stride": 0.07,
+    "lift": 0.014,
+    "stance": 0.67,
+    "joint_limit": 175,
+    "paw_flex": 7,
+    "shoulder_sweep": 0
+  },
+  "limbs": [
+    {
+      "id": "FrontLeft",
+      "family": "front",
+      "offset": 0,
+      "upper": "DEF_front_thigh.L",
+      "lower": "DEF_front_shin.L",
+      "foot": "DEF_front_foot.L",
+      "toe": "DEF_front_toe.L",
+      "shoulder": "DEF_shoulder.L",
+      "pole": [
+        0,
+        1,
+        0
+      ],
+      "target": "DMMO_WalkV3_FrontLeft",
+      "orientation": "DMMO_WalkV5_PawWorld_FrontLeft"
+    },
+    {
+      "id": "FrontRight",
+      "family": "front",
+      "offset": 0.5,
+      "upper": "DEF_front_thigh.R",
+      "lower": "DEF_front_shin.R",
+      "foot": "DEF_front_foot.R",
+      "toe": "DEF_front_toe.R",
+      "shoulder": "DEF_shoulder.R",
+      "pole": [
+        0,
+        1,
+        0
+      ],
+      "target": "DMMO_WalkV3_FrontRight",
+      "orientation": "DMMO_WalkV5_PawWorld_FrontRight"
+    },
+    {
+      "id": "HindLeft",
+      "family": "hind",
+      "offset": 0.75,
+      "upper": "DEF_hind_thigh.L",
+      "lower": "DEF_hind_shin.L",
+      "foot": "DEF_hind_foot.L",
+      "toe": "DEF_hind_toe.L",
+      "shoulder": null,
+      "pole": [
+        0,
+        1,
+        0
+      ],
+      "target": "DMMO_WalkV3_HindLeft",
+      "orientation": "DMMO_WalkV5_PawWorld_HindLeft"
+    },
+    {
+      "id": "HindRight",
+      "family": "hind",
+      "offset": 0.25,
+      "upper": "DEF_hind_thigh.R",
+      "lower": "DEF_hind_shin.R",
+      "foot": "DEF_hind_foot.R",
+      "toe": "DEF_hind_toe.R",
+      "shoulder": null,
+      "pole": [
+        0,
+        1,
+        0
+      ],
+      "target": "DMMO_WalkV3_HindRight",
+      "orientation": "DMMO_WalkV5_PawWorld_HindRight"
+    }
+  ]
+}
