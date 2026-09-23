@@ -94,7 +94,7 @@ local function main()
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
     local knight = assert(Coverage.for_branch("HumanKnight"))
-    check(knight.Status == "SourceRanksAuditedClassUnimplemented"
+    check(knight.Status == "SkillRankParityOutstanding"
         and knight.SourceRankEntriesThroughCap == 54
         and knight.SourceRankEntriesByLevel[20] == 16
         and knight.SourceRankEntriesByLevel[24] == 16
