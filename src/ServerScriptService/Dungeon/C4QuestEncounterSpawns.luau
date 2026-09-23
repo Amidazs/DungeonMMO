@@ -148,9 +148,15 @@ function Spawns.augment(options: any, factory: any?): any
                 EncounterId = options.encounter_id,
                 EnemyId = name,
                 LifeIndex = 1,
-                RewardXP = 0,
+                -- EncounterService requires positive XP even for a
+                -- quest-only enemy. A valid minimal ordinary reward is
+                -- necessary for death accounting and room clear.
+                RewardXP = 1,
                 RewardGoldMin = 0,
                 RewardGoldMax = 0,
+                -- Temporary combat rig is a Marauder; register a valid
+                -- known bestiary key until unique quest models exist.
+                BestiaryCreatureId = "marauder",
                 BaseMaxHealth = challenge.Health,
                 HealthMultiplier = options.health_multiplier or 1,
                 DamageMultiplier = options.damage_multiplier or 1,
