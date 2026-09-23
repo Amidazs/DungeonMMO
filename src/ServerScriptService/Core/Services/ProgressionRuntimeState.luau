@@ -33,6 +33,9 @@ local SkillUnlockRules = require(
 local PassiveSkillEffects = require(
     Shared:WaitForChild("PassiveSkillEffects")
 )
+local ItemDefinitions = require(
+    Shared:WaitForChild("ItemDefinitions")
+)
 
 local CombatStatusService = require(
     ServerScriptService.Combat.CombatStatusService
@@ -1025,6 +1028,23 @@ function ProgressionRuntimeState.is_skill_usable(
     for _, required in ipairs(definition.WeaponTags or {}) do
         if not has_weapon_tag(authoritative_tags, required) then
             return false, "WrongWeapon"
+        end
+    end
+
+    -- A shield attack may be learned without a shield but NEVER cast
+    -- unless a real server-equipped offhand is registered as a Shield.
+    -- Client-supplied weapon tags cannot satisfy this equipment gate.
+    if definition.RequiresShield == true then
+        local state_equipment = state.Equipment
+        local shield_id = type(state_equipment) == "table"
+            and state_equipment.OffHand or nil
+        local shield = if type(shield_id) == "string"
+            then ItemDefinitions.get(shield_id) else nil
+        if not shield or shield.Kind ~= "Equipment"
+            or shield.Slot ~= "OffHand"
+            or shield.Category ~= "Shield"
+        then
+            return false, "ShieldRequired"
         end
     end
 
