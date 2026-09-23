@@ -71,7 +71,8 @@ local function is_valid(player: Player, record: any): boolean
     local character = player.Character
     local humanoid = character
         and character:FindFirstChildOfClass("Humanoid")
-    if player.Parent ~= Players or character ~= record.Character
+    if player.Parent ~= Players or not character
+        or character ~= record.Character
         or not character.Parent or not humanoid
         or humanoid.Health <= 0
         or not authorizer or not authorizer(player, record)
