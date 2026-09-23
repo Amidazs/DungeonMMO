@@ -295,6 +295,24 @@ local function exercise(
                 and current.ClassAdvancement.OriginalFirstTransferQuest
                     .Proofs.SpartoiBone10 == true,
                 "Actual mentor turn-in consumes ten bones but keeps proof")
+        elseif index == 6 and branch_id == "HumanRogue" then
+            for _, item_id in ipairs({
+                "cinder_cipher", "cinder_route_map",
+                "cinder_ward_seal", "cinder_tideglass_lens",
+            }) do
+                check(Inventory.count_item(current, item_id) == 1
+                    and not TransferRules.can_trade(item_id)
+                    and not TransferRules.can_bank(item_id),
+                    "Unique Cinder kill mints each personal untradeable record")
+            end
+        elseif index == 7 and branch_id == "HumanRogue" then
+            for _, item_id in ipairs({
+                "cinder_cipher", "cinder_route_map",
+                "cinder_ward_seal", "cinder_tideglass_lens",
+            }) do
+                check(Inventory.count_item(current, item_id) == 0,
+                    "Authenticated captain consumes each recovered record")
+            end
         elseif index == 4 and branch_id == "ElvenScout" then
             for fragment = 1, 4 do
                 check(Inventory.count_item(
@@ -338,6 +356,13 @@ local function exercise(
                 .Proofs.SpartoiBone10 == true,
             "Rogue trial weapons and spent bone-proof state survive "
                 .. "save/reload without restoring consumed quest items")
+        for _, item_id in ipairs({
+            "cinder_cipher", "cinder_route_map",
+            "cinder_ward_seal", "cinder_tideglass_lens",
+        }) do
+            check(Inventory.count_item(reloaded, item_id) == 0,
+                "Spent supply-cache items must not reappear after reload")
+        end
     else
         local reloaded = assert(profiles:get_character(user_id, 1))
         for fragment = 1, 4 do
