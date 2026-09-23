@@ -210,9 +210,9 @@ end
 local function read_motors()
     local discovered = {}
     for _, item in rig:GetDescendants() do
-        if item:IsA("Motor6D") then
+        if item:IsA("Motor6D") or item:IsA("AnimationConstraint") then
             assert(not discovered[item.Name],
-                "Duplicate motor name: " .. item.Name)
+                "Duplicate joint name: " .. item.Name)
             discovered[item.Name] = item
         end
     end
