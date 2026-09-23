@@ -109,6 +109,9 @@ function Runtime.attach(options: any): any
             self:_talk(player, branch_id)
         end)
     end
+    Players.PlayerRemoving:Connect(function(player: Player)
+        self:remove(player)
+    end)
     return self
 end
 
