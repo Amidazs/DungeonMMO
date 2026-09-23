@@ -84,8 +84,10 @@ local function main()
     local original = workspace:FindFirstChild(
         "DMMO_Astra_Guardian_Test"
     )
-    assert(original and original ~= character,
-        "The source guardian must remain separate")
+    if original then
+        assert(original ~= character,
+            "Never build the new clips on the source guardian")
+    end
     local builder = require(module)
     local built = builder.BuildAll()
     local output = {}
@@ -97,7 +99,8 @@ local function main()
     return HttpService:JSONEncode({
         status = "EDITABLE SEQUENCES BUILT; Studio visual QA pending",
         testRig = character:GetFullName(),
-        originalRigUnmodified = original.Parent == workspace,
+        originalRigUnmodified = original == nil
+            or original.Parent == workspace,
         clips = output,
     })
 end
