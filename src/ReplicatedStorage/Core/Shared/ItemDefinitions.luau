@@ -121,6 +121,17 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    bracken_ward_sigil = table.freeze({
+        Id = "bracken_ward_sigil",
+        Name = "Bracken Ward Sigil",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     cinder_cipher = table.freeze({
         Id = "cinder_cipher",
         Name = "Cinder Supply Cipher",
