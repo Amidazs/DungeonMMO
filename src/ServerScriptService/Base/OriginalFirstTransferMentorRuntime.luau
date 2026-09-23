@@ -47,6 +47,43 @@ local function nearby(player: Player, mentor: BasePart): boolean
 end
 
 --[[
+Creates a separate physical training station to avoid competing prompts.
+
+Args:
+    self (any): Actual Base mentor runtime and owned world folder.
+    definition (any): Exact first-transfer trainer restriction metadata.
+    mentor (BasePart): Corresponding actual advancement mentor actor.
+
+Returns:
+    nil: Registers one non-overlapping physical skill-training prompt.
+]]
+local function make_trainer(
+    self: any, definition: any, mentor: BasePart
+)
+    local part = Instance.new("Part")
+    part.Name = definition.TrainerId
+    part.Size = Vector3.new(2, 4, 2)
+    part.Anchored = true
+    part.CanCollide = false
+    part.Color = mentor.Color
+    part.Material = Enum.Material.Wood
+    part.CFrame = mentor.CFrame * CFrame.new(5, 0, 0)
+    part:SetAttribute("TrainerId", definition.TrainerId)
+
+    local prompt = Instance.new("ProximityPrompt")
+    prompt.Name = "ProgressionTrainerPrompt"
+    prompt.ObjectText = definition.MentorName
+    prompt.ActionText = "Train"
+    prompt.HoldDuration = 0.4
+    prompt.RequiresLineOfSight = true
+    prompt.MaxActivationDistance = MAX_RANGE
+    prompt.Parent = part
+
+    self._trainers[definition.BranchId] = part
+    part.Parent = self._folder
+end
+
+--[[
 Creates separate mentor parts without touching existing original NPCs.
 
 Args:
@@ -55,7 +92,7 @@ Args:
     spawn (BasePart): Existing authenticated Base player-spawn anchor.
 
 Returns:
-    BasePart: Real server-owned named mentor with two physical prompts.
+    BasePart: Real server-owned advancement mentor and separate trainer.
 ]]
 local function make_mentor(
     self: any, definition: any, spawn: BasePart
@@ -72,8 +109,6 @@ local function make_mentor(
     part.CFrame = spawn.CFrame * CFrame.new(
         OFFSETS[definition.BranchId]
     )
-    part:SetAttribute("TrainerId", definition.TrainerId)
-
     local prompt = Instance.new("ProximityPrompt")
     prompt.Name = "FirstTransferMentorPrompt"
     prompt.ObjectText = definition.MentorName
@@ -86,16 +121,8 @@ local function make_mentor(
         self:_claim(player, definition)
     end)
 
-    local training_prompt = Instance.new("ProximityPrompt")
-    training_prompt.Name = "ProgressionTrainerPrompt"
-    training_prompt.ObjectText = definition.MentorName
-    training_prompt.ActionText = "Train"
-    training_prompt.HoldDuration = 0.4
-    training_prompt.RequiresLineOfSight = true
-    training_prompt.MaxActivationDistance = MAX_RANGE
-    training_prompt.Parent = part
-    -- Publish the complete actor only after both prompts are present.
     part.Parent = self._folder
+    make_trainer(self, definition, part)
 
     return part
 end
@@ -120,6 +147,7 @@ function Runtime.attach(options: any): any
         _is_ready = options.is_ready,
         _on_progress = options.on_progress,
         _parts = {},
+        _trainers = {},
         _pending = {},
     }, Runtime)
     local folder = Instance.new("Folder")
@@ -255,7 +283,7 @@ function Runtime:nearby_trainer(
 ): boolean
     for _, definition in ipairs(FirstTransfers.all()) do
         if definition.TrainerId == trainer_id then
-            local part = self._parts[definition.BranchId]
+            local part = self._trainers[definition.BranchId]
             return part ~= nil and nearby(player, part)
         end
     end
