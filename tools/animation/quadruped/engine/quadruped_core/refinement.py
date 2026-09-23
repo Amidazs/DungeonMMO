@@ -48,3 +48,38 @@ def two_bone(start,target,upper,lower,pole,max_angle=165.):
     elbow=add(add(start,mul(axis,along)),mul(bend,height))
     angle=math.degrees(math.acos(max(-1,min(1,(upper*upper+lower*lower-d*d)/(2*upper*lower)))))
     return dict(elbow=elbow,end=end,angle=angle,residual=abs(requested-d))
+
+def validate_config(config):
+    """Fail before Blender clears actions or modifies authoring controls."""
+    def finite(value,name,low=None,high=None,strict=False):
+        if isinstance(value,bool) or not isinstance(value,(float,int)) or not math.isfinite(value):
+            raise ValueError(name+" must be finite")
+        if low is not None and (value<=low if strict else value<low):raise ValueError(name+" below range")
+        if high is not None and value>=high:raise ValueError(name+" above range")
+    try:
+        finite(config.get("fps",24),"fps",1,121)
+        finite(config["root_stride"],"root_stride",0,strict=True)
+        finite(config.get("settle",1.2),"settle",0,strict=True)
+        timing=config["timeline"]
+        for key in ("cycles","cadence","ramp"):finite(timing[key],key,0,strict=True)
+        finite(timing["idle"],"idle",0)
+        timeline(0,**timing)
+        for family in ("front","hind"):
+            settings=config[family]
+            finite(settings["stride"],family+" stride",0,strict=True)
+            finite(settings["lift"],family+" lift",0)
+            finite(settings["stance"],family+" stance",0,1,True)
+            finite(settings["joint_limit"],family+" limit",0,180,True)
+            for key in ("paw_flex","shoulder_sweep"):finite(settings[key],family+" "+key)
+        if not config["limbs"]:raise ValueError("no limbs")
+        for limb in config["limbs"]:
+            if limb["family"] not in ("front","hind"):raise ValueError("unknown limb family")
+            finite(limb["offset"],"offset",0,1)
+            finite(limb.get("ground_offset",0),"ground_offset")
+            if limb["family"]=="front":
+                if len(limb["pole"])!=3:raise ValueError("invalid bend pole")
+                for v in limb["pole"]:finite(v,"pole")
+                if norm(limb["pole"])<1e-8:raise ValueError("zero bend pole")
+    except (KeyError,TypeError) as error:
+        raise ValueError("Incomplete refinement configuration: "+str(error)) from error
+    return config
