@@ -99,6 +99,9 @@ local DungeonEncounterExecutionController = require(
 local CompletionEligibilityRules = require(Dungeon:WaitForChild("CompletionEligibilityRules"))
 local CompletionService = require(Dungeon:WaitForChild("CompletionService"))
 local ReturnPortalService = require(Dungeon:WaitForChild("ReturnPortalService"))
+local ScoutLockpickingService = require(
+    Dungeon:WaitForChild("ScoutLockpickingService")
+)
 local DungeonReplayService = require(Dungeon:WaitForChild("DungeonReplayService"))
 local DungeonStudioEquipmentBootstrap = require(
     Dungeon:WaitForChild("DungeonStudioEquipmentBootstrap")
@@ -179,6 +182,7 @@ enemies_folder.Name = "DungeonEnemies"
 enemies_folder.Parent = runtime_root
 
 local active_session_id: string? = nil
+local lockpick_service: any = nil
 local encounter_service: any = nil
 local encounter_runtime_controller: any = nil
 local encounter_execution_controller: any = nil
@@ -1495,6 +1499,46 @@ local function register_encounter_checkpoints()
     end
 end
 
+-- Creates server-owned placeholder locks at actual resolved room checkpoints.
+-- The service only accepts registered physical prompts and live party members.
+-- Ranks 4-5 naturally appear only in layouts containing enough rooms.
+local function register_scout_lock_caches(session: any)
+    lockpick_service = ScoutLockpickingService.new(
+        sessions, profiles, session.SessionId, active_definition.Id,
+        send_profile
+    )
+    local folder = Instance.new("Folder")
+    folder.Name = "ScoutLockCaches"
+    folder.Parent = runtime_root
+    local count = 0
+    for _, binding in ipairs(encounter_bindings.ordered) do
+        if binding.Kind ~= "SecretBoss" and count < 5 then
+            local anchor = environment:get(binding.CheckpointAnchor)
+            assert(anchor and anchor:IsA("BasePart"),
+                "Scout lock checkpoint anchor was not resolved")
+            count += 1
+            local part = Instance.new("Part")
+            part.Name = "ScoutLockCache_" .. tostring(count)
+            part.Size = Vector3.new(3, 2, 2)
+            part.Anchored = true
+            part.CanCollide = false
+            part.CFrame = anchor.CFrame * CFrame.new(6, 0, -4)
+            part.Color = Color3.fromRGB(140, 100, 46)
+            part.Material = Enum.Material.Wood
+            part.Parent = folder
+            local registered = lockpick_service:register({
+                Id = binding.RoomSlotId .. "_Cache",
+                Rank = count,
+                Part = part,
+                CheckpointSequence = binding.CheckpointSequence,
+                RewardItemId = "captain_emblem",
+                RewardQuantity = count,
+            })
+            assert(registered.ok, "Failed to register real Scout lock")
+        end
+    end
+end
+
 local function initialize_session_services(session: any): (any?, boolean)
     if active_session_id and active_session_id ~= session.SessionId then
         error("Reserved Dungeon server received more than one SessionId")
@@ -1533,6 +1577,7 @@ local function initialize_session_services(session: any): (any?, boolean)
         session.SessionId
     )
     register_encounter_checkpoints()
+    register_scout_lock_caches(session)
     bind_encounter_triggers()
     if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
     local completion_reward=active_definition.CompletionReward
