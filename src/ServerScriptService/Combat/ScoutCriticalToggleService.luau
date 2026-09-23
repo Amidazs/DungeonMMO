@@ -2,13 +2,12 @@
 -- Authenticated, resource-draining C4 Rogue/Scout critical-power stance.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local StaminaService = require(script.Parent:WaitForChild("StaminaService"))
-
 local ScoutCriticalToggleService = {}
 
 local active: {[Player]: any} = {}
 local last_activation: {[Player]: number} = {}
 local authorizer: ((Player, any) -> boolean)? = nil
+local spend_stamina: ((Player, number) -> boolean)? = nil
 
 --[[
 Disables a toggle and immediately clears replicated character status.
@@ -41,6 +40,21 @@ Returns:
 function ScoutCriticalToggleService.set_authorizer(callback: any)
     assert(type(callback) == "function", "A server authorizer is required")
     authorizer = callback
+end
+
+--[[
+Registers the ordinary authoritative combat stamina spender.
+
+Args:
+    callback ((Player, number) -> boolean): Existing server stamina
+        deduction. Injected to avoid a combat/progression require cycle.
+
+Returns:
+    nil: Toggles now use actual player stamina, never client values.
+]]
+function ScoutCriticalToggleService.set_stamina_spender(callback: any)
+    assert(type(callback) == "function", "Stamina spender is required")
+    spend_stamina = callback
 end
 
 --[[
@@ -127,7 +141,9 @@ function ScoutCriticalToggleService.toggle(
     if not is_valid(player, record) then
         return false, false, "ToggleUnavailable"
     end
-    if not StaminaService.try_spend(player, definition.STAMINA_COST) then
+    if not spend_stamina
+        or not spend_stamina(player, definition.STAMINA_COST)
+    then
         return false, false, "Stamina"
     end
     last_activation[player] = now
@@ -157,7 +173,9 @@ local function update_active(delta_time: number)
         record.Elapsed += math.clamp(delta_time, 0, 1)
         while record.Elapsed >= 1 do
             record.Elapsed -= 1
-            if not StaminaService.try_spend(player, record.Upkeep) then
+            if not spend_stamina
+                or not spend_stamina(player, record.Upkeep)
+            then
                 ScoutCriticalToggleService.stop(player)
                 break
             end
