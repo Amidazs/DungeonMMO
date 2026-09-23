@@ -259,6 +259,25 @@ local function verify_party_heal(players, runtime, session)
         "Repeat client request bypassed the party-heal cooldown")
     print("[C4 Party Heal Live] COOLDOWN_PASS")
 
+    -- Confirm server-side range is a real three-dimensional boundary
+    -- and a nearby active ally is eligible before testing spectator
+    -- exclusion. A healed caster is not a false positive target.
+    first.Health = first.MaxHealth
+    second.Health = math.max(1, second.MaxHealth - 25)
+    local ally_root = assert(
+        ally.Character:FindFirstChild("HumanoidRootPart")
+    )
+    ally_root.CFrame = CFrame.new(200, 100, 0)
+    assert(not PartyHeal.has_injured_member(caster, 24),
+        "Distant party member bypassed the actual healing radius")
+    assert(not select(1, PartyHeal.cast(
+        caster, 56, 24, "MysticPartyHeal"
+    )), "Party Heal restored a player outside the authored radius")
+    print("[C4 Party Heal Live] OUT_OF_RANGE_DENIAL_PASS")
+    ally_root.CFrame = CFrame.new(5, 100, 0)
+    assert(PartyHeal.has_injured_member(caster, 24),
+        "Nearby injured active member should be an eligible party target")
+
     local muted = runtime.SessionService:set_member_mode(
         session.SessionId, ally.UserId, "Spectating"
     )
