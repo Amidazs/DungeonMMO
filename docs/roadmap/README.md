@@ -1,3 +1,25 @@
+**Current DungeonMMO class backend: v2.08 — GitHub-only Oathguard shield-mastery candidate, Studio verification pending.**
+[Latest level-30 roadmap](
+DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md)
+and [pending acceptance checklist](
+../testing/oathguard-shield-mastery-github-candidate-v2-08-20260924.md).
+Two newly registered, individually bought Knight shield ranks
+at levels 20 and 28 require a genuinely earned Oathguard and
+a server-registered equipped OffHand shield. Each rank gives
+0.8% hostile physical melee/area damage reduction, up to 1.6%;
+magic and PvP are unaffected. The actual own-career trainer,
+rank inventory, runtime snapshot, DamageService and focused
+test fixtures have been updated directly in GitHub. Knight
+source-rank schedule mapping is now a candidate **37/54** with
+**17** missing, Warrior **27/62** with **35** missing; two
+source-audited Scout paths retain 59/59 and 77/77 mapped
+training schedules. **No new Studio tests or disposable Rojo
+builds have run** while desktop is unavailable. Prior v2.07
+Ironvow Base physical PASS remains historical evidence; its
+Knight healing/magic live-client effect tests are still
+pending. No level-30 release certification, main merge,
+Roblox publish or production DataStore operations occurred.
+
 **Current DungeonMMO class backend: v2.07 — verified recovered Ironvow physical Base acceptance and additional Knight anti-magic and owner-healing ranks.**
 [Current level-30 class/skill roadmap](
 DungeonMMO_Roadmap_v2_07_Ironvow_Resume_Knight_Magic_Healing_20260924.md)
