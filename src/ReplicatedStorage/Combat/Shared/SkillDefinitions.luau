@@ -1547,6 +1547,48 @@ local GREENWARD_CALMING_ARROW = specialize_skill(
     }
 )
 
+-- Prepared original Human Warrior combat. No source quest or real
+-- mentor is available yet, so normal clients cannot learn this skill.
+local IRONVOW_DRIVING_STRIKE = specialize_skill(
+    IRON_CLEAVE, "IronvowDrivingStrike", "Ironvow Driving Strike", {
+        STAMINA_COST = 21,
+        COOLDOWN_SECONDS = 7,
+        BASE_DAMAGE = 25,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 25}),
+            [2] = table.freeze({BASE_DAMAGE = 28}),
+            [3] = table.freeze({BASE_DAMAGE = 31}),
+            [4] = table.freeze({BASE_DAMAGE = 34}),
+            [5] = table.freeze({BASE_DAMAGE = 37}),
+            [6] = table.freeze({BASE_DAMAGE = 40}),
+            [7] = table.freeze({BASE_DAMAGE = 43}),
+            [8] = table.freeze({BASE_DAMAGE = 46}),
+            [9] = table.freeze({BASE_DAMAGE = 49}),
+        }),
+    }
+)
+
+local IRONVOW_BATTLE_CALL = specialize_skill(
+    ELVEN_SCOUT_BATTLE_FOCUS, "IronvowBattleCall",
+    "Ironvow Battle Call", {
+        STAMINA_COST = 18,
+        COOLDOWN_SECONDS = 25,
+        BUFF_MAGNITUDE = 0.08,
+        BUFF_SECONDS = 12,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.08, BUFF_SECONDS = 12,
+            }),
+            [2] = table.freeze({
+                BUFF_MAGNITUDE = 0.10, BUFF_SECONDS = 12,
+            }),
+            [3] = table.freeze({
+                BUFF_MAGNITUDE = 0.12, BUFF_SECONDS = 12,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1709,6 +1751,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     WayfinderCut = WAYFINDER_CUT,
     WayfinderWound = WAYFINDER_WOUND,
     GreenwardCalmingArrow = GREENWARD_CALMING_ARROW,
+    IronvowDrivingStrike = IRONVOW_DRIVING_STRIKE,
+    IronvowBattleCall = IRONVOW_BATTLE_CALL,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
