@@ -5,13 +5,13 @@
   "timeline": {
     "idle": 2,
     "cycles": 4,
-    "cadence": 1,
+    "cadence": 0.75,
     "ramp": 0.6
   },
   "front": {
     "stride": 0.07,
-    "lift": 0.023,
-    "stance": 0.67,
+    "lift": 0.018,
+    "stance": 0.6,
     "joint_limit": 165,
     "paw_flex": 5,
     "shoulder_sweep": 3
@@ -93,5 +93,7 @@
       "target": "DMMO_WalkV3_HindRight",
       "orientation": "DMMO_WalkV5_PawWorld_HindRight"
     }
-  ]
+  ],
+  "body_drop": 0.014,
+  "pelvis": "DEF_spine.005"
 }
