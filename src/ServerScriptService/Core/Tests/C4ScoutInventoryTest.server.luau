@@ -8,6 +8,9 @@ local Progression = require(Shared.SkillProgressionDefinitions)
 local Recipes = require(Shared.ProfessionRecipes)
 local Professions = require(Shared.ProfessionDefinitions)
 local Items = require(Shared.ItemDefinitions)
+local Passives = require(Shared.PassiveSkillEffects)
+local Environment = require(Shared.ScoutEnvironmentalRules)
+local EquipmentRules = require(Shared.EquipmentRules)
 local Combat = require(
     game:GetService("ReplicatedStorage").Combat.Shared.SkillDefinitions
 )
@@ -15,9 +18,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 95, Missing = 4,
+    Human = {Raw = 99, Functional = 99, Missing = 0,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 126, Missing = 3,
+    Elf = {Raw = 129, Functional = 129, Missing = 0,
         EquipmentMismatch = 0},
 }
 
@@ -96,7 +99,43 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "Lockpicking" then
+    if category == "EquipmentExpertise" then
+        local item = assert(Items.get("scout_expert_leather_vest"))
+        local recipe = assert(Recipes.get("stitch_scout_expert_vest"))
+        check(level == 20 and definition.MaxRank == 1
+            and definition.AdvancedEquipmentEnabled == true
+            and item.RequiredSkillId == mapping.SkillId
+            and item.RequiredSkillRank == 1
+            and item.CombatModifiers.MaxHealthFlat > 0
+            and recipe.Output.ItemId == item.Id
+            and recipe.ProfessionId == "Leatherworking"
+            and type(EquipmentRules.validate) == "function"
+            and type(Passives.has_scout_equipment_expertise) == "function",
+            "Source Expertise must unlock real craftable equippable gear")
+    elseif category == "LungCapacity" then
+        check(level == 20 and definition.MaxRank == 1
+            and definition.OxygenSecondsBonusPerRank == 15
+            and type(Passives.scout_oxygen_bonus) == "function"
+            and type(Environment.next_oxygen) == "function",
+            "Source Lung Capacity must extend real server-sampled water air")
+    elseif category == "FallResistance" then
+        check(level == 20 and definition.MaxRank == 1
+            and definition.FallDamageReductionPerRank == 0.4
+            and type(Passives.scout_fall_reduction) == "function"
+            and type(Environment.fall_damage) == "function",
+            "Fall Resistance must reduce actual hard-landing injury")
+    elseif category == "Sprint" then
+        local effect = assert(Combat.get_for_rank(mapping.SkillId, 1))
+        check(race_id == "Human" and level == 20
+            and definition.MaxRank == 1
+            and effect.KIND == "Buff"
+            and effect.BUFF_KIND == "Movement"
+            and effect.BUFF_SECONDS > 0
+            and effect.BUFF_MAGNITUDE > 0
+            and effect.STAMINA_COST > 0
+            and effect.COOLDOWN_SECONDS > 0,
+            "Human Rogue Sprint must be a real paid timed movement cast")
+    elseif category == "Lockpicking" then
         local rank = table.find(LEVELS, level)
         check(definition.MaxRank == 5
             and definition.Kind == "Passive"
