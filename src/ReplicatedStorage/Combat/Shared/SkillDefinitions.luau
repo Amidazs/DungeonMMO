@@ -1589,6 +1589,23 @@ local IRONVOW_BATTLE_CALL = specialize_skill(
     }
 )
 
+-- Oathguard's personal recovery uses the existing server-owned heal
+-- executor; no client-selected healing target or arbitrary HP amount.
+local OATHGUARD_MENDING_OATH = specialize_skill(
+    ELVEN_SCOUT_CURE_WOUNDS, "OathguardMendingOath",
+    "Oathguard Mending Oath", {
+        SELF_ONLY = true,
+        MANA_COST = 15,
+        COOLDOWN_SECONDS = 18,
+        TOTAL_HEAL = 30,
+        RANKS = table.freeze({
+            [1] = table.freeze({TOTAL_HEAL = 30}),
+            [2] = table.freeze({TOTAL_HEAL = 37}),
+            [3] = table.freeze({TOTAL_HEAL = 44}),
+        }),
+    }
+)
+
 -- Original Oathguard shield impacts and zero-damage taunts share the
 -- real authenticated melee and threat executors. A usable impact must
 -- also pass the runtime's server-owned offhand Shield equipment gate.
@@ -1831,6 +1848,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     IronvowDrivingStrike = IRONVOW_DRIVING_STRIKE,
     IronvowBattleCall = IRONVOW_BATTLE_CALL,
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
+    OathguardMendingOath = OATHGUARD_MENDING_OATH,
     OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
