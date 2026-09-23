@@ -1,6 +1,6 @@
 --!strict
--- The prepared Human Warrior must fail closed until original quest
--- actors, authenticated evidence and first-transfer mentor are built.
+-- Earned original Human Warrior skills, equipped gear and forged-class
+-- safeguards must remain distinct from other first-transfer careers.
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Progression = require(Shared.SkillProgressionDefinitions)
@@ -16,6 +16,8 @@ local CHECKS = 0
 local SWORD = "IronvowDrivingStrike"
 local BLADE = "IronvowBladeTraining"
 local CALL = "IronvowBattleCall"
+local LIGHT = "IronvowLightArmorTraining"
+local HEAVY = "IronvowHeavyArmorTraining"
 
 --[[
 Fails the isolated original Warrior test on the first false assertion.
@@ -50,7 +52,11 @@ local function forged_character(): any
         CreationStage = "Complete",
     }
     character.Level = 28
-    for _, skill_id in ipairs({SWORD, BLADE, CALL}) do
+    character.Equipment.Weapon = "marauder_sword"
+    character.Equipment.Body = "marauder_armor"
+    for _, skill_id in ipairs({
+        SWORD, BLADE, CALL, LIGHT, HEAVY,
+    }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
         }
@@ -95,7 +101,9 @@ Returns:
 ]]
 local function main()
     check_ranks(SWORD, {20, 20, 20, 24, 24, 24, 28, 28, 28})
-    check_ranks(BLADE, {20, 24, 28})
+    check_ranks(BLADE, {20, 24, 28, 28})
+    check_ranks(LIGHT, {20, 20, 24, 24, 28, 28, 28})
+    check_ranks(HEAVY, {20, 20, 24, 24, 28, 28, 28})
     check_ranks(CALL, {20, 24, 28})
     local low = assert(Combat.get_for_rank(SWORD, 1))
     local high = assert(Combat.get_for_rank(SWORD, 9))
@@ -121,7 +129,9 @@ local function main()
         "Forging a raw Ironvow ClassId cannot produce an earned identity")
     check(not Identity.is_complete(unearned),
         "Unawarded forged advanced character fails identity validation")
-    for _, skill_id in ipairs({SWORD, BLADE, CALL}) do
+    for _, skill_id in ipairs({
+        SWORD, BLADE, CALL, LIGHT, HEAVY,
+    }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
         )
@@ -129,7 +139,9 @@ local function main()
             "Unawarded original Warrior cannot buy its registered skill")
     end
     check(Passives.damage_bonus(unearned, BLADE) == 0,
-        "Forged bought Warrior passive must not increase physical damage")
+        "Forged equipped sword must not receive Warrior passive damage")
+    check(Passives.fighter_armor_reduction(unearned) == 0,
+        "Forged Warrior cannot use a bought heavy-armour rank")
     print(("[Ironvow Foundation] PASS: %d assertions")
         :format(CHECKS))
 end
