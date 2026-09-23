@@ -7,6 +7,7 @@ local Shared = RS.Core.Shared
 local Source = require(Shared.C4OriginalFirstTransferQuestStages)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
 local Inventory = require(script.Parent.InventoryService)
+local QuestDrops = require(script.Parent.C4OriginalQuestDrops)
 local NETI_TRIAL_WEAPONS = table.freeze({
     "neti_trial_dagger", "neti_trial_bow",
 })
@@ -175,6 +176,10 @@ function Service:record_world_event(
     end
     local permitted, rejection = Rules.can_progress(quest, state, evidence)
     if not permitted then return result(false, rejection) end
+    local eligible, ownership_reason = QuestDrops.validate(
+        character, state, evidence
+    )
+    if not eligible then return result(false, ownership_reason) end
     local progress: any? = nil
     local ok, reason = self._profiles:mutate(
         user_id, function(profile: any)
@@ -214,6 +219,15 @@ function Service:record_world_event(
                     end
                 end
                 evidence.TrialWeaponsGranted = true
+            end
+            -- The same profile transaction owns the unique kill receipt,
+            -- bound item grant and ordered stage counter. A failed grant
+            -- rolls all three back; the world binder remains authoritative.
+            local drop_ok, drop_reason = QuestDrops.apply(
+                live, latest, evidence
+            )
+            if not drop_ok then
+                error(drop_reason or "OriginalQuestDropGrantFailed")
             end
             progress = Rules.advance(quest, latest, evidence)
             if not progress.ok then error(progress.reason) end
