@@ -29,6 +29,36 @@ local function selected_character(profile: any): any?
 end
 
 --[[
+Determines whether a character already owns an old completed/active
+advancement that needs its separate, non-destructive migration.
+
+Args:
+    character (any): Authoritative current selected character.
+
+Returns:
+    boolean: True when an earlier trial or advanced class exists.
+]]
+local function has_legacy_advancement(character: any): boolean
+    local old = character and character.ClassAdvancement
+    if type(old) == "table" and old.ActiveClassId ~= nil then
+        return true
+    end
+    local quests = character and character.Quests
+    local active = quests and quests.Active
+    if type(active) == "table" then
+        for _, id in ipairs({
+            "FighterAdvancementTrial", "MageAdvancementTrial",
+            "RangerAdvancementTrial", "RogueAdvancementTrial",
+        }) do
+            if active[id] ~= nil then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+--[[
 Constructs a Base-only server-owned first-transfer choice service.
 
 Args:
@@ -66,6 +96,7 @@ function Selection:build_snapshot(user_id: number): any
     local stored = character.ClassAdvancement
     local choice_id = type(stored) == "table"
         and stored.OriginalFirstTransferChoiceId or nil
+    local legacy = has_legacy_advancement(character)
     local options = {}
     for _, branch in ipairs(available.branches) do
         table.insert(options, {
@@ -81,7 +112,8 @@ function Selection:build_snapshot(user_id: number): any
         Options = options,
         SelectedClassId = choice_id,
         CanChoose = (tonumber(character.Level) or 0) >= 18
-            and choice_id == nil,
+            and choice_id == nil and not legacy,
+        LegacyAdvancementNeedsMigration = legacy,
         QuestImplemented = false,
         MinimumLevel = 18,
     })
@@ -122,6 +154,9 @@ function Selection:choose(user_id: number, requested_id: string): any
     if not branch then
         return result(false, "OriginalClassChoiceUnavailable")
     end
+    if has_legacy_advancement(character) then
+        return result(false, "LegacyClassMigrationRequired")
+    end
     local current = character.ClassAdvancement
     if type(current) == "table"
         and current.OriginalFirstTransferChoiceId ~= nil
@@ -146,6 +181,9 @@ function Selection:choose(user_id: number, requested_id: string): any
                 live.ClassAdvancement = {
                     Version = 1, CompletedByRace = {},
                 }
+            end
+            if has_legacy_advancement(live) then
+                error("LegacyClassMigrationRequired")
             end
             if live.ClassAdvancement.OriginalFirstTransferChoiceId
                 ~= nil
