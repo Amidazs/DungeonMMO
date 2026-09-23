@@ -37,6 +37,10 @@ local DEFINITIONS = table.freeze({
                 SkillId = "OathguardHeavyArmorTraining",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "OathguardRunicResistance",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
     IronvowTrainer = table.freeze({
