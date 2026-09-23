@@ -410,6 +410,26 @@ local RECIPES = table.freeze({
         Output = table.freeze({ItemId = "cured_leather", Quantity = 1}),
         XP = 20,
     }),
+    -- Scout advanced equipment is made by a real Leatherworker, not
+    -- materialized by learning the expertise rank.
+    stitch_scout_expert_vest = table.freeze({
+        Id = "stitch_scout_expert_vest",
+        Name = "Stitch Expert Scout Vest",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "cured_leather", Quantity = 3}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "scout_expert_leather_vest", Quantity = 1,
+        }),
+        XP = 42,
+    }),
+
     stitch_leatherbound_gloves = table.freeze({
         Id = "stitch_leatherbound_gloves",
         Name = "Stitch Leatherbound Gloves",
@@ -518,6 +538,7 @@ local STATION_ORDER = table.freeze({
         "scout_cure_leather_rank_3",
         "c4_common_cured_leather",
         "cure_raw_hide",
+        "stitch_scout_expert_vest",
         "stitch_leatherbound_gloves",
     }),
     Enchanting = table.freeze({
