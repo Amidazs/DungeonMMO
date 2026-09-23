@@ -86,6 +86,9 @@ local MAPPINGS = table.freeze({
         BattleHeal = table.freeze({
             [14] = "MysticBattleHeal",
         }),
+        PartyHeal = table.freeze({
+            [14] = "MysticPartyHeal",
+        }),
         LifeDrain = table.freeze({
             [14] = "MysticLifeDrain",
         }),
@@ -301,6 +304,22 @@ function C4BaseImplementationAudit.audit(
                     or family == "CommonItemCreation"
                     then crafting_ranks_at_level(skill_id, level)
                     else executable_ranks_at_level(skill_id, level)
+            end
+            -- A single-target heal must never satisfy three source
+            -- ranks of genuine, mana-costed multi-target party healing.
+            if skill_id and family == "PartyHeal" then
+                for rank = 1, count do
+                    local effect = Combat.get_for_rank(skill_id, rank)
+                    if not effect or effect.KIND ~= "MageHeal"
+                        or effect.PARTY_HEAL ~= true
+                        or (effect.TOTAL_HEAL or 0) <= 0
+                        or (effect.MANA_COST or 0) <= 0
+                        or (effect.COOLDOWN_SECONDS or 0) <= 0
+                    then
+                        actual = 0
+                        break
+                    end
+                end
             end
             -- Direct spell damage alone cannot satisfy an enemy
             -- weakening source family. Check the authored status too.
