@@ -527,6 +527,19 @@ local function connect_trainer(trainer: Instance)
     end)
 end
 
+-- New first-transfer mentor parts register alongside the existing Base
+-- trainer anchors and never replace legacy trainer locations.
+task.spawn(function()
+    local folder = workspace:WaitForChild(
+        "OriginalFirstTransferMentors", 20
+    )
+    if not folder then return end
+    for _, trainer in ipairs(folder:GetChildren()) do
+        connect_trainer(trainer)
+    end
+    folder.ChildAdded:Connect(connect_trainer)
+end)
+
 task.spawn(function()
     for _, anchor_id in ipairs({
         "Base.Trainer.Fighter",
