@@ -5,6 +5,8 @@ local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Paths = require(Shared.C4ClassPathRules)
 local Branches = require(Shared.C4FirstTransferBranches)
+local SkillCoverage = require(Shared.C4OriginalClassSkillCoverage)
+local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
 
 local Selection = {}
 Selection.__index = Selection
@@ -99,6 +101,8 @@ function Selection:build_snapshot(user_id: number): any
     local legacy = has_legacy_advancement(character)
     local options = {}
     for _, branch in ipairs(available.branches) do
+        local skill_status = SkillCoverage.for_branch(branch)
+        local quest_source = QuestStages.get(branch.Id)
         table.insert(options, {
             Id = branch.Id,
             DisplayName = branch.SourceClass,
@@ -106,6 +110,13 @@ function Selection:build_snapshot(user_id: number): any
             MinimumLevel = branch.SourceQuestStartLevel,
             QuestImplemented = type(branch.GameQuestId) == "string"
                 and Branches.is_complete(branch),
+            QuestSourceMapped = quest_source ~= nil,
+            QuestWorldReady = quest_source ~= nil
+                and quest_source.WorldBindingStatus == "Implemented",
+            SkillInventoryStatus = skill_status.SourceInventoryStatus,
+            MappedAnalogueRanks = skill_status.MappedAnalogueRanks,
+            ExactC4SkillParityCertified =
+                skill_status.ExactC4RankParityCertified,
         })
     end
     return result(true, nil, {
