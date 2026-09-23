@@ -37,6 +37,9 @@ local PassiveSkillEffects = require(
 local CombatStatusService = require(
     ServerScriptService.Combat.CombatStatusService
 )
+local ScoutCriticalToggleService = require(
+    ServerScriptService.Combat.ScoutCriticalToggleService
+)
 
 --[[
 Returns a live, server-owned buff value without trusting client metadata.
@@ -782,11 +785,23 @@ function ProgressionRuntimeState.get_critical_damage_multiplier(
         .critical_damage_multiplier(
             ProgressionRuntimeState.get_race_id(user_id)
         )
+    local player = Players:GetPlayerByUserId(user_id)
+    local toggle_bonus = 0
+    if player then
+        local usable = ProgressionRuntimeState.is_skill_usable(
+            user_id, "ScoutCriticalPowerToggle"
+        )
+        if usable then
+            toggle_bonus = ScoutCriticalToggleService.get_bonus(player)
+        else
+            ScoutCriticalToggleService.stop(player)
+        end
+    end
     return math.max(
         1,
         racial_multiplier + PassiveSkillEffects.critical_damage_bonus(
             state_for(user_id)
-        )
+        ) + toggle_bonus
     )
 end
 
