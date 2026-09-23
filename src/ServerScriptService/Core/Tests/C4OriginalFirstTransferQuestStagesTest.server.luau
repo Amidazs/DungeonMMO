@@ -7,6 +7,8 @@ local Branches = require(Shared.C4FirstTransferBranches)
 local Stages = require(Shared.C4OriginalFirstTransferQuestStages)
 local Skills = require(Shared.C4OriginalClassSkillCoverage)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
+local SkillRules = require(Shared.SkillUnlockRules)
+local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
 local Adapter = require(SSS.Core.Adapters.InMemoryProfileAdapter)
 local Profiles = require(SSS.Core.Services.ProfileService)
 local Selection = require(SSS.Core.Services.C4FirstTransferSelectionService)
@@ -208,6 +210,13 @@ local function exercise(
         and profiles:get_character(user_id, 1)
             .ClassAdvancement.ActiveClassId == nil,
         "Completed backend quest stages cannot grant an unimplemented class")
+    local starter = assert(profiles:get_character(user_id, 1))
+    local can_train, locked_reason = SkillRules.can_train(
+        starter, assert(SkillDefinitions.get("ScoutLockpicking")), 1
+    )
+    check(not can_train and locked_reason == "WrongClass",
+        "Source choice or quest readiness cannot leak Scout skills to "
+            .. "the original Fighter before a real level-20 transfer")
     check(profiles:save(user_id, "C4OriginalQuest"),
         "Source quest progress must persist to original profile adapter")
     check(profiles:release(user_id, "C4OriginalQuest"),
