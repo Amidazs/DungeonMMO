@@ -89,6 +89,9 @@ local C4QuestMonsterCombatLedger = require(
 local C4QuestEncounterSpawns = require(
     Dungeon:WaitForChild("C4QuestEncounterSpawns")
 )
+local C4ScoutCaelQuestRuntime = require(
+    Dungeon:WaitForChild("C4ScoutCaelQuestRuntime")
+)
 local C4OriginalFirstTransferQuestService = require(
     Services:WaitForChild("C4OriginalFirstTransferQuestService")
 )
@@ -198,6 +201,7 @@ local active_session_id: string? = nil
 local lockpick_service: any = nil
 local encounter_service: any = nil
 local c4_quest_combat_ledger: any = nil
+local c4_scout_cael_runtime: any = nil
 local encounter_runtime_controller: any = nil
 local encounter_execution_controller: any = nil
 local active_execution: any = nil
@@ -1033,6 +1037,18 @@ local function start_executed_slot(room_slot_id: string): any?
 
     active_execution = started
     sync_encounter_members_from_session()
+    if c4_scout_cael_runtime
+        and binding.Encounter
+        and binding.Encounter.ExecutorId == "CombatPack"
+        and enemies[1] and enemies[1].PrimaryPart
+    then
+        c4_scout_cael_runtime:spawn(
+            enemies[1].PrimaryPart.CFrame,
+            encounter_id,
+            runtime_root,
+            connected_member_user_ids()
+        )
+    end
     for _, registration in ipairs(quest_registrations) do
         if not c4_quest_combat_ledger:register_enemy(
             registration.enemy,
@@ -1608,9 +1624,8 @@ local function initialize_session_services(session: any): (any?, boolean)
         session.SessionId,
         session.Modifier and session.Modifier.Id or nil
     )
-    -- Install the server-only combat observer once per reserved run.
-    -- Until a future original quest room registers specific monsters,
-    -- this cannot authorize any class quest drop or stage advancement.
+    -- This reserved run owns all one-use combat and physical rescue
+    -- receipts; no client can submit a fabricated quest proof.
     c4_quest_combat_ledger = C4QuestMonsterCombatLedger.new({
         profiles = profiles,
         session_id = session.SessionId,
@@ -1624,10 +1639,37 @@ local function initialize_session_services(session: any): (any?, boolean)
                 )
         end,
     })
-    c4_quest_combat_ledger:attach_quest_service(
+    c4_scout_cael_runtime = C4ScoutCaelQuestRuntime.new({
+        profiles = profiles,
+        session_id = session.SessionId,
+        is_member_active = function(
+            user_id: number, encounter_id: string
+        ): boolean
+            if not encounter_service
+                or encounter_service:get_current_id() ~= encounter_id
+                or not loaded_users[user_id]
+            then
+                return false
+            end
+            for _, member_id in ipairs(connected_member_user_ids()) do
+                if member_id == user_id then return true end
+            end
+            return false
+        end,
+        on_progress = send_profile,
+    })
+    c4_quest_combat_ledger:attach_scout_actor(
+        c4_scout_cael_runtime
+    )
+    local c4_source_quest_service =
         C4OriginalFirstTransferQuestService.new(
             profiles, "Dungeon", c4_quest_combat_ledger
         )
+    c4_quest_combat_ledger:attach_quest_service(
+        c4_source_quest_service
+    )
+    c4_scout_cael_runtime:attach_quest_service(
+        c4_source_quest_service
     )
     DungeonContributionBridge.bind_quest_damage_observer(
         c4_quest_combat_ledger
