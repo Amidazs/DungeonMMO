@@ -8,7 +8,7 @@ sys.path.insert(0,str(ENGINE))
 from quadruped_blender.refine_walk import generate
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
 SOURCE=ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend"
-OUTPUT=ROOT/"ForelegRefinement_20260923_B"
+OUTPUT=ROOT/"ForelegRefinement_20260923_C"
 CONFIG=ENGINE/"profiles/frostfang_v16_refinement.json"
 def main():
     args=sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else []
@@ -63,7 +63,7 @@ def render(stills):
     scene.display.shading.show_cavity=True
     scene.render.resolution_x=700;scene.render.resolution_y=480;scene.render.resolution_percentage=100
     scene.render.image_settings.file_format="PNG"
-    bpy.ops.mesh.primitive_plane_add(size=200,location=(0,0,0))
+    bpy.ops.mesh.primitive_plane_add(size=20,location=(0,0,0))
     bpy.context.object.name="QA_Floor"
     bpy.context.object.color=(.15,.17,.20,1)
     for obj in bpy.data.objects:
@@ -72,7 +72,7 @@ def render(stills):
            "front":((-.10,-3,.65),(-.09,-.24,.48),1.65),
            "rear":((-.10,3,.65),(-.09,-.24,.48),1.65),
            "three_quarter":((2,-2,1),(-.09,-.18,.48),1.95),
-           "foreleg_close":((2.4,-.52,.36),(-.09,-.53,.35),.92)}
+           "foreleg_close":((2.4,-.59,.32),(-.09,-.59,.30),1.18)}
     camera_data=bpy.data.cameras.new("RefinementReview")
     camera=bpy.data.objects.new("RefinementReview",camera_data);scene.collection.objects.link(camera)
     camera_data.type="ORTHO";scene.camera=camera
