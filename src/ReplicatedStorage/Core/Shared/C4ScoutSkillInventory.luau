@@ -116,6 +116,26 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "RangerRogue",
         DaggerEquipmentPending = false,
     }),
+    EquipmentExpertise = table.freeze({
+        SkillId = "ScoutEquipmentExpertise",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    LungCapacity = table.freeze({
+        SkillId = "ScoutLungCapacity",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    FallResistance = table.freeze({
+        SkillId = "ScoutFallResistance",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    Sprint = table.freeze({
+        SkillId = "HumanScoutSprint",
+        Owner = "Rogue",
+        DaggerEquipmentPending = false,
+    }),
     Lockpicking = table.freeze({
         SkillId = "ScoutLockpicking",
         Owner = "RangerRogue",
