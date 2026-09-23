@@ -58,20 +58,25 @@ Args:
     enemy (Model): Server-spawned model with real living Humanoid.
     branch_id (string): Original source-quest class branch.
     encounter_id (string): Current authoritative dungeon encounter.
+    step_index (number?): Exact enabled stage three or six; defaults to three.
 
 Returns:
     boolean: Whether this exact model life can produce quest evidence.
 ]]
 function Ledger:register_enemy(
-    enemy: Model, branch_id: string, encounter_id: string
+    enemy: Model, branch_id: string, encounter_id: string,
+    step_index: number?
 ): boolean
     if typeof(enemy) ~= "Instance" or not enemy:IsA("Model")
     then
         return false
     end
     local quest = Source.get(branch_id)
-    local step = quest and quest.Steps[3]
-    if not step or step.Kind ~= "QuestMonsterDefeat" then
+    local index = step_index or 3
+    local step = quest and quest.Steps[index]
+    if (index ~= 3 and index ~= 6)
+        or not step or step.Kind ~= "QuestMonsterDefeat"
+    then
         return false
     end
     local humanoid = enemy:FindFirstChildOfClass("Humanoid")
@@ -88,6 +93,7 @@ function Ledger:register_enemy(
     end
     self._enemies[enemy] = {
         BranchId = branch_id,
+        Step = index,
         TargetId = step.TargetId,
         EncounterId = encounter_id,
         ReceiptId = HttpService:GenerateGUID(false),
@@ -99,7 +105,7 @@ end
 
 --[[
 Checks that an actual connected dungeon player is eligible to damage this
-monster, and that their selected quest is currently at monster stage three.
+monster, and that their selected quest matches this exact monster stage.
 
 Args:
     context (any): Server-created DamageService hit context.
@@ -130,7 +136,7 @@ local function eligible_owner(
     local advancement = character and character.ClassAdvancement
     local state = advancement and advancement.OriginalFirstTransferQuest
     if not state or state.BranchId ~= record.BranchId
-        or state.Step ~= 3 or state.Ready == true
+        or state.Step ~= record.Step or state.Ready == true
     then
         return nil, nil
     end
@@ -192,11 +198,16 @@ local function event_for_owner(
     local character = self._profiles:get_character(user_id)
     local advancement = character and character.ClassAdvancement
     local state = advancement and advancement.OriginalFirstTransferQuest
-    if not state or state.Step ~= 3
+    if not state or state.Step ~= record.Step
         or state.BranchId ~= record.BranchId then
         return nil
     end
-    local proof_ids = if record.BranchId == "HumanRogue"
+    local proof_ids = if record.TargetId == "CinderBrigand"
+        then {
+            StolenJewelry = true, StolenTomes = true,
+            StolenRing = true, StolenNecklace = true,
+        }
+        elseif record.BranchId == "HumanRogue"
         then {SpartoiBone = true} else next_proof(state)
     if not proof_ids then return nil end
     return {
@@ -235,6 +246,7 @@ local function grant_earned_quest_drops(
                 self._pending[user_id] = {
                     Event = event,
                     BranchId = record.BranchId,
+                    Step = record.Step,
                     MonsterReceiptId = record.ReceiptId,
                 }
                 local outcome = self._quest_service:record_world_event(
@@ -298,19 +310,23 @@ function Ledger:record_damage(
 end
 
 --[[
-Exposes only the registered physical third step to the quest service.
+Exposes only the exact registered physical monster stage to the quest service.
 
 Args:
     quest (any): Actual selected source quest.
     step_index (number?): Requested stage number.
 
 Returns:
-    boolean: Whether an authentic stage-three enemy is registered.
+    boolean: Whether an authentic enemy for this exact stage is registered.
 ]]
 function Ledger:available(quest: any, step_index: number?): boolean
-    if not quest or step_index ~= 3 then return false end
+    if not quest or type(step_index) ~= "number" then return false end
     for _, record in pairs(self._enemies) do
-        if record.BranchId == quest.BranchId then return true end
+        if record.BranchId == quest.BranchId
+            and record.Step == step_index
+        then
+            return true
+        end
     end
     return false
 end
@@ -333,7 +349,7 @@ function Ledger:verify(
     local pending = self._pending[user_id]
     self._pending[user_id] = nil
     return pending ~= nil and pending.Event == event
-        and state.Step == 3
+        and state.Step == pending.Step
         and quest.BranchId == pending.BranchId
         and event.ActorUserId == user_id
         and event.MonsterReceiptId == pending.MonsterReceiptId
