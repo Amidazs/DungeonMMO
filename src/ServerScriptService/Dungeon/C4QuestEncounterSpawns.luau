@@ -13,6 +13,18 @@ local Source = require(
 local Spawns = {}
 local PER_BRANCH_PER_ROOM = 2
 local CHALLENGES = table.freeze({
+    HumanKnight = table.freeze({
+        Name = "Gloam Striker",
+        SourceId = "GloamStriker",
+        Health = 80,
+    }),
+    HumanKnightFive = table.freeze({
+        Name = "Gloam Bulwark",
+        SourceId = "GloamBulwark",
+        BranchId = "HumanKnight",
+        Step = 5,
+        Health = 135,
+    }),
     HumanWarrior = table.freeze({
         Name = "Ridge Marauder",
         SourceId = "RidgeMarauder",
@@ -73,7 +85,10 @@ function Spawns.eligible_branches(
         local branch = state and state.BranchId
         local quest = branch and Source.get(branch)
         local challenge_id = if state and state.Step == 5
-            and branch == "HumanWarrior"
+            and branch == "HumanKnight"
+            then "HumanKnightFive"
+            elseif state and state.Step == 5
+                and branch == "HumanWarrior"
             then "HumanWarriorFive"
             elseif state and state.Step == 6
                 and branch == "HumanRogue"
@@ -161,6 +176,7 @@ function Spawns.augment(options: any, factory: any?): any
     for branch_index, branch in ipairs(branches) do
         local challenge = CHALLENGES[branch]
         local count = if branch == "ElvenScoutSix"
+            or branch == "HumanKnightFive"
             or branch == "HumanWarriorFive"
             or branch == "HumanRogueSix"
             then 1 else PER_BRANCH_PER_ROOM
