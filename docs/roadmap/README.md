@@ -1,3 +1,38 @@
+**Current DungeonMMO source-quest backend: v1.98 — Scout Cael rescue, real Bracken Warden and final hub reports.**
+[Newest backend roadmap](
+DungeonMMO_Roadmap_v1_98_Scout_Cael_Warden_Source_20260923.md)
+and [actual v1.98 unpublished Studio acceptance](
+../testing/c4-scout-cael-source-v1-98-20260923.md).
+A selected, active Elf Fighter can now find the
+physical Scout Cael actor in an instanced dungeon,
+trigger an authenticated stage-five discovery
+prompt, defeat a unique stage-six Bracken Warden
+and earn one personally bound Bracken Ward Sigil.
+A second actual owner prompt refuses a missing
+sigil and consumes the real item atomically
+when rescuing Cael; replay and unrelated Human
+clients cannot advance the Elf's quest. The
+existing physical Warden Thorne and Pathfinder
+Elyra hub NPCs handle ordered stage-eight and
+stage-nine reports. Actual two-client Dungeon
+rescue and separate Base hub tests passed
+without awarding advanced classes; the Base
+fixture explicitly seeded previously completed
+rescue state. Focused Base **5/5 PASS**
+(170 source assertions), Dungeon **3/3 PASS**
+(10 + 24 + 13 assertions) and shared-store
+coordinator save/fresh-profile handoff **66
+assertions PASS**. Human Rogue and Elven Scout
+source quests can now each reach `Ready`;
+**actual uninterrupted cross-place gameplay,
+entirely client-controlled victory sequences,
+level-20 class identities and skill/trainer
+authorization remain pending. Fully playable
+first-transfer advanced classes: 0/18.**
+All source and roadmap edits remained in GitHub;
+no Roblox publish, `main` merge, production
+DataStore mutation or local source edit.
+
 **Current DungeonMMO C4-inspired backend: v1.97 — source quest handoff, original Cinder recovery and physical captain final report.**
 [Newest source quest backend roadmap](
 DungeonMMO_Roadmap_v1_97_Source_Cinder_Quest_Handoff_20260923.md)
