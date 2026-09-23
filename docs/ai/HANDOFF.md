@@ -1,3 +1,15 @@
+## 23 September 2026 — approved quadruped engine work in progress
+
+Owner approved reusable quadruped design, GitHub source/docs commits on
+wip/phase-4-test-hud-integration-v1, and native continuous execution.
+Latest backend roadmap is v1.90; older introductory backend snapshots below
+are historical. No backend acceptance changes are inferred here.
+Engine source is isolated under tools/animation/quadruped/engine/.
+See its EXECUTION.md and the 2026-09-23 design/plan under docs/superpowers/.
+Current evidence: read-only V3 Blender skeleton inventory only; implementation
+and actual V3 Studio playback remain pending. Original rigs and production
+compositions remain untouched. No asset/place publishing authorized.
+
 # DungeonMMO Development Handoff
 
 ## 22 September 2026 — v1.77 C4 poison/cure, still INCOMPLETE
