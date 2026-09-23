@@ -71,6 +71,26 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "RangerRogue",
         DaggerEquipmentPending = false,
     }),
+    CureWounds = table.freeze({
+        SkillId = "ElvenScoutCureWounds",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    AttackBuff = table.freeze({
+        SkillId = "ElvenScoutBattleFocus",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    SpeedBuff = table.freeze({
+        SkillId = "ElvenScoutWindRun",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
+    MovementSlow = table.freeze({
+        SkillId = "ElvenScoutSnaringShot",
+        Owner = "Ranger",
+        DaggerEquipmentPending = false,
+    }),
     SittingRecovery = table.freeze({
         SkillId = "HumanScoutRestingRecovery",
         Owner = "RangerRogue",
