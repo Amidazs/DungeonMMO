@@ -28,6 +28,9 @@
         },
         "ScoutCriticalToggleService": {
           "$path": "src/ServerScriptService/Combat/ScoutCriticalToggleService.luau"
+        },
+        "ScoutAccuracyToggleService": {
+          "$path": "src/ServerScriptService/Combat/ScoutAccuracyToggleService.luau"
         }
       },
       "Base": {
