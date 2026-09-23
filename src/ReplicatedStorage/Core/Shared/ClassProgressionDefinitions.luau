@@ -94,6 +94,10 @@ local DEFINITIONS = table.freeze({
         TeachableSkills = table.freeze({
             "HumanScoutSprint",
             "AshenbladeOpening",
+            "WayfinderArrow",
+            "WayfinderCut",
+            "WayfinderBowMastery",
+            "WayfinderDaggerMastery",
         }),
     }),
 
@@ -108,6 +112,10 @@ local DEFINITIONS = table.freeze({
         TeachableSkills = table.freeze({
             "ElvenScoutGuard",
             "GreenwardRenewal",
+            "WayfinderArrow",
+            "WayfinderCut",
+            "WayfinderBowMastery",
+            "WayfinderDaggerMastery",
         }),
     }),
 
