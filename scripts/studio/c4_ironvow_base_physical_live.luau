@@ -43,6 +43,14 @@ signal.OnClientEvent:Connect(function(action, part)
         return
     end
     if action ~= "HOLD" then return end
+    local camera = workspace.CurrentCamera
+    if camera then
+        camera.CameraType = Enum.CameraType.Scriptable
+        camera.CFrame = CFrame.lookAt(
+            part.Position + Vector3.new(0, 5, 9),
+            part.Position
+        )
+    end
     local prompt = part:FindFirstChildOfClass("ProximityPrompt")
     if not prompt then signal:FireServer("FAIL", "No prompt") return end
     local deadline = os.clock() + 6
@@ -105,7 +113,14 @@ local function hold(player, part)
     root.AssemblyLinearVelocity = Vector3.zero
     responses.PROMPT_VISIBLE = nil
     responses.HELD = nil
-    task.wait(0.6)
+    task.wait(1.2)
+    local prompt = assert(part:FindFirstChildOfClass(
+        "ProximityPrompt"
+    ))
+    local confirmed = false
+    local connection = prompt.Triggered:Connect(function(actor)
+        if actor == player then confirmed = true end
+    end)
     signal:FireClient(player, "HOLD", part)
     await_state(function()
         return responses.HELD or responses.FAIL
@@ -116,6 +131,12 @@ local function hold(player, part)
         warn("[Ironvow Physical] CLIENT_PROMPT_VISIBILITY_NOT_CONFIRMED "
             .. part.Name)
     end
+    local deadline = os.clock() + 3
+    repeat task.wait(0.1) until confirmed
+        or os.clock() >= deadline
+    connection:Disconnect()
+    assert(confirmed,
+        "Client hold never triggered actual server NPC " .. part.Name)
 end
 
 -- Args: profiles (any), player (Player).
