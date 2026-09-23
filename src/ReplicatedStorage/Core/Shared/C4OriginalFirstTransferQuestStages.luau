@@ -34,11 +34,12 @@ local QUESTS = table.freeze({
             talk("Vela", "Obtain Vela's dagger and bow."),
             defeat("CryptSentinel", 10,
                 "Gather ten crypt relics with Vela's weapons.", true),
-            talk("Vela", "Return the skeleton proof."),
-            talk("CaptainAshford", "Present Vela's recognition."),
+            talk("Vela", "Deliver your crypt fragments."),
+            talk("CaptainAshford", "Report the completed crypt trial."),
             defeat("CinderBrigand", 1,
-                "Recover all four stolen items using Vela's weapons.", true),
-            talk("CaptainAshford", "Return the stolen items."),
+                "Recover the supply cipher, route map, ward seal and "
+                    .. "tideglass lens using Vela's weapons.", true),
+            talk("CaptainAshford", "Deliver the captured supply records."),
         }),
         RequiredProofIds = table.freeze({
             "SpartoiBone10", "StolenJewelry", "StolenTomes",
