@@ -1353,6 +1353,103 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- The original first-transfer bow/dagger lines are separate from
+    -- old legacy Ranger/Rogue catalogue IDs. Each source bracket offers
+    -- three independently purchased ability ranks to BOTH new careers.
+    WayfinderArrow = table.freeze({
+        Id = "WayfinderArrow",
+        Tier = "Common", MaxRank = 9, Kind = "Physical",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout",
+        }),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterBowShot",
+                Rank = 9, Proficiency = 320,
+            }),
+        }),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    WayfinderCut = table.freeze({
+        Id = "WayfinderCut",
+        Tier = "Common", MaxRank = 9, Kind = "Physical",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout",
+        }),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterDaggerStrike",
+                Rank = 9, Proficiency = 320,
+            }),
+        }),
+        WeaponTags = table.freeze({"Dagger"}),
+    }),
+
+    -- Independently purchased masteries produce live server-side
+    -- physical damage scaling only with valid earned career receipts.
+    WayfinderBowMastery = table.freeze({
+        Id = "WayfinderBowMastery",
+        Tier = "Common", MaxRank = 9, Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout",
+        }),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+            [8] = 0, [9] = 0,
+        }),
+        DamageBonusPerRank = 0.006,
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+    WayfinderDaggerMastery = table.freeze({
+        Id = "WayfinderDaggerMastery",
+        Tier = "Common", MaxRank = 4, Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout",
+        }),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28, [4] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+        }),
+        DamageBonusPerRank = 0.01,
+        WeaponTags = table.freeze({"Dagger"}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
