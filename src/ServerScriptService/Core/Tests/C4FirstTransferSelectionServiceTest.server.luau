@@ -8,6 +8,7 @@ local Profiles = require(SSS.Core.Services.ProfileService)
 local Selection = require(
     SSS.Core.Services.C4FirstTransferSelectionService
 )
+local RaceChange = require(SSS.Core.Services.RaceChangeService)
 local Branches = require(Shared.C4FirstTransferBranches)
 local Inventory = require(SSS.Core.Services.InventoryService)
 local checks = 0
@@ -151,6 +152,16 @@ local function check_chosen_paths(profiles: any, service: any)
     check(service:choose(99301, "HumanWarrior").reason
         == "OriginalClassChoiceAlreadyMade",
         "Reloaded original C4 class choice cannot be silently replaced")
+    local race_change = RaceChange.new(profiles, "TEST")
+    check(race_change:preview(99301, "Elf").reason
+        == "OriginalClassRaceLocked",
+        "An original Human C4 path cannot be reassigned to an Elf")
+    check(race_change:apply(
+        99301, "Elf", "forged_preview", "forged_transaction"
+    ).reason == "OriginalClassRaceLocked",
+        "Forged race-change commit cannot override the chosen source path")
+    check(profiles:get_character(99301, 1).Identity.RaceId == "Human",
+        "Blocked development race change must preserve the source race")
 
     local metadata = assert(Branches.find(
         "Human", "Fighter", "HumanRogue"
