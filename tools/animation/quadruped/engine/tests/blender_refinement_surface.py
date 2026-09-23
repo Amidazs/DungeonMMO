@@ -4,7 +4,7 @@ from pathlib import Path
 import bpy,numpy as np
 from mathutils import Vector
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
-OUT=ROOT/"ForelegRefinement_20260923_C"
+OUT=ROOT/"ForelegRefinement_20260923_D"
 def fingerprint(mesh,rig):
     h=hashlib.sha256()
     for v in mesh.data.vertices:
