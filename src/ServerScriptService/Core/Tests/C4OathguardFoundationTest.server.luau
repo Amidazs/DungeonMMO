@@ -117,8 +117,8 @@ local function main()
         and last.TAUNT_BONUS_THREAT > first.TAUNT_BONUS_THREAT,
         "Real zero-damage taunt creates greater threat at later ranks")
     local owner = forged()
-    check(Careers.for_branch("HumanKnight") == nil,
-        "Unbuilt Knight world quest cannot award a counterfeit class")
+    check(Careers.for_branch("HumanKnight") ~= nil,
+        "Independent Knight career requires its own completed personal quest")
     check(not Identity.is_complete(owner)
         and Careers.awarded(owner) == nil,
         "Claiming a raw Knight class ID cannot create mentor receipt")
