@@ -1200,6 +1200,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Longbow"}),
     }),
 
+    -- Human Rogue and Elven Scout five-rank source power toggle.
+    -- Ranks are separately purchased at each original training bracket.
+    -- The server-owned active status spends stamina every second.
+    ScoutCriticalPowerToggle = table.freeze({
+        Id = "ScoutCriticalPowerToggle",
+        Tier = "Common",
+        MaxRank = 5,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28,
+            [4] = 32, [5] = 36,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0, [5] = 0,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Human first-transfer critical power (C4 levels 24 and 32).
     -- Purchased ranks affect real critical-hit damage, not raw attack.
     HumanScoutCriticalPower = table.freeze({
