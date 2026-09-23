@@ -9,7 +9,7 @@ local Branches = require(Shared.C4FirstTransferBranches)
 
 local C4CatalogueCoverage = {}
 local BASE_CLASSES = {"Fighter", "Mage"}
-local RACES = {"Human", "Elf"}
+local IMPLEMENTED_STARTING_RACES = {"Human", "Elf"}
 
 --[[
 Accumulates genuine C4 source and functional ranks for a named class.
@@ -30,11 +30,10 @@ end
 --[[
 Computes a conservative first-tier + first-transfer coverage result.
 
-The original nine distinct C4 first-transfer choices are required.
-The Human Rogue and Elven Scout inventories are only partial source
-class analogues, not completed first-transfer implementations.
-The other seven source careers remain unimplemented regardless of
-whether DungeonMMO already has a similar gameplay role.
+All eighteen original C4 first-transfer choices across five races
+are required. The Human Rogue and Elven Scout source rank inventories
+are mapped, but their authentic class-transfer quests are unfinished.
+The other sixteen branches have no complete supported class path.
 
 Args:
     None.
@@ -50,12 +49,20 @@ function C4CatalogueCoverage.report(): any
         Total = 0, Complete = 0, Partial = 0, Unimplemented = {},
     }
 
-    for _, race_id in ipairs(RACES) do
+    -- Only Human/Elf are presently playable and have starter audits.
+    for _, race_id in ipairs(IMPLEMENTED_STARTING_RACES) do
         for _, class_id in ipairs(BASE_CLASSES) do
             add_counts(base, assert(BaseAudit.audit(race_id, class_id)))
-            for _, branch in ipairs(assert(
-                Branches.get(race_id, class_id)
-            )) do
+        end
+    end
+
+    -- Source class counts include every original race, even though three
+    -- have no playable character or associated rank inventory yet.
+    for _, race_id in ipairs(Branches.races()) do
+        for _, class_id in ipairs(BASE_CLASSES) do
+            for _, branch in ipairs(
+                Branches.get(race_id, class_id) or {}
+            ) do
                 branches.Total += 1
                 if Branches.is_complete(branch) then
                     branches.Complete += 1
