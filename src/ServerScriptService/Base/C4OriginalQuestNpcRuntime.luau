@@ -122,7 +122,12 @@ Args:
 Returns:
     boolean: Whether the authenticated first-stage interaction can start.
 ]]
-function Runtime:available(quest: any): boolean
+function Runtime:available(
+    quest: any, stage_index: number?
+): boolean
+    if stage_index ~= nil and stage_index ~= 1 then
+        return false
+    end
     local part = quest and self._parts[quest.BranchId]
     local first = quest and quest.Steps[1]
     return part ~= nil and part:IsDescendantOf(workspace)
