@@ -1,87 +1,121 @@
 --!strict
--- Source-confirmed C4 first transfers, distinct from game role analogues.
+-- Original Chronicle 4: five historical races and eighteen first transfers.
+-- This source-only inventory does not turn unsupported races playable.
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Branches = require(Shared.C4FirstTransferBranches)
 local Inventory = require(Shared.C4ScoutSkillInventory)
+local RaceDefinitions = require(Shared.RaceDefinitions)
 
 local EXPECTED = {
     Human = {
         Fighter = {"Warrior", "Human Knight", "Rogue"},
-        Mage = {"Wizard", "Cleric"},
+        Mage = {"Human Wizard", "Cleric"},
     },
     Elf = {
         Fighter = {"Elven Knight", "Elven Scout"},
         Mage = {"Elven Wizard", "Elven Oracle"},
     },
+    DarkElf = {
+        Fighter = {"Palus Knight", "Assassin"},
+        Mage = {"Dark Wizard", "Shillien Oracle"},
+    },
+    Orc = {
+        Fighter = {"Orc Raider", "Orc Monk"},
+        Mage = {"Orc Shaman"},
+    },
+    Dwarf = {
+        Fighter = {"Artisan", "Scavenger"},
+    },
 }
-local assertions = 0
+local checks = 0
 
 --[[
-Counts one verified source-class or real-implementation requirement.
+Checks one source branch, tier, unique ID or unsupported-class invariant.
 
 Args:
-    condition (boolean): Expected authentic first-transfer invariant.
-    description (string): Diagnostic identifying a missing class branch.
+    condition (boolean): Required original Chronicle 4 source fact.
+    description (string): Exact failing branch or gate.
 
 Returns:
-    nil: Increments the successful check count or raises.
+    nil: Records the assertion or fails the real Studio fixture.
 ]]
 local function check(condition: boolean, description: string)
-    assertions += 1
+    checks += 1
     assert(condition, "[C4 First Transfers] " .. description)
 end
 
 --[[
-Checks all currently supported original Chronicle 4 Human/Elf
-first-transfer choices without claiming incomplete skills as complete.
+Checks original five-race paths without claiming unimplemented gameplay.
 
 Args:
     None.
 
 Returns:
-    nil: Prints source branch coverage after all checks pass.
+    nil: Prints actual source and partial-implementation assertions.
 ]]
 local function main()
     local total = 0
     local partial = 0
-    for race_id, classes in pairs(EXPECTED) do
-        for class_id, names in pairs(classes) do
-            local options = assert(Branches.get(race_id, class_id))
+    local ids = {}
+    check(#Branches.races() == 5,
+        "Original Chronicle 4 has five playable source races")
+    for race_id, families in pairs(EXPECTED) do
+        for base_id, names in pairs(families) do
+            local options = assert(Branches.get(race_id, base_id))
             check(#options == #names,
-                race_id .. " " .. class_id .. " C4 branch count changed")
+                race_id .. " " .. base_id .. " branch count changed")
             for index, source_class in ipairs(names) do
                 local option = options[index]
-                check(option.SourceClass == source_class,
-                    "Wrong C4 first-transfer class " .. source_class)
-                check(option.SourceRace == race_id
-                    and option.SourceTransferLevel == 20,
-                    source_class .. " has wrong original race or level")
+                check(option.SourceClass == source_class
+                    and option.SourceRace == race_id,
+                    "Wrong original first transfer " .. source_class)
+                check(option.SourceTransferLevel == 20
+                    and option.SourceQuestStartLevel == 18
+                    and type(option.SourceQuestName) == "string"
+                    and option.SourceQuestName ~= "",
+                    "Original first transfer needs its own level-18 quest")
+                check(not ids[option.Id], "Duplicate original class ID")
+                ids[option.Id] = true
+                check(Branches.find(
+                    race_id, base_id, option.Id
+                ) == option, "Exact selected path not resolved")
+                check(Branches.find(
+                    "Human", "Mage", option.Id
+                ) == (if race_id == "Human" and base_id == "Mage"
+                    then option else nil),
+                    "Wrong starting family could select another branch")
                 check(not Branches.is_complete(option),
-                    "Unfinished C4 first-transfer class marked complete")
+                    "Unimplemented C4 transfer was falsely made playable")
                 if option.GameplayStatus == "Partial" then
                     partial += 1
                     check(option.SourceSkillInventory
                         == "C4ScoutSkillInventory",
-                        "Unsupported C4 class claims functional skill inventory")
+                        "Unmapped class incorrectly claims a skill list")
                     local audit = assert(Inventory.audit(race_id))
-                    check(audit.Missing > 0,
-                        "Partially implemented source class has no missing ranks")
+                    check(audit.Missing == 0,
+                        "Previously implemented Rogue/Scout ranks regressed")
                 else
                     check(option.GameplayStatus == "NotImplemented",
-                        source_class .. " has an unverified completion label")
+                        "Unfinished source class was marked implemented")
                 end
                 total += 1
             end
         end
     end
-    check(total == 9 and partial == 2,
-        "Expected nine source paths, two partially mapped Scout classes")
-    check(Branches.get("Orc", "Fighter") == nil,
-        "Unsupported class tree should not be assumed implemented")
+    check(total == 18 and partial == 2,
+        "Original C4 requires eighteen paths, two partially mapped")
+    for _, race_id in ipairs({"DarkElf", "Orc", "Dwarf"}) do
+        check(RaceDefinitions.get(race_id) == nil,
+            "Source class registry cannot prematurely unlock a race")
+    end
+    check(Branches.get("Dwarf", "Mage") == nil,
+        "Invented Dwarven Mystic path must not exist")
+    check(Branches.find("Elf", "Fighter", "HumanRogue") == nil,
+        "Cross-race class selection must be rejected")
     print(("[C4 First Transfers] PASS: %d assertions, "
-        .. "%d source classes, %d partially mapped."):format(
-        assertions, total, partial
+        .. "%d original source classes, %d partial."):format(
+        checks, total, partial
     ))
 end
 
