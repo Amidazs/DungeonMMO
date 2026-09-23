@@ -155,6 +155,23 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Original Human Warrior foundation, intentionally unclaimable
+    -- until its independent level-18 quest/world evidence is integrated.
+    Ironvow = table.freeze({
+        Id = "Ironvow",
+        DisplayName = "Ironvow",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Human"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "IronvowDrivingStrike",
+            "IronvowBladeTraining",
+            "IronvowBattleCall",
+        }),
+    }),
+
     Ranger = table.freeze({
         Id = "Ranger",
         DisplayName = "Ranger",
