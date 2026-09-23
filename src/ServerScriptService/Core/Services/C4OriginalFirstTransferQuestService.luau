@@ -6,6 +6,10 @@ local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Source = require(Shared.C4OriginalFirstTransferQuestStages)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
+local Inventory = require(script.Parent.InventoryService)
+local NETI_TRIAL_WEAPONS = table.freeze({
+    "neti_trial_dagger", "neti_trial_bow",
+})
 
 local Service = {}
 Service.__index = Service
@@ -182,6 +186,34 @@ function Service:record_world_event(
             local latest = live.ClassAdvancement.OriginalFirstTransferQuest
             if not latest or latest.QuestId ~= quest.Id then
                 error("OriginalQuestStateChanged")
+            end
+            if quest.BranchId == "HumanRogue" and latest.Step == 2 then
+                -- The real Neti NPC receipt has already been authenticated
+                -- by the world binder. Grant BOTH bound personal weapons in
+                -- the SAME profile transaction as stage progression.
+                -- Failed grants roll back the entire quest advancement.
+                -- An unrelated NPC event never grants trial equipment.
+                local stage = quest.Steps[latest.Step]
+                if evidence.Kind ~= "NpcTalk"
+                    or evidence.TargetId ~= "Neti"
+                    or not stage or stage.TargetId ~= "Neti"
+                then
+                    error("OriginalTrialWeaponRequired")
+                end
+                for _, item_id in ipairs(NETI_TRIAL_WEAPONS) do
+                    if Inventory.count_item(live, item_id) == 0 then
+                        local granted = Inventory.apply_item_to_character(
+                            live, item_id, 1
+                        )
+                        if not granted.ok then
+                            error(granted.reason or "OriginalTrialWeaponGrantFailed")
+                        end
+                    end
+                    if Inventory.count_item(live, item_id) ~= 1 then
+                        error("OriginalTrialWeaponOwnershipInvalid")
+                    end
+                end
+                evidence.TrialWeaponsGranted = true
             end
             progress = Rules.advance(quest, latest, evidence)
             if not progress.ok then error(progress.reason) end
