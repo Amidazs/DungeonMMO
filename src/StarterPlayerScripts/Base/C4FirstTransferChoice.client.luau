@@ -207,13 +207,28 @@ local function render(snapshot: any)
             then
                 status.Text = "Visit Vela near the hub arrival point to "
                     .. "receive your personal trial dagger and bow. "
-                    .. "Later quest battles and class transfer remain locked."
+                    .. "Then seek Crypt Sentinels in the dungeon."
             elseif quest.WorldReady and quest.Step == 2
                 and quest.BranchId == "ElvenScout"
             then
                 status.Text = "Visit Warden Thorne near the hub arrival "
-                    .. "point. Later letter-fragment combat and "
-                    .. "class transfer remain locked."
+                    .. "point. Then seek Bracken Raiders "
+                    .. "in the dungeon for Cael's field report."
+            elseif quest.Step == 3
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Defeat ten Crypt Sentinels in instanced "
+                    .. "dungeon rooms with Vela's equipped trial weapon."
+            elseif quest.Step == 3
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Defeat Bracken Raiders in the dungeon "
+                    .. "to recover Cael's four report fragments."
+            elseif quest.WorldReady and quest.Step == 5
+                and quest.BranchId == "HumanRogue"
+            then
+                status.Text = "Report your completed Crypt Sentinel "
+                    .. "trial to Captain Ashford in the hub."
             elseif quest.WorldReady and quest.Step == 4
                 and quest.BranchId == "HumanRogue"
             then
