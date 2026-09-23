@@ -38,7 +38,7 @@ RS.Core.Remotes.ProgressionActionResult.OnClientEvent:Connect(
 signal.OnClientEvent:Connect(function(action, part)
     if action == "LEARN" then
         RS.Core.Remotes.SkillLearnRequest:FireServer(
-            "OathguardTrainer", "OathguardDrivingStrike"
+            "OathguardTrainer", "OathguardShieldImpact"
         )
         return
     end
@@ -149,7 +149,7 @@ local function seed_prior_combat(profiles, player)
             .OriginalFirstTransferQuest
         quest.Step = 4
         quest.Count = 0
-        quest.Proofs.StonewatchToken4 = true
+        quest.Proofs.StonewatchBadge3 = true
         for _ = 1, 3 do
             assert(inv.apply_item_to_character(
                 character, "stonewatch_badge", 1
@@ -192,7 +192,7 @@ local function run()
     end), "Cannot create disposable level-18 Human Fighter")
     assert(selection.new(profiles, "Base"):choose(
         player.UserId, "HumanKnight"
-    ).ok, "Player could not select Human Warrior")
+    ).ok, "Player could not select Human Knight")
     local npcs = workspace:WaitForChild("C4OriginalSourceQuestNPCs")
     hold(player, assert(npcs:FindFirstChild("CaptainRowan")))
     await_state(function()
@@ -265,8 +265,8 @@ local function run()
     end, "real client trainer SkillLearnRequest", 12)
     assert(responses.SKILL_RESULT.ok
         and profiles:get_character(player.UserId).Progression
-            .Skills.OathguardDrivingStrike.PurchasedRank == 1,
-        "Client could not purchase its original Warrior first rank")
+            .Skills.OathguardShieldImpact.PurchasedRank == 1,
+        "Client could not purchase its original Knight first rank")
     print("[Oathguard Physical] REAL_CLIENT_TRAINER_PURCHASE_PASS")
 end
 task.spawn(function()
