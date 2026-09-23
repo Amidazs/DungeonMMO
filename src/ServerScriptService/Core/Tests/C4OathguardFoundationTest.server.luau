@@ -78,7 +78,10 @@ local function forged(): any
     owner.Level = 28
     owner.Equipment.Body = "marauder_armor"
     owner.Equipment.OffHand = "marauder_shield"
-    for _, skill_id in ipairs({IMPACT, CHALLENGE, ARMOR}) do
+    for _, skill_id in ipairs({
+        IMPACT, CHALLENGE, ARMOR,
+        "OathguardRunicResistance", "OathguardMendingOath",
+    }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
         }
@@ -103,6 +106,21 @@ local function main()
     check_ranks(
         ARMOR, {20, 20, 20, 24, 24, 24, 28, 28, 28}
     )
+    check_ranks(
+        "OathguardRunicResistance",
+        {20, 20, 24, 24, 24, 28, 28, 28}
+    )
+    check_ranks("OathguardMendingOath", {28, 28, 28})
+    local early_heal = assert(Combat.get_for_rank(
+        "OathguardMendingOath", 1
+    ))
+    local late_heal = assert(Combat.get_for_rank(
+        "OathguardMendingOath", 3
+    ))
+    check(early_heal.KIND == "MageHeal"
+        and early_heal.SELF_ONLY
+        and late_heal.TOTAL_HEAL > early_heal.TOTAL_HEAL,
+        "Paid Knight recovery genuinely scales server-owned self-heal")
     local low = assert(Combat.get_for_rank(IMPACT, 1))
     local high = assert(Combat.get_for_rank(IMPACT, 9))
     check(low.KIND == "Melee"
@@ -122,7 +140,10 @@ local function main()
     check(not Identity.is_complete(owner)
         and Careers.awarded(owner) == nil,
         "Claiming a raw Knight class ID cannot create mentor receipt")
-    for _, skill_id in ipairs({IMPACT, CHALLENGE, ARMOR}) do
+    for _, skill_id in ipairs({
+        IMPACT, CHALLENGE, ARMOR,
+        "OathguardRunicResistance", "OathguardMendingOath",
+    }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
         ), "An unawarded Fighter cannot purchase original Knight abilities")
