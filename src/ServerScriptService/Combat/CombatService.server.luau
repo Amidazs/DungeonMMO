@@ -66,6 +66,9 @@ local StaminaService = require(
 local ScoutCriticalToggleService = require(
     script.Parent:WaitForChild("ScoutCriticalToggleService")
 )
+local ScoutAccuracyToggleService = require(
+    script.Parent:WaitForChild("ScoutAccuracyToggleService")
+)
 local ManaService = require(
     script.Parent:WaitForChild("ManaService")
 )
@@ -2824,13 +2827,17 @@ local function handle_skill_request(
         return
     end
 
-    if skill_definition.KIND == "ScoutToggle" then
+    if skill_definition.KIND == "ScoutToggle"
+        or skill_definition.KIND == "ScoutAccuracyToggle"
+    then
         -- A second genuine click must turn the existing stance off,
         -- without paying an activation cost or entering casting state.
-        local changed, enabled, reason =
-            ScoutCriticalToggleService.toggle(
-                player, skill_definition, rank
-            )
+        local toggles = if skill_definition.KIND == "ScoutToggle"
+            then ScoutCriticalToggleService
+            else ScoutAccuracyToggleService
+        local changed, enabled, reason = toggles.toggle(
+            player, skill_definition, rank
+        )
         CombatValidationService.emit(
             player, "SCOUT_TOGGLE",
             if changed then "APPLIED" else "REJECT",
@@ -3564,6 +3571,7 @@ local function on_character_added(
     player_states[player] = record
     RangerDrawService.reset_character(player, character)
     ScoutCriticalToggleService.stop(player)
+    ScoutAccuracyToggleService.stop(player)
     StaminaService.reset_player(player)
     ManaService.reset_player(player)
     ProgressionRuntimeState.apply_max_health(player)
@@ -3613,8 +3621,26 @@ ScoutCriticalToggleService.set_stamina_spender(function(
 ): boolean
     return StaminaService.try_spend(player, amount)
 end)
+ScoutAccuracyToggleService.set_stamina_spender(function(
+    player: Player, amount: number
+): boolean
+    return StaminaService.try_spend(player, amount)
+end)
 
 ScoutCriticalToggleService.set_authorizer(function(
+    player: Player, toggle_record: any
+): boolean
+    local usable = ProgressionRuntimeState.is_skill_usable(
+        player.UserId, toggle_record.Definition.ID
+    )
+    return usable and ProgressionRuntimeState.get_skill_rank(
+        player.UserId, toggle_record.Definition.ID
+    ) == toggle_record.Rank and player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) ~= false
+end)
+
+ScoutAccuracyToggleService.set_authorizer(function(
     player: Player, toggle_record: any
 ): boolean
     local usable = ProgressionRuntimeState.is_skill_usable(
@@ -3642,6 +3668,7 @@ Players.PlayerRemoving:Connect(function(player)
     stop_dodge_movement(player)
     DefenseService.clear(player)
     ScoutCriticalToggleService.stop(player)
+    ScoutAccuracyToggleService.stop(player)
     StaminaService.remove_player(player)
     ManaService.remove_player(player)
     SkillCooldownService.remove_owner(player)
