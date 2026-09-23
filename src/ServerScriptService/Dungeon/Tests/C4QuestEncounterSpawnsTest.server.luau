@@ -34,6 +34,10 @@ local function mock_create(options: any): Model
     enemy.Name = options.Name
     enemy:SetAttribute("DungeonEncounterId", options.EncounterId)
     enemy:SetAttribute("DungeonEnemyId", options.EnemyId)
+    enemy:SetAttribute("DungeonRewardXP", options.RewardXP)
+    enemy:SetAttribute("DungeonRewardGoldMin", options.RewardGoldMin)
+    enemy:SetAttribute("DungeonRewardGoldMax", options.RewardGoldMax)
+    enemy:SetAttribute("BestiaryCreatureId", options.BestiaryCreatureId)
     local root = Instance.new("Part")
     root.Name = "HumanoidRootPart"
     root.CFrame = options.SpawnCFrame
@@ -129,6 +133,11 @@ local function main()
             and enemy:GetAttribute("DungeonEncounterId")
                 == "QuestRoom1",
             "Challenge is a physical, session-scoped dungeon enemy")
+        check(enemy:GetAttribute("DungeonRewardXP") == 1
+            and enemy:GetAttribute("DungeonRewardGoldMin") == 0
+            and enemy:GetAttribute("DungeonRewardGoldMax") == 0
+            and enemy:GetAttribute("BestiaryCreatureId") == "marauder",
+            "Source enemy has a valid minimal normal reward for room clear")
         check(ledger:register_enemy(
             enemy, registration.branch_id, "QuestRoom1"
         ), "One distinct real source enemy can register for combat")
@@ -160,6 +169,10 @@ local function main()
             and registration.enemy:GetAttribute("SourceQuestMonsterId")
                 == "CinderBrigand",
             "Original Cinder monster is bound to exactly Rogue stage six")
+        check(registration.enemy:GetAttribute("DungeonRewardXP") == 1
+            and registration.enemy:GetAttribute("BestiaryCreatureId")
+                == "marauder",
+            "Cinder enemy death must preserve ordinary encounter clear")
         check(ledger:register_enemy(
             registration.enemy, registration.branch_id,
             "QuestRoom1", registration.step_index
