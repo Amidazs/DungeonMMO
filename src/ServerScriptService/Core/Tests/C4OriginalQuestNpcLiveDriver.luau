@@ -1,6 +1,6 @@
 --!strict
 -- Real unpublished Base client -> physical ProximityPrompt -> original
--- source-quest stage one -> persistent server profile -> actual UI.
+-- source-quest stage one -> persistent profile; source stage two is next.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Original C4 physical quest NPC test needs an unpublished place")
 
@@ -262,7 +262,7 @@ local function main()
         return if state.ok and state.Started and state.Step == 2
             then state else nil
     end, "real Captain Bezique talk persisted source quest stage", 15)
-    assert(quest.FirstNpcReady and not quest.WorldReady
+    assert(quest.FirstNpcReady and quest.WorldReady
         and not quest.FullWorldReady and not quest.Ready
         and not quest.ClassAwarded
         and quest.BranchId == "HumanRogue",
@@ -281,9 +281,8 @@ local function main()
         }
     )
     assert(not missing_dungeon.ok
-        and missing_dungeon.reason == "OriginalQuestWorldNotReady",
-        "Incomplete dungeon quest steps must fail before consuming "
-            .. "unverified server evidence")
+        and missing_dungeon.reason == "OriginalQuestWorldEvidenceUnverified",
+        "Forged Neti event cannot grant trial weapons through live stage two")
     print("[C4 Original NPC Live] UNBUILT_DUNGEON_STAGE_LOCKED_PASS")
 
     local original_step = quest.Step
@@ -301,7 +300,7 @@ local function main()
     end, "real client sees its genuine original C4 quest stage", 13)
     assert(client_ui.BranchId == "HumanRogue"
         and not client_ui.Ready
-        and string.find(client_ui.Text, "quest are still", 1, true),
+        and string.find(client_ui.Text, "Neti", 1, true),
         "Actual GUI hid missing later dungeon stages or forged completion")
     print("[C4 Original NPC Live] REAL_CLIENT_QUEST_UI_PASS")
 end
