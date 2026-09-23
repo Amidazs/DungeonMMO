@@ -26,12 +26,12 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
-    -- Original C4 Rogue quest trial weapons: personal, non-tradeable
-    -- inventory equipment granted ONLY inside Neti stage-two commit.
+    -- Original DungeonMMO rogue trial weapons: personal, non-tradeable
+    -- inventory equipment granted ONLY inside Vela stage-two commit.
     -- These remain placeholders pending final historical meshes/art.
     neti_trial_dagger = table.freeze({
         Id = "neti_trial_dagger",
-        Name = "Neti's Dagger (Trial)",
+        Name = "Vela's Trial Dagger",
         Kind = "Equipment",
         InventoryCategory = "Equipment",
         Slot = "Weapon",
@@ -47,7 +47,7 @@ local DEFINITIONS = table.freeze({
 
     neti_trial_bow = table.freeze({
         Id = "neti_trial_bow",
-        Name = "Neti's Bow (Trial)",
+        Name = "Vela's Trial Bow",
         Kind = "Equipment",
         InventoryCategory = "Equipment",
         Slot = "Weapon",
@@ -63,12 +63,12 @@ local DEFINITIONS = table.freeze({
         ReservedSlots = table.freeze({"OffHand"}),
     }),
 
-    -- Original source-monster proofs belong to the character who earned
+    -- Original DungeonMMO source-monster proofs belong to the character who earned
     -- them. Live drops remain disabled until authentic dungeon combat
     -- supplies a verified, one-use server-owned monster receipt.
     spartoi_bone = table.freeze({
         Id = "spartoi_bone",
-        Name = "Spartoi Bone (Rogue Trial)",
+        Name = "Crypt Sentinel Fragment",
         Kind = "Material",
         InventoryCategory = "Materials",
         Rarity = "Quest",
@@ -79,7 +79,7 @@ local DEFINITIONS = table.freeze({
 
     prias_letter_1 = table.freeze({
         Id = "prias_letter_1",
-        Name = "Prias's Letter Fragment 1",
+        Name = "Cael's Field Report Fragment 1",
         Kind = "Material",
         InventoryCategory = "Materials",
         Rarity = "Quest",
@@ -90,7 +90,7 @@ local DEFINITIONS = table.freeze({
 
     prias_letter_2 = table.freeze({
         Id = "prias_letter_2",
-        Name = "Prias's Letter Fragment 2",
+        Name = "Cael's Field Report Fragment 2",
         Kind = "Material",
         InventoryCategory = "Materials",
         Rarity = "Quest",
@@ -101,7 +101,7 @@ local DEFINITIONS = table.freeze({
 
     prias_letter_3 = table.freeze({
         Id = "prias_letter_3",
-        Name = "Prias's Letter Fragment 3",
+        Name = "Cael's Field Report Fragment 3",
         Kind = "Material",
         InventoryCategory = "Materials",
         Rarity = "Quest",
@@ -112,7 +112,7 @@ local DEFINITIONS = table.freeze({
 
     prias_letter_4 = table.freeze({
         Id = "prias_letter_4",
-        Name = "Prias's Letter Fragment 4",
+        Name = "Cael's Field Report Fragment 4",
         Kind = "Material",
         InventoryCategory = "Materials",
         Rarity = "Quest",
