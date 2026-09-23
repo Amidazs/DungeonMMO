@@ -1,4 +1,54 @@
-**Current DungeonMMO class backend: v2.06 — real physical Warrior/Knight class-trainer acceptance and explicit level-30 remaining ranks.**
+**Current DungeonMMO class backend: v2.07 — verified recovered Ironvow physical Base acceptance and additional Knight anti-magic and owner-healing ranks.**
+[Current level-30 class/skill roadmap](
+DungeonMMO_Roadmap_v2_07_Ironvow_Resume_Knight_Magic_Healing_20260924.md)
+and [actually executed test record](
+../testing/ironvow-resume-oathguard-magic-healing-v2-07-20260924.md).
+The timed-out Ironvow physical test was
+recovered; an older build genuinely failed
+the physical NPC trigger. The current
+unpublished two-client Base test **PASS**
+was verified from its own Roblox Studio
+process log, including genuine source
+NPCs, personally bound four-marker and
+boss-seal turn-ins, level-20 physical
+career mentor and live client trainer.
+Another concurrent test wrote unrelated
+markers to the named output log; that
+mixed output is **not** Ironvow evidence.
+New original Oathguard Runic Resistance
+adds eight purchased 20/24/28 ranks
+with actual server EnemyMagic mitigation
+(up to 4.8% for genuinely awarded Knight
+profiles only). Its new Mending Oath
+adds three purchased level-28 self-heal
+ranks using the existing server-owned
+heal executor (30/37/44 base HP).
+The final unpublished Base and Dungeon
+Rojo builds **PASS**, focused Knight
+Quest/Foundation **2/2 PASS (56 + 56
+assertions)** and current source-rank
+audit **27 PASS**. The new effects have
+not yet passed their own real
+client-originating spell-damage and
+self-heal tests. Historical first-
+transfer rank-map status remains
+Ashenblade **59/59**, Greenward Scout
+**77/77**, Ironvow **27/62** and
+Oathguard **35/54**, as training
+schedules, not a complete natural
+level-1–30 class, independent source
+equivalence or all distinct live effects.
+**4/18** careers have prior real
+physical source/mentor/trainer acceptance,
+**0/18** complete initial release
+catalogues. Level 30 remains planned
+but not yet enforced. No `main` merge,
+Roblox publication, production
+DataStore mutation or Desktop Commander
+source edits. The separate humanoid
+and quadruped animation work is intact.
+
+**Previous DungeonMMO class backend: v2.06 — real physical Warrior/Knight class-trainer acceptance and explicit level-30 remaining ranks.**
 [Latest class/skill roadmap](
 DungeonMMO_Roadmap_v2_06_Original_Warrior_Knight_Physical_Acceptance_20260923.md)
 and [executed Studio tests and limits](
