@@ -1,3 +1,22 @@
+**Current C4 backend: v1.82 — tested Elven Scout support.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_82_Elven_Scout_Support_20260923.md)
+and [actual Studio / one-client Dungeon test record](
+../testing/c4-elf-scout-v1-82-2026-09-23.md).
+Four additional source ranks have real purchased analogues:
+Elf Scout self-only Cure Wounds, physical-attack Battle Focus,
+cast-only Wind Run and Ranger longbow Snaring Shot. The focused
+unpublished Studio run passed 5/5 suites, and the real one-client
+Dungeon test verified HP recovery, real melee/bow damage bonus,
+actual WalkSpeed and expiry. Actual client-to-NPC Snaring Shot
+impact is still pending. Current six-inventory source mapping:
+**361/396**; Human Rogue **81/99**, Elven Scout **112/129**.
+Seven other original first-transfer class inventories remain
+unmapped, and **0/9** paths are fully complete. WoW-style
+one-Gathering-plus-one-Crafting limits remain enforced. The
+v1.78 Mystic weakening client combat test and the separate
+humanoid animation roadmap remain open. No publish or main merge.
+
 **Current C4 backend: v1.81 — verified first-tier Party Heal.**
 [Latest C4 roadmap](
 DungeonMMO_Roadmap_v1_81_C4_Party_Heal_20260923.md)
