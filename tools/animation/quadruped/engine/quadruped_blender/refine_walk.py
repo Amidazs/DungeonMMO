@@ -7,7 +7,7 @@ IK with continuous scapular support. Operates on an already opened COPY.
 import math,json
 import bpy
 from mathutils import Vector, Quaternion, Matrix
-from quadruped_core.refinement import timeline, contact, smooth, two_bone
+from quadruped_core.refinement import timeline, contact, smooth, two_bone, validate_config
 
 def key_pose(bone, frame):
     bone.rotation_mode="QUATERNION"
@@ -23,8 +23,11 @@ def aim(bone, head, tail):
     bpy.context.view_layer.update()
 
 def generate(rig, config):
+    validate_config(config)
+    if config["pelvis"] not in rig.pose.bones:raise ValueError("Missing pelvis mapping")
     for limb in config["limbs"]:
-        for role in ("upper","lower","foot","toe"):
+        roles=("upper","lower","foot","toe","shoulder") if limb["family"]=="front" else ("upper","lower","foot","toe")
+        for role in roles:
             if limb[role] not in rig.pose.bones:raise ValueError("Missing mapped bone: "+limb[role])
         for role in ("target","orientation"):
             if limb[role] not in bpy.data.objects:raise ValueError("Missing control: "+limb[role])
