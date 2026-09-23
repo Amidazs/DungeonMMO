@@ -14,6 +14,9 @@ local CharacterIdentityRules = require(
 local EquipmentSlots = require(
     Shared:WaitForChild("EquipmentSlots")
 )
+local PassiveSkillEffects = require(
+    Shared:WaitForChild("PassiveSkillEffects")
+)
 
 local EquipmentRules = {}
 
@@ -82,6 +85,15 @@ function EquipmentRules.validate(
 
     if not allowed(item.AllowedClasses, identity.ClassId) then
         return result(false, "ClassRestricted")
+    end
+
+    if item.RequiredSkillId == "ScoutEquipmentExpertise"
+        and (item.RequiredSkillRank ~= 1
+            or not PassiveSkillEffects.has_scout_equipment_expertise(
+                character
+            ))
+    then
+        return result(false, "ScoutEquipmentExpertiseRequired")
     end
 
     return result(true, nil)
