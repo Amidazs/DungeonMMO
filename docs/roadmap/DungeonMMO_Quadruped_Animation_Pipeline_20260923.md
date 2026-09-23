@@ -226,6 +226,12 @@ mouth** on Frostfang's single closed muzzle.
   `Studio_JawV3_Bend_Xminus24.png`
 - QA scripts in the parent `DungeonMMO_CanineRig_QA`
   working directory.
+- The parent directory contains
+  `Frostfang_JawV3_StudioImport_EXPERIMENTAL_20260923.zip`
+  with the JawV3 FBX/GLB, Blender file, validation
+  and Studio screenshots; archive contents and CRC
+  were checked. It does **not** contain a newly saved
+  JawV3 `.rbxl` place.
 
 **Actual isolated Studio import:** With
 `Upload to Roblox` unchecked, `Frostfang_JawV3_QA`
