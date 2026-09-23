@@ -81,6 +81,7 @@ local function forged(): any
     for _, skill_id in ipairs({
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
+        "OathguardShieldMastery",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -144,6 +145,7 @@ local function main()
     for _, skill_id in ipairs({
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
+        "OathguardShieldMastery",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
