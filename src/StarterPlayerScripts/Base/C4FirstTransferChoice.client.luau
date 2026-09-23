@@ -151,7 +151,11 @@ local function add_option(entry: any, state: any)
     local skills_note = if entry.SkillInventoryStatus
         == "DungeonMMOAnaloguesMapped"
         then tostring(entry.MappedAnalogueRanks)
-            .. " DungeonMMO skill-rank analogues; exact C4 audit pending"
+            .. " DungeonMMO rank analogues; exact C4 audit pending"
+        elseif entry.SkillInventoryStatus
+            == "OriginalC4Level20SourceMapped"
+        then tostring(entry.ExactOriginalLevel20RankEntries)
+            .. " original C4 level-20 ranks documented; not yet playable"
         else "Original C4 class skills not yet inventoried"
     button.Text = "  " .. entry.DisplayName
         .. (if selected then "  — SELECTED" else "")
