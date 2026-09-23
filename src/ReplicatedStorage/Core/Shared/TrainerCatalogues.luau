@@ -46,6 +46,9 @@ local DEFINITIONS = table.freeze({
                 SkillId = "WayfinderDaggerMastery", Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "WayfinderWound", Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ScoutEquipmentExpertise", Mode = "LearnOrRank",
             }),
             table.freeze({
@@ -122,6 +125,12 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "WayfinderDaggerMastery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderWound", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardCalmingArrow", Mode = "LearnOrRank",
             }),
             table.freeze({
                 SkillId = "ScoutEquipmentExpertise", Mode = "LearnOrRank",
