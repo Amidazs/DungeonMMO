@@ -25,7 +25,9 @@ local DEFINITIONS = table.freeze({
         MaxRank = 1,
         Kind = "Passive",
         AllowedRaces = table.freeze({"Human", "Elf"}),
-        AllowedBaseClasses = table.freeze({"Fighter", "Mage"}),
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
         RankLevels = table.freeze({[1] = 1}),
         RequiresCraftingProfessionChoice = true,
         RecipeReadingEnabled = true,
@@ -42,6 +44,29 @@ local DEFINITIONS = table.freeze({
         RankLevels = table.freeze({[1] = 5}),
         RequiresCraftingProfessionChoice = true,
         CommonItemCreationEnabled = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4RecipeReading", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Three earned original C4 Rogue/Elven Scout crafting ranks.
+    -- A purchase improves ONLY the character's chosen creation career.
+    -- Reading is a prerequisite; earlier ranks must be purchased first.
+    ScoutCommonItemCreation = table.freeze({
+        Id = "ScoutCommonItemCreation",
+        Tier = "Common",
+        MaxRank = 3,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28, [3] = 36}),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        RequiresCraftingProfessionChoice = true,
+        ScoutCommonCreationEnabled = true,
         Prerequisites = table.freeze({
             table.freeze({
                 SkillId = "C4RecipeReading", Rank = 1,
