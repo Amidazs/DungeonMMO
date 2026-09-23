@@ -14,16 +14,32 @@ Runtime.__index = Runtime
 local MAX_RANGE = 10
 local NPCS = table.freeze({
     HumanRogue = table.freeze({
-        TargetId = "CaptainBezique",
-        Name = "Captain Bezique",
-        Offset = Vector3.new(-12, 2.5, 10),
-        Color = Color3.fromRGB(118, 78, 53),
+        table.freeze({
+            TargetId = "CaptainBezique",
+            Name = "Captain Bezique",
+            Offset = Vector3.new(-12, 2.5, 10),
+            Color = Color3.fromRGB(118, 78, 53),
+        }),
+        table.freeze({
+            TargetId = "Neti",
+            Name = "Neti",
+            Offset = Vector3.new(-21, 2.5, 10),
+            Color = Color3.fromRGB(114, 89, 142),
+        }),
     }),
     ElvenScout = table.freeze({
-        TargetId = "MasterReisa",
-        Name = "Master Reisa",
-        Offset = Vector3.new(12, 2.5, 10),
-        Color = Color3.fromRGB(58, 121, 94),
+        table.freeze({
+            TargetId = "MasterReisa",
+            Name = "Master Reisa",
+            Offset = Vector3.new(12, 2.5, 10),
+            Color = Color3.fromRGB(58, 121, 94),
+        }),
+        table.freeze({
+            TargetId = "GuardMoretti",
+            Name = "Guard Moretti",
+            Offset = Vector3.new(21, 2.5, 10),
+            Color = Color3.fromRGB(75, 110, 130),
+        }),
     }),
 })
 
@@ -75,6 +91,7 @@ function Runtime.attach(options: any): any
         _is_ready = options.is_ready,
         _on_progress = options.on_progress,
         _parts = {},
+        _step_parts = {},
         _pending = {},
         _last_action = {},
         _event_counter = 0,
@@ -85,29 +102,35 @@ function Runtime.attach(options: any): any
     folder.Name = "C4OriginalSourceQuestNPCs"
     folder.Parent = workspace
     self._folder = folder
-    for branch_id, source in pairs(NPCS) do
-        local part = Instance.new("Part")
-        part.Name = source.TargetId
-        part.Size = Vector3.new(3, 5, 3)
-        part.Anchored = true
-        part.CanCollide = false
-        part.Color = source.Color
-        part.Material = Enum.Material.Wood
-        part.CFrame = spawn.CFrame * CFrame.new(source.Offset)
-        part.Parent = folder
+    for branch_id, source_npcs in pairs(NPCS) do
+        self._step_parts[branch_id] = {}
+        for step_index, source in ipairs(source_npcs) do
+            local part = Instance.new("Part")
+            part.Name = source.TargetId
+            part.Size = Vector3.new(3, 5, 3)
+            part.Anchored = true
+            part.CanCollide = false
+            part.Color = source.Color
+            part.Material = Enum.Material.Wood
+            part.CFrame = spawn.CFrame * CFrame.new(source.Offset)
+            part.Parent = folder
 
-        local prompt = Instance.new("ProximityPrompt")
-        prompt.Name = "C4SourceQuestPrompt"
-        prompt.ActionText = "Talk"
-        prompt.ObjectText = source.Name
-        prompt.HoldDuration = 0.4
-        prompt.MaxActivationDistance = MAX_RANGE
-        prompt.RequiresLineOfSight = true
-        prompt.Parent = part
-        self._parts[branch_id] = part
-        prompt.Triggered:Connect(function(player: Player)
-            self:_talk(player, branch_id)
-        end)
+            local prompt = Instance.new("ProximityPrompt")
+            prompt.Name = "C4SourceQuestPrompt"
+            prompt.ActionText = "Talk"
+            prompt.ObjectText = source.Name
+            prompt.HoldDuration = 0.4
+            prompt.MaxActivationDistance = MAX_RANGE
+            prompt.RequiresLineOfSight = true
+            prompt.Parent = part
+            self._step_parts[branch_id][step_index] = part
+            if step_index == 1 then
+                self._parts[branch_id] = part
+            end
+            prompt.Triggered:Connect(function(player: Player)
+                self:_talk(player, branch_id, step_index)
+            end)
+        end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
         self:remove(player)
@@ -128,14 +151,13 @@ Returns:
 function Runtime:available(
     quest: any, stage_index: number?
 ): boolean
-    if stage_index ~= nil and stage_index ~= 1 then
-        return false
-    end
-    local part = quest and self._parts[quest.BranchId]
-    local first = quest and quest.Steps[1]
+    local index = stage_index or 1
+    local steps = quest and self._step_parts[quest.BranchId]
+    local part = steps and steps[index]
+    local source_stage = quest and quest.Steps[index]
     return part ~= nil and part:IsDescendantOf(workspace)
-        and first ~= nil and first.Kind == "NpcTalk"
-        and part.Name == first.TargetId
+        and source_stage ~= nil and source_stage.Kind == "NpcTalk"
+        and part.Name == source_stage.TargetId
 end
 
 --[[
@@ -157,10 +179,13 @@ function Runtime:verify(
     local pending = self._pending[user_id]
     self._pending[user_id] = nil
     local player = Players:GetPlayerByUserId(user_id)
-    local part = quest and self._parts[quest.BranchId]
-    local step = quest and quest.Steps[state and state.Step or -1]
+    local index = state and state.Step or -1
+    local parts = quest and self._step_parts[quest.BranchId]
+    local part = parts and parts[index]
+    local step = quest and quest.Steps[index]
     return pending ~= nil and pending.Event == event
         and pending.BranchId == quest.BranchId
+        and pending.Step == index
         and pending.TargetId == event.TargetId
         and player ~= nil
         and part ~= nil and nearby(player, part)
@@ -182,9 +207,13 @@ Args:
 Returns:
     any: Server-validated quest stage or a safe explicit refusal.
 ]]
-function Runtime:_talk(player: Player, branch_id: string): any
-    local source = NPCS[branch_id]
-    local part = self._parts[branch_id]
+function Runtime:_talk(
+    player: Player, branch_id: string, step_index: number?
+): any
+    local index = step_index or 1
+    local source = NPCS[branch_id] and NPCS[branch_id][index]
+    local part = self._step_parts[branch_id]
+        and self._step_parts[branch_id][index]
     if not source or not part or not nearby(player, part)
         or not self._is_ready(player)
     then
@@ -206,12 +235,16 @@ function Runtime:_talk(player: Player, branch_id: string): any
     if not quest or not self:available(quest) then
         return response(false, "OriginalQuestWorldNotReady")
     end
-    if type(advancement.OriginalFirstTransferQuest) ~= "table" then
+    if index == 1
+        and type(advancement.OriginalFirstTransferQuest) ~= "table"
+    then
         local started = self._quest_service:start(player.UserId)
         if not started.ok then return started end
     end
     local state = self._quest_service:build_snapshot(player.UserId)
-    if not state.ok or state.Step ~= 1 then
+    if not state.ok or not state.Started or state.Step ~= index
+        or not self:available(quest, index)
+    then
         return response(false, "OriginalQuestNextWorldStagePending")
     end
     self._event_counter += 1
@@ -222,10 +255,14 @@ function Runtime:_talk(player: Player, branch_id: string): any
         TargetId = source.TargetId,
         ActorUserId = player.UserId,
         EventId = event_id,
+        -- Only the real ordered Neti stage may enter the transaction that
+        -- atomically mints both owner-bound quest trial weapons.
+        TrialWeaponsGranted = branch_id == "HumanRogue" and index == 2,
     }
     self._pending[player.UserId] = {
         Event = event, EventId = event_id,
-        BranchId = branch_id, TargetId = source.TargetId,
+        BranchId = branch_id, Step = index,
+        TargetId = source.TargetId,
     }
     local progress = self._quest_service:record_world_event(
         player.UserId, event
