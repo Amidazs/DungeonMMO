@@ -567,6 +567,23 @@ function ProgressionRuntimeState.get_mystic_magic_reduction(
 end
 
 --[[
+Returns Knight-only earned physical protection with a valid OffHand shield.
+
+Args:
+    user_id (number): Defender with authoritative class, skills and gear.
+
+Returns:
+    number: Verified physical reduction from zero through 1.6%.
+]]
+function ProgressionRuntimeState.get_oathguard_shield_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.oathguard_shield_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns verified original Knight resistance against enemy spell damage.
 
 Args:
