@@ -66,6 +66,27 @@ local DEFINITIONS = table.freeze({
     -- DungeonMMO source-monster quest materials belong to their earning
     -- character. Live drops require a verified one-use server-owned
     -- instanced combat receipt; an arbitrary item flag is not enough.
+    stonewatch_badge = table.freeze({
+        Id = "stonewatch_badge",
+        Name = "Stonewatch Signal Badge",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = true,
+        Bound = true,
+        Tradeable = false,
+    }),
+    gloam_ward_seal = table.freeze({
+        Id = "gloam_ward_seal",
+        Name = "Gloam Ward Seal",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     ironroot_dispatch_marker = table.freeze({
         Id = "ironroot_dispatch_marker",
         Name = "Ironroot Dispatch Marker",
