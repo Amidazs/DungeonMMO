@@ -1,3 +1,49 @@
+**Current C4 class backend: v1.90 — real first-transfer choice, quests still pending.**
+[Newest C4 class roadmap](
+DungeonMMO_Roadmap_v1_90_C4_Explicit_First_Transfer_Choice_20260923.md)
+and [executed focused and two-client Studio evidence](
+../testing/c4-explicit-first-transfer-choice-v1-90-20260923.md).
+Fresh characters begin **Fighter or Mystic** (temporary
+internal Mystic ID `Mage`) and at original
+level 18 may explicitly select an original
+race/family-specific C4 first-transfer path
+in the new closable Base class-choice UI.
+The actual server persists that one chosen
+branch and prohibits forged other-race
+choices, early selection and replacement
+without awarding any advanced class
+or fake quest. The old automatic
+Vanguard/Arcanist/Thornwarden trial
+cannot start on a new Fighter/Mystic.
+Already-started old quests may still be
+claimed and historical custom classes,
+skills, economy and profession slots
+remain intact for the explicit
+versioned migration yet to come.
+Focused unpublished Studio acceptance:
+**5/5 PASS, 251 assertions**.
+Actual unpublished **two-client Base
+playtest PASS**: two Human Fighter
+clients saw their respective source
+choices, independently chose Rogue
+and Human Knight, and could not
+claim an unearned automatic class
+or change their first source choice.
+The GUI was observed and real
+client remotes executed; the test
+did not manually click the UI card.
+The underlying original branch-specific
+advancement quests and level-20 class
+award remain **unimplemented**:
+**0/18 original first transfers are
+fully playable**, notwithstanding
+396/396 mapped ranks in six previously
+inventoried starter/Rogue/Scout lists.
+Preserve the separate newer
+humanoid/quadruped art roadmap,
+one-Gathering/one-Crafting policy
+and no Roblox publish/main merge.
+
 **Current C4 class backend: v1.89 — Fighter/Mystic-only fresh starters confirmed.**
 [Newest C4 starter-class roadmap](
 DungeonMMO_Roadmap_v1_89_C4_Starter_Classes_20260923.md).
