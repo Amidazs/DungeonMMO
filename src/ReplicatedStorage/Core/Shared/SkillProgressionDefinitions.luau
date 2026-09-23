@@ -1734,6 +1734,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- A personal late first-transfer recovery: actual owned Knight class
+    -- and earlier purchased Fighter endurance are mandatory. Exactly
+    -- three source rank opportunities occur at level 28.
+    OathguardMendingOath = table.freeze({
+        Id = "OathguardMendingOath",
+        Tier = "Common", MaxRank = 3, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 28, [2] = 28, [3] = 28}),
+        RankThresholds = table.freeze({[2] = 40, [3] = 80}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterRestingRecovery",
+                Rank = 1, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
