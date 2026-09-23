@@ -196,6 +196,7 @@ def pose_frame(frame, rig, legs, start_location):
                 gait, idle, (frame - WALK_FINISH) /
                 (FINAL_FRAME - WALK_FINISH)
             )
+        destination.z -= GROUND_Z
         leg["target"].location = destination
         leg["target"].keyframe_insert(
             data_path="location", frame=frame
