@@ -271,6 +271,14 @@ local DEFINITIONS = table.freeze({
                 Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "C4RecipeReading",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCommonItemCreation",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "ElvenScoutSnaringShot",
                 Mode = "LearnOrRank",
             }),
@@ -406,6 +414,14 @@ local DEFINITIONS = table.freeze({
             }),
             table.freeze({
                 SkillId = "ScoutAccuracyToggle",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "C4RecipeReading",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCommonItemCreation",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
