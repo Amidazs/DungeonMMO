@@ -1712,6 +1712,28 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Authenticated Knight-specific magical mitigation. Each historical
+    -- 20/24/28 rank is bought independently; no physical-damage bonus
+    -- or free mitigation is attached to a bare Oathguard class label.
+    OathguardRunicResistance = table.freeze({
+        Id = "OathguardRunicResistance",
+        Tier = "Common", MaxRank = 8, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20,
+            [3] = 24, [4] = 24, [5] = 24,
+            [6] = 28, [7] = 28, [8] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0, [8] = 0,
+        }),
+        MagicReductionPerRank = 0.006,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
