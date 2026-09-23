@@ -111,6 +111,7 @@ local function main()
         {20, 20, 24, 24, 24, 28, 28, 28}
     )
     check_ranks("OathguardMendingOath", {28, 28, 28})
+    check_ranks("OathguardShieldMastery", {20, 28})
     local early_heal = assert(Combat.get_for_rank(
         "OathguardMendingOath", 1
     ))
@@ -150,6 +151,8 @@ local function main()
     end
     check(Passives.fighter_armor_reduction(owner) == 0,
         "Forged rank-nine heavy armor must not reduce any NPC damage")
+    check(Passives.oathguard_shield_reduction(owner) == 0,
+        "Unawarded Knight receives no protection from a forged shield rank")
     print(("[Oathguard Foundation] PASS: %d assertions")
         :format(CHECKS))
 end
