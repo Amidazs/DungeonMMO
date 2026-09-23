@@ -26,6 +26,43 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Original C4 Rogue quest trial weapons: personal, non-tradeable
+    -- inventory equipment granted ONLY inside Neti stage-two commit.
+    -- These remain placeholders pending final historical meshes/art.
+    neti_trial_dagger = table.freeze({
+        Id = "neti_trial_dagger",
+        Name = "Neti's Dagger (Trial)",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Weapon",
+        Category = "Dagger",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = FIGHTER,
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+        WeaponTags = table.freeze({"Dagger", "OneHandedSword"}),
+    }),
+
+    neti_trial_bow = table.freeze({
+        Id = "neti_trial_bow",
+        Name = "Neti's Bow (Trial)",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Weapon",
+        Category = "Longbow",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = FIGHTER,
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+        CanBlock = false,
+        WeaponTags = table.freeze({"Longbow"}),
+        ReservedSlots = table.freeze({"OffHand"}),
+    }),
+
     scout_dagger = table.freeze({
         Id = "scout_dagger",
         Name = "Scout Dagger",
