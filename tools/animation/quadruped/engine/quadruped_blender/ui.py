@@ -109,7 +109,7 @@ class SavePose(SafeOperator,bpy.types.Operator):
     bl_idname="quadruped.save_pose";bl_label="Save current pose"
     def run(self,c):
         s=c.scene.qae;rig=rig_context(c);profile=profile_for(s);cal=calibrate(rig,profile)
-        selected=[b for b in rig.pose.bones if b.bone.select] or list(rig.pose.bones)
+        selected=[b for b in rig.pose.bones if b.select] or list(rig.pose.bones)
         aliases={v:k for k,v in profile["roles"].items()}
         channels={aliases.get(b.name,b.name):dict(rotation=list(b.matrix_basis.to_quaternion()),translation=[v/cal["scale"] for v in b.matrix_basis.translation]) for b in selected}
         p=dict(version=1,kind="pose",id=s.name,profileId=profile["id"],family=profile["family"],channels=channels,mask=list(channels))
@@ -142,7 +142,7 @@ class SelectBone(SafeOperator,bpy.types.Operator):
         rig=rig_context(c);name=c.scene.qae.bone
         if name not in rig.data.bones:raise ValueError("choose a bone")
         if c.mode!="POSE":bpy.ops.object.mode_set(mode="POSE")
-        for b in rig.data.bones:b.select=b.name==name
+        for b in rig.pose.bones:b.select=b.name==name
         rig.data.bones.active=rig.data.bones[name];rig.pose.bones[name].rotation_mode="XYZ"
 class Panel(bpy.types.Panel):
     bl_label="Quadruped Animation Studio";bl_idname="QAE_PT_main";bl_space_type="VIEW_3D";bl_region_type="UI";bl_category="Quadruped"
