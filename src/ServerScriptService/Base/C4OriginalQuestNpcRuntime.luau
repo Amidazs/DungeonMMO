@@ -13,6 +13,20 @@ local Runtime = {}
 Runtime.__index = Runtime
 local MAX_RANGE = 10
 local NPCS = table.freeze({
+    HumanWarrior = table.freeze({
+        table.freeze({
+            TargetId = "MarshalTorren",
+            Name = "Marshal Torren",
+            Offset = Vector3.new(-38, 2.5, -17),
+            Color = Color3.fromRGB(129, 78, 51),
+        }),
+        table.freeze({
+            TargetId = "SmithOrla",
+            Name = "Smith Orla",
+            Offset = Vector3.new(-49, 2.5, -17),
+            Color = Color3.fromRGB(121, 104, 75),
+        }),
+    }),
     HumanRogue = table.freeze({
         table.freeze({
             TargetId = "CaptainAshford",
@@ -135,7 +149,10 @@ function Runtime.attach(options: any): any
         -- this character has actually earned its ordered stage-four proof.
         self._step_parts[branch_id][4] =
             self._step_parts[branch_id][2]
-        if branch_id == "HumanRogue" then
+        if branch_id == "HumanWarrior" then
+            self._step_parts[branch_id][6] =
+                self._step_parts[branch_id][1]
+        elseif branch_id == "HumanRogue" then
             -- Stage five is a new ordered report to the real captain,
             -- not a replay of the stage-one quest-start interaction.
             self._step_parts[branch_id][5] =
@@ -240,12 +257,14 @@ function Runtime:_talk(
     elseif current and index == 1
         and (branch_id == "HumanRogue"
             and (current.Step == 5 or current.Step == 7)
-            or branch_id == "ElvenScout" and current.Step == 9)
+            or branch_id == "ElvenScout" and current.Step == 9
+            or branch_id == "HumanWarrior" and current.Step == 6)
     then
         index = current.Step
     end
     local source_index = if index == 4 or index == 8
         then 2 elseif index == 5 or index == 7 or index == 9
+            or branch_id == "HumanWarrior" and index == 6
         then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
