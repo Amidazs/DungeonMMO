@@ -218,10 +218,14 @@ local function verify_party_heal(players, runtime, session)
     channel:FireClient(caster, "Cast")
     wait_for(function() return cast_sent[caster.UserId] end,
         "real Mystic client sent party-heal request", 25)
+    -- Roblox's ordinary passive regeneration may add 1 HP before
+    -- the skill's wind-up ends. Wait for the actual rank-three heal,
+    -- rather than mistaking background regeneration for successful
+    -- two-target casting.
     wait_for(function()
-        return first.Health > first_before
-            and second.Health > second_before
-    end, "both live party members received actual HP", 15)
+        return first.Health - first_before >= 50
+            and second.Health - second_before >= 50
+    end, "both live party members received rank-three HP", 15)
     local first_gain = first.Health - first_before
     local second_gain = second.Health - second_before
     print(("[C4 Party Heal Live] HEAL_DIAGNOSTIC "
