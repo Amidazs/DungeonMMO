@@ -567,6 +567,23 @@ function ProgressionRuntimeState.get_mystic_magic_reduction(
 end
 
 --[[
+Returns verified original Knight resistance against enemy spell damage.
+
+Args:
+    user_id (number): Real server-owned selected character and saved rank.
+
+Returns:
+    number: Authentic Knight mitigation up to 4.8%, or zero if unearned.
+]]
+function ProgressionRuntimeState.get_oathguard_magic_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.oathguard_magic_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns bounded real physical mitigation from a purchased starting-class
 protection rank, ending automatically at first-transfer level 20.
 
