@@ -187,6 +187,7 @@ Returns:
 local function render(snapshot: any)
     local state = snapshot and snapshot.OriginalFirstTransfer
     local quest = snapshot and snapshot.OriginalQuest
+    local transfer = snapshot and snapshot.OriginalTransfer
     latest = state
     toggle.Visible = type(state) == "table" and state.ok == true
     if not toggle.Visible then
@@ -202,7 +203,21 @@ local function render(snapshot: any)
         status.Text = "Existing class progression is preserved; migration is pending."
     elseif state.SelectedClassId then
         if quest and quest.ok and quest.Started then
-            if quest.WorldReady and quest.Step == 2
+            if quest.ClassAwarded and transfer and transfer.ok then
+                status.Text = "First class: "
+                    .. tostring(transfer.DisplayName)
+                    .. ". Your mentor can now teach your earned "
+                    .. "level-20 class skills."
+            elseif quest.Ready and transfer and transfer.ok then
+                status.Text = if transfer.Eligible
+                    then "Your trial is complete. Visit "
+                        .. tostring(transfer.MentorName)
+                        .. " near the hub arrival point to advance."
+                    else "Your trial is complete. First transfer "
+                        .. "requires level "
+                        .. tostring(transfer.RequiredLevel)
+                        .. "."
+            elseif quest.WorldReady and quest.Step == 2
                 and quest.BranchId == "HumanRogue"
             then
                 status.Text = "Visit Vela near the hub arrival point to "
@@ -239,11 +254,30 @@ local function render(snapshot: any)
             then
                 status.Text = "Deliver the four personally earned supply "
                     .. "records to Captain Ashford in the hub."
-            elseif quest.Ready and quest.BranchId == "HumanRogue"
+            elseif quest.Step == 5
+                and quest.BranchId == "ElvenScout"
             then
-                status.Text = "Your Ashen Blade trial is complete. "
-                    .. "The level-20 transfer mentor and advanced "
-                    .. "class award are still in development."
+                status.Text = "Find Scout Cael in an instanced "
+                    .. "dungeon combat room."
+            elseif quest.Step == 6
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Defeat a Bracken Warden in Cael's "
+                    .. "dungeon room to earn your personal ward sigil."
+            elseif quest.Step == 7
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Use your bound Bracken Ward Sigil "
+                    .. "at Scout Cael's physical dungeon prompt."
+            elseif quest.WorldReady and quest.Step == 8
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Report Cael's rescue to Warden Thorne."
+            elseif quest.WorldReady and quest.Step == 9
+                and quest.BranchId == "ElvenScout"
+            then
+                status.Text = "Deliver your final report to "
+                    .. "Pathfinder Elyra in the hub."
             elseif quest.WorldReady and quest.Step == 4
                 and quest.BranchId == "HumanRogue"
             then
@@ -259,13 +293,11 @@ local function render(snapshot: any)
             else
                 status.Text = "Advancement trial stage "
                     .. tostring(quest.Step)
-                    .. " reached. The remaining dungeon stages and "
-                    .. "class transfer are still in development."
+                    .. " reached. Follow your current quest objective."
             end
         elseif quest and quest.ok and quest.WorldReady then
-            status.Text = "Visit your advancement mentor near the "
-                .. "hub arrival point. The full advancement quest is still "
-                .. "in development; no advanced class is awarded yet."
+            status.Text = "Visit your quest mentor near the hub "
+                .. "arrival point to begin your selected class trial."
         else
             status.Text = "Your chosen path is saved. Its original "
                 .. "advancement quest is still in development."
