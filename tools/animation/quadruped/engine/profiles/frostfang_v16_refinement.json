@@ -101,5 +101,13 @@
     }
   ],
   "body_drop": 0.014,
-  "pelvis": "DEF_spine.005"
+  "pelvis": "DEF_spine.005",
+  "skin_transition": {
+    "y_min": -0.53,
+    "y_max": -0.19,
+    "z_min": 0.47,
+    "z_max": 0.85,
+    "iterations": 10,
+    "strength": 0.65
+  }
 }
