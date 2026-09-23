@@ -116,6 +116,11 @@ local IMPLEMENTATIONS = table.freeze({
         Owner = "RangerRogue",
         DaggerEquipmentPending = false,
     }),
+    CriticalPowerToggle = table.freeze({
+        SkillId = "ScoutCriticalPowerToggle",
+        Owner = "RangerRogue",
+        DaggerEquipmentPending = false,
+    }),
     CriticalDamagePassive = table.freeze({
         SkillId = "HumanScoutCriticalPower",
         Owner = "RangerRogue",
