@@ -37,6 +37,8 @@ expose('local runtime = RuntimeServices.new("Base")',
     '_G.C4OriginalNpcLiveRuntime_TEMP = runtime')
 expose('    c4_source_npcs:quest_service()\n)',
     '_G.C4OriginalNpcLiveStage_TEMP = c4_source_npcs')
+expose('    original_transfer_mentors\n)',
+    '_G.C4OriginalTransferMentors_TEMP = original_transfer_mentors')
 original_runtime.Source = source
 
 local channel = Instance.new("RemoteEvent")
@@ -74,8 +76,10 @@ snapshots.OnClientEvent:Connect(function(snapshot)
     end
 end)
 channel.OnClientEvent:Connect(function(action, part)
-    if action ~= "Talk" then return end
-    local prompt = part:WaitForChild("C4SourceQuestPrompt", 12)
+    if action ~= "Talk" and action ~= "Transfer" then return end
+    local prompt_name = if action == "Transfer"
+        then "FirstTransferMentorPrompt" else "C4SourceQuestPrompt"
+    local prompt = part:WaitForChild(prompt_name, 12)
     if not prompt then
         channel:FireServer("Error", "Actual original quest NPC prompt absent")
         return
@@ -168,7 +172,10 @@ Returns:
     nil: A genuine ProximityPrompt.Triggered receipt on the server.
 ]]
 local function talk(player, part)
-    local prompt = assert(part:FindFirstChild("C4SourceQuestPrompt"))
+    local is_transfer = part:GetAttribute("TrainerId") ~= nil
+    local prompt_name = if is_transfer
+        then "FirstTransferMentorPrompt" else "C4SourceQuestPrompt"
+    local prompt = assert(part:FindFirstChild(prompt_name))
     local triggered = false
     local listener = prompt.Triggered:Connect(function(actor)
         if actor == player then triggered = true end
@@ -176,7 +183,9 @@ local function talk(player, part)
     for attempt = 1, 3 do
         local old = held[player.UserId] or 0
         task.wait(1.2)
-        channel:FireClient(player, "Talk", part)
+        channel:FireClient(
+            player, if is_transfer then "Transfer" else "Talk", part
+        )
         wait_for(function()
             assert(not failures[player.UserId],
                 "Real client prompt input failure: "
@@ -647,6 +656,103 @@ local function verify_scout_hub_reports(elf, profiles, npcs)
 end
 
 --[[
+Moves only a disposable, source-quest-complete test character to level 20.
+
+Args:
+    profiles (any): Real live Base exclusive profile writer.
+    player (Player): Authenticated Human or Elf test client.
+
+Returns:
+    nil: Updates level/temporary SP only, not the class or quest proof.
+]]
+local function reach_transfer_level(profiles, player)
+    assert(profiles:mutate(player.UserId, function(profile)
+        local character = profile.Characters.Slot1
+        character.Level = 20
+        character.Progression.SkillPointEntitlement = math.max(
+            character.Progression.SkillPointEntitlement or 0, 1000
+        )
+    end), "Disposable test character could not reach level 20")
+end
+
+--[[
+Verifies an actual physical mentor's player-owned first-class award.
+
+Args:
+    player (Player): Real Base client with the selected source quest.
+    profiles (any): Real server-side selected character profile writer.
+    mentors (any): Production physical first-transfer mentor runtime.
+    definition (any): Exact expected first-transfer class and trainer.
+    wrong_mentor (BasePart): Other branch's real physical NPC.
+
+Returns:
+    nil: Checks level, other-race, receipt, replay and trainer gates.
+]]
+local function verify_physical_transfer(
+    player, profiles, mentors, definition, wrong_mentor
+)
+    local RS = game:GetService("ReplicatedStorage")
+    local Shared = RS.Core.Shared
+    local SkillRules = require(Shared.SkillUnlockRules)
+    local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
+    local TrainerCatalogues = require(Shared.TrainerCatalogues)
+    local FirstTransfers = require(
+        Shared.OriginalFirstTransferDefinitions
+    )
+    local actor = assert(
+        workspace.OriginalFirstTransferMentors
+            :FindFirstChild(definition.MentorId)
+    )
+    local prompt = assert(actor:FindFirstChild(
+        "FirstTransferMentorPrompt"
+    ))
+    assert(prompt.ObjectText == definition.MentorName
+        and actor:GetAttribute("TrainerId") == definition.TrainerId,
+        "The first-transfer mentor must use original names and a real rig")
+    local before = profiles:get_character(player.UserId)
+    assert(before.ClassAdvancement.OriginalFirstTransferQuest.Ready
+        and before.Identity.ClassId == "Fighter",
+        "Transfer trial must be complete but class still unearned")
+    approach(player, actor)
+    talk(player, actor)
+    assert(profiles:get_character(player.UserId)
+        .Identity.ClassId == "Fighter",
+        "Real mentor prompt at level 18 must not award a class")
+    reach_transfer_level(profiles, player)
+    approach(player, wrong_mentor)
+    talk(player, wrong_mentor)
+    assert(profiles:get_character(player.UserId)
+        .Identity.ClassId == "Fighter",
+        "Other race's physical mentor cannot mint a wrong class")
+    approach(player, actor)
+    talk(player, actor)
+    local awarded = wait_for(function()
+        local owner = profiles:get_character(player.UserId)
+        return if owner and owner.Identity.ClassId == definition.Id
+            then owner else nil
+    end, "genuine physical level-20 mentor class award", 12)
+    assert(FirstTransfers.awarded(awarded) == definition
+        and awarded.ClassAdvancement.ActiveClassId == nil
+        and awarded.Identity.BaseClassId == "Fighter",
+        "Transfer awarded wrong career or replaced legacy class identity")
+    local transfer = mentors:build_snapshot(player.UserId)
+    assert(transfer.ClassAwarded and not transfer.Eligible,
+        "Mentor must record a one-time persistent original class award")
+    talk(player, actor)
+    assert(profiles:get_character(player.UserId)
+        .ClassAdvancement.OriginalFirstTransferReceiptId
+            == awarded.ClassAdvancement.OriginalFirstTransferReceiptId,
+        "Repeated mentor prompt may not generate a second award")
+    local skill = assert(SkillDefinitions.get(definition.SkillId))
+    assert(SkillRules.can_train(awarded, skill, 1)
+        and TrainerCatalogues.can_offer(
+            definition.TrainerId, awarded, definition.SkillId
+        ).ok, "Awarded class must unlock only its registered skill")
+    print("[C4 Original Second NPC Live] REAL_FIRST_TRANSFER_"
+        .. definition.Id .. "_PASS")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -772,6 +878,34 @@ local function main()
     ).Ready == true,
         "Elf source-quest completion must not modify Human quest")
     print("[C4 Original Second NPC Live] REAL_SCOUT_HUB_REPORT_PASS")
+    local mentors = wait_for(function()
+        return _G.C4OriginalTransferMentors_TEMP
+    end, "real existing Base first-transfer mentor authority", 12)
+    local transfer_definitions = require(
+        RS.Core.Shared.OriginalFirstTransferDefinitions
+    )
+    local rogue = assert(
+        transfer_definitions.for_branch("HumanRogue")
+    )
+    local scout = assert(
+        transfer_definitions.for_branch("ElvenScout")
+    )
+    local mentor_parts = workspace.OriginalFirstTransferMentors
+    verify_physical_transfer(
+        human, profiles, mentors, rogue,
+        assert(mentor_parts:FindFirstChild(scout.MentorId))
+    )
+    assert(profiles:get_character(elf.UserId)
+        .Identity.ClassId == "Fighter",
+        "Human transfer changed the independent Elf's first class")
+    verify_physical_transfer(
+        elf, profiles, mentors, scout,
+        assert(mentor_parts:FindFirstChild(rogue.MentorId))
+    )
+    assert(profiles:get_character(human.UserId)
+        .Identity.ClassId == "Ashenblade",
+        "Elf transfer changed previously awarded Human class")
+    print("[C4 Original Second NPC Live] TWO_CLIENT_FIRST_TRANSFER_PASS")
 end
 
 task.spawn(function()
@@ -802,3 +936,4 @@ print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_ROGUE_FINAL_SOURCE_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_SCOUT_SOURCE_COMPLETE_PASS")
+print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_FIRST_TRANSFER_PASS")
