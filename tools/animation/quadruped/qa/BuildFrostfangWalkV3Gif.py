@@ -83,7 +83,7 @@ def save_gif(frames):
         frames (list[Image.Image]): Ordered synchronized review frames.
 
     Returns:
-        tuple: Output filename, byte size and verified frame count.
+        tuple: Output filename, byte size, frame count and playback duration.
     """
     first, *remaining = frames
     first.save(
@@ -97,7 +97,11 @@ def save_gif(frames):
     )
     with Image.open(OUTPUT) as verified:
         count = verified.n_frames
-    return str(OUTPUT), OUTPUT.stat().st_size, count
+        duration_ms = 0
+        for index in range(count):
+            verified.seek(index)
+            duration_ms += verified.info.get("duration", 0)
+    return str(OUTPUT), OUTPUT.stat().st_size, count, duration_ms
 
 
 def main():
@@ -110,12 +114,15 @@ def main():
         None: Saves one locally viewable, unapproved motion preview.
     """
     frames = [make_frame(frame) for frame in FRAMES]
-    destination, size, verified_count = save_gif(frames)
-    if verified_count != len(FRAMES):
-        raise RuntimeError(
-            f"Expected {len(FRAMES)} frames, found {verified_count}"
-        )
-    print("WALK_V3_GIF_SAVED", destination, size, verified_count)
+    destination, size, verified_count, duration_ms = save_gif(frames)
+    expected_ms = len(FRAMES) * FRAME_DURATION_MS
+    # Pillow may merge visually identical frames and round to 10 ms.
+    if not (expected_ms - 180 <= duration_ms <= expected_ms + 180):
+        raise RuntimeError("GIF playback duration changed unexpectedly")
+    print(
+        "WALK_V3_GIF_SAVED", destination, size,
+        verified_count, duration_ms,
+    )
 
 
 if __name__ == "__main__":
