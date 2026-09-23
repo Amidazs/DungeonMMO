@@ -89,9 +89,12 @@ local function main()
             "Never build the new clips on the source guardian")
     end
     local builder = require(module)
-    local built = builder.BuildAll()
+    local built = {}
     local output = {}
     for _, name in builder.Names() do
+        local clipName = "DMMO_Humanoid_" .. name .. "_v1"
+        built[name] = character:FindFirstChild(clipName)
+            or builder.Build(name)
         assert(built[name].Parent == character,
             "The animation was stored outside its isolated test rig")
         output[name] = inspect_clip(built[name], EXPECTED[name])
