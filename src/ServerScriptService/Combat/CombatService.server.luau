@@ -63,6 +63,9 @@ local RogueBleedService = require(
 local StaminaService = require(
     script.Parent:WaitForChild("StaminaService")
 )
+local ScoutCriticalToggleService = require(
+    script.Parent:WaitForChild("ScoutCriticalToggleService")
+)
 local ManaService = require(
     script.Parent:WaitForChild("ManaService")
 )
@@ -2821,6 +2824,22 @@ local function handle_skill_request(
         return
     end
 
+    if skill_definition.KIND == "ScoutToggle" then
+        -- A second genuine click must turn the existing stance off,
+        -- without paying an activation cost or entering casting state.
+        local changed, enabled, reason =
+            ScoutCriticalToggleService.toggle(player, skill_definition)
+        CombatValidationService.emit(
+            player, "SCOUT_TOGGLE",
+            if changed then "APPLIED" else "REJECT",
+            if changed then requested_skill_id .. " "
+                .. (if enabled then "ON" else "OFF")
+                else reason,
+            record.sequence_id
+        )
+        return
+    end
+
     if not SkillCooldownService.is_ready(
         player,
         requested_skill_id
@@ -3542,6 +3561,7 @@ local function on_character_added(
     stop_dodge_movement(player)
     player_states[player] = record
     RangerDrawService.reset_character(player, character)
+    ScoutCriticalToggleService.stop(player)
     StaminaService.reset_player(player)
     ManaService.reset_player(player)
     ProgressionRuntimeState.apply_max_health(player)
@@ -3583,6 +3603,22 @@ local function on_player_added(player: Player)
 end
 
 
+-- This callback never trusts a client-supplied rank or toggle strength.
+-- Any respec, loadout change, class/race change or Dungeon exclusion
+-- invalidates the active effect and stops further upkeep.
+ScoutCriticalToggleService.set_authorizer(function(
+    player: Player, toggle_record: any
+): boolean
+    local usable = ProgressionRuntimeState.is_skill_usable(
+        player.UserId, toggle_record.Definition.ID
+    )
+    return usable and ProgressionRuntimeState.get_skill_rank(
+        player.UserId, toggle_record.Definition.ID
+    ) > 0 and player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) ~= false
+end)
+
 attack_request.OnServerEvent:Connect(handle_attack_request)
 defense_request.OnServerEvent:Connect(handle_defense_request)
 skill_request.OnServerEvent:Connect(handle_skill_request)
@@ -3597,6 +3633,7 @@ Players.PlayerRemoving:Connect(function(player)
     cancel_mends_targeting_player(player)
     stop_dodge_movement(player)
     DefenseService.clear(player)
+    ScoutCriticalToggleService.stop(player)
     StaminaService.remove_player(player)
     ManaService.remove_player(player)
     SkillCooldownService.remove_owner(player)
