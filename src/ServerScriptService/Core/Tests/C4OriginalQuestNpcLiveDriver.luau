@@ -35,7 +35,7 @@ end
 
 expose('local runtime = RuntimeServices.new("Base")',
     '_G.C4OriginalNpcLiveRuntime_TEMP = runtime')
-expose('c4_class_advancement_controller:set_original_quest_service(',
+expose('    c4_source_npcs:quest_service()\n)',
     '_G.C4OriginalNpcLiveStage_TEMP = c4_source_npcs')
 original_runtime.Source = source
 
