@@ -939,14 +939,25 @@ local function verify_client_training(
         "Client cannot substitute an unrelated mentor's trainer ID")
 
     assert(profiles:mutate(player.UserId, function(profile)
-        profile.Characters.Slot1.Progression
-            .SkillPointEntitlement = 0
+        local progression = profile.Characters.Slot1.Progression
+        -- Profile migration restores the earned level-24 entitlement.
+        -- An actual zero-SP character must already have spent those
+        -- points on permitted pre-transfer Fighter skill ranks.
+        for _, base_skill in ipairs({
+            "IronCleave", "FighterBowShot", "PursuitStep",
+        }) do
+            progression.Skills[base_skill] = {
+                Known = true, PurchasedRank = 9, Proficiency = 350,
+            }
+        end
+        progression.SkillPointEntitlement = 0
     end), "Disposable test-only low-SP trainer setup failed")
     local no_sp = request_client_training(player, definition, skill_id)
     assert(not no_sp.ok and no_sp.reason == "InsufficientSP"
         and not profiles:get_character(player.UserId)
             .Progression.Skills[skill_id],
-        "Authenticated in-range trainer cannot give away a free skill")
+        "In-range trainer must charge real remaining skill points: "
+            .. tostring(no_sp.reason))
     assert(profiles:mutate(player.UserId, function(profile)
         profile.Characters.Slot1.Progression
             .SkillPointEntitlement = 1000
