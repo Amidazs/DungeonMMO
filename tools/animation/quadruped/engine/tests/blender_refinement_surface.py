@@ -5,6 +5,8 @@ import bpy,numpy as np
 from mathutils import Vector
 ROOT=Path.home()/"Documents/Roblox/DungeonMMO_CanineRig_QA/Frostfang_20260923/GroundedWalkTrial_20260923"
 OUT=ROOT/"ForelegRefinement_20260923_E"
+args=sys.argv[sys.argv.index("--")+1:] if "--" in sys.argv else []
+if args:OUT=Path(args[0])
 def fingerprint(mesh,rig):
     h=hashlib.sha256()
     for v in mesh.data.vertices:
@@ -26,8 +28,12 @@ def inspect(path,records=None,edge_ids=None):
     maxima=[];counts=[];first={};last={};drift={};previous={};pad_drift={};pad_start={}
     config=json.loads((OUT/"settings.json").read_text())
     paw_ids={l["id"]:[v.index for v in mesh.data.vertices if any(names[g.group]==l["toe"] and g.weight>.7 for g in v.groups)] for l in config["limbs"]}
+    joints={l["id"]:[] for l in config["limbs"]}
     for f in range(scene.frame_start,scene.frame_end+1):
         scene.frame_set(f)
+        for limb in config["limbs"]:
+            upper=rig.pose.bones[limb["upper"]];lower=rig.pose.bones[limb["lower"]];foot=rig.pose.bones[limb["foot"]]
+            joints[limb["id"]].append(math.degrees((upper.head-lower.head).angle(foot.head-lower.head)))
         obj=mesh.evaluated_get(bpy.context.evaluated_depsgraph_get());data=obj.to_mesh()
         coords=np.empty(len(data.vertices)*3,dtype=np.float32);data.vertices.foreach_get("co",coords);coords=coords.reshape((-1,3))
         ratios=np.linalg.norm(coords[edges[:,0]]-coords[edges[:,1]],axis=1)/lengths
@@ -47,7 +53,7 @@ def inspect(path,records=None,edge_ids=None):
         if f==scene.frame_start:first=matrices
         if f==scene.frame_end:last=matrices
         obj.to_mesh_clear()
-    return dict(edge_ids=edge_ids,planted_toe_centroid_drift=pad_drift,fingerprint=fingerprint(mesh,rig),shoulder_edges=len(edges),max_edge_stretch=max(maxima),max_edges_over_150_percent=max(counts),
+    return dict(joints={n:dict(min=min(v),max=max(v),max_step=max(abs(a-b) for a,b in zip(v,v[1:]))) for n,v in joints.items()},edge_ids=edge_ids,planted_toe_centroid_drift=pad_drift,fingerprint=fingerprint(mesh,rig),shoulder_edges=len(edges),max_edge_stretch=max(maxima),max_edges_over_150_percent=max(counts),
       frame_stretch=maxima,stance_ankle_step=drift,neutral_return_matrix_error=max(abs(a-b) for n in first for r,s in zip(first[n],last[n]) for a,b in zip(r,s)),
       objects=[dict(name=o.name,type=o.type) for o in scene.objects])
 a=inspect(ROOT/"WalkV16_PawPadGait/Frostfang_WalkV16_UNAPPROVED.blend")
