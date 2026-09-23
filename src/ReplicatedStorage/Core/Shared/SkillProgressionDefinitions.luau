@@ -1311,6 +1311,48 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- A separate DungeonMMO level-24 blade skill. Real purchased
+    -- starter-dagger mastery and use proficiency are required.
+    AshenbladeOpening = table.freeze({
+        Id = "AshenbladeOpening",
+        Tier = "Common",
+        MaxRank = 2,
+        Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 80}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterDaggerStrike",
+                Rank = 3, Proficiency = 80,
+            }),
+        }),
+        WeaponTags = table.freeze({"Dagger"}),
+    }),
+
+    -- Greenward's independent healing skill uses the existing
+    -- server-authoritative self-heal executor, not client-side HP.
+    GreenwardRenewal = table.freeze({
+        Id = "GreenwardRenewal",
+        Tier = "Common",
+        MaxRank = 2,
+        Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardScout"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 80}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "ElvenFighterRenewal",
+                Rank = 1, Proficiency = 30,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
