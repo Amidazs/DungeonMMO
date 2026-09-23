@@ -164,6 +164,18 @@ function Rules.can_progress(
             end
         end
     end
+    if step.TargetId == "CaptainAshford" and current.Step == 7 then
+        for _, proof_id in ipairs({
+            "StolenJewelry", "StolenTomes",
+            "StolenRing", "StolenNecklace",
+        }) do
+            if type(current.Proofs) ~= "table"
+                or current.Proofs[proof_id] ~= true
+            then
+                return false, "OriginalQuestLootProofRequired"
+            end
+        end
+    end
     if step.TargetId == "BrackenRaider" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
