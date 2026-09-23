@@ -184,8 +184,9 @@ local function check_legacy_safety(profiles: any, service: any)
         "Existing in-progress quest must not be overwritten by a C4 choice")
     seed(profiles, 99305, "Elf", "Mage")
     check(profiles:mutate(99305, function(profile: any)
-        profile.Characters.Slot1.ClassAdvancement.ActiveClassId =
-            "ElfSpellweaver"
+        local advancement = profile.Characters.Slot1.ClassAdvancement
+        advancement.CompletedByRace.Elf = {ElfSpellweaver = true}
+        advancement.ActiveClassId = "ElfSpellweaver"
     end), "Historical advanced class must persist")
     check(service:choose(99305, "ElvenOracle").reason
         == "LegacyClassMigrationRequired",
