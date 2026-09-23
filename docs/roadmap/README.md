@@ -1,3 +1,35 @@
+**Current C4 backend: v1.96 — physical stage-three quest fights and original stage-four NPC turn-ins.**
+[Latest backend roadmap](
+DungeonMMO_Roadmap_v1_96_Source_Quest_Combat_And_Return_20260923.md)
+and [actual two-client Studio acceptance](
+../testing/c4-original-quest-stage3-4-v1-96-20260923.md).
+Active quest owners now encounter two original-name
+Crypt Sentinels or Bracken Raiders per ordinary instanced
+combat-pack room; the server registers exact physical
+monster lives and applies one owner-bound source drop per
+qualified kill. A disposable two-client Dungeon playtest
+passed real room entry, both monster archetypes, one
+genuine client normal-attack hit and genuine server-authority
+lethal proof for one rightful source item per player.
+The real Base Vela/Thorne physical prompts now accept
+a later stage-four return **only** with personally owned
+complete source materials and proof; they atomically
+consume ten/four items, then leave the player at
+stage five with no free class award. A second genuine
+two-client Base playtest passed missing-item denial,
+real physical turn-ins, replay protection and spent-item
+checks. Focused Dungeon combat **3/3 PASS**;
+Base class/quest/migration **5/5 PASS** with **153**
+quest assertions. Both unpublished Rojo compositions built.
+**The cross-place continuous quest journey, complete ten/four
+player-controlled kills, later story stages and original
+level-20 transfer remain untested/unimplemented. Fully
+playable original first-transfer classes: 0/18.**
+Retain original DungeonMMO visual/writing identity,
+stable saved legacy keys, one Gathering and one
+Crafting profession per character, separate animation
+roadmaps, no `main` merge and no Roblox publish.
+
 **Current C4 backend: v1.95 — original DungeonMMO advancement quest names and combat ledger.**
 [Newest class/quest backend roadmap](
 DungeonMMO_Roadmap_v1_95_Original_Quest_Names_Combat_Ledger_20260923.md)
