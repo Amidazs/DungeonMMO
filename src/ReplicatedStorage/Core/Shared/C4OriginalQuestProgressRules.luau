@@ -176,6 +176,13 @@ function Rules.can_progress(
             end
         end
     end
+    if quest.BranchId == "ElvenScout"
+        and current.Step >= 7
+        and (type(current.Proofs) ~= "table"
+            or current.Proofs.RustedKey ~= true)
+    then
+        return false, "OriginalQuestLootProofRequired"
+    end
     if step.TargetId == "BrackenRaider" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
