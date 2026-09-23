@@ -252,15 +252,27 @@ not visually approved.**
 The original reference was retained and
 `Frostfang_StudioRig_Import_QA_PreJawV3.rbxl` was saved
 as a separate copy of the earlier, independently verified
-original QA place. The newer JawV3 variant was tested in
-Studio's **Edit session but a new .rbxl checkpoint for it
-has NOT yet been verified saved**. A second Studio session
-intermittently opened on the shared Windows desktop during
-Save As attempts. Those UI operations were halted rather
-than risk saving or running commands against another
-DungeonMMO place. The Blender/FBX/GLB and screenshot QA
-artifacts above *are* saved; do not conflate them with a
-saved JawV3 Roblox place.
+original QA place. The newer JawV3 variant was tested in Studio's **Edit
+session**. Attempts to save a separately named QA file
+through the shared GUI were interrupted by other Studio
+windows, so **no ordinary Studio Save As was verified**.
+Instead, a separate Roblox Studio auto-recovery snapshot
+was copied without changing the original QA file:
+
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\Frostfang_StudioRig_JawV3_RECOVERED_UNVERIFIED.rbxl`
+
+The copied file is 354,176 bytes and matches its AutoSaves
+source by SHA-256
+`6694F613B9409016A195E474076A0B3C21B8CF2D27B771F86A3156F211BE517A`.
+A read-only binary RBXL chunk inspection (decompressed
+`PROP` records) confirmed exact names `Frostfang_JawV3_QA`
+and `Frostfang_Roblox_SectionedRig_QA`, plus `DEF_jaw`
+and `DMMO_JawV3Status`. The older, independently saved QA
+file does **not** contain the JawV3 model name. **This
+confirms the revised model is present in the recovered
+place data, but the recovered .rbxl has not yet been
+reopened and tested in Studio.** The original saved place
+and pre-JawV3 copy remain unchanged.
 
 **Still blocking handoff to Astra:** a real, separately
 opening lower jaw and inner-mouth geometry; correction of
@@ -274,14 +286,16 @@ were changed or published. Roblox importer assigned
 numeric MeshIds even with `Upload to Roblox` unchecked;
 account asset creation cannot be ruled out.
 
-**Safe resume:** first confirm only the isolated
-`Frostfang_StudioRig_Import_QA.rbxl` is open, inspect its
-Edit-mode `Frostfang_JawV3_QA` model, reset every Bone
-Transform and save a *separately named* local .rbxl,
-verifying its modified timestamp and re-opened contents.
-Do not touch a different Studio session. Prioritize
-correcting real muzzle topology rather than repeating
-numeric `DEF_jaw` tests on closed mesh.
+**Safe resume:** when no other Studio task is running,
+open the **recovered copy above** in a distinct, isolated
+Studio session and verify its imported JawV3 mesh,
+controller, neutral transforms and editable hierarchy.
+Only then save a separately named, explicitly verified
+QA .rbxl. Do not switch to the production DungeonMMO
+session. Prioritize correcting real muzzle topology,
+hindleg posture and shoulder weights; then verify natural
+continuous walk playback rather than repeating numeric
+jaw tests on a closed-mouth mesh.
 
 ## Stage 1 — approve the canine master rig [OPEN]
 
