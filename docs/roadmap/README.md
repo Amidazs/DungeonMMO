@@ -33,6 +33,20 @@ all its visual gates. No publish or main merge.
 
 # Canonical Roadmap
 
+**Separate quadruped animation foundation (23 September 2026):**
+[Canine master-rig inspection, engine and gameplay-motion acceptance](
+DungeonMMO_Quadruped_Animation_Pipeline_20260923.md).
+A source-controlled, rig-independent Walk/Trot paw-target and
+two-segment IK mathematics helper, plus a read-only animal-rig
+audit, now live under `tools/animation/quadruped/`. These
+development tools are **not an animated wolf**: no canine master
+rig has passed skinning/foot-contact review, no Studio playback
+has been performed, and no game scripts or published assets
+were changed. The next gate is an approved, standing and
+properly skinned four-legged rig, not the welded dungeon
+placeholder. Humanoid R15 approvals remain independent.
+
+
 **Humanoid creature-animation production workflow (22 September 2026):**
 [Authoring, Studio validation, and rollout roadmap](DungeonMMO_Humanoid_Animation_Pipeline_20260922.md).
 Astra's isolated R15 guardian overhead strike and a separate
