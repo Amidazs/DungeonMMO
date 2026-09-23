@@ -318,6 +318,99 @@ local function advance_two_stages(
 end
 
 --[[
+Stages a completed source-monster inventory only inside disposable Studio.
+
+Args:
+    profiles (any): Actual loaded Base profile service.
+    user_id (number): The independent owner's UserId.
+    branch_id (string): Selected source advancement branch.
+    add_proofs (boolean): Whether to add genuinely owned test-only loot.
+
+Returns:
+    nil: Source quest remains stage four until a physical mentor turn-in.
+]]
+local function prepare_return(
+    profiles, user_id, branch_id, add_proofs
+)
+    local items = require(game:GetService("ServerScriptService")
+        .Core.Services.InventoryService)
+    local ok, reason = profiles:mutate(user_id, function(profile)
+        local character = profile.Characters.Slot1
+        local state = character.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state and state.BranchId == branch_id and state.Step >= 3)
+        state.Step = 4
+        state.Count = 0
+        if not add_proofs then return end
+        if branch_id == "HumanRogue" then
+            for _ = 1, 10 do
+                assert(items.apply_item_to_character(
+                    character, "spartoi_bone", 1
+                ).ok)
+            end
+            state.Proofs.SpartoiBone10 = true
+        else
+            for index = 1, 4 do
+                assert(items.apply_item_to_character(
+                    character, "prias_letter_" .. tostring(index), 1
+                ).ok)
+                state.Proofs["PriasLetter" .. tostring(index)] = true
+            end
+        end
+    end)
+    assert(ok, "Test-only return preparation rejected: "
+        .. tostring(reason))
+end
+
+--[[
+Checks that an existing physically prompted mentor accepts only complete
+personal stage-four items and never grants an unfinished advanced class.
+
+Args:
+    player (Player): Real Human or Elf Studio client.
+    profiles (any): Real Base profile service with personally owned items.
+    npc_runtime (any): Existing physically authenticated world binder.
+    branch_id (string): Owner's selected original source class.
+    mentor_id (string): Same genuine mentor from stage two.
+
+Returns:
+    nil: Verifies missing-loot denial then genuine prompt-driven return.
+]]
+local function verify_return(
+    player, profiles, npc_runtime, branch_id, mentor_id
+)
+    local mentor = assert(workspace.C4OriginalSourceQuestNPCs
+        :FindFirstChild(mentor_id))
+    prepare_return(profiles, player.UserId, branch_id, false)
+    approach(player, mentor)
+    talk(player, mentor)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 4, "Mentor accepted stage-four return without owner loot")
+    prepare_return(profiles, player.UserId, branch_id, true)
+    local available = npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    )
+    assert(available.Step == 4 and available.WorldReady,
+        "Earned source proof must expose the real return mentor")
+    talk(player, mentor)
+    local returned = wait_for(function()
+        local snapshot = npc_runtime:quest_service()
+            :build_snapshot(player.UserId)
+        return if snapshot.ok and snapshot.Step == 5
+            then snapshot else nil
+    end, "real authenticated stage-four return", 12)
+    local owner = profiles:get_character(player.UserId)
+    assert(not returned.ClassAwarded
+        and owner.Identity.ClassId == "Fighter"
+        and owner.ClassAdvancement.ActiveClassId == nil,
+        "Physical stage-four return awarded an unfinished advanced class")
+    talk(player, mentor)
+    assert(npc_runtime:quest_service():build_snapshot(
+        player.UserId
+    ).Step == 5, "Repeated stage-four mentor cannot bypass future stages")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -421,6 +514,12 @@ local function main()
     ) == 1, "The second client's NPC modified the first client's loot")
     print("[C4 Original Second NPC Live] REAL_THORNE_ISOLATED_PASS")
     print("[C4 Original Second NPC Live] TWO_CLIENT_STAGE_TWO_PASS")
+    verify_return(human, profiles, npcs, "HumanRogue", "Vela")
+    assert(npcs:quest_service():build_snapshot(
+        elf.UserId
+    ).Step == 3, "Human return modified the independent Elf's quest")
+    verify_return(elf, profiles, npcs, "ElvenScout", "WardenThorne")
+    print("[C4 Original Second NPC Live] REAL_STAGE_FOUR_TURNIN_PASS")
 end
 
 task.spawn(function()
@@ -447,3 +546,4 @@ channel:Destroy()
 assert(ok and value == "PASS",
     "Original C4 second NPC two-client playtest failed: " .. tostring(value))
 print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
+print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
