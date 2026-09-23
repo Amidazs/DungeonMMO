@@ -23,7 +23,7 @@ end
 
 --[[
 Rejects false parity across every supported starting class and original
-C4 first-transfer choice, including the seven unmapped class branches.
+C4 first-transfer choice, including sixteen unmapped branches across all five original races.
 
 Args:
     None.
@@ -45,10 +45,10 @@ local function main()
         and scout.Functional == 228
         and scout.Missing == 0,
         "Human Rogue and Elven Scout source-rank totals diverged")
-    check(branches.Total == 9 and branches.Partial == 2
+    check(branches.Total == 18 and branches.Partial == 2
         and branches.Complete == 0,
-        "Not all nine first-transfer C4 classes are accounted for")
-    check(#branches.Unimplemented == 7,
+        "Not all eighteen original C4 class transfers are accounted for")
+    check(#branches.Unimplemented == 16,
         "Unmapped first-transfer skill catalogues were silently dropped")
     check(base.Functional + base.Missing == base.Raw,
         "Base source skills counted twice or disappeared")
