@@ -162,7 +162,7 @@ calling the production quest service directly as a substitute for input.
 
 Args:
     player (Player): Actual connected original-class client.
-    part (BasePart): Server-owned Captain Bezique world actor.
+    part (BasePart): Server-owned Captain Ashford world actor.
 
 Returns:
     nil: A genuine ProximityPrompt.Triggered receipt on the server.
@@ -227,7 +227,7 @@ local function main()
     end, "real Base profile and local-client readiness", 65)
     local profiles = runtime.ProfileService
     local part = assert(workspace.C4OriginalSourceQuestNPCs
-        :FindFirstChild("CaptainBezique"))
+        :FindFirstChild("CaptainAshford"))
     local root = assert(player.Character:FindFirstChild("HumanoidRootPart"))
     root.Anchored = true
     root.CFrame = part.CFrame * CFrame.new(0, 0, 4)
@@ -261,7 +261,7 @@ local function main()
         local state = npcs:quest_service():build_snapshot(player.UserId)
         return if state.ok and state.Started and state.Step == 2
             then state else nil
-    end, "real Captain Bezique talk persisted source quest stage", 15)
+    end, "real Captain Ashford talk persisted source quest stage", 15)
     assert(quest.FirstNpcReady and quest.WorldReady
         and not quest.FullWorldReady and not quest.Ready
         and not quest.ClassAwarded
@@ -276,13 +276,13 @@ local function main()
     local missing_dungeon = npcs:quest_service():record_world_event(
         player.UserId, {
             EventId = "forged-missing-skeleton-stage",
-            Kind = "NpcTalk", TargetId = "Neti",
+            Kind = "NpcTalk", TargetId = "Vela",
             ActorUserId = player.UserId,
         }
     )
     assert(not missing_dungeon.ok
         and missing_dungeon.reason == "OriginalQuestWorldEvidenceUnverified",
-        "Forged Neti event cannot grant trial weapons through live stage two")
+        "Forged Vela event cannot grant trial weapons through live stage two")
     print("[C4 Original NPC Live] UNBUILT_DUNGEON_STAGE_LOCKED_PASS")
 
     local original_step = quest.Step
@@ -300,7 +300,7 @@ local function main()
     end, "real client sees its genuine original C4 quest stage", 13)
     assert(client_ui.BranchId == "HumanRogue"
         and not client_ui.Ready
-        and string.find(client_ui.Text, "Neti", 1, true),
+        and string.find(client_ui.Text, "Vela", 1, true),
         "Actual GUI hid missing later dungeon stages or forged completion")
     print("[C4 Original NPC Live] REAL_CLIENT_QUEST_UI_PASS")
 end
