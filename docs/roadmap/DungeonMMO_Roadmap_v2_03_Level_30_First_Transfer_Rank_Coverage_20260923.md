@@ -70,6 +70,14 @@ Independent humanoid/quadruped animation roadmaps are not superseded.
   local Rojo builds and unpublished Studio checks.
   No Roblox publish, `main` merge or production save change.
 
+**Coverage boundary:** The 59/77 mapped rows are the recorded
+*first-transfer* source training brackets at 20/24/28. The complete
+historical starter-class level-1–19 ranks and the in-game behaviour of
+every shared/passive/utility effect have **not** been certified against
+C4, so the full level-1–30 class catalogue is not yet release accepted.
+The original SourceRankScheduleMapped flag represents training rows,
+not mechanically identical or fully player-tested skills.
+
 ## Next implementation order
 
 1. **Complete original two-class gameplay acceptance:** use
