@@ -131,6 +131,10 @@ function Runtime.attach(options: any): any
                 self:_talk(player, branch_id, step_index)
             end)
         end
+        -- The same physical mentor accepts a later return only when
+        -- this character has actually earned its ordered stage-four proof.
+        self._step_parts[branch_id][4] =
+            self._step_parts[branch_id][2]
     end
     Players.PlayerRemoving:Connect(function(player: Player)
         self:remove(player)
@@ -211,7 +215,15 @@ function Runtime:_talk(
     player: Player, branch_id: string, step_index: number?
 ): any
     local index = step_index or 1
-    local source = NPCS[branch_id] and NPCS[branch_id][index]
+    local character = self._profiles:get_character(player.UserId)
+    local advancement = character and character.ClassAdvancement
+    local current = advancement
+        and advancement.OriginalFirstTransferQuest
+    if index == 2 and current and current.Step == 4 then
+        index = 4
+    end
+    local source_index = if index == 4 then 2 else index
+    local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
         and self._step_parts[branch_id][index]
     if not source or not part or not nearby(player, part)
@@ -224,8 +236,6 @@ function Runtime:_talk(
         return response(false, "OriginalNpcInteractionCooldown")
     end
     self._last_action[player.UserId] = now
-    local character = self._profiles:get_character(player.UserId)
-    local advancement = character and character.ClassAdvancement
     if not advancement
         or advancement.OriginalFirstTransferChoiceId ~= branch_id
     then
