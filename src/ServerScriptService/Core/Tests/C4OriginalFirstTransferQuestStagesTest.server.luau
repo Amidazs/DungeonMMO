@@ -256,6 +256,13 @@ local function exercise(
         and persisted.Step == #quest.Steps + 1
         and persisted.ClassAwarded == false,
         "Source-specific quest completion must survive genuine save/reload")
+    if branch_id == "HumanRogue" then
+        local reloaded = assert(profiles:get_character(user_id, 1))
+        check(Inventory.count_item(reloaded, "neti_trial_dagger") == 1
+            and Inventory.count_item(reloaded, "neti_trial_bow") == 1,
+            "Neti's personal trial weapons must survive migration/reload "
+                .. "without duplicate rewards")
+    end
 end
 
 --[[
