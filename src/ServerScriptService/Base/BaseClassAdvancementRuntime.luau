@@ -14,10 +14,11 @@ local ACTION_COOLDOWN_SECONDS = 0.25
 -- Returns:
 --   nil: Sends the current advancement state to the player.
 function BaseClassAdvancementRuntime:send_snapshot(player: Player)
-    self._snapshot:FireClient(
-        player,
-        self._advancement:build_snapshot(player.UserId)
+    local snapshot = self._advancement:build_snapshot(player.UserId)
+    snapshot.OriginalFirstTransfer = self._selection:build_snapshot(
+        player.UserId
     )
+    self._snapshot:FireClient(player, snapshot)
 end
 
 -- Starts or claims the existing class-specific advancement trial.
@@ -29,7 +30,7 @@ end
 --   nil: Sends the action result and authoritative progression state.
 function BaseClassAdvancementRuntime:handle_action(
     player: Player,
-    action: any
+    action: any, class_id: any
 )
     if not self._is_ready(player) then
         self._result:FireClient(player, {
@@ -44,7 +45,9 @@ function BaseClassAdvancementRuntime:handle_action(
         return
     end
 
-    if action ~= "StartTrial" and action ~= "ClaimTrial" then
+    if action ~= "StartTrial" and action ~= "ClaimTrial"
+        and action ~= "SelectFirstTransfer"
+    then
         self._result:FireClient(player, {
             ok = false,
             reason = "InvalidAdvancementAction",
@@ -63,7 +66,9 @@ function BaseClassAdvancementRuntime:handle_action(
     end
     self._last_request[player.UserId] = now
 
-    local result = if action == "StartTrial"
+    local result = if action == "SelectFirstTransfer"
+        then self._selection:choose(player.UserId, class_id)
+        elseif action == "StartTrial"
         then self._advancement:start_trial(player.UserId)
         else self._advancement:claim(player.UserId)
 
@@ -79,12 +84,14 @@ end
 --   any: Server-owned handler retained by its remote event connections.
 function BaseClassAdvancementRuntime.attach(options: any): any
     assert(
-        options.remotes and options.advancement and options.is_ready,
+        options.remotes and options.advancement and options.selection
+            and options.is_ready,
         "Base class advancement dependencies are required"
     )
 
     local self = setmetatable({
         _advancement = options.advancement,
+        _selection = options.selection,
         _is_ready = options.is_ready,
         _request = options.remotes:WaitForChild(
             "ClassAdvancementRequest"
@@ -98,8 +105,8 @@ function BaseClassAdvancementRuntime.attach(options: any): any
         _last_request = {},
     }, BaseClassAdvancementRuntime)
 
-    self._request.OnServerEvent:Connect(function(player, action)
-        self:handle_action(player, action)
+    self._request.OnServerEvent:Connect(function(player, action, class_id)
+        self:handle_action(player, action, class_id)
     end)
     Players.PlayerRemoving:Connect(function(player)
         self._last_request[player.UserId] = nil
