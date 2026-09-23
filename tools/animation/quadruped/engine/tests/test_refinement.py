@@ -1,6 +1,15 @@
-import unittest,math
-from quadruped_core.refinement import two_bone, timeline, contact
+import unittest,math,json,copy
+from pathlib import Path
+from quadruped_core.refinement import two_bone, timeline, contact, validate_config
 class RefinementTests(unittest.TestCase):
+    def test_reject_bad_configuration_before_authoring(self):
+        config=json.loads((Path(__file__).parents[1]/"profiles/frostfang_v16_refinement.json").read_text())
+        validate_config(config)
+        for path,value in [(("timeline","cadence"),0),(("front","stride"),0),(("front","lift"),float("nan")),(("hind","stance"),1),(("timeline","ramp"),float("inf")),(("settle",),0)]:
+            bad=copy.deepcopy(config);target=bad
+            for key in path[:-1]:target=target[key]
+            target[path[-1]]=value
+            with self.assertRaises(ValueError):validate_config(bad)
     def test_measured_elbow_plane_and_lengths(self):
         a=[0,0,.6];b=[0,.02,.34];c=[0,-.02,.10]
         for y in [-.12,-.02,.08]:
