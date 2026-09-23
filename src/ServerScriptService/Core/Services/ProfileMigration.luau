@@ -763,7 +763,17 @@ local function sanitize_class_advancement(
                 QuestId = quest.Id, BranchId = choice,
                 Step = raw_quest.Step, Count = progress,
                 Ready = step == nil, AppliedEvents = applied,
-                Proofs = {},
+                Proofs = (function()
+                    local proofs = {}
+                    for _, proof_id in ipairs(quest.RequiredProofIds) do
+                        if type(raw_quest.Proofs) == "table"
+                            and raw_quest.Proofs[proof_id] == true
+                        then
+                            proofs[proof_id] = true
+                        end
+                    end
+                    return proofs
+                end)(),
             }
         end
     end
