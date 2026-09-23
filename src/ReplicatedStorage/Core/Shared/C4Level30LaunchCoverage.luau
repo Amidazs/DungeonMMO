@@ -108,8 +108,11 @@ function Coverage.for_branch(branch_id: string): any?
         then ScoutInventory.get("Human")
         elseif branch_id == "ElvenScout"
         then ScoutInventory.get("Elf") else nil
-    local levels, total = if source then source_counts(source)
-        else {}, nil
+    local levels: {[number]: number} = {}
+    local total: number? = nil
+    if source then
+        levels, total = source_counts(source)
+    end
     local authored = authored_skills(branch_id)
     return {
         BranchId = branch.Id,
