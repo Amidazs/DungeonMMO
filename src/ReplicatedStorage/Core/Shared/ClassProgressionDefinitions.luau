@@ -6,6 +6,9 @@ local HUMAN_ELF = table.freeze({"Human", "Elf"})
 local DEFINITIONS = table.freeze({
     Fighter = table.freeze({
         Id = "Fighter",
+        DisplayName = "Fighter",
+        SourceC4StarterName = "Fighter",
+        FreshCreationAllowed = true,
         AllowedRaces = HUMAN_ELF,
         StarterSkills = table.freeze({
             "ShieldBash",
@@ -36,6 +39,9 @@ local DEFINITIONS = table.freeze({
 
     Mage = table.freeze({
         Id = "Mage",
+        DisplayName = "Mystic",
+        SourceC4StarterName = "Mystic",
+        FreshCreationAllowed = true,
         AllowedRaces = HUMAN_ELF,
         StarterSkills = table.freeze({
             "WindStrike",
@@ -77,6 +83,9 @@ local DEFINITIONS = table.freeze({
 
     Ranger = table.freeze({
         Id = "Ranger",
+        DisplayName = "Ranger",
+        FreshCreationAllowed = false,
+        LegacySpecialistClass = true,
         AllowedRaces = HUMAN_ELF,
         StarterSkills = table.freeze({
             "PiercingShot",
@@ -129,6 +138,9 @@ local DEFINITIONS = table.freeze({
 
     Rogue = table.freeze({
         Id = "Rogue",
+        DisplayName = "Rogue",
+        FreshCreationAllowed = false,
+        LegacySpecialistClass = true,
         AllowedRaces = HUMAN_ELF,
         StarterSkills = table.freeze({
             "QuickStrike",
