@@ -620,3 +620,79 @@ Two Studio processes had the same saved JawV3 QA place open at
 this checkpoint; neither existing QA place was overwritten or
 controlled blindly. No Roblox assets were exported/published, and
 no production DungeonMMO runtime or original GLB was altered.
+
+## WalkV5 world-oriented paws and continuous visual QA — 23 September 2026
+
+**Stage 1 remains OPEN; WalkV5 is now the most promising *isolated
+motion experiment*, not a finished animal master or approved walk.**
+The previous WalkV3, discarded WalkV4 contact-correction trial, and
+all original sources remain separate and untouched.
+
+Finite-difference testing on WalkV3 revealed that the source
+hind-right ankle target is not a monotonic vertical toe control:
+depending on the stance frame, lowering the IK empty can raise the
+actual toe mesh and move its horizontal center. The safer experimental
+change was to copy each existing foot bone's world-space **neutral
+orientation** from a dedicated reference empty, while keeping the
+already authored two-bone leg IK and the WalkV3 moving armature.
+This was saved to a *new* Blend, not written over WalkV3.
+
+Actual weighted-toe mesh audit (72 frames, 24 FPS) from WalkV5:
+
+- Greatest planted toe horizontal-centroid drift across all four
+  legs: **0.003708 source units**, versus **0.026657** for WalkV3.
+- Hind-right stance drift: **0.003704–0.003708** during the two
+  substantial recorded intervals, but minimum toe height still
+  varies between ~0 and **0.007032** above the test floor.
+- Front-left: **0.002251** planted drift; longest front-right
+  interval: ~**0.000001**; hind-left: **0.00163**.
+- These are actual deformed-toe vertex measurements, **not**
+  game-scale units, physically verified floor contact, or
+  evidence of natural shoulder/hock movement.
+
+The 12 side/oblique stills and a synchronized continuous 2-camera
+GIF were rendered from the actual skinned original-looking mesh.
+Side and three-quarter inspection still shows a rather stiff
+torso/foreleg gait; freezing the paw world orientation is a useful
+**contact diagnostic**, not a proven solution for lifelike swing,
+turns, uneven floors, or combat. The original muzzle is still
+one closed mesh with no genuinely opening bite, and the rear-leg
+anatomy and upper-shoulder fur still need correction. Do not
+export this as a production Studio clip or hand it to Astra as
+an approved quadruped master yet.
+
+Files on the authorized PC:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\WalkV5_PawOrientation\\`
+
+- `Frostfang_WalkV5_UNAPPROVED.blend` — separate editable
+  experiment with world-orientation paw reference controls.
+- `walk_v5_actual_mesh_audit.json` — full evaluated toe
+  geometry and recorded stance intervals.
+- `preview\\Frostfang_WalkV5_Review_UNAPPROVED.gif` —
+  saved/reopened **1,520×510**, 34 optimized display frames,
+  **2,970 ms** playback, ~9.06 MB; derived from 37 source
+  Blender samples per camera (identical frames coalesced).
+- `preview\\full\\` — 74 side and three-quarter PNG source
+  frames plus earlier six-frame-per-view pose checks.
+
+Source-controlled QA scripts:
+`FrostfangWalkV5PawOrientation.py`,
+`FrostfangWalkV5MeshAudit.py`,
+`FrostfangWalkV5Preview.py`,
+`FrostfangWalkV5FullPreview.py`,
+`BuildFrostfangWalkV5Gif.py` under
+`tools/animation/quadruped/qa/`.
+
+**Next gate:** add anatomically credible shifting body mass,
+adaptive foot orientation during swing/stance, and hind-right
+shin/hock/paw plus skin-weight corrections on a new copy. Review
+motion continuously from multiple angles, then bake a stable
+independent editable FK idle–walk–idle clip and demonstrate real
+Roblox Studio Animator playback in a single isolated QA place.
+Do not silently treat IK authoring constraints as exportable Roblox
+keyframes. Jaw topology and playable bite remain separate blockers.
+The GitHub backend baseline remains **v1.89** and has not been
+modified by the experimental art work. No live dungeon place,
+Studio QA snapshot, original GLB, or gameplay scripts were changed
+or published.
