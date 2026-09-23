@@ -312,6 +312,134 @@ local function verify_next_skill(profiles: any, owner: any)
 end
 
 --[[
+Raises purchased starter mastery only in this disposable owner fixture.
+
+Args:
+    profiles (any): Current real ProfileService test writer.
+    user_id (number): Actual isolated profile owner.
+
+Returns:
+    nil: Enables earned career tests without granting free production ranks.
+]]
+local function seed_first_transfer_mastery(
+    profiles: any, user_id: number
+)
+    check(profiles:mutate(user_id, function(profile: any)
+        local progression = profile.Characters.Slot1.Progression
+        progression.SkillPointEntitlement = 3000
+        for _, skill_id in ipairs({
+            "FighterBowShot", "FighterDaggerStrike",
+        }) do
+            progression.Skills[skill_id] = {
+                Known = true, PurchasedRank = 9, Proficiency = 320,
+            }
+        end
+    end), "Mastered actual starter bow and dagger prerequisites")
+end
+
+--[[
+Purchases each original-class skill rank in its exact C4 level bracket.
+
+Args:
+    profiles (any): Actual profile store used by the skill service.
+    service (any): Authoritative rank purchase and SP deduction service.
+    user_id (number): Selected original class owner.
+    skill_id (string): One of the four new exclusively earned skills.
+    rank_levels ({number}): Complete level-20/24/28 rank schedule.
+
+Returns:
+    nil: Verifies every separately earned class rank and level restriction.
+]]
+local function purchase_launch_line(
+    profiles: any, service: any, user_id: number,
+    skill_id: string, rank_levels: {number}
+)
+    local definition = assert(Skills.get(skill_id))
+    local character = assert(profiles:get_character(user_id))
+    check(Classes.can_teach(character.Identity.ClassId, skill_id)
+        and Catalogues.can_offer(
+            if character.Identity.ClassId == "Ashenblade"
+                then "AshenbladeTrainer" else "GreenwardScoutTrainer",
+            character, skill_id
+        ).ok, "Only the real awarded class trainer offers this line")
+    for rank, required_level in ipairs(rank_levels) do
+        check(profiles:mutate(user_id, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Level = required_level
+            local current = owner.Progression.Skills[skill_id]
+            if current then
+                current.Proficiency =
+                    definition.RankThresholds[rank] or 0
+            end
+        end), "Test owner reaches this specific rank's own bracket")
+        local outcome = if rank == 1
+            then service:learn_trainer_skill(user_id, skill_id)
+            else service:purchase_rank(user_id, skill_id)
+        check(outcome.ok and outcome.rank == rank,
+            "Actual trainer must purchase every separate source-rank "
+                .. skill_id .. " " .. tostring(rank))
+    end
+    local current = profiles:get_character(user_id)
+    check(current.Progression.Skills[skill_id].PurchasedRank
+        == #rank_levels, "Full through-cap skill rank remains in profile")
+    check(not service:purchase_rank(user_id, skill_id).ok,
+        "No unregistered post-launch rank can be purchased")
+end
+
+--[[
+Tests both original careers' weapon skills and applied combat masteries.
+
+Args:
+    profiles (any): Existing already awarded real profile writer.
+    owner (any): Correct Human or Elf test character identity.
+
+Returns:
+    nil: Proves all 31 distinct training ranks and real damage effects.
+]]
+local function verify_weapon_skill_catalogue(
+    profiles: any, owner: any
+)
+    seed_first_transfer_mastery(profiles, owner.UserId)
+    local service = SkillService.new(
+        profiles, Inventory.new(profiles), Loadout.new(profiles)
+    )
+    local nine = {20, 20, 20, 24, 24, 24, 28, 28, 28}
+    local four = {20, 24, 28, 28}
+    purchase_launch_line(
+        profiles, service, owner.UserId, "WayfinderArrow", nine
+    )
+    purchase_launch_line(
+        profiles, service, owner.UserId, "WayfinderCut", nine
+    )
+    local base = assert(profiles:get_character(owner.UserId))
+    Runtime.set_character(owner.UserId, base)
+    local initial_bow =
+        Runtime.get_ranged_physical_multiplier(owner.UserId)
+    local initial_dagger =
+        Runtime.get_physical_multiplier(owner.UserId)
+    purchase_launch_line(
+        profiles, service, owner.UserId, "WayfinderBowMastery", nine
+    )
+    purchase_launch_line(
+        profiles, service, owner.UserId, "WayfinderDaggerMastery", four
+    )
+    local trained = assert(profiles:get_character(owner.UserId))
+    Runtime.set_character(owner.UserId, trained)
+    check(Runtime.get_ranged_physical_multiplier(owner.UserId)
+        > initial_bow, "Bow mastery increases actual server ranged damage")
+    check(Runtime.get_physical_multiplier(owner.UserId)
+        > initial_dagger, "Dagger mastery increases actual melee damage")
+    check(Combat.get_for_rank("WayfinderArrow", 9).BASE_DAMAGE
+        > Combat.get_for_rank("WayfinderArrow", 1).BASE_DAMAGE
+        and Combat.get_for_rank("WayfinderCut", 9).BASE_DAMAGE
+            > Combat.get_for_rank("WayfinderCut", 1).BASE_DAMAGE,
+        "Both new nine-rank attacks scale actual server damage")
+    Runtime.clear_character(owner.UserId)
+    check(profiles:save(owner.UserId, "OriginalWeaponCatalogueTest"),
+        "Separate learned attack and mastery rank state persists")
+end
+
+--[[
 Checks the dungeon runtime, weapon tag and earned-class cast barriers.
 
 Args:
@@ -433,6 +561,7 @@ local function main()
         verify_denials(profiles, transfer, owner, pending)
         verify_award(profiles, transfer, owner, pending)
         verify_next_skill(profiles, owner)
+        verify_weapon_skill_catalogue(profiles, owner)
         verify_runtime_skill(profiles, owner)
         verify_reload(store, owner, profiles)
     end
