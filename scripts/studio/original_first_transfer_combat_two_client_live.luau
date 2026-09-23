@@ -274,6 +274,26 @@ local function verify_ashenblade(profiles, human, elf)
     user_root.AssemblyLinearVelocity = Vector3.zero
     task.wait(0.4)
     local before = humanoid.Health
+    assert(profiles:mutate(human.UserId, function(profile)
+        profile.Characters.Slot1.Equipment.Weapon = "marauder_sword"
+    end), "Disposable wrong-weapon combat denial setup failed")
+    state.set_character(human.UserId,
+        assert(profiles:get_character(human.UserId)))
+    assert(not state.is_skill_usable(human.UserId, "AshenbladeOpening"),
+        "Sword cannot authorize an earned dagger-only first-class skill")
+    request(human, "AshenbladeOpening")
+    task.wait(0.8)
+    assert(humanoid.Health == before
+        and cooldowns.get_remaining(human, "AshenbladeOpening") == 0,
+        "Real client wrong-weapon request damaged enemy or spent cooldown")
+    assert(profiles:mutate(human.UserId, function(profile)
+        profile.Characters.Slot1.Equipment.Weapon = "scout_dagger"
+    end), "Disposable real dagger restore was rejected")
+    state.set_character(human.UserId,
+        assert(profiles:get_character(human.UserId)))
+    assert(state.is_skill_usable(human.UserId, "AshenbladeOpening"),
+        "Restored earned dagger cannot authorize real combat skill")
+    print("[First Transfer Combat] WRONG_WEAPON_CLIENT_CAST_DENIED_PASS")
     local stamina_before = stamina.get(human)
     request(human, "AshenbladeOpening")
     wait_for(function()
@@ -313,6 +333,22 @@ local function verify_greenward(profiles, elf, human)
     healer.Health = 1400
     local before = healer.Health
     local other_before = other.Health
+    assert(profiles:mutate(elf.UserId, function(profile)
+        profile.Characters.Slot1.Progression
+            .Skills.GreenwardRenewal = nil
+    end), "Disposable unpurchased-heal test setup failed")
+    state.set_character(elf.UserId,
+        assert(profiles:get_character(elf.UserId)))
+    assert(not state.is_skill_usable(elf.UserId, "GreenwardRenewal"),
+        "Unpurchased Greenward heal must fail server combat eligibility")
+    request(elf, "GreenwardRenewal")
+    task.wait(0.8)
+    assert(healer.Health == before
+        and other.Health == other_before
+        and cooldowns.get_remaining(elf, "GreenwardRenewal") == 0,
+        "Unpurchased real client Greenward heal changed live character HP")
+    prepare(profiles, elf, "ElvenScout", 1)
+    print("[First Transfer Combat] UNPURCHASED_CLIENT_HEAL_DENIED_PASS")
     local mana_before = mana.get(elf)
     local minimum = assert(
         combat.get_for_rank("GreenwardRenewal", 1)
