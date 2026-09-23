@@ -1,4 +1,45 @@
-**Current DungeonMMO class backend: v2.03 — original level-30 first-transfer source rank schedules and purchase acceptance.**
+**Current DungeonMMO class backend: v2.04 — new live two-client expanded Scout combat and first locked Human Warrior skill foundation.**
+[Latest class backend roadmap](
+DungeonMMO_Roadmap_v2_04_Expanded_Combat_Ironvow_Foundation_20260923.md)
+and [executed v2.04 Studio test record](
+../testing/original-first-transfer-expanded-combat-and-ironvow-v2-04-20260923.md).
+An unpublished real two-client instanced Dungeon
+playtest **PASS** verified rank-nine Wayfinder
+Cut/Arrow hits, genuine dagger bleed ticks
+and Greenward Calming Arrow reducing its
+owner's actual server threat after a damaging
+hit. The expanded combat test used test-only
+prior class/skill progress, not a new fully
+natural level-1→30 cross-place journey.
+The next Human Warrior's independently
+named **Ironvow** backend now defines nine
+ranks of an original sword attack, three
+ranks of purchased sword mastery and three
+ranks of a temporary combat buff. The
+unpublished Base/Dungeon builds and focused
+**33-assertion Warrior foundation** passed,
+including refusal of a forged class identity,
+purchased skill and passive bonus. Ironvow
+is intentionally **not earnable or advertised
+as a third playable class**: its independent
+source quest, legitimate monster and NPC
+world binder, level-20 physical mentor and
+separate trainer still need implementation.
+The two existing original first-transfer
+careers remain **2/18** actually awarded;
+recorded level-20/24/28 rank schedules are
+mapped, but full starter 1–19 parity, every
+skill's functional gameplay acceptance
+and real uninterrupted cross-place travel
+are still open. Level 30 remains the
+planned, not server-enforced initial cap.
+No Roblox publish, production DataStore
+change, merge into `main` or permanent
+source editing via Desktop Commander.
+Independent humanoid/quadruped animation
+roadmaps remain untouched.
+
+**Previous DungeonMMO class backend: v2.03 — original level-30 first-transfer source rank schedules and purchase acceptance.**
 [Latest active class backend roadmap](
 DungeonMMO_Roadmap_v2_03_Level_30_First_Transfer_Rank_Coverage_20260923.md)
 and [executed Studio acceptance / limitations](
