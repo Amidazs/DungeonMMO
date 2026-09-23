@@ -73,7 +73,6 @@ local function make_mentor(
         OFFSETS[definition.BranchId]
     )
     part:SetAttribute("TrainerId", definition.TrainerId)
-    part.Parent = self._folder
 
     local prompt = Instance.new("ProximityPrompt")
     prompt.Name = "FirstTransferMentorPrompt"
@@ -95,6 +94,8 @@ local function make_mentor(
     training_prompt.RequiresLineOfSight = true
     training_prompt.MaxActivationDistance = MAX_RANGE
     training_prompt.Parent = part
+    -- Publish the complete actor only after both prompts are present.
+    part.Parent = self._folder
 
     return part
 end
