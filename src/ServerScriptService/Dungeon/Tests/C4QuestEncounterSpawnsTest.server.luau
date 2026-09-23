@@ -1,0 +1,154 @@
+--!strict
+-- Physical optional source-pack insertion into one disposable dungeon room.
+local SSS = game:GetService("ServerScriptService")
+local Spawns = require(SSS.Dungeon.C4QuestEncounterSpawns)
+local Ledger = require(SSS.Dungeon.C4QuestMonsterCombatLedger)
+local checks = 0
+
+--[[
+Checks that one observed source-challenge contract is satisfied.
+
+Args:
+    condition (boolean): Asserted fact from the spawned physical models.
+    label (string): Description of the rule under test.
+
+Returns:
+    nil: Raises on a failed assertion.
+]]
+local function check(condition: boolean, label: string)
+    checks += 1
+    assert(condition, "[C4 Source Pack] " .. label)
+end
+
+--[[
+Creates a harmless disposable physical model with a real root and humanoid.
+
+Args:
+    options (any): Existing dungeon encounter and spawn factory options.
+
+Returns:
+    Model: One world-owned model, never a client event or fake table.
+]]
+local function mock_create(options: any): Model
+    local enemy = Instance.new("Model")
+    enemy.Name = options.Name
+    enemy:SetAttribute("DungeonEncounterId", options.EncounterId)
+    enemy:SetAttribute("DungeonEnemyId", options.EnemyId)
+    local root = Instance.new("Part")
+    root.Name = "HumanoidRootPart"
+    root.CFrame = options.SpawnCFrame
+    root.Anchored = true
+    root.Parent = enemy
+    enemy.PrimaryPart = root
+    local humanoid = Instance.new("Humanoid")
+    humanoid.Parent = enemy
+    enemy.Parent = options.Parent
+    return enemy
+end
+
+--[[
+Builds the minimum saved stage-three character to test branch selection.
+
+Args:
+    branch_id (string): Exact original character's selected branch.
+
+Returns:
+    any: Profile character with an uncompleted real stage-three quest.
+]]
+local function character_for(branch_id: string): any
+    return {
+        Level = 18,
+        Identity = {ClassId = "Fighter"},
+        ClassAdvancement = {
+            OriginalFirstTransferChoiceId = branch_id,
+            OriginalFirstTransferQuest = {
+                BranchId = branch_id,
+                Step = 3,
+                Ready = false,
+            },
+        },
+    }
+end
+
+--[[
+Exercises mixed-party quest spawn isolation and actual model registration.
+
+Args:
+    None.
+
+Returns:
+    nil: Reports the focused instanced challenge integration result.
+]]
+local function main()
+    local folder = Instance.new("Folder")
+    folder.Name = "C4QuestSpawnTest"
+    folder.Parent = workspace
+    local seed = mock_create({
+        Parent = folder, Name = "ExistingMarauder",
+        EncounterId = "QuestRoom1", EnemyId = "Marauder1",
+        SpawnCFrame = CFrame.new(0, 20, 0),
+    })
+    local characters = {
+        [101] = character_for("HumanRogue"),
+        [102] = character_for("ElvenScout"),
+    }
+    local profiles = {
+        get_character = function(
+            _self: any, user_id: number
+        ): any
+            return characters[user_id]
+        end,
+    }
+    local execution = {Enemies = {seed}}
+    local options = {
+        profiles = profiles,
+        user_ids = {101, 102},
+        execution = execution,
+        encounter_id = "QuestRoom1",
+        folder = folder,
+    }
+    local spawned = Spawns.augment(
+        options, {create = mock_create}
+    )
+    check(spawned.ok and #spawned.registrations == 4,
+        "Mixed party gets two source monsters per eligible branch")
+    check(#execution.Enemies == 5,
+        "All original enemies and challenges share the encounter lifecycle")
+    local ledger = Ledger.new({
+        profiles = profiles,
+        session_id = "QuestSession1",
+        is_member_active = function(): boolean
+            return false
+        end,
+    })
+    local seen = {}
+    for _, registration in ipairs(spawned.registrations) do
+        local enemy = registration.enemy
+        local source_id = enemy:GetAttribute("SourceQuestMonsterId")
+        check(enemy:IsDescendantOf(workspace)
+            and enemy:GetAttribute("DungeonEncounterId")
+                == "QuestRoom1",
+            "Challenge is a physical, session-scoped dungeon enemy")
+        check(ledger:register_enemy(
+            enemy, registration.branch_id, "QuestRoom1"
+        ), "One distinct real source enemy can register for combat")
+        seen[source_id] = (seen[source_id] or 0) + 1
+    end
+    check(seen.CryptSentinel == 2 and seen.BrackenRaider == 2,
+        "Human and Elf branches receive their own original archetypes")
+    characters[101].ClassAdvancement
+        .OriginalFirstTransferQuest.Step = 4
+    characters[102].ClassAdvancement
+        .OriginalFirstTransferQuest.Step = 4
+    local later = Spawns.augment(
+        options, {create = mock_create}
+    )
+    check(later.ok and #later.registrations == 0
+        and #execution.Enemies == 5,
+        "Completed source combat stages cannot spawn repeated rewards")
+    ledger:clear()
+    folder:Destroy()
+    print(("[C4 Source Pack] PASS: %d assertions"):format(checks))
+end
+
+main()
