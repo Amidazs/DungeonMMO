@@ -18,6 +18,34 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    AshenbladeTrainer = table.freeze({
+        Id = "AshenbladeTrainer",
+        DisplayName = "Marshal Briar's Ashenblade Training",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Ashenblade"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "HumanScoutSprint",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
+    GreenwardScoutTrainer = table.freeze({
+        Id = "GreenwardScoutTrainer",
+        DisplayName = "Pathwarden Siora's Greenward Training",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"GreenwardScout"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "ElvenScoutGuard",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
     FighterTrainer = table.freeze({
         Id = "FighterTrainer",
         DisplayName = "Fighter Trainer",
