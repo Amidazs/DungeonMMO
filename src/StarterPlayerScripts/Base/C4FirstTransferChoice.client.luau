@@ -186,6 +186,7 @@ Returns:
 ]]
 local function render(snapshot: any)
     local state = snapshot and snapshot.OriginalFirstTransfer
+    local quest = snapshot and snapshot.OriginalQuest
     latest = state
     toggle.Visible = type(state) == "table" and state.ok == true
     if not toggle.Visible then
@@ -200,7 +201,19 @@ local function render(snapshot: any)
     if state.LegacyAdvancementNeedsMigration then
         status.Text = "Existing class progression is preserved; migration is pending."
     elseif state.SelectedClassId then
-        status.Text = "Your chosen path is saved. Its original advancement quest is still in development."
+        if quest and quest.ok and quest.Started then
+            status.Text = "Original quest stage "
+                .. tostring(quest.Step)
+                .. " started. The remaining dungeon stages and full "
+                .. "advancement quest are still in development."
+        elseif quest and quest.ok and quest.WorldReady then
+            status.Text = "Visit your original C4 quest NPC near the "
+                .. "hub arrival point. The full advancement quest is still "
+                .. "in development; no advanced class is awarded yet."
+        else
+            status.Text = "Your chosen path is saved. Its original "
+                .. "advancement quest is still in development."
+        end
     elseif state.CanChoose then
         status.Text = "Select one path. Selection does not award a class or bypass its quest."
     else
