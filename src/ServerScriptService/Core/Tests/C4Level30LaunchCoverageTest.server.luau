@@ -81,15 +81,25 @@ local function main()
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
-    check(report.SourceAuditedBranches == 2
+    check(report.SourceAuditedBranches == 4
         and report.RankSchedulesMappedBranches == 2
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
-    check(warrior.Status == "HistoricalSourceAuditOutstanding"
-        and warrior.SourceRankEntriesThroughCap == nil,
-        "Level-20-only historical Warrior notes are not full cap parity")
+    check(warrior.Status == "SourceRanksAuditedClassUnimplemented"
+        and warrior.SourceRankEntriesThroughCap == 62
+        and warrior.SourceRankEntriesByLevel[20] == 20
+        and warrior.SourceRankEntriesByLevel[24] == 19
+        and warrior.SourceRankEntriesByLevel[28] == 23,
+        "Historical Warrior 20/24/28 rank inventory is now complete")
+    local knight = assert(Coverage.for_branch("HumanKnight"))
+    check(knight.Status == "SourceRanksAuditedClassUnimplemented"
+        and knight.SourceRankEntriesThroughCap == 54
+        and knight.SourceRankEntriesByLevel[20] == 16
+        and knight.SourceRankEntriesByLevel[24] == 16
+        and knight.SourceRankEntriesByLevel[28] == 22,
+        "Historical Knight 20/24/28 inventory does not grant a class")
     check(Coverage.for_branch("UnknownCareer") == nil,
         "Invented classes must not count toward release coverage")
     print(("[Level 30 Launch] PASS: %d assertions")
