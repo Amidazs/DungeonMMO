@@ -93,8 +93,8 @@ local function main()
         and warrior.SourceRankEntriesByLevel[24] == 19
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
-    check(warrior.TrainerMappedRankEntries == 24
-        and warrior.MissingRankScheduleEntries == 38
+    check(warrior.TrainerMappedRankEntries == 27
+        and warrior.MissingRankScheduleEntries == 35
         and not warrior.SourceRankScheduleMapped
         and not warrior.LaunchSkillCatalogueReady,
         "Ironvow has only four fully scheduled real trainer families; "
