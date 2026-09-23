@@ -93,7 +93,8 @@ def inspect_case(scene, mesh, label, group_name, frame):
         probes[axis] = {}
         for sign in (-1, 1):
             target.location = original.copy()
-            target.location[axis] += sign * TEST_STEP
+            index = {"y": 1, "z": 2}[axis]
+            target.location[index] += sign * TEST_STEP
             bpy.context.view_layer.update()
             probes[axis][str(sign)] = measure(mesh, indices)
     target.location = original
