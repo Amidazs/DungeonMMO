@@ -234,6 +234,39 @@ local function equip_visuals(character)
     end
 end
 
+-- Args: character (Model) - the new independent preview mannequin.
+-- Returns: nil - makes the body readable against Studio's default floor.
+local function style_test_performer(character)
+    local skin = Color3.fromRGB(215, 195, 168)
+    local cloth = Color3.fromRGB(169, 185, 205)
+    local limbs = Color3.fromRGB(189, 200, 215)
+    for _, part in character:GetChildren() do
+        if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart"
+            and not part.Name:match("^DMMO_Test") then
+            if part.Name == "Head" then
+                part.Color = skin
+                if part:IsA("MeshPart") then
+                    part.TextureID = ""
+                end
+            elseif part.Name:find("Torso") then
+                part.Color = cloth
+            else
+                part.Color = limbs
+            end
+            part.Material = Enum.Material.SmoothPlastic
+        end
+    end
+    local colors = character:FindFirstChildOfClass("BodyColors")
+    if colors then
+        colors.HeadColor3 = skin
+        colors.TorsoColor3 = cloth
+        colors.LeftArmColor3 = limbs
+        colors.RightArmColor3 = limbs
+        colors.LeftLegColor3 = limbs
+        colors.RightLegColor3 = limbs
+    end
+end
+
 -- Args: None.
 -- Returns: string - JSON record identifying isolated generated rig.
 local function main()
@@ -252,6 +285,7 @@ local function main()
         performer = create_default_performer()
     end
     equip_visuals(performer)
+    style_test_performer(performer)
     return HttpService:JSONEncode({
         testRig = performer:GetFullName(),
         sourceWasAvailable = source ~= nil,
