@@ -188,6 +188,136 @@ local function assert_one_drop(profiles, player, branch, item_id)
         "Genuine registered death did not atomically grant rightful loot")
 end
 
+--[[
+Moves only the Human test avatar to the actual next stage-six state.
+
+Args:
+    profiles (any): Live Dungeon's authoritative character writer.
+    human (Player): Rogue owner who first earned a real stage-three item.
+
+Returns:
+    nil: Seeds only future story progression inside disposable Studio.
+]]
+local function stage_cinder_owner(profiles, human)
+    local prepared, refusal = profiles:mutate(
+        human.UserId, function(profile)
+            local owner = profile.Characters.Slot1
+            local quest =
+                owner.ClassAdvancement.OriginalFirstTransferQuest
+            assert(quest.Step == 3 and quest.Count == 1)
+            quest.Step = 6
+            quest.Count = 0
+            quest.Ready = false
+        end
+    )
+    assert(prepared, "Temporary stage-six seed failed: "
+        .. tostring(refusal))
+end
+
+--[[
+Completes the prior fixture room and enters a genuine new combat room.
+
+Args:
+    players ({Player}): Two real admitted and active Studio avatars.
+    sessions (any): Live Dungeon run/session authority.
+    session_id (string): Exact existing party's instanced run ID.
+    folder (Folder): Actual Dungeon enemy models and cleanup lifecycle.
+
+Returns:
+    Model: Fresh physically spawned original Cinder quest monster.
+]]
+local function enter_cinder_room(players, sessions, session_id, folder)
+    for _, enemy in ipairs(folder:GetChildren()) do
+        local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.Health > 0 then
+            -- Prior encounter cleanup only, NOT the Cinder combat result.
+            humanoid.Health = 0
+        end
+    end
+    wait_for(function()
+        local current = sessions:get(session_id)
+        local state = current and current.InstanceState
+        local progress = state and state.EncounterRuntime
+        return progress and progress.EncounterStates
+            and progress.EncounterStates.CombatRoom1 == "Cleared"
+    end, "ordinary first room clear", 14)
+    local trigger = anchor("Temple.Room2.Trigger")
+    for _, player in ipairs(players) do
+        local root = player.Character.HumanoidRootPart
+        root.CFrame = trigger.CFrame * CFrame.new(0, 0, 9)
+        task.wait(0.15)
+        player.Character:FindFirstChildOfClass("Humanoid"):MoveTo(
+            trigger.Position + Vector3.new(0, 0, -2)
+        )
+    end
+    return wait_for(function()
+        for _, enemy in ipairs(folder:GetChildren()) do
+            if enemy:GetAttribute("SourceQuestMonsterId")
+                == "CinderBrigand"
+                and enemy:GetAttribute("DungeonEncounterId")
+                    ~= "CombatRoom1"
+                and enemy:FindFirstChildOfClass("Humanoid")
+                and enemy:FindFirstChildOfClass("Humanoid").Health > 0
+            then
+                return enemy
+            end
+        end
+    end, "actual stage-six Cinder pack in next combat room", 18)
+end
+
+--[[
+Verifies a normal client hit plus qualified real server kill and four items.
+
+Args:
+    profiles (any): Authoritative real Dungeon player profile service.
+    human (Player): Active Rogue equipped for source stage six.
+    elf (Player): Independent party member on a different quest branch.
+    monster (Model): Newly registered actual Cinder humanoid enemy.
+
+Returns:
+    nil: Genuine damage and four personally owned supplies are asserted.
+]]
+local function verify_cinder_combat(profiles, human, elf, monster)
+    local enemy_health = monster:FindFirstChildOfClass("Humanoid")
+    monster.PrimaryPart.Anchored = true
+    local root = human.Character.HumanoidRootPart
+    root.CFrame = CFrame.lookAt(
+        monster.PrimaryPart.Position + Vector3.new(0, 0, 4),
+        monster.PrimaryPart.Position
+    )
+    local before = enemy_health.Health
+    responses[tostring(human.UserId) .. ":ATTACK_RESULT"] = nil
+    channel:FireClient(human, "ATTACK")
+    wait_for(function()
+        return responses[tostring(human.UserId) .. ":ATTACK_RESULT"]
+    end, "new stage-six client basic attack request", 12)
+    wait_for(function()
+        return enemy_health.Health < before
+    end, "real client attack damages registered Cinder Brigand", 18)
+    assert(genuine_damage(human, monster, 1000) > 0,
+        "Original stage-six owner could not defeat physical Cinder enemy")
+    local owner = wait_for(function()
+        local character = profiles:get_character(human.UserId)
+        local state = character and
+            character.ClassAdvancement.OriginalFirstTransferQuest
+        return if state and state.Step == 7 then character else nil
+    end, "real source stage-six personal cache progress", 12)
+    for _, item_id in ipairs({
+        "cinder_cipher", "cinder_route_map",
+        "cinder_ward_seal", "cinder_tideglass_lens",
+    }) do
+        assert(inventory.count_item(owner, item_id) == 1
+            and inventory.count_item(
+                profiles:get_character(elf.UserId), item_id
+            ) == 0,
+            "Cinder material was duplicated or awarded to unrelated Elf")
+    end
+    assert(owner.Identity.ClassId == "Fighter"
+        and owner.ClassAdvancement.ActiveClassId == nil,
+        "Completing Cinder combat cannot grant unimplemented transfer")
+    print("[C4 Source Two Client] REAL_CINDER_SUPPLY_COMBAT_PASS")
+end
+
 -- Args: None.
 -- Returns: nil; two real clients fight separate physical challenge targets.
 local function run()
@@ -320,6 +450,13 @@ local function run()
             .ClassAdvancement.ActiveClassId == nil,
         "Source combat awarded an unfinished first class transfer")
     print("[C4 Source Two Client] REAL_HIT_AND_OWNER_BOUND_DROPS_PASS")
+    -- This separate stage-six section seeds only a later story step;
+    -- the earlier stage-three kills above came from genuine live combat.
+    stage_cinder_owner(profiles, human)
+    local cinder = enter_cinder_room(
+        members, sessions, session.SessionId, folder
+    )
+    verify_cinder_combat(profiles, human, elf, cinder)
 end
 
 task.spawn(function()
