@@ -1303,7 +1303,10 @@ local DEFINITIONS = table.freeze({
         Id = "HumanScoutSprint",
         Tier = "Common", MaxRank = 1, Kind = "Support",
         AllowedRaces = table.freeze({"Human"}),
-        AllowedBaseClasses = table.freeze({"Rogue"}),
+        AllowedBaseClasses = table.freeze({"Rogue", "Fighter"}),
+        -- Fighter access is granted ONLY by Marshal Briar's genuine
+        -- original first-transfer award. Legacy Rogue remains compatible.
+        AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
         RankLevels = table.freeze({[1] = 20}),
         WeaponTags = table.freeze({}),
     }),
@@ -1500,7 +1503,8 @@ local DEFINITIONS = table.freeze({
         MaxRank = 1,
         Kind = "Support",
         AllowedRaces = table.freeze({"Elf"}),
-        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardScout"}),
         RankLevels = table.freeze({[1] = 20}),
         WeaponTags = table.freeze({}),
     }),
