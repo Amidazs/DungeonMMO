@@ -1,3 +1,24 @@
+**Current C4 backend: v1.81 — verified first-tier Party Heal.**
+[Latest C4 roadmap](
+DungeonMMO_Roadmap_v1_81_C4_Party_Heal_20260923.md)
+and [actual two-client Dungeon/Studio gameplay record](
+../testing/c4-party-heal-v1-81-2026-09-23.md).
+Human and Elven Mystics now have all three genuine
+level-fourteen group-healing source ranks, authorized by the
+actual server-owned Dungeon party roster. The focused Studio
+source/healing suite passed 5/5, and the final unpublished
+two-client Dungeon combat test verified effective HP recovery
+for both players, healing-generated NPC threat, cooldown,
+real 3D range and spectator/solo exclusion.
+**All four Human/Elf starting-class source inventories are
+168/168; six currently inventoried classes total 357/396.**
+Thirty-nine partial Rogue/Scout source ranks and seven
+additional entirely unmapped first-transfer catalogues remain;
+0/9 original first-transfer paths are complete. The unrelated
+v1.78 hostile-weakening live-combat acceptance and separate
+humanoid-animation roadmap remain open. No `main` merge,
+publishing or production DataStore mutation took place.
+
 **Current C4 and professions backend: v1.80 — verified craft skills.**
 [Latest backend roadmap](
 DungeonMMO_Roadmap_v1_80_C4_Crafting_Playtest_20260923.md)
