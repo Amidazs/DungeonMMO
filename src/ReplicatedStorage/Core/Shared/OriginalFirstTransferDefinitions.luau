@@ -5,6 +5,17 @@ local Stages = require(script.Parent.C4OriginalFirstTransferQuestStages)
 local Definitions = {}
 
 local ENTRIES = table.freeze({
+    HumanWarrior = table.freeze({
+        BranchId = "HumanWarrior",
+        Id = "Ironvow",
+        DisplayName = "Ironvow",
+        RaceId = "Human",
+        BaseClassId = "Fighter",
+        MentorId = "MarshalTorren",
+        MentorName = "Marshal Torren",
+        SkillId = "IronvowDrivingStrike",
+        TrainerId = "IronvowTrainer",
+    }),
     HumanRogue = table.freeze({
         BranchId = "HumanRogue",
         Id = "Ashenblade",
@@ -29,6 +40,7 @@ local ENTRIES = table.freeze({
     }),
 })
 local BY_ID = table.freeze({
+    Ironvow = ENTRIES.HumanWarrior,
     Ashenblade = ENTRIES.HumanRogue,
     GreenwardScout = ENTRIES.ElvenScout,
 })
@@ -60,7 +72,7 @@ function Definitions.for_class(class_id: string): any?
 end
 
 --[[
-Lists only the two class careers with actual implemented source quests.
+Lists original class careers with authoritative source and mentor gates.
 
 Args:
     None.
@@ -69,7 +81,9 @@ Returns:
     {any}: Supported authored, immutable first-transfer definitions.
 ]]
 function Definitions.all(): {any}
-    return table.freeze({ENTRIES.HumanRogue, ENTRIES.ElvenScout})
+    return table.freeze({
+        ENTRIES.HumanWarrior, ENTRIES.HumanRogue, ENTRIES.ElvenScout,
+    })
 end
 
 --[[
