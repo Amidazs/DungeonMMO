@@ -6,6 +6,9 @@ local SkillDefinitions = require(
 local ItemDefinitions = require(
     script.Parent:WaitForChild("ItemDefinitions")
 )
+local FirstTransfers = require(
+    script.Parent:WaitForChild("OriginalFirstTransferDefinitions")
+)
 
 local PassiveSkillEffects = {}
 
@@ -40,6 +43,24 @@ local function purchased_rank(character: any, definition: any): number
     end
     if not eligible then
         return 0
+    end
+
+    -- An unearned Fighter must never receive an original transfer
+    -- passive from a forged or stale purchased-skill field. Legacy
+    -- Ranger/Rogue profiles retain their existing behavior.
+    local transferred = definition.AllowedFirstTransferClasses
+    if identity.BaseClassId == "Fighter"
+        and type(transferred) == "table"
+    then
+        local awarded = FirstTransfers.awarded(character)
+        local earned = false
+        for _, class_id in ipairs(transferred) do
+            if awarded and awarded.Id == class_id then
+                earned = true
+                break
+            end
+        end
+        if not earned then return 0 end
     end
 
     local allowed_races = definition.AllowedRaces
