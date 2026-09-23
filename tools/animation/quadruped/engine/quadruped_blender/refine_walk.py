@@ -23,6 +23,11 @@ def aim(bone, head, tail):
     bpy.context.view_layer.update()
 
 def generate(rig, config):
+    for limb in config["limbs"]:
+        for role in ("upper","lower","foot","toe"):
+            if limb[role] not in rig.pose.bones:raise ValueError("Missing mapped bone: "+limb[role])
+        for role in ("target","orientation"):
+            if limb[role] not in bpy.data.objects:raise ValueError("Missing control: "+limb[role])
     scene=bpy.context.scene
     scene.frame_set(1)
     bpy.context.view_layer.update()
