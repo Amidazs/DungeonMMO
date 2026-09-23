@@ -1,11 +1,13 @@
 # DungeonMMO — six humanoid starter animations
 
-Status (23 September 2026): **six authored R15 animation definitions in
-GitHub; Studio authoring and visual acceptance still pending.** The
-unpublished Studio test place and its original guardian were not open
-when this set was prepared. Do not claim that editable KeyframeSequences
-were already built inside Studio, that the motion looked good in
-playback, or that animation assets have been published.
+Status (23 September 2026): **six editable R15 KeyframeSequences
+actually built and replayed in unpublished Roblox Studio Place1;
+all six structural/marker checks and real Play-button event checks
+passed.** Actual Play-mode two-view motion quality and weapon
+alignment remain user-review gates. No animation assets were
+published or integrated into the live game. The original guardian
+was absent, so a separate built-in default R15 mannequin was
+created without replacing the original.
 
 These are source-controlled development-only files, **not** game
 `src/` code or production animation IDs.
@@ -35,14 +37,17 @@ projectile.
 - [HumanoidStarter_Generator.luau](HumanoidStarter_Generator.luau):
   reusable R15 joint pose authoring, six clip definitions, individual
   `Build(name)`, `BuildAll()`, `Pose(name, time)`, `Play(name)`,
-  `Equip(name)`, and `Stop()` controls. Requires the existing 15
-  R15 body `Motor6D` names and a `Humanoid.Animator`.
+  `Equip(name)`, and `Stop()` controls. Accepts 15 connected R15
+  body `Motor6D` **or** `AnimationConstraint` joints and requires a
+  `Humanoid.Animator`.
 - [HumanoidStarter_TestRigSetup.luau](HumanoidStarter_TestRigSetup.luau):
-  creates a **new** `DMMO_Humanoid_Starter_Test` by cloning the
-  original marked R15 guardian, removes the cloned hammer/scripts,
-  anchors only the new root, and attaches hideable practice sword,
-  dual daggers, bow and arrow to the appropriate hands. Does not
-  mutate the original guardian or its saved animation sequences.
+  creates **new** `DMMO_Humanoid_Starter_Test`. When the original
+  marked R15 guardian exists it clones that source; otherwise it
+  creates a fresh default Roblox R15 mannequin with connected
+  `AnimationConstraint` joints. It removes default animation
+  conflicts **on the clone only**, anchors the new root, adds
+  readable preview colors and attaches practice weapons. Original
+  guardian and saved clips are unchanged.
 - [HumanoidStarter_QA.luau](HumanoidStarter_QA.luau):
   command-bar build and structural checks for six distinct editable
   sequences, exact sampled duration, loop flags and event counts.
@@ -65,9 +70,10 @@ the assistant should perform this workflow using the connected Studio
 integration. The user does not need to install the generator, place
 keyframes, program, or learn Blender.
 
-1. Verify `game.PlaceId == 0`, Studio edit mode, and
-   `Workspace.DMMO_Astra_Guardian_Test` has the original
-   `DMMO_TestOnly` marker and a connected R15 Humanoid/Animator.
+1. Verify `game.PlaceId == 0` and Studio edit mode. The source
+   guardian is optional; if it exists it **must** be marked
+   `DMMO_TestOnly` and have a connected R15 Humanoid/Animator.
+   Without that source, setup creates its own built-in R15 model.
    **Never aim these scripts at the production DungeonMMO place.**
 2. Execute `HumanoidStarter_TestRigSetup.luau` once in the Studio
    command bar. Preserve the existing test rig if already present.
@@ -75,11 +81,11 @@ keyframes, program, or learn Blender.
    `DMMO_Humanoid_Starter_Generator` under
    `Workspace.DMMO_Humanoid_Starter_Test`. Install the exact GitHub
    generator source as the ModuleScript's `Source` property.
-4. Execute `HumanoidStarter_QA.luau` in edit mode. It calls
-   `BuildAll()`, saves six editable `KeyframeSequence` children
-   beneath the cloned R15 rig, and inspects their marker/keyframe
-   counts. Do **not** rerun `BuildAll()` on the same rig:
-   `Build(name)` refuses to overwrite existing same-named clips.
+4. Execute `HumanoidStarter_QA.luau` in edit mode. It builds
+   missing clips only, reuses already-created ones without overwriting
+   them and checks all six editable sequences, frame counts,
+   durations, loops and markers. `Build(name)` still rejects
+   overwriting an existing clip.
 5. Install `HumanoidStarter_Replay.server.lua` as a **disabled**
    `Script` under this same clone, then enable it in an isolated
    Play test. Capture full-speed side, front and gameplay-angle
@@ -113,3 +119,44 @@ require separate user approval.
 
 [Humanoid animation roadmap](../../../../docs/roadmap/DungeonMMO_Humanoid_Animation_Pipeline_20260922.md)
 tracks the independent visual QA and production acceptance gates.
+
+
+## Actual unpublished Studio execution and GIF review
+
+On 23 September 2026 the exact separate
+`Workspace.DMMO_Humanoid_Starter_Test` mannequin was built in
+unpublished Place1 and all six `KeyframeSequence` objects were
+generated and verified at 60 Hz. The subsequent real Play-button
+replay returned `DMMO_HUMANOID_REPLAY_COMPLETE`: Idle/Walk/Run
+looped twice; Sword emitted one `Impact`, Daggers two
+`Impact` markers, and Bow one `ArrowRelease` marker.
+An initial QA-only final check incorrectly required the absent
+original guardian; that check was fixed in GitHub and the complete
+replay passed on its final run.
+
+Six real Play-mode 12-frame animated GIFs and individual source
+screenshots are saved under:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_Humanoid_Starter_QA_20260923\\Play`
+
+For example:
+`Walk/DMMO_Humanoid_Walk_UNAPPROVED.gif` and
+`Bow/DMMO_Humanoid_Bow_UNAPPROVED.gif`.
+Use the same `<Clip>/DMMO_Humanoid_<Clip>_UNAPPROVED.gif`
+pattern for Idle, Run, Sword and Daggers. The capture scripts
+and GIF builder are in [qa](qa/). The original guardian was not
+present in Place1; no user scripts/models were overwritten.
+The replay test Script was disabled and Studio restored to
+unpublished Edit mode with six editable clips still present.
+
+**Visual approval is still OPEN.** The built-in R15 mannequin is
+simple block art; foot planting and controller movement need
+final-character testing. Practice weapon shape/visibility,
+bow/arrow/string alignment and attack arcs need user review.
+No published Roblox animation IDs exist. A permanent local
+`.rbxlx` or `.rbxm` Studio-file backup is not verified; the
+GitHub generator and six local QA GIFs are durable reproduction
+sources, not substitutes for an accepted, saved animation asset.
+
+[Focused Studio validation record](
+../../../../docs/testing/humanoid-starter-six-clip-20260923.md).
