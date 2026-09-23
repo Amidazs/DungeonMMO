@@ -30,6 +30,13 @@ local CHALLENGES = table.freeze({
         Step = 6,
         Health = 95,
     }),
+    ElvenScoutSix = table.freeze({
+        Name = "Bracken Warden",
+        SourceId = "BrackenWarden",
+        BranchId = "ElvenScout",
+        Step = 6,
+        Health = 105,
+    }),
 })
 
 --[[
@@ -53,11 +60,17 @@ function Spawns.eligible_branches(
             and advancement.OriginalFirstTransferQuest
         local branch = state and state.BranchId
         local quest = branch and Source.get(branch)
-        local challenge_id = if branch == "HumanRogue"
-            and state and state.Step == 6
-            then "HumanRogueSix" else branch
+        local challenge_id = if state and state.Step == 6
+            and branch == "HumanRogue"
+            then "HumanRogueSix"
+            elseif state and (state.Step == 5 or state.Step == 6)
+                and branch == "ElvenScout"
+            then "ElvenScoutSix" else branch
         local challenge = CHALLENGES[challenge_id]
-        local step = quest and quest.Steps[state.Step]
+        local step = quest and quest.Steps[
+            if challenge_id == "ElvenScoutSix"
+                then 6 else state.Step
+        ]
         if quest and challenge and state.Ready ~= true
             and step and step.Kind == "QuestMonsterDefeat"
             and step.TargetId == challenge.SourceId
@@ -132,7 +145,9 @@ function Spawns.augment(options: any, factory: any?): any
     local registrations = {}
     for branch_index, branch in ipairs(branches) do
         local challenge = CHALLENGES[branch]
-        for index = 1, PER_BRANCH_PER_ROOM do
+        local count = if challenge_id == "ElvenScoutSix"
+            then 1 else PER_BRANCH_PER_ROOM
+        for index = 1, count do
             local name = challenge.SourceId
                 .. tostring(branch_index) .. "_" .. tostring(index)
             local spawn_at = base.PrimaryPart.CFrame
