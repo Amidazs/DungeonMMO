@@ -1444,6 +1444,47 @@ local GREENWARD_RENEWAL = specialize_skill(
     }
 )
 
+-- Both first-transfer classes have an independently authored bow and
+-- dagger training line. Each purchased rank changes real server damage;
+-- existing combat projectiles and melee hit authority stay unchanged.
+local WAYFINDER_ARROW = specialize_skill(
+    FIGHTER_BOW_SHOT, "WayfinderArrow", "Wayfinder Arrow", {
+        STAMINA_COST = 17,
+        COOLDOWN_SECONDS = 6,
+        BASE_DAMAGE = 22,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 22}),
+            [2] = table.freeze({BASE_DAMAGE = 25}),
+            [3] = table.freeze({BASE_DAMAGE = 28}),
+            [4] = table.freeze({BASE_DAMAGE = 31}),
+            [5] = table.freeze({BASE_DAMAGE = 34}),
+            [6] = table.freeze({BASE_DAMAGE = 37}),
+            [7] = table.freeze({BASE_DAMAGE = 40}),
+            [8] = table.freeze({BASE_DAMAGE = 43}),
+            [9] = table.freeze({BASE_DAMAGE = 46}),
+        }),
+    }
+)
+
+local WAYFINDER_CUT = specialize_skill(
+    FIGHTER_DAGGER_STRIKE, "WayfinderCut", "Wayfinder Cut", {
+        STAMINA_COST = 17,
+        COOLDOWN_SECONDS = 6,
+        BASE_DAMAGE = 23,
+        RANKS = table.freeze({
+            [1] = table.freeze({BASE_DAMAGE = 23}),
+            [2] = table.freeze({BASE_DAMAGE = 26}),
+            [3] = table.freeze({BASE_DAMAGE = 29}),
+            [4] = table.freeze({BASE_DAMAGE = 32}),
+            [5] = table.freeze({BASE_DAMAGE = 35}),
+            [6] = table.freeze({BASE_DAMAGE = 38}),
+            [7] = table.freeze({BASE_DAMAGE = 41}),
+            [8] = table.freeze({BASE_DAMAGE = 44}),
+            [9] = table.freeze({BASE_DAMAGE = 47}),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1602,6 +1643,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     HumanScoutSprint = HUMAN_SCOUT_SPRINT,
     AshenbladeOpening = ASHENBLADE_OPENING,
     GreenwardRenewal = GREENWARD_RENEWAL,
+    WayfinderArrow = WAYFINDER_ARROW,
+    WayfinderCut = WAYFINDER_CUT,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
