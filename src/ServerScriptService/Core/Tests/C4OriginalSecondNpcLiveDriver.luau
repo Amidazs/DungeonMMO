@@ -1038,9 +1038,15 @@ client:Destroy()
 channel:Destroy()
 assert(ok and value == "PASS",
     "Original C4 second NPC two-client playtest failed: " .. tostring(value))
-print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
-print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
-print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
-print("[C4 Original Second NPC Live] VERIFIED_ROGUE_FINAL_SOURCE_PASS")
-print("[C4 Original Second NPC Live] VERIFIED_SCOUT_SOURCE_COMPLETE_PASS")
-print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_FIRST_TRANSFER_PASS")
+if workspace:GetAttribute("DungeonMMOStudioTransferFocus") == true then
+    -- This focused test seeds finished source quests; it has NOT rerun
+    -- the previously accepted stage-one through nine NPC interactions.
+    print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_FIRST_TRANSFER_PASS")
+else
+    print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
+    print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
+    print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
+    print("[C4 Original Second NPC Live] VERIFIED_ROGUE_FINAL_SOURCE_PASS")
+    print("[C4 Original Second NPC Live] VERIFIED_SCOUT_SOURCE_COMPLETE_PASS")
+    print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_FIRST_TRANSFER_PASS")
+end
