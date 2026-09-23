@@ -7,10 +7,10 @@ quadruped master rig, finished animation or backend integration.**
 
 This is an additional **art/animation** workstream. The
 [humanoid animation pipeline](DungeonMMO_Humanoid_Animation_Pipeline_20260922.md)
-remains separate. The current [v1.79 professions/economy roadmap](
-DungeonMMO_Roadmap_v1_79_Exclusive_Professions_20260923.md)
-remains the latest backend supplement; no C4/profession acceptance
-is inferred from this animal-animation work.
+remains separate. The [canonical roadmap index](README.md) tracks newer backend
+supplements independently of this art workstream. No C4,
+profession or combat-backend acceptance is inferred from
+experimental animal rigging.
 
 ## Desired result
 
