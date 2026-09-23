@@ -109,15 +109,19 @@ Studio run reported:
 
 `[C4 Scout Lock Live] VERIFIED_REAL_CLIENT_LOCKPICKING_PASS`
 
-The first client test attempt timed out because the
-test driver issued prompt input immediately after
-moving the test player. The test runner was updated
-to allow 0.4 seconds for movement replication before
-the genuine client prompt input. The subsequent
-run observed actual server prompt events and
-passed the full targeted client acceptance.
-Only test-runner instrumentation was changed
-for that timing fix.
+The headless Studio input driver initially issued
+prompt input before the test avatar/engine had
+finished movement replication and showing its
+local ProximityPrompt. One later run also found
+that a fixed-delay-only input was intermittent.
+The disposable **test runner**, not the production
+lock authority, was amended to observe the actual
+client `ProximityPromptService.PromptShown` signal
+and require the real server `Triggered` event.
+The final run after this change passed the complete
+client acceptance on the current game code.
+Previous timing-related timeouts are retained
+in diagnostic logs; they were not counted as passes.
 
 **Boundaries of this proof:** Ranks three through five
 are purchased and their matching physical locks are
