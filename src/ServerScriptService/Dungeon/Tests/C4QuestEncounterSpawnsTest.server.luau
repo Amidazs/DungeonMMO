@@ -146,6 +146,30 @@ local function main()
     check(later.ok and #later.registrations == 0
         and #execution.Enemies == 5,
         "Completed source combat stages cannot spawn repeated rewards")
+    characters[101].ClassAdvancement
+        .OriginalFirstTransferQuest.Step = 6
+    local cinder = Spawns.augment(
+        options, {create = mock_create}
+    )
+    check(cinder.ok and #cinder.registrations == 2
+        and #execution.Enemies == 7,
+        "Only eligible Rogue stage six spawns its own Cinder challenge")
+    for _, registration in ipairs(cinder.registrations) do
+        check(registration.branch_id == "HumanRogue"
+            and registration.step_index == 6
+            and registration.enemy:GetAttribute("SourceQuestMonsterId")
+                == "CinderBrigand",
+            "Original Cinder monster is bound to exactly Rogue stage six")
+        check(ledger:register_enemy(
+            registration.enemy, registration.branch_id,
+            "QuestRoom1", registration.step_index
+        ), "Physical Cinder life registers only for exact stage six")
+    end
+    check(ledger:available(
+        require(game:GetService("ReplicatedStorage")
+            .Core.Shared.C4OriginalFirstTransferQuestStages
+        ).get("HumanRogue"), 6),
+        "Ledger exposes stage-six monster only when physically registered")
     ledger:clear()
     folder:Destroy()
     print(("[C4 Source Pack] PASS: %d assertions"):format(checks))
