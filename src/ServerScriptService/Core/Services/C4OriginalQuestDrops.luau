@@ -102,7 +102,39 @@ function Drops.validate(
 end
 
 --[[
-Mints one personal proof item within the same mutation as quest progress.
+Consumes exactly the owner's earned materials on a real stage-four turn-in.
+
+Args:
+    character (any): Mutable verified quest owner's selected character.
+    branch_id (string): Current original source quest branch.
+
+Returns:
+    (boolean, string?): Successful full turn-in or transaction refusal.
+]]
+local function consume_return_items(
+    character: any, branch_id: string
+): (boolean, string?)
+    if branch_id == "HumanRogue" then
+        local removed = Inventory.apply_remove_from_character(
+            character, "spartoi_bone", 10
+        )
+        return removed.ok, removed.reason
+    end
+    if branch_id == "ElvenScout" then
+        for _, item_id in pairs(LETTER_ITEMS) do
+            local removed = Inventory.apply_remove_from_character(
+                character, item_id, 1
+            )
+            if not removed.ok then
+                return false, removed.reason
+            end
+        end
+    end
+    return true, nil
+end
+
+--[[
+Commits a real owner-bound quest drop or consumes a verified NPC turn-in.
 
 Args:
     character (any): Mutable owner character inside ProfileService mutate.
@@ -117,6 +149,9 @@ function Drops.apply(
 ): (boolean, string?)
     local valid, refusal = Drops.validate(character, state, event)
     if not valid then return false, refusal end
+    if state.Step == 4 then
+        return consume_return_items(character, state.BranchId)
+    end
     local item_id: string? = nil
     if state.Step == 3 and state.BranchId == "HumanRogue" then
         item_id = "spartoi_bone"
