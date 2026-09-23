@@ -484,3 +484,47 @@ mesh with grounded paw contact, test continuous playback
 from all sides in the isolated Studio place and obtain
 user visual approval before assigning Astra the full
 quadruped engine. The current model is still experimental.
+
+## Isolated IK paw-target and actual-mesh audit — 23 September 2026
+
+**Stage 1 remains OPEN; this is NOT a grounded or approved walk.**
+After confirming that two Roblox Studio processes had the same saved
+JawV3 QA place open, continued exclusively in Blender background mode.
+Neither Studio instance nor any existing QA or production place was
+modified. No assets were published or attached to live gameplay.
+
+Source-controlled experimental scripts:
+
+- [FrostfangIKWalkTrial.py](../../tools/animation/quadruped/qa/FrostfangIKWalkTrial.py)
+  adds four individually keyed IK ankle targets and saves an independent
+  72-frame, 24 FPS Blend. The initially attempted Blender API call to
+  `bone.constraints.clear()` failed; the committed script now removes
+  constraints individually and ran successfully in Blender 5.0.1.
+- [FrostfangIKPawMeshAudit.py](../../tools/animation/quadruped/qa/FrostfangIKPawMeshAudit.py)
+  evaluates actual skinned toe vertices, not only IK empties, at 11
+  frames and writes an independent JSON diagnostic report.
+
+Unpublished local outputs:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\`
+
+- `Frostfang_IKWalk_TARGET_QA.blend` — new editable Blender-only
+  trial; it does NOT replace the earlier saved JawV3 Studio place.
+- `target_audit.json` — four targets returned to their initial
+  positions at frame 1 and frame 72; vertical excursion ~0.044364
+  source units. Target rest return is not foot-plant approval.
+- `actual_paw_mesh_audit.json` — samples 883/979 forepaw and
+  827/933 hindpaw weighted toe vertices respectively. The
+  fore-left sampled minimum paw height varied from ~0.0263 to
+  0.0684 source units, with horizontal centroid drift; other paws
+  also show height and horizontal-position changes. All four
+  return to the sampled rest heights at the end. The current gait
+  remains unsuitable: **do not label it world-locked/grounded**.
+
+**Remaining blockers:** true continuous paw-mesh world contact and
+root-motion coordination, corrected shoulder weights and asymmetric
+hindleg anatomy, genuine independently opening lower mouth and jaw,
+multiview motion review, actual Studio Animator playback, and visual
+approval. Preserve the earlier source, JawV3 files, QA Studio places,
+and experimental motion preview. Use current roadmap index v1.88 as
+backend/class baseline; the art status is independent of that version.
