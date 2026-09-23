@@ -199,23 +199,7 @@ local function check_legacy_safety(profiles: any, service: any)
         advancement.CompletedByRace.Elf = {ElfSpellweaver = true}
         advancement.ActiveClassId = "ElfSpellweaver"
     end), "Historical advanced class must persist")
-    local persisted = assert(profiles:get_character(99305, 1))
     local legacy_choice = service:choose(99305, "ElvenOracle")
-    print("[C4 First Transfer Choice] LEGACY_DIAG",
-        "reason=" .. tostring(legacy_choice.reason),
-        "active=" .. tostring(
-            persisted.ClassAdvancement.ActiveClassId
-        ),
-        "completed=" .. tostring(
-            persisted.ClassAdvancement.CompletedByRace.Elf
-                and persisted.ClassAdvancement.CompletedByRace.Elf
-                    .ElfSpellweaver
-        ),
-        "identity=" .. tostring(persisted.Identity.BaseClassId),
-        "chosen=" .. tostring(
-            persisted.ClassAdvancement.OriginalFirstTransferChoiceId
-        )
-    )
     check(legacy_choice.reason == "LegacyClassMigrationRequired",
         "Existing advanced class history must remain migration-protected")
     check(profiles:get_character(99305, 1)
