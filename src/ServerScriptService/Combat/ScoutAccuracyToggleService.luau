@@ -21,7 +21,7 @@ Returns:
 function ScoutAccuracyToggleService.stop(player: Player)
     local record = active[player]
     active[player] = nil
-    if record and record.Character.Parent then
+    if record and record.Character and record.Character.Parent then
         record.Character:SetAttribute("C4ScoutAccuracyActive", false)
         record.Character:SetAttribute("C4ScoutAccuracyBonus", 0)
     end
