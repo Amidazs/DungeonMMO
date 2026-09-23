@@ -567,6 +567,86 @@ local function verify_captain_final(player, profiles, npc_runtime)
 end
 
 --[[
+Seeds a completed dungeon rescue only within the disposable Base fixture.
+
+Args:
+    profiles (any): Real Base loaded character profile authority.
+    user_id (number): Real Elf client's unique Roblox UserId.
+    has_proof (boolean): Whether the earlier real Warden proof is supplied.
+
+Returns:
+    nil: Leaves the original Elf Fighter at the ordered hub report stage.
+]]
+local function seed_scout_report(profiles, user_id, has_proof)
+    local ok, reason = profiles:mutate(user_id, function(profile)
+        local character = profile.Characters.Slot1
+        local state = character.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state.BranchId == "ElvenScout" and state.Step == 5)
+        state.Step = 8
+        state.Count = 0
+        if has_proof then
+            state.Proofs.RustedKey = true
+        else
+            state.Proofs.RustedKey = nil
+        end
+    end)
+    assert(ok, "Disposable Scout hub report seed refused: "
+        .. tostring(reason))
+end
+
+--[[
+Verifies the actual two physical hub mentors and later Scout proof gating.
+
+Args:
+    elf (Player): Real authenticated Elf client avatar.
+    profiles (any): Existing authoritative Base profile service.
+    npcs (any): Already connected physical source quest NPC runtime.
+
+Returns:
+    nil: Completes the Scout source sequence without granting class skills.
+]]
+local function verify_scout_hub_reports(elf, profiles, npcs)
+    local parts = workspace:WaitForChild("C4OriginalSourceQuestNPCs")
+    local thorne = assert(parts:FindFirstChild("WardenThorne"))
+    local elyra = assert(parts:FindFirstChild("PathfinderElyra"))
+    seed_scout_report(profiles, elf.UserId, false)
+    approach(elf, thorne)
+    talk(elf, thorne)
+    assert(npcs:quest_service():build_snapshot(
+        elf.UserId
+    ).Step == 8, "Thorne must refuse rescue report without earned proof")
+    assert(profiles:mutate(elf.UserId, function(profile)
+        local state = profile.Characters.Slot1
+            .ClassAdvancement.OriginalFirstTransferQuest
+        state.Proofs.RustedKey = true
+    end), "Cannot restore test-owned authentic Warden receipt proof")
+    talk(elf, thorne)
+    local reported = wait_for(function()
+        local snapshot = npcs:quest_service():build_snapshot(elf.UserId)
+        return if snapshot.ok and snapshot.Step == 9
+            then snapshot else nil
+    end, "real stage-eight Warden Thorne report", 12)
+    assert(not reported.ClassAwarded and reported.WorldReady,
+        "Thorne report must not grant a class or bypass real Elyra prompt")
+    approach(elf, elyra)
+    talk(elf, elyra)
+    local completed = wait_for(function()
+        local snapshot = npcs:quest_service():build_snapshot(elf.UserId)
+        return if snapshot.ok and snapshot.Ready
+            then snapshot else nil
+    end, "real final Pathfinder Elyra report", 12)
+    local owner = profiles:get_character(elf.UserId)
+    assert(completed.Step == 10 and not completed.ClassAwarded
+        and owner.Identity.ClassId == "Fighter"
+        and owner.ClassAdvancement.ActiveClassId == nil,
+        "Finishing Scout source quest must not grant level-20 class early")
+    talk(elf, elyra)
+    assert(npcs:quest_service():build_snapshot(
+        elf.UserId
+    ).Step == 10, "Repeated final scout prompt cannot skip advanced class")
+end
+
+--[[
 Tests two independent characters and their real physical source quest NPCs.
 
 Args:
@@ -686,6 +766,12 @@ local function main()
         elf.UserId
     ).Step == 5, "Rogue final report cannot complete Elf's separate quest")
     print("[C4 Original Second NPC Live] REAL_FINAL_CAPTAIN_TURNIN_PASS")
+    verify_scout_hub_reports(elf, profiles, npcs)
+    assert(npcs:quest_service():build_snapshot(
+        human.UserId
+    ).Ready == true,
+        "Elf source-quest completion must not modify Human quest")
+    print("[C4 Original Second NPC Live] REAL_SCOUT_HUB_REPORT_PASS")
 end
 
 task.spawn(function()
@@ -715,3 +801,4 @@ print("[C4 Original Second NPC Live] VERIFIED_TWO_CLIENT_STAGE_TWO_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FOUR_TURNIN_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_STAGE_FIVE_CAPTAIN_PASS")
 print("[C4 Original Second NPC Live] VERIFIED_ROGUE_FINAL_SOURCE_PASS")
+print("[C4 Original Second NPC Live] VERIFIED_SCOUT_SOURCE_COMPLETE_PASS")
