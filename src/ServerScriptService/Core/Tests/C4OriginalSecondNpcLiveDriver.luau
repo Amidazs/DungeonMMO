@@ -378,6 +378,20 @@ local function main()
             and not Trade.can_bank(item_id),
             "Neti trial weapon escaped its personal quest binding")
     end
+    -- The trial weapons are real equippable Fighter inventory gear,
+    -- not inert quest flags or a client-side icon.
+    for _, weapon_id in ipairs({
+        "neti_trial_dagger", "neti_trial_bow",
+    }) do
+        local equipped = runtime.EquipmentService:equip(
+            human.UserId, weapon_id, "Weapon"
+        )
+        assert(equipped.ok, "Owner could not equip real Neti trial weapon "
+            .. weapon_id .. ": " .. tostring(equipped.reason))
+        local after_equip = profiles:get_character(human.UserId)
+        assert(after_equip.Equipment.Weapon == weapon_id,
+            "Neti trial weapon did not become actual equipped item")
+    end
     print("[C4 Original Second NPC Live] REAL_NETI_ATOMIC_WEAPONS_PASS")
 
     advance_two_stages(
