@@ -1140,6 +1140,65 @@ local function run_ironvow_only(human, elf, profiles, npcs)
         "HumanWarrior", "MarshalTorren", "SmithOrla"
     )
     print("[Ironvow Physical Live] REAL_IRONROOT_TWO_NPCS_PASS")
+    local items = require(game:GetService("ServerScriptService")
+        .Core.Services.InventoryService)
+    local actors = workspace.C4OriginalSourceQuestNPCs
+    local smith = assert(actors:FindFirstChild("SmithOrla"))
+    local marshal = assert(actors:FindFirstChild("MarshalTorren"))
+    assert(profiles:mutate(human.UserId, function(profile)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state and state.BranchId == "HumanWarrior"
+            and state.Step == 3)
+        -- Four distinct raider kills were already tested in Dungeon.
+        -- Only those earlier owner-bound results are prepared here.
+        state.Step = 4
+        state.Count = 0
+        state.Proofs.IronrootToken4 = true
+        for _ = 1, 4 do
+            assert(items.apply_item_to_character(
+                owner, "ironroot_dispatch_marker", 1
+            ).ok)
+        end
+    end), "Prior stage-three personal loot fixture was rejected")
+    approach(human, smith)
+    talk(human, smith)
+    local returned = wait_for(function()
+        local owner = profiles:get_character(human.UserId)
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        if state.Step == 5 and items.count_item(
+            owner, "ironroot_dispatch_marker"
+        ) == 0 then return state end
+    end, "real Smith Orla consumes four individually owned markers", 12)
+    assert(returned.Proofs.IronrootToken4 == true,
+        "Four unique raider proofs disappeared after real Orla hand-in")
+    print("[Ironvow Physical Live] REAL_FOUR_MARKER_TURNIN_PASS")
+    assert(profiles:mutate(human.UserId, function(profile)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state.Step == 5)
+        -- The independently tested boss life supplied this earlier seal.
+        state.Step = 6
+        state.Count = 0
+        state.Proofs.RidgebreakerSigil = true
+        assert(items.apply_item_to_character(
+            owner, "ridgebreaker_oath_seal", 1
+        ).ok)
+    end), "Prior boss owner's authentic seal fixture was rejected")
+    approach(human, marshal)
+    talk(human, marshal)
+    local complete = wait_for(function()
+        local owner = profiles:get_character(human.UserId)
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        if state.Ready and state.Step == 7
+            and items.count_item(owner, "ridgebreaker_oath_seal") == 0
+        then return state end
+    end, "real Marshal Torren consumes personal final boss seal", 12)
+    assert(complete.Proofs.RidgebreakerSigil == true
+        and profiles:get_character(human.UserId).Identity.ClassId
+            == "Fighter",
+        "Physical final turn-in cannot give a class before real mentor")
+    print("[Ironvow Physical Live] REAL_BOSS_SEAL_TURNIN_PASS")
     local definition = assert(require(
         game:GetService("ReplicatedStorage").Core.Shared
             .OriginalFirstTransferDefinitions
@@ -1152,15 +1211,12 @@ local function run_ironvow_only(human, elf, profiles, npcs)
         local owner = profile.Characters.Slot1
         local state = owner.ClassAdvancement.OriginalFirstTransferQuest
         assert(state and state.BranchId == source.BranchId
-            and state.Step == 3)
-        -- Monster/loot stages are separately tested in live Dungeon.
-        -- Only earlier proofs are prepared for this isolated Base test.
-        state.Step = #source.Steps + 1
-        state.Count = 0
-        state.Ready = true
-        state.Proofs = {
-            IronrootToken4 = true, RidgebreakerSigil = true,
-        }
+            and state.Step == #source.Steps + 1
+            and state.Ready == true
+            and state.Proofs.IronrootToken4 == true
+            and state.Proofs.RidgebreakerSigil == true)
+        -- The actual physical NPCs above completed every Base turn-in.
+        -- Only level-20 starter mastery is prepared for trainer testing.
         owner.Progression.SkillPointEntitlement = 1600
         owner.Progression.Skills.IronCleave = {
             Known = true, PurchasedRank = 9, Proficiency = 350,
