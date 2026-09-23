@@ -1,3 +1,28 @@
+**Current C4 backend: v1.84 — real Scout Accuracy toggle.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_84_C4_Scout_Accuracy_20260923.md)
+and [executed focused Studio / actual Dungeon client record](
+../testing/c4-scout-accuracy-toggle-v1-84-2026-09-23.md).
+Human Rogue and Elven Scout each gained a genuine, separately
+purchased level-24 Accuracy stance: client-on/off, actual
+three-stamina activation and three-stamina-per-second upkeep,
+revocation on resource exhaustion/skill loss and +0.12
+server-authoritative melee/bow hit probability against NPCs
+with explicitly authored evasiveness. NPCs without the new
+evasion attribute preserve previous physical hit behavior.
+A real admitted Dungeon client activated/deactivated the
+stance; deterministic server physical damage contexts
+verified identical off/on/off misses and HP hits, actual
+stamina upkeep and exhaustion. Focused Studio suites passed
+**7/7**, including updated source audit. Current six-class
+original C4 source mapping is **373/396**: four starting
+classes 168/168, Human Rogue **87/99** and Elven Scout
+**118/129**. The other seven original first-transfer class
+catalogues remain unmapped, and **0/9** paths are fully
+complete. Agreed one-Gathering/one-Crafting profession and
+no-publish policies and separate humanoid/quadruped animation
+roadmap remain unchanged.
+
 **Current C4 backend: v1.83 — live Scout Critical Power toggle.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_83_C4_Scout_Critical_Power_20260923.md)
