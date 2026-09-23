@@ -1589,6 +1589,83 @@ local IRONVOW_BATTLE_CALL = specialize_skill(
     }
 )
 
+-- Original Oathguard shield impacts and zero-damage taunts share the
+-- real authenticated melee and threat executors. A usable impact must
+-- also pass the runtime's server-owned offhand Shield equipment gate.
+local OATHGUARD_SHIELD_IMPACT = specialize_skill(
+    SHIELD_BASH, "OathguardShieldImpact", "Stonewatch Impact", {
+        STAMINA_COST = 19,
+        COOLDOWN_SECONDS = 6,
+        BASE_DAMAGE = 7,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 7,
+                STAGGER_SECONDS = 0.70,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 9,
+                STAGGER_SECONDS = 0.80,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 11,
+                STAGGER_SECONDS = 0.90,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 13,
+                STAGGER_SECONDS = 1.00,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 15,
+                STAGGER_SECONDS = 1.10,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 17,
+                STAGGER_SECONDS = 1.20,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 19,
+                STAGGER_SECONDS = 1.30,
+            }),
+            [8] = table.freeze({
+                BASE_DAMAGE = 21,
+                STAGGER_SECONDS = 1.40,
+            }),
+            [9] = table.freeze({
+                BASE_DAMAGE = 23,
+                STAGGER_SECONDS = 1.50,
+            }),
+        }),
+    }
+)
+
+local OATHGUARD_CHALLENGE = specialize_skill(
+    TAUNT, "OathguardChallenge", "Oathguard Challenge", {
+        COOLDOWN_SECONDS = 10,
+        BASE_DAMAGE = 0,
+        TAUNT_BONUS_THREAT = 24,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                TAUNT_BONUS_THREAT = 24,
+            }),
+            [2] = table.freeze({
+                TAUNT_BONUS_THREAT = 31,
+            }),
+            [3] = table.freeze({
+                TAUNT_BONUS_THREAT = 38,
+            }),
+            [4] = table.freeze({
+                TAUNT_BONUS_THREAT = 45,
+            }),
+            [5] = table.freeze({
+                TAUNT_BONUS_THREAT = 52,
+            }),
+            [6] = table.freeze({
+                TAUNT_BONUS_THREAT = 59,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -1753,6 +1830,8 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GreenwardCalmingArrow = GREENWARD_CALMING_ARROW,
     IronvowDrivingStrike = IRONVOW_DRIVING_STRIKE,
     IronvowBattleCall = IRONVOW_BATTLE_CALL,
+    OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
+    OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,
