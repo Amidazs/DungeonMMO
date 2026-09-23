@@ -5,6 +5,22 @@ local SourceQuests = require(
 )
 local Rules = {}
 
+local LETTER_IDS = table.freeze({
+    PriasLetter1 = true, PriasLetter2 = true,
+    PriasLetter3 = true, PriasLetter4 = true,
+})
+
+local STAGE_PROOFS = table.freeze({
+    RogueTrialSkeleton = table.freeze({SpartoiBone = true}),
+    OlMahumPatrol = LETTER_IDS,
+    OlMahumSentry = table.freeze({RustedKey = true}),
+    CatsEyeBandit = table.freeze({
+        StolenJewelry = true, StolenTomes = true,
+        StolenRing = true, StolenNecklace = true,
+    }),
+})
+
+
 --[[
 Starts a source quest only for a saved original branch choice and starter.
 
@@ -89,6 +105,30 @@ function Rules.can_progress(
     if event.Kind ~= step.Kind or event.TargetId ~= step.TargetId then
         return false, "OriginalQuestWrongStage"
     end
+    -- Each actual monster life has one stable receipt, independent of
+    -- EventId. Changing the event wrapper cannot credit the same kill.
+    if step.Kind == "QuestMonsterDefeat" then
+        local receipt_id = event.MonsterReceiptId
+        if type(receipt_id) ~= "string" or #receipt_id == 0
+            or #receipt_id > 108
+        then
+            return false, "OriginalQuestMonsterReceiptRequired"
+        end
+        if current.AppliedEvents["Kill:" .. receipt_id] == true then
+            return false, "OriginalQuestMonsterAlreadyCredited"
+        end
+    end
+    local permitted_proofs = STAGE_PROOFS[step.TargetId] or {}
+    if event.VerifiedProofIds ~= nil
+        and type(event.VerifiedProofIds) ~= "table"
+    then
+        return false, "OriginalQuestUnexpectedProof"
+    end
+    for proof_id, verified in pairs(event.VerifiedProofIds or {}) do
+        if verified == true and permitted_proofs[proof_id] ~= true then
+            return false, "OriginalQuestUnexpectedProof"
+        end
+    end
     if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
         return false, "OriginalTrialWeaponRequired"
     end
@@ -103,20 +143,37 @@ function Rules.can_progress(
     then
         return false, "OriginalQuestLootProofRequired"
     end
+    if step.TargetId == "Neti" and current.Step == 4
+        and (type(current.Proofs) ~= "table"
+            or current.Proofs.SpartoiBone10 ~= true)
+    then
+        return false, "OriginalQuestLootProofRequired"
+    end
+    if step.TargetId == "GuardMoretti" and current.Step == 4 then
+        for letter_id in pairs(LETTER_IDS) do
+            if type(current.Proofs) ~= "table"
+                or current.Proofs[letter_id] ~= true
+            then
+                return false, "OriginalQuestLootProofRequired"
+            end
+        end
+    end
     if step.TargetId == "OlMahumPatrol" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
-        local fresh = false
+        local fresh_count = 0
+        local verified = event.VerifiedProofIds or {}
         for _, id in ipairs(ids) do
-            if type(event.VerifiedProofIds) == "table"
-                and event.VerifiedProofIds[id] == true
-                and type(current.Proofs) == "table"
-                and current.Proofs[id] ~= true
-            then
-                fresh = true
+            if verified[id] == true then
+                if type(current.Proofs) == "table"
+                    and current.Proofs[id] == true
+                then
+                    return false, "OriginalQuestDistinctLetterRequired"
+                end
+                fresh_count += 1
             end
         end
-        if not fresh then
+        if fresh_count ~= 1 then
             return false, "OriginalQuestDistinctLetterRequired"
         end
     end
@@ -161,6 +218,9 @@ function Rules.advance(quest: any, current: any, event: any): any
     if not ok then return {ok = false, reason = reason} end
     local step = quest.Steps[current.Step]
     current.AppliedEvents[event.EventId] = true
+    if step.Kind == "QuestMonsterDefeat" then
+        current.AppliedEvents["Kill:" .. event.MonsterReceiptId] = true
+    end
     if type(current.Proofs) ~= "table" then
         current.Proofs = {}
     end
@@ -168,6 +228,12 @@ function Rules.advance(quest: any, current: any, event: any): any
         if verified == true then current.Proofs[id] = true end
     end
     current.Count = math.min(step.Required, (current.Count or 0) + 1)
+    if step.TargetId == "RogueTrialSkeleton"
+        and current.Count == step.Required
+    then
+        -- Never accept an aggregate ten-bone proof from an incoming event.
+        current.Proofs.SpartoiBone10 = true
+    end
     if current.Count >= step.Required then
         current.Step += 1
         current.Count = 0
