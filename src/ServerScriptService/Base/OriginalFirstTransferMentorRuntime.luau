@@ -67,7 +67,9 @@ local function make_trainer(
     part.CanCollide = false
     part.Color = mentor.Color
     part.Material = Enum.Material.Wood
-    part.CFrame = mentor.CFrame * CFrame.new(5, 0, 0)
+    -- Keep the trainer outside the advancement prompt's ten-stud
+    -- display range, so nearby training never hides a class transfer.
+    part.CFrame = mentor.CFrame * CFrame.new(0, 0, -14)
     part:SetAttribute("TrainerId", definition.TrainerId)
 
     local prompt = Instance.new("ProximityPrompt")
