@@ -149,6 +149,8 @@ local function check_effects()
 
     local npc = Instance.new("Model")
     npc.Name = "C4ElfScoutSnare_TEMP"
+    local humanoid = Instance.new("Humanoid")
+    humanoid.Parent = npc
     npc.Parent = workspace
     check(Slow.apply(npc, 0.35, 0.06),
         "Server NPC slow must apply a genuine movement multiplier")
