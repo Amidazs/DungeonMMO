@@ -166,7 +166,7 @@ local function prepare(profiles, player, stage)
                 Step = stage, Count = 0, Ready = false,
                 AppliedEvents = {},
                 Proofs = if stage == 5
-                    then {StonewatchToken4 = true} else {},
+                    then {StonewatchBadge3 = true} else {},
             }
         end
     )
