@@ -142,6 +142,11 @@ function Runtime.attach(options: any): any
                 self._step_parts[branch_id][1]
             self._step_parts[branch_id][7] =
                 self._step_parts[branch_id][1]
+        elseif branch_id == "ElvenScout" then
+            self._step_parts[branch_id][8] =
+                self._step_parts[branch_id][2]
+            self._step_parts[branch_id][9] =
+                self._step_parts[branch_id][1]
         end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
@@ -227,16 +232,20 @@ function Runtime:_talk(
     local advancement = character and character.ClassAdvancement
     local current = advancement
         and advancement.OriginalFirstTransferQuest
-    if current and index == 2 and current.Step == 4 then
-        index = 4
-    elseif current and branch_id == "HumanRogue"
-        and index == 1
-        and (current.Step == 5 or current.Step == 7)
+    if current and index == 2
+        and (current.Step == 4
+            or branch_id == "ElvenScout" and current.Step == 8)
+    then
+        index = current.Step
+    elseif current and index == 1
+        and (branch_id == "HumanRogue"
+            and (current.Step == 5 or current.Step == 7)
+            or branch_id == "ElvenScout" and current.Step == 9)
     then
         index = current.Step
     end
-    local source_index = if index == 4
-        then 2 elseif index == 5 or index == 7
+    local source_index = if index == 4 or index == 8
+        then 2 elseif index == 5 or index == 7 or index == 9
         then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
