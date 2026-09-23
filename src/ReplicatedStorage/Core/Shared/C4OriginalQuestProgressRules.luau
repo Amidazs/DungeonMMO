@@ -12,6 +12,8 @@ local LETTER_IDS = table.freeze({
 
 local STAGE_PROOFS = table.freeze({
     CryptSentinel = table.freeze({SpartoiBone = true}),
+    RidgeMarauder = table.freeze({IronrootToken = true}),
+    Ridgebreaker = table.freeze({RidgebreakerSigil = true}),
     BrackenRaider = LETTER_IDS,
     BrackenWarden = table.freeze({RustedKey = true}),
     CinderBrigand = table.freeze({
@@ -43,8 +45,8 @@ function Rules.can_start(
         return false, "OriginalCharacterUnavailable", nil
     end
     local identity = character.Identity
-    local expected_race = if branch_id == "HumanRogue"
-        then "Human" else "Elf"
+    local expected_race = if branch_id == "ElvenScout"
+        then "Elf" else "Human"
     if identity.RaceId ~= expected_race
         or identity.BaseClassId ~= "Fighter"
         or identity.ClassId ~= "Fighter"
@@ -183,6 +185,32 @@ function Rules.can_progress(
     then
         return false, "OriginalQuestLootProofRequired"
     end
+    if quest.BranchId == "HumanWarrior" then
+        if step.TargetId == "RidgeMarauder"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.IronrootToken ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "SmithOrla" and current.Step == 4
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.IronrootToken4 ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "Ridgebreaker"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.RidgebreakerSigil ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "MarshalTorren" and current.Step == 6
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.RidgebreakerSigil ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+    end
     if step.TargetId == "BrackenRaider" then
         local ids = {"PriasLetter1", "PriasLetter2",
             "PriasLetter3", "PriasLetter4"}
@@ -253,6 +281,11 @@ function Rules.advance(quest: any, current: any, event: any): any
         if verified == true then current.Proofs[id] = true end
     end
     current.Count = math.min(step.Required, (current.Count or 0) + 1)
+    if step.TargetId == "RidgeMarauder"
+        and current.Count == step.Required
+    then
+        current.Proofs.IronrootToken4 = true
+    end
     if step.TargetId == "CryptSentinel"
         and current.Count == step.Required
     then
