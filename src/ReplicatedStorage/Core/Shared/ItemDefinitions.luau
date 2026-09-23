@@ -63,9 +63,9 @@ local DEFINITIONS = table.freeze({
         ReservedSlots = table.freeze({"OffHand"}),
     }),
 
-    -- Original DungeonMMO source-monster proofs belong to the character who earned
-    -- them. Live drops remain disabled until authentic dungeon combat
-    -- supplies a verified, one-use server-owned monster receipt.
+    -- DungeonMMO source-monster quest materials belong to their earning
+    -- character. Live drops require a verified one-use server-owned
+    -- instanced combat receipt; an arbitrary item flag is not enough.
     spartoi_bone = table.freeze({
         Id = "spartoi_bone",
         Name = "Crypt Sentinel Fragment",
