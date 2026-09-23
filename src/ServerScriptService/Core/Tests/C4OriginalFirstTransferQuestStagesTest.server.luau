@@ -452,8 +452,11 @@ local function check_skill_scope()
             seen[key] = true
         end
     end
-    check(Stages.get("HumanWarrior") == nil,
-        "A named Warrior source quest is not a completed implemented quest")
+    local warrior_quest = assert(Stages.get("HumanWarrior"))
+    check(warrior_quest.WorldBindingStatus == "NotImplemented"
+        and warrior_quest.RequiredProofIds[1] == "IronrootToken4",
+        "New original Warrior source blueprint remains distinct from "
+            .. "a completed player-accepted live class journey")
 end
 
 --[[
