@@ -163,6 +163,11 @@ function PassiveSkillEffects.damage_bonus(
     then
         return 0
     end
+    if skill_id == "IronvowBladeTraining"
+        and not equipped_weapon_has_tag(character, "OneHandedSword")
+    then
+        return 0
+    end
     return resolve_bonus(character, skill_id, "DamageBonusPerRank")
 end
 
@@ -351,12 +356,19 @@ function PassiveSkillEffects.fighter_armor_reduction(
     then
         return 0
     end
-    local bonus = resolve_bonus(
-        character,
-        "FighterArmorTraining",
-        "PhysicalReductionPerRank"
+    local base = math.clamp(resolve_bonus(
+        character, "FighterArmorTraining", "PhysicalReductionPerRank"
+    ), 0, 0.035)
+    local career_skill = if body.Category == "HeavyArmor"
+        then "IronvowHeavyArmorTraining"
+        else "IronvowLightArmorTraining"
+    local advanced = resolve_bonus(
+        character, career_skill, "PhysicalReductionPerRank"
     )
-    return math.clamp(bonus, 0, 0.035)
+    -- Both branches use the existing server-side incoming NPC damage
+    -- resolver. Unlike base Fighter armour, an original class must be
+    -- personally awarded and wear the corresponding real Body category.
+    return math.clamp(base + advanced, 0, 0.085)
 end
 
 --[[
