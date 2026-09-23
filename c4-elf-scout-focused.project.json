@@ -32,7 +32,8 @@
         "Tests": {
           "RangerSlowServiceTest": {
             "$path": "src/ServerScriptService/Combat/Tests/RangerSlowServiceTest.server.luau"
-          }
+          },
+          "$className": "Folder"
         }
       },
       "Base": {
