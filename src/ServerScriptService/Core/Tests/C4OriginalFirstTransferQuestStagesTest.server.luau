@@ -361,9 +361,10 @@ local function exercise(
     local can_train, locked_reason = SkillRules.can_train(
         starter, assert(SkillDefinitions.get("ScoutLockpicking")), 1
     )
-    check(not can_train and locked_reason == "WrongClass",
-        "Source choice or quest readiness cannot leak Scout skills to "
-            .. "the original Fighter before a real level-20 transfer")
+    check(not can_train
+        and locked_reason == "OriginalFirstTransferRequired",
+        "Quest readiness must not grant shared Scout utility before "
+            .. "the saved first-transfer mentor receipt")
     check(profiles:save(user_id, "C4OriginalQuest"),
         "Source quest progress must persist to original profile adapter")
     check(profiles:release(user_id, "C4OriginalQuest"),
