@@ -84,6 +84,7 @@ local CombatShared = RS.Combat.Shared
 
 local PartyHeal = require(Combat.PartyHealService)
 local Threat = require(Combat.ThreatService)
+local Cooldowns = require(Combat.SkillCooldownService)
 local RuntimeState = require(SSS.Core.Services.ProgressionRuntimeState)
 local CombatConfig = require(CombatShared.CombatConfig)
 local channel = RS:WaitForChild("C4PartyHealLiveChannel_TEMP")
@@ -241,12 +242,21 @@ local function verify_party_heal(players, runtime, session)
         "Effective multi-target HP restoration produced no NPC threat")
     print("[C4 Party Heal Live] TWO_CLIENT_HEAL_AND_THREAT_PASS")
 
-    -- The same remote cannot immediately recast through its cooldown.
+    -- Natural regeneration continues after the initial cast. Compare
+    -- only new HP after the retry and inspect the real server cooldown.
+    local caster_after_cast = first.Health
+    local ally_after_cast = second.Health
+    local remaining_before = Cooldowns.get_remaining(
+        caster, "MysticPartyHeal"
+    )
+    assert(remaining_before > 9,
+        "Party heal did not start its actual server cooldown")
     channel:FireClient(caster, "Cast")
     task.wait(0.5)
-    assert(first.Health - first_before <= 56.1
-        and second.Health - second_before <= 56.1,
-        "Repeat client request bypassed party-heal cooldown")
+    assert(first.Health - caster_after_cast < 5
+        and second.Health - ally_after_cast < 5
+        and Cooldowns.get_remaining(caster, "MysticPartyHeal") > 8,
+        "Repeat client request bypassed the party-heal cooldown")
     print("[C4 Party Heal Live] COOLDOWN_PASS")
 
     local muted = runtime.SessionService:set_member_mode(
