@@ -1589,6 +1589,44 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- An earned Warrior may purchase two real maximum-health training
+    -- ranks; raw class IDs never create a health or stamina benefit.
+    IronvowFortitude = table.freeze({
+        Id = "IronvowFortitude",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        HealthBonusPerRank = 8,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "StalwartTraining",
+                Rank = 6, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Recovery applies only while actually seated, not when running.
+    IronvowRestRecovery = table.freeze({
+        Id = "IronvowRestRecovery",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 24}),
+        RestingStaminaBonusPerRank = 0.08,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "FighterRestingRecovery",
+                Rank = 1, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     IronvowBattleCall = table.freeze({
         Id = "IronvowBattleCall",
         Tier = "Common", MaxRank = 3, Kind = "Support",
