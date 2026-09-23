@@ -41,7 +41,7 @@ local QUESTS = table.freeze({
             talk("CaptainAshford", "Return the stolen items."),
         }),
         RequiredProofIds = table.freeze({
-            "crypt sentinelBone10", "StolenJewelry", "StolenTomes",
+            "SpartoiBone10", "StolenJewelry", "StolenTomes",
             "StolenRing", "StolenNecklace",
         }),
         WorldBindingStatus = "NotImplemented",
