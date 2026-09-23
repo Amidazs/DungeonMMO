@@ -1459,6 +1459,57 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"Dagger"}),
     }),
 
+    -- A genuine confirmed dagger wound may apply a server-owned
+    -- three-tick bleed; it requires the separately purchased first
+    -- training bracket of the earned Wayfinder Cut line.
+    WayfinderWound = table.freeze({
+        Id = "WayfinderWound", Tier = "Common",
+        MaxRank = 1, Kind = "Physical",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout",
+        }),
+        RankLevels = table.freeze({[1] = 24}),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "WayfinderCut",
+                Rank = 3, Proficiency = 80,
+            }),
+        }),
+        WeaponTags = table.freeze({"Dagger"}),
+    }),
+
+    -- Elf-only calming shot earns individually purchased threat-reduction
+    -- ranks in three 20/24/28 training bands. Its basic source
+    -- prerequisite is the new earned Fighter-based Wayfinder Arrow.
+    GreenwardCalmingArrow = table.freeze({
+        Id = "GreenwardCalmingArrow",
+        Tier = "Common", MaxRank = 9, Kind = "Control",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "GreenwardScout",
+        }),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "WayfinderArrow",
+                Rank = 3, Proficiency = 80,
+            }),
+        }),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+
     -- C4 source level-24 real on/off accuracy stance (Human/Elf).
     -- This increases hit probability against server-authored NPC evasion;
     -- an unactivated purchased rank grants no free accuracy.
