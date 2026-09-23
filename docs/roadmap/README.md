@@ -20,10 +20,14 @@ claimed and historical custom classes,
 skills, economy and profession slots
 remain intact for the explicit
 versioned migration yet to come.
-Focused unpublished Studio acceptance:
-**5/5 PASS, 251 assertions**.
-Actual unpublished **two-client Base
-playtest PASS**: two Human Fighter
+Final expanded unpublished focused
+Studio closeout: **8/8 PASS**, including
+the original five suites plus quest
+advancement migration, race-change
+migration and race-change service
+regressions. Actual unpublished
+**one-client GUI/remote playtest PASS**
+and **two-client Base playtest PASS**: two Human Fighter
 clients saw their respective source
 choices, independently chose Rogue
 and Human Knight, and could not
