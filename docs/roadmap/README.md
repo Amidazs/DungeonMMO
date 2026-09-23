@@ -1,3 +1,48 @@
+**Current C4 backend: v1.87 — all 396 ranks in six audited source inventories now implemented.**
+[Latest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_87_C4_Scout_Source_Environment_20260923.md)
+and [actual focused/real-client Studio acceptance evidence](
+../testing/c4-scout-environment-equipment-sprint-v1-87-2026-09-23.md).
+Both currently inventoried first-transfer
+source lists reached numerical source-rank
+parity: Human Rogue **99/99**, Elven Scout
+**129/129**, alongside the four original
+starting-class lists **168/168**.
+The seven new source entries are authentic
+purchased level-20 expert-equipment,
+breathing and fall mitigation ranks
+for both classes plus Human Rogue
+Sprint. A genuine single-career
+Leatherworker manufactured and sold
+the expertise-gated vest through
+the real profession and market
+services; the Rogue buyer could not
+equip it before training and gained
+real maximum HP only on legitimate
+equip. Actual one-client unpublished
+Dungeon tests passed real paid Sprint
+client activation/speed/expiry,
+real Terrain water submersion,
+drowning Humanoid HP and controlled
+server fall-injury mitigation.
+Focused Studio **5/5** passed,
+including **106**, **28**, **1,183**
+and **38** assertions in the relevant
+skill, expert-gear market, C4
+inventory and existing equipment
+suites. **Source rank parity of
+396/396 is not full C4 catalogue
+completion**: seven *other* original
+first-transfer classes still have no
+source inventory implementation;
+the authoritative full class-path
+gate remains **0/9 complete** and
+`Completed=false`. Preserve the
+separate current humanoid/quadruped
+art roadmap, the one-Gathering/one-
+Crafting career rule and the
+no-publish policy.
+
 **Current C4 backend: v1.86 — secure Rogue/Scout Lockpicking.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_86_C4_Scout_Lockpicking_20260923.md)
