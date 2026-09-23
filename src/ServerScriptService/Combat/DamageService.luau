@@ -136,9 +136,13 @@ function DamageService.apply_damage(context: DamageContext): number
             0, 0.50
         )
     elseif defender and context.source_kind == "EnemyMagic" then
-        local magic_reduction = ProgressionRuntimeState
+        local mystic_reduction = ProgressionRuntimeState
             .get_mystic_magic_reduction(defender.UserId)
-        damage *= 1 - magic_reduction
+        local oathguard_reduction = ProgressionRuntimeState
+            .get_oathguard_magic_reduction(defender.UserId)
+        damage *= 1 - math.clamp(
+            mystic_reduction + oathguard_reduction, 0, 0.25
+        )
     end
     local health_damage, ward_absorbed = WardService.absorb_damage(
         context.target, damage
