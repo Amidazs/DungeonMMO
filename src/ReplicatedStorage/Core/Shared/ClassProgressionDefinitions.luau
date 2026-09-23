@@ -81,6 +81,30 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- An original first-transfer award is separate from legacy Rogue/
+    -- Ranger starter profiles and their old specialist class identities.
+    Ashenblade = table.freeze({
+        Id = "Ashenblade",
+        DisplayName = "Ashenblade",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Human"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({"HumanScoutSprint"}),
+    }),
+
+    GreenwardScout = table.freeze({
+        Id = "GreenwardScout",
+        DisplayName = "Greenward Scout",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Elf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({"ElvenScoutGuard"}),
+    }),
+
     Ranger = table.freeze({
         Id = "Ranger",
         DisplayName = "Ranger",
