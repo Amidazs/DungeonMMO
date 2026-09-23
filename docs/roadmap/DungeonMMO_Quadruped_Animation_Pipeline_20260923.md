@@ -53,6 +53,74 @@ Rojo `src/` directory. Do not publish, merge `main`, attach
 to live dungeon combat, or describe it as a finished animal
 animation system until the acceptance gates below pass.
 
+## Frostfang rigging checkpoint — experimental, 23 September 2026
+
+**Status: first-pass import candidate; Stage 1 remains OPEN.**
+The previous Meshy wolf skeleton had clustered bone pivots and
+unweighted leg chains. The original GLBs were left untouched.
+On the authorized PC, Blender 5.0.1/Rigify Animals.wolf was
+fitted against Frostfang's actual standing geometry and four
+independently measured paw locations.
+
+A separate 33-bone compact deform skeleton was derived, with
+new spatial skin weights on a copy of the original 80,974-vertex
+mesh. A second skinning pass smoothed 24,121 forequarter
+vertices; controlled foreleg bend testing reduced sampled
+front-shoulder edge stretch above 1.4x from 1,628 to 1,266 of
+31,267 evaluated edges. The tested paw retained its width
+and the test poses returned to rest, but upper-foreleg fur
+and the asymmetric source hindleg still need visual correction.
+
+Rigify's full wolf control rig was separately generated after
+restoring 117 metarig bone connections (823 controller/auxiliary
+bones, including 197 deform bones). **It is NOT yet linked to
+the compact skinned skeleton:** its spine/face bone mapping
+does not align one-to-one, so attaching them blindly would
+risk corrupting the rest pose and paw deformation. Astra should
+receive the compact rig only after animation and import QA
+passes, not assume the generated Rigify controls drive it.
+
+An initial single-mesh GLB and FBX retained the skinned
+33-bone mesh on Blender reimport, but Frostfang has 161,948
+triangles; Roblox's [general modeling specifications](
+https://create.roblox.com/docs/art/modeling/specifications)
+limit an **individual mesh** to 20,000 triangles.
+A **separate** Roblox-targeted candidate therefore preserves
+all 161,948 triangles across **12 skinned mesh sections**,
+maximum 13,496 triangles each, driven by one **34-bone**
+skeleton (33 deform bones + non-deforming Root). Both
+sectioned FBX and GLB were reimported into Blender and
+verified to have 12 skinned sections, one shared rig,
+no more than four weights per vertex, preserved world
+bounds, and bend-responsive front-leg skin.
+
+**Asset location on the authorized PC (not published or
+merged into GitHub):**
+
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\`
+
+Important files:
+`Frostfang_Canine_ExperimentalMaster.blend` — unsplit full
+detail skinned working copy;
+`Frostfang_Rigify_Fitted_CONNECTED.blend` — corrected wolf
+template;
+`Rigify_Frostfang_GeneratedControls_CONNECTED_QA.blend` —
+independent generated authoring controls, not linked to mesh;
+`Frostfang_Roblox_SectionedRig_QA.blend`,
+`Frostfang_Roblox_SectionedRig_QA.fbx`,
+`Frostfang_Roblox_SectionedRig_QA.glb` — experimental
+sectioned candidates;
+`sectioned_roundtrip_validation.json` — Blender-only import
+checks. The parent directory also contains an
+`Frostfang_20260923_EXPERIMENTAL.zip` checkpoint.
+
+**Still NOT done:** actual Roblox Studio import/playback;
+grounded continuous walk/turn; full 3D paw/fur deformation
+and hindleg symmetry; mouth/jaw and tail control completion;
+Astra authoring engine compatibility; visual user approval.
+No live dungeon monster, gameplay script, mesh or Roblox
+asset was replaced or published.
+
 ## Stage 1 — approve the canine master rig [OPEN]
 
 - [ ] Find/import a genuinely standing, properly rigged and
@@ -136,7 +204,10 @@ Use the test place and source-controlled development tools;
 no publish, production rig substitution or live place changes
 without explicit approval.
 
-**Next actionable step:** select the master canine rig and
-run a Studio anatomy/weighting inspection. Until that exists,
-the code here is a mathematical scaffold, **not an approved
-quadruped animation engine**.
+**Next actionable step:** import the experimental sectioned
+FBX into an unpublished Studio test place. Verify that all
+12 sections share one animatable rig, inspect four paws and
+upper-foreleg skin under real limb motion, then fix the
+remaining shoulder, hindleg and facial-control issues before
+attempting one natural idle/walk cycle. Neither this mesh nor
+the mathematical helper is an approved quadruped master yet.
