@@ -62,6 +62,39 @@ local function clone_performer(character)
     return model
 end
 
+-- Args: None.
+-- Returns: Model - a new default R15 mannequin in an unpublished place.
+local function create_default_performer()
+    local description = Instance.new("HumanoidDescription")
+    local model = game:GetService("Players"):CreateHumanoidModelFromDescription(
+        description, Enum.HumanoidRigType.R15
+    )
+    description:Destroy()
+    assert(model, "Roblox could not create its built-in R15 mannequin")
+    model.Name = TARGET_NAME
+    model:SetAttribute("DMMO_TestOnly", true)
+    model:SetAttribute("DMMO_AnimationLibrary", "Humanoid starter v1")
+    model:SetAttribute("DMMO_MannequinSource", "Built-in Roblox R15")
+    model.Parent = workspace
+    model:PivotTo(CFrame.new(0, 5, 0))
+    local humanoid = model:FindFirstChildOfClass("Humanoid")
+    assert(humanoid, "Default R15 model has no Humanoid")
+    if not humanoid:FindFirstChildOfClass("Animator") then
+        Instance.new("Animator").Parent = humanoid
+    end
+    local footHeight = math.min(
+        model.LeftFoot.Position.Y - model.LeftFoot.Size.Y / 2,
+        model.RightFoot.Position.Y - model.RightFoot.Size.Y / 2
+    )
+    model:PivotTo(
+        CFrame.new(0, 0.05 - footHeight, 0) * model:GetPivot()
+    )
+    model.HumanoidRootPart.Anchored = true
+    humanoid.AutoRotate = false
+    verify_rig(model)
+    return model
+end
+
 -- Args: parent (Instance), name (string), size (Vector3), color (Color3).
 -- Returns: Part - noncolliding visual-only weapon geometry.
 local function make_part(parent, name, size, color)
@@ -206,19 +239,25 @@ local function main()
     assert(RunService:IsStudio() and game.PlaceId == 0,
         "Only run in a separate unpublished Roblox Studio test place")
     local source = workspace:FindFirstChild(SOURCE_NAME)
-    assert(source and source:GetAttribute("DMMO_TestOnly"),
-        "The existing test-only R15 guardian must be open first")
     assert(not workspace:FindFirstChild(TARGET_NAME),
         "The starter mannequin already exists; preserve its animations")
-    verify_rig(source)
-    local clone = clone_performer(source)
-    equip_visuals(clone)
+    local performer
+    if source then
+        assert(source:GetAttribute("DMMO_TestOnly"),
+            "Refusing to clone an unmarked original guardian")
+        verify_rig(source)
+        performer = clone_performer(source)
+    else
+        performer = create_default_performer()
+    end
+    equip_visuals(performer)
     return HttpService:JSONEncode({
-        testRig = clone:GetFullName(),
-        originalUnmodified = source.Parent == workspace,
-        rigType = tostring(clone.Humanoid.RigType),
-        sourceName = SOURCE_NAME,
-        testOnly = clone:GetAttribute("DMMO_TestOnly"),
+        testRig = performer:GetFullName(),
+        sourceWasAvailable = source ~= nil,
+        originalUnmodified = source == nil or source.Parent == workspace,
+        rigType = tostring(performer.Humanoid.RigType),
+        sourceName = source and SOURCE_NAME or "Built-in Roblox R15",
+        testOnly = performer:GetAttribute("DMMO_TestOnly"),
     })
 end
 
