@@ -1,0 +1,44 @@
+{
+  "name": "Quadruped_Animation_QA",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "QAE": {
+        "$path": "runtime"
+      },
+      "QAETests": {
+        "$path": "tests/studio"
+      }
+    },
+    "Workspace": {
+      "$className": "Workspace",
+      "Floor": {
+        "$className": "Part",
+        "$properties": {
+          "Anchored": true,
+          "Size": [
+            40,
+            1,
+            40
+          ],
+          "Position": [
+            0,
+            -0.5,
+            0
+          ],
+          "Color": [
+            0.14,
+            0.17,
+            0.21
+          ]
+        }
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "Brightness": 2,
+        "ClockTime": 14
+      }
+    }
+  }
+}

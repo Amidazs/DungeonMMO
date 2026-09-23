@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "kind": "runtime",
+  "id": "quadruped",
+  "fade": 0.2,
+  "states": {
+    "Idle": {
+      "clip": "idle",
+      "loop": true,
+      "priority": "Idle"
+    },
+    "Walk": {
+      "clip": "walk",
+      "loop": true,
+      "priority": "Movement"
+    },
+    "Run": {
+      "clip": "run",
+      "loop": true,
+      "priority": "Movement"
+    },
+    "Turn": {
+      "clip": "turn",
+      "loop": false,
+      "priority": "Movement"
+    },
+    "Attack": {
+      "clip": "attack",
+      "loop": false,
+      "priority": "Action"
+    },
+    "Hit": {
+      "clip": "hit",
+      "loop": false,
+      "priority": "Action2"
+    },
+    "Death": {
+      "clip": "death",
+      "loop": false,
+      "priority": "Action4"
+    }
+  }
+}
