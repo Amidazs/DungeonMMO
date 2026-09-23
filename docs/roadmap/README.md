@@ -1,4 +1,50 @@
-**Current DungeonMMO class backend: v2.04 — new live two-client expanded Scout combat and first locked Human Warrior skill foundation.**
+**Current DungeonMMO class backend: v2.05 — Ironroot original Warrior quest, personally owned monster drops and server-authorized Ironvow class transfer.**
+[Latest active class roadmap](
+DungeonMMO_Roadmap_v2_05_Ironroot_Quest_And_Ironvow_Transfer_20260923.md)
+and [executed v2.05 acceptance / limitations](
+../testing/ironvow-quest-world-class-v2-05-20260923.md).
+The independently authored Human Fighter →
+**Ironvow** now has a six-stage ordered
+level-18 source quest, separate physical
+Marshal Torren/Smith Orla hub NPCs, four
+owner-bound Ridge Marauder dispatch markers,
+one uniquely registered Ridgebreaker boss
+and personally consumed final Oath Seal.
+The server-only original level-20 transfer
+service and physically separate class mentor
+and trainer are registered; class and the
+first actual sword skill survive profile
+save/reload only with earned quest proofs
+and an authentic one-use mentor receipt.
+Unpublished actual **two-client Dungeon**
+combat/loot tests PASS for one genuine
+client hit on each physical raider and
+boss, with server-authored finishing hits
+granting the correct personal items.
+Focused quest **31 PASS**, award/skill/save
+**17 PASS**, Warrior first-skill safeguards
+**34 PASS**, physical stage/boss registration
+**11 PASS**, existing class compatibility
+**459 + 8 PASS**, and cap inventory audit
+**25 PASS**. This is **not** a complete
+unassisted cross-place Warrior journey
+or a passed client-held physical Base
+mentor/trainer playtest. Ironvow currently
+has 15 authored skill ranks versus 62
+recorded Warrior first-transfer reference
+rows; neither complete source-game mechanic
+parity nor full level-1–30 class acceptance
+is claimed. **3/18** branches have a
+source/award backend, **2/18** have completed
+physical class/trainer client acceptance,
+and **0/18** are complete level-30
+class gameplay catalogues. No Roblox
+publication, production DataStore change,
+`main` merge or permanent code editing
+via Desktop Commander. Separate humanoid/
+quadruped animation roadmaps remain intact.
+
+**Previous DungeonMMO class backend: v2.04 — new live two-client expanded Scout combat and first locked Human Warrior skill foundation.**
 [Latest class backend roadmap](
 DungeonMMO_Roadmap_v2_04_Expanded_Combat_Ironvow_Foundation_20260923.md)
 and [executed v2.04 Studio test record](
