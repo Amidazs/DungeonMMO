@@ -298,6 +298,40 @@ local function trade(
 end
 
 --[[
+Proves rank revocation is checked again inside atomic craft completion.
+
+Args:
+    context (any): Four real profile, inventory and crafting services.
+
+Returns:
+    nil: Rejects a prepared rank-three craft after the rank is revoked.
+]]
+local function verify_atomic_revalidation(context: any)
+    local owner = 99701
+    local recipe = assert(Recipes.get("scout_forge_bars_rank_3"))
+    stock_inputs(context, owner, recipe)
+    local prepared = context.Professions:prepare_craft(owner, recipe.Id)
+    check(prepared.ok, "Rank-three recipe initially prepares")
+    local character = assert(context.Profiles:get_character(owner, 1))
+    local before = Inventory.count_item(character, "iron_ore")
+    check(context.Profiles:mutate(owner, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            SKILL_ID
+        ].PurchasedRank = 2
+    end), "Test revokes only the prepared character's source rank")
+    local denied = context.Professions:complete_craft(
+        owner, recipe.Id,
+        Professions.foundation_success_outcome(prepared.minigame_id)
+    )
+    check(not denied.ok
+        and denied.reason == "ScoutCommonItemCreationNotLearned",
+        "Prepared minigame cannot bypass a rank revoked before commit")
+    character = assert(context.Profiles:get_character(owner, 1))
+    check(Inventory.count_item(character, "iron_ore") == before,
+        "Rejected rank-three completion cannot consume any materials")
+end
+
+--[[
 Runs isolated progression and four-person cross-profession acceptance.
 
 Args:
@@ -339,6 +373,7 @@ local function main()
         check(after == current - 1,
             "Ranked recipe consumed the other player's traded input")
     end
+    verify_atomic_revalidation(context)
     print(("[C4 Scout Ranked Craft] PASS: %d assertions")
         :format(checks))
 end
