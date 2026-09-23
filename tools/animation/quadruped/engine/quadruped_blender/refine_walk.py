@@ -136,6 +136,17 @@ def generate(rig, config):
             pelvis=rig.pose.bones[config["pelvis"]]
             matrix=pelvis.matrix.copy();matrix.translation.z-=support+.0001
             pelvis.matrix=matrix;bpy.context.view_layer.update()
+            # Some rigs parent the chest beneath the pelvis: re-solve forelegs
+            # after support moves their ancestor, retaining the world anchors.
+            for limb in config["limbs"]:
+                if limb["family"]!="front":continue
+                upper=rig.pose.bones[limb["upper"]];lower=rig.pose.bones[limb["lower"]]
+                start=upper.head.copy()
+                goal=rig.matrix_world.inverted() @ controls[limb["id"]][0].location
+                solved=two_bone(tuple(start),tuple(goal),upper.bone.length,lower.bone.length,tuple(limb["pole"]),config["front"]["joint_limit"])
+                aim(upper,start,Vector(solved["elbow"]))
+                aim(lower,Vector(solved["elbow"]),Vector(solved["end"]))
+                frame_record["limbs"][limb["id"]].update(elbow=solved["angle"],residual=solved["residual"])
         for bone in rig.pose.bones:key_pose(bone,frame)
         rig.keyframe_insert(data_path="location",frame=frame)
         records.append(frame_record)
