@@ -39,6 +39,9 @@ local C4OriginalFirstTransferQuestStages = require(
 local ClassProgressionDefinitions = require(
     shared:WaitForChild("ClassProgressionDefinitions")
 )
+local OriginalFirstTransfers = require(
+    shared:WaitForChild("OriginalFirstTransferDefinitions")
+)
 
 local SecondaryClassDefinitions = require(
     shared:WaitForChild("SecondaryClassDefinitions")
@@ -206,7 +209,9 @@ local function legacy_identity(value: any): any
     )
 end
 
-local function sanitize_v4_identity(value: any): any
+local function sanitize_v4_identity(
+    value: any, raw_advancement: any, level: any
+): any
     local identity = identity_copy(value)
 
     if identity.Version ~= IDENTITY_VERSION then
@@ -260,10 +265,15 @@ local function sanitize_v4_identity(value: any): any
             end
         end
 
+        local earned = OriginalFirstTransfers.awarded({
+            Identity = identity,
+            ClassAdvancement = raw_advancement,
+            Level = level,
+        })
         if (
             not race_id
             or not base_definition
-            or class_id ~= base_class_id
+            or (class_id ~= base_class_id and not earned)
             or not race_allowed
         ) then
             return fresh_identity(identity)
@@ -691,7 +701,7 @@ local function sanitize_race_change(value: any): any
 end
 
 local function sanitize_class_advancement(
-    value: any, identity: any
+    value: any, identity: any, level: number
 ): any
     local current_race_id = identity and identity.RaceId
     local result = {Version = 1, CompletedByRace = {}}
@@ -720,10 +730,16 @@ local function sanitize_class_advancement(
     end
     -- A first-transfer choice is not an awarded class, so its original
     -- race/family must still match the current unadvanced character.
+    local earned = OriginalFirstTransfers.awarded({
+        Identity = identity,
+        ClassAdvancement = value,
+        Level = level,
+    })
     local choice = value.OriginalFirstTransferChoiceId
     if type(choice) == "string" and type(identity) == "table"
         and identity.CreationStage == "Complete"
-        and identity.ClassId == identity.BaseClassId
+        and (identity.ClassId == identity.BaseClassId
+            or earned ~= nil and earned.BranchId == choice)
         and C4FirstTransferBranches.find(
             identity.RaceId, identity.BaseClassId, choice
         ) ~= nil
@@ -775,6 +791,13 @@ local function sanitize_class_advancement(
                     return proofs
                 end)(),
             }
+            if earned and earned.BranchId == choice
+                and identity.ClassId == earned.Id
+            then
+                result.OriginalFirstTransferClassId = earned.Id
+                result.OriginalFirstTransferReceiptId =
+                    value.OriginalFirstTransferReceiptId
+            end
         end
     end
     return result
@@ -864,7 +887,7 @@ function ProfileMigration.migrate(raw: any): any
         slot1.Identity = fresh_identity(slot1.Identity)
     else
         slot1.Identity = sanitize_v4_identity(
-            slot1.Identity
+            slot1.Identity, slot1.ClassAdvancement, slot1.Level
         )
     end
 
@@ -877,7 +900,7 @@ function ProfileMigration.migrate(raw: any): any
     slot1.Gold = nonnegative_integer(slot1.Gold, 0)
 
     slot1.ClassAdvancement = sanitize_class_advancement(
-        slot1.ClassAdvancement, slot1.Identity
+        slot1.ClassAdvancement, slot1.Identity, slot1.Level
     )
 
     if type(slot1.Inventory) ~= "table" then
