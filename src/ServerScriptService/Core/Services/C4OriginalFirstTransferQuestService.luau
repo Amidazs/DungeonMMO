@@ -6,6 +6,7 @@ local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Source = require(Shared.C4OriginalFirstTransferQuestStages)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
+local FirstTransfers = require(Shared.OriginalFirstTransferDefinitions)
 local Inventory = require(script.Parent.InventoryService)
 local QuestDrops = require(script.Parent.C4OriginalQuestDrops)
 local VELA_TRIAL_WEAPONS = table.freeze({
@@ -91,7 +92,7 @@ function Service:build_snapshot(user_id: number): any
         Step = if type(state) == "table"
             then state.Step else 1,
         Ready = type(state) == "table" and state.Ready == true,
-        ClassAwarded = false,
+        ClassAwarded = FirstTransfers.awarded(character) ~= nil,
         TransferRequiresLevel = quest.TransferLevel,
     })
 end
