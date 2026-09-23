@@ -15,20 +15,27 @@ Returns:
     nil: Fails unless personal loot/quest/save assertions execute.
 ]]
 local function main()
-    local source = assert(tests:FindFirstChild(
-        "C4IronvowQuestServiceTest"
-    ), "New original Warrior quest fixture missing from Base")
-    assert(source:IsA("LuaSourceContainer"),
-        "Original Warrior quest test source is not executable")
-    local module = Instance.new("ModuleScript")
-    module.Name = "C4IronvowQuestFocus_TEMP"
-    module.Source = source.Source .. "\nreturn true\n"
-    module.Parent = tests
-    local ok, result = pcall(require, module)
-    module:Destroy()
-    assert(ok and result == true,
-        "Original Warrior source quest failed: " .. tostring(result))
-    print("[Ironvow Quest] VERIFIED_ORDERED_SOURCE_QUEST_PASS")
+    for _, fixture_name in ipairs({
+        "C4IronvowQuestServiceTest",
+        "C4IronvowAwardServiceTest",
+        "C4IronvowFoundationTest",
+    }) do
+        local source = assert(tests:FindFirstChild(fixture_name),
+            "Missing original Warrior server fixture " .. fixture_name)
+        assert(source:IsA("LuaSourceContainer"),
+            "Original Warrior test source is not executable")
+        local module = Instance.new("ModuleScript")
+        module.Name = "TEMP_" .. fixture_name
+        module.Source = source.Source .. "\nreturn true\n"
+        module.Parent = tests
+        local ok, result = pcall(require, module)
+        module:Destroy()
+        assert(ok and result == true,
+            "Original Warrior focused fixture failed: " .. fixture_name
+                .. ": " .. tostring(result))
+        print("[Ironvow Quest] VERIFIED_" .. fixture_name .. "_PASS")
+    end
+    print("[Ironvow Quest] VERIFIED_QUEST_AWARD_SKILLS_PASS")
 end
 
 main()
