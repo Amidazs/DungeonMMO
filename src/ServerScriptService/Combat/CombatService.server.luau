@@ -459,7 +459,11 @@ local function apply_movement_scale(
     -- blocked movement during dodge, death, channel or casting.
     local scout_movement = ProgressionRuntimeState
         .get_movement_multiplier(player.UserId)
-    humanoid.WalkSpeed = record.base_walk_speed * scale * scout_movement
+    local cast_movement = 1 + CombatStatusService.get(
+        player.Character, "Movement"
+    )
+    humanoid.WalkSpeed = record.base_walk_speed
+        * scale * scout_movement * cast_movement
 
     local movement_locked = scale <= 0
     humanoid.Jump = false
@@ -2316,6 +2320,18 @@ local function enter_skill_active(
         local applied = CombatStatusService.apply_self(
             player, skill_definition
         )
+        if applied and skill_definition.BUFF_KIND == "Movement" then
+            -- Combat state transitions remain the sole authority for
+            -- immobilization. Apply immediately and recompute on expiry.
+            apply_movement_scale(player, record)
+            local buff_character = character
+            task.delay(skill_definition.BUFF_SECONDS + 0.05, function()
+                if player.Character == buff_character
+                    and player_states[player] == record then
+                    apply_movement_scale(player, record)
+                end
+            end)
+        end
         CombatValidationService.emit(
             player,
             "BUFF",
