@@ -65,17 +65,23 @@ Returns:
 function Ledger:register_enemy(
     enemy: Model, branch_id: string, encounter_id: string
 ): boolean
+    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model")
+    then
+        return false
+    end
     local quest = Source.get(branch_id)
     local step = quest and quest.Steps[3]
-    local humanoid = enemy and enemy:FindFirstChildOfClass("Humanoid")
-    local enemy_id = enemy and enemy:GetAttribute("DungeonEnemyId")
-    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model")
-        or not enemy:IsDescendantOf(workspace)
+    if not step or step.Kind ~= "QuestMonsterDefeat" then
+        return false
+    end
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    local enemy_id = enemy:GetAttribute("DungeonEnemyId")
+    if not enemy:IsDescendantOf(workspace)
         or not humanoid or humanoid.Health <= 0
         or type(encounter_id) ~= "string" or encounter_id == ""
         or enemy:GetAttribute("DungeonEncounterId") ~= encounter_id
+        or enemy:GetAttribute("SourceQuestMonsterId") ~= step.TargetId
         or type(enemy_id) ~= "string" or enemy_id == ""
-        or not step or step.Kind ~= "QuestMonsterDefeat"
         or self._enemies[enemy] ~= nil
     then
         return false
