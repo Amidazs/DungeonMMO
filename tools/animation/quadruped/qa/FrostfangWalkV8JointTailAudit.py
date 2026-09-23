@@ -17,7 +17,7 @@ ROOT = (
     "GroundedWalkTrial_20260923"
 )
 SOURCE = (
-    ROOT / "WalkV8_ForelegTail" / "Frostfang_WalkV8_ForelegTail_UNAPPROVED.blend"
+    ROOT / "WalkV8_ForelegTail" / "Frostfang_WalkV8_UNAPPROVED.blend"
 )
 FORELEGS = {
     "left": (
