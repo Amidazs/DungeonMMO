@@ -1,10 +1,10 @@
 --!strict
 -- Canonical persistent player-profile schema.
--- Schema v14 adds exclusive per-character profession selection slots.
+-- Schema v15 adds earned first-transfer class identities and mentor receipts.
 
 local ProfileSchema = {}
 
-ProfileSchema.VERSION = 14
+ProfileSchema.VERSION = 15
 
 local function deep_clone(
     value: any,
