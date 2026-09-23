@@ -51,9 +51,12 @@ projectile.
   their event counts. Does not publish or change live game combat.
 
 The practice weapons use simple connected Roblox Parts for animation
-inspection. They are not production models or finished bow/arrow
-mechanics. The arrow prop is hidden at the release marker during the
-isolated preview; no flying projectile is created.
+inspection. The bow has two visual Beam strands connected from the
+left-hand bow limbs to a right-hand draw-point Attachment; the strands
+follow the draw hand but are not physically simulated. They are not
+production weapon models or finished bow/arrow mechanics. The arrow
+prop is hidden at the release marker during the isolated preview;
+no flying projectile is created.
 
 ## Assistant-run Studio authoring workflow
 
