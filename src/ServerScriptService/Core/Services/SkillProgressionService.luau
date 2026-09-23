@@ -100,6 +100,14 @@ local function class_can_teach(
     if ClassDefinitions.can_teach(identity.BaseClassId, skill_id) then
         return true
     end
+    -- Original first-transfer skills use a separate awarded current
+    -- identity. The complete identity check above validates the actual
+    -- mentor receipt rather than trusting an arbitrary saved ClassId.
+    if identity.ClassId ~= identity.BaseClassId
+        and ClassDefinitions.can_teach(identity.ClassId, skill_id)
+    then
+        return true
+    end
 
     local advancement = character.ClassAdvancement
     local active_class_id = if type(advancement) == "table"
