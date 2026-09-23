@@ -83,6 +83,12 @@ local DungeonProgressionBridge = require(Dungeon:WaitForChild("DungeonProgressio
 local DungeonContributionBridge = require(
     Dungeon:WaitForChild("DungeonContributionBridge")
 )
+local C4QuestMonsterCombatLedger = require(
+    Dungeon:WaitForChild("C4QuestMonsterCombatLedger")
+)
+local C4OriginalFirstTransferQuestService = require(
+    Services:WaitForChild("C4OriginalFirstTransferQuestService")
+)
 local DungeonDeathService = require(
     Dungeon:WaitForChild("DungeonDeathService")
 )
@@ -188,6 +194,7 @@ enemies_folder.Parent = runtime_root
 local active_session_id: string? = nil
 local lockpick_service: any = nil
 local encounter_service: any = nil
+local c4_quest_combat_ledger: any = nil
 local encounter_runtime_controller: any = nil
 local encounter_execution_controller: any = nil
 local active_execution: any = nil
@@ -1069,6 +1076,9 @@ local function reset_wiped_encounter(session: any): any
     end
 
     active_execution = nil
+    if c4_quest_combat_ledger then
+        c4_quest_combat_ledger:clear()
+    end
     sync_all_character_encounters("")
     sessions:set_runtime_progress(
         session.SessionId,
@@ -1553,6 +1563,30 @@ local function initialize_session_services(session: any): (any?, boolean)
         rewards,
         session.SessionId,
         session.Modifier and session.Modifier.Id or nil
+    )
+    -- Install the server-only combat observer once per reserved run.
+    -- Until a future original quest room registers specific monsters,
+    -- this cannot authorize any class quest drop or stage advancement.
+    c4_quest_combat_ledger = C4QuestMonsterCombatLedger.new({
+        profiles = profiles,
+        session_id = session.SessionId,
+        is_member_active = function(
+            user_id: number, enemy: Model, encounter_id: string
+        ): boolean
+            return encounter_service ~= nil
+                and encounter_service:get_current_id() == encounter_id
+                and encounter_service:is_contribution_eligible(
+                    user_id, enemy
+                )
+        end,
+    })
+    c4_quest_combat_ledger:attach_quest_service(
+        C4OriginalFirstTransferQuestService.new(
+            profiles, "Dungeon", c4_quest_combat_ledger
+        )
+    )
+    DungeonContributionBridge.bind_quest_damage_observer(
+        c4_quest_combat_ledger
     )
     DungeonProgressionBridge.bind({
         proficiency_service = proficiency,
