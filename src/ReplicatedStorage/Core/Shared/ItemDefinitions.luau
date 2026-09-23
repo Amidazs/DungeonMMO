@@ -66,6 +66,27 @@ local DEFINITIONS = table.freeze({
     -- DungeonMMO source-monster quest materials belong to their earning
     -- character. Live drops require a verified one-use server-owned
     -- instanced combat receipt; an arbitrary item flag is not enough.
+    ironroot_dispatch_marker = table.freeze({
+        Id = "ironroot_dispatch_marker",
+        Name = "Ironroot Dispatch Marker",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = true,
+        Bound = true,
+        Tradeable = false,
+    }),
+    ridgebreaker_oath_seal = table.freeze({
+        Id = "ridgebreaker_oath_seal",
+        Name = "Ridgebreaker's Oath Seal",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     spartoi_bone = table.freeze({
         Id = "spartoi_bone",
         Name = "Crypt Sentinel Fragment",
