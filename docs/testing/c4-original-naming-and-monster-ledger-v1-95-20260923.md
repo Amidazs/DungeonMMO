@@ -34,8 +34,11 @@ receipt ledger. **No finished stage-three playable quest is claimed.**
   only from an authenticated lethal server damage callback.
   Its world verifier consumes one exact event per owner,
   and requires an already registered live quest encounter.
-  **This ledger is not yet attached to a live spawned challenge,
-  damage callback, dungeon quest service or return-trip UI.**
+  The actual Dungeon session now attaches this fail-closed ledger
+  to its authoritative original quest service and the existing
+  contribution bridge's already-validated DamageService events.
+  **No source quest monster is yet registered in a playable room;
+  real player-to-quest-monster kills and return-trip UI remain pending.**
 
 ## Executed unpublished Roblox Studio tests
 
@@ -51,13 +54,17 @@ receipt ledger. **No finished stage-three playable quest is claimed.**
   independently owned stage-three mock proof and rollback.
   These source-stage mock kills are **not real client combat**.
 - `scripts/studio/c4_source_quest_combat_ledger_focus.luau`
-  in the unpublished local Dungeon: **1/1 PASS**, 10
-  assertions. Registered a real Humanoid Model in Workspace
-  with canonical server encounter and monster attributes;
-  rejected wrong-branch, wrong-room, duplicate life,
-  attacker table and forged world evidence; verified
-  stage-specific availability and wipe cleanup.
-  This does **not** verify a real player attacking a monster.
+  in the unpublished local Dungeon: **2/2 PASS**.
+  The registration fixture passed **10 assertions** for
+  real Humanoid models, wrong branch/room, duplicate life,
+  fake attacker, forged evidence, stage availability
+  and wipe cleanup. Existing contribution-damage bridge
+  regression passed **13 assertions**, including accepted
+  damage delivery to the optional quest observer, zero/
+  ownerless damage denial, lethal-hit forwarding, and
+  preservation of normal contribution recording.
+  These fixtures do **not** verify a real player attacking
+  a physically spawned quest monster.
 - `scripts/studio/c4_original_second_npc_two_client_live.luau`
   in the unpublished local Base: **PASS**:
   `VERIFIED_TWO_CLIENT_STAGE_TWO_PASS`. The test checked
@@ -81,8 +88,10 @@ no `main` merge, Roblox publish or production DataStore mutation.
    whose server creates Crypt Sentinel/Bracken Raider models
    with authenticated encounter and source IDs. Register each
    physical model in the new ledger and attach the ledger
-   to the existing server DamageService callback without
-   overriding the contribution/threat listeners.
+   to the existing server DamageService callback; this
+   non-overriding damage observer is already installed
+   and tested, but a dedicated live enemy registration
+   and full combat acceptance are still required.
 3. Persist one earned fragment per qualifying owner, test
    real client impact/kill, disconnection, wipe/retry,
    party outsider and wrong-equipment denials, then
