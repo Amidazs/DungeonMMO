@@ -1220,6 +1220,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 source level-24 real on/off accuracy stance (Human/Elf).
+    -- This increases hit probability against server-authored NPC evasion;
+    -- an unactivated purchased rank grants no free accuracy.
+    ScoutAccuracyToggle = table.freeze({
+        Id = "ScoutAccuracyToggle",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Human first-transfer critical power (C4 levels 24 and 32).
     -- Purchased ranks affect real critical-hit damage, not raw attack.
     HumanScoutCriticalPower = table.freeze({
