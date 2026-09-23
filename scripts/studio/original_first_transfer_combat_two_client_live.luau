@@ -350,6 +350,11 @@ local function verify_greenward(profiles, elf, human)
         "Unpurchased real client Greenward heal restored significant HP "
             .. "or started its server cooldown")
     prepare(profiles, elf, "ElvenScout", 1)
+    -- Runtime-stat restoration can refill or resize a Humanoid.
+    -- Reapply the injured owner baseline after restoring the earned skill.
+    healer.MaxHealth = 2500
+    healer.Health = 1400
+    local heal_start = healer.Health
     print("[First Transfer Combat] UNPURCHASED_CLIENT_HEAL_DENIED_PASS")
     local mana_before = mana.get(elf)
     local minimum = assert(
@@ -357,7 +362,7 @@ local function verify_greenward(profiles, elf, human)
     ).MANA_COST
     request(elf, "GreenwardRenewal")
     wait_for(function()
-        return healer.Health >= before + 25
+        return healer.Health >= heal_start + 25
     end, "real client Greenward self-heal increases owner health", 12)
     assert(other.Health == other_before,
         "Greenward self-heal incorrectly healed another party member")
