@@ -344,7 +344,8 @@ Returns:
 ]]
 function Ledger:available(quest: any, step_index: number?): boolean
     if not quest or type(step_index) ~= "number" then return false end
-    if self._scout_actor and (step_index == 5 or step_index == 7)
+    if self._scout_actor and quest.BranchId == "ElvenScout"
+        and (step_index == 5 or step_index == 7)
     then
         return self._scout_actor:available(quest, step_index)
     end
