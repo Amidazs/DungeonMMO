@@ -296,6 +296,69 @@ local function verify_cinder_handoff(shared_store: any, source: any)
 end
 
 --[[
+Checks a personally earned Scout Warden sigil survives an extra handoff.
+
+Args:
+    shared_store (any): Shared deterministic persisted profile adapter.
+    source (any): Loaded first-return Base profile authority.
+
+Returns:
+    nil: Verifies fresh destination owns exactly one bound sigil and proof.
+]]
+local function verify_scout_ward_handoff(
+    shared_store: any, source: any
+)
+    local user_id = OWNERS[2].UserId
+    check(source:mutate(user_id, function(profile: any)
+        local owner = profile.Characters.Slot1
+        local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+        assert(state.Step == 4)
+        for index = 1, 4 do
+            assert(Inventory.apply_remove_from_character(
+                owner, "prias_letter_" .. tostring(index), 1
+            ).ok)
+        end
+        -- The separate real physical mentor test authenticates stages
+        -- four/five; this isolated handoff fixture starts at stage six.
+        state.Step = 6
+    end), "Later Scout handoff fixture uses existing owner profile")
+    local service = Quest.new(source, "Dungeon", test_world())
+    check(service:record_world_event(user_id, {
+        EventId = "BrackenHandoff:Kill1",
+        MonsterReceiptId = "BrackenHandoff:Life1",
+        ServerVerified = true,
+        ActorUserId = user_id,
+        Kind = "QuestMonsterDefeat",
+        TargetId = "BrackenWarden",
+        VerifiedProofIds = {RustedKey = true},
+    }).ok, "One authenticated fixture Warden kill earns real owned sigil")
+    local coordinator, transport = create_return_coordinator(source)
+    check(coordinator:return_to_base(
+        {{UserId = user_id}}, {
+            SessionId = "BrackenWardenHandoff",
+            DungeonId = "TestDungeon",
+            ReturnPlaceId = 42,
+        }
+    ).ok, "Coordinator saves Scout's personal rescue key")
+    check(transport.routing.Inventory == nil
+        and transport.routing.Proofs == nil,
+        "Routing metadata never becomes source loot authority")
+    check(source:forget_for_handoff(user_id),
+        "Saved Scout handoff releases the original writer cache")
+    local destination = Profiles.new(shared_store)
+    check(destination:load(user_id) ~= nil,
+        "New Base profile reads Scout's actual saved rescue proof")
+    local owner = assert(destination:get_character(user_id))
+    local state = owner.ClassAdvancement.OriginalFirstTransferQuest
+    check(state.Step == 7 and state.Proofs.RustedKey == true
+        and Inventory.count_item(owner, "bracken_ward_sigil") == 1,
+        "Exactly one personally earned sigil survives server handoff")
+    check(Inventory.count_item(owner, "cinder_cipher") == 0
+        and owner.Identity.ClassId == "Fighter",
+        "Source rescue does not cross-award Rogue loot or transfer class")
+end
+
+--[[
 Tests both actual source profile save/handoff and fresh destination loads.
 
 Args:
@@ -338,6 +401,7 @@ local function main()
         verify_destination(base, owner)
     end
     verify_cinder_handoff(shared_store, base)
+    verify_scout_ward_handoff(shared_store, base)
     print(("[C4 Quest Handoff] PASS: %d assertions")
         :format(assertions))
 end
