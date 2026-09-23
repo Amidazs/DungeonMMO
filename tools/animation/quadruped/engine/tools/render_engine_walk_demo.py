@@ -8,7 +8,6 @@ from pathlib import Path
 
 import bpy
 from mathutils import Vector
-from PIL import Image, ImageDraw
 
 
 ENGINE_ROOT = (
@@ -98,73 +97,20 @@ def render_engine_frames(scene):
     return paths
 
 
-def load_frame(path):
-    """Convert a rendered Blender frame into a labelled preview image.
-
-    Args:
-        path (Path): Existing rendered source-mesh PNG.
-
-    Returns:
-        Image.Image: Quantized RGB sample ready for GIF playback.
-    """
-    with Image.open(path) as original:
-        frame = original.convert("RGB")
-    frame.thumbnail((368, 240))
-    draw = ImageDraw.Draw(frame)
-    draw.text(
-        (7, 7), "FROSTFANG / ENGINE WALK / QA ONLY",
-        fill=(255, 255, 255),
-    )
-    return frame.quantize(colors=48)
-
-
-def build_preview(paths):
-    """Encode and verify a looped GIF from real engine-generated poses.
-
-    Args:
-        paths (list[Path]): Ordered actual-mesh render frames.
-
-    Returns:
-        tuple: Saved GIF path, encoded frame count and total duration.
-    """
-    images = [load_frame(path) for path in paths]
-    gif_path = OUTPUT / "Frostfang_Engine_Walk_QA.gif"
-    images[0].save(
-        gif_path,
-        save_all=True,
-        append_images=images[1:],
-        duration=FRAME_DURATION_MS,
-        loop=0,
-        optimize=True,
-        disposal=2,
-    )
-    with Image.open(gif_path) as saved:
-        total_ms = 0
-        for index in range(saved.n_frames):
-            saved.seek(index)
-            total_ms += saved.info.get("duration", 0)
-        return gif_path, saved.n_frames, total_ms
-
-
 def main():
-    """Generate an engine-authored wolf animation preview, not a mock-up.
+    """Render actual engine-authored wolf frames for a separate GIF builder.
 
     Args:
         None.
 
     Returns:
-        None: Saves a separate real-mesh GIF and diagnostic details.
+        None: Saves separate real-mesh PNGs and diagnostic details.
     """
     scene = prepare_scene()
     paths = render_engine_frames(scene)
-    gif_path, count, duration_ms = build_preview(paths)
-    if count < 5 or duration_ms < 1000:
-        raise RuntimeError("The generated animation preview is incomplete")
-    print("ENGINE_PREVIEW_SAVED", gif_path, flush=True)
+    print("ENGINE_RENDER_COUNT", len(paths), flush=True)
     print("ENGINE_ACTION", ACTION_NAME, flush=True)
-    print("ENGINE_GIF_FRAMES", count, flush=True)
-    print("ENGINE_GIF_DURATION_MS", duration_ms, flush=True)
-    print("ENGINE_GIF_BYTES", gif_path.stat().st_size, flush=True)
+    print("ENGINE_FRAME_DIRECTORY", OUTPUT, flush=True)
 
 
 if __name__ == "__main__":
