@@ -1293,6 +1293,56 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original Elven Scout self-only wound recovery, purchased at 24.
+    ElvenScoutCureWounds = table.freeze({
+        Id = "ElvenScoutCureWounds",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 24}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Source level-28 attack focus uses a real, short timed status,
+    -- not an automatically granted passive or cosmetic icon.
+    ElvenScoutBattleFocus = table.freeze({
+        Id = "ElvenScoutBattleFocus",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 28}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Original level-32 speed buff requires an actual server cast.
+    ElvenScoutWindRun = table.freeze({
+        Id = "ElvenScoutWindRun",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger", "Rogue"}),
+        RankLevels = table.freeze({[1] = 32}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Level-36 Elf Scout slowing arrow requires a longbow and
+    -- a server-confirmed projectile impact on a living enemy.
+    ElvenScoutSnaringShot = table.freeze({
+        Id = "ElvenScoutSnaringShot",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Control",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Ranger"}),
+        RankLevels = table.freeze({[1] = 36}),
+        WeaponTags = table.freeze({"Longbow"}),
+    }),
+
     -- C4 Elven Scout level-24 self-only Poison Recovery. A real
     -- non-stacking server poison must exist before use is allowed.
     ElvenScoutPoisonRecovery = table.freeze({
