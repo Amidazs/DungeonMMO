@@ -48,6 +48,10 @@ plus one Crafting profession per character** remains mandatory.
   **39 assertions**; updated inventory audit
   **1,112 assertions**. Luau source parsing and
   focused/full Dungeon Rojo builds passed.
+- [x] Ran the existing checked-in `DamageServiceTest`
+  independently in unpublished Studio: **15/15 assertions
+  passed**, preserving legacy physical hit and critical
+  damage behavior after the Accuracy change.
 - [x] An actual admitted one-client unpublished Dungeon
   playtest verified activation/off via the real skill
   remote, a deterministic server melee/bow miss becoming
