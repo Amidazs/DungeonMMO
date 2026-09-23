@@ -2828,7 +2828,9 @@ local function handle_skill_request(
         -- A second genuine click must turn the existing stance off,
         -- without paying an activation cost or entering casting state.
         local changed, enabled, reason =
-            ScoutCriticalToggleService.toggle(player, skill_definition)
+            ScoutCriticalToggleService.toggle(
+                player, skill_definition, rank
+            )
         CombatValidationService.emit(
             player, "SCOUT_TOGGLE",
             if changed then "APPLIED" else "REJECT",
@@ -3620,7 +3622,7 @@ ScoutCriticalToggleService.set_authorizer(function(
     )
     return usable and ProgressionRuntimeState.get_skill_rank(
         player.UserId, toggle_record.Definition.ID
-    ) > 0 and player:GetAttribute(
+    ) == toggle_record.Rank and player:GetAttribute(
         CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
     ) ~= false
 end)
