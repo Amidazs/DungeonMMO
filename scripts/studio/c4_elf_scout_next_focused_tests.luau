@@ -33,7 +33,8 @@ local function run_fixture(parent: Instance, test_name: string): boolean
     local runner = Instance.new("ModuleScript")
     runner.Name = "TEMP_" .. test_name
     runner.Source = fixture.Source .. "\nreturn true\n"
-    runner.Parent = server
+    -- Preserve the original test's script.Parent-relative require paths.
+    runner.Parent = parent
     local ok, reason = pcall(require, runner)
     runner:Destroy()
     if not ok then
