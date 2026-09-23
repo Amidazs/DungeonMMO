@@ -224,6 +224,13 @@ local function verify_party_heal(players, runtime, session)
     end, "both live party members received actual HP", 15)
     local first_gain = first.Health - first_before
     local second_gain = second.Health - second_before
+    print(("[C4 Party Heal Live] HEAL_DIAGNOSTIC "
+        .. "caster=%.2f/%.2f ally=%.2f/%.2f "
+        .. "rank=%d multiplier=%.3f")
+        :format(first_gain, first.MaxHealth, second_gain,
+            second.MaxHealth, RuntimeState.get_skill_rank(
+                caster.UserId, "MysticPartyHeal"
+            ), RuntimeState.get_heal_multiplier(caster.UserId)))
     assert(first_gain >= 50 and second_gain >= 50,
         "Rank-three party healing did not restore both members")
     assert(Threat.get_threat(enemy, caster.UserId) > 0,
