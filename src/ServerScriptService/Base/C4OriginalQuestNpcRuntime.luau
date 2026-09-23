@@ -135,6 +135,12 @@ function Runtime.attach(options: any): any
         -- this character has actually earned its ordered stage-four proof.
         self._step_parts[branch_id][4] =
             self._step_parts[branch_id][2]
+        if branch_id == "HumanRogue" then
+            -- Stage five is a new ordered report to the real captain,
+            -- not a replay of the stage-one quest-start interaction.
+            self._step_parts[branch_id][5] =
+                self._step_parts[branch_id][1]
+        end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
         self:remove(player)
@@ -219,10 +225,15 @@ function Runtime:_talk(
     local advancement = character and character.ClassAdvancement
     local current = advancement
         and advancement.OriginalFirstTransferQuest
-    if index == 2 and current and current.Step == 4 then
+    if current and index == 2 and current.Step == 4 then
         index = 4
+    elseif current and branch_id == "HumanRogue"
+        and index == 1 and current.Step == 5
+    then
+        index = 5
     end
-    local source_index = if index == 4 then 2 else index
+    local source_index = if index == 4
+        then 2 elseif index == 5 then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]
         and self._step_parts[branch_id][index]
