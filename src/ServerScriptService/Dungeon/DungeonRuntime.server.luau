@@ -13,6 +13,9 @@ local Services = Core:WaitForChild("Services")
 local Adapters = Core:WaitForChild("Adapters")
 local Dungeon = ServerScriptService:WaitForChild("Dungeon")
 local Combat = ServerScriptService:WaitForChild("Combat")
+local PartyHealService = require(
+    Combat:WaitForChild("PartyHealService")
+)
 local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local SharedCombat = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 
@@ -217,6 +220,39 @@ local SESSION_REFRESH_SECONDS = 30
 local function current_session(): any?
     return if active_session_id then sessions:get(active_session_id) else nil
 end
+
+-- Only this authoritative Dungeon session service may enumerate healer
+-- allies. Client attributes, proximity alone and supplied UserIds do not
+-- create party membership. A solo session never qualifies as a party.
+PartyHealService.set_roster_provider(function(caster: Player): {Player}
+    local session = current_session()
+    if not session or session.State ~= "Active" then
+        return {}
+    end
+    local caster_member = session.Members[tostring(caster.UserId)]
+    if not caster_member or caster_member.Mode ~= "Active"
+        or caster_member.Connected ~= true
+        or caster_member.Abandoned == true then
+        return {}
+    end
+
+    local roster = {}
+    for user_id, member in pairs(session.Members) do
+        if member.Mode == "Active"
+            and member.Connected == true
+            and member.Abandoned ~= true then
+            local user = tonumber(user_id)
+            local player = if user then Players:GetPlayerByUserId(user)
+                else nil
+            if player and player:GetAttribute(
+                CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+            ) == true then
+                table.insert(roster, player)
+            end
+        end
+    end
+    return roster
+end)
 
 -- Returns the authoritative base encounter sequence for the admitted session.
 local function base_encounter_sequence(session: any): {any}?
