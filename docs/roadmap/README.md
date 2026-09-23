@@ -1,4 +1,43 @@
-**Current DungeonMMO class backend: v2.01 — real client-caused first-transfer combat and negative-cast acceptance.**
+**Current DungeonMMO class launch scope: v2.02 — initial cap at level 30 with complete historical C4-through-cap skill-rank coverage as the acceptance target.**
+[Latest class/skill launch roadmap](
+DungeonMMO_Roadmap_v2_02_Level_30_Launch_Skill_Parity_20260923.md).
+Stop building level-32/36+ class unlocks merely for the
+initial release: finish the C4 reference skill families and
+individual learnable ranks available through level 30 for
+every advertised original DungeonMMO class. The two
+previously accepted physical level-20 class identities
+currently have two independently authored trainable
+abilities each; that is NOT a complete C4-equivalent
+level-30 catalogue. The source-row audit records
+Human Rogue **20 + 19 + 20 = 59** and Elven Scout
+**26 + 25 + 26 = 77** individual historical
+rank entries in the level-20/24/28 brackets,
+including shared/general ranks. These are not
+different skill button counts or currently
+implemented ranks; current old Rogue/Ranger
+legacy skill implementations must not be
+misreported as original first-transfer training.
+New `C4Level30LaunchCoverage` audits all 18 source
+first-transfer paths, keeps all completeness
+flags false and explicitly marks the remaining
+16 historical through-cap inventories for review.
+Its focused unpublished Base Rojo/Studio test
+**PASS, 22 assertions**. Once the two current
+class catalogues satisfy this level-30 gate,
+continue Human Warrior/Knight and Human
+Wizard/Cleric, then the other original
+class/race branches; independently author
+all player-facing DungeonMMO class, skill,
+NPC, monster and quest expression. This is
+a revised release *scope*, not an already
+enforced game level cap or a finished
+first-transfer catalogue. No Roblox publish,
+`main` merge, production DataStore write
+or Desktop Commander source editing.
+The independently maintained humanoid/
+quadruped animation roadmaps remain current.
+
+**Previous DungeonMMO class backend: v2.01 — real client-caused first-transfer combat and negative-cast acceptance.**
 [Latest class backend roadmap](
 DungeonMMO_Roadmap_v2_01_Real_Original_Combat_20260923.md)
 and [executed two-client Studio test record](
