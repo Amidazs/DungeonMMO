@@ -403,6 +403,33 @@ Returns:
 ]]
 local function main()
     check_skill_scope()
+    local rogue_quest = assert(Stages.get("HumanRogue"))
+    local scout_quest = assert(Stages.get("ElvenScout"))
+    check(rogue_quest.SourceTitle == "The Ashen Blade Trial"
+        and rogue_quest.Steps[1].TargetId == "CaptainAshford"
+        and rogue_quest.Steps[2].TargetId == "Vela"
+        and rogue_quest.Steps[3].TargetId == "CryptSentinel"
+        and rogue_quest.Steps[6].TargetId == "CinderBrigand",
+        "Rogue player-facing quest and actor IDs use original game names")
+    check(scout_quest.SourceTitle == "The Greenward Search"
+        and scout_quest.Steps[1].TargetId == "PathfinderElyra"
+        and scout_quest.Steps[2].TargetId == "WardenThorne"
+        and scout_quest.Steps[3].TargetId == "BrackenRaider"
+        and scout_quest.Steps[5].TargetId == "ScoutCael"
+        and scout_quest.Steps[6].TargetId == "BrackenWarden",
+        "Scout player-facing quest and actor IDs use original game names")
+    check(rogue_quest.SourceUrl == nil
+        and scout_quest.SourceUrl == nil,
+        "Quest snapshots must not expose third-party walkthrough links")
+    check(assert(ItemDefinitions.get("neti_trial_dagger")).Name
+            == "Vela's Trial Dagger"
+        and assert(ItemDefinitions.get("neti_trial_bow")).Name
+            == "Vela's Trial Bow"
+        and assert(ItemDefinitions.get("spartoi_bone")).Name
+            == "Crypt Sentinel Fragment"
+        and assert(ItemDefinitions.get("prias_letter_1")).Name
+            == "Cael's Field Report Fragment 1",
+        "Legacy save IDs remain valid while visible quest item names change")
     local profiles = Profiles.new(Adapter.new())
     seed(profiles, 99341, "Human", "HumanRogue")
     seed(profiles, 99342, "Elf", "ElvenScout")
