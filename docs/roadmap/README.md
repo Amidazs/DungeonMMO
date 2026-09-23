@@ -1,3 +1,24 @@
+**Current C4 backend: v1.83 — live Scout Critical Power toggle.**
+[Newest C4 backend roadmap](
+DungeonMMO_Roadmap_v1_83_C4_Scout_Critical_Power_20260923.md)
+and [focused Studio plus real-client gameplay evidence](
+../testing/c4-scout-critical-toggle-and-snare-v1-83-2026-09-23.md).
+The previously pending genuine client-to-NPC Elven Snaring Shot
+impact, damage, timed 35% slow and expiry were verified.
+Human Rogue and Elven Scout each gained five actual original
+C4 Critical Power toggle source ranks with learned/rank-gated
+on/off, real stamina upkeep, non-free melee/bow critical damage
+and automatic revocation on exhaustion/character restrictions.
+The targeted unpublished Studio run passed **6/6**; actual
+Dungeon client critical-toggle gameplay passed. Six currently
+inventoried C4 classes stand at **371/396** real rank analogues,
+with 13 Human Rogue and 12 Elven Scout source ranks missing;
+seven other original first-transfer class catalogues remain
+entirely unmapped and **0/9** paths are fully complete.
+Existing one-Gathering/one-Crafting limits, no-publish policy,
+independent humanoid/quadruped animation roadmap and separate
+v1.78 Mystic hostile-weakening release gate remain unchanged.
+
 **Current C4 backend: v1.82 — tested Elven Scout support.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_82_Elven_Scout_Support_20260923.md)
