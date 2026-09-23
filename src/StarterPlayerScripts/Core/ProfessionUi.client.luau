@@ -447,6 +447,8 @@ action_result.OnClientEvent:Connect(function(payload: any)
             reason = "Learn Common Item Creation at your class trainer."
         elseif reason == "RecipeReadingNotLearned" then
             reason = "Learn Recipe Reading at your class trainer."
+        elseif reason == "ScoutCommonItemCreationNotLearned" then
+            reason = "Learn the required Scout crafting rank at your class trainer."
         elseif reason == "NotAtRequiredStation" then
             reason = "Move closer to the required station"
         elseif reason == "IngredientEquipped" then
