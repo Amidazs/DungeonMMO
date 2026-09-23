@@ -1,3 +1,25 @@
+## 24 September 2026 — v2.08 Knight shield candidate (NOT TESTED IN STUDIO)
+
+- [x] GitHub source adds personally earned Oathguard shield mastery
+  at levels 20 and 28 with shield-dependent 0.8% physical damage
+  reduction per bought rank (maximum 1.6%), correct career
+  trainer and strict incomplete 37/54 launch-rank audit.
+- [x] Source-owned test fixtures now assert genuine profile
+  purchase, forged owner rejection, equipment isolation,
+  runtime mitigation and rank count; these tests are **staged**.
+- [ ] Focused Knight quest/foundation and level-30 audit
+  suites have **not executed** for this code candidate.
+- [ ] No disposable Base/Dungeon Rojo builds for v2.08.
+- [ ] Genuine client-controlled physical shield damage,
+  wrong gear/class/PvP/magic isolation, Knight personal
+  self-heal and enemy spell protection still require
+  unpublished local Studio evidence. Keep v2.07 acceptance
+  receipts historical, not a pass for new source changes.
+- [ ] 17 Knight and 35 Warrior source rank entries
+  remain unmapped; **0/18** careers certified for launch.
+[Candidate checklist](
+../testing/oathguard-shield-mastery-github-candidate-v2-08-20260924.md).
+
 ## 23 September 2026 — approved quadruped engine work in progress
 
 Owner approved reusable quadruped design, GitHub source/docs commits on
