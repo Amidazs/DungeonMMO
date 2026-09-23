@@ -923,6 +923,34 @@ local function verify_client_training(
         return trainer_ui[player.UserId] == true
     end, "real client trainer UI showing its advanced skill", 12),
         "Physical trainer UI omitted the available advanced skill")
+
+    local foreign = if definition.RaceId == "Human"
+        then {TrainerId = "GreenwardScoutTrainer",
+            SkillId = "GreenwardRenewal"}
+        else {TrainerId = "AshenbladeTrainer",
+            SkillId = "AshenbladeOpening"}
+    skill_purchases[player.UserId] = nil
+    channel:FireClient(player, "LearnAdvanced", foreign)
+    local foreign_result = wait_for(function()
+        return skill_purchases[player.UserId]
+    end, "real wrong-class trainer remote response", 12)
+    assert(not foreign_result.ok
+        and foreign_result.reason == "InvalidTrainerSkillRequest",
+        "Client cannot substitute an unrelated mentor's trainer ID")
+
+    assert(profiles:mutate(player.UserId, function(profile)
+        profile.Characters.Slot1.Progression
+            .SkillPointEntitlement = 0
+    end), "Disposable test-only low-SP trainer setup failed")
+    local no_sp = request_client_training(player, definition, skill_id)
+    assert(not no_sp.ok and no_sp.reason == "InsufficientSP"
+        and not profiles:get_character(player.UserId)
+            .Progression.Skills[skill_id],
+        "Authenticated in-range trainer cannot give away a free skill")
+    assert(profiles:mutate(player.UserId, function(profile)
+        profile.Characters.Slot1.Progression
+            .SkillPointEntitlement = 1000
+    end), "Disposable owner skill-point balance restoration failed")
     local learned = request_client_training(player, definition, skill_id)
     assert(learned.ok, "Real client could not buy its advanced skill: "
         .. tostring(learned.reason))
