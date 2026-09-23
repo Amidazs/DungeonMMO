@@ -113,13 +113,13 @@ local function evidence(
 ): any
     local step = quest.Steps[step_index]
     local proofs = {}
-    if step.TargetId == "RogueTrialSkeleton" then
-        proofs.SpartoiBone = true
-    elseif step.TargetId == "OlMahumPatrol" then
+    if step.TargetId == "CryptSentinel" then
+        proofs.crypt sentinelBone = true
+    elseif step.TargetId == "BrackenRaider" then
         proofs["PriasLetter" .. tostring(count)] = true
-    elseif step.TargetId == "OlMahumSentry" then
+    elseif step.TargetId == "BrackenWarden" then
         proofs.RustedKey = true
-    elseif step.TargetId == "CatsEyeBandit" then
+    elseif step.TargetId == "CinderBrigand" then
         for _, id in ipairs({
             "StolenJewelry", "StolenTomes",
             "StolenRing", "StolenNecklace",
@@ -135,7 +135,7 @@ local function evidence(
                 .. ":owner-" .. tostring(user_id)
                 .. ":enemy-" .. tostring(count) .. ":life-1"
             else nil,
-        TrialWeaponsGranted = step.TargetId == "Neti",
+        TrialWeaponsGranted = step.TargetId == "Vela",
         TrialWeaponVerified = step.RequiresTrialWeapon == true,
         VerifiedProofIds = proofs,
     }
@@ -186,7 +186,7 @@ local function exercise(
             check(service:record_world_event(
                 user_id, event
             ).reason == "OriginalTrialWeaponNotEquipped",
-                "Owning Neti's trial items is not enough to earn bone proof")
+                "Owning Vela's trial items is not enough to earn bone proof")
             check(Equipment.new(profiles, "Base"):equip(
                 user_id, "neti_trial_dagger", "Weapon"
             ).ok, "Actual authoritative equipment service equips trial dagger")
@@ -216,12 +216,12 @@ local function exercise(
             check(service:record_world_event(
                 user_id, event
             ).reason == "OriginalTrialWeaponRequired",
-                "Original Neti weapon condition cannot be skipped")
+                "Original Vela weapon condition cannot be skipped")
             event.TrialWeaponVerified = true
         end
-        if step.TargetId == "CatsEyeBandit"
-            or step.TargetId == "OlMahumSentry"
-            or step.TargetId == "RogueTrialSkeleton"
+        if step.TargetId == "CinderBrigand"
+            or step.TargetId == "BrackenWarden"
+            or step.TargetId == "CryptSentinel"
         then
             local proofs = event.VerifiedProofIds
             event.VerifiedProofIds = {}
@@ -241,7 +241,7 @@ local function exercise(
             }) do
                 local item = assert(ItemDefinitions.get(item_id))
                 check(Inventory.count_item(owner, item_id) == 1,
-                    "Only the authenticated Rogue owns Neti's real weapon")
+                    "Only the authenticated Rogue owns Vela's real weapon")
                 check(EquipmentRules.validate(
                     owner, item, "Weapon"
                 ).ok, "Original Human Fighter may equip its quest-only gear")
@@ -253,7 +253,7 @@ local function exercise(
             local elf = assert(profiles:get_character(user_id, 1))
             check(Inventory.count_item(elf, "neti_trial_dagger") == 0
                 and Inventory.count_item(elf, "neti_trial_bow") == 0,
-                "Elven Moretti meeting cannot grant Human Rogue weapons")
+                "Elven Thorne meeting cannot grant Human Rogue weapons")
         end
         check(service:record_world_event(
             user_id, event
@@ -277,7 +277,7 @@ local function exercise(
             local quest_state =
                 current.ClassAdvancement.OriginalFirstTransferQuest
             check(Inventory.count_item(current, "spartoi_bone") == 10
-                and quest_state.Proofs.SpartoiBone10 == true,
+                and quest_state.Proofs.crypt sentinelBone10 == true,
                 "Ten distinct receipts must mint ten owned bones and proof")
             check(not TransferRules.can_trade("spartoi_bone")
                 and not TransferRules.can_bank("spartoi_bone"),
@@ -324,7 +324,7 @@ local function exercise(
             and Inventory.count_item(reloaded, "neti_trial_bow") == 1
             and Inventory.count_item(reloaded, "spartoi_bone") == 10
             and reloaded.ClassAdvancement.OriginalFirstTransferQuest
-                .Proofs.SpartoiBone10 == true,
+                .Proofs.crypt sentinelBone10 == true,
             "Original Rogue equipment, ten earned bones and aggregate proof "
                 .. "must survive save/reload without duplicate rewards")
     else
