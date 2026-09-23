@@ -268,3 +268,70 @@ hand/weapon grip intersections and bow/arrow geometry before
 treating any clip as usable game art. Check and retain all original
 humanoid generator files. Keep all clips out of production game
 code and do not publish until the user separately approves them.
+
+
+## Six-clip R15 starter acceptance checkpoint — 23 September 2026
+
+**Current status: six native editable test-clips built on an isolated
+unpublished R15 mannequin; 6/6 structural checks and 6/6 real
+Play-button playback/event checks PASSED. Visual approval, live
+movement/combat integration, local .rbxlx backup and publication
+remain OPEN.** The current independently updated backend roadmap
+is [v2.04](DungeonMMO_Roadmap_v2_04_Expanded_Combat_Ironvow_Foundation_20260923.md).
+This animation checkpoint does not replace or modify the backend
+progression/class roadmap or its separate acceptance evidence.
+
+After the user opened Studio, the original `Place1` was confirmed
+unpublished (`PlaceId == 0`). The previous Astra guardian was
+not actually present. The source-controlled starter setup therefore
+created a **separate Roblox built-in R15 test mannequin** instead
+of silently modifying a guardian or the other open DungeonMMO
+test sessions. The built-in Roblox R15 had the current 15 connected
+`AnimationConstraint` body joints, not legacy `Motor6D` bodies:
+the GitHub authoring generator was fixed to support both types
+before any successful sequence creation.
+
+The six actual `KeyframeSequence` clips built under
+`Workspace.DMMO_Humanoid_Starter_Test` were Idle, Walk, Run,
+Sword, Daggers and Bow. The deterministic 60-Hz keys, exact
+durations/loop flags and 0/0/0/1/2/1 named event counts passed
+structural QA. Edit-mode real Animator playback observed moving
+body parts and expected attack markers; a separate Play-button
+test replayed the full set and passed with
+`DMMO_HumanoidStarterQA=PLAYBACK_MARKERS_CHECKED`.
+A first replay completed all individual actions but an outdated
+test-only final guardian-presence assertion failed; this was
+corrected on GitHub, and the final uninterrupted Studio replay
+and its six action logs passed.
+
+A source-controlled QA helper captured 12 genuine clean
+Play-mode Studio viewport frames per clip and built six
+verified full-loop preview GIFs in
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_Humanoid_Starter_QA_20260923\\Play\\<Clip>\\DMMO_Humanoid_<Clip>_UNAPPROVED.gif`.
+The [actual Studio closeout record](
+../testing/humanoid-starter-six-clip-20260923.md)
+contains the complete six-sequence timeline, playback and
+capture evidence; the [starter README](
+../../tools/animation/humanoid/starter/README.md)
+documents how to reproduce this exact test without modifying
+existing production scripts.
+
+**User quality review remains required.** The recorded demo
+uses generic blocky R15 art; in-place walk/run have not been
+approved for final foot planting on playable race meshes. Sword,
+dagger and bow props are intentionally simple; their visible
+alignment/occlusion, bowstring/arrow trajectory, weapon-ready
+stance, combat timing against actual target dummies and
+idle/locomotion blending still require refinement on the final
+rig. A correct `Impact` or `ArrowRelease` animation marker
+is not authoritative damage/projectile logic.
+
+The assistant stopped Play, disabled the temporary replay Script,
+reset the idle pose and verified that all six editable clips
+remained in unpublished Edit mode. No animation was published,
+no original guardian or production game was replaced, and no
+Studio local place-file backup was verified. **Next:** user reviews
+the six real Studio GIFs; refine specific gait/weapon defects
+on the same isolated test mannequin, then save an independently
+versioned unpublished local animation/place backup before any
+approved integration.
