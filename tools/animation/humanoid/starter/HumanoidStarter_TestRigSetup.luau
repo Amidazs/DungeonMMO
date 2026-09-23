@@ -71,6 +71,7 @@ local function create_default_performer()
     )
     description:Destroy()
     assert(model, "Roblox could not create its built-in R15 mannequin")
+    remove_source_attacks(model)
     model.Name = TARGET_NAME
     model:SetAttribute("DMMO_TestOnly", true)
     model:SetAttribute("DMMO_AnimationLibrary", "Humanoid starter v1")
