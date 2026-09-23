@@ -49,6 +49,9 @@ local BaseQuestRuntime = require(Base:WaitForChild("BaseQuestRuntime"))
 local BaseClassAdvancementRuntime = require(
     Base:WaitForChild("BaseClassAdvancementRuntime")
 )
+local C4FirstTransferSelectionService = require(
+    Services:WaitForChild("C4FirstTransferSelectionService")
+)
 local RaceChangeRuntime = require(Base:WaitForChild("RaceChangeRuntime"))
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
@@ -437,6 +440,7 @@ BaseQuestRuntime.attach({
 BaseClassAdvancementRuntime.attach({
     remotes = remotes,
     advancement = runtime.ClassAdvancementService,
+    selection = C4FirstTransferSelectionService.new(profiles, "Base"),
     is_ready = function(player: Player): boolean
         return loaded_users[player.UserId] == true
             and profiles:get_profile(player.UserId) ~= nil
