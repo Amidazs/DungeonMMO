@@ -58,7 +58,7 @@ def generate(rig, config):
         # A small anticipatory load transfer precedes root travel.
         anticipation=smooth((t-config["timeline"]["idle"]+.25)/.25)*(1-smooth((t-config["timeline"]["idle"])/.6))
         travel=q*config["root_stride"]
-        rig.location=origin+Vector((0,-travel,-.002*weight*(1-math.cos(4*math.pi*q))))
+        rig.location=origin+Vector((0,-travel,(-config.get("body_drop",.014)+.001*(1-math.cos(4*math.pi*q)))*max(weight,anticipation)))
         for name,basis in bases.items():rig.pose.bones[name].matrix_basis=basis
         bpy.context.view_layer.update()
         frame_record={"frame":frame,"time":t,"cycles":q,"limbs":{}}
@@ -113,6 +113,20 @@ def generate(rig, config):
                 # Existing two-link hind IK, rest proportions and bend branch.
                 frame_record["limbs"][limb["id"]]={}
             frame_record["limbs"][limb["id"]].update(planted=sample["planted"],target=list(position))
+        # Preserve hind IK branch; limit extension with measured pelvis support.
+        support=0.
+        for limb in config["limbs"]:
+            if limb["family"]!="hind":continue
+            upper=rig.pose.bones[limb["upper"]];lower=rig.pose.bones[limb["lower"]]
+            goal=rig.matrix_world.inverted() @ controls[limb["id"]][0].location
+            start=upper.head;angle=math.radians(config["hind"]["joint_limit"])
+            reach2=upper.bone.length**2+lower.bone.length**2-2*upper.bone.length*lower.bone.length*math.cos(angle)
+            z=math.sqrt(max(.00001,reach2-(start.x-goal.x)**2-(start.y-goal.y)**2))
+            support=max(support,start.z-goal.z-z)
+        if support>0:
+            pelvis=rig.pose.bones[config["pelvis"]]
+            matrix=pelvis.matrix.copy();matrix.translation.z-=support+.0001
+            pelvis.matrix=matrix;bpy.context.view_layer.update()
         for bone in rig.pose.bones:key_pose(bone,frame)
         rig.keyframe_insert(data_path="location",frame=frame)
         records.append(frame_record)
