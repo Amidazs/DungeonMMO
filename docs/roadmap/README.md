@@ -1,4 +1,49 @@
-**Current DungeonMMO class launch scope: v2.02 — initial cap at level 30 with complete historical C4-through-cap skill-rank coverage as the acceptance target.**
+**Current DungeonMMO class backend: v2.03 — original level-30 first-transfer source rank schedules and purchase acceptance.**
+[Latest active class backend roadmap](
+DungeonMMO_Roadmap_v2_03_Level_30_First_Transfer_Rank_Coverage_20260923.md)
+and [executed Studio acceptance / limitations](
+../testing/original-first-transfer-level30-ranks-v2-03-20260923.md).
+The intended initial release remains **level 30**.
+Both previously implemented physical Human Rogue →
+Ashenblade and Elven Scout → Greenward Scout
+source/mentor class paths now offer their complete
+*recorded historical level-20/24/28 rank schedules*
+through genuine earned-Fighter career trainer entries:
+**59/59** Human and **77/77** Elf individual source
+rank entries, including shared/general skills, not
+different skill icon counts. Dedicated new bow/dagger
+attack/mastery lines use valid server combat/rank
+effects and source prerequisites; existing audited
+DungeonMMO armor, movement, recovery, critical
+and utility skills are newly available only
+for the correctly earned original careers, with
+the crafting profession choice kept mandatory.
+All mapped ranks were exercised through genuine
+server ProfileService/SkillProgressionService
+purchases in isolated test profiles. Base/Dungeon
+local builds **PASS**, focused Base class/skill
+**2/2 PASS (459 + 8 assertions)**, source-rank
+audit **25 PASS**, and actual unpublished
+two-client Base mentor/trainer regression **PASS**.
+This is *not* every ability's live client
+combat/effect acceptance, not an uninterrupted
+real cross-place quest, and does not enforce
+a live level-30 cap yet. The next original
+Human Warrior **62** and Knight **54**
+through-cap source rank inventories are now
+audited, but **neither class/quest/trainer
+is playable yet**. Exact status: **2/18**
+genuine original level-20 career awards,
+**2/18** source-rank trainer schedules
+mapped/purchased, **4/18** historical
+first-transfer through-cap source catalogues
+audited, **0/18** full-class gameplay
+acceptance. No Roblox publish, production
+DataStore write, `main` merge or edits via
+Desktop Commander. Separate humanoid and
+quadruped animation roadmaps remain intact.
+
+**Previous DungeonMMO class launch scope: v2.02 — initial cap at level 30 with complete historical C4-through-cap skill-rank coverage as the acceptance target.**
 [Latest class/skill launch roadmap](
 DungeonMMO_Roadmap_v2_02_Level_30_Launch_Skill_Parity_20260923.md).
 Stop building level-32/36+ class unlocks merely for the
