@@ -190,6 +190,7 @@ local DEFINITIONS = table.freeze({
             "OathguardShieldImpact",
             "OathguardChallenge",
             "OathguardHeavyArmorTraining",
+            "OathguardRunicResistance",
         }),
     }),
 
