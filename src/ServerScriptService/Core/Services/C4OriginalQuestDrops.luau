@@ -95,7 +95,21 @@ Returns:
 function Drops.validate(
     character: any, state: any, event: any
 ): (boolean, string?)
-    if state.BranchId == "HumanRogue" then
+    if state.BranchId == "HumanWarrior" then
+        local marker_count = Inventory.count_item(
+            character, "ironroot_dispatch_marker"
+        )
+        local seal_count = Inventory.count_item(
+            character, "ridgebreaker_oath_seal"
+        )
+        if (state.Step == 3 and marker_count ~= state.Count)
+            or (state.Step == 4 and marker_count ~= 4)
+            or (state.Step == 5 and seal_count ~= 0)
+            or (state.Step == 6 and seal_count ~= 1)
+        then
+            return false, "OriginalQuestProofOwnershipInvalid"
+        end
+    elseif state.BranchId == "HumanRogue" then
         if state.Step == 3 or state.Step == 6 then
             if not has_trial_weapon(character) then
                 return false, "OriginalTrialWeaponNotEquipped"
@@ -156,6 +170,12 @@ Returns:
 local function consume_return_items(
     character: any, branch_id: string
 ): (boolean, string?)
+    if branch_id == "HumanWarrior" then
+        local removed = Inventory.apply_remove_from_character(
+            character, "ironroot_dispatch_marker", 4
+        )
+        return removed.ok, removed.reason
+    end
     if branch_id == "HumanRogue" then
         local removed = Inventory.apply_remove_from_character(
             character, "spartoi_bone", 10
@@ -227,6 +247,12 @@ function Drops.apply(
     if state.Step == 4 then
         return consume_return_items(character, state.BranchId)
     end
+    if state.BranchId == "HumanWarrior" and state.Step == 6 then
+        local removed = Inventory.apply_remove_from_character(
+            character, "ridgebreaker_oath_seal", 1
+        )
+        return removed.ok, removed.reason
+    end
     if state.BranchId == "HumanRogue" and state.Step == 6 then
         return apply_cinder_items(character, false)
     end
@@ -240,7 +266,11 @@ function Drops.apply(
         return removed.ok, removed.reason
     end
     local item_id: string? = nil
-    if state.Step == 3 and state.BranchId == "HumanRogue" then
+    if state.Step == 3 and state.BranchId == "HumanWarrior" then
+        item_id = "ironroot_dispatch_marker"
+    elseif state.Step == 5 and state.BranchId == "HumanWarrior" then
+        item_id = "ridgebreaker_oath_seal"
+    elseif state.Step == 3 and state.BranchId == "HumanRogue" then
         item_id = "spartoi_bone"
     elseif state.Step == 3 and state.BranchId == "ElvenScout" then
         item_id = letter_item(event)
