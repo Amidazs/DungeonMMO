@@ -528,3 +528,95 @@ multiview motion review, actual Studio Animator playback, and visual
 approval. Preserve the earlier source, JawV3 files, QA Studio places,
 and experimental motion preview. Use current roadmap index v1.88 as
 backend/class baseline; the art status is independent of that version.
+
+## Paw-mesh/root-motion investigation and continuous preview — 23 September 2026
+
+**Stage 1 OPEN. Preferred current experimental authoring candidate is
+WalkV3, NOT an accepted canine gait, master rig or Roblox clip.**
+The latest separate backend supplement on this branch is roadmap
+**v1.89 (original C4 starter classes)**; no backend, character-class or
+published game acceptance follows from these art-only experiments.
+
+The first independent IK trial was saved separately and audited.
+In a further WalkV2 trial the root advanced along the wolf's forward
+axis, while four independent ankle-target empties used phased stance
+and swing arcs. Actual weighted toe geometry, however, did not follow
+the armature object's root movement consistently because the original
+experimental mesh had **no parent** (although it had an Armature
+modifier). This made moving-target-only metrics misleading and
+produced large planted-toe sliding.
+
+**WalkV3** corrects that isolated copy's mesh-to-armature relationship
+before keying the same route; it keeps the unchanged original
+`Frostfang_Canine_ExperimentalMaster_JawV3.blend` as source and
+saves a separate new Blend. Its 72-frame/24-fps mesh audit reported:
+
+- WalkV2 greatest measured planted toe horizontal-centroid drift:
+  **0.048764 source units**; greatest planted toe height:
+  **0.037068 source units**.
+- WalkV3 greatest planted drift across all paws:
+  **0.026657 source units**, still on the **hind-right**; its highest
+  stance foot point was **0.013578** above test Z=0 and other
+  sampled stance points reached **-0.003723** below it.
+- On the full measured WalkV3 intervals, front-left drift was
+  **0.004522** and the longest front-right interval **0.002176**
+  source units. Hind-left remained **0.00815**; hind-right remains
+  too poorly grounded to certify the gait. These are source-space
+  measurements of actual weighted toe vertices, not visual approval.
+
+**WalkV4 is a rejected, isolated contact-correction experiment.**
+A naive iterative approach that nudged ankle targets toward the mesh
+contact point produced worse residuals for some legs. A subsequent
+finite-difference inspection confirmed **axis coupling/nonlinear
+response** on the original hind-right IK chain; moving the target
+downward could actually raise measured toe vertices and shift their
+horizontal centroid. Do not replace WalkV3, reuse WalkV4's correction
+as an engine solution, or mark the four-paw contact gate passed.
+Proper anatomical hind-right rig/skin diagnosis, stable foot
+orientation and measured IK response are needed before new tuning.
+
+New source-controlled, editable QA utilities live under
+`tools/animation/quadruped/qa/`:
+
+- `FrostfangWalkV2.py`,
+  `FrostfangWalkV2MeshAudit.py`;
+- `FrostfangWalkV3.py`,
+  `FrostfangWalkV3MeshAudit.py`,
+  `FrostfangIKResponseAudit.py`;
+- `FrostfangWalkV4Contact.py` (failed correction preserved for
+  diagnosis, not promoted);
+- `FrostfangWalkV3Preview.py`,
+  `FrostfangWalkV3FullPreview.py`,
+  `BuildFrostfangWalkV3Gif.py`.
+
+Local experiments (do not publish, merge or automatically integrate):
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\`
+
+The editable candidate and numerical audit are under `WalkV3\\`:
+`Frostfang_WalkV3_IK_UNAPPROVED.blend` and
+`walk_v3_actual_mesh_audit.json`. A continuous 2-camera,
+Blender-rendered **real skinned mesh** preview is at:
+
+`WalkV3\\preview\\Frostfang_WalkV3_Review_UNAPPROVED.gif`
+
+The 1,520×510 GIF was saved and reopened: 34 optimized display frames,
+2,970 ms playback, ~9.07 MB. The source sequence includes 37
+synchronized side and three-quarter samples per camera, spaced at
+two-frame intervals across the 72-frame Blender test; duplicate
+display frames may be coalesced during GIF optimization.
+Side/oblique inspection showed visible stiffness and lingering
+hind-right support problems. This is **Blender output**, not an
+actual Studio Animator export/playback.
+
+**Safe next action:** refine the asymmetric rear-leg anatomy, shin
+and paw/ankle orientation and associated source skin weights on a
+**new** reversible copy. Validate weighted paw contact during every
+stance and swing, plus spine/body mass movement, across continuous
+front/side/rear views before baking editable FK clips for Roblox.
+Frostfang's jaw remains closed original topology; a true opening
+lower jaw and inner mouth still require separate mesh work.
+Two Studio processes had the same saved JawV3 QA place open at
+this checkpoint; neither existing QA place was overwritten or
+controlled blindly. No Roblox assets were exported/published, and
+no production DungeonMMO runtime or original GLB was altered.
