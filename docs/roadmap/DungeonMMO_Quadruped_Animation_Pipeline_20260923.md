@@ -836,3 +836,54 @@ changed or published.
   pass the master to Astra for an actual reusable canine animation
   system. Do not mistake these discrete pose tests for finished
   head/tail motion during walking or a published Roblox clip.
+
+
+## WalkV6 isolated forequarter motion trial — 23 September 2026
+
+**Stage 1 still OPEN. WalkV6 is an editable Blender-only QA candidate,
+not an approved natural gait or Roblox Studio animation.** The latest
+backend roadmap visible when this trial began was v1.98; the art
+experiment does not modify that backend track.
+
+The user's request to try improving the engine without Astra led to
+a conservative, reversible WalkV6 branch from the saved WalkV5 copy.
+The new authoring script adds low-amplitude animated upper-spine pitch
+(0.65 degrees), upper-spine roll (0.35 degrees), counter-moving neck
+pitch (0.42 degrees), and tail yaw (1.1 degrees), with idle transition
+envelopes. The existing WalkV5 four-leg IK targets, paw-world-orientation
+constraints, original mesh and original skin weights were not changed.
+
+**Actual background Blender 5.0.1 execution succeeded** and saved
+`GroundedWalkTrial_20260923/WalkV6_Forequarter/
+Frostfang_WalkV6_UNAPPROVED.blend` on the authorized PC. Separate
+actual weighted-toe evaluation of all 72 frames reported greatest
+recorded stance drift **0.003708 source units**, equal to WalkV5's
+reported maximum; greatest stance height remains **0.007032 source
+units** on the hind-right foot. This is *not* an improved grounding
+result: hind-right contact still fails, and the very small added
+upper-body movements require visual assessment before declaring even
+a perceptible improvement.
+
+The actual mesh was rendered from side and three-quarter cameras to
+74 PNGs; a 1,520 x 510 looping preview GIF was saved and reopened,
+with 34 optimized display frames and 2,970 ms playback. The user can
+review the local result at:
+
+`C:\\Users\\Remko\\Documents\\Roblox\\DungeonMMO_CanineRig_QA\\Frostfang_20260923\\GroundedWalkTrial_20260923\\WalkV6_Forequarter\\preview\\Frostfang_WalkV6_Review_UNAPPROVED.gif`
+
+New GitHub development-only helpers in
+`tools/animation/quadruped/qa/`:
+`FrostfangWalkV6Forequarter.py`,
+`FrostfangWalkV6MeshAudit.py`,
+`FrostfangWalkV6FullPreview.py`, and
+`BuildFrostfangWalkV6Gif.py`.
+The independent `walk_v6_actual_mesh_audit.json` and Blend remain
+beside the preview in the new WalkV6 QA directory.
+
+**Limitations:** V6 primarily adds subtle body movement and does not
+correct the underlying foreleg shoulder weights, hind-right paw
+anatomy, tail-fur tearing or the closed lower muzzle. The full visual
+result has not been accepted by the user. No Studio Animator playback,
+animation export, production asset replacement or publishing occurred.
+All older experimental versions, original source assets and Studio QA
+places are retained.
