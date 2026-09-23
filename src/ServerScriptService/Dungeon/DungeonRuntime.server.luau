@@ -1037,7 +1037,8 @@ local function start_executed_slot(room_slot_id: string): any?
         if not c4_quest_combat_ledger:register_enemy(
             registration.enemy,
             registration.branch_id,
-            encounter_id
+            encounter_id,
+            registration.step_index
         ) then
             warn("[C4 Quest] Rejected generated challenge enemy: "
                 .. registration.enemy.Name)
