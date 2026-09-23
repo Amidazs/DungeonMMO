@@ -87,7 +87,7 @@ local function main()
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
-    check(warrior.Status == "SourceRanksAuditedClassUnimplemented"
+    check(warrior.Status == "SkillRankParityOutstanding"
         and warrior.SourceRankEntriesThroughCap == 62
         and warrior.SourceRankEntriesByLevel[20] == 20
         and warrior.SourceRankEntriesByLevel[24] == 19
