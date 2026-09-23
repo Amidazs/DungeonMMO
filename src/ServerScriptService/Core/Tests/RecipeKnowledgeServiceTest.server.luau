@@ -101,6 +101,9 @@ check(
 
 assert(profiles:mutate(8501, function(profile: any)
     profile.Characters.Slot1.Professions.Blacksmithing.XP = level_two_xp()
+    profile.Characters.Slot1.Progression.Skills.C4RecipeReading = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
 end))
 
 local before_count = InventoryService.count_item(
@@ -248,6 +251,9 @@ local knowledge2 = RecipeKnowledgeService.new(profiles, inventory2)
 assert(inventory2:add_item(8502, "blacksmith_iron_guard_blueprint", 1).ok)
 assert(profiles:mutate(8502, function(profile: any)
     profile.Characters.Slot1.Professions.Blacksmithing.XP = level_two_xp()
+    profile.Characters.Slot1.Progression.Skills.C4RecipeReading = {
+        Known = true, PurchasedRank = 1, Proficiency = 0,
+    }
 end))
 
 local first = knowledge2:learn_from_item(
