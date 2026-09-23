@@ -10,11 +10,11 @@ local Combat = require(RS.Combat.Shared.SkillDefinitions)
 local EXPECTED = {
     Human = {
         Fighter = {Raw = 39, Functional = 39, Missing = 0},
-        Mage = {Raw = 44, Functional = 40, Missing = 4},
+        Mage = {Raw = 44, Functional = 41, Missing = 3},
     },
     Elf = {
         Fighter = {Raw = 43, Functional = 43, Missing = 0},
-        Mage = {Raw = 42, Functional = 37, Missing = 5},
+        Mage = {Raw = 42, Functional = 39, Missing = 3},
     },
 }
 local assertions = 0
