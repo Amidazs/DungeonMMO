@@ -432,6 +432,16 @@ local function verify_weapon_skill_catalogue(
         > initial_bow, "Bow mastery increases actual server ranged damage")
     check(Runtime.get_physical_multiplier(owner.UserId)
         > initial_dagger, "Dagger mastery increases actual melee damage")
+    local forged = Schema.deep_clone(trained)
+    forged.Identity.ClassId = "Fighter"
+    Runtime.set_character(owner.UserId, forged)
+    check(Runtime.get_ranged_physical_multiplier(owner.UserId)
+        <= initial_bow,
+        "Forged starter identity cannot retain first-transfer bow mastery")
+    check(Runtime.get_physical_multiplier(owner.UserId)
+        <= initial_dagger,
+        "Forged starter identity cannot retain first-transfer blade mastery")
+    Runtime.set_character(owner.UserId, trained)
     check(Combat.get_for_rank("WayfinderArrow", 9).BASE_DAMAGE
         > Combat.get_for_rank("WayfinderArrow", 1).BASE_DAMAGE
         and Combat.get_for_rank("WayfinderCut", 9).BASE_DAMAGE
@@ -523,6 +533,10 @@ Returns:
 local function verify_source_skill_purchases(
     profiles: any, owner: any
 )
+    local before = profiles:get_character(owner.UserId)
+    check(not SkillRules.can_train(
+        before, assert(Skills.get("ScoutCommonItemCreation")), 1
+    ), "Unchosen crafting profession cannot learn common crafting")
     seed_crafting_choice(profiles, owner.UserId)
     local service = SkillService.new(
         profiles, Inventory.new(profiles), Loadout.new(profiles)
