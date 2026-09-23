@@ -322,8 +322,11 @@ local function check_race(race_id: string)
     end
     check(remaining == audit.Missing,
         race_id .. " missing family ledger does not reconcile")
-    check(audit.Missing > 0,
-        "Incomplete C4 Scout catalogue must not be declared complete")
+    check(audit.Missing == 0 and audit.Functional == audit.Raw,
+        "Inventoried Rogue and Elf Scout source ranks are not all mapped")
+    -- This is source-rank parity for two class lists only. The separate
+    -- nine-path C4 catalogue gate must remain incomplete until every
+    -- first-transfer path, quest and actual full class is implemented.
 
     -- Sorted missing source families form the next actionable content gate.
     local pending = {}
