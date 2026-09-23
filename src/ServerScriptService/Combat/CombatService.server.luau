@@ -2922,24 +2922,7 @@ local function handle_skill_request(
         end
     end
 
-    -- The live party roster is validated before spending shared mana.
-    -- Every recipient is independently rechecked on skill release.
-    if false then
-        local target = resolve_skill_heal_target(
-            player, skill_definition
-        )
-
-        if not target then
-            CombatValidationService.emit(
-                player,
-                "MAGE_HEAL",
-                "REJECT",
-                "NoInjuredTarget",
-                record.sequence_id
-            )
-            return
-        end
-    end
+    -- Live party membership is rechecked independently on release.
 
     local mana_cost =
         tonumber(skill_definition.MANA_COST) or 0
