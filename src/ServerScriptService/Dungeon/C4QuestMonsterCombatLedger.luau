@@ -90,7 +90,7 @@ function Ledger:register_enemy(
     local quest = Source.get(branch_id)
     local index = step_index or 3
     local step = quest and quest.Steps[index]
-    if (index ~= 3 and index ~= 6)
+    if (index ~= 3 and index ~= 5 and index ~= 6)
         or not step or step.Kind ~= "QuestMonsterDefeat"
     then
         return false
@@ -218,7 +218,9 @@ local function event_for_owner(
         or state.BranchId ~= record.BranchId then
         return nil
     end
-    local proof_ids = if record.TargetId == "BrackenWarden"
+    local proof_ids = if record.TargetId == "Ridgebreaker"
+        then {RidgebreakerSigil = true}
+        elseif record.TargetId == "BrackenWarden"
         then {RustedKey = true}
         elseif record.TargetId == "CinderBrigand"
         then {
@@ -226,7 +228,10 @@ local function event_for_owner(
             StolenRing = true, StolenNecklace = true,
         }
         elseif record.BranchId == "HumanRogue"
-        then {SpartoiBone = true} else next_proof(state)
+        then {SpartoiBone = true}
+        elseif record.BranchId == "HumanWarrior"
+        then {IronrootToken = true}
+        else next_proof(state)
     if not proof_ids then return nil end
     return {
         EventId = "QuestKill:" .. record.ReceiptId
