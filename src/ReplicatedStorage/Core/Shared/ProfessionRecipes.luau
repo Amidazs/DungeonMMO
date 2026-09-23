@@ -2,6 +2,229 @@
 local ProfessionRecipes = {}
 
 local RECIPES = table.freeze({
+    -- Three genuine first-transfer C4 ranks per selected crafting career.
+    -- Higher ranks consume real materials made by other professions;
+    -- skill mastery never grants an additional creation profession.
+    scout_forge_bars_rank_1 = table.freeze({
+        Id = "scout_forge_bars_rank_1",
+        Name = "Scout Iron Bars (Rank 1)",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 1,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_ore", Quantity = 2}),
+        }),
+        Output = table.freeze({
+            ItemId = "iron_bar", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    scout_forge_bars_rank_2 = table.freeze({
+        Id = "scout_forge_bars_rank_2",
+        Name = "Scout Iron Bars (Rank 2)",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 2,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_ore", Quantity = 2}),
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "iron_bar", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    scout_forge_bars_rank_3 = table.freeze({
+        Id = "scout_forge_bars_rank_3",
+        Name = "Scout Iron Bars (Rank 3)",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 3,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 3,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_ore", Quantity = 3}),
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "iron_bar", Quantity = 5,
+        }),
+        XP = 54,
+    }),
+    scout_distill_oil_rank_1 = table.freeze({
+        Id = "scout_distill_oil_rank_1",
+        Name = "Scout Tempering Oil (Rank 1)",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 1,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    scout_distill_oil_rank_2 = table.freeze({
+        Id = "scout_distill_oil_rank_2",
+        Name = "Scout Tempering Oil (Rank 2)",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 2,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    scout_distill_oil_rank_3 = table.freeze({
+        Id = "scout_distill_oil_rank_3",
+        Name = "Scout Tempering Oil (Rank 3)",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 3,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 3,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 3}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil", Quantity = 5,
+        }),
+        XP = 54,
+    }),
+    scout_cure_leather_rank_1 = table.freeze({
+        Id = "scout_cure_leather_rank_1",
+        Name = "Scout Cured Leather (Rank 1)",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 1,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 2}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "cured_leather", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    scout_cure_leather_rank_2 = table.freeze({
+        Id = "scout_cure_leather_rank_2",
+        Name = "Scout Cured Leather (Rank 2)",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 2,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 3}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "cured_leather", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    scout_cure_leather_rank_3 = table.freeze({
+        Id = "scout_cure_leather_rank_3",
+        Name = "Scout Cured Leather (Rank 3)",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 3,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 3,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 4}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "cured_leather", Quantity = 5,
+        }),
+        XP = 54,
+    }),
+    scout_inscribe_runes_rank_1 = table.freeze({
+        Id = "scout_inscribe_runes_rank_1",
+        Name = "Scout Warding Runes (Rank 1)",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 1,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warding_rune", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    scout_inscribe_runes_rank_2 = table.freeze({
+        Id = "scout_inscribe_runes_rank_2",
+        Name = "Scout Warding Runes (Rank 2)",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 2,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warding_rune", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    scout_inscribe_runes_rank_3 = table.freeze({
+        Id = "scout_inscribe_runes_rank_3",
+        Name = "Scout Warding Runes (Rank 3)",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 3,
+        RequiredSkillId = "ScoutCommonItemCreation",
+        RequiredSkillRank = 3,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 2}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "cured_leather", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warding_rune", Quantity = 5,
+        }),
+        XP = 54,
+    }),
     -- Optional real inventory/XP recipes, not free goods or extra careers.
     -- Each alternative needs a purchased source C4 level-five passive
     -- and remains bound to the player's single selected crafting career.
@@ -269,6 +492,9 @@ local RECIPES = table.freeze({
 
 local STATION_ORDER = table.freeze({
     Blacksmithing = table.freeze({
+        "scout_forge_bars_rank_1",
+        "scout_forge_bars_rank_2",
+        "scout_forge_bars_rank_3",
         "c4_common_iron_bar",
         "smelt_iron_bar",
         "forge_ironbound_gloves",
@@ -277,6 +503,9 @@ local STATION_ORDER = table.freeze({
         "forge_runic_ironbound_gloves",
     }),
     Alchemy = table.freeze({
+        "scout_distill_oil_rank_1",
+        "scout_distill_oil_rank_2",
+        "scout_distill_oil_rank_3",
         "c4_common_tempering_oil",
         "distill_tempering_oil",
         "distill_blueprinted_tempering_oil",
@@ -284,11 +513,17 @@ local STATION_ORDER = table.freeze({
         "distill_warding_essence",
     }),
     Leatherworking = table.freeze({
+        "scout_cure_leather_rank_1",
+        "scout_cure_leather_rank_2",
+        "scout_cure_leather_rank_3",
         "c4_common_cured_leather",
         "cure_raw_hide",
         "stitch_leatherbound_gloves",
     }),
     Enchanting = table.freeze({
+        "scout_inscribe_runes_rank_1",
+        "scout_inscribe_runes_rank_2",
+        "scout_inscribe_runes_rank_3",
         "c4_common_warding_rune",
         "inscribe_warding_rune",
         "enchant_leatherbound_gloves",
