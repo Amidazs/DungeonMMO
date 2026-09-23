@@ -1,3 +1,44 @@
+**Current C4 backend: v1.93 — real Neti and Guard Moretti original quest stage two.**
+[Newest original C4 class backend roadmap](
+DungeonMMO_Roadmap_v1_93_C4_Neti_Moretti_Quest_20260923.md)
+and [actual focused and two-client Studio test record](
+../testing/c4-original-second-npc-v1-93-20260923.md).
+The live Base now binds two distinct physical
+source NPCs for **each** of the selected original
+Human Rogue and Elven Scout first-transfer quests:
+Captain Bezique → Neti and Master Reisa →
+Guard Moretti. The actual Human Fighter receives
+one separately owned, personally bound,
+non-tradeable and genuinely equippable
+Neti trial dagger and bow **atomically with
+the authenticated real Neti NPC stage**.
+The Elf's separate Moretti meeting never
+grants the Human's trial weapons. Both
+quests stop honestly at their still-unbuilt
+instanced source-monster stage three.
+The actual unpublished **two-client** Base
+playtest passed both physically triggered
+NPC quest paths, rightful trial item
+ownership/equip, cross-branch denial,
+forged event refusal and stage replay
+protection. Focused affected source
+quest/rank/migration tests passed **5/5**,
+including **125** source quest assertions
+and saved/reloaded trial equipment.
+The previous genuine Bezique first-NPC
+playtest also passed with the new
+second-stage availability.
+**No original level-20 class award
+has been implemented: 0/18 paths
+fully playable.** The original Fighter/
+Mystic fresh starters, exactly one
+Gathering plus one Crafting profession,
+hub/instanced dungeon structure,
+separate latest humanoid/quadruped
+art roadmap, no-publish policy and
+legacy save preservation remain
+unchanged.
+
 **Current C4 backend: v1.92 — genuine first-stage original C4 quest NPCs.**
 [Newest C4 backend roadmap](
 DungeonMMO_Roadmap_v1_92_C4_Original_NPC_Quest_20260923.md)
