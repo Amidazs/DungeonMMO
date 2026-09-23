@@ -78,6 +78,9 @@ local WardService = require(
 local MageHealService = require(
     script.Parent:WaitForChild("MageHealService")
 )
+local PartyHealService = require(
+    script.Parent:WaitForChild("PartyHealService")
+)
 local PoisonStatusService = require(
     script.Parent:WaitForChild("PoisonStatusService")
 )
@@ -2321,6 +2324,31 @@ local function enter_skill_active(
             sequence_id
         )
     elseif character and skill_definition.KIND == "MageHeal" then
+        if skill_definition.PARTY_HEAL == true then
+            local total_heal = skill_definition.TOTAL_HEAL
+                * ProgressionRuntimeState.get_heal_multiplier(
+                    player.UserId
+                )
+            local applied, members, effective = PartyHealService.cast(
+                player, total_heal, skill_definition.RANGE_STUDS,
+                skill_definition.ID
+            )
+            CombatValidationService.emit(
+                player, "MAGE_PARTY_HEAL",
+                if applied then "APPLIED" else "REJECT",
+                if applied then string.format(
+                    "%s members=%d actual=%.1f",
+                    skill_definition.ID, members, effective
+                ) else "NoEligiblePartyMember",
+                sequence_id
+            )
+            task.delay(skill_definition.ACTIVE_SECONDS, function()
+                enter_skill_recovery(
+                    player, record, sequence_id, skill_definition
+                )
+            end)
+            return
+        end
         local target = resolve_skill_heal_target(
             player, skill_definition
         )
@@ -2870,6 +2898,33 @@ local function handle_skill_request(
     end
 
     if skill_definition.KIND == "MageHeal" then
+        if skill_definition.PARTY_HEAL == true then
+            if not PartyHealService.has_injured_member(
+                player, skill_definition.RANGE_STUDS
+            ) then
+                CombatValidationService.emit(
+                    player, "MAGE_PARTY_HEAL", "REJECT",
+                    "NoEligiblePartyMember", record.sequence_id
+                )
+                return
+            end
+        else
+            local target = resolve_skill_heal_target(
+                player, skill_definition
+            )
+            if not target then
+                CombatValidationService.emit(
+                    player, "MAGE_HEAL", "REJECT",
+                    "NoInjuredTarget", record.sequence_id
+                )
+                return
+            end
+        end
+    end
+
+    -- The live party roster is validated before spending shared mana.
+    -- Every recipient is independently rechecked on skill release.
+    if false then
         local target = resolve_skill_heal_target(
             player, skill_definition
         )
