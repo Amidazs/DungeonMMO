@@ -73,6 +73,14 @@ local input = require(
     )
 )
 local channel = RS:WaitForChild("C4SourceLiveChannel_TEMP")
+local prompt_service = game:GetService("ProximityPromptService")
+local shown = {}
+prompt_service.PromptShown:Connect(function(prompt)
+    shown[prompt] = true
+end)
+prompt_service.PromptHidden:Connect(function(prompt)
+    shown[prompt] = nil
+end)
 channel.OnClientEvent:Connect(function(command, part)
     if command == "ATTACK" then
         local accepted = input.request_attack()
@@ -81,6 +89,16 @@ channel.OnClientEvent:Connect(function(command, part)
         local prompt = part:WaitForChild("ScoutCaelQuestPrompt", 10)
         if not prompt then
             channel:FireServer("PROMPT_ERROR", "Missing Cael prompt")
+            return
+        end
+        local deadline = os.clock() + 8
+        repeat
+            if shown[prompt] then break end
+            task.wait(0.1)
+        until os.clock() >= deadline
+        channel:FireServer("PROMPT_SEEN", shown[prompt] == true)
+        if not shown[prompt] then
+            channel:FireServer("PROMPT_ERROR", "Cael prompt not visible")
             return
         end
         local ok, reason = pcall(function()
@@ -244,8 +262,10 @@ local function hold_cael(player, part, label)
     root.Anchored = true
     root.CFrame = part.CFrame * CFrame.new(0, 0, 4)
     local response_key = tostring(player.UserId) .. ":PROMPT_HELD"
+    local seen_key = tostring(player.UserId) .. ":PROMPT_SEEN"
     local failure_key = tostring(player.UserId) .. ":PROMPT_ERROR"
     responses[response_key] = nil
+    responses[seen_key] = nil
     responses[failure_key] = nil
     channel:FireClient(player, "TALK_CAEL", part)
     wait_for(function()
@@ -255,6 +275,8 @@ local function hold_cael(player, part, label)
             ))
         return responses[response_key]
     end, label, 14)
+    assert(responses[seen_key] == true,
+        "Cael's real client ProximityPrompt was never visible")
     task.wait(0.65)
 end
 
