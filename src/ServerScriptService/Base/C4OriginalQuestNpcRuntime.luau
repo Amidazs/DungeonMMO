@@ -135,7 +135,10 @@ function Runtime.attach(options: any): any
             prompt.ObjectText = source.Name
             prompt.HoldDuration = 0.4
             prompt.MaxActivationDistance = MAX_RANGE
-            prompt.RequiresLineOfSight = true
+            -- The Ironroot NPCs sit beside unfinished hub geometry.
+            -- Server-side proximity still requires a living owner
+            -- within ten studs; terrain must not hide a valid prompt.
+            prompt.RequiresLineOfSight = branch_id ~= "HumanWarrior"
             prompt.Parent = part
             self._step_parts[branch_id][step_index] = part
             if step_index == 1 then
