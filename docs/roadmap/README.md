@@ -1,4 +1,39 @@
-**Current DungeonMMO class backend: v2.00 — original level-24/28 skill progression and live trainer safeguards.**
+**Current DungeonMMO class backend: v2.01 — real client-caused first-transfer combat and negative-cast acceptance.**
+[Latest class backend roadmap](
+DungeonMMO_Roadmap_v2_01_Real_Original_Combat_20260923.md)
+and [executed two-client Studio test record](
+../testing/original-first-transfer-real-combat-v2-01-20260923.md).
+Both original level-20 first-transfer careers now have
+two implemented trainable abilities each. The new
+level-24 Ashenblade Opening and Greenward Renewal
+also passed real unpublished two-client instanced
+Dungeon **combat**, not merely skill-definition or
+trainer tests. An actual Human client hit a physical
+current-room enemy with Opening and spent actual
+stamina/cooldown; a wrong-weapon client request
+did not damage the enemy or begin a cooldown.
+A separate actual Elf client healed only its
+own Humanoid with Renewal, spent actual mana
+and began its server cooldown; an unpurchased
+client heal did not trigger that effect. The
+test tolerates small ordinary regeneration.
+Prior source quests, level-20 awards and owned
+skill ranks were prepared in disposable Studio
+profiles to isolate new combat; this is **not**
+an uninterrupted cross-place quest acceptance
+or proof of rank-two live effects. The accepted
+rank-two training and stronger effect
+definitions remain covered by v2.00.
+**2/18** original careers have real physical
+class awards and two trainable abilities each;
+**0/18** complete original first-transfer class
+catalogues or uninterrupted real journeys.
+No Roblox publish, production DataStore write,
+`main` merge or local code/doc edits via
+Desktop Commander. Animation roadmaps remain
+independent and untouched.
+
+**Previous DungeonMMO class backend: v2.00 — original level-24/28 skill progression and live trainer safeguards.**
 [Latest backend roadmap](
 DungeonMMO_Roadmap_v2_00_First_Transfer_Skills_20260923.md)
 and [actual focused/real-client Studio acceptance](
