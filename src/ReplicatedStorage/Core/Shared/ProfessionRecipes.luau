@@ -2,6 +2,66 @@
 local ProfessionRecipes = {}
 
 local RECIPES = table.freeze({
+    -- Optional real inventory/XP recipes, not free goods or extra careers.
+    -- Each alternative needs a purchased source C4 level-five passive
+    -- and remains bound to the player's single selected crafting career.
+    c4_common_iron_bar = table.freeze({
+        Id = "c4_common_iron_bar",
+        Name = "Common Iron Bar",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 1,
+        RequiredSkillId = "C4CommonItemCreation",
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_ore", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        XP = 6,
+    }),
+    c4_common_tempering_oil = table.freeze({
+        Id = "c4_common_tempering_oil",
+        Name = "Common Tempering Oil",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 1,
+        RequiredSkillId = "C4CommonItemCreation",
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+        }),
+        Output = table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        XP = 8,
+    }),
+    c4_common_cured_leather = table.freeze({
+        Id = "c4_common_cured_leather",
+        Name = "Common Cured Leather",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 1,
+        RequiredSkillId = "C4CommonItemCreation",
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 2}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "cured_leather", Quantity = 1}),
+        XP = 12,
+    }),
+    c4_common_warding_rune = table.freeze({
+        Id = "c4_common_warding_rune",
+        Name = "Common Warding Rune",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 1,
+        RequiredSkillId = "C4CommonItemCreation",
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+        }),
+        Output = table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        XP = 16,
+    }),
     smelt_iron_bar = table.freeze({
         Id = "smelt_iron_bar",
         Name = "Smelt Iron Bar",
@@ -209,6 +269,7 @@ local RECIPES = table.freeze({
 
 local STATION_ORDER = table.freeze({
     Blacksmithing = table.freeze({
+        "c4_common_iron_bar",
         "smelt_iron_bar",
         "forge_ironbound_gloves",
         "forge_blueprinted_ironbound_gloves",
@@ -216,16 +277,19 @@ local STATION_ORDER = table.freeze({
         "forge_runic_ironbound_gloves",
     }),
     Alchemy = table.freeze({
+        "c4_common_tempering_oil",
         "distill_tempering_oil",
         "distill_blueprinted_tempering_oil",
         "distill_forging_flux",
         "distill_warding_essence",
     }),
     Leatherworking = table.freeze({
+        "c4_common_cured_leather",
         "cure_raw_hide",
         "stitch_leatherbound_gloves",
     }),
     Enchanting = table.freeze({
+        "c4_common_warding_rune",
         "inscribe_warding_rune",
         "enchant_leatherbound_gloves",
     }),
