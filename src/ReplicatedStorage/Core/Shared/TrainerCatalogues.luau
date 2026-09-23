@@ -18,8 +18,8 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
-    -- No physical Knight trainer is spawned until an authentic
-    -- personally earned quest and first-transfer mentor are added.
+    -- The physical Knight trainer requires an authentic personal quest
+    -- and first-transfer mentor; server checks proximity and ownership.
     OathguardTrainer = table.freeze({
         Id = "OathguardTrainer",
         DisplayName = "Oathguard Shield Training",
