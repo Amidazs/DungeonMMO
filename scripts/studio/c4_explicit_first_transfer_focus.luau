@@ -7,6 +7,9 @@ local tests = game:GetService("ServerScriptService").Core.Tests
 local names = {
     "C4FirstTransferSelectionServiceTest",
     "ClassAdvancementServiceTest",
+    "ProfileMigrationQuestAdvancementV8Test",
+    "ProfileMigrationRaceChangeV12Test",
+    "RaceChangeServiceTest",
     "C4FirstTransferBranchesTest",
     "C4ClassPathRulesTest",
     "C4CatalogueCoverageTest",
