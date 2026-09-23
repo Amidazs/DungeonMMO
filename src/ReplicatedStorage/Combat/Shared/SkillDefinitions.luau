@@ -96,7 +96,15 @@ export type ScoutToggleSkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
-export type SkillDefinition = ScoutToggleSkillDefinition
+export type ScoutAccuracyToggleSkillDefinition = {
+    KIND: "ScoutAccuracyToggle", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, COOLDOWN_SECONDS: number,
+    ACCURACY_BONUS: number, UPKEEP_STAMINA_PER_SECOND: number,
+    RANKS: {[number]: any}?,
+}
+
+export type SkillDefinition = ScoutAccuracyToggleSkillDefinition
+    | ScoutToggleSkillDefinition
     | MeleeSkillDefinition
     | BuffSkillDefinition
     | SupportSkillDefinition
@@ -1426,6 +1434,21 @@ local SCOUT_CRITICAL_POWER_TOGGLE: ScoutToggleSkillDefinition =
         }),
     })
 
+-- A genuine on/off C4 accuracy stance against authored NPC evasion.
+local SCOUT_ACCURACY_TOGGLE: ScoutAccuracyToggleSkillDefinition =
+    table.freeze({
+        KIND = "ScoutAccuracyToggle",
+        ID = "ScoutAccuracyToggle",
+        DISPLAY_NAME = "Accuracy",
+        STAMINA_COST = 3,
+        COOLDOWN_SECONDS = 0,
+        ACCURACY_BONUS = 0.12,
+        UPKEEP_STAMINA_PER_SECOND = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({ACCURACY_BONUS = 0.12}),
+        }),
+    })
+
 local ARCANIST_EMBER = specialize_skill(
     WIND_STRIKE, "ArcanistEmber", "Arcanist Ember", {
         MANA_COST = 38,
@@ -1545,6 +1568,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ArcherDraw = ARCHER_DRAW,
     ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
     ScoutCriticalPowerToggle = SCOUT_CRITICAL_POWER_TOGGLE,
+    ScoutAccuracyToggle = SCOUT_ACCURACY_TOGGLE,
     ElvenRenewal = ELVEN_RENEWAL,
     ElvenCalmingShot = ELVEN_CALMING_SHOT,
     RogueVitalBlow = ROGUE_VITAL_BLOW,
@@ -1690,6 +1714,27 @@ local function validate_scout_toggle(definition: ScoutToggleSkillDefinition)
     end
 end
 
+--[[
+Checks the bounded resource cost and real chance bonus for Accuracy.
+
+Args:
+    definition (ScoutAccuracyToggleSkillDefinition): Source C4 stance.
+
+Returns:
+    nil: Raises if the stance is resource-free or grants a fake effect.
+]]
+local function validate_accuracy_toggle(
+    definition: ScoutAccuracyToggleSkillDefinition
+)
+    assert(definition.STAMINA_COST > 0
+        and definition.UPKEEP_STAMINA_PER_SECOND >= 1
+        and definition.UPKEEP_STAMINA_PER_SECOND <= 10,
+        "Accuracy must spend actual stamina on cast and every second.")
+    assert(definition.ACCURACY_BONUS > 0
+        and definition.ACCURACY_BONUS <= 0.2,
+        "Accuracy must provide a bounded real physical hit bonus.")
+end
+
 local function validate_support(definition: SupportSkillDefinition)
     assert(definition.HEAL_AMOUNT > 0, "Support healing must be positive.")
     assert(definition.RANGE_STUDS > 0, "Support range must be positive.")
@@ -1827,6 +1872,10 @@ for _, definition in DEFINITIONS do
     validate_common(definition)
     if definition.KIND == "Melee" then
         validate_melee(definition)
+    elseif definition.KIND == "ScoutAccuracyToggle" then
+        validate_accuracy_toggle(
+            definition :: ScoutAccuracyToggleSkillDefinition
+        )
     elseif definition.KIND == "ScoutToggle" then
         validate_scout_toggle(definition :: ScoutToggleSkillDefinition)
     elseif definition.KIND == "Buff" then
