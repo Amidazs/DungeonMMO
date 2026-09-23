@@ -8,3 +8,6 @@ Task 1/2: RED core tests authored; awaiting execution.
 Import: two existing local Studio instances contain earlier rigs, not proof of V3 import.
 Core RED: python unittest at 519a86c failed ModuleNotFoundError quadruped_core (expected absent implementation).
 Ruling: initial IK is bounded anatomical-plane CCD with explicit out-of-plane residual; no universal 3D solver claim. Blender calibration supplies actual planes and rest roll.
+Core GREEN: 9/9 tests at aac7cd3; initial non-escalated TEMP write failed on sandbox permissions, rerun with approved disposable access passed unchanged.
+Blender RED at 86bf3a9: missing quadruped_blender module, expected.
+Local Studio EditableMesh probe: AddBone/weights/CreateMeshPartAsync succeeded, MeshId empty; actual wolf visual/native Animator validation still pending.
