@@ -1,3 +1,23 @@
+## 24 September 2026 — class backend v2.08, GitHub-only candidate
+
+Current class backend roadmap is
+`docs/roadmap/DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md`;
+the roadmap index selects it over older historical status sections.
+Branch `wip/phase-4-test-hud-integration-v1`.
+Oathguard has newly authored 20/28 purchased shield-mastery ranks,
+personally earned Knight-only, requiring a server-owned equipped
+OffHand Shield for 0.8% hostile physical mitigation per rank
+(maximum 1.6%). The own-class trainer, reference-rank mapping,
+server passive/runtime/damage paths and focused test fixtures
+were committed through GitHub. Knight historical 20/24/28 rank
+schedules now candidate-map **37/54** (17 unmapped); Warrior
+**27/62** (35 unmapped). **No new Studio or Rojo run** occurred
+during this GitHub-only continuation. Pending v2.07 live Knight
+self-heal/spell defence and new shield real-hit checks remain
+open. Previous v2.07 Ironvow Base physical PASS is historical,
+not an automatic pass for this candidate. Do not merge/publish
+or treat any of 18 classes as level-30 release certified.
+
 ## 23 September 2026 — approved quadruped engine work in progress
 
 Owner approved reusable quadruped design, GitHub source/docs commits on
