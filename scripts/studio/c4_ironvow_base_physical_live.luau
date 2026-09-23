@@ -97,6 +97,10 @@ end
 -- Returns: nil; authentic client-visible, client-held physical prompt.
 local function hold(player, part)
     local root = assert(player.Character.HumanoidRootPart)
+    -- The placeholder hub has no safe floor under every test NPC.
+    -- Anchor the disposable avatar as the existing successful two-
+    -- client Base prompt driver does, then use real client input.
+    root.Anchored = true
     root.CFrame = part.CFrame * CFrame.new(0, 0, 4)
     root.AssemblyLinearVelocity = Vector3.zero
     responses.PROMPT_VISIBLE = nil
