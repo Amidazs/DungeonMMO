@@ -262,15 +262,29 @@ local function main()
         return if state.ok and state.Started and state.Step == 2
             then state else nil
     end, "real Captain Bezique talk persisted source quest stage", 15)
-    assert(quest.WorldReady and not quest.Ready
+    assert(quest.FirstNpcReady and not quest.WorldReady
+        and not quest.FullWorldReady and not quest.Ready
         and not quest.ClassAwarded
         and quest.BranchId == "HumanRogue",
-        "Physical first NPC must not complete unbuilt original class quest")
+        "Physical first NPC must leave later unbuilt dungeon stages locked")
     local after = profiles:get_character(player.UserId)
     assert(after.Identity.ClassId == "Fighter"
         and after.ClassAdvancement.ActiveClassId == nil,
         "Real first quest NPC awarded an unearned class")
     print("[C4 Original NPC Live] REAL_CLIENT_FIRST_NPC_QUEST_STAGE_PASS")
+
+    local missing_dungeon = npcs:quest_service():record_world_event(
+        player.UserId, {
+            EventId = "forged-missing-skeleton-stage",
+            Kind = "NpcTalk", TargetId = "Neti",
+            ActorUserId = player.UserId,
+        }
+    )
+    assert(not missing_dungeon.ok
+        and missing_dungeon.reason == "OriginalQuestWorldNotReady",
+        "Incomplete dungeon quest steps must fail before consuming "
+            .. "unverified server evidence")
+    print("[C4 Original NPC Live] UNBUILT_DUNGEON_STAGE_LOCKED_PASS")
 
     local original_step = quest.Step
     task.wait(0.8)
