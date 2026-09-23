@@ -15,9 +15,9 @@ local Combat = require(
 local assertions = 0
 local LEVELS = {20, 24, 28, 32, 36}
 local EXPECTED = {
-    Human = {Raw = 99, Functional = 90, Missing = 9,
+    Human = {Raw = 99, Functional = 95, Missing = 4,
         EquipmentMismatch = 0},
-    Elf = {Raw = 129, Functional = 121, Missing = 8,
+    Elf = {Raw = 129, Functional = 126, Missing = 3,
         EquipmentMismatch = 0},
 }
 
@@ -96,7 +96,14 @@ local function check_implementation(
         check(table.find(definition.WeaponTags or {}, "Dagger")
             ~= nil, "Dagger skill is not actually weapon-gated")
     end
-    if category == "CommonItemCreation" then
+    if category == "Lockpicking" then
+        local rank = table.find(LEVELS, level)
+        check(definition.MaxRank == 5
+            and definition.Kind == "Passive"
+            and definition.WorldLockpickingEnabled == true
+            and definition.RankLevels[rank] == level,
+            "Lockpicking needs five bought original C4 rank-gated world locks")
+    elseif category == "CommonItemCreation" then
         local rank = ({[20] = 1, [28] = 2, [36] = 3})[level]
         check(definition.MaxRank == 3
             and definition.Kind == "Passive"
