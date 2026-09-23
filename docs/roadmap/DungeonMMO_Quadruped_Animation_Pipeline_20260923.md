@@ -166,12 +166,21 @@ Proper mouth/jaw topology and inner-mouth geometry or an
 alternative properly skinned canine with working jaw
 are required before custom bite authoring.
 
-**Alternative inspected:** the local Mesh2Motion fox GLB
-has a 49-bone canine rig and imported walk/bite actions;
-the bone list includes Chin, but the audit did not find
-Chin-weighted mesh vertices. It is a possible locomotion
-*reference*, not a proven complete replacement for a
-wolf with a working jaw or an approved walking cycle.
+**Alternative inspected and jaw-filter correction:** the local
+Mesh2Motion fox GLB has a 49-bone canine rig and imported
+walk/bite actions. The initial audit filtered only names
+containing `jaw`/`mouth`/`lower` and mistakenly omitted
+its **independently skinned `Chin` (105 vertices) and
+`Chin_Tip` (16 vertices)**. A subsequent Blender jaw
+QA rotated `Chin` ±28° and verified displaced chin
+vertices (~0.075 source-space units) with visibly opening
+mouth in side-view renders. The source fox is a simple
+~1,654-triangle mesh, visually unlike Frostfang; its
+existing gait and bite have **not** passed full Studio
+playback. It is a promising **alternative canine
+animation reference/rig**, not proof that Frostfang's
+closed original muzzle has been remodeled or an approved
+replacement for Frostfang's appearance.
 
 **Persistent isolated Studio place:**
 `C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\Frostfang_StudioRig_Import_QA.rbxl`.
