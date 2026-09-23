@@ -320,6 +320,78 @@ inspect one natural continuous idle–walk–idle
 clip in Studio before passing it to Astra.
 
 
+## Frostfang editable motion example — 23 September 2026
+
+**Rig-motion demonstration only: this is NOT a natural walk,
+playtested Roblox animation, approved bite, or completed
+quadruped engine.** Using the existing experimental JawV3
+Blender master, authored and baked a 64-frame, 16 fps,
+4-second **editable Blender action** named
+`DMMO_Frostfang_Motion_QA_UNAPPROVED`. It shows a short
+four-leg **walk-in-place approximation**, returns to rest,
+then performs a separate forepaw lift with head and jaw
+movement before returning to rest.
+
+Actual evaluated, **weighted Frostfang mesh** geometry
+was rendered from synchronized three-quarter and side
+cameras into a looping GIF. A six-pose contact sheet
+and per-paw displacement report accompany it. This is a
+Blender render of the genuine skinned rig—not generated
+illustration, not Roblox Animator replay, and not an
+example of production-quality locomotion.
+
+**Preview on the authorized PC:**
+
+`C:\Users\Remko\Documents\Roblox\DungeonMMO_CanineRig_QA\Frostfang_20260923\Frostfang_Animation_Example.gif`
+
+All source frames, editable animation, side-by-side GIF,
+pose sheet and grounding audit live under the neighboring
+`MotionPreview_20260923\` folder. A compact, checked
+`Frostfang_Animation_Example_QA.zip` in the parent
+Frostfang folder includes the GIF, still sheet, editable
+`.blend`, audit, manifest and generator. The animated
+GIF opens successfully, has 28 optimized display frames
+made from 32 rendered samples and plays for about 3.87
+seconds. The independent test scripts are preserved in
+[quadruped QA tools](
+../../tools/animation/quadruped/qa/FrostfangRigMotion_QA.py).
+
+**Explicit failures and limitations:** the walk is in
+place, not root-motion locomotion; its stance paws are
+NOT world-locked, visibly lift/slide during the cycle
+and must be corrected using the actual mesh/leg anatomy.
+An evaluated sample showed resting lowest paw vertices
+near 0.026–0.030 Blender units above the test floor,
+with varying sampled foot heights during the motion,
+up to ~0.060 at a raised paw. The model returned to
+its original sampled rest paw heights at the final
+frame (measured maximum reported lowest-Z error 0).
+The body/head movement is subtle. Source muzzle
+topology remains closed even when the jaw-weighted
+vertices move; this is **not** an acceptable bite.
+The original rear-leg asymmetry and upper-shoulder skin
+also remain for visual correction.
+
+The isolated Studio JawV3 QA place is separately saved
+as `Frostfang_StudioRig_JawV3_SAVED_QA.rbxl`, and
+the animated Blender demonstration does NOT change
+that .rbxl or the production DungeonMMO game.
+Roblox imported skeleton and static deformation checks
+remain separate from the unverified Studio
+Animator/keyframe playback for this *new* motion.
+Do not pass this test clip to Astra as an approved gait.
+
+**Next motion quality gate:** correct the four-paw
+stance support (including rest mesh/ground height),
+source hindleg asymmetry and shoulder weighting; give
+Frostfang an actual opening lower mouth if the original
+appearance must be preserved. Then bake a compatible,
+separate `idle → walk → idle` clip for the approved
+skinned export and review actual Roblox Studio Animator
+playback from side, front and player cameras. Preserve
+the existing original, JawV3 QA place and preview files
+without publishing or overwriting production assets.
+
 ## Stage 1 — approve the canine master rig [OPEN]
 
 - [ ] Find/import a genuinely standing, properly rigged and
