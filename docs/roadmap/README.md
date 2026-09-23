@@ -1,3 +1,47 @@
+**Current original first-transfer class backend: v1.99 — genuine level-20 careers and physical mentors.**
+[Latest class backend roadmap](
+DungeonMMO_Roadmap_v1_99_Original_First_Transfers_20260923.md)
+and [executed unpublished Studio tests](
+../testing/c4-original-first-transfer-v1-99-20260923.md).
+Two independently named DungeonMMO careers now have
+real server-verified first-transfer identities:
+**Ashenblade** (Human Fighter/Rogue source) and
+**Greenward Scout** (Elf Fighter/Scout source).
+Physical **Marshal Briar** and **Pathwarden Siora**
+ProximityPrompts require actual level-20 eligible
+quest owners, one-use server mentor receipts,
+matching saved race/branch and complete source
+proof before an atomic profile-backed award.
+Separate physical advanced trainer stations
+allow each newly earned class to **purchase**
+exactly one already implemented class skill;
+ordinary legacy Rogue/Ranger specialist skill
+catalogues cannot be claimed by a new Fighter
+class simply by changing a ClassId. Profile
+schema v15 preserves earned classes/receipts
+across save/reload and rejects unbacked raw
+ClassId changes. Focused server tests passed
+**2/2** (47 award/skill/persistence assertions
+and 8 adjacent migration checks). The dedicated
+real two-client physical mentor playtest passed
+both original first-transfer awards and actual
+server-side purchases after production prompt
+collision/visibility fixes. That final focused
+test **seeded completed source quests in a
+disposable unpublished Base**, rather than
+repeating the earlier genuine source quest
+tests; it did not exercise real live cross-place
+transport or the full training UI remote flow.
+**2/18** careers now have level-20 class awards
+and one trainable skill each; **0/18** are
+accepted as feature-complete first-transfer
+skill catalogues or as uninterrupted real
+cross-place journeys. The separately maintained
+quadruped/humanoid animation roadmaps remain
+unaffected. No Roblox publish, `main` merge
+or production DataStore mutation; scripts,
+tests and docs edited in GitHub only.
+
 **Current DungeonMMO source-quest backend: v1.98 — Scout Cael rescue, real Bracken Warden and final hub reports.**
 [Newest backend roadmap](
 DungeonMMO_Roadmap_v1_98_Scout_Cael_Warden_Source_20260923.md)
