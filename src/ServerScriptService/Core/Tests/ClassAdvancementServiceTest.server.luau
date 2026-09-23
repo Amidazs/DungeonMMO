@@ -1,367 +1,204 @@
 --!strict
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-
-local Core = ServerScriptService:WaitForChild("Core")
-local Adapters = Core:WaitForChild("Adapters")
-local Services = Core:WaitForChild("Services")
-local Shared = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
-
-local InMemoryProfileAdapter = require(
-    Adapters:WaitForChild("InMemoryProfileAdapter")
+-- The old one-candidate trial must never grant a fresh C4 Fighter/Mystic
+-- an invented original class. Already started old quests remain claimable.
+local RS = game:GetService("ReplicatedStorage")
+local SSS = game:GetService("ServerScriptService")
+local Shared = RS.Core.Shared
+local Adapter = require(SSS.Core.Adapters.InMemoryProfileAdapter)
+local Profiles = require(SSS.Core.Services.ProfileService)
+local Quests = require(SSS.Core.Services.QuestService)
+local Advancements = require(SSS.Core.Services.ClassAdvancementService)
+local Selection = require(
+    SSS.Core.Services.C4FirstTransferSelectionService
 )
-local ProfileService = require(Services:WaitForChild("ProfileService"))
-local QuestService = require(Services:WaitForChild("QuestService"))
-local ClassAdvancementService = require(
-    Services:WaitForChild("ClassAdvancementService")
-)
-local RaceChangeService = require(Services:WaitForChild("RaceChangeService"))
-local DungeonDefinitions = require(Shared:WaitForChild("DungeonDefinitions"))
-local QuestDefinitions = require(Shared:WaitForChild("QuestDefinitions"))
+local DungeonDefinitions = require(Shared.DungeonDefinitions)
+local QuestDefinitions = require(Shared.QuestDefinitions)
+local checks = 0
 
+--[[
+Checks one server-authoritative C4 advancement or legacy save invariant.
 
-local assertions = 0
+Args:
+    condition (boolean): Required original class or preserved trial behavior.
+    description (string): Focused Studio assertion label.
 
-local function check(condition: boolean, message: string)
-    assertions += 1
-    if not condition then
-        error("[Class Advancement Tests] " .. message, 2)
-    end
+Returns:
+    nil: Records a passing check or fails real Studio execution.
+]]
+local function check(condition: boolean, description: string)
+    checks += 1
+    assert(condition, "[Class Advancement Tests] " .. description)
 end
 
--- Seeds legitimate fully purchased prerequisite ranks and proficiency
--- without bypassing the production advancement or quest validators.
---
--- Args:
---   character (any): Mutable test character profile.
---   quest_id (string): Registered race/base-class advancement trial.
--- Returns:
---   nil: Creates earned skill states required by that class's quest.
-local function seed_trial_mastery(character: any, quest_id: string)
-    local trial = assert(QuestDefinitions.get(quest_id))
-    character.Progression.SkillPointEntitlement = 60
-    for _, requirement in ipairs(trial.SkillPrerequisites) do
-        character.Progression.Skills[requirement.SkillId] = {
-            Known = true,
-            StarterGranted = false,
-            PurchasedRank = requirement.Rank,
-            Proficiency = requirement.Proficiency,
-        }
-    end
-end
+--[[
+Sets up a valid original starting class with paid trial skills in memory.
 
-local function set_mage(
-    profiles: any,
-    user_id: number,
-    race_id: string
+Args:
+    profiles (any): Exclusive writer-owned real ProfileService.
+    user_id (number): Disposable original starting-class profile.
+    race_id (string): Human or Elf current playable original race.
+    family (string): Fighter or internal Mage/Mystic family ID.
+
+Returns:
+    nil: Creates an actual eligible old trial fixture without claiming it.
+]]
+local function seed(
+    profiles: any, user_id: number, race_id: string, family: string
 )
-    local ok, reason = profiles:mutate(user_id, function(profile: any)
+    check(profiles:load(user_id), "Source class character must load")
+    check(profiles:mutate(user_id, function(profile: any)
         local character = profile.Characters.Slot1
         character.Level = 20
+        character.Gold = 500
         character.Identity = {
-            Version = 1,
-            RaceId = race_id,
-            BaseClassId = "Mage",
-            ClassId = "Mage",
+            Version = 1, RaceId = race_id,
+            BaseClassId = family, ClassId = family,
             CreationStage = "Complete",
         }
-        seed_trial_mastery(character, "MageAdvancementTrial")
-    end)
-    check(ok == true, "Mage fixture mutation failed: " .. tostring(reason))
+        local quest_id = if family == "Fighter"
+            then "FighterAdvancementTrial"
+            else "MageAdvancementTrial"
+        local trial = assert(QuestDefinitions.get(quest_id))
+        character.Progression.SkillPointEntitlement = 70
+        for _, requirement in ipairs(trial.SkillPrerequisites) do
+            character.Progression.Skills[requirement.SkillId] = {
+                Known = true, StarterGranted = false,
+                PurchasedRank = requirement.Rank,
+                Proficiency = requirement.Proficiency,
+            }
+        end
+    end), "Original class level and skill mastery must persist")
 end
 
-local profiles = ProfileService.new(InMemoryProfileAdapter.new())
-assert(profiles:load(5201))
-assert(profiles:load(5202))
-assert(profiles:load(5203))
-set_mage(profiles, 5201, "Human")
-set_mage(profiles, 5202, "Elf")
+--[[
+Verifies a newly eligible character cannot begin or claim custom classes.
 
-local fixture_ok = profiles:mutate(5203, function(profile: any)
-    local character = profile.Characters.Slot1
-    character.Level = 20
-    character.Identity = {
-        Version = 1,
-        RaceId = "Human",
-        BaseClassId = "Fighter",
-        ClassId = "Fighter",
-        CreationStage = "Complete",
-    }
-    seed_trial_mastery(character, "FighterAdvancementTrial")
-end)
-check(fixture_ok == true, "Fighter fixture mutation failed.")
+Args:
+    profiles (any): Actual original class profile service.
+    advancement (any): Existing live class advancement authority.
+    choice (any): New explicit original C4 source branch selection service.
 
-local quests = QuestService.new(profiles)
-local base = ClassAdvancementService.new(profiles, quests, "Base")
-local dungeon = ClassAdvancementService.new(profiles, quests, "Dungeon")
+Returns:
+    nil: Checks honest original choice and not falsely awarded class.
+]]
+local function check_original_starters(
+    profiles: any, advancement: any, choice: any
+)
+    seed(profiles, 51001, "Human", "Fighter")
+    seed(profiles, 51002, "Human", "Mage")
+    seed(profiles, 51003, "Elf", "Fighter")
+    seed(profiles, 51004, "Elf", "Mage")
+    for _, user_id in ipairs({51001, 51002, 51003, 51004}) do
+        check(advancement:start_trial(user_id).reason
+            == "OriginalC4BranchChoiceRequired",
+            "Fresh Fighter/Mystic must not start automatic custom class")
+        check(advancement:claim(user_id).reason
+            == "OriginalC4BranchChoiceRequired",
+            "Unstarted legacy trial cannot manufacture a C4 first transfer")
+        local snapshot = advancement:build_snapshot(user_id)
+        check(snapshot.CandidateClassId == nil
+            and snapshot.Completed == false,
+            "New C4 characters must not see an automatic legacy candidate")
+    end
+    local selected = choice:choose(51001, "HumanRogue")
+    check(selected.ok and selected.class_id == "HumanRogue",
+        "Human Fighter must explicitly choose its original Rogue branch")
+    check(advancement:start_trial(51001).reason
+        == "OriginalC4BranchChoiceRequired",
+        "An original source choice must not start an unrelated Vanguard trial")
+    check(advancement:claim(51001).reason
+        == "OriginalC4BranchChoiceRequired",
+        "An original source choice cannot itself grant an advanced class")
+    local fighter = assert(profiles:get_character(51001, 1))
+    check(fighter.ClassAdvancement.OriginalFirstTransferChoiceId
+        == "HumanRogue"
+        and fighter.ClassAdvancement.ActiveClassId == nil
+        and fighter.Identity.ClassId == "Fighter",
+        "Explicit selection must be saved without an unearned transfer")
+end
 
-local dungeon_reject = dungeon:start_trial(5201)
-check(
-    dungeon_reject.ok == false and dungeon_reject.reason == "BaseOnlyAction",
-    "Advancement trial must not start in Dungeon context."
-)
+--[[
+Tests that a pre-existing already-started quest may still be claimed.
 
-local fighter_start = base:start_trial(5203)
-check(
-    fighter_start.ok and fighter_start.class_id == "HumanVanguard"
-        and fighter_start.quest_id == "FighterAdvancementTrial"
-        and fighter_start.role_id == "Tank",
-    "Human Fighter must receive the Vanguard tank trial at level 20."
-)
+Args:
+    profiles (any): Real in-memory persistent profiles.
+    quests (any): Actual server-owned preexisting quest authority.
+    advancement (any): Existing class claim service with migration guard.
+    choice (any): Explicit original C4 selection service.
 
-local human_start = base:start_trial(5201)
-check(human_start.ok == true, "Human Mage trial must start.")
-
-local early_claim = base:claim(5201)
-check(
-    early_claim.ok == false
-        and early_claim.reason == "AdvancementQuestNotReady",
-    "Advancement claim before objective completion must reject."
+Returns:
+    nil: Preserves old completed-class and quest history without duplication.
+]]
+local function check_legacy_claim(
+    profiles: any, quests: any, advancement: any, choice: any
 )
-
-local human_event = quests:record_event(5201, {
-    EventId = "human-session:DungeonClear",
-    Type = "DungeonClear",
-    TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
-    Amount = 1,
-})
-check(human_event.ok == true, "Human Temple clear must progress quest.")
-
-local human_claim = base:claim(5201)
-check(human_claim.ok == true, "Ready Human Mage advancement must claim.")
-check(
-    human_claim.class_id == "HumanArcanist",
-    "Human Mage must advance to HumanArcanist."
-)
-
-local human_character = assert(profiles:get_character(5201, 1))
-check(
-    human_character.Identity.ClassId == "Mage"
-        and human_character.Identity.BaseClassId == "Mage",
-    "Advancement must preserve accepted Mage base-family identity."
-)
-check(
-    human_character.ClassAdvancement.ActiveClassId == "HumanArcanist",
-    "Human advanced identity must persist separately."
-)
-check(
-    human_character.ClassAdvancement.CompletedByRace.Human.HumanArcanist
-        == true,
-    "Human advancement history must persist by race."
-)
-check(
-    human_character.Quests.Active.MageAdvancementTrial == nil
-        and human_character.Quests.Completed.MageAdvancementTrial == true,
-    "Claim must atomically consume the ready quest into Completed."
-)
-
-local duplicate_claim = base:claim(5201)
-check(
-    duplicate_claim.ok == false
-        and duplicate_claim.reason == "AdvancementAlreadyCompleted",
-    "Duplicate Human advancement claim must reject."
-)
-
-check(base:start_trial(5202).ok == true, "Elf Mage trial must start.")
-check(quests:record_event(5202, {
-    EventId = "elf-session:DungeonClear",
-    Type = "DungeonClear",
-    TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
-    Amount = 1,
-}).ok == true, "Elf Temple clear must progress quest.")
-
-local elf_claim = base:claim(5202)
-check(elf_claim.ok == true, "Ready Elf Mage advancement must claim.")
-check(
-    elf_claim.class_id == "ElfSpellweaver",
-    "Elf Mage must advance to ElfSpellweaver."
-)
-local elf_character = assert(profiles:get_character(5202, 1))
-check(
-    elf_character.ClassAdvancement.ActiveClassId == "ElfSpellweaver",
-    "Elf advanced identity must persist."
-)
-check(
-    elf_character.ClassAdvancement.CompletedByRace.Elf.ElfSpellweaver
-        == true,
-    "Elf advancement history must persist by race."
-)
-
-local race_change = RaceChangeService.new(profiles, "TEST", function() return 888 end)
-local elf_preview = race_change:preview(5201, "Elf")
-check(elf_preview.ok == true, "Human advanced Mage must preview Elf Race Change.")
-check(race_change:apply(5201, "Elf", elf_preview.Hash, "adv-human-to-elf").ok == true,
-    "Human advanced Mage must apply Elf Race Change.")
-local changed_snapshot = base:build_snapshot(5201)
-check(changed_snapshot.ActiveClassId == nil,
-    "HumanArcanist completion must not activate as an Elf class.")
-check(changed_snapshot.CandidateClassId == "ElfSpellweaver" and changed_snapshot.Completed == false,
-    "Human advancement must not manufacture equivalent Elf completion.")
-check(assert(profiles:get_character(5201, 1)).ClassAdvancement.CompletedByRace.Human.HumanArcanist == true,
-    "Human advancement history must remain stored while Elf.")
-
-local human_preview = race_change:preview(5201, "Human")
-check(human_preview.ok == true, "Elf Mage must preview return to Human.")
-check(race_change:apply(5201, "Human", human_preview.Hash, "adv-elf-to-human").ok == true,
-    "Elf Mage must return to Human.")
-local restored_snapshot = base:build_snapshot(5201)
-check(restored_snapshot.ActiveClassId == "HumanArcanist" and restored_snapshot.Completed == true,
-    "Returning race must reactivate historical Human advancement without re-claiming.")
-
--- Four new race-specific advancement paths reuse the original
--- quest, profile, race history and ClassAdvancementService authority.
-local fighter_early = base:claim(5203)
-check(
-    fighter_early.reason == "AdvancementQuestNotReady",
-    "A Fighter cannot claim an uncompleted Temple trial."
-)
-check(
-    quests:record_event(5203, {
-        EventId = "fighter-wrong-mine:DungeonClear",
-        Type = "DungeonClear",
-        TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
-        Amount = 1,
-    }).ok,
-    "A Mine clear is unrelated to the Fighter Temple trial."
-)
-check(
-    base:claim(5203).reason == "AdvancementQuestNotReady",
-    "Wrong-dungeon completion must not advance a Fighter."
-)
-check(
-    quests:record_event(5203, {
-        EventId = "fighter-temple:DungeonClear",
+    seed(profiles, 51005, "Human", "Fighter")
+    check(quests:start(51005, "FighterAdvancementTrial").ok,
+        "Existing prior trial may already have been started before update")
+    check(choice:choose(51005, "HumanRogue").reason
+        == "LegacyClassMigrationRequired",
+        "New source choice must not erase an existing custom trial")
+    check(advancement:start_trial(51005).reason
+        == "OriginalC4BranchChoiceRequired",
+        "Even an old active trial cannot be freshly started a second time")
+    check(advancement:claim(51005).reason
+        == "AdvancementQuestNotReady",
+        "Previously started trial may not be claimed before its objectives")
+    check(quests:record_event(51005, {
+        EventId = "prior-legacy-temple-clear",
         Type = "DungeonClear",
         TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
         Amount = 1,
-    }).ok,
-    "The trusted Temple clear must ready the Fighter trial."
-)
-local fighter_claim = base:claim(5203)
-check(
-    fighter_claim.ok and fighter_claim.class_id == "HumanVanguard"
-        and fighter_claim.role_id == "Tank",
-    "The Vanguard must claim only after completing its own trial."
-)
-check(
-    base:claim(5203).reason == "AdvancementAlreadyCompleted",
-    "Vanguard advancement cannot be claimed twice."
-)
-
--- Args:
---   user_id (number): Test character's stable user identity.
---   race_id (string): Supported Human or Elf race.
---   base_class_id (string): Supported Fighter or Ranger class.
--- Returns:
---   nil: Seeds one independent level-20 advancement candidate.
-local function seed_candidate(
-    user_id: number,
-    race_id: string,
-    base_class_id: string
-)
-    assert(profiles:load(user_id), "Candidate profile must load.")
-    local mutated = profiles:mutate(user_id, function(profile: any)
-        local character = profile.Characters.Slot1
-        character.Level = 20
-        character.Identity = {
-            Version = 1,
-            RaceId = race_id,
-            BaseClassId = base_class_id,
-            ClassId = base_class_id,
-            CreationStage = "Complete",
-        }
-        local quest_id = if base_class_id == "Fighter"
-            then "FighterAdvancementTrial"
-            else "RangerAdvancementTrial"
-        seed_trial_mastery(character, quest_id)
-    end)
-    check(mutated, "Advancement candidate profile mutation must succeed.")
+    }).ok, "Actual original legacy dungeon event must ready old quest")
+    local claim = advancement:claim(51005)
+    check(claim.ok and claim.class_id == "HumanVanguard",
+        "Already-started prior class trial remains claimable, not deleted")
+    local character = assert(profiles:get_character(51005, 1))
+    check(character.ClassAdvancement.ActiveClassId == "HumanVanguard"
+        and character.Quests.Completed.FighterAdvancementTrial == true
+        and character.Quests.Active.FighterAdvancementTrial == nil,
+        "Old quest and advanced history commit once in the real profile")
+    check(advancement:claim(51005).reason
+        == "AdvancementAlreadyCompleted",
+        "Legacy quest completion may not be replayed")
+    check(choice:choose(51005, "HumanKnight").reason
+        == "LegacyClassMigrationRequired",
+        "Old completed advanced class must stay separate until migration")
+    check(profiles:save(51005, "PreexistingClassHistory"),
+        "Historical class completion must save")
+    check(profiles:release(51005, "PreexistingClassHistory"),
+        "Original legacy character must release safely")
+    check(profiles:load(51005),
+        "Original legacy character must reload after the source update")
+    character = assert(profiles:get_character(51005, 1))
+    check(character.ClassAdvancement.ActiveClassId == "HumanVanguard"
+        and character.ClassAdvancement.CompletedByRace.Human
+            .HumanVanguard == true
+        and character.Level == 20 and character.Gold == 500,
+        "Legacy class, level, gold and race-bound historical proof persist")
 end
 
-local additional_paths = {
-    {5204, "Elf", "Fighter", "ElfThornwarden", "Tank",
-        DungeonDefinitions.TEST_DUNGEON.Id},
-    {5205, "Human", "Ranger", "HumanSharpshooter",
-        "RangedDamage", DungeonDefinitions.ABANDONED_MINE.Id},
-    {5206, "Elf", "Ranger", "ElfWindrunner",
-        "RangedDamage", DungeonDefinitions.ABANDONED_MINE.Id},
-}
-for _, path in ipairs(additional_paths) do
-    local user_id = path[1]
-    local race_id = path[2]
-    local base_class_id = path[3]
-    local class_id = path[4]
-    local role_id = path[5]
-    local dungeon_id = path[6]
-    seed_candidate(user_id, race_id, base_class_id)
+--[[
+Runs focused non-destructive C4 class-choice and grandfathered trial tests.
 
-    local candidate = base:build_snapshot(user_id)
-    check(
-        candidate.CandidateClassId == class_id
-            and candidate.CandidateRoleId == role_id
-            and candidate.Completed == false,
-        "Race and base class must select their own advanced role."
-    )
-    local started = base:start_trial(user_id)
-    check(
-        started.ok and started.class_id == class_id
-            and started.role_id == role_id,
-        "An eligible character must start only its own class trial."
-    )
-    check(
-        base:claim(user_id).reason == "AdvancementQuestNotReady",
-        "A class path cannot skip its required dungeon clear."
-    )
-    check(
-        quests:record_event(user_id, {
-            EventId = "advanced-path-" .. tostring(user_id),
-            Type = "DungeonClear",
-            TargetId = dungeon_id,
-            Amount = 1,
-        }).ok,
-        "The chosen dungeon must progress this class's trial."
-    )
-    local claim = base:claim(user_id)
-    local character = assert(profiles:get_character(user_id, 1))
-    check(
-        claim.ok and claim.class_id == class_id
-            and character.ClassAdvancement.ActiveClassId == class_id
-            and character.ClassAdvancement.CompletedByRace[
-                race_id
-            ][class_id] == true,
-        "Every advanced path must persist its own race-bound class."
-    )
-    check(
-        character.Identity.BaseClassId == base_class_id
-            and character.Identity.ClassId == base_class_id,
-        "Advancement must preserve the existing base combat family."
-    )
-    check(
-        base:claim(user_id).reason == "AdvancementAlreadyCompleted",
-        "Every new path must be claimable only once."
-    )
+Args:
+    None.
+
+Returns:
+    nil: Prints counts only after all actual profile/quest checks pass.
+]]
+local function main()
+    local profiles = Profiles.new(Adapter.new())
+    local quests = Quests.new(profiles)
+    local advancement = Advancements.new(profiles, quests, "Base")
+    local selection = Selection.new(profiles, "Base")
+    check_original_starters(profiles, advancement, selection)
+    check_legacy_claim(profiles, quests, advancement, selection)
+    check(Advancements.new(profiles, quests, "Dungeon"):start_trial(
+        51001
+    ).reason == "BaseOnlyAction", "Dungeon cannot start Base class trial")
+    print(("[Class Advancement Tests] PASS: %d assertions")
+        :format(checks))
 end
 
-seed_candidate(5207, "Human", "Ranger")
-local level_check = profiles:mutate(5207, function(profile: any)
-    profile.Characters.Slot1.Level = 19
-end)
-check(level_check, "Level-19 Ranger must be seeded.")
-check(
-    base:start_trial(5207).reason == "AdvancementRequirementsNotMet",
-    "Advancement remains unavailable below level 20."
-)
-
--- Saving and reloading a class must preserve the advanced role identity.
-check(profiles:save(5206, "AdvancedClassTest"),
-    "Advanced Ranger must persist to profile storage.")
-check(profiles:release(5206, "AdvancedClassTest"),
-    "Advanced Ranger profile must release cleanly.")
-check(profiles:load(5206) ~= nil, "Advanced Ranger must reload.")
-check(
-    base:build_snapshot(5206).ActiveClassId == "ElfWindrunner"
-        and base:build_snapshot(5206).Completed == true,
-    "Reload must retain the Elf Ranger's completed class path."
-)
-
-print(string.format("[Class Advancement Tests] PASS: %d assertions.", assertions))
+main()
