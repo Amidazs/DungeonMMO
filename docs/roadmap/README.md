@@ -20,7 +20,7 @@ Knight healing/magic live-client effect tests are still
 pending. No level-30 release certification, main merge,
 Roblox publish or production DataStore operations occurred.
 
-**Current DungeonMMO class backend: v2.07 — verified recovered Ironvow physical Base acceptance and additional Knight anti-magic and owner-healing ranks.**
+**Previous DungeonMMO class backend: v2.07 — verified recovered Ironvow physical Base acceptance and additional Knight anti-magic and owner-healing ranks.**
 [Current level-30 class/skill roadmap](
 DungeonMMO_Roadmap_v2_07_Ironvow_Resume_Knight_Magic_Healing_20260924.md)
 and [actually executed test record](
