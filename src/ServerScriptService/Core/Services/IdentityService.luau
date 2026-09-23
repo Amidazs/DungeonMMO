@@ -181,6 +181,12 @@ function IdentityService:select_base_class(user_id: number, class_id: string): a
         return rejected("ClassSelectionNotAllowed")
     end
 
+    -- New C4 characters begin as Fighter or Mystic. Legacy Ranger/Rogue
+    -- profiles remain loadable but cannot be created by a new selection.
+    if class_id ~= "Fighter" and class_id ~= "Mage" then
+        return rejected("OriginalC4StartingClassRequired")
+    end
+
     local race_id = identity.RaceId
     if type(race_id) ~= "string"
         or RaceDefinitions.get(race_id) == nil
@@ -193,6 +199,9 @@ function IdentityService:select_base_class(user_id: number, class_id: string): a
         local live_identity = live_character.Identity
         if live_identity.CreationStage ~= "ClassSelection" then error("CreationStageChanged") end
         if live_identity.RaceId ~= race_id then error("RaceChanged") end
+        if class_id ~= "Fighter" and class_id ~= "Mage" then
+            error("OriginalC4StartingClassRequired")
+        end
         if not race_is_eligible(race_id, class_id) then error("RaceNotEligibleForClass") end
 
         grant_class_starters(live_character, class_id, class_definition)
