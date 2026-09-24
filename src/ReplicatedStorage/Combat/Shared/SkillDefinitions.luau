@@ -97,6 +97,15 @@ export type ScoutToggleSkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
+export type IronvowAccuracyToggleSkillDefinition = {
+    KIND: "IronvowAccuracyToggle", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, MANA_COST: number,
+    COOLDOWN_SECONDS: number,
+    ACCURACY_BONUS: number, SOURCE_ACCURACY: number,
+    UPKEEP_MANA_PER_SECOND: number,
+    RANKS: {[number]: any}?,
+}
+
 export type IronvowCriticalToggleSkillDefinition = {
     KIND: "IronvowCriticalToggle", ID: string, DISPLAY_NAME: string,
     STAMINA_COST: number, MANA_COST: number,
@@ -115,6 +124,7 @@ export type ScoutAccuracyToggleSkillDefinition = {
 
 export type SkillDefinition = ScoutAccuracyToggleSkillDefinition
     | IronvowCriticalToggleSkillDefinition
+    | IronvowAccuracyToggleSkillDefinition
     | ScoutToggleSkillDefinition
     | MeleeSkillDefinition
     | BuffSkillDefinition
@@ -2002,6 +2012,29 @@ local SCOUT_CRITICAL_POWER_TOGGLE: ScoutToggleSkillDefinition =
     })
 
 -- A genuine on/off C4 accuracy stance against authored NPC evasion.
+-- Source C4 Warrior's single Accuracy toggle improves the source
+-- Accuracy stat by 3, activation costs 1 MP and upkeep consumes MP.
+-- The Roblox percentage to-hit adapter is provisional.
+local IRONVOW_ACCURACY_STANCE: IronvowAccuracyToggleSkillDefinition =
+    table.freeze({
+        KIND = "IronvowAccuracyToggle",
+        ID = "IronvowAccuracyStance",
+        DISPLAY_NAME = "Ironvow Keen Aim",
+        STAMINA_COST = 0,
+        MANA_COST = 1,
+        COOLDOWN_SECONDS = 0,
+        ACCURACY_BONUS = 0.03,
+        SOURCE_ACCURACY = 3,
+        UPKEEP_MANA_PER_SECOND = 2,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                ACCURACY_BONUS = 0.03,
+                SOURCE_ACCURACY = 3,
+                MANA_COST = 1,
+            }),
+        }),
+    })
+
 local SCOUT_ACCURACY_TOGGLE: ScoutAccuracyToggleSkillDefinition =
     table.freeze({
         KIND = "ScoutAccuracyToggle",
@@ -2154,6 +2187,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
     ScoutCriticalPowerToggle = SCOUT_CRITICAL_POWER_TOGGLE,
     IronvowCriticalStance = IRONVOW_CRITICAL_STANCE,
+    IronvowAccuracyStance = IRONVOW_ACCURACY_STANCE,
     ScoutAccuracyToggle = SCOUT_ACCURACY_TOGGLE,
     ElvenRenewal = ELVEN_RENEWAL,
     ElvenCalmingShot = ELVEN_CALMING_SHOT,
@@ -2307,6 +2341,29 @@ Args:
 Returns:
     nil: Rejects free, unbounded or incorrectly ordered rank stances.
 ]]
+--[[
+Validates source-owned Warrior MP Accuracy rank before server requests.
+
+Args:
+    definition (IronvowAccuracyToggleSkillDefinition): The genuine
+        one-rank C4 source-stat and upkeep contract.
+
+Returns:
+    nil: Rejects free resource toggles and invalid accuracy magnitudes.
+]]
+local function validate_ironvow_accuracy(
+    definition: IronvowAccuracyToggleSkillDefinition
+)
+    assert(definition.STAMINA_COST == 0
+        and definition.MANA_COST == 1
+        and definition.UPKEEP_MANA_PER_SECOND > 0
+        and definition.UPKEEP_MANA_PER_SECOND <= 5
+        and definition.SOURCE_ACCURACY == 3
+        and definition.ACCURACY_BONUS > 0
+        and definition.ACCURACY_BONUS <= 0.15,
+        "Source Warrior Accuracy must spend MP and add bounded hit chance.")
+end
+
 local function validate_ironvow_critical(
     definition: IronvowCriticalToggleSkillDefinition
 )
@@ -2513,6 +2570,10 @@ for _, definition in DEFINITIONS do
     elseif definition.KIND == "IronvowCriticalToggle" then
         validate_ironvow_critical(
             definition :: IronvowCriticalToggleSkillDefinition
+        )
+    elseif definition.KIND == "IronvowAccuracyToggle" then
+        validate_ironvow_accuracy(
+            definition :: IronvowAccuracyToggleSkillDefinition
         )
     elseif definition.KIND == "Buff" then
         validate_buff(definition :: BuffSkillDefinition)
