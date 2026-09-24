@@ -82,7 +82,7 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(report.SourceAuditedBranches == 4
-        and report.RankSchedulesMappedBranches == 2
+        and report.RankSchedulesMappedBranches == 3
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
@@ -100,18 +100,19 @@ local function main()
         "Ironvow has only four fully scheduled real trainer families; "
             .. "blunt, polearm, HP and utility rows must remain outstanding")
     local knight = assert(Coverage.for_branch("HumanKnight"))
-    check(knight.Status == "SkillRankParityOutstanding"
+    check(knight.Status == "RankScheduleMappedEffectsPending"
         and knight.SourceRankEntriesThroughCap == 55
         and knight.SourceRankEntriesByLevel[20] == 16
         and knight.SourceRankEntriesByLevel[24] == 16
         and knight.SourceRankEntriesByLevel[28] == 23,
         "Historical Knight 20/24/28 inventory does not grant a class")
-    check(knight.TrainerMappedRankEntries == 53
-        and knight.MissingRankScheduleEntries == 2
-        and not knight.SourceRankScheduleMapped
+    check(knight.TrainerMappedRankEntries == 55
+        and knight.MissingRankScheduleEntries == 0
+        and knight.SourceRankScheduleMapped
+        and not knight.ExactSourceRankCoverageCertified
         and not knight.LaunchSkillCatalogueReady,
-        "Knight real D-grade expertise maps 53 of 55 source "
-            .. "ranks; two separate common-creation rows remain")
+        "Knight has all 55 source rank schedules, but live mechanic "
+            .. "parity and launch certification are still outstanding")
     check(Coverage.for_branch("UnknownCareer") == nil,
         "Invented classes must not count toward release coverage")
     print(("[Level 30 Launch] PASS: %d assertions")
