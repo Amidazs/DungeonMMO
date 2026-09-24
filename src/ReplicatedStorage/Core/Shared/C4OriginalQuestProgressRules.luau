@@ -48,6 +48,7 @@ function Rules.can_start(
     end
     local identity = character.Identity
     local expected_race = if branch_id == "ElvenScout"
+        or branch_id == "ElvenKnight"
         then "Elf" else "Human"
     if identity.RaceId ~= expected_race
         or identity.BaseClassId ~= "Fighter"

@@ -20,6 +20,7 @@ local OFFSETS = table.freeze({
     HumanWarrior = Vector3.new(-64, 2.5, -17),
     HumanRogue = Vector3.new(-31, 2.5, 17),
     ElvenScout = Vector3.new(31, 2.5, 17),
+    ElvenKnight = Vector3.new(53, 2.5, -15),
 })
 
 --[[

@@ -38,6 +38,16 @@ local ENTRIES = table.freeze({
         SkillId = "HumanScoutSprint",
         TrainerId = "AshenbladeTrainer",
     }),
+    ElvenKnight = table.freeze({
+        BranchId = "ElvenKnight",
+        Id = "GreenwardWarden",
+        DisplayName = "Greenward Warden",
+        RaceId = "Elf",
+        BaseClassId = "Fighter",
+        MentorId = "SentinelIlyra",
+        MentorName = "Sentinel Ilyra",
+        TrainerId = "GreenwardWardenTrainer",
+    }),
     ElvenScout = table.freeze({
         BranchId = "ElvenScout",
         Id = "GreenwardScout",
@@ -55,6 +65,7 @@ local BY_ID = table.freeze({
     Ironvow = ENTRIES.HumanWarrior,
     Ashenblade = ENTRIES.HumanRogue,
     GreenwardScout = ENTRIES.ElvenScout,
+    GreenwardWarden = ENTRIES.ElvenKnight,
 })
 
 --[[
@@ -96,6 +107,7 @@ function Definitions.all(): {any}
     return table.freeze({
         ENTRIES.HumanKnight, ENTRIES.HumanWarrior,
         ENTRIES.HumanRogue, ENTRIES.ElvenScout,
+        ENTRIES.ElvenKnight,
     })
 end
 

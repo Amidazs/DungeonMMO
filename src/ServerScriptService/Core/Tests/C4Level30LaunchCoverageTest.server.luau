@@ -96,7 +96,7 @@ local function main()
         "Human and Elven starter skill inventories must stay separate")
     local elven_knight = assert(Coverage.for_branch("ElvenKnight"))
     check(elven_knight.SourceClass == "Elven Knight"
-        and elven_knight.CurrentCareerId == nil
+        and elven_knight.CurrentCareerId == "GreenwardWarden"
         and elven_knight.SourceInventoryAuditedThroughCap == true
         and elven_knight.SourceRankEntriesThroughCap == 56
         and elven_knight.SourceRankEntriesByLevel[20] == 18
@@ -107,8 +107,7 @@ local function main()
         and elven_knight.MissingRankScheduleEntries == 56
         and not elven_knight.SourceRankScheduleMapped
         and not elven_knight.LaunchSkillCatalogueReady
-        and elven_knight.Status
-            == "SourceRanksAuditedClassUnimplemented",
+        and elven_knight.Status == "SkillRankParityOutstanding",
         "Source-only Elven Knight cannot count as a playable Scout")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,

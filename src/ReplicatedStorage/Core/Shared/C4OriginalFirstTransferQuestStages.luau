@@ -70,6 +70,29 @@ local QUESTS = table.freeze({
         }),
         WorldBindingStatus = "NotImplemented",
     }),
+    -- Original Elven Knight quest: Base NPC steps are implemented first.
+    -- Combat proof and the final class award stay locked until authored.
+    ElvenKnight = table.freeze({
+        Id = "VerdantOathTrial", BranchId = "ElvenKnight",
+        SourceTitle = "The Verdant Oath",
+        StartLevel = 18, TransferLevel = 20,
+        TransferNpcId = "SentinelIlyra",
+        Recommendation = "VerdantOathSeal",
+        Steps = table.freeze({
+            talk("SentinelIlyra", "Answer the grove's watch call."),
+            talk("WardenCaer", "Learn the missing patrol's last route."),
+            defeat("RootboundMarauder", 3,
+                "Recover three personally earned patrol reports."),
+            talk("WardenCaer", "Return the patrol reports."),
+            defeat("ThornboundColossus", 1,
+                "Recover the colossus's personal guardian seal."),
+            talk("SentinelIlyra", "Present the seal and swear the oath."),
+        }),
+        RequiredProofIds = table.freeze({
+            "VerdantPatrolReports3", "VerdantGuardianSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanRogue = table.freeze({
         Id = "C4PathToRogue", BranchId = "HumanRogue",
         SourceQuestId = 403, SourceTitle = "The Ashen Blade Trial",
@@ -147,6 +170,7 @@ function SourceQuests.inventoried(): {any}
     return table.freeze({
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.ElvenScout,
+        QUESTS.ElvenKnight,
     })
 end
 

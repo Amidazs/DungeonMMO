@@ -55,6 +55,20 @@ local NPCS = table.freeze({
             Color = Color3.fromRGB(114, 89, 142),
         }),
     }),
+    ElvenKnight = table.freeze({
+        table.freeze({
+            TargetId = "SentinelIlyra",
+            Name = "Sentinel Ilyra",
+            Offset = Vector3.new(10, 2.5, -15),
+            Color = Color3.fromRGB(67, 130, 98),
+        }),
+        table.freeze({
+            TargetId = "WardenCaer",
+            Name = "Warden Caer",
+            Offset = Vector3.new(22, 2.5, -15),
+            Color = Color3.fromRGB(80, 112, 93),
+        }),
+    }),
     ElvenScout = table.freeze({
         table.freeze({
             TargetId = "PathfinderElyra",
@@ -170,6 +184,7 @@ function Runtime.attach(options: any): any
             self._step_parts[branch_id][2]
         if branch_id == "HumanWarrior"
             or branch_id == "HumanKnight"
+            or branch_id == "ElvenKnight"
         then
             self._step_parts[branch_id][6] =
                 self._step_parts[branch_id][1]
@@ -280,14 +295,16 @@ function Runtime:_talk(
             and (current.Step == 5 or current.Step == 7)
             or branch_id == "ElvenScout" and current.Step == 9
             or (branch_id == "HumanWarrior"
-                or branch_id == "HumanKnight") and current.Step == 6)
+                or branch_id == "HumanKnight"
+                or branch_id == "ElvenKnight") and current.Step == 6)
     then
         index = current.Step
     end
     local source_index = if index == 4 or index == 8
         then 2 elseif index == 5 or index == 7 or index == 9
             or (branch_id == "HumanWarrior"
-                or branch_id == "HumanKnight") and index == 6
+                or branch_id == "HumanKnight"
+                or branch_id == "ElvenKnight") and index == 6
         then 1 else index
     local source = NPCS[branch_id] and NPCS[branch_id][source_index]
     local part = self._step_parts[branch_id]

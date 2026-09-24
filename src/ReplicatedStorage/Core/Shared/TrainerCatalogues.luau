@@ -79,6 +79,16 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+    -- Physical Elven Knight station is independently restricted.
+    -- Skills remain unavailable until real source effects are authored.
+    GreenwardWardenTrainer = table.freeze({
+        Id = "GreenwardWardenTrainer",
+        DisplayName = "Greenward Warden Training",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"GreenwardWarden"}),
+        Skills = table.freeze({}),
+    }),
     IronvowTrainer = table.freeze({
         Id = "IronvowTrainer",
         DisplayName = "Marshal Torren's Ironvow Training",
