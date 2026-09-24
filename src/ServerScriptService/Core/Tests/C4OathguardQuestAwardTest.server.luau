@@ -351,6 +351,45 @@ local function verify_arrow_ward(profiles: any, service: any)
 end
 
 --[[
+Purchases all four separately level-gated sword AND blunt mastery ranks.
+
+Args:
+    profiles (any): Owner's actual saved Knight class profile.
+    service (any): Authoritative class trainer and rank purchase service.
+
+Returns:
+    nil: Checks source gates and four separate persistable passive ranks.
+]]
+local function verify_sword_blunt_mastery(profiles: any, service: any)
+    local skill_id = "OathguardSteelAndStoneTraining"
+    local levels = {20, 24, 28, 28}
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 20
+    end), "Knight prepares first C4 sword/blunt rank")
+    for rank, level in ipairs(levels) do
+        if rank == 2 or rank == 3 then
+            local blocked = service:purchase_rank(USER_ID, skill_id)
+            check(not blocked.ok,
+                "Knight cannot buy next weapon mastery before source level")
+        end
+        check(profiles:mutate(USER_ID, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Level = level
+            owner.Progression.SkillPointEntitlement = 12000
+        end), "Knight reaches exact source weapon mastery level")
+        local result = if rank == 1
+            then service:learn_trainer_skill(USER_ID, skill_id)
+            else service:purchase_rank(USER_ID, skill_id)
+        check(result.ok and result.rank == rank,
+            "Knight must pay for each separate sword/blunt mastery "
+                .. tostring(rank) .. " " .. tostring(result.reason))
+    end
+    check(profiles:get_character(USER_ID).Progression
+        .Skills[skill_id].PurchasedRank == 4,
+        "Sword AND blunt mastery four ranks persist for earned Knight")
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -509,6 +548,7 @@ local function award(profiles: any, pending: any)
     end), "Knight first acquires drain at source level twenty")
     verify_umbral_siphon(profiles, service)
     verify_arrow_ward(profiles, service)
+    verify_sword_blunt_mastery(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
         "Knight quest, rune, recovery, shield, stance and drain persist")
 end
