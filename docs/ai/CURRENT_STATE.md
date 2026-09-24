@@ -1,3 +1,39 @@
+## 24 September 2026 — CURRENT v2.18 Warrior source blunt control
+
+[Latest full roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_18_Warrior_Stonebreaker_20260924.md)
+and [executed true client proof](
+../testing/ironvow-stonebreaker-v2-18-20260924.md).
+Earned first-transfer Ironvow now separately buys nine
+`IronvowStonebreaker` ranks 20/24/28, original blunt-
+only target, MP and source skill power. Actual client
+slot-one request (not only a scripted attacker)
+spent 30 MP, damaged genuine spawned Dungeon NPC for
+21.3888 HP, applied real server 1.1sec shock, and
+rejected immediate cooldown repeat, actual sword and
+unawarded Fighter. Quest/Award/Foundation **31/137/119
+PASS**, strict C4 level30 audit **27 PASS**, Base and
+Dungeon unpublished disposable Rojo PASS. Warrior
+**53/62 mapped**, **9 utility source rows remain**;
+Knight **55/55 mapped**, all first-transfer classes
+**0/18 release certified**. CombatService only avoids
+refreshing an already dazed target for the new
+blunt-control ability; competing two-client re-stun
+is not live tested. Its 1.1s stun and 0.3× source power
+Roblox damage conversion are NOT C4 native formulas.
+The successful real client used a disposable internally
+valid quest/skill fixture, not natural saved multi-place
+progression. Next: Warrior EquipmentExpertise (1),
+CommonItemCreation (2), CriticalStance (3),
+HealthRecovery (1), AccuracyStance (1), EnduranceSurge
+(1). Then remaining 14 C4 first transfers and
+starter 1–19. Existing v2.12 Marauder/Captain HP
+chip/guard break fixes do not certify boss/world-boss
+pipelines. Avoid repetitive already-green test runs,
+reserve desktop calls for targeted unpublished play.
+All permanent changes via GitHub, no main merge,
+publish, production saves or animation worktree edits.
+
 ## 24 September 2026 — latest v2.17 source-ranked Warrior area skill
 
 [Current roadmap](
