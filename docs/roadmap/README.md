@@ -1,4 +1,34 @@
-**Current DungeonMMO class backend: v2.08 — focused Studio and real-player shield damage PASS; new Base physical prompt FAIL; full acceptance pending.**
+**Current DungeonMMO class backend: v2.09 — earned Oathguard timed defensive stance with real client/HP PASS; 16 Knight source ranks remain.**
+[Latest class backend roadmap](
+DungeonMMO_Roadmap_v2_09_Knight_Steadfast_Stance_20260924.md)
+and [executed test evidence](
+../testing/oathguard-steadfast-stance-v2-09-20260924.md).
+An awarded Knight can separately purchase level-20
+`OathguardSteadfastStance` after Fighter armour rank 3:
+real server stamina cost 14, nonstacking 10% physical
+self-guard for 10 seconds, 24-second cooldown.
+Verified fresh Base/Dungeon disposable Rojo builds,
+Knight quest and foundation **70 + 67 assertions PASS**,
+strict source audit **27 PASS**, and real-client
+Dungeon Play: 100-base hostile physical melee/area
+hits dealt 90 HP under the active buff and 100
+after expiry; enemy magic and ordinary player melee
+remained at 100. A quick second cast did not extend
+the buff; an unearned Fighter cannot use it. This
+live Play fixture used test-only internally verified
+advancement/rank snapshots, not a fully natural
+persistent player journey. Knight rank-map is now
+**38/54, 16 missing**; Warrior **27/62, 35 missing**.
+Earlier v2.08 Knight real-client self-heal **30/44 HP**
+and spell mitigation **95.2 HP from 100** also PASS.
+The two-client physical Base rerun PASS used a bounded
+genuine client-input retry after one initial missed
+Captain Rowan hold; root cause of intermittent first
+hold is not certified fixed. **0/18** original first
+transfer careers are fully level-30 release certified.
+No `main` merge or Roblox publish.
+
+**Previous DungeonMMO class backend: v2.08 — focused Studio, physical quest after one input retry and real-player shield/heal/magic PASS; full release acceptance pending.**
 [Latest level-30 roadmap](
 DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md)
 and [pending acceptance checklist](
