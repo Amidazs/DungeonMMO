@@ -1,3 +1,61 @@
+## 24 September 2026 — CURRENT v2.23 Warrior final six skill ranks
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_23_Warrior_Level30_Rank_Mapping_20260924.md)
+and [exact executed focused/real-client evidence](
+../testing/ironvow-final-utilities-v2-23-20260924.md).
+Warrior `IronvowCriticalStance` ranks 20/24/28
+(MP activation/upkeep and real NPC critical HP),
+level24 `IronvowAccuracyStance` (MP toggle and
+server-owned NPC accuracy), level24
+`IronvowFieldRecovery` (paid owner-only actual HP
+regeneration) and level28 `IronvowEnduranceSurge`
+(13 MP, nonstacking 10% MaxHealth plus single
+10% restoration) are now individually learned
+skills with actual server effects. Fresh disposable
+Base/Dungeon Rojo PASS at `efa2f0e1`;
+Quest/Award/Foundation **31/198/160 PASS**,
+strict source audit **27 PASS**. Real client
+critical/accuracy toggle Play PASS on earlier
+utility increments. Current real recovery Play
+`0.740.0.7400927_20260924T125548Z_Studio_C9E7D_last.log`
+PASS: max-health cap, rank revocation, forged
+class and dead-player denial. Two earlier recovery
+Play failures resulted from a **detached test
+avatar** (player.Character.Parent=nil); a diagnostic
+confirmed this and test-only world spawning repaired
+the fixture. DO NOT delete production's parent/owner
+check. Current real client surge Play
+`0.740.0.7400927_20260924T125726Z_Studio_65402_last.log`
+PASS: 13 MP, MaxHealth 108->118.8, one 11.88
+owner HP restoration, full 100-damage hostile
+melee still applies, immediate re-cast cannot
+stack/reheal/extend expiry, copied Fighter and
+rank-revocation cleanup denied. Ten-minute
+expiry timestamp tested, not real full-duration wait.
+Current separate strict rank audit 27 PASS in
+`0.740.0.7400927_20260924T125831Z_Studio_50C82_last.log`.
+Warrior **62/62 training rank schedules mapped**;
+Knight 55/55; Human Rogue 59/59; Elf Scout
+77/77. **0/18 first-transfer careers fully
+C4-mechanic/economy/cross-place/release certified**,
+14 original advancement source inventories and
+original level1–19 starter class skills remain.
+Provisional Roblox C4 formula adaptations,
+natural saved quest-to-dungeon-to-rejoin journey,
+multiple-client buff/gear/stun exploits and boss/
+world-boss shield-block chip remain OPEN.
+Prior actual Marauder/Captain shield block fix
+does not certify every hostile encounter.
+Next prioritize genuine full-session owner and
+adversarial multiple-NPC/client tests, then next
+historical first-transfer skill inventory.
+Permanent source/roadmap edits via GitHub, remote
+desktop only safe fast-forward/disposable
+unpublished builds and tests. No `main` merge,
+Roblox publish, production DataStore mutation or
+parallel animation project edits.
+
 ## 24 September 2026 — CURRENT v2.20 earned Warrior common creation
 
 [Latest roadmap](
