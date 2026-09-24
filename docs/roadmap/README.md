@@ -1,4 +1,35 @@
-**Current DungeonMMO backend: v2.15 — genuine earned Warrior sword AND blunt mastery tested on real NPC HP; 31 Warrior rank rows still missing.**
+**Current DungeonMMO backend: v2.16 — source-grounded Warrior polearm mastery, real 5/10-NPC capped sweep and dual-handed shield abuse tests PASS; 27 Warrior rows remain.**
+[Current v2.16 C4 roadmap](
+DungeonMMO_Roadmap_v2_16_Warrior_Polearm_20260924.md)
+and [exact executed source/runtime/Play evidence](
+../testing/ironvow-polearm-mastery-v2-16-20260924.md).
+Four real purchased Polearm Mastery ranks (20/24/28/28)
+retain C4 source P.Atk 4.5/7.3/8.9/10.7 and +5
+hit targets. Server-registered two-handed polearm uses
+distinct wide melee geometry, capped at 5 untrained
+or 10 earned targets across all samples; a 12-NPC
+physical-world test confirms only the permitted targets
+lose HP once. Actual player-owned real NPC HP goes
+from **110 to 111.07** (100-base) by rank four
+under the provisional source-to-Roblox stat adapter.
+Actual equipment service denies shield-then-polearm
+and polearm-then-shield, preserving shield-block
+anti-invulnerability. Genuine Warrior Quest/Award/
+Foundation **31/99/73 PASS**, both disposable Rojo
+builds PASS, focused 12-NPC HP **26 PASS** and real
+player/NPC Play PASS. Strict source rank audit:
+Warrior **35/62 mapped, 27 missing**, Knight **55/55
+mapped**, both still require original C4 formula/skill
+effect equivalence, live natural saved play and broad
+boss/world-boss/multiplayer exploit testing. Four of 18
+original first-transfer paths source inventoried,
+**0/18 release certified**. Desktop Commander reports
+87% monthly usage; preserve remaining credits and
+avoid repeatedly running already passing suites.
+No `main` merge, public Roblox publish, production
+DataStore or separate animation-worktree changes.
+
+**Previous DungeonMMO backend: v2.15 — genuine earned Warrior sword and blunt mastery tested on real NPC HP; polearm ranks not yet mapped at that checkpoint.**
 [Current class roadmap](
 DungeonMMO_Roadmap_v2_15_Warrior_Sword_Blunt_20260924.md)
 and [exact focused/live Studio evidence](
