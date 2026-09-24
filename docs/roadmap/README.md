@@ -1,3 +1,14 @@
+**Current v2.44 C4 stat source:** exact C4 Scions of Destiny
+class-template and HP/MP/CP growth data now exists for all nine
+implemented original paths (4 starters + 5 first transfers), pinned to
+C4 source commit `07f85363`. [Roadmap](
+DungeonMMO_Roadmap_v2_44_C4_Exact_Nine_Class_Growth_20260924.md);
+[evidence](../testing/c4-exact-nine-class-growth-source-20260924.md).
+This closes the prior unsourced growth-table gap but is still read-only:
+live Roblox health/mana/CP, damage, passives and skills remain on the
+old custom system until the shared C4 derived-stat/formula migration is
+implemented coherently. No publish/main merge/production saves.
+
 **Current v2.43 C4 all-class stat migration (source-only):**
 [source and rollout roadmap](
 DungeonMMO_Roadmap_v2_43_C4_Nine_Class_Primary_Stat_Reference_20260924.md).

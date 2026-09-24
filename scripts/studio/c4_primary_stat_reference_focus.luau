@@ -1,5 +1,5 @@
 --!strict
--- Isolated unpublished test; never updates the player's live profile.
+-- Isolated unpublished source test; never migrates the player's profile.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "C4 stat source inspection requires a disposable local place")
 
@@ -16,4 +16,4 @@ local ok, result = pcall(require, runner)
 runner:Destroy()
 assert(ok and result == true,
     "C4 primary stat source regression failed: " .. tostring(result))
-print("[C4 Primary Stats] VERIFIED_SOURCE_ONLY_NOT_LIVE_PARITY")
+print("[C4 Primary Stats] VERIFIED_EXACT_SOURCE_NOT_LIVE_MIGRATION")

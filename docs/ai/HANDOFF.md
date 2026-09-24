@@ -1,3 +1,22 @@
+## 24 September 2026 — v2.44 exact C4 nine-template growth source
+
+Pinned actual C4 Scions of Destiny source/datapack
+`Neco-spain/l2jadmins_C4-Scions-of-Destiny@07f85363`.
+C4PrimaryStatReference now records exact source template IDs and
+class-specific HP/MP/CP bases/growth for Human Fighter/Mystic,
+Elven Fighter/Mystic, Human Warrior/Knight/Rogue and Elven
+Knight/Scout, plus base combat template fields. Exact HP/MP/CP source
+formulas from FuncMax* and C4 CON/MEN bonuses are represented through
+level30. Representative source lv30 integer results:
+HF 922/319/418, HM 699/466/366, EF 792/324/353,
+EM 666/469/348, Warrior 1070/320/849, Knight 1018/320/610,
+Rogue 983/320/399, ElfKnight 902/325/453, Scout 874/325/354.
+Read-only source milestone only; production AttributeConfig,
+Humanoid health, ManaService, CP, damage and all skills are NOT yet
+migrated. Next build C4 derived-stat/formula engine then coherent
+profile/runtime/HUD migration before replacing every class skill.
+No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.43 first actual nine-path primary stat source
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_43_C4_Nine_Class_Primary_Stat_Reference_20260924.md).
