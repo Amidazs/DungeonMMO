@@ -106,12 +106,12 @@ local function main()
         and knight.SourceRankEntriesByLevel[24] == 16
         and knight.SourceRankEntriesByLevel[28] == 23,
         "Historical Knight 20/24/28 inventory does not grant a class")
-    check(knight.TrainerMappedRankEntries == 48
-        and knight.MissingRankScheduleEntries == 7
+    check(knight.TrainerMappedRankEntries == 52
+        and knight.MissingRankScheduleEntries == 3
         and not knight.SourceRankScheduleMapped
         and not knight.LaunchSkillCatalogueReady,
-        "Knight dedicated bow protection maps 48 of 55 recorded "
-            .. "source ranks; seven equipment/crafting rows remain")
+        "Knight weapon-family mastery maps 52 of 55 recorded "
+            .. "source ranks; three equipment/crafting rows remain")
     check(Coverage.for_branch("UnknownCareer") == nil,
         "Invented classes must not count toward release coverage")
     print(("[Level 30 Launch] PASS: %d assertions")
