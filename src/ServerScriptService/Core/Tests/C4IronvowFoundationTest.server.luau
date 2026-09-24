@@ -55,7 +55,7 @@ local function forged_character(): any
     character.Equipment.Weapon = "marauder_sword"
     character.Equipment.Body = "marauder_armor"
     for _, skill_id in ipairs({
-        SWORD, BLADE, CALL, LIGHT, HEAVY,
+        SWORD, BLADE, "IronvowPolearmTraining", CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -102,6 +102,14 @@ Returns:
 local function main()
     check_ranks(SWORD, {20, 20, 20, 24, 24, 24, 28, 28, 28})
     check_ranks(BLADE, {20, 24, 28, 28})
+    check_ranks("IronvowPolearmTraining", {20, 24, 28, 28})
+    local polearm = assert(Progression.get("IronvowPolearmTraining"))
+    local source_power = {4.5, 7.3, 8.9, 10.7}
+    for rank, expected in ipairs(source_power) do
+        check(polearm.SourcePhysicalAttackByRank[rank] == expected
+            and polearm.SourceExtraHitTargets == 5,
+            "Warrior polearm must preserve real C4 P.Atk and target rows")
+    end
     local weapon_mastery = assert(Progression.get(BLADE))
     check(weapon_mastery.DamageBonusPerRank == 0.014
         and #weapon_mastery.WeaponTags == 0,
@@ -135,7 +143,7 @@ local function main()
     check(not Identity.is_complete(unearned),
         "Unawarded forged advanced character fails identity validation")
     for _, skill_id in ipairs({
-        SWORD, BLADE, CALL, LIGHT, HEAVY,
+        SWORD, BLADE, "IronvowPolearmTraining", CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
@@ -148,6 +156,11 @@ local function main()
     unearned.Equipment.Weapon = "stonewatch_training_mace"
     check(Passives.damage_bonus(unearned, BLADE) == 0,
         "Forged Warrior cannot get the same mastery with blunt equipment")
+    unearned.Equipment.Weapon = "ironroot_training_halberd"
+    check(Passives.damage_bonus(
+        unearned, "IronvowPolearmTraining"
+    ) == 0 and Passives.polearm_extra_targets(unearned) == 0,
+        "Unearned polearm rank gives neither damage nor extra targets")
     check(Passives.fighter_armor_reduction(unearned) == 0,
         "Forged Warrior cannot use a bought heavy-armour rank")
     print(("[Ironvow Foundation] PASS: %d assertions")
