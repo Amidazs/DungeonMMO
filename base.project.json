@@ -35,6 +35,9 @@
         "IronvowAccuracyToggleService": {
           "$path": "src/ServerScriptService/Combat/IronvowAccuracyToggleService.luau"
         },
+        "IronvowEnduranceSurgeService": {
+          "$path": "src/ServerScriptService/Combat/IronvowEnduranceSurgeService.luau"
+        },
         "ScoutAccuracyToggleService": {
           "$path": "src/ServerScriptService/Combat/ScoutAccuracyToggleService.luau"
         }
