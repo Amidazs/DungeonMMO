@@ -12,6 +12,7 @@ export type MeleeSkillDefinition = {
     FORWARD_STEP_STUDS: number, REACH_STUDS: number, ARC_DEGREES: number,
     HITBOX: {SIZE: Vector3, FORWARD_OFFSET: number, SAMPLE_COUNT: number},
     BASE_DAMAGE: number, STAGGER_SECONDS: number,
+    MANA_COST: number?, MAX_TARGETS: number?, SOURCE_POWER: number?,
     TAUNT_BONUS_THREAT: number?,
     MOVEMENT_SCALE: {WIND_UP: number, ACTIVE: number, RECOVERY: number},
     RANKS: {[number]: any}?,
@@ -1568,6 +1569,66 @@ local IRONVOW_DRIVING_STRIKE = specialize_skill(
     }
 )
 
+-- C4 Warrior's source Wild Sweep family is a real polearm-only
+-- area skill with 9 separately purchased levels and MP on use.
+-- Original 90..191 skill power is *not* Roblox HP damage; the
+-- 0.15 conversion below is provisional pending full C4 P.Atk maths.
+-- C4 physical AoE has a separate 20-target PvE cap, not the
+-- normal polearm five/ten-target basic swing.
+local IRONVOW_CRESCENT_SWEEP = specialize_skill(
+    ARC_SLASH, "IronvowCrescentSweep", "Crescent Sweep", {
+        STAMINA_COST = 0, MANA_COST = 22,
+        COOLDOWN_SECONDS = 8,
+        FORWARD_STEP_STUDS = 0.6,
+        REACH_STUDS = 7.0, ARC_DEGREES = 125,
+        HITBOX = table.freeze({
+            SIZE = Vector3.new(12.0, 5.0, 8.0),
+            FORWARD_OFFSET = 3.5,
+            SAMPLE_COUNT = 4,
+        }),
+        MAX_TARGETS = 20, BASE_DAMAGE = 13.5,
+        SOURCE_POWER = 90, STAGGER_SECONDS = 0,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                SOURCE_POWER = 90, MANA_COST = 22,
+                BASE_DAMAGE = 13.5,
+            }),
+            [2] = table.freeze({
+                SOURCE_POWER = 97, MANA_COST = 22,
+                BASE_DAMAGE = 14.55,
+            }),
+            [3] = table.freeze({
+                SOURCE_POWER = 105, MANA_COST = 22,
+                BASE_DAMAGE = 15.75,
+            }),
+            [4] = table.freeze({
+                SOURCE_POWER = 123, MANA_COST = 23,
+                BASE_DAMAGE = 18.45,
+            }),
+            [5] = table.freeze({
+                SOURCE_POWER = 132, MANA_COST = 24,
+                BASE_DAMAGE = 19.8,
+            }),
+            [6] = table.freeze({
+                SOURCE_POWER = 143, MANA_COST = 25,
+                BASE_DAMAGE = 21.45,
+            }),
+            [7] = table.freeze({
+                SOURCE_POWER = 165, MANA_COST = 27,
+                BASE_DAMAGE = 24.75,
+            }),
+            [8] = table.freeze({
+                SOURCE_POWER = 177, MANA_COST = 29,
+                BASE_DAMAGE = 26.55,
+            }),
+            [9] = table.freeze({
+                SOURCE_POWER = 191, MANA_COST = 30,
+                BASE_DAMAGE = 28.65,
+            }),
+        }),
+    }
+)
+
 local IRONVOW_BATTLE_CALL = specialize_skill(
     ELVEN_SCOUT_BATTLE_FOCUS, "IronvowBattleCall",
     "Ironvow Battle Call", {
@@ -1954,6 +2015,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     WayfinderWound = WAYFINDER_WOUND,
     GreenwardCalmingArrow = GREENWARD_CALMING_ARROW,
     IronvowDrivingStrike = IRONVOW_DRIVING_STRIKE,
+    IronvowCrescentSweep = IRONVOW_CRESCENT_SWEEP,
     IronvowBattleCall = IRONVOW_BATTLE_CALL,
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
@@ -2055,6 +2117,16 @@ local function validate_melee(definition: MeleeSkillDefinition)
     assert(definition.HITBOX.SAMPLE_COUNT >= 1, "Hitbox needs a sample.")
     assert(definition.BASE_DAMAGE >= 0, "Skill damage cannot be negative.")
     assert(definition.STAGGER_SECONDS >= 0, "Stagger cannot be negative.")
+    if definition.MAX_TARGETS ~= nil then
+        assert(definition.MAX_TARGETS >= 1
+            and definition.MAX_TARGETS % 1 == 0
+            and definition.MAX_TARGETS <= 20,
+            "Melee area skill target cap must be a safe integer <= 20.")
+    end
+    if definition.MANA_COST ~= nil then
+        assert(definition.MANA_COST >= 0,
+            "Melee skill mana cannot be negative.")
+    end
     if definition.TAUNT_BONUS_THREAT ~= nil then
         assert(
             definition.TAUNT_BONUS_THREAT > 0
