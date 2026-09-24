@@ -2535,12 +2535,20 @@ local function validate_melee(definition: MeleeSkillDefinition)
         assert(definition.MANA_COST >= 0,
             "Melee skill mana cannot be negative.")
     end
+    local reduction = definition.THREAT_REDUCTION_FRACTION
+    if reduction ~= nil then
+        assert(type(reduction) == "number"
+            and reduction > 0 and reduction <= 0.85,
+            "Charm must reduce a bounded positive threat fraction.")
+        assert(definition.BASE_DAMAGE == 0,
+            "Threat-reduction cast must not also cause health damage.")
+    end
     if definition.TAUNT_BONUS_THREAT ~= nil then
-        assert(
-            definition.TAUNT_BONUS_THREAT > 0
-                and definition.TAUNT_BONUS_THREAT < math.huge,
-            "Taunt threat must be positive and finite."
-        )
+        local bonus = definition.TAUNT_BONUS_THREAT
+        assert(type(bonus) == "number"
+            and bonus < math.huge and bonus == bonus
+            and (bonus > 0 or (bonus == 0 and reduction ~= nil)),
+            "Taunt must add threat; only Charm may have zero bonus.")
     end
 end
 
