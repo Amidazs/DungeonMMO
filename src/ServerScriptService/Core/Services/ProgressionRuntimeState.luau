@@ -43,6 +43,9 @@ local CombatStatusService = require(
 local ScoutCriticalToggleService = require(
     ServerScriptService.Combat.ScoutCriticalToggleService
 )
+local IronvowCriticalToggleService = require(
+    ServerScriptService.Combat.IronvowCriticalToggleService
+)
 
 --[[
 Returns a live, server-owned buff value without trusting client metadata.
@@ -860,12 +863,20 @@ function ProgressionRuntimeState.get_critical_damage_multiplier(
         else
             ScoutCriticalToggleService.stop(player)
         end
+        local warrior_usable = ProgressionRuntimeState.is_skill_usable(
+            user_id, "IronvowCriticalStance"
+        )
+        if warrior_usable then
+            toggle_bonus += IronvowCriticalToggleService.get_bonus(player)
+        else
+            IronvowCriticalToggleService.stop(player)
+        end
     end
     return math.max(
         1,
         racial_multiplier + PassiveSkillEffects.critical_damage_bonus(
             state_for(user_id)
-        ) + toggle_bonus
+        ) + math.min(toggle_bonus, 0.15)
     )
 end
 
