@@ -10,17 +10,22 @@ Checks a source equipment condition without guessing Roblox item tags.
 
 Args:
     allowed (string?): Source comma-separated weapon or armour kinds.
-    equipped_kind (string?): Historical kind of actual source equipment.
+    equipment (any): Historical kind or explicit Weapon/Body/OffHand.
 
 Returns:
     boolean: Whether an equipped original item meets this exact kind.
 ]]
-local function uses_kind(allowed: string?, equipped_kind: string?): boolean
+local function uses_kind(allowed: string?, equipment: any): boolean
     if allowed == nil then return true end
-    if not equipped_kind then return false end
+    if not equipment then return false end
+    local worn = if type(equipment) == "table"
+        then {equipment.Weapon, equipment.Body, equipment.OffHand}
+        else {equipment}
     for kind in string.gmatch(allowed, "[^,]+") do
         local trimmed = kind:match("^%s*(.-)%s*$")
-        if trimmed == equipped_kind then return true end
+        for _, equipped_kind in ipairs(worn) do
+            if trimmed == equipped_kind then return true end
+        end
     end
     return false
 end
@@ -30,13 +35,13 @@ Checks every source-wide equipment condition on one original skill.
 
 Args:
     conditions (any): Exact source Conditions table, possibly empty.
-    equipped_kind (string?): C4 equipment kind to check.
+    equipped_kind (any): One kind or trusted multi-slot C4 loadout.
 
 Returns:
     (boolean, string?): Allowed status and reason for unsupported rules.
 ]]
 local function meets_conditions(
-    conditions: any, equipped_kind: string?
+    conditions: any, equipped_kind: any
 ): (boolean, string?)
     for _, condition in ipairs(conditions) do
         if condition.Tag ~= "using" or type(condition.kind) ~= "string"
@@ -104,13 +109,13 @@ Collects original passive rows only, without applying active buffs.
 
 Args:
     source_ranks (any): List of {SkillId:number, Rank:number}.
-    equipped_kind (string?): Original C4 weapon/armour kind.
+    equipped_kind (any): Single kind or trusted multi-slot loadout.
 
 Returns:
     (any?, string?): Sortable original operations or refusal reason.
 ]]
 local function collect_passives(
-    source_ranks: any, equipped_kind: string?
+    source_ranks: any, equipped_kind: any
 ): (any?, string?)
     local modifiers = {}
     local seen = {}
@@ -157,14 +162,14 @@ A missing stat or unsupported source operation rejects the entire call.
 
 Args:
     source_stats (any): Historical stat-name to numerical base values.
-    equipped_kind (string?): Exact C4 weapon/armour kind or nil.
+    equipped_kind (any): Single kind or trusted three-slot loadout.
     source_ranks (any): One or more distinct original passive ranks.
 
 Returns:
     (any?, string?): New stat table and source operation count, or reason.
 ]]
 function C4PassiveStatReference.apply(
-    source_stats: any, equipped_kind: string?, source_ranks: any
+    source_stats: any, equipped_kind: any, source_ranks: any
 ): (any?, string?)
     if type(source_stats) ~= "table" or type(source_ranks) ~= "table"
     then return nil, "InvalidSourceInputs" end
@@ -191,6 +196,51 @@ function C4PassiveStatReference.apply(
         SourceOnly = true,
         LiveCombatIntegrated = false,
     }, nil
+end
+
+--[[
+Validates a complete original equipment-kind loadout.
+
+Args:
+    loadout (any): Weapon, Body and OffHand C4 kind names only.
+
+Returns:
+    boolean: True only for explicitly named source equipment slots.
+]]
+local function valid_loadout(loadout: any): boolean
+    if type(loadout) ~= "table" then return false end
+    local slots = {Weapon = true, Body = true, OffHand = true}
+    for slot, kind in pairs(loadout) do
+        if not slots[slot] or type(kind) ~= "string"
+            or kind == ""
+        then return false end
+    end
+    return true
+end
+
+--[[
+Applies simultaneously equipped weapon and body conditional passives.
+
+This is source-only: the caller must supply genuinely classified C4
+equipment, already-computed source item stats and owned source ranks.
+
+Args:
+    source_stats (any): C4 stat-name to already-composed base values.
+    loadout (any): C4 Weapon, Body and OffHand kinds, or empty table.
+    source_ranks (any): One owned original rank per distinct passive.
+
+Returns:
+    (any?, string?): Ordered C4 passive result or fail-closed reason.
+]]
+function C4PassiveStatReference.apply_loadout(
+    source_stats: any, loadout: any, source_ranks: any
+): (any?, string?)
+    if not valid_loadout(loadout) then
+        return nil, "InvalidOriginalEquipmentLoadout"
+    end
+    return C4PassiveStatReference.apply(
+        source_stats, loadout, source_ranks
+    )
 end
 
 return table.freeze(C4PassiveStatReference)
