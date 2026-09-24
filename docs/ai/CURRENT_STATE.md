@@ -1,4 +1,26 @@
-## 24 September 2026 — class backend v2.08, GitHub-only candidate
+24 September live verification addendum: both disposable Rojo builds
+PASS. Studio Knight quest/foundation 66/62 assertions PASS and
+level-30 launch audit 27 PASS. New unpublished full-Dungeon Play
+`scripts/studio/c4_oathguard_shield_damage_live.luau` verified actual
+player HP: 100 base becomes 99.2 damage with one purchased shield rank,
+98.4 with two, and 98.4 for hostile area; magic, PvP, unequipped,
+wrong-slot and forged-class cases remain at 100. The test uses
+synthetic but internally validated earned-class/purchased-rank and
+registered OffHand equipment snapshots, NOT natural client purchase
+or quest/gear UI. Exact Studio log:
+`0.740.0.7400927_20260924T082450Z_Studio_B7727_last.log`.
+A separate newly executed two-client physical Base quest test FAILED:
+client saw and held the enabled four-stud Captain Rowan prompt, but
+server Triggered never fired. Exact server Studio log:
+`0.740.0.7400927_20260924T081936Z_Studio_ECDA7_last.log`.
+Diagnose prompt transport before rerunning complete NPC route;
+then verify genuine client heal/magic/equip, other-player isolation,
+profile rejoin and cross-place journey. Existing v2.07 historic Base
+PASS does not override the new physical prompt failure.
+[Evidence](../testing/oathguard-shield-mastery-github-candidate-v2-08-20260924.md).
+No main merge, Roblox publish, production DataStore or paid action.
+
+## 24 September 2026 — class backend v2.08, focused Studio and live HP verified
 
 Current class backend roadmap is
 `docs/roadmap/DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md`;
