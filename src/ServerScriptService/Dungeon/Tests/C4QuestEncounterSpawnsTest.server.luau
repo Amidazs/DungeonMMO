@@ -3,6 +3,8 @@
 local SSS = game:GetService("ServerScriptService")
 local Spawns = require(SSS.Dungeon.C4QuestEncounterSpawns)
 local Ledger = require(SSS.Dungeon.C4QuestMonsterCombatLedger)
+local Careers = require(game:GetService("ReplicatedStorage")
+    .Core.Shared.OriginalFirstTransferDefinitions)
 local checks = 0
 
 --[[
@@ -60,9 +62,14 @@ Returns:
     any: Profile character with an uncompleted real stage-three quest.
 ]]
 local function character_for(branch_id: string): any
+    local career = assert(Careers.for_branch(branch_id))
     return {
         Level = 18,
-        Identity = {ClassId = "Fighter"},
+        Identity = {
+            ClassId = "Fighter",
+            BaseClassId = career.BaseClassId,
+            RaceId = career.RaceId,
+        },
         ClassAdvancement = {
             OriginalFirstTransferChoiceId = branch_id,
             OriginalFirstTransferQuest = {

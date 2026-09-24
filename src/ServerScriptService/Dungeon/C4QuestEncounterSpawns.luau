@@ -10,6 +10,11 @@ local Source = require(
         .Core.Shared.C4OriginalFirstTransferQuestStages
 )
 
+local Careers = require(
+    game:GetService("ReplicatedStorage")
+        .Core.Shared.OriginalFirstTransferDefinitions
+)
+
 local Spawns = {}
 local PER_BRANCH_PER_ROOM = 2
 local CHALLENGES = table.freeze({
@@ -96,6 +101,8 @@ function Spawns.eligible_branches(
             and advancement.OriginalFirstTransferQuest
         local branch = state and state.BranchId
         local quest = branch and Source.get(branch)
+        local career = branch and Careers.for_branch(branch)
+        local identity = character and character.Identity
         local challenge_id = if state and state.Step == 5
             and branch == "ElvenKnight"
             then "ElvenKnightFive"
@@ -116,7 +123,9 @@ function Spawns.eligible_branches(
             if challenge_id == "ElvenScoutSix"
                 then 6 else state.Step
         ]
-        if quest and challenge and state.Ready ~= true
+        if quest and career and challenge and state.Ready ~= true
+            and identity and identity.RaceId == career.RaceId
+            and identity.BaseClassId == career.BaseClassId
             and step and step.Kind == "QuestMonsterDefeat"
             and step.TargetId == challenge.SourceId
             and advancement.OriginalFirstTransferChoiceId == branch

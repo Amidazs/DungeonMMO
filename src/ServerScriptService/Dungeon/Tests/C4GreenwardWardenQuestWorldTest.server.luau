@@ -62,7 +62,10 @@ Returns:
 local function selected_owner(step: number): any
     return {
         Level = 18,
-        Identity = {ClassId = "Fighter", RaceId = "Elf"},
+        Identity = {
+            ClassId = "Fighter", BaseClassId = "Fighter",
+            RaceId = "Elf",
+        },
         ClassAdvancement = {
             OriginalFirstTransferChoiceId = "ElvenKnight",
             OriginalFirstTransferQuest = {
@@ -159,6 +162,14 @@ local function main()
     check_stage(
         profiles, ledger, folder, 3, "RootboundMarauder", 2
     )
+    owner.Identity.RaceId = "Human"
+    check(#Spawns.eligible_branches(profiles, {USER_ID}) == 0,
+        "A Human with a copied Elven quest cannot spawn Warden loot")
+    owner.Identity.RaceId = "Elf"
+    owner.Identity.BaseClassId = "Mage"
+    check(#Spawns.eligible_branches(profiles, {USER_ID}) == 0,
+        "A Mage with copied Fighter quest cannot spawn Warden loot")
+    owner.Identity.BaseClassId = "Fighter"
     owner.ClassAdvancement.OriginalFirstTransferQuest.Step = 5
     check_stage(
         profiles, ledger, folder, 5, "ThornboundColossus", 1

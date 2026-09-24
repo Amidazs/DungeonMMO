@@ -61,7 +61,10 @@ Returns:
 local function selected_owner(stage: number): any
     return {
         Level = 18,
-        Identity = {ClassId = "Fighter"},
+        Identity = {
+            ClassId = "Fighter", BaseClassId = "Fighter",
+            RaceId = "Human",
+        },
         ClassAdvancement = {
             OriginalFirstTransferChoiceId = "HumanWarrior",
             OriginalFirstTransferQuest = {
