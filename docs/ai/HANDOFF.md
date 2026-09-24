@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.49 all original classes skill ID/rank candidate map and passive source arithmetic
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_49_C4_Nine_Class_Creative_Mapping_20260924.md); [test evidence](../testing/c4-nine-class-creative-skill-map-and-passive-source-v2-49-20260924.md). Every one of 476 nine-path C4 learning rows classified in C4CreativeSkillSourceMap: exact source ID/rank -> explicit creative ID/rank candidate, or documented gap. First Base audit 451 candidates/25 gaps; found MysticFeebleCurse and ElvenMysticLanguor existed in trainer but were absent from Mage teachable list; class and map fixed, rerun PASS 454 candidate rows/22 missing/0 broken and 94 numeric mana mismatches. ElvenScout original Elemental Heal nine ranks remain genuinely missing; existing ElvenRenewal is not automatically equivalent. C4PassiveStatReference added read-only source 0x30 multiplier then 0x40 additive stat operations, using-kind equipment gates, one rank per mastery, no active aura as permanent passive; Base Studio pure source 9 assertions PASS. Base/Dungeon Rojo builds PASS. No LIVE HP/MP/equipment/combat stat migration or exact C4 balance certification; creative extra skill families still logged. No main merge/publish/production saves or animation edits. Local __pycache__ from separate quadruped engine was untouched.
+
 ## 24 September 2026 — v2.48 all nine paths, 75 C4 source effects
 
 Generated structured, pinned C4 source effect data for every one of

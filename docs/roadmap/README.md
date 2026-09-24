@@ -1,3 +1,5 @@
+**v2.49 C4 all-nine-class source map:** [current roadmap](DungeonMMO_Roadmap_v2_49_C4_Nine_Class_Creative_Mapping_20260924.md), [Studio evidence](../testing/c4-nine-class-creative-skill-map-and-passive-source-v2-49-20260924.md). All 476 historical level-30 learning rows classified: 454 source-to-creative candidate rank links, 22 explicit gaps, 0 broken links; 94 current numeric MP-cost differences. Fixed two previously authored Mystic debuffs absent from Mage class teaching. Shared read-only C4 passive calculator (source operation order, weapon/armour gating) passed 9 pure source assertions. **Neither candidate mapping nor a read-only formula certifies live C4 skills or balance.** Do not silently set source skill power equal to Roblox HP damage; coherent HP/MP/equipment/buff/live migration and remaining classes are OPEN. No main merge/publish/production saves.
+
 **Current v2.48 all-class C4 effect source:** the exact
 pinned C4 skill XML is now structured for all **75 source skill IDs /
 272 unique learned source ranks** used by the nine original
