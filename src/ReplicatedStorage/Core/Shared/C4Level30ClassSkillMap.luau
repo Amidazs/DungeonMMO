@@ -45,6 +45,7 @@ local ELF = table.freeze({
 -- genuine implemented effects before any rank coverage can be claimed.
 local WARRIOR = table.freeze({
     SwordPowerAttack = "IronvowDrivingStrike",
+    SwordBluntMastery = "IronvowBladeTraining",
     LightArmorMastery = "IronvowLightArmorTraining",
     HeavyArmorMastery = "IronvowHeavyArmorTraining",
     BattleCry = "IronvowBattleCall",
