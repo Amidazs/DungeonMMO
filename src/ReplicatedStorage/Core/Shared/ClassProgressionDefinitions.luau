@@ -197,6 +197,7 @@ local DEFINITIONS = table.freeze({
             "OathguardLastBastion",
             "OathguardArrowWard",
             "OathguardSteelAndStoneTraining",
+            "OathguardEquipmentExpertise",
             "OathguardUmbralSiphon",
         }),
     }),
