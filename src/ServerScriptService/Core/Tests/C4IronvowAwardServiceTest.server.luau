@@ -245,7 +245,7 @@ local function verify_armour_training(profiles: any)
         for _, item_id in ipairs({
             "marauder_sword", "stonewatch_training_mace",
             "ironroot_training_halberd", "apprentice_longbow",
-            "ironroot_light_vest",
+            "marauder_shield", "ironroot_light_vest",
             "marauder_armor",
         }) do
             assert(Inventory.apply_item_to_character(
@@ -291,6 +291,15 @@ local function verify_armour_training(profiles: any)
     check(Passives.damage_bonus(
         polearm_owner, "IronvowBladeTraining"
     ) == 0, "Polearm never inherits sword-and-blunt mastery")
+    local shield_attempt = equipment:equip(
+        USER_ID, "marauder_shield", "OffHand"
+    )
+    check(not shield_attempt.ok,
+        "Two-handed polearm must refuse simultaneous shield equip")
+    local equipped = assert(profiles:get_character(USER_ID)).Equipment
+    check(equipped.Weapon == "ironroot_training_halberd"
+        and equipped.OffHand == nil,
+        "Rejected shield equip preserves genuine polearm only")
 
     purchase_full_line(
         profiles, service, "IronvowLightArmorTraining"
