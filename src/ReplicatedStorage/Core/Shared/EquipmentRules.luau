@@ -96,6 +96,14 @@ function EquipmentRules.validate(
         return result(false, "ScoutEquipmentExpertiseRequired")
     end
 
+    if item.RequiredSkillId == "OathguardEquipmentExpertise"
+        and (item.Grade ~= "D" or item.RequiredSkillRank ~= 1
+            or not PassiveSkillEffects
+                .has_oathguard_equipment_expertise(character))
+    then
+        return result(false, "KnightEquipmentExpertiseRequired")
+    end
+
     return result(true, nil)
 end
 
