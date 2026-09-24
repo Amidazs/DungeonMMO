@@ -7,6 +7,9 @@ local RS = game:GetService("ReplicatedStorage")
 local Source = require(
     RS.Core.Shared.C4OriginalFirstTransferQuestStages
 )
+local Careers = require(
+    RS.Core.Shared.OriginalFirstTransferDefinitions
+)
 
 local Ledger = {}
 Ledger.__index = Ledger
@@ -120,6 +123,47 @@ function Ledger:register_enemy(
 end
 
 --[[
+Checks immutable original quest identity again at damage and reward time.
+
+A copied quest table alone must never authorize personal enemy credit.
+Checking at reward time also denies stale damage recorded before the
+owner changed class, level, selection or quest stage.
+
+Args:
+    character (any): Current authoritative selected owner character.
+    branch_id (string): Original branch of the registered enemy life.
+    step_index (number): Exact server-registered combat quest stage.
+
+Returns:
+    boolean: True only for the eligible unadvanced original owner.
+]]
+function Ledger.is_owner_eligible(
+    character: any, branch_id: string, step_index: number
+): boolean
+    local career = Careers.for_branch(branch_id)
+    local quest = Source.get(branch_id)
+    local identity = type(character) == "table"
+        and character.Identity
+    local advancement = type(character) == "table"
+        and character.ClassAdvancement
+    local state = advancement and advancement.OriginalFirstTransferQuest
+    return career ~= nil and quest ~= nil
+        and type(identity) == "table"
+        and identity.RaceId == career.RaceId
+        and identity.BaseClassId == career.BaseClassId
+        and identity.ClassId == "Fighter"
+        and type(advancement) == "table"
+        and advancement.OriginalFirstTransferChoiceId == branch_id
+        and type(state) == "table"
+        and state.BranchId == branch_id
+        and state.Step == step_index
+        and state.Ready ~= true
+        and (tonumber(character.Level) or 0) >= quest.StartLevel
+        and quest.Steps[step_index] ~= nil
+        and quest.Steps[step_index].Kind == "QuestMonsterDefeat"
+end
+
+--[[
 Checks that an actual connected dungeon player is eligible to damage this
 monster, and that their selected quest matches this exact monster stage.
 
@@ -149,11 +193,9 @@ local function eligible_owner(
         return nil, nil
     end
     local character = self._profiles:get_character(player.UserId)
-    local advancement = character and character.ClassAdvancement
-    local state = advancement and advancement.OriginalFirstTransferQuest
-    if not state or state.BranchId ~= record.BranchId
-        or state.Step ~= record.Step or state.Ready == true
-    then
+    if not Ledger.is_owner_eligible(
+        character, record.BranchId, record.Step
+    ) then
         return nil, nil
     end
     return player.UserId, character
@@ -212,12 +254,12 @@ local function event_for_owner(
     self: any, user_id: number, record: any
 ): any?
     local character = self._profiles:get_character(user_id)
-    local advancement = character and character.ClassAdvancement
-    local state = advancement and advancement.OriginalFirstTransferQuest
-    if not state or state.Step ~= record.Step
-        or state.BranchId ~= record.BranchId then
+    if not Ledger.is_owner_eligible(
+        character, record.BranchId, record.Step
+    ) then
         return nil
     end
+    local state = character.ClassAdvancement.OriginalFirstTransferQuest
     local proof_ids = if record.TargetId == "GloamBulwark"
         then {GloamBulwarkSeal = true}
         elseif record.TargetId == "ThornboundColossus"
