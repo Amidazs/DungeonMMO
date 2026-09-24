@@ -52,3 +52,13 @@ physical dungeon encounters and real client quest Play remain open.
 
 No main merge, publish, production DataStore, or unrelated animation
 worktree changes. Permanent script/roadmap edits in GitHub.
+
+## Targeted server regression source added
+
+`C4GreenwardWardenPassiveTrainingTest` and disposable Base runner
+`c4_greenward_warden_passive_training_focus.luau` now exercise
+an independently minted one-use mentor receipt, all 21 rank purchases
+through the real profile/skill services, unarmed/dagger/sword equipment
+effects, actual HeavyArmor Body ownership and removal, server runtime
+combat-stat hooks and copied-race/class/receipt denial. **Not yet
+executed in Studio**; Rojo builds alone do not pass these assertions.

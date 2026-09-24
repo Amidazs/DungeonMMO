@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.28 focused Warden passive test fixture
+
+New `C4GreenwardWardenPassiveTrainingTest` and unpublished Base runner exercise earned class, full 21 individually purchased passive ranks, actual EquipmentService sword/dagger/HeavyArmor toggling and copied-class/receipt/race denials. Test has NOT run in Studio. The four original Fighter branch schedules are unchanged; Elven Knight 21/56 mapped, 35 remaining. Do not claim actual live hostile-hit Play from build success.
+
 ## 24 September 2026 — v2.28 first three Greenward Warden passives
 
 [Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_28_Elven_Knight_Three_Passive_Families_20260924.md). Elven Knight now has its own real class-restricted three-family trainer: `GreenwardWardenSteelTraining` 4 ranks (20/24/28/28), `GreenwardWardenHeavyArmorTraining` 9 (3/3/3) and `GreenwardWardenMagicResistance` 8 (2/3/3). Purchased owner-only server effects use registered Sword/Blunt, HeavyArmor Body and hostile-magic-only bounded reduction. Coverage 21/56 mapped, 35 remaining, zero full mechanical/release certifications. Greenward Warden physical quest NPCs/monster combat Play and new skill regressions remain OPEN, prior Warrior stored avatar tests pending. No main merge/publish/production saves/animation edits.
