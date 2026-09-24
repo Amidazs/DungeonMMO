@@ -4,6 +4,10 @@ local ProfessionSelectionRules = require(
     script.Parent:WaitForChild("ProfessionSelectionRules")
 )
 
+local FirstTransfers = require(
+    script.Parent:WaitForChild("OriginalFirstTransferDefinitions")
+)
+
 local C4ProfessionSkillRules = {}
 
 --[[
@@ -110,6 +114,56 @@ function C4ProfessionSkillRules.can_make_scout_common(
         and type(state.PurchasedRank) == "number"
         and state.PurchasedRank >= required_rank
         and state.PurchasedRank <= 3
+end
+
+--[[
+Authorizes only real personally earned Knight common-item creation tiers.
+
+The original source tiers 2 and 3 are represented by purchased ranks
+one and two, at owner levels 20 and 28. Crafting never grants a second
+profession; it still requires starter recipe literacy and common creation.
+
+Args:
+    character (any): Authoritative server-owned character profile.
+    profession_id (string): This character's one selected craft career.
+    required_rank (number): Authored Knight recipe tier, one or two.
+
+Returns:
+    boolean: True only for verified class, skills, level and career.
+]]
+function C4ProfessionSkillRules.can_make_knight_common(
+    character: any,
+    profession_id: string,
+    required_rank: number
+): boolean
+    if type(character) ~= "table"
+        or type(required_rank) ~= "number"
+        or required_rank % 1 ~= 0
+        or required_rank < 1 or required_rank > 2
+        or not C4ProfessionSkillRules.can_make_common(
+            character, profession_id
+        )
+    then
+        return false
+    end
+    local awarded = FirstTransfers.awarded(character)
+    if not awarded or awarded.Id ~= "Oathguard" then
+        return false
+    end
+    local levels = {20, 28}
+    if (tonumber(character.Level) or 0)
+        < levels[required_rank]
+    then
+        return false
+    end
+    local skills = character.Progression
+        and character.Progression.Skills
+    local state = skills and skills.OathguardCommonItemCreation
+    return type(state) == "table"
+        and state.Known == true
+        and type(state.PurchasedRank) == "number"
+        and state.PurchasedRank >= required_rank
+        and state.PurchasedRank <= 2
 end
 
 return table.freeze(C4ProfessionSkillRules)
