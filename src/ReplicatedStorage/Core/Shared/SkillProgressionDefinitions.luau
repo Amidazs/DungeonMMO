@@ -1757,6 +1757,18 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Distinct C4 Knight Deflect Arrow source ranks at 24 and 28.
+    -- Only an actual authored ranged bow hit receives protection.
+    OathguardArrowWard = table.freeze({
+        Id = "OathguardArrowWard",
+        Tier = "Common", MaxRank = 2, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Two independently earned Knight shield-mastery ranks protect only
     -- when the server owns a valid shield in the OffHand equipment slot.
     OathguardShieldMastery = table.freeze({
