@@ -42,3 +42,16 @@ character HP/MP/CP/profile/HUD and actual class skill executors
 together with multi-class combat/anti-exploit testing.
 No main merge, publish, production saves or unrelated
 animation/art changes.
+
+## 25 September — focused source-only validation
+
+Final v2.50 implementation commit `4ea8f0d7c4a31a49e3efdaf2897a8d4b8f4be39d` has now passed
+unpublished Base and Dungeon Rojo builds. The corrected focused
+Base Studio run records **35 assertions PASS across all nine class
+paths**, including separate slot validation for weapon/armour
+conditions. The [full evidence](
+../testing/c4-nine-class-unified-stat-reference-v2-50-20260925.md)
+explicitly marks `LiveCombatIntegrated=false` and
+`ExactFinalC4StatsCertified=false`. The same nine-source
+HP/MP/CP curves remain reference values, *not* current live
+Humanoid health, mana, CP or finished all-class skill effects.
