@@ -123,6 +123,7 @@ function DamageService.apply_damage(context: DamageContext): number
     if defender and (
         context.source_kind == "EnemyMelee"
         or context.source_kind == "EnemyArea"
+        or context.source_kind == "EnemyBow"
     ) then
         -- C4-inspired light-armour mastery mitigates real physical NPC
         -- attacks only. Magic, player attacks and unarmoured targets are
@@ -140,6 +141,9 @@ function DamageService.apply_damage(context: DamageContext): number
         )
         local novice_reduction = ProgressionRuntimeState
             .get_novice_physical_reduction(defender.UserId)
+        local bow_bonus = if context.source_kind == "EnemyBow"
+            then CombatStatusService.get(context.target, "BowGuard")
+            else 0
         local fortress_bonus = CombatStatusService.get(
             context.target, "Fortress"
         )
@@ -148,7 +152,7 @@ function DamageService.apply_damage(context: DamageContext): number
         damage *= 1 - math.clamp(
             reduction + fighter_reduction + shield_reduction
                 + mystic_reduction + guard_bonus + novice_reduction
-                + fortress_bonus,
+                + fortress_bonus + bow_bonus,
             0, max_reduction
         )
     elseif defender and context.source_kind == "EnemyMagic" then
