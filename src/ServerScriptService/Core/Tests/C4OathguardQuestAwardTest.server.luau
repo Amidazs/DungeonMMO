@@ -275,7 +275,7 @@ local function verify_defensive_stance(profiles: any, service: any)
     end), "Knight reaches original C4 level-twenty stance bracket")
     local result = service:learn_trainer_skill(USER_ID, stance_id)
     check(result.ok and result.rank == 1,
-        "Earned Knight's own physical trainer sells its distinct stance")
+        "Earned Knight trainer stance failed: " .. tostring(result.reason))
     check(profiles:get_character(USER_ID).Progression
         .Skills[stance_id].PurchasedRank == 1,
         "Purchased Knight stance persists in the authoritative profile")
