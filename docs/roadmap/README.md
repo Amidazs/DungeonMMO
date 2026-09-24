@@ -1,4 +1,33 @@
-**Current DungeonMMO backend: v2.19 — real personally earned Warrior level20 D-grade expertise buys actual wearable server-owned gear; eight original Warrior utility ranks remain.**
+**Current DungeonMMO backend: v2.20 — two genuinely paid Warrior common-craft source tiers, material-backed inventory transactions and revocation anti-duplication PASS; 6 original Warrior utility ranks remain.**
+[Current roadmap](
+DungeonMMO_Roadmap_v2_20_Warrior_Common_Craft_20260924.md)
+and [precise executed tests](
+../testing/ironvow-common-crafting-v2-20-20260924.md).
+Warrior `IronvowCommonItemCreation` at original
+level20/28 requires a genuinely earned class, base
+recipe literacy and one selected creation career.
+Eight actual material-backed recipes cover four
+creation careers; source-tier Blacksmithing makes
+owned 2-handed polearm and D-grade Warrior body
+armour (actual equipping remains gated by its
+distinct purchased equipment expertise). Server
+crafting spends actual owned ingredients, saves
+owned rank and still denies a second crafting
+career. A previously prepared higher-rank craft
+cannot complete after source rank revocation:
+no materials lost or output duplicated. Source
+Quest/Award/Foundation **31/182/131 PASS**,
+rank audit **27 PASS** and disposable Base/
+Dungeon Rojo PASS. Warrior **56/62 source
+rank rows mapped**, six utility rows still
+missing; Knight **55/55 scheduled**. These
+are NOT complete original C4 economy/math,
+natural cross-place player journey or class
+release certification (**0/18**). Never
+merge `main`, publish Roblox or touch
+production saves/animation worktrees.
+
+**Previous DungeonMMO backend: v2.19 — real D-grade Warrior equip tested; common crafting tiers were still unmapped.**
 [Current roadmap](
 DungeonMMO_Roadmap_v2_19_Warrior_Equipment_20260924.md)
 and [focused actual server equip/save proof](
