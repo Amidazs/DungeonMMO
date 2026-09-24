@@ -138,3 +138,25 @@ Do not pad ranks or shift C4's trainer level brackets merely
 to make a counter green. Content and actual skill effects
 must arrive together. Full published multiplayer/cloud and
 release tests remain separately approval-gated.
+
+## Superseding owner direction — 24 September 2026
+
+The owner now wants the **C4 source effects, damages, passives,
+resources and rank-by-rank mechanics** themselves to be the
+fidelity target, with independent names and creative assets, rather
+than merely C4 rank-count density and unrelated custom balance
+numbers. The earlier sentence above about keeping original
+DungeonMMO combat numbers is historical; it no longer defines the
+target for final skill fidelity. **Do not confuse historical source
+skill power with final HP damage:** original damage, defence, hate,
+MP/stat, duration and status/resistance formulas must be verified
+and mapped before changing `BASE_DAMAGE`, passive percentage
+adapters or standalone heal magnitudes. Custom blocking, stamina,
+instant dodge and Roblox enemy/HP design prevent any promise that
+copying a few C4 numbers removes all play-balance work.
+
+See [mechanical fidelity audit](C4_Skill_Effect_Fidelity_Audit_20260924.md).
+Rank-schedule pass is necessary but no longer sufficient; mark all
+currently implemented skill effects provisional until each family
+has sourced data, formula-compatible implementation and targeted
+runtime tests. Do not claim 56/56 effect parity for the Warden.
