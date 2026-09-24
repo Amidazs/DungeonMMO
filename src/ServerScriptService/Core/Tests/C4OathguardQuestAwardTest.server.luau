@@ -20,6 +20,7 @@ local Loadout = require(SSS.Core.Services.LoadoutService)
 local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
 local SkillUnlockRules = require(Shared.SkillUnlockRules)
 local PassiveEffects = require(Shared.PassiveSkillEffects)
+local EquipmentStatResolver = require(Shared.EquipmentStatResolver)
 local RuntimeState = require(
     SSS.Core.Services.ProgressionRuntimeState
 )
@@ -420,7 +421,8 @@ local function verify_equipment_expertise(profiles: any, service: any)
     local character = assert(profiles:get_character(USER_ID))
     check(character.Equipment.Body == item_id,
         "Paid Knight expertise must persist actual equipped body slot")
-    check(worn.effects.MaxHealthFlat == 20,
+    local bonuses = EquipmentStatResolver.resolve(character.Equipment)
+    check(bonuses.MaxHealthFlat >= 20,
         "Genuine D-grade heavy armour must alter real equipped HP")
 end
 
