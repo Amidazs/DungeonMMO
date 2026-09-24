@@ -564,6 +564,40 @@ local function verify_knight_common_crafting(
         "Earned Knight must buy second independent common creation tier "
             .. tostring(last.reason))
     craft_knight_recipe(profiles, inventory, professions, second)
+    stock_knight_recipe(inventory, profiles, second)
+    local before = assert(profiles:get_character(USER_ID))
+    local primary = second.Inputs[1]
+    local ingredient_before = Inventory.count_item(
+        before, primary.ItemId
+    )
+    local output_before = Inventory.count_item(
+        before, second.Output.ItemId
+    )
+    local prepared = professions:prepare_craft(USER_ID, second.Id)
+    check(prepared.ok, "Earned Knight can begin a second real rank-two craft")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            skill_id
+        ].PurchasedRank = 1
+    end), "Simulated revocation affects only the disposable Knight")
+    local denied_craft = professions:complete_craft(
+        USER_ID, second.Id,
+        Professions.foundation_success_outcome(prepared.minigame_id)
+    )
+    check(not denied_craft.ok
+        and denied_craft.reason == "KnightCommonItemCreationNotLearned",
+        "Revoked paid source rank cannot commit an already begun craft")
+    local after = assert(profiles:get_character(USER_ID))
+    check(Inventory.count_item(after, primary.ItemId)
+        == ingredient_before
+        and Inventory.count_item(after, second.Output.ItemId)
+            == output_before,
+        "Rejected craft cannot consume inputs or duplicate D-grade gear")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            skill_id
+        ].PurchasedRank = 2
+    end), "Restore genuine purchased rank only in this test profile")
     check(not professions:prepare_craft(
         USER_ID, "knight_distill_oil_rank_1"
     ).ok, "Buying Knight creation rank cannot grant Alchemy as second craft")
