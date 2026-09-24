@@ -17,6 +17,7 @@ local Inventory = require(SSS.Core.Services.InventoryService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
 local Equipment = require(SSS.Core.Services.EquipmentService)
 local Passives = require(Shared.PassiveSkillEffects)
+local EquipmentStatResolver = require(Shared.EquipmentStatResolver)
 local Schema = require(Shared.ProfileSchema)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
@@ -385,6 +386,54 @@ local function verify_armour_training(profiles: any)
 end
 
 --[[
+Buys a real Warrior D-grade license after first refusing the actual equip.
+
+Args:
+    profiles (any): Exclusive genuinely quest-awarded Warrior test owner.
+
+Returns:
+    nil: Verifies trainer payment, item ownership, real equipment
+        service, HP bonus, forged/underlevel denial and save.
+]]
+local function verify_equipment_expertise(profiles: any)
+    local inventory = Inventory.new(profiles)
+    local equipment = Equipment.new(profiles, "Base")
+    local service = SkillService.new(
+        profiles, inventory, Loadout.new(profiles)
+    )
+    local item_id = "ironroot_d_grade_armor"
+    check(inventory:add_item(USER_ID, item_id, 1).ok,
+        "Genuine Warrior inventory receives registered D-grade body")
+    local denied = equipment:equip(USER_ID, item_id, "Body")
+    check(not denied.ok
+        and denied.reason == "WarriorEquipmentExpertiseRequired",
+        "Without paid independent Warrior source rank D-grade fails")
+    local purchased = service:learn_trainer_skill(
+        USER_ID, "IronvowEquipmentExpertise"
+    )
+    check(purchased.ok and purchased.rank == 1,
+        "Only earned Warrior trainer sells actual D-grade permission "
+            .. tostring(purchased.reason))
+    check(equipment:equip(USER_ID, item_id, "Body").ok,
+        "Paid Warrior can equip real owned D-grade body")
+    local character = assert(profiles:get_character(USER_ID))
+    check(character.Equipment.Body == item_id
+        and EquipmentStatResolver.resolve(
+            character.Equipment
+        ).MaxHealthFlat >= 20,
+        "Equipped Warrior D-grade item changes actual server max HP")
+    local forged = Schema.deep_clone(character)
+    forged.Identity.ClassId = "Fighter"
+    local underlevel = Schema.deep_clone(character)
+    underlevel.Level = 19
+    check(not Passives.has_ironvow_equipment_expertise(forged)
+        and not Passives.has_ironvow_equipment_expertise(underlevel),
+        "Copied or underlevel D-grade skill cannot grant permission")
+    check(profiles:save(USER_ID, "IronvowDGradeExpertise"),
+        "Owned Warrior D-grade item and paid expertise save together")
+end
+
+--[[
 Proves a fresh profile service accepts the exact earned class and rank.
 
 Args:
@@ -416,6 +465,9 @@ local function verify_reload(store: any, profiles: any)
         and character.Progression.Skills
             .IronvowStonebreaker.PurchasedRank == 9
         and character.Progression.Skills
+            .IronvowEquipmentExpertise.PurchasedRank == 1
+        and character.Equipment.Body == "ironroot_d_grade_armor"
+        and character.Progression.Skills
             .IronvowFortitude.PurchasedRank == 2
         and character.Progression.Skills
             .IronvowRestRecovery.PurchasedRank == 1,
@@ -441,6 +493,7 @@ local function main()
     )
     verify_skill_purchase(profiles)
     verify_armour_training(profiles)
+    verify_equipment_expertise(profiles)
     verify_reload(store, profiles)
     print(("[Ironvow Award] PASS: %d assertions"):format(CHECKS))
 end
