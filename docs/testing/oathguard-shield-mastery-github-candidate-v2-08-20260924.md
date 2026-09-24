@@ -127,6 +127,53 @@ skill/equipment purchases, natural quest completion, physical NPC
 prompt acceptance or persistent saved-player flow. The separate
 two-client Base physical NPC test remains FAILED as recorded above.
 
+## Real client healing and enemy magic acceptance
+
+The new, source-controlled
+`scripts/studio/c4_oathguard_heal_magic_client_live.luau`
+uses genuine `CombatInputActions.request_skill_slot(1)` input from
+an unpublished Play client. The server seeds a *synthetic, internally
+valid* earned Knight advancement receipt and paid ranks only in the
+disposable Dungeon instance; no natural level grind or saved profile
+is implied.
+
+The first run in
+`0.740.0.7400927_20260924T083334Z_Studio_48AF8_last.log`
+**FAILED its rank-comparison assertion**: it watched an ordinary HP
+increase, incorrectly counting approximately 10.16 HP from ongoing
+character regeneration before the actual rank-three self-heal
+completed. The test—not the production ability—was corrected in
+GitHub to await `MageHealPulse` and read `MageHealLastAmount`
+from the server's actual completed heal.
+
+The next run at `c322c50` on a fresh disposable Dungeon build
+**PASS**. The exact independent Studio process log
+`0.740.0.7400927_20260924T083446Z_Studio_B5287_last.log`
+records:
+
+- Actual client hotbar rank-one `OathguardMendingOath`
+  healed its own real Humanoid for **30 HP**, spending at least
+  14 mana measured after the cast.
+- Actual client hotbar rank-three `OathguardMendingOath`
+  healed its own real Humanoid for **44 HP**, spending mana;
+  the second cast occurred after waiting 19 seconds for the
+  authored 18-second cooldown. An *early* rejected recast has
+  **not** been independently measured.
+- Eight synthetic, paid-rank `OathguardRunicResistance` ranks
+  caused a real 100-base hostile `EnemyMagic` hit on the
+  spawned player to deal **95.2 HP**, while `EnemyMelee`
+  dealt **100 HP** without shield or heavy-armour bonuses.
+  A forged Fighter identity with copied rune ranks again
+  received **100 HP** magical damage.
+- `ALL_REAL_CLIENT_HEAL_MAGIC_PASS` and
+  `VERIFIED_PLAY_MODE_PASS` were emitted from this exact run.
+
+This confirms the real client skill-input/healing and live player
+HP damage paths with controlled server-owned setup. Still open:
+the *natural* quest/purchase/equip flow, healer/other-party-member
+isolation in two-client play, explicit cooldown/insufficient-mana
+negative casts and save/rejoin.
+
 ## Remaining live gameplay verification
 
 - [x] Focused Knight quest/foundation suites: **66 + 62 PASS**;
@@ -143,9 +190,13 @@ two-client Base physical NPC test remains FAILED as recorded above.
   and wrong-slot gear remain unaffected by the Knight shield passive.
 - [ ] Verify natural earned class and client-owned equipment/purchases
   on the live player, and separate multiplayer party-member isolation.
-- [ ] Check prior v2.07 `OathguardMendingOath` owner-only healing and
-  `OathguardRunicResistance` enemy spell mitigation with genuine
-  client casts, cooldown, resources and wrong-class rejection.
+- [x] Actual client hotbar Mending Oath rank one/three healed
+  30/44 HP on the real owner, consuming mana after the cooldown;
+  eight-rank runic defence prevented 4.8% real hostile magic damage.
+  Forged class and physical-hit isolation PASS.
+- [ ] Confirm explicitly rejected early heal recast, insufficient
+  mana and live second-player isolation, then natural saved-owner
+  progression and equipment purchase paths.
 - [ ] Save/rejoin, cross-place transfer and existing dungeon
   multiplayer/party-difficulty rules require independent proof.
 
