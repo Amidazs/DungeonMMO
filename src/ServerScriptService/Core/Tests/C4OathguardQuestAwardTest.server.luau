@@ -287,6 +287,27 @@ local function verify_defensive_stance(profiles: any, service: any)
 end
 
 --[[
+Buys a separate one-rank Knight immobile dual-defence ability.
+
+Args:
+    profiles (any): Authenticated, personally quest-awarded Knight.
+    service (any): Authoritative class-trainer skill purchase service.
+
+Returns:
+    nil: Confirms source-level defence purchased and saved only by owner.
+]]
+local function verify_last_bastion(profiles: any, service: any)
+    local skill_id = "OathguardLastBastion"
+    local result = service:learn_trainer_skill(USER_ID, skill_id)
+    check(result.ok and result.rank == 1,
+        "Knight trainer must sell separate C4 ultimate defence "
+            .. tostring(result.reason))
+    check(profiles:get_character(USER_ID).Progression
+        .Skills[skill_id].PurchasedRank == 1,
+        "Knight persists separate ultimate defence rank")
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -439,6 +460,7 @@ local function award(profiles: any, pending: any)
         "Three source-level-28 personal recovery ranks remain purchased")
     verify_shield_mastery(profiles, service)
     verify_defensive_stance(profiles, service)
+    verify_last_bastion(profiles, service)
     check(profiles:mutate(USER_ID, function(profile: any)
         profile.Characters.Slot1.Level = 20
     end), "Knight first acquires drain at source level twenty")
