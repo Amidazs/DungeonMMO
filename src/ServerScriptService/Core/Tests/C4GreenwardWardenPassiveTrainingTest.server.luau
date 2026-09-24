@@ -23,6 +23,7 @@ local Classes = require(Shared.ClassProgressionDefinitions)
 local Passives = require(Shared.PassiveSkillEffects)
 local Schema = require(Shared.ProfileSchema)
 local Coverage = require(Shared.C4Level30LaunchCoverage)
+local Combat = require(RS.Combat.Shared.SkillDefinitions)
 
 local OWNER_ID = 848821
 local BRANCH_ID = "ElvenKnight"
@@ -349,6 +350,9 @@ Returns:
     nil: Produces real owned equipment without extra profession slots.
 ]]
 local function verify_crafting(profiles: any)
+    check(profiles:mutate(OWNER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 28
+    end), "Previously purchased rank-two creation remains level-28 gated")
     local owner = assert(profiles:get_character(OWNER_ID))
     check(CraftRules.can_make_warden_common(
         owner, "Blacksmithing", 1
@@ -444,6 +448,16 @@ local function main()
         "No incomplete Warden source family becomes release-certified")
     verify_equipment(profiles, Equipment.new(profiles, "Base"))
     verify_crafting(profiles)
+    local recovery = assert(Combat.get_for_rank(
+        "GreenwardWardenBleedRecovery", 1
+    ))
+    check(recovery.CURE_BLEED_TIER == 1
+        and (recovery.CURE_POISON_TIER or 0) == 0
+        and recovery.SELF_ONLY == true
+        and recovery.TOTAL_HEAL == 0
+        and recovery.MANA_COST > 0
+        and recovery.COOLDOWN_SECONDS > 0,
+        "Paid bleed cure cannot heal, poison-cure, or target allies")
     verify_forgeries(profiles)
     print(("[Greenward Warden Passives] PASS: %d assertions")
         :format(assertions))

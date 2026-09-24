@@ -105,10 +105,11 @@ local function main()
         "Elven Knight must keep its independently sourced 56 ranks")
     check(elven_knight.TrainerMappedRankEntries == 56
         and elven_knight.MissingRankScheduleEntries == 0
-        and not elven_knight.SourceRankScheduleMapped
+        and elven_knight.SourceRankScheduleMapped
+        and not elven_knight.ExactSourceRankCoverageCertified
         and not elven_knight.LaunchSkillCatalogueReady
         and elven_knight.Status == "RankScheduleMappedEffectsPending",
-        "Source-only Elven Knight cannot count as a playable Scout")
+        "All Warden ranks map independently, without release certification")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")

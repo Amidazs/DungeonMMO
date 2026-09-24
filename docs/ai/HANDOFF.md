@@ -1,3 +1,11 @@
+## v2.32 focused tests corrected
+
+The v2.32 Elven Knight source test now expects independently mapped
+56/56 ranks without release acceptance. The rank-purchase/crafting
+fixture restores level 28 after the level-24 bleed purchase and asserts
+self-only non-healing bleed cure costs and tier. Both remain Studio-pending;
+build success alone does not certify functional tests.
+
 ## 24 September 2026 — v2.32 Elven Knight source rank map 56/56
 
 [Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_32_Elven_Knight_Bleed_Recovery_20260924.md). A real tagged CaptainSlash positive, unblocked HP hit can now apply bounded, non-stacking server-owned player bleed through PlayerBleedStatusService; genuine Warden only, purchased level24 GreenwardWardenBleedRecovery mana/cooldown clears only owner active bleed and cancels old ticks. No client-attribute cure. All 56/56 original C4 source training rank SCHEDULES now mapped, 5 of 18 first-transfer paths fully rank-scheduled, 0 mechanically/release certified. Full physical Captain bleed/cure Play and all prior Warden focused source tests still need Studio execution. No main merge/publish/production saves/animation edits.

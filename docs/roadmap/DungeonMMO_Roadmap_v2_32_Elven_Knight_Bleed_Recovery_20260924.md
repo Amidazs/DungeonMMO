@@ -43,3 +43,15 @@ needed before claiming the new status effect complete.
 
 No main merge, public publish, production DataStore mutations
 or separate animation-worktree edits. GitHub-only source/doc edits.
+
+## Focused test corrections before Studio execution
+
+The launch audit now expects `SourceRankScheduleMapped=true` for the
+new 56/56 Warden record, while independently requiring
+`ExactSourceRankCoverageCertified=false` and
+`LaunchSkillCatalogueReady=false`. The focused training fixture
+restores character level 28 after independently buying the level-24
+Bleed Recovery, before testing level-28 material crafting. It also
+verifies the Bleed Recovery rank's self-only, mana/cooldown,
+non-healing and non-poison-cleansing source definitions.
+All changes are authored and await actual Studio execution.
