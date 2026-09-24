@@ -74,6 +74,9 @@ local IronvowAccuracyToggleService = require(
 )
 -- Passive source rank recovery is scheduled by its own server heartbeat.
 require(script.Parent:WaitForChild("IronvowHealthRecoveryService"))
+local IronvowEnduranceSurgeService = require(
+    script.Parent:WaitForChild("IronvowEnduranceSurgeService")
+)
 local ScoutAccuracyToggleService = require(
     script.Parent:WaitForChild("ScoutAccuracyToggleService")
 )
@@ -2936,6 +2939,43 @@ local function handle_skill_request(
         end
     end
 
+    if skill_definition.KIND == "HealthSurge" then
+        if not IronvowEnduranceSurgeService.can_activate(player) then
+            CombatValidationService.emit(
+                player, "HEALTH_SURGE", "REJECT",
+                "AlreadyActive", record.sequence_id
+            )
+            return
+        end
+        if not ManaService.try_spend(
+            player, skill_definition.MANA_COST
+        ) then
+            CombatValidationService.emit(
+                player, "HEALTH_SURGE", "REJECT",
+                "Mana", record.sequence_id
+            )
+            return
+        end
+        if IronvowEnduranceSurgeService.activate(
+            player, skill_definition, rank
+        ) then
+            SkillCooldownService.start(
+                player, requested_skill_id,
+                skill_definition.COOLDOWN_SECONDS
+            )
+            CombatValidationService.emit(
+                player, "HEALTH_SURGE", "APPLIED",
+                requested_skill_id, record.sequence_id
+            )
+        else
+            CombatValidationService.emit(
+                player, "HEALTH_SURGE", "REJECT",
+                "InvalidOwner", record.sequence_id
+            )
+        end
+        return
+    end
+
     if skill_definition.KIND == "Support" then
         if skill_definition.ID ~= "Mend" then
             CombatValidationService.emit(
@@ -3561,6 +3601,7 @@ local function handle_character_death(
     stop_dodge_movement(player)
     stop_attack_step(player)
     DefenseService.clear(player)
+    IronvowEnduranceSurgeService.stop(player)
     StaminaService.set_regen_paused(player, false)
     SkillCooldownService.remove_owner(player)
 
@@ -3641,6 +3682,7 @@ local function on_character_added(
     ScoutAccuracyToggleService.stop(player)
     IronvowCriticalToggleService.stop(player)
     IronvowAccuracyToggleService.stop(player)
+    IronvowEnduranceSurgeService.stop(player)
     StaminaService.reset_player(player)
     ManaService.reset_player(player)
     ProgressionRuntimeState.apply_max_health(player)
@@ -3719,6 +3761,22 @@ ScoutCriticalToggleService.set_authorizer(function(
     ) ~= false
 end)
 
+IronvowEnduranceSurgeService.set_recalculator(function(player: Player)
+    ProgressionRuntimeState.apply_max_health(player)
+end)
+IronvowEnduranceSurgeService.set_authorizer(function(
+    player: Player, record: any
+): boolean
+    local usable = ProgressionRuntimeState.is_skill_usable(
+        player.UserId, record.Definition.ID
+    )
+    return usable and ProgressionRuntimeState.get_skill_rank(
+        player.UserId, record.Definition.ID
+    ) == record.Rank and player:GetAttribute(
+        CombatConfig.DUNGEON_COMBAT_ALLOWED_ATTRIBUTE
+    ) ~= false
+end)
+
 IronvowAccuracyToggleService.set_authorizer(function(
     player: Player, toggle_record: any
 ): boolean
@@ -3776,6 +3834,7 @@ Players.PlayerRemoving:Connect(function(player)
     ScoutAccuracyToggleService.stop(player)
     IronvowCriticalToggleService.stop(player)
     IronvowAccuracyToggleService.stop(player)
+    IronvowEnduranceSurgeService.stop(player)
     StaminaService.remove_player(player)
     ManaService.remove_player(player)
     SkillCooldownService.remove_owner(player)
