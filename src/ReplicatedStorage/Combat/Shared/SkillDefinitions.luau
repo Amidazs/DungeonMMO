@@ -1589,6 +1589,43 @@ local IRONVOW_BATTLE_CALL = specialize_skill(
     }
 )
 
+-- The Knight's seven C4 source-banded drain ranks reuse the already
+-- authenticated magic projectile and 20%-of-dealt-damage owner heal.
+-- Power/MP per rank follow the recorded C4 reference; actual Roblox
+-- target, casting, scaling and animation still need equivalence checks.
+local OATHGUARD_UMBRAL_SIPHON = specialize_skill(
+    WIND_STRIKE, "OathguardUmbralSiphon", "Umbral Siphon", {
+        MANA_COST = 12,
+        COOLDOWN_SECONDS = 4,
+        WIND_UP_SECONDS = 3,
+        BASE_DAMAGE = 20,
+        LIFE_DRAIN_FRACTION = 0.20,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BASE_DAMAGE = 20, MANA_COST = 12,
+            }),
+            [2] = table.freeze({
+                BASE_DAMAGE = 22, MANA_COST = 13,
+            }),
+            [3] = table.freeze({
+                BASE_DAMAGE = 24, MANA_COST = 14,
+            }),
+            [4] = table.freeze({
+                BASE_DAMAGE = 26, MANA_COST = 15,
+            }),
+            [5] = table.freeze({
+                BASE_DAMAGE = 28, MANA_COST = 15,
+            }),
+            [6] = table.freeze({
+                BASE_DAMAGE = 29, MANA_COST = 17,
+            }),
+            [7] = table.freeze({
+                BASE_DAMAGE = 31, MANA_COST = 17,
+            }),
+        }),
+    }
+)
+
 -- Earned Knight stance uses server-owned temporary PhysicalGuard.
 -- The caster pays real stamina and receives no magical resistance.
 local OATHGUARD_STEADFAST_STANCE = specialize_skill(
@@ -1868,6 +1905,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
     OathguardSteadfastStance = OATHGUARD_STEADFAST_STANCE,
+    OathguardUmbralSiphon = OATHGUARD_UMBRAL_SIPHON,
     OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
