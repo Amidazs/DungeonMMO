@@ -13,7 +13,7 @@ export type MeleeSkillDefinition = {
     HITBOX: {SIZE: Vector3, FORWARD_OFFSET: number, SAMPLE_COUNT: number},
     BASE_DAMAGE: number, STAGGER_SECONDS: number,
     MANA_COST: number?, MAX_TARGETS: number?, SOURCE_POWER: number?,
-    TAUNT_BONUS_THREAT: number?,
+    NO_STAGGER_REFRESH: boolean?, TAUNT_BONUS_THREAT: number?,
     MOVEMENT_SCALE: {WIND_UP: number, ACTIVE: number, RECOVERY: number},
     RANKS: {[number]: any}?,
 }
@@ -1629,6 +1629,75 @@ local IRONVOW_CRESCENT_SWEEP = specialize_skill(
     }
 )
 
+-- Source C4 Warrior Stun Attack family: single-target blunt damage
+-- plus non-refreshable shock, with nine source MP/power ranks.
+-- Original source "cannot be stunned again while dazed" is enforced
+-- for this ability by checking the existing authoritative stagger.
+-- 1.1s PvE shock and power*0.3 Roblox HP are provisional adapters,
+-- NOT original C4 crowd-control duration or damage formula.
+local IRONVOW_STONEBREAKER = specialize_skill(
+    IRON_CLEAVE, "IronvowStonebreaker", "Stonebreaker", {
+        STAMINA_COST = 0, MANA_COST = 22,
+        COOLDOWN_SECONDS = 9, MAX_TARGETS = 1,
+        FORWARD_STEP_STUDS = 0.4,
+        REACH_STUDS = 5.2, ARC_DEGREES = 75,
+        HITBOX = table.freeze({
+            SIZE = Vector3.new(6.0, 5.0, 5.2),
+            FORWARD_OFFSET = 2.6,
+            SAMPLE_COUNT = 3,
+        }),
+        BASE_DAMAGE = 9, SOURCE_POWER = 30,
+        STAGGER_SECONDS = 1.1, NO_STAGGER_REFRESH = true,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                SOURCE_POWER = 30, MANA_COST = 22,
+                BASE_DAMAGE = 9,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [2] = table.freeze({
+                SOURCE_POWER = 33, MANA_COST = 22,
+                BASE_DAMAGE = 9.9,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [3] = table.freeze({
+                SOURCE_POWER = 35, MANA_COST = 22,
+                BASE_DAMAGE = 10.5,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [4] = table.freeze({
+                SOURCE_POWER = 41, MANA_COST = 23,
+                BASE_DAMAGE = 12.3,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [5] = table.freeze({
+                SOURCE_POWER = 44, MANA_COST = 24,
+                BASE_DAMAGE = 13.2,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [6] = table.freeze({
+                SOURCE_POWER = 48, MANA_COST = 25,
+                BASE_DAMAGE = 14.4,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [7] = table.freeze({
+                SOURCE_POWER = 55, MANA_COST = 27,
+                BASE_DAMAGE = 16.5,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [8] = table.freeze({
+                SOURCE_POWER = 59, MANA_COST = 29,
+                BASE_DAMAGE = 17.7,
+                STAGGER_SECONDS = 1.1,
+            }),
+            [9] = table.freeze({
+                SOURCE_POWER = 64, MANA_COST = 30,
+                BASE_DAMAGE = 19.2,
+                STAGGER_SECONDS = 1.1,
+            }),
+        }),
+    }
+)
+
 local IRONVOW_BATTLE_CALL = specialize_skill(
     ELVEN_SCOUT_BATTLE_FOCUS, "IronvowBattleCall",
     "Ironvow Battle Call", {
@@ -2016,6 +2085,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GreenwardCalmingArrow = GREENWARD_CALMING_ARROW,
     IronvowDrivingStrike = IRONVOW_DRIVING_STRIKE,
     IronvowCrescentSweep = IRONVOW_CRESCENT_SWEEP,
+    IronvowStonebreaker = IRONVOW_STONEBREAKER,
     IronvowBattleCall = IRONVOW_BATTLE_CALL,
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
