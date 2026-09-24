@@ -1,4 +1,41 @@
-**Current DungeonMMO backend: v2.20 — two genuinely paid Warrior common-craft source tiers, material-backed inventory transactions and revocation anti-duplication PASS; 6 original Warrior utility ranks remain.**
+**Current DungeonMMO class backend: v2.23 — Warrior 62/62 historical level-30 training rows mapped; all six final utility rows focused-tested and actual owner HP surge/recovery Play PASS.**
+[Current full roadmap](
+DungeonMMO_Roadmap_v2_23_Warrior_Level30_Rank_Mapping_20260924.md)
+and [exact executed test record](
+../testing/ironvow-final-utilities-v2-23-20260924.md).
+The personally earned Ironvow now has critical MP
+stance (three ranks), MP accuracy stance, passive
+HP recovery and paid active max-HP surge (one
+rank each), beyond its earlier trained weapon,
+control, profession and equipment skills. Fresh
+disposable Base/Dungeon Rojo builds PASS.
+Actual quest/trainer/in-memory save/foundation
+**31/198/160 assertions PASS**, strict source
+rank audit **27 PASS**. Real-client critical and
+accuracy toggle damage/evasion/MP Play previously
+passed. The first new recovery Play failed due
+to a test-only detached Player.Character; the
+test now spawns and waits for a world-parented
+real owner and recovery Play PASSED, without
+weakening the actual server owner/health checks.
+The new client hotbar surge Play PASSED: 13 MP,
+108->118.8 owner maximum HP, single 11.88 HP heal,
+no immediate stack/recast, incoming hostile 100 HP
+melee still applies, and revoked/copy-class
+ability cleanup succeeds. Historical rank mapping:
+Warrior **62/62**, Knight **55/55**, Human Rogue
+**59/59**, Elf Scout **77/77**. These are *training
+schedules*, not mathematically identical C4
+combat mechanics, natural saved cross-place
+acceptance or full release. Other **14/18** original
+first-transfer source inventories and starter
+levels 1–19 remain; **0/18** release-certified.
+Earlier Marauder/Captain shield chip tests do not
+establish every boss/world-boss damage path.
+No main merge, Roblox publishing, production saves
+or parallel animation edits.
+
+**Previous DungeonMMO backend: v2.20 — Warrior common crafting and transaction denial PASS; six utility ranks were then unmapped.**
 [Current roadmap](
 DungeonMMO_Roadmap_v2_20_Warrior_Common_Craft_20260924.md)
 and [precise executed tests](
