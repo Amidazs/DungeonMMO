@@ -103,6 +103,13 @@ function EquipmentRules.validate(
     then
         return result(false, "KnightEquipmentExpertiseRequired")
     end
+    if item.RequiredSkillId == "IronvowEquipmentExpertise"
+        and (item.Grade ~= "D" or item.RequiredSkillRank ~= 1
+            or not PassiveSkillEffects
+                .has_ironvow_equipment_expertise(character))
+    then
+        return result(false, "WarriorEquipmentExpertiseRequired")
+    end
 
     return result(true, nil)
 end
