@@ -30,7 +30,9 @@ function BlockedHitDamageRules.resolve(
     source_kind: string,
     blocked: boolean?
 ): number
-    if blocked ~= true or source_kind ~= "EnemyMelee" then
+    if blocked ~= true or (
+        source_kind ~= "EnemyMelee" and source_kind ~= "EnemyBow"
+    ) then
         return defended_damage
     end
     if incoming_damage <= 0 or defended_damage <= 0 then
