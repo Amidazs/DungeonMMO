@@ -1,3 +1,23 @@
+## 25 September 2026 — v2.54 independent C4 Scout heal source migration
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_54_Elven_Scout_C4_Heal_Migration_Plan_20260925.md).
+Added read-only C4ScoutHealMigrationPlan for original skill58 ranks
+4–12 (creative Scout-only planned ranks1–9). It resolves original SP,
+self-heal power, split MP, cast/reuse and level20/24/28 brackets from
+pinned source tree/XML, checks authentic earned GreenwardScout identity
+and level<=30 and attaches source-only plans to the nine Scout preview
+rows. Rows REMAIN Missing with no live skill ID, trainer, cast or MP
+transaction; no Warden skill borrowing or made-up HP-power conversion.
+Extended C4NineClassAuthenticatedSkillPreviewTest with nine exact
+source comparisons, level bracket and cross-class denial regression.
+**No Studio/Rojo tests tonight:** owner says Remote Desktop Commander
+offline, test only after owner confirms availability. Existing v2.53
+500-pass evidence is for earlier commit, not this v2.54. Next implement
+original source MP/HP healing formula and separate purchased Scout
+skill, then address remaining 13 row gaps. Current 476 total/
+454 candidate/22 missing source rows not relabelled prematurely.
+No main merge/publish/production saves/animation edits.
+
 ## 25 September 2026 — v2.53 all-nine-class original skill source from authenticated runtime
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_53_C4_Authenticated_Nine_Class_Skill_Source_20260925.md); [evidence](../testing/c4-authenticated-nine-class-source-skill-preview-v2-53-20260925.md). Added read-only C4AuthenticatedSkillSourcePreview + ProgressionRuntimeState.get_c4_source_skill_tree(user_id), using actual complete original server-owned owner and mentor receipt. Returns historical original SP, split MP costs, source target/type/reuse/cast and Effects/Modifiers/Conditions only for class/level-accessible source rows; CreativeLinkStatus Candidate vs Missing, never parity. Focused unpublished Base Studio PASS 500 assertions over all 476 original nine-path rows (454 candidate,22 explicit missing), Base/Dungeon Rojo both PASS. Scout historical Elemental Heal skill58 rank4 was checked original power95/53MP/TARGET_SELF and still Missing; level20 excludes Scout skill rank7 until lvl24. This is NOT a live HP/MP/CP, C4 item/active skill economy, ownership, source combat balance migration. Next close Scout heal+remaining gaps and prepare coherently integrated nine-class profiles/gear/HPMP/CP/HUD/skills with anti-exploit tests. No main merge/publish/production saves/animation edits.

@@ -8,6 +8,7 @@ local Primary = require(Shared.C4PrimaryStatReference)
 local Tree = require(Shared.C4Level30SkillTreeSource)
 local Effects = require(Shared.C4SkillEffectSource)
 local Map = require(Shared.C4CreativeSkillSourceMap)
+local ScoutHealPlan = require(Shared.C4ScoutHealMigrationPlan)
 
 local C4AuthenticatedSkillSourcePreview = {}
 
@@ -33,6 +34,9 @@ local function inspect_row(scope_id: string, row: any): any
     local sets = effect.Sets
     local initial_mp = sets.mpInitialConsume or 0
     local ongoing_mp = sets.mpConsume or 0
+    local planned_scout_heal = if scope_id == "ElvenScout"
+        and row.SkillId == 58
+        then ScoutHealPlan.get_rank(row.SkillLevel) else nil
     return {
         SourceSkillId = row.SkillId,
         SourceSkillName = row.SkillName,
@@ -53,6 +57,9 @@ local function inspect_row(scope_id: string, row: any): any
         CreativeSkillId = link.CreativeSkillId,
         CreativeSkillRank = link.CreativeRank,
         MissingReason = link.Reason,
+        -- The nine Scout self-heal gaps have a separate source contract,
+        -- but no purchased rank or real original-formula executor yet.
+        SourceOnlyMigrationPlan = planned_scout_heal,
         ExactC4EffectCertified = false,
         LiveIntegrated = false,
     }

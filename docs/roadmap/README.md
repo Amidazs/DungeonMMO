@@ -1,3 +1,15 @@
+**v2.54 GitHub-only, STUDIO PENDING:** [current roadmap](
+DungeonMMO_Roadmap_v2_54_Elven_Scout_C4_Heal_Migration_Plan_20260925.md).
+Nine independent Elven Scout source-only self-heal contracts now preserve
+the pinned C4 rank 4–12 SP/MP/power/self-target/reuse/cast fields and
+original 20/24/28 learning brackets in the authenticated Scout preview.
+These historical rows intentionally remain 9 of the 22 explicit
+unimplemented skill rows until live C4 HP/MP/heal formula, separate
+Scout trainer/rank and real executor exist. No live skills, HP, MP or
+damage were changed. v2.53's 500-assertion Studio result belongs to
+its earlier candidate only; v2.54 changes await testing tomorrow.
+No main merge/publish/production saves.
+
 **Current v2.53 authenticated nine-path C4 source skills:** [roadmap](DungeonMMO_Roadmap_v2_53_C4_Authenticated_Nine_Class_Skill_Source_20260925.md), [500-assertion unpublished Studio evidence](../testing/c4-authenticated-nine-class-source-skill-preview-v2-53-20260925.md). Current server-owned race/class/mentor state now gates read-only C4 original rank/power/MP/SP/target/source-effects preview across all 476 nine-path learning rows: 454 candidate creative links, 22 explicit gaps including nine Scout self-heal ranks. Both disposable Rojo builds PASS; 500 source assertions PASS. Not live skill ownership, source HP/MP/CP or final C4 gameplay balance. v2.51 46-assertion pinned sample original gear and v2.52 31-assertion original vitals source tests separately passed. No main merge/publish/production saves.
 
 **Current v2.52 all-nine-class C4 source rollout:** [roadmap](DungeonMMO_Roadmap_v2_52_C4_Nine_Class_Authoritative_Stat_Preview_20260925.md) and [31-assertion Studio evidence](../testing/c4-nine-class-authoritative-runtime-stat-preview-v2-52-20260925.md). ProgressionRuntimeState.get_c4_source_vitals now reads nine-path original level-30 HP/MP/CP from authenticated server-owned identities and personally earned first-transfer receipts, denying copied classes and unreviewed level31. Focused unpublished Studio PASS 31; both Base/Dungeon Rojo builds PASS. This is NOT live Humanoid health/mana/CP, full equipment stats or completed C4 skill effects. v2.51 original 9-item gear sample remains source-only, 454/476 skill mapping links are candidate, 22 gaps. No main merge/publish/production saves.

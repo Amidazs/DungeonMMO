@@ -7,6 +7,9 @@ local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local Schema = require(Shared.ProfileSchema)
 local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Stages = require(Shared.C4OriginalFirstTransferQuestStages)
+local ScoutHeal = require(Shared.C4ScoutHealMigrationPlan)
+local Source = require(Shared.C4SkillEffectSource)
+local Tree = require(Shared.C4Level30SkillTreeSource)
 
 local OWNER_ID = 938188
 local checks = 0
@@ -182,6 +185,76 @@ local function check_heal_source_and_denials()
 end
 
 --[[
+Checks independent Scout self-heal source-rank contracts and class gates.
+
+Args:
+    None.
+
+Returns:
+    nil: Nine C4 ranks remain source-only until a real executor exists.
+]]
+local function check_scout_heal_migration_plan()
+    local original_rows = Tree.find_skill("ElvenScout", 58)
+    check(#original_rows == 9,
+        "Scout has nine separate original first-transfer heal ranks")
+    for _, row in ipairs(original_rows) do
+        local planned = assert(ScoutHeal.get_rank(row.SkillLevel))
+        local effect = assert(Source.get_rank(58, row.SkillLevel))
+        check(planned.SourceLearnLevel == row.MinLevel
+            and planned.SourceSP == row.SP
+            and planned.PlannedCreativeRank == row.SkillLevel - 3
+            and planned.SourcePower == effect.Effects[1].power
+            and planned.SourceTotalMP
+                == effect.Sets.mpInitialConsume
+                    + effect.Sets.mpConsume
+            and planned.SourceTarget == "TARGET_SELF",
+            "Scout rank preserves real C4 SP, MP, power and targeting")
+        check(planned.SourceOnly and not planned.LiveLearnable
+            and not planned.LiveCastable
+            and not planned.ExactC4HealFormulaCertified,
+            "A source contract must not grant free live healing")
+    end
+    check(ScoutHeal.get_rank(3) == nil
+        and ScoutHeal.get_rank(13) == nil,
+        "Scout source ranks must stay separate from starter and future")
+    for _, bracket in ipairs({
+        {20, 3}, {24, 6}, {28, 9}, {30, 9},
+    }) do
+        seed("Elf", "GreenwardScout", bracket[1])
+        local character = assert(Runtime.get_character(OWNER_ID))
+        local plan, reason = ScoutHeal.for_character(character)
+        check(plan ~= nil and reason == nil
+            and #plan.Rows == bracket[2]
+            and not plan.LiveCastable,
+            "Earned Scout sees only its current C4 source heal ranks")
+        local preview = assert(Runtime.get_c4_source_skill_tree(OWNER_ID))
+        for _, original in ipairs(plan.Rows) do
+            local row = assert(find_row(
+                preview, 58, original.SourceSkillRank
+            ))
+            check(row.CreativeLinkStatus == "Missing"
+                and row.CreativeSkillId == nil
+                and row.SourceOnlyMigrationPlan == original,
+                "Scout source plan does not become a fake live candidate")
+        end
+    end
+    seed("Elf", "GreenwardWarden", 30)
+    local warden = assert(Runtime.get_character(OWNER_ID))
+    check(select(1, ScoutHeal.for_character(warden)) == nil,
+        "Scout cannot borrow Warden's independent heal entitlement")
+    local warden_preview = assert(
+        Runtime.get_c4_source_skill_tree(OWNER_ID)
+    )
+    check(assert(find_row(
+        warden_preview, 58, 4
+    )).SourceOnlyMigrationPlan == nil,
+        "Warden source healing never inherits Scout's planned family")
+    Runtime.clear_character(OWNER_ID)
+    check(select(1, ScoutHeal.for_character({})) == nil,
+        "Missing original class identity cannot inspect Scout plans")
+end
+
+--[[
 Executes all nine authenticated historical skill-source trees.
 
 Args:
@@ -193,6 +266,7 @@ Returns:
 local function main()
     check_nine_class_trees()
     check_heal_source_and_denials()
+    check_scout_heal_migration_plan()
     print(("[C4 Nine-Class Skills] SOURCE_ONLY_PASS: %d assertions "
         .. "rows=476 candidates=454 gaps=22 live=false")
         :format(checks))
