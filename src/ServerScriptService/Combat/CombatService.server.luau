@@ -1225,12 +1225,13 @@ local function enter_active(
                 sequence_id
             )
         else
-            -- Blunt weapons use the same prototype melee executor and
-            -- hitbox timing as swords until their own models/animations
-            -- are authored. They are still a separate equipment family.
+            -- Sword and blunt use current prototype timing; a genuine
+            -- Polearm receives its own long forward fan and per-swing cap.
+            -- A polearm is two-handed and cannot equip an OffHand shield.
             local is_melee_weapon =
                 weapon_tags.OneHandedSword == true
                 or weapon_tags.OneHandedBlunt == true
+                or weapon_tags.Polearm == true
             local melee_definition = attack_definition
             local base_damage =
                 CombatConfig.PROTOTYPE_WEAPON.BASE_DAMAGE
@@ -1239,7 +1240,27 @@ local function enter_active(
                             player.UserId
                         )
 
-            if not is_melee_weapon then
+            if weapon_tags.Polearm == true then
+                melee_definition = {}
+                for key, value in pairs(attack_definition) do
+                    melee_definition[key] = value
+                end
+                melee_definition.FORWARD_STEP_STUDS = math.min(
+                    tonumber(attack_definition.FORWARD_STEP_STUDS) or 0,
+                    0.70
+                )
+                melee_definition.REACH_STUDS = 7.0
+                melee_definition.ARC_DEGREES = 130
+                melee_definition.MAX_TARGETS = if
+                    ProgressionRuntimeState.get_skill_rank(
+                        player.UserId, "IronvowPolearmTraining"
+                    ) >= 1 then 10 else 5
+                melee_definition.HITBOX = {
+                    SIZE = Vector3.new(10.0, 5.0, 7.0),
+                    FORWARD_OFFSET = 3.5,
+                    SAMPLE_COUNT = 3,
+                }
+            elseif not is_melee_weapon then
                 melee_definition = {}
 
                 for key, value in pairs(attack_definition) do
