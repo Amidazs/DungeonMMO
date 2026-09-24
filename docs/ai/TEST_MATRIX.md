@@ -1,3 +1,33 @@
+## 24 September 2026 — latest v2.15 Warrior Sword/Blunt verification
+
+[Current v2.15 roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_15_Warrior_Sword_Blunt_20260924.md)
+and [exact test record](
+../testing/ironvow-sword-blunt-mastery-v2-15-20260924.md).
+Stable saved `IronvowBladeTraining` now grants its earned,
+purchased rank bonus to real server-equipped Sword **or**
+Blunt; dagger, bow, empty slot and forged Fighter do not
+receive it. Genuine Warrior trainer and quest/source ranks
+20/24/28/28 retained. Fresh disposable Base/Dungeon
+Rojo PASS. Warrior Quest/Award/Foundation 31/81/60
+assertions PASS. Unpublished Dungeon Play on real NPC HP:
+both Sword and Blunt 100-base hits 110 untrained to
+115.6 at rank4; all tests and forged-denial marker PASS.
+Fresh strict C4 level30 audit 27 PASS; Warrior **31/62**
+training rows mapped, **31 missing**; Knight **55/55**
+rank schedules mapped, neither release certified and
+full original C4 balance/stat/formula parity NOT verified.
+All 14 other original first-transfer source catalogues,
+starter 1–19, natural full Base→Dungeon→Base saved
+acceptance and broad boss/worldboss anti-block exploit
+audit remain outstanding. C4 source trained ranks are
+not equivalent to a green game-wide release. Earlier
+v2.12 Marauder/Captain real blocked HP chip proof
+remains current but not evidence for other enemy dispatch.
+No `main` merge, Roblox publish, production saves or
+parallel humanoid/quadruped changes. Permanent work via
+GitHub, disposable builds/Studio only via desktop.
+
 ## 24 September — current backend v2.14, Knight common craft and anti-duplication
 
 [Latest roadmap](
