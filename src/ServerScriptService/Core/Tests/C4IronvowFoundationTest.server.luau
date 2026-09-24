@@ -59,7 +59,7 @@ local function forged_character(): any
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
         "IronvowCriticalStance", "IronvowAccuracyStance",
-        CALL, LIGHT, HEAVY,
+        "IronvowFieldRecovery", CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -111,6 +111,11 @@ local function main()
     check_ranks("IronvowCommonItemCreation", {20, 28})
     check_ranks("IronvowCriticalStance", {20, 24, 28})
     check_ranks("IronvowAccuracyStance", {24})
+    check_ranks("IronvowFieldRecovery", {24})
+    local health = assert(Progression.get("IronvowFieldRecovery"))
+    check(health.Kind == "Passive"
+        and health.HPRegenPerSecond == 1.1,
+        "Warrior source HP recovery is actual bounded passive regeneration")
     local accuracy = assert(Combat.get_for_rank(
         "IronvowAccuracyStance", 1
     ))
@@ -221,7 +226,7 @@ local function main()
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
         "IronvowCriticalStance", "IronvowAccuracyStance",
-        CALL, LIGHT, HEAVY,
+        "IronvowFieldRecovery", CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
@@ -239,6 +244,8 @@ local function main()
         unearned, "IronvowPolearmTraining"
     ) == 0 and Passives.polearm_extra_targets(unearned) == 0,
         "Unearned polearm rank gives neither damage nor extra targets")
+    check(Passives.ironvow_health_recovery(unearned) == 0,
+        "Forged Fighter cannot gain free Warrior regenerative healing")
     check(not Passives.has_ironvow_equipment_expertise(unearned),
         "Forged Warrior cannot equip D-grade from an unearned rank")
     check(Passives.fighter_armor_reduction(unearned) == 0,
