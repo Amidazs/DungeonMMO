@@ -97,15 +97,23 @@ local function main()
     local elven_knight = assert(Coverage.for_branch("ElvenKnight"))
     check(elven_knight.SourceClass == "Elven Knight"
         and elven_knight.CurrentCareerId == nil
-        and elven_knight.SourceInventoryAuditedThroughCap == false
-        and elven_knight.TrainerMappedRankEntries == 0
-        and elven_knight.SourceRankScheduleMapped == false
-        and elven_knight.LaunchSkillCatalogueReady == false,
-        "Do not count the unimplemented Elven Knight as a Scout")
+        and elven_knight.SourceInventoryAuditedThroughCap == true
+        and elven_knight.SourceRankEntriesThroughCap == 56
+        and elven_knight.SourceRankEntriesByLevel[20] == 18
+        and elven_knight.SourceRankEntriesByLevel[24] == 18
+        and elven_knight.SourceRankEntriesByLevel[28] == 20,
+        "Elven Knight must keep its independently sourced 56 ranks")
+    check(elven_knight.TrainerMappedRankEntries == 0
+        and elven_knight.MissingRankScheduleEntries == 56
+        and not elven_knight.SourceRankScheduleMapped
+        and not elven_knight.LaunchSkillCatalogueReady
+        and elven_knight.Status
+            == "SourceRanksAuditedClassUnimplemented",
+        "Source-only Elven Knight cannot count as a playable Scout")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
-    check(report.SourceAuditedBranches == 4
+    check(report.SourceAuditedBranches == 5
         and report.RankSchedulesMappedBranches == 4
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,

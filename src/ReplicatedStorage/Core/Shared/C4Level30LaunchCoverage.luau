@@ -5,6 +5,7 @@ local Shared = script.Parent
 local Branches = require(Shared.C4FirstTransferBranches)
 local ScoutInventory = require(Shared.C4ScoutSkillInventory)
 local WarriorKnight = require(Shared.C4WarriorKnightLevel30Sources)
+local ElvenKnight = require(Shared.C4ElvenKnightLevel30Sources)
 local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Classes = require(Shared.ClassProgressionDefinitions)
 local Skills = require(Shared.SkillProgressionDefinitions)
@@ -188,6 +189,8 @@ function Coverage.for_branch(branch_id: string): any?
         then ScoutInventory.get("Human")
         elseif branch_id == "ElvenScout"
         then ScoutInventory.get("Elf")
+        elseif branch_id == "ElvenKnight"
+        then ElvenKnight.get()
         else WarriorKnight.get(branch_id)
     local levels: {[number]: number} = {}
     local total: number? = nil

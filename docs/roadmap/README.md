@@ -1,3 +1,6 @@
+**Current class backend: v2.25 — Elven Knight's 56 historical level-20/24/28 C4 training rows now inventoried, 0 mapped/playable.** [Source inventory and next implementation](
+docs/roadmap/DungeonMMO_Roadmap_v2_25_Elven_Knight_Source_Inventory_20260924.md). Human Fighter has three first transfers, Elven Fighter has two: four of their five rank schedules mapped, distinct Elven Knight still missing. Across all 18 first transfers, source inventories 5/18, rank schedules mapped 4/18, full mechanical/release certified 0/18. New Elf Knight audit assertions and v2.23 stored-avatar Play regressions still await Studio execution. No public publish or main merge.
+
 **Current class-tree checkpoint: v2.24 — Human Fighter has three first-transfer choices, Elven Fighter has two; Elven Knight is the unimplemented fifth fighter path.**
 [Class-tree checkpoint](docs/roadmap/DungeonMMO_Roadmap_v2_24_Human_Elven_Fighter_Path_Gap_20260924.md) records race-specific base Fighter source skills, keeps Greenward Scout distinct from the proposed Elven Knight/Warden, and does not mislabel Human Warrior as a level-1 starter. New focused coverage assertions are written but not yet Studio-executed. v2.23's stored-avatar security Play checks also remain pending.
 
