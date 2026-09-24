@@ -189,7 +189,7 @@ function PassiveSkillEffects.damage_bonus(
         return 0
     end
     if skill_id == "IronvowBladeTraining"
-        and not equipped_weapon_has_tag(character, "OneHandedSword")
+        and not equipped_sword_or_blunt(character)
     then
         return 0
     end
