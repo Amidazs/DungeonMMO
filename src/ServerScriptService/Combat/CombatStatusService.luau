@@ -13,6 +13,10 @@ local BUFFS = table.freeze({
         Magnitude = "C4PhysicalGuardBonus",
         ExpiresAt = "C4PhysicalGuardExpiresAt",
     }),
+    Fortress = table.freeze({
+        Magnitude = "C4FortressDualDefenseBonus",
+        ExpiresAt = "C4FortressDualDefenseExpiresAt",
+    }),
     Evasion = table.freeze({
         Magnitude = "C4EvasionBonus",
         ExpiresAt = "C4EvasionExpiresAt",
@@ -122,6 +126,15 @@ function CombatStatusService.apply_self(
     if not humanoid or humanoid.Health <= 0 or not character.Parent then
         return false
     end
+    local fortress = definition.BUFF_KIND == "Fortress"
+    local root = if fortress then character:FindFirstChild(
+        "HumanoidRootPart"
+    ) else nil
+    if fortress and (not root or not root:IsA("BasePart")
+        or definition.IMMOBILIZES_CASTER ~= true)
+    then
+        return false
+    end
 
     local prior = CombatStatusService.get(
         character, definition.BUFF_KIND
@@ -149,12 +162,32 @@ function CombatStatusService.apply_self(
         )
     end
 
+    local root_was_anchored = if root then root.Anchored else false
+    if fortress then
+        -- Source P.Def/M.Def are retained as server metadata; applying
+        -- the old flat stat values to current Roblox HP would be invalid.
+        character:SetAttribute(
+            "C4FortressSourcePhysicalDefence",
+            tonumber(definition.SOURCE_PHYSICAL_DEFENCE) or 0
+        )
+        character:SetAttribute(
+            "C4FortressSourceMagicDefence",
+            tonumber(definition.SOURCE_MAGIC_DEFENCE) or 0
+        )
+        (root :: BasePart).Anchored = true
+    end
+
     task.delay(expires_at - os.clock(), function()
         if character.Parent and character:GetAttribute(
             fields.ExpiresAt
         ) == expires_at then
             character:SetAttribute(fields.Magnitude, 0)
             character:SetAttribute(fields.ExpiresAt, 0)
+            if fortress and root and root.Parent
+                and not root_was_anchored
+            then
+                root.Anchored = false
+            end
         end
     end)
     return true
