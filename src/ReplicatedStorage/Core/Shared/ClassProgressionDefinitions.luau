@@ -173,6 +173,7 @@ local DEFINITIONS = table.freeze({
             "IronvowStonebreaker",
             "IronvowEquipmentExpertise",
             "IronvowCommonItemCreation",
+            "IronvowCriticalStance",
             "IronvowLightArmorTraining",
             "IronvowHeavyArmorTraining",
             "IronvowBattleCall",
