@@ -411,6 +411,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
     ) + PassiveSkillEffects.damage_bonus(
         character, "IronvowBladeTraining"
     ) + PassiveSkillEffects.damage_bonus(
+        character, "IronvowPolearmTraining"
+    ) + PassiveSkillEffects.damage_bonus(
         character, "OathguardSteelAndStoneTraining"
     )
     return math.max(
