@@ -14,6 +14,7 @@ local QuestService = require(
 )
 local Transfer = require(SSS.Core.Services.OriginalFirstTransferService)
 local Inventory = require(SSS.Core.Services.InventoryService)
+local Equipment = require(SSS.Core.Services.EquipmentService)
 local SkillService = require(SSS.Core.Services.SkillProgressionService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
 local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
@@ -390,6 +391,40 @@ local function verify_sword_blunt_mastery(profiles: any, service: any)
 end
 
 --[[
+Proves source D-grade Knight expertise changes actual owned equipment.
+
+Args:
+    profiles (any): Real personally awarded persistent Knight owner.
+    service (any): Authoritative class-trainer purchase service.
+
+Returns:
+    nil: Validates unpaid denial, paid equip and real 20 HP gear effect.
+]]
+local function verify_equipment_expertise(profiles: any, service: any)
+    local skill_id = "OathguardEquipmentExpertise"
+    local item_id = "stonewatch_d_grade_armor"
+    local inventory = Inventory.new(profiles)
+    local equipment = Equipment.new(profiles, "Base")
+    check(inventory:add_item(USER_ID, item_id, 1).ok,
+        "Real Knight inventory can receive earned D-grade cuirass")
+    local denied = equipment:equip(USER_ID, item_id, "Body")
+    check(not denied.ok
+        and denied.reason == "KnightEquipmentExpertiseRequired",
+        "Untrained Knight must not equip D-grade combat gear")
+    local result = service:learn_trainer_skill(USER_ID, skill_id)
+    check(result.ok and result.rank == 1,
+        "Earned Knight trainer must purchase D-grade expertise "
+            .. tostring(result.reason))
+    local worn = equipment:equip(USER_ID, item_id, "Body")
+    check(worn.ok, "Real owned D-grade cuirass must equip after purchase")
+    local character = assert(profiles:get_character(USER_ID))
+    check(character.Equipment.Body == item_id,
+        "Paid Knight expertise must persist actual equipped body slot")
+    check(worn.effects.MaxHealthFlat == 20,
+        "Genuine D-grade heavy armour must alter real equipped HP")
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -549,6 +584,7 @@ local function award(profiles: any, pending: any)
     verify_umbral_siphon(profiles, service)
     verify_arrow_ward(profiles, service)
     verify_sword_blunt_mastery(profiles, service)
+    verify_equipment_expertise(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
         "Knight quest, rune, recovery, shield, stance and drain persist")
 end
