@@ -1696,6 +1696,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 Warrior source level24 passive, real owner-only HP recovery.
+    -- +1.1 HP/s is the provisional Roblox stat/tick conversion;
+    -- C4 regeneration timing and full balance remain unaudited.
+    IronvowFieldRecovery = table.freeze({
+        Id = "IronvowFieldRecovery",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 24}),
+        HPRegenPerSecond = 1.1,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
