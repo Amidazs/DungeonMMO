@@ -1766,6 +1766,7 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
         RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
         WeaponTags = table.freeze({}),
     }),
 
