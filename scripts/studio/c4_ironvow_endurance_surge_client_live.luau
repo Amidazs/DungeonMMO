@@ -168,6 +168,16 @@ local function verify_surge(player, character, humanoid)
         "Earned Warrior does not own the learned HP-surge skill")
     Runtime.apply_max_health(player)
     Mana.reset_player(player)
+    local previous_parent = character.Parent
+    local before_detach_mp = Mana.get(player)
+    character.Parent = game:GetService("ServerStorage")
+    assert(not Surge.can_activate(player)
+        and Mana.get(player) == before_detach_mp,
+        "A stored avatar passed the paid-surge preflight")
+    character.Parent = previous_parent
+    assert(Surge.can_activate(player),
+        "A restored living world character failed surge preflight")
+    print("[Warrior Surge] STORED_CHARACTER_PRECHARGE_DENIAL_PASS")
     local base_max = humanoid.MaxHealth
     assert(base_max > 20, "Expected living baseline character health")
     humanoid.Health = base_max * 0.55

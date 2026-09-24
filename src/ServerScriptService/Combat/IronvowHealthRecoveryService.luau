@@ -34,7 +34,8 @@ function IronvowHealthRecoveryService.apply_tick(
     local character = player.Character
     local humanoid = character
         and character:FindFirstChildOfClass("Humanoid")
-    if not character or not character.Parent
+    -- A stored or detached avatar is not a living world-owned player.
+    if not character or not character:IsDescendantOf(workspace)
         or not humanoid or humanoid.Health <= 0
         or humanoid.Health >= humanoid.MaxHealth
     then

@@ -127,6 +127,14 @@ local function main()
         "Forged unawarded Fighter gained Warrior passive regeneration")
     owner.Identity.ClassId = "Ironvow"
     Runtime.set_character(player.UserId, owner)
+    local previous_parent = character.Parent
+    local before_detach = humanoid.Health
+    character.Parent = game:GetService("ServerStorage")
+    assert(Recovery.apply_tick(player, 1) == 0
+        and humanoid.Health == before_detach,
+        "A character parked outside Workspace received free regeneration")
+    character.Parent = previous_parent
+    print("[Warrior Recovery] STORED_CHARACTER_REJECTED_PASS")
     humanoid.Health = 0
     assert(Recovery.apply_tick(player, 1) == 0
         and humanoid.Health == 0,

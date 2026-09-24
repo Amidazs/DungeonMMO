@@ -76,7 +76,7 @@ local function valid(player: Player, record: any): boolean
         and character:FindFirstChildOfClass("Humanoid")
     return player.Parent == Players
         and character == record.Character
-        and character ~= nil and character.Parent ~= nil
+        and character ~= nil and character:IsDescendantOf(workspace)
         and humanoid ~= nil and humanoid.Health > 0
         and os.clock() < record.ExpiresAt
         and authorizer ~= nil and authorizer(player, record)
@@ -119,7 +119,8 @@ function IronvowEnduranceSurgeService.can_activate(
     local humanoid = character
         and character:FindFirstChildOfClass("Humanoid")
     return player.Parent == Players and not active[player]
-        and character ~= nil and humanoid ~= nil
+        and character ~= nil and character:IsDescendantOf(workspace)
+        and humanoid ~= nil
         and humanoid.Health > 0
 end
 
