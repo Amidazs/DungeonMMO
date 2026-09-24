@@ -47,10 +47,8 @@ Returns:
 local function apply_chest(
     stats: any, naked: any, body: any, is_mystic: boolean
 )
-    local original_base = stats.PHYSICAL_DEFENCE
-        / naked.LevelModifier
-    -- Undo naked integer rounding before the source 0x10/0x20 ops.
-    -- The class template base P.Def is explicit and not this quotient.
+    -- The 0x10 item add comes before the 0x20 class formula.
+    -- Never add gear to the already-rounded naked P.Def.
     local base = if is_mystic then 54 else 80
     local paperdoll_deduction = if is_mystic then 15 else 31
     stats.PHYSICAL_DEFENCE = math.floor(
