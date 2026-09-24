@@ -82,6 +82,7 @@ local function forged(): any
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
+        "OathguardUmbralSiphon",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -114,6 +115,22 @@ local function main()
     check_ranks("OathguardMendingOath", {28, 28, 28})
     check_ranks("OathguardShieldMastery", {20, 28})
     check_ranks("OathguardSteadfastStance", {20})
+    check_ranks(
+        "OathguardUmbralSiphon", {20, 20, 24, 24, 28, 28, 28}
+    )
+    local reference_power = {20, 22, 24, 26, 28, 29, 31}
+    local reference_mana = {12, 13, 14, 15, 15, 17, 17}
+    for rank = 1, 7 do
+        local drain = assert(Combat.get_for_rank(
+            "OathguardUmbralSiphon", rank
+        ))
+        check(drain.KIND == "MagicProjectile"
+            and drain.BASE_DAMAGE == reference_power[rank]
+            and drain.MANA_COST == reference_mana[rank]
+            and drain.LIFE_DRAIN_FRACTION == 0.20
+            and drain.STAMINA_COST == 0,
+            "Knight drain retains the C4 rank-specific power and mana")
+    end
     local stance = assert(Combat.get_for_rank(
         "OathguardSteadfastStance", 1
     ))
@@ -157,6 +174,7 @@ local function main()
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
+        "OathguardUmbralSiphon",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
