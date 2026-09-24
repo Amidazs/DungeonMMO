@@ -1553,6 +1553,27 @@ local DEFINITIONS = table.freeze({
         DamageBonusPerRank = 0.014,
         WeaponTags = table.freeze({}),
     }),
+    -- Original C4 polearm mastery source values are flat P.Atk +4.5,
+    -- +7.3, +8.9 and +10.7 with +5 hit-number for a held polearm.
+    -- Source P.Atk is converted by a provisional Roblox attack adapter;
+    -- these source stats do not imply exact C4 damage-formula parity.
+    IronvowPolearmTraining = table.freeze({
+        Id = "IronvowPolearmTraining",
+        Tier = "Common", MaxRank = 4, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28, [4] = 28,
+        }),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0, [4] = 0}),
+        SourcePhysicalAttackByRank = table.freeze({
+            [1] = 4.5, [2] = 7.3, [3] = 8.9, [4] = 10.7,
+        }),
+        SourceExtraHitTargets = 5,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
