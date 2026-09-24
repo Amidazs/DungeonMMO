@@ -46,6 +46,9 @@ local ScoutCriticalToggleService = require(
 local IronvowCriticalToggleService = require(
     ServerScriptService.Combat.IronvowCriticalToggleService
 )
+local IronvowEnduranceSurgeService = require(
+    ServerScriptService.Combat.IronvowEnduranceSurgeService
+)
 
 --[[
 Returns a live, server-owned buff value without trusting client metadata.
@@ -921,8 +924,11 @@ function ProgressionRuntimeState.get_max_health(user_id: number): number
     local trained_health = PassiveSkillEffects.health_bonus(
         state_for(user_id)
     )
+    local player = Players:GetPlayerByUserId(user_id)
+    local surge_bonus = IronvowEnduranceSurgeService.get_bonus(player)
     return math.max(
-        1, base_health + equipment_health + trained_health
+        1, (base_health + equipment_health + trained_health)
+            * (1 + surge_bonus)
     )
 end
 
