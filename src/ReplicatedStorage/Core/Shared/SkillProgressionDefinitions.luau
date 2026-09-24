@@ -1536,8 +1536,12 @@ local DEFINITIONS = table.freeze({
         }),
         WeaponTags = table.freeze({"OneHandedSword"}),
     }),
+    -- The existing Ironvow Blade Training ID is retained for saved
+    -- rank compatibility, but the authentic C4 weapon family explicitly
+    -- covers Sword AND Blunt and excludes daggers or unarmed attacks.
     IronvowBladeTraining = table.freeze({
         Id = "IronvowBladeTraining",
+        DisplayName = "Ironvow Steel and Stone Training",
         Tier = "Common", MaxRank = 4, Kind = "Passive",
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
@@ -1547,7 +1551,7 @@ local DEFINITIONS = table.freeze({
         }),
         RankThresholds = table.freeze({[2] = 0, [3] = 0, [4] = 0}),
         DamageBonusPerRank = 0.014,
-        WeaponTags = table.freeze({"OneHandedSword"}),
+        WeaponTags = table.freeze({}),
     }),
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
