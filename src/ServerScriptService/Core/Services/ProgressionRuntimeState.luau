@@ -39,6 +39,9 @@ local ItemDefinitions = require(
 local C4PrimaryStatReference = require(
     Shared:WaitForChild("C4PrimaryStatReference")
 )
+local C4AuthenticatedSkillSourcePreview = require(
+    Shared:WaitForChild("C4AuthenticatedSkillSourcePreview")
+)
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
@@ -782,6 +785,28 @@ function ProgressionRuntimeState.get_c4_source_vitals(
         ItemBonusesIntegrated = false,
         ActiveEffectsIntegrated = false,
     }, nil
+end
+
+--[[
+Returns original nine-class skills from the authoritative selected owner.
+
+The source tree includes historical learnable rows, NOT owned skills,
+trainer purchases or live effect equivalence.
+
+Args:
+    user_id (number): Current server-owned selected character user ID.
+
+Returns:
+    (any?, string?): Strict C4 source catalogue or identity denial.
+]]
+function ProgressionRuntimeState.get_c4_source_skill_tree(
+    user_id: number
+): (any?, string?)
+    local character = states[user_id]
+    if not character then
+        return nil, "OriginalCharacterIdentityNotVerified"
+    end
+    return C4AuthenticatedSkillSourcePreview.for_character(character)
 end
 
 --[[
