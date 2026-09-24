@@ -1,4 +1,42 @@
-**Current DungeonMMO class backend: v2.12 — real Knight block/shield/buff exploit FIXED and Play-tested; separate C4 Ultimate Defence plus two bow-defence ranks implemented.**
+**Current DungeonMMO class backend: v2.13 — true Knight sword AND blunt mastery family with bought source ranks and real NPC health PASS; three original Knight rank entries remain.**
+[Current C4 class backend roadmap](
+DungeonMMO_Roadmap_v2_13_Knight_Sword_Blunt_20260924.md)
+and [exact focused plus live weapon damage evidence](
+../testing/knight-sword-blunt-mastery-v2-13-20260924.md).
+Implemented independently paid lvl20/24/28/28 Knight
+`OathguardSteelAndStoneTraining` as physical damage
+passive for genuinely server-equipped Sword **or** Blunt.
+Added a separate registered blunt training mace item and
+routed it through the actual server melee-hit executor.
+A dagger using the prototype sword hitbox or missing
+equipment does NOT inherit the passive. Focused Knight
+Quest/Foundation **108/103 assertions PASS**, disposable
+Base/Dungeon builds PASS, and actual spawned Dungeon
+NPC Humanoid HP per 100-base server attack:
+Sword untrained/mastered **110 → 114.8**,
+Blunt untrained/mastered **110 → 114.8**,
+wrong gear and forged class denied. The four rank
+`0.012` Roblox multiplier per rank is provisional:
+source C4 P.Atk. formula/rank effect values and final
+equipped Tool animation and full player-input hit
+remain unverified; never equate schedule mapping
+with complete original C4 mechanical balance.
+
+Corrected source Knight inventory **55 ranks** (including
+two bow-defence ranks at 24/28), now **52/55 mapped**
+with **3 historical utility ranks still missing**:
+equipment expertise rank1 and common-item creation
+ranks2/3. Warrior remains **27/62**, 35 missing,
+and other 14 original advancement branches are
+not source-complete. Previously discovered shield
+zero-HP block/guard-break exploit has been fixed
+and actual stacked Knight buff/block HP verified
+in Marauder/Captain pipelines; remaining boss,
+world-boss and full cross-place regression pending.
+**0/18** first-transfer classes release-certified.
+No `main` merge, Roblox publish or production save.
+
+**Previous DungeonMMO class backend: v2.12 — real shield-block exploit and dual defence/bow protection tested; seven Knight ranks then unmapped.**
 [Current C4 backend roadmap](
 DungeonMMO_Roadmap_v2_12_Knight_Defense_Exploit_Bow_20260924.md)
 and [actual focused and live Studio evidence](
