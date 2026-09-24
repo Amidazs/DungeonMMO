@@ -1745,6 +1745,18 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Separate original C4 level-twenty Ultimate Defence family.
+    -- Class award and actual trainer purchase are server-owned.
+    OathguardLastBastion = table.freeze({
+        Id = "OathguardLastBastion",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Two independently earned Knight shield-mastery ranks protect only
     -- when the server owns a valid shield in the OffHand equipment slot.
     OathguardShieldMastery = table.freeze({
