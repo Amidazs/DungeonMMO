@@ -59,7 +59,8 @@ local function forged_character(): any
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
         "IronvowCriticalStance", "IronvowAccuracyStance",
-        "IronvowFieldRecovery", CALL, LIGHT, HEAVY,
+        "IronvowFieldRecovery", "IronvowEnduranceSurge",
+        CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -112,6 +113,18 @@ local function main()
     check_ranks("IronvowCriticalStance", {20, 24, 28})
     check_ranks("IronvowAccuracyStance", {24})
     check_ranks("IronvowFieldRecovery", {24})
+    check_ranks("IronvowEnduranceSurge", {28})
+    local surge = assert(Combat.get_for_rank(
+        "IronvowEnduranceSurge", 1
+    ))
+    check(surge.KIND == "HealthSurge"
+        and surge.MANA_COST == 13
+        and surge.STAMINA_COST == 0
+        and surge.MAX_HP_BONUS == 0.10
+        and surge.RESTORE_FRACTION == 0.10
+        and surge.DURATION_SECONDS == 600
+        and surge.COOLDOWN_SECONDS > 0,
+        "Paid Warrior surge must change true maximum HP and heal once")
     local health = assert(Progression.get("IronvowFieldRecovery"))
     check(health.Kind == "Passive"
         and health.HPRegenPerSecond == 1.1,
@@ -226,7 +239,8 @@ local function main()
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
         "IronvowCriticalStance", "IronvowAccuracyStance",
-        "IronvowFieldRecovery", CALL, LIGHT, HEAVY,
+        "IronvowFieldRecovery", "IronvowEnduranceSurge",
+        CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
