@@ -1,3 +1,43 @@
+## 24 September — current Knight C4 mechanical parity v2.11
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_11_C4_Knight_Majesty_20260924.md)
+and [fresh exact test evidence](
+../testing/oathguard-c4-majesty-v2-11-20260924.md).
+Previous v2.10 seven-rank Knight life drain remains implemented
+and real-client hit/heal validated. v2.11 corrected the separate
+C4 Knight Majesty analogue `OathguardSteadfastStance` from
+v2.09 adapted 10%/10-second/14-stamina guard to recorded
++7% physical defence, -2 Evasion, 10 MP, approximately
+five-minute timed buff. Old v2.09 live test results are
+historical, not accepted for current source. Fresh disposable
+Base and Dungeon builds PASS; Knight Quest/Foundation
+**87 + 84 assertions PASS**; real-client Dungeon Play
+**PASS** at `fbbfb8bf7d8938648d426bd1fefea5785e421f84`:
+100-base hostile physical melee/area damage = **93 HP**
+while active, magic/ordinary player melee = 100, forced
+expiry returns 100; cost and evasion metadata verified,
+premature recast does not extend expiry. The 300-second
+expiration was checked as an issued timestamp and end
+via **test-forced expiry**, not actual five-minute wait.
++7% C4 P.Def and -2 Evasion *stat* are currently approximated
+in Roblox as 7 percentage points of physical damage mitigation
+and 2 percentage points of dodge chance penalty, not
+identical source damage/evasion mathematics. Nine Knight
+source rows, 35 Warrior rows and other 14 class catalogues
+remain; no fully C4-balanced or fully releasable class.
+A first attempted focused test failed `IdentityIncomplete`
+because it invalidly persisted level19 on an awarded level20
+Knight; fixed the test to use detached clone, and focused
+suite subsequently PASSED. Avoid repeating broad suites.
+Next: separate true immobile dual physical/magic Ultimate
+Defence, rather than treating Majesty as equivalent; then
+equipment/crafting/sword-blunt/bow and original starter
+catalogues. Permanent changes in GitHub; desktop only
+disposable fast-forward builds, Play and logs; leave user's
+other humanoid Studio session and animation work intact.
+No publish, main merge or production save mutation.
+
 ## 24 September 2026 — v2.10 source-checked Knight life drain
 
 Current [v2.10 C4 fidelity roadmap](
