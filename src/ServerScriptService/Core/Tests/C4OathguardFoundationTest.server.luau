@@ -83,7 +83,7 @@ local function forged(): any
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
         "OathguardUmbralSiphon", "OathguardLastBastion",
-        "OathguardArrowWard",
+        "OathguardArrowWard", "OathguardSteelAndStoneTraining",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -118,6 +118,9 @@ local function main()
     check_ranks("OathguardSteadfastStance", {20})
     check_ranks("OathguardLastBastion", {20})
     check_ranks("OathguardArrowWard", {24, 28})
+    check_ranks(
+        "OathguardSteelAndStoneTraining", {20, 24, 28, 28}
+    )
     local bow_one = assert(Combat.get_for_rank(
         "OathguardArrowWard", 1
     ))
@@ -207,7 +210,7 @@ local function main()
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
         "OathguardUmbralSiphon", "OathguardLastBastion",
-        "OathguardArrowWard",
+        "OathguardArrowWard", "OathguardSteelAndStoneTraining",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
@@ -215,6 +218,9 @@ local function main()
     end
     check(Passives.fighter_armor_reduction(owner) == 0,
         "Forged rank-nine heavy armor must not reduce any NPC damage")
+    check(Passives.damage_bonus(
+        owner, "OathguardSteelAndStoneTraining"
+    ) == 0, "Unawarded Knight mastery cannot boost any melee weapon")
     check(Passives.oathguard_shield_reduction(owner) == 0,
         "Unawarded Knight receives no protection from a forged shield rank")
     print(("[Oathguard Foundation] PASS: %d assertions")
