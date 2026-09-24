@@ -1589,6 +1589,24 @@ local IRONVOW_BATTLE_CALL = specialize_skill(
     }
 )
 
+-- Earned Knight stance uses server-owned temporary PhysicalGuard.
+-- The caster pays real stamina and receives no magical resistance.
+local OATHGUARD_STEADFAST_STANCE = specialize_skill(
+    ELVEN_SCOUT_GUARD, "OathguardSteadfastStance",
+    "Oathguard Steadfast Stance", {
+        MANA_COST = 0,
+        STAMINA_COST = 14,
+        COOLDOWN_SECONDS = 24,
+        BUFF_MAGNITUDE = 0.10,
+        BUFF_SECONDS = 10,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.10, BUFF_SECONDS = 10,
+            }),
+        }),
+    }
+)
+
 -- Oathguard's personal recovery uses the existing server-owned heal
 -- executor; no client-selected healing target or arbitrary HP amount.
 local OATHGUARD_MENDING_OATH = specialize_skill(
@@ -1849,6 +1867,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     IronvowBattleCall = IRONVOW_BATTLE_CALL,
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
+    OathguardSteadfastStance = OATHGUARD_STEADFAST_STANCE,
     OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
