@@ -169,6 +169,9 @@ local DEFINITIONS = table.freeze({
             "GreenwardWardenSteelTraining",
             "GreenwardWardenHeavyArmorTraining",
             "GreenwardWardenMagicResistance",
+            "GreenwardWardenElementalHeal",
+            "GreenwardWardenCharm",
+            "GreenwardWardenAggression",
         }),
     }),
 

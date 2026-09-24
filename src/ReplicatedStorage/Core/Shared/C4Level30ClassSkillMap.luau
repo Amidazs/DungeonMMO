@@ -84,6 +84,9 @@ local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
     MagicResistance = "GreenwardWardenMagicResistance",
+    ElementalHeal = "GreenwardWardenElementalHeal",
+    Charm = "GreenwardWardenCharm",
+    Aggression = "GreenwardWardenAggression",
 })
 
 --[[

@@ -1950,6 +1950,129 @@ local OATHGUARD_CHALLENGE = specialize_skill(
     }
 )
 
+-- Distinct Greenward Warden healing uses MageHealService's actual
+-- mana, cooldown, injured-ally selection and owner-authoritative HP cap.
+-- Amounts/costs are provisional Roblox adapters, not C4 formula parity.
+local GREENWARD_WARDEN_ELEMENTAL_HEAL = specialize_skill(
+    MAGE_HEAL, "GreenwardWardenElementalHeal",
+    "Greenward Elemental Mend", {
+        SELF_ONLY = false,
+        MANA_COST = 13, STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 6, TOTAL_HEAL = 24,
+        HUMAN_INSTANT_FRACTION = 1, ELF_INSTANT_FRACTION = 1,
+        HUMAN_HOT_SECONDS = 0, ELF_HOT_SECONDS = 0,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                TOTAL_HEAL = 24,
+                MANA_COST = 13,
+            }),
+            [2] = table.freeze({
+                TOTAL_HEAL = 29,
+                MANA_COST = 13,
+            }),
+            [3] = table.freeze({
+                TOTAL_HEAL = 34,
+                MANA_COST = 13,
+            }),
+            [4] = table.freeze({
+                TOTAL_HEAL = 39,
+                MANA_COST = 16,
+            }),
+            [5] = table.freeze({
+                TOTAL_HEAL = 44,
+                MANA_COST = 16,
+            }),
+            [6] = table.freeze({
+                TOTAL_HEAL = 49,
+                MANA_COST = 16,
+            }),
+            [7] = table.freeze({
+                TOTAL_HEAL = 54,
+                MANA_COST = 19,
+            }),
+            [8] = table.freeze({
+                TOTAL_HEAL = 59,
+                MANA_COST = 19,
+            }),
+            [9] = table.freeze({
+                TOTAL_HEAL = 64,
+                MANA_COST = 19,
+            }),
+        }),
+    }
+)
+
+-- Charm targets only one server-accepted hostile and removes the
+-- owner's existing threat, never the threat of a different player.
+-- Melee-like targeting is provisional until a C4-style spell executor.
+local GREENWARD_WARDEN_CHARM = specialize_skill(
+    TAUNT, "GreenwardWardenCharm", "Greenward Pacifying Call", {
+        STAMINA_COST = 0, MANA_COST = 7,
+        COOLDOWN_SECONDS = 8, BASE_DAMAGE = 0,
+        TAUNT_BONUS_THREAT = 0,
+        THREAT_REDUCTION_FRACTION = 0.10,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.100,
+            }),
+            [2] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.125,
+            }),
+            [3] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.150,
+            }),
+            [4] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.175,
+            }),
+            [5] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.200,
+            }),
+            [6] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.225,
+            }),
+            [7] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.250,
+            }),
+            [8] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.275,
+            }),
+            [9] = table.freeze({
+                THREAT_REDUCTION_FRACTION = 0.300,
+            }),
+        }),
+    }
+)
+
+-- Aggression adjusts a single registered enemy's server threat
+-- with no health damage and therefore no free kill or drop credit.
+local GREENWARD_WARDEN_AGGRESSION = specialize_skill(
+    TAUNT, "GreenwardWardenAggression", "Greenward Challenge", {
+        STAMINA_COST = 0, MANA_COST = 9,
+        COOLDOWN_SECONDS = 10, BASE_DAMAGE = 0,
+        TAUNT_BONUS_THREAT = 24,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                TAUNT_BONUS_THREAT = 24,
+            }),
+            [2] = table.freeze({
+                TAUNT_BONUS_THREAT = 32,
+            }),
+            [3] = table.freeze({
+                TAUNT_BONUS_THREAT = 40,
+            }),
+            [4] = table.freeze({
+                TAUNT_BONUS_THREAT = 48,
+            }),
+            [5] = table.freeze({
+                TAUNT_BONUS_THREAT = 56,
+            }),
+            [6] = table.freeze({
+                TAUNT_BONUS_THREAT = 64,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -2203,6 +2326,9 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     OathguardArrowWard = OATHGUARD_ARROW_WARD,
     OathguardUmbralSiphon = OATHGUARD_UMBRAL_SIPHON,
     OathguardChallenge = OATHGUARD_CHALLENGE,
+    GreenwardWardenElementalHeal = GREENWARD_WARDEN_ELEMENTAL_HEAL,
+    GreenwardWardenCharm = GREENWARD_WARDEN_CHARM,
+    GreenwardWardenAggression = GREENWARD_WARDEN_AGGRESSION,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,

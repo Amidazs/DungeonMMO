@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.29 Warden active heal and aggro
+
+[Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_29_Elven_Knight_Heal_Charm_Taunt_20260924.md). Warden's ElementalHeal (9), Charm (9), Aggression (6) new separately bought combat families use actual MageHealService and single-target ThreatService owner-only reduce/taunt with MP spend and zero-damage threat skills. Six Warden families now map 45/56 source training ranks; 11 remaining. Focused in-memory rank purchase driver updated but NOT Studio run. Full C4 balancing/formula/source range parity and actual client/physical dungeon quest Play remain OPEN. No main merge/publish/production saves/animation changes.
+
 ## 24 September 2026 — v2.28 focused Warden passive test fixture
 
 New `C4GreenwardWardenPassiveTrainingTest` and unpublished Base runner exercise earned class, full 21 individually purchased passive ranks, actual EquipmentService sword/dagger/HeavyArmor toggling and copied-class/receipt/race denials. Test has NOT run in Studio. The four original Fighter branch schedules are unchanged; Elven Knight 21/56 mapped, 35 remaining. Do not claim actual live hostile-hit Play from build success.

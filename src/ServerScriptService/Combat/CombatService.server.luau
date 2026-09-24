@@ -1828,6 +1828,27 @@ local function apply_skill_threat(
     skill_definition: any,
     target: Model
 )
+    local fraction = tonumber(
+        skill_definition.THREAT_REDUCTION_FRACTION
+    ) or 0
+    if fraction > 0 and fraction < math.huge
+        and (skill_definition.BASE_DAMAGE or 0) == 0
+    then
+        local removed = ThreatService.reduce_threat(
+            target, player, fraction
+        )
+        if removed > 0 then
+            DungeonProgressionBridge.award_control(
+                player, skill_definition.ID, target, "Charm", true
+            )
+        end
+        CombatValidationService.emit(
+            player, "THREAT", "CHARM",
+            skill_definition.ID .. " -> " .. target.Name, nil
+        )
+        return
+    end
+
     local bonus = tonumber(skill_definition.TAUNT_BONUS_THREAT) or 0
     if bonus <= 0 or bonus >= math.huge then
         return
@@ -2194,7 +2215,9 @@ local function enter_skill_active(
                 local target_index = 0
                 return function(target: Model)
                     target_index += 1
-                    if (skill_definition.TAUNT_BONUS_THREAT or 0) > 0
+                    if ((skill_definition.TAUNT_BONUS_THREAT or 0) > 0
+                        or (skill_definition.THREAT_REDUCTION_FRACTION
+                            or 0) > 0)
                         and skill_definition.BASE_DAMAGE == 0 then
                         -- Only the first server-confirmed hostile target
                         -- receives threat. Taunt causes zero health damage

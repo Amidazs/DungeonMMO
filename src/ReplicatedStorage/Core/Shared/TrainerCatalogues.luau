@@ -100,6 +100,16 @@ local DEFINITIONS = table.freeze({
                 SkillId = "GreenwardWardenMagicResistance",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "GreenwardWardenElementalHeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardWardenCharm", Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardWardenAggression", Mode = "LearnOrRank",
+            }),
         }),
     }),
     IronvowTrainer = table.freeze({

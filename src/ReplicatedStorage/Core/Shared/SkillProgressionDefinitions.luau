@@ -1944,6 +1944,67 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Elven Knight's separately bought owner/ally heal ranks use
+    -- the existing authoritative mana, friendly-target and HP cap.
+    GreenwardWardenElementalHeal = table.freeze({
+        Id = "GreenwardWardenElementalHeal",
+        Tier = "Common", MaxRank = 9, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Non-damaging targeted Charm must reduce this caster's threat
+    -- rather than grant another character's or an enemy's threat.
+    GreenwardWardenCharm = table.freeze({
+        Id = "GreenwardWardenCharm",
+        Tier = "Common", MaxRank = 9, Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200, [7] = 240,
+            [8] = 280, [9] = 320,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Distinct zero-damage hostile taunt with personal MP and
+    -- separately earned rank progression through the level-30 cap.
+    GreenwardWardenAggression = table.freeze({
+        Id = "GreenwardWardenAggression",
+        Tier = "Common", MaxRank = 6, Kind = "Control",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 24, [2] = 24, [3] = 24,
+            [4] = 28, [5] = 28, [6] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 40, [3] = 80, [4] = 120,
+            [5] = 160, [6] = 200,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The original Knight's seven dark-magic life-drain ranks occur
     -- at source brackets 20/24/28. Actual health is restored only after
     -- the server confirms damage to a valid opposing NPC.

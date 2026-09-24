@@ -41,6 +41,22 @@ local FAMILIES = table.freeze({
         Id = "GreenwardWardenMagicResistance",
         Levels = table.freeze({20, 20, 24, 24, 24, 28, 28, 28}),
     }),
+    table.freeze({
+        Id = "GreenwardWardenElementalHeal",
+        Levels = table.freeze({
+            20, 20, 20, 24, 24, 24, 28, 28, 28,
+        }),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenCharm",
+        Levels = table.freeze({
+            20, 20, 20, 24, 24, 24, 28, 28, 28,
+        }),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenAggression",
+        Levels = table.freeze({24, 24, 24, 28, 28, 28}),
+    }),
 })
 local assertions = 0
 
@@ -182,13 +198,22 @@ local function purchase_family(
         and Classes.can_teach(CAREER_ID, family.Id)
         and not Classes.can_teach("Oathguard", family.Id),
         "Warden passive must have its own trained source ranks")
+    check(profiles:mutate(OWNER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 20
+    end), "Training bracket resets before each family")
     local initial = assert(profiles:get_character(OWNER_ID))
     check(not SkillRules.can_train(
         initial, definition, definition.MaxRank
     ), "Level-20 owner cannot skip into a level-28 rank")
     for rank, level in ipairs(family.Levels) do
         check(profiles:mutate(OWNER_ID, function(profile: any)
-            profile.Characters.Slot1.Level = level
+            local owner = profile.Characters.Slot1
+            owner.Level = level
+            local state = owner.Progression.Skills[family.Id]
+            if state then
+                state.Proficiency = definition.RankThresholds
+                    and definition.RankThresholds[rank] or 0
+            end
         end), "Owner reaches the exact purchase level")
         local outcome = if rank == 1
             then service:learn_trainer_skill(OWNER_ID, family.Id)
@@ -309,8 +334,8 @@ local function main()
         purchase_family(profiles, skills, family)
     end
     local audit = assert(Coverage.for_branch(BRANCH_ID))
-    check(audit.TrainerMappedRankEntries == 21
-        and audit.MissingRankScheduleEntries == 35
+    check(audit.TrainerMappedRankEntries == 45
+        and audit.MissingRankScheduleEntries == 11
         and not audit.LaunchSkillCatalogueReady,
         "No incomplete Warden source family becomes release-certified")
     verify_equipment(profiles, Equipment.new(profiles, "Base"))
