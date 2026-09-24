@@ -81,3 +81,20 @@ numerical skills fix.
 
 No main merge, Roblox publication, production DataStore edit or
 animation/art changes. Permanent source/docs through GitHub.
+
+## Executed validation
+
+The first attempt to run the local build stopped because the
+separate quadruped animation worktree contains untracked
+`__pycache__` folders. No cache was deleted or modified.
+A second attempt checked **tracked source** for changes,
+fast-forwarded GitHub, and used the unpublished disposable Base
+and Dungeon Rojo builds. Both builds succeeded. The focused Base
+Studio runner `c4_primary_stat_reference_focus.luau` reported
+`[C4 Primary Stats] SOURCE_ONLY_PASS: 77 assertions,
+9 paths, 4 baselines, 0 verified HP/MP/CP curves` and
+`VERIFIED_SOURCE_ONLY_NOT_LIVE_PARITY`.
+Log: `%TEMP%\\DungeonMMO_v243_c4_primary_stats\\primary_stats.log`.
+A passing source-data test is **not** a passing level-30 stat
+or combat migration. The other four legacy class variants remain
+excluded from claims of exact original C4 class parity.

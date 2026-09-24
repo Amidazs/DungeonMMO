@@ -1,3 +1,28 @@
+## 24 September 2026 — v2.43 first actual nine-path primary stat source
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_43_C4_Nine_Class_Primary_Stat_Reference_20260924.md).
+Owner wants the same C4 HP/MP/CP and per-level character stats across
+ALL currently implemented original classes before migrating skill
+effects/damage/costs, with creative renaming but no arbitrary rebalance.
+Added read-only C4PrimaryStatReference for six original attributes:
+Human Fighter 40/30/43/21/11/25, Human Mystic
+22/21/27/41/20/39, Elven Fighter 36/35/36/23/14/26,
+Elven Mystic 21/24/25/37/23/40 in STR/DEX/CON/INT/WIT/MEN
+order; all five original Fighter first-transfers inherit matching
+race Fighter six-stat baseline. Unsupported legacy/forged identities
+fail closed. get_level_vitals refuses to fabricate unsourced
+C4-level HP/MP/CP; ZERO original class-growth curves verified.
+Unpublished Base and Dungeon Rojo builds PASS; Base focus Studio
+SOURCE_ONLY_PASS 77 assertions and VERIFIED_SOURCE_ONLY_NOT_LIVE_PARITY.
+Local quadruped __pycache__ untracked was preserved untouched during
+fast-forward pull. No production stat/skill numbers changed.
+v2.42 all-class inventory 13 scopes /1353 current rank occurrences /
+32 independently sourced historic rows, not mechanical parity.
+Next source C4-specific class-level HP/MP/CP full table,
+CON/MEN multipliers, shared formula and safe migration, then each
+class's skill effects and real-client tests. No main merge, Roblox
+publish, production save mutation or animation edits.
+
 ## 24 September 2026 — v2.42 C4 all-class stat baseline is owner-approved TARGET
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_42_C4_All_Classes_Stat_Baseline_20260924.md); [design](../design/C4_All_Classes_Stats_And_Skills_Target_20260924.md). Owner wants actual original Chronicle 4 class-and-level HP/MP/CP and STR/DEX/CON/INT/WIT/MEN, with historical per-rank skill powers/costs, defence, passives, threat and formula semantics for ALL playable Human/Elf Fighter/Mystic starting and five first-transfer paths, not just Warden. Current game custom AttributeConfig 100 HP and five stats/RaceDefinitions 1.08 Human HP /0.92 Elf, current mana/XP/stamina do not match. Do NOT copy original skill power directly into direct Roblox HP damage, or declare archival generic class-base HP charts C4-certified without proper chronicle verification. Implement authoritative shared stat/class-level layer and profile migration, then across-class skill fidelity and anti-exploit tests. This v2.42 commit only documents source/versioning requirements, NO live stats changed, no main merge/publish/production saves/animation changes.

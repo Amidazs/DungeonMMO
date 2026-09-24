@@ -1,3 +1,19 @@
+**Current v2.43 C4 all-class stat migration (source-only):**
+[source and rollout roadmap](
+DungeonMMO_Roadmap_v2_43_C4_Nine_Class_Primary_Stat_Reference_20260924.md).
+A source-verified six-attribute reference now covers all four
+original Human/Elf Fighter/Mystic starter combinations and all five
+first transfers, with a real unpublished Studio source test
+PASS (77 assertions, 9 paths). The four primary baselines are
+not live HP/MP/CP migration: zero level-growth tables are
+C4-verified, and existing production HP, mana, stamina, damage,
+skills and old saves remain unchanged. Prior v2.42 inventory
+covers 13 current/legacy scopes and 1,353 class-scoped
+rank occurrences, but only 32 have individually verified
+C4 numerical source rows; count does not mean effect parity.
+Do not report C4 balance or full classes complete.
+No publish/main merge/production saves.
+
 **Current v2.42 design decision: target historical C4 class-specific HP/MP/CP per level, STR/DEX/CON/INT/WIT/MEN and shared combat formulas BEFORE changing skill effects and costs across ALL implemented Human/Elven starters and first transfers.** [Roadmap](DungeonMMO_Roadmap_v2_42_C4_All_Classes_Stat_Baseline_20260924.md); [shared stat/skill target](../design/C4_All_Classes_Stats_And_Skills_Target_20260924.md). The existing 100-base-HP/five-attribute code and 24-row Warden-only reference are NOT full C4 parity. No live gameplay stat edits, no publish/main merge/production saves.
 
 **All-current-classes C4 skill audit v2.42** — [roadmap](DungeonMMO_Roadmap_v2_42_All_Implemented_Class_Skill_Fidelity_20260924.md) and [13-class-scope findings](../testing/c4-all-implemented-class-skill-fidelity-20260924.md). Both Human/Elven Fighters and Mystics, five genuine first transfers, and four legacy Ranger/Rogue variants were inventoried; focused Studio reported 1,353 race/class-specific current skill-rank occurrences, only 32 with individual C4 source-number references. Full current runtime/passive definitions are inspectable per row; **NO CLASS is C4-mechanically certified**, and 1,353 is not a count of unique skills. Source and formula completion for EVERY family is outstanding. No live combat edits, public publish or main merge.
