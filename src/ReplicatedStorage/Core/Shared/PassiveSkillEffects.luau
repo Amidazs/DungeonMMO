@@ -869,4 +869,30 @@ function PassiveSkillEffects.stamina_recovery_multiplier(
     return math.clamp(1 + bonus, 1, 1.25)
 end
 
+--[[
+Returns extra real HP regeneration per second for a genuinely awarded
+level-24 Warrior who bought the independent source passive.
+
+Args:
+    character (any): Current server-owned class, level and skill ranks.
+
+Returns:
+    number: Bounded extra HP per second; zero for forged or untrained.
+]]
+function PassiveSkillEffects.ironvow_health_recovery(
+    character: any
+): number
+    if type(character) ~= "table"
+        or (tonumber(character.Level) or 0) < 24
+    then
+        return 0
+    end
+    return math.clamp(
+        resolve_bonus(
+            character, "IronvowFieldRecovery", "HPRegenPerSecond"
+        ),
+        0, 1.1
+    )
+end
+
 return table.freeze(PassiveSkillEffects)
