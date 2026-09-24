@@ -18,6 +18,9 @@ local Loadout = require(SSS.Core.Services.LoadoutService)
 local Equipment = require(SSS.Core.Services.EquipmentService)
 local Passives = require(Shared.PassiveSkillEffects)
 local EquipmentStatResolver = require(Shared.EquipmentStatResolver)
+local Professions = require(SSS.Core.Services.ProfessionService)
+local ProfessionRecipes = require(Shared.ProfessionRecipes)
+local CraftRules = require(Shared.C4ProfessionSkillRules)
 local Schema = require(Shared.ProfileSchema)
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 
@@ -434,6 +437,144 @@ local function verify_equipment_expertise(profiles: any)
 end
 
 --[[
+Stocks exactly the required missing recipe inputs in disposable inventory.
+
+Args:
+    profiles (any): Exclusive earned Warrior test profile service.
+    inventory (any): Real server inventory writer.
+    recipe (any): Authored, ingredient-backed Warrior recipe.
+
+Returns:
+    nil: Verifies each actual material receipt is owned.
+]]
+local function stock_warrior_inputs(
+    profiles: any, inventory: any, recipe: any
+)
+    for _, input in ipairs(recipe.Inputs) do
+        local owner = assert(profiles:get_character(USER_ID))
+        local owned = Inventory.count_item(owner, input.ItemId)
+        local missing = math.max(0, input.Quantity - owned)
+        if missing > 0 then
+            check(inventory:add_item(
+                USER_ID, input.ItemId, missing
+            ).ok, "Warrior must actually own its recipe inputs")
+        end
+    end
+end
+
+--[[
+Completes one real authoritative craft with actual material changes.
+
+Args:
+    profiles (any): Genuine personally advanced Warrior profile.
+    inventory (any): Actual owned materials and inventory service.
+    professions (any): One-selected-career server craft service.
+    recipe (any): A real source rank-one or rank-two recipe.
+
+Returns:
+    nil: Verifies the exact ingredient spend and one output grant.
+]]
+local function craft_warrior_recipe(
+    profiles: any, inventory: any, professions: any, recipe: any
+)
+    stock_warrior_inputs(profiles, inventory, recipe)
+    local before = assert(profiles:get_character(USER_ID))
+    local ingredient = recipe.Inputs[1]
+    local material_count = Inventory.count_item(
+        before, ingredient.ItemId
+    )
+    local output_count = Inventory.count_item(
+        before, recipe.Output.ItemId
+    )
+    local prepared = professions:prepare_craft(USER_ID, recipe.Id)
+    check(prepared.ok, "Earned Warrior prepares real " .. recipe.Id)
+    local result = professions:complete_craft(
+        USER_ID, recipe.Id,
+        Professions.foundation_success_outcome(prepared.minigame_id)
+    )
+    check(result.ok, "Real Warrior craft committed " .. tostring(result.reason))
+    local after = assert(profiles:get_character(USER_ID))
+    check(Inventory.count_item(after, ingredient.ItemId)
+        == material_count - ingredient.Quantity
+        and Inventory.count_item(after, recipe.Output.ItemId)
+            == output_count + recipe.Output.Quantity,
+        "Craft must consume real material and grant exact owned output")
+end
+
+--[[
+Buys and actually uses both source Warrior crafting ranks and one career.
+
+Args:
+    profiles (any): Quest-awarded first-transfer Warrior test owner.
+
+Returns:
+    nil: Proves paid level20/28 gates, actual polearm/D-grade outputs,
+        correct one-profession limit and saved purchased rank.
+]]
+local function verify_warrior_common_crafting(profiles: any)
+    local inventory = Inventory.new(profiles)
+    local professions = Professions.new(profiles, inventory)
+    local trainer = SkillService.new(
+        profiles, inventory, Loadout.new(profiles)
+    )
+    local skill_id = "IronvowCommonItemCreation"
+    check(professions:choose_profession(USER_ID, "Mining").ok,
+        "Warrior selects exactly one real gathering career")
+    check(professions:choose_profession(USER_ID, "Blacksmithing").ok,
+        "Warrior selects exactly one real creation career")
+    check(trainer:learn_trainer_skill(
+        USER_ID, "C4RecipeReading"
+    ).ok, "Warrior buys genuine base recipe literacy")
+    check(trainer:learn_trainer_skill(
+        USER_ID, "C4CommonItemCreation"
+    ).ok, "Warrior buys genuine base common creation")
+    local first = assert(ProfessionRecipes.get(
+        "warrior_forge_weapon_rank_1"
+    ))
+    local second = assert(ProfessionRecipes.get(
+        "warrior_forge_armor_rank_2"
+    ))
+    check(not professions:prepare_craft(
+        USER_ID, first.Id
+    ).ok, "First-transfer common goods require paid Warrior rank")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 20
+    end), "Warrior reaches original first common creation tier")
+    local paid = trainer:learn_trainer_skill(USER_ID, skill_id)
+    check(paid.ok and paid.rank == 1,
+        "Separate Warrior source rank one must be bought")
+    check(CraftRules.can_make_warrior_common(
+        assert(profiles:get_character(USER_ID)),
+        "Blacksmithing", 1
+    ), "Paid Warrior class rank permits its own Blacksmithing craft")
+    check(not professions:prepare_craft(
+        USER_ID, second.Id
+    ).ok, "Warrior cannot craft D-grade armour with only rank one")
+    for _ = 1, 2 do
+        craft_warrior_recipe(profiles, inventory, professions, first)
+    end
+    check(profiles:mutate(USER_ID, function(profile: any)
+        local owner = profile.Characters.Slot1
+        owner.Level = 28
+        owner.Progression.SkillPointEntitlement = 14000
+    end), "Warrior reaches original advanced common creation tier")
+    local last = trainer:purchase_rank(USER_ID, skill_id)
+    check(last.ok and last.rank == 2,
+        "Warrior buys its second independent real common-creation rank")
+    craft_warrior_recipe(profiles, inventory, professions, second)
+    check(not professions:prepare_craft(
+        USER_ID, "warrior_distill_oil_rank_1"
+    ).ok, "Crafting mastery cannot grant a second creation career")
+    local owner = assert(profiles:get_character(USER_ID))
+    check(owner.ProfessionSlots.Creation == "Blacksmithing"
+        and owner.ProfessionSlots.Gathering == "Mining"
+        and owner.Progression.Skills[skill_id].PurchasedRank == 2,
+        "Original two ranks persist with one crafting/gathering choice")
+    check(profiles:save(USER_ID, "IronvowCommonCreation"),
+        "Genuine Warrior common crafts and selected career save")
+end
+
+--[[
 Proves a fresh profile service accepts the exact earned class and rank.
 
 Args:
@@ -466,6 +607,9 @@ local function verify_reload(store: any, profiles: any)
             .IronvowStonebreaker.PurchasedRank == 9
         and character.Progression.Skills
             .IronvowEquipmentExpertise.PurchasedRank == 1
+        and character.Progression.Skills
+            .IronvowCommonItemCreation.PurchasedRank == 2
+        and character.ProfessionSlots.Creation == "Blacksmithing"
         and character.Equipment.Body == "ironroot_d_grade_armor"
         and character.Progression.Skills
             .IronvowFortitude.PurchasedRank == 2
@@ -494,6 +638,7 @@ local function main()
     verify_skill_purchase(profiles)
     verify_armour_training(profiles)
     verify_equipment_expertise(profiles)
+    verify_warrior_common_crafting(profiles)
     verify_reload(store, profiles)
     print(("[Ironvow Award] PASS: %d assertions"):format(CHECKS))
 end
