@@ -198,6 +198,27 @@ function PassiveSkillEffects.damage_bonus(
     then
         return 0
     end
+    if skill_id == "IronvowPolearmTraining" then
+        local equipment = type(character) == "table"
+            and character.Equipment
+        local weapon_id = type(equipment) == "table"
+            and equipment.Weapon
+        local weapon = if type(weapon_id) == "string"
+            then ItemDefinitions.get(weapon_id) else nil
+        if not weapon or weapon.Kind ~= "Equipment"
+            or weapon.Slot ~= "Weapon"
+            or weapon.Category ~= "Polearm"
+        then
+            return 0
+        end
+        local definition = SkillDefinitions.get(skill_id)
+        local rank = purchased_rank(character, definition)
+        local source_power = definition.SourcePhysicalAttackByRank
+            and definition.SourcePhysicalAttackByRank[rank] or 0
+        -- Flat source P.Atk is not Roblox's formula. Keep its rank
+        -- ordering, but treat this conversion as provisional.
+        return source_power * 0.001
+    end
     return resolve_bonus(character, skill_id, "DamageBonusPerRank")
 end
 
