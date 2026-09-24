@@ -282,6 +282,42 @@ local function verify_defensive_stance(profiles: any, service: any)
 end
 
 --[[
+Buys every separately ranked Knight damage-to-heal spell.
+
+Args:
+    profiles (any): Authenticated, personally quest-awarded Knight owner.
+    service (any): Real class-trainer skill and rank purchase service.
+
+Returns:
+    nil: Checks level brackets, every paid rank and persisted ownership.
+]]
+local function verify_umbral_siphon(profiles: any, service: any)
+    local skill_id = "OathguardUmbralSiphon"
+    local levels = {20, 20, 24, 24, 28, 28, 28}
+    for rank, level in ipairs(levels) do
+        if rank == 3 or rank == 5 then
+            local blocked = service:purchase_rank(USER_ID, skill_id)
+            check(not blocked.ok,
+                "Knight cannot buy the next drain rank before its level")
+        end
+        check(profiles:mutate(USER_ID, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Level = level
+            owner.Progression.SkillPointEntitlement = 12000
+        end), "Knight reaches the individually paid drain rank level")
+        local result = if rank == 1
+            then service:learn_trainer_skill(USER_ID, skill_id)
+            else service:purchase_rank(USER_ID, skill_id)
+        check(result.ok and result.rank == rank,
+            "Earned Knight buys genuine drain rank "
+                .. tostring(rank) .. " " .. tostring(result.reason))
+    end
+    check(profiles:get_character(USER_ID).Progression
+        .Skills[skill_id].PurchasedRank == 7,
+        "All seven personally purchased drain ranks persist")
+end
+
+--[[
 Awards Knight only at level twenty with one-use private mentor evidence.
 
 Args:
@@ -398,8 +434,12 @@ local function award(profiles: any, pending: any)
         "Three source-level-28 personal recovery ranks remain purchased")
     verify_shield_mastery(profiles, service)
     verify_defensive_stance(profiles, service)
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 20
+    end), "Knight first acquires drain at source level twenty")
+    verify_umbral_siphon(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
-        "Knight quest, class, rune, recovery, shield and stance persist")
+        "Knight quest, rune, recovery, shield, stance and drain persist")
 end
 
 --[[
