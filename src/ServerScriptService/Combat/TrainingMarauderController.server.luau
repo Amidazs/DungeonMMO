@@ -592,12 +592,14 @@ local function resolve_strike(
         return
     end
 
-    if result.outcome == "Hit" then
+    if result.outcome == "Hit" or result.outcome == "Blocked"
+        or result.outcome == "GuardBroken" then
         DamageService.apply_damage({
             attacker = nil,
             attacker_character = runtime.model,
             target = character,
             source_kind = "EnemyMelee",
+            blocked = result.outcome == "Blocked",
             source_id = source_id,
             attack_id = nil,
             base_damage = attack_definition.HEALTH_DAMAGE,
