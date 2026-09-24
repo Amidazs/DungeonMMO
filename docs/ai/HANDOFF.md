@@ -1,3 +1,16 @@
+## 24 September 2026 — v2.47 all nine original paths C4 learning rows
+
+Added C4Level30SkillTreeSource for ALL current original paths:
+HF39, HM44, EF43, EM42, Warrior62, Knight54, Rogue59,
+ElfKnight56, ElfScout77 = 476 rows /75 unique source skill IDs through
+lv30. 457 rows come from pinned C4 skill_trees.sql; 19 missing automatic
+common rows are explicitly sourced from C4 L2Hub (Create Common Item
+for 4 starters; ExpertiseD + Create Common ranks2/3 for 5 transfers).
+Rows preserve source ID/level/name/SP/min level/origin. This is source
+metadata only, not current effect parity. Next parse exact C4 skill XML
+for the 75 IDs then map each family to current creative IDs before any
+live migration. No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.46 pinned C4 combat formula layer
 
 Added read-only C4CombatFormulaReference from the same pinned C4 source:

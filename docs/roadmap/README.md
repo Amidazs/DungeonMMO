@@ -1,3 +1,13 @@
+**Current v2.47 all-class C4 skill source:** all nine
+implemented original paths now have an exact level<=30 learning-tree
+inventory: 476 C4 rows / 75 source skill IDs including source skill
+level, SP and minimum level. [Roadmap](
+DungeonMMO_Roadmap_v2_47_C4_Nine_Path_Skill_Tree_Source_20260924.md);
+[evidence](../testing/c4-nine-path-skill-tree-source-20260924.md).
+Next resolve those 75 IDs against C4 skill XML and map the exact
+power/cost/passive/status fields to the creative DungeonMMO IDs.
+No live trainer/combat migration yet.
+
 **Current v2.46 C4 formula work:** the pinned source
 physical/magic damage, instant-heal, attack/cast timing, hit chance and
 magic-level resistance formulas now have deterministic read-only
