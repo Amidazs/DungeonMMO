@@ -6,6 +6,8 @@ local Primary = require(Shared.C4PrimaryStatReference)
 local Derived = require(Shared.C4DerivedStatReference)
 local Passives = require(Shared.C4PassiveStatReference)
 local Tree = require(Shared.C4Level30SkillTreeSource)
+local Items = require(Shared.C4SourceItemReference)
+local Gear = require(Shared.C4EquippedStatReference)
 
 local C4UnifiedStatReference = {}
 
@@ -130,6 +132,66 @@ function C4UnifiedStatReference.get(
         -- before treating this as a complete C4 damage/HP/MP input.
         OriginalItemStatsIntegrated = false,
         ActiveBuffsIntegrated = false,
+        LiveCombatIntegrated = false,
+        ExactFinalC4StatsCertified = false,
+    }, nil
+end
+
+--[[
+Builds a nine-path C4 item-and-passive source stat comparison.
+
+Only original item IDs present in the pinned reference may be used.
+Weapon base stat sets and armour paperdoll adjustments run BEFORE
+the source class multiplier; item MP order 0x60 runs after passives.
+This remains independent of Roblox inventory, profiles and combat.
+
+Args:
+    race_id (string): Original Human or Elf race.
+    class_id (string): One current original starter or first transfer.
+    level (number): Supported historical class level through 30.
+    item_ids (any): Reviewed C4 original Weapon/Body/OffHand item IDs.
+    source_ranks (any): Claimed original owned passive skill/rank pairs.
+
+Returns:
+    (any?, string?): Staged source stats or strict rejection reason.
+]]
+function C4UnifiedStatReference.get_with_source_items(
+    race_id: string, class_id: string, level: number,
+    item_ids: any, source_ranks: any
+): (any?, string?)
+    if type(source_ranks) ~= "table" then
+        return nil, "UnreviewedClassOrSourceRanks"
+    end
+    local resolved, item_reason = Items.resolve(item_ids)
+    if not resolved then return nil, item_reason end
+    local reference = Primary.get(race_id, class_id)
+    if not reference then return nil, "UnreviewedClassOrSourceRanks" end
+    local naked, naked_reason = Derived.get_naked_combat(
+        race_id, class_id, level, resolved.Items.Weapon ~= nil
+    )
+    if not naked then return nil, naked_reason end
+    for _, rank_id in ipairs(source_ranks) do
+        if not is_learnable(reference.ScopeId, rank_id, level) then
+            return nil, "OriginalPassiveNotLearnableByClassOrLevel"
+        end
+    end
+    local staged = Gear.stage(
+        source_stats(naked), naked, resolved, class_id == "Mage"
+    )
+    local passive, passive_reason = Passives.apply_loadout(
+        staged.Stats, resolved.Kinds, source_ranks
+    )
+    if not passive then return nil, passive_reason end
+    local values = table.clone(passive.Stats)
+    values.MAX_MP += staged.DeferredMaxMp
+    return {
+        ScopeId = reference.ScopeId, Level = level,
+        SourceItemIds = table.clone(item_ids),
+        SourceKinds = resolved.Kinds, SourceCommit = resolved.SourceCommit,
+        Naked = naked, EquippedStats = values,
+        AppliedSourceModifiers = passive.AppliedModifiers,
+        MultiSlotItemsIntegrated = false,
+        EnchantmentsIntegrated = false, ActiveBuffsIntegrated = false,
         LiveCombatIntegrated = false,
         ExactFinalC4StatsCertified = false,
     }, nil
