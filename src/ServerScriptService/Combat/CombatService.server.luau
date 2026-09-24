@@ -72,6 +72,8 @@ local IronvowCriticalToggleService = require(
 local IronvowAccuracyToggleService = require(
     script.Parent:WaitForChild("IronvowAccuracyToggleService")
 )
+-- Passive source rank recovery is scheduled by its own server heartbeat.
+require(script.Parent:WaitForChild("IronvowHealthRecoveryService"))
 local ScoutAccuracyToggleService = require(
     script.Parent:WaitForChild("ScoutAccuracyToggleService")
 )
