@@ -1,3 +1,33 @@
+## 24 September 2026 — v2.10 source-checked Knight life drain
+
+Current [v2.10 C4 fidelity roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_10_C4_Skill_Fidelity_Knight_Drain_20260924.md)
+and [executed evidence](
+../testing/oathguard-umbral-siphon-v2-10-20260924.md).
+GitHub branch `wip/phase-4-test-hud-integration-v1` now contains
+`OathguardUmbralSiphon`: seven independently purchased
+Human Knight ranks with C4 reference power/MP values and real
+post-hit 20% owner lifesteal. The separate existing
+`OathguardMendingOath` remains an owner-only *healing* spell.
+Fresh disposable Base/Dungeon Rojo PASS; focused Quest/Foundation
+**88/84** assertions PASS; rank inventory **27 PASS**; actual
+client-originated Dungeon Play rank one NPC **20 damage →
+4 HP owned heal**, rank seven NPC **31 → 6.2 HP owned heal**,
+both spend rank-specific mana and forged Fighter cannot cast.
+No natural uninterrupted saved quest-to-Dungeon journey was
+proven. Historical mapping now Knight **45/54** (9 missing),
+Warrior **27/62** (35 missing), Scouts 59/59 and 77/77;
+**0/18** full level-30 first-transfer classes release-certified.
+Critically, all earlier `mapped` counts measure purchasable
+*rank rows*, not authentic equivalent mechanics or original
+balance. Existing Knight stance, self-heal, shield, resistance
+and shield-control effects still have documented C4 function/
+cost/stat differences; reconcile individually before marking
+full source parity. Do not merge main, publish Roblox, mutate
+production DataStores or change the one-gathering/one-crafting
+profession rule. Permanent edits in GitHub only; desktop
+reserved for pulls, disposable builds and unpublished playtests.
+
 ## 24 September 2026 — v2.09 verified Knight timed defence
 
 [Current class roadmap](../roadmap/DungeonMMO_Roadmap_v2_09_Knight_Steadfast_Stance_20260924.md)
