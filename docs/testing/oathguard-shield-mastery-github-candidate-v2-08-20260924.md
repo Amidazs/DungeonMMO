@@ -67,6 +67,37 @@ equipped-shield hostile physical hit measurements, multiplayer owner
 isolation and end-to-end saved cross-place journey. No publication
 or production DataStore mutation occurred.
 
+## Fresh actual player-HP combat acceptance (24 September)
+
+A new permanent, source-controlled Studio test driver
+`scripts/studio/c4_oathguard_shield_damage_live.luau` ran through
+unpublished Studio Play using disposable **Dungeon**
+`DungeonMMO_v208_ShieldLive_Dungeon.rbxl`. The initial attempted
+Base-composition run failed setup because the Base rightly does not
+contain `DamageService`; the next run used the full Dungeon
+composition and produced an explicit **PASS**. The verified source
+is the *specific* process log
+`0.740.0.7400927_20260924T082450Z_Studio_B7727_last.log`:
+
+- `REAL_RANK_ONE_MELEE PASS` — exactly 99.2 damage from 100 base.
+- `REAL_RANK_TWO_MELEE PASS` and
+  `REAL_RANK_TWO_AREA PASS` — exactly 98.4 each.
+- `REAL_MAGIC_UNAFFECTED PASS` and
+  `REAL_PLAYER_DAMAGE_UNAFFECTED PASS` — 100 each.
+- `REAL_UNEQUIPPED_SHIELD_DENIAL PASS`,
+  `REAL_WRONG_SLOT_DENIAL PASS` and
+  `REAL_FORGED_CLASS_DENIAL PASS` — 100 each.
+- `ALL_REAL_PLAYER_HP_CHECKS_PASS` and
+  `VERIFIED_PLAY_MODE_PASS` on a real spawned player Humanoid.
+
+This measures the unchanged server `DamageService.apply_damage`
+and actual live player health, with a **test-only synthesized
+internally valid Knight advancement receipt, purchased ranks and
+equipment snapshot**. It does not establish client-originated
+skill/equipment purchases, natural quest completion, physical NPC
+prompt acceptance or persistent saved-player flow. The separate
+two-client Base physical NPC test remains FAILED as recorded above.
+
 ## Remaining live gameplay verification
 
 - [x] Focused Knight quest/foundation suites: **66 + 62 PASS**;
@@ -75,17 +106,20 @@ or production DataStore mutation occurred.
   canonical `DungeonMMO.rbxl` unchanged.
 - [ ] Two-client Base physical NPC input: **FAILED** at visible,
   enabled four-stud Captain Rowan prompt; needs targeted diagnosis.
-- [ ] Real client: genuine Oathguard with bought rank 1 and rank 2
-  receives the correct reduction from the **same** enemy melee/area
-  hit with an equipped shield. Unequipping eliminates the bonus.
-- [ ] Real client: spell hits, player damage, unawarded Fighter,
-  another party member and invalid OffHand gear do not receive it.
+- [x] Genuine spawned Play character's HP: deterministic 99.2/98.4
+  hostile melee and 98.4 hostile area with synthesized, internally valid
+  paid-rank/equipment snapshot; unequipping eliminates the reduction.
+- [x] Real player HP: magic, ordinary player damage, forged-class
+  and wrong-slot gear remain unaffected by the Knight shield passive.
+- [ ] Verify natural earned class and client-owned equipment/purchases
+  on the live player, and separate multiplayer party-member isolation.
 - [ ] Check prior v2.07 `OathguardMendingOath` owner-only healing and
   `OathguardRunicResistance` enemy spell mitigation with genuine
   client casts, cooldown, resources and wrong-class rejection.
 - [ ] Save/rejoin, cross-place transfer and existing dungeon
   multiplayer/party-difficulty rules require independent proof.
 
-Status: **GITHUB IMPLEMENTED / STUDIO PENDING**, not physically
-accepted, release-ready, published or merged. No production DataStore
+Status: **FOCUSED STUDIO PASS / REAL PLAYER HP PASS / BASE PHYSICAL
+PROMPT FAIL / END-TO-END PENDING**. Not a complete class or
+release-ready, published or merged. No production DataStore
 or paid-product operations were performed.
