@@ -5,6 +5,157 @@ local RECIPES = table.freeze({
     -- Three genuine first-transfer C4 ranks per selected crafting career.
     -- Higher ranks consume real materials made by other professions;
     -- skill mastery never grants an additional creation profession.
+    -- Class-rank common goods remain limited to ONE selected crafting
+    -- career. Two paid Knight ranks authorize real recipe material
+    -- consumption and output, never an extra profession slot.
+    knight_forge_weapon_rank_1 = table.freeze({
+        Id = "knight_forge_weapon_rank_1",
+        Name = "Stonewatch Common Mace",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 1,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_bar", Quantity = 2}),
+            table.freeze({ItemId = "forging_flux", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "stonewatch_training_mace", Quantity = 1,
+        }),
+        XP = 18,
+    }),
+    knight_forge_armor_rank_2 = table.freeze({
+        Id = "knight_forge_armor_rank_2",
+        Name = "Stonewatch Common Cuirass",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 2,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_bar", Quantity = 4}),
+            table.freeze({ItemId = "cured_leather", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "stonewatch_d_grade_armor", Quantity = 1,
+        }),
+        XP = 32,
+    }),
+    knight_cure_hide_rank_1 = table.freeze({
+        Id = "knight_cure_hide_rank_1",
+        Name = "Knight Common Hide",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 1,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 2}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "cured_leather", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    knight_cure_hide_rank_2 = table.freeze({
+        Id = "knight_cure_hide_rank_2",
+        Name = "Knight Reinforced Common Hide",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 2,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "raw_hide", Quantity = 3}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "warding_rune", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "cured_leather", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    knight_distill_oil_rank_1 = table.freeze({
+        Id = "knight_distill_oil_rank_1",
+        Name = "Knight Common Tempering Oil",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 1,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 2}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    knight_distill_oil_rank_2 = table.freeze({
+        Id = "knight_distill_oil_rank_2",
+        Name = "Knight Reinforced Tempering Oil",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 2,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "silverleaf", Quantity = 3}),
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+            table.freeze({ItemId = "cured_leather", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "tempering_oil", Quantity = 3,
+        }),
+        XP = 32,
+    }),
+    knight_inscribe_rune_rank_1 = table.freeze({
+        Id = "knight_inscribe_rune_rank_1",
+        Name = "Knight Common Warding Rune",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 1,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 1}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warding_rune", Quantity = 2,
+        }),
+        XP = 18,
+    }),
+    knight_inscribe_rune_rank_2 = table.freeze({
+        Id = "knight_inscribe_rune_rank_2",
+        Name = "Knight Reinforced Warding Rune",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 2,
+        RequiredSkillId = "OathguardCommonItemCreation",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "warding_essence", Quantity = 2}),
+            table.freeze({ItemId = "iron_bar", Quantity = 1}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "warding_rune", Quantity = 3,
+        }),
+        XP = 32,
+    }),
     scout_forge_bars_rank_1 = table.freeze({
         Id = "scout_forge_bars_rank_1",
         Name = "Scout Iron Bars (Rank 1)",
