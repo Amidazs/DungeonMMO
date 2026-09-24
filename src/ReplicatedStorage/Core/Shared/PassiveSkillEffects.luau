@@ -223,6 +223,26 @@ function PassiveSkillEffects.damage_bonus(
 end
 
 --[[
+Returns C4's extra polearm target count only for the actual earned owner.
+
+Args:
+    character (any): Server-owned current class, skill rank and equipment.
+
+Returns:
+    number: Five extra targets only for earned, actually equipped polearm.
+]]
+function PassiveSkillEffects.polearm_extra_targets(
+    character: any
+): number
+    if PassiveSkillEffects.damage_bonus(
+        character, "IronvowPolearmTraining"
+    ) <= 0 then
+        return 0
+    end
+    return 5
+end
+
+--[[
 Returns the equipped-gear permission earned through the purchased source rank.
 
 Args:
