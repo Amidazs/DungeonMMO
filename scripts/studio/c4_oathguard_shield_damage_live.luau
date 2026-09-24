@@ -1,7 +1,7 @@
 --!strict
 -- Disposable Play-mode check of real player HP and server-owned shield rules.
 assert(game.PlaceId == 0 and game.GameId == 0,
-    "Knight shield playtest requires an unpublished local Base")
+    "Knight shield playtest requires an unpublished local Dungeon")
 
 local SSS = game:GetService("ServerScriptService")
 local STS = game:GetService("StudioTestService")
