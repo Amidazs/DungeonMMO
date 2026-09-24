@@ -308,6 +308,49 @@ local function verify_last_bastion(profiles: any, service: any)
 end
 
 --[[
+Buys both original C4 bow-defence ranks on a real earned Knight.
+
+Args:
+    profiles (any): Personally quest-awarded Knight profile service.
+    service (any): Real class trainer skill and rank purchase service.
+
+Returns:
+    nil: Checks source levels, two separate paid ranks and saved owner.
+]]
+local function verify_arrow_ward(profiles: any, service: any)
+    local skill_id = "OathguardArrowWard"
+    local before_level = Schema.deep_clone(
+        assert(profiles:get_character(USER_ID))
+    )
+    before_level.Level = 23
+    check(not SkillUnlockRules.can_train(
+        before_level, assert(SkillDefinitions.get(skill_id)), 1
+    ), "Original Knight bow defence cannot appear before level 24")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 24
+    end), "Knight earns first bow defence source level")
+    local first = service:learn_trainer_skill(USER_ID, skill_id)
+    check(first.ok and first.rank == 1,
+        "Knight must purchase first real bow defence rank "
+            .. tostring(first.reason))
+    local early = service:purchase_rank(USER_ID, skill_id)
+    check(not early.ok,
+        "Knight cannot buy bow defence rank two at source level 24")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 28
+        profile.Characters.Slot1.Progression.SkillPointEntitlement
+            = 12000
+    end), "Knight earns second bow defence source level")
+    local last = service:purchase_rank(USER_ID, skill_id)
+    check(last.ok and last.rank == 2,
+        "Knight must buy second bow defence rank "
+            .. tostring(last.reason))
+    check(profiles:get_character(USER_ID).Progression
+        .Skills[skill_id].PurchasedRank == 2,
+        "Two separate source bow defence ranks remain saved to owner")
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -465,6 +508,7 @@ local function award(profiles: any, pending: any)
         profile.Characters.Slot1.Level = 20
     end), "Knight first acquires drain at source level twenty")
     verify_umbral_siphon(profiles, service)
+    verify_arrow_ward(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
         "Knight quest, rune, recovery, shield, stance and drain persist")
 end
