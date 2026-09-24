@@ -1778,6 +1778,32 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 common-creation tiers two and three are earned at levels
+    -- 20 and 28. Real server crafting still requires exactly one
+    -- selected creation profession and owned source recipe literacy.
+    OathguardCommonCreation = table.freeze({
+        Id = "OathguardCommonCreation",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        RequiresCraftingProfessionChoice = true,
+        KnightCommonCreationEnabled = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4RecipeReading", Rank = 1,
+                Proficiency = 0,
+            }),
+            table.freeze({
+                SkillId = "C4CommonItemCreation", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The C4 Knight's source Expertise D rank: earned level20
     -- permits actual D-grade equipment, never a cosmetic UI badge.
     OathguardEquipmentExpertise = table.freeze({
