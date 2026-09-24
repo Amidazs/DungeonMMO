@@ -18,13 +18,14 @@ Returns:
 local function uses_kind(allowed: string?, equipment: any): boolean
     if allowed == nil then return true end
     if not equipment then return false end
-    local worn = if type(equipment) == "table"
-        then {equipment.Weapon, equipment.Body, equipment.OffHand}
-        else {equipment}
     for kind in string.gmatch(allowed, "[^,]+") do
         local trimmed = kind:match("^%s*(.-)%s*$")
-        for _, equipped_kind in ipairs(worn) do
-            if trimmed == equipped_kind then return true end
+        if type(equipment) == "table" then
+            for _, slot in ipairs({"Weapon", "Body", "OffHand"}) do
+                if trimmed == equipment[slot] then return true end
+            end
+        elseif trimmed == equipment then
+            return true
         end
     end
     return false
