@@ -168,6 +168,7 @@ local DEFINITIONS = table.freeze({
         TeachableSkills = table.freeze({
             "IronvowDrivingStrike",
             "IronvowBladeTraining",
+            "IronvowPolearmTraining",
             "IronvowLightArmorTraining",
             "IronvowHeavyArmorTraining",
             "IronvowBattleCall",
