@@ -244,7 +244,8 @@ local function verify_armour_training(profiles: any)
         }
         for _, item_id in ipairs({
             "marauder_sword", "stonewatch_training_mace",
-            "apprentice_longbow", "ironroot_light_vest",
+            "ironroot_training_halberd", "apprentice_longbow",
+            "ironroot_light_vest",
             "marauder_armor",
         }) do
             assert(Inventory.apply_item_to_character(
@@ -274,6 +275,22 @@ local function verify_armour_training(profiles: any)
     check(Passives.damage_bonus(
         profiles:get_character(USER_ID), "IronvowBladeTraining"
     ) == 0, "Sword-only mastery never buffs an equipped bow")
+
+    purchase_full_line(
+        profiles, service, "IronvowPolearmTraining"
+    )
+    check(equipment:equip(
+        USER_ID, "ironroot_training_halberd", "Weapon"
+    ).ok, "Genuine Warrior equips its separately registered polearm")
+    local polearm_owner = assert(profiles:get_character(USER_ID))
+    check(math.abs(Passives.damage_bonus(
+        polearm_owner, "IronvowPolearmTraining"
+    ) - 0.0107) < 1e-6
+        and Passives.polearm_extra_targets(polearm_owner) == 5,
+        "Four real paid polearm ranks give source stat and extra targets")
+    check(Passives.damage_bonus(
+        polearm_owner, "IronvowBladeTraining"
+    ) == 0, "Polearm never inherits sword-and-blunt mastery")
 
     purchase_full_line(
         profiles, service, "IronvowLightArmorTraining"
@@ -365,6 +382,8 @@ local function verify_reload(store: any, profiles: any)
             .IronvowHeavyArmorTraining.PurchasedRank == 7
         and character.Progression.Skills
             .IronvowBladeTraining.PurchasedRank == 4
+        and character.Progression.Skills
+            .IronvowPolearmTraining.PurchasedRank == 4
         and character.Progression.Skills
             .IronvowFortitude.PurchasedRank == 2
         and character.Progression.Skills
