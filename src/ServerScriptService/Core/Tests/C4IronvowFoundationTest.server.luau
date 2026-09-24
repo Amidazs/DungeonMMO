@@ -55,7 +55,8 @@ local function forged_character(): any
     character.Equipment.Weapon = "marauder_sword"
     character.Equipment.Body = "marauder_armor"
     for _, skill_id in ipairs({
-        SWORD, BLADE, "IronvowPolearmTraining", CALL, LIGHT, HEAVY,
+        SWORD, BLADE, "IronvowPolearmTraining",
+        "IronvowCrescentSweep", CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -103,6 +104,28 @@ local function main()
     check_ranks(SWORD, {20, 20, 20, 24, 24, 24, 28, 28, 28})
     check_ranks(BLADE, {20, 24, 28, 28})
     check_ranks("IronvowPolearmTraining", {20, 24, 28, 28})
+    check_ranks(
+        "IronvowCrescentSweep",
+        {20, 20, 20, 24, 24, 24, 28, 28, 28}
+    )
+    local sweep = assert(Progression.get("IronvowCrescentSweep"))
+    check(sweep.WeaponTags[1] == "Polearm"
+        and sweep.Prerequisites[1].SkillId == "IronvowPolearmTraining",
+        "Earned Warrior area skill requires the polearm mastery and gear")
+    local source_power = {90, 97, 105, 123, 132, 143, 165, 177, 191}
+    local source_mp = {22, 22, 22, 23, 24, 25, 27, 29, 30}
+    for rank, expected in ipairs(source_power) do
+        local ability = assert(Combat.get_for_rank(
+            "IronvowCrescentSweep", rank
+        ))
+        check(ability.KIND == "Melee"
+            and ability.SOURCE_POWER == expected
+            and ability.MANA_COST == source_mp[rank]
+            and ability.STAMINA_COST == 0
+            and ability.MAX_TARGETS == 20
+            and ability.STAGGER_SECONDS == 0,
+            "Nine genuine polearm area ranks preserve source power and MP")
+    end
     local polearm = assert(Progression.get("IronvowPolearmTraining"))
     local source_power = {4.5, 7.3, 8.9, 10.7}
     for rank, expected in ipairs(source_power) do
@@ -143,7 +166,8 @@ local function main()
     check(not Identity.is_complete(unearned),
         "Unawarded forged advanced character fails identity validation")
     for _, skill_id in ipairs({
-        SWORD, BLADE, "IronvowPolearmTraining", CALL, LIGHT, HEAVY,
+        SWORD, BLADE, "IronvowPolearmTraining",
+        "IronvowCrescentSweep", CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
