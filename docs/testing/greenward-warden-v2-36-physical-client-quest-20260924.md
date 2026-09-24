@@ -63,3 +63,14 @@ This does not prove a fully client-delivered final blow, all
 three report kills, a natural Base/Dungeon transfer, a physical
 mentor acting on the *same transferred* profile, or published
 cross-place save/rejoin. Those gates are open.
+
+## Later v2.37 stronger client-kill acceptance
+
+The server-assisted finishing hits described above applied only
+to the original v2.36 candidate. At `1e9178838b045923c24ebd600cc3bb63b10e7767`, a later dedicated
+two-client unpublished Dungeon rerun replaced those shortcuts
+with ordinary client attack requests **through the lethal blow**
+for both the Rootbound Marauder and Thornbound Colossus. It passed
+the same separate personal report/seal isolation checks. See
+[v2.37 evidence](greenward-warden-v2-37-real-client-lethal-quest-20260924.md).
+The full uninterrupted cross-place quest is still OPEN.
