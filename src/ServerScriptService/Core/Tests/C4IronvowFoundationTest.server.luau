@@ -57,7 +57,7 @@ local function forged_character(): any
     for _, skill_id in ipairs({
         SWORD, BLADE, "IronvowPolearmTraining",
         "IronvowCrescentSweep", "IronvowStonebreaker",
-        CALL, LIGHT, HEAVY,
+        "IronvowEquipmentExpertise", CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -105,6 +105,7 @@ local function main()
     check_ranks(SWORD, {20, 20, 20, 24, 24, 24, 28, 28, 28})
     check_ranks(BLADE, {20, 24, 28, 28})
     check_ranks("IronvowPolearmTraining", {20, 24, 28, 28})
+    check_ranks("IronvowEquipmentExpertise", {20})
     check_ranks(
         "IronvowCrescentSweep",
         {20, 20, 20, 24, 24, 24, 28, 28, 28}
@@ -191,7 +192,7 @@ local function main()
     for _, skill_id in ipairs({
         SWORD, BLADE, "IronvowPolearmTraining",
         "IronvowCrescentSweep", "IronvowStonebreaker",
-        CALL, LIGHT, HEAVY,
+        "IronvowEquipmentExpertise", CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
@@ -209,6 +210,8 @@ local function main()
         unearned, "IronvowPolearmTraining"
     ) == 0 and Passives.polearm_extra_targets(unearned) == 0,
         "Unearned polearm rank gives neither damage nor extra targets")
+    check(not Passives.has_ironvow_equipment_expertise(unearned),
+        "Forged Warrior cannot equip D-grade from an unearned rank")
     check(Passives.fighter_armor_reduction(unearned) == 0,
         "Forged Warrior cannot use a bought heavy-armour rank")
     print(("[Ironvow Foundation] PASS: %d assertions")
