@@ -83,6 +83,27 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Warrior-only registered D-grade heavy armour (functional
+    -- placeholder appearance). Does not borrow the Knight's licence.
+    ironroot_d_grade_armor = table.freeze({
+        Id = "ironroot_d_grade_armor",
+        Name = "Ironroot D-Grade Harness",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body",
+        Category = "HeavyArmor",
+        Grade = "D",
+        AllowedBaseClasses = FIGHTER,
+        AllowedClasses = table.freeze({"Ironvow"}),
+        RequiredSkillId = "IronvowEquipmentExpertise",
+        RequiredSkillRank = 1,
+        Rarity = "Uncommon",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 20,
+        }),
+    }),
+
     -- Original DungeonMMO rogue trial weapons: personal, non-tradeable
     -- inventory equipment granted ONLY inside Vela stage-two commit.
     -- These remain placeholders pending final historical meshes/art.
