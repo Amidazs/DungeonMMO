@@ -101,8 +101,11 @@ function DamageService.apply_damage(context: DamageContext): number
         local active_evasion = CombatStatusService.get(
             context.target, "Evasion"
         )
+        local stance_penalty = CombatStatusService
+            .get_evasion_penalty_chance(context.target)
         local evasion = math.clamp(
-            passive_evasion + active_evasion, 0, 0.40
+            passive_evasion + active_evasion - stance_penalty,
+            0, 0.40
         )
         if evasion > 0 and critical_random:NextNumber() < evasion then
             CombatValidationService.emit(
