@@ -243,8 +243,9 @@ local function verify_armour_training(profiles: any)
             Known = true, PurchasedRank = 1, Proficiency = 0,
         }
         for _, item_id in ipairs({
-            "marauder_sword", "apprentice_longbow",
-            "ironroot_light_vest", "marauder_armor",
+            "marauder_sword", "stonewatch_training_mace",
+            "apprentice_longbow", "ironroot_light_vest",
+            "marauder_armor",
         }) do
             assert(Inventory.apply_item_to_character(
                 owner, item_id, 1
@@ -261,6 +262,12 @@ local function verify_armour_training(profiles: any)
     check(Passives.damage_bonus(
         trained, "IronvowBladeTraining"
     ) > 0, "Fourth paid sword rank changes real server melee multiplier")
+    check(equipment:equip(
+        USER_ID, "stonewatch_training_mace", "Weapon"
+    ).ok, "The actual Warrior can equip its distinct blunt weapon")
+    check(Passives.damage_bonus(
+        profiles:get_character(USER_ID), "IronvowBladeTraining"
+    ) > 0, "The same paid source weapon mastery powers real blunt attacks")
     check(equipment:equip(
         USER_ID, "apprentice_longbow", "Weapon"
     ).ok, "The real Fighter can switch to an owned legal longbow")
