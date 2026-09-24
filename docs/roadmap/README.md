@@ -1,4 +1,30 @@
-**Current DungeonMMO class backend: v2.10 — C4 source-derived Knight seven-rank life drain; fresh real client-hit/owner-HP playtest PASS.**
+**Current DungeonMMO class backend: v2.11 — C4-informed Knight Majesty correction with fresh real-client combat PASS; full source formula parity and nine rank rows still open.**
+[Current Knight C4-fidelity roadmap](
+DungeonMMO_Roadmap_v2_11_C4_Knight_Majesty_20260924.md)
+and [exact live Studio test evidence](
+../testing/oathguard-c4-majesty-v2-11-20260924.md).
+Replaced previously adapted 10%/10s/14-stamina
+Knight stance with documented C4 +7% physical
+defence, -2 Evasion and 10 MP reference parameters.
+Actual DungeonMMO server now applies an independently
+expiring five-minute physical guard and evasion penalty
+after a genuine client hotbar cast; real owner HP loses
+93 from 100-base hostile physical melee and area hits,
+100 on enemy magic/PvP-style hits and 100 again after
+test-forced expiry. Fresh Base/Dungeon disposable Rojo
+PASS, awarded Knight Quest/Foundation **87/84 PASS**
+and exact isolated Play `VERIFIED_PLAY_MODE_PASS`.
+C4 P.Def and Evasion are temporarily converted to
+7 percentage-point Roblox physical mitigation and
+2 percentage-point evasion chance cost, **not** the
+original C4 mathematical damage/evasion formulas.
+Earlier v2.09 Knight stance tests are **historical**.
+Level-30 Knight rank schedules **45/54**, nine still
+missing; Warrior **27/62**, 35 missing. No first-transfer
+career release certified, no main merge, Roblox publish,
+or production DataStore manipulation.
+
+**Previous DungeonMMO class backend: v2.10 — verified distinct seven-rank Knight life drain and separate original C4 mechanic parity audit.**
 [Current full roadmap](
 DungeonMMO_Roadmap_v2_10_C4_Skill_Fidelity_Knight_Drain_20260924.md)
 and [exact Studio evidence](
