@@ -1669,6 +1669,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Distinct C4 Warrior toggled critical-power family, three ranks.
+    -- Original C4 applies +35/48/64 to critical power with MP upkeep.
+    -- The Roblox percentage conversion is a temporary combat adapter.
+    IronvowCriticalStance = table.freeze({
+        Id = "IronvowCriticalStance",
+        Tier = "Common", MaxRank = 3, Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 24, [3] = 28}),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
