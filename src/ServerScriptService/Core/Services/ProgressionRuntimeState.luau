@@ -927,6 +927,23 @@ function ProgressionRuntimeState.get_max_health(user_id: number): number
 end
 
 --[[
+Returns actual passive HP regeneration for the genuine Warrior owner.
+
+Args:
+    user_id (number): Authenticated server-selected player profile.
+
+Returns:
+    number: Extra HP per second or zero for forged/untrained identity.
+]]
+function ProgressionRuntimeState.get_health_recovery_per_second(
+    user_id: number
+): number
+    return PassiveSkillEffects.ironvow_health_recovery(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns the purchased rank of a known runtime skill.
 
 Args:
