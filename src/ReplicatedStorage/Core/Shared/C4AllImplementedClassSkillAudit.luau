@@ -218,6 +218,15 @@ local function inspect_scope(scope: any): any
                         Level = level, Kind = skill.Kind,
                         Source = source,
                         Runtime = runtime_values(skill, id, rank),
+                        -- Full authored tables remain accessible for
+                        -- fields beyond the compact numeric summary.
+                        ProgressionDefinition = skill,
+                        CombatDefinition =
+                            Combat.get_for_rank(id, rank),
+                        SourceManaNumberMatches = if source
+                            then (Combat.get_for_rank(id, rank)
+                                or {}).MANA_COST == source.Mp
+                            else nil,
                         ExactC4MechanicsCertified = false,
                     })
                 end
@@ -258,15 +267,24 @@ function Audit.report(): any
     local scopes = {}
     local total = 0
     local sampled = 0
+    local mismatched_mp = 0
     for _, scope in ipairs(SCOPES) do
         local entry = inspect_scope(scope)
         table.insert(scopes, entry)
         total += entry.RankRows
         sampled += entry.SourceRowsReviewed
+        for _, row in ipairs(entry.Rows) do
+            if row.Source
+                and row.SourceManaNumberMatches == false
+            then
+                mismatched_mp += 1
+            end
+        end
     end
     return {
         LevelCap = CAP, ClassScopes = #scopes,
         RanksExamined = total, SourceRowsReviewed = sampled,
+        ReviewedRowsWithDifferentMp = mismatched_mp,
         OtherRankRowsNotSourceVerified = total - sampled,
         Classes = scopes, ExactC4MechanicalParityCertified = false,
     }

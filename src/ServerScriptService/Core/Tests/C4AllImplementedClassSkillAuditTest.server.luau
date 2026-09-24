@@ -21,6 +21,13 @@ for _, entry in ipairs(audit.Classes) do
         assert(entry.SourceRowsReviewed > 0,
             "Each original class requires a sourced numerical example")
     end
+    for _, row in ipairs(entry.Rows) do
+        assert(row.ProgressionDefinition ~= nil,
+            "Every audited rank retains complete progression fields")
+        assert(row.CombatDefinition ~= nil
+            or row.ProgressionDefinition.Kind == "Passive",
+            "All nonpassive ranks require a real effect executor")
+    end
     found[entry.Id] = true
     print(("[C4 ALL-CLASS AUDIT] %s families=%d ranks=%d "
         .. "source_rows=%d unverified=%d legacy=%s")
@@ -37,7 +44,9 @@ for _, class_id in ipairs({
     assert(found[class_id], "Current class omitted: " .. class_id)
 end
 print(("[C4 ALL-CLASS AUDIT] AUDIT_ONLY scopes=%d "
-    .. "rank_rows=%d sourced=%d missing_source=%d parity=OPEN")
+    .. "rank_rows=%d sourced=%d missing_source=%d "
+    .. "different_numeric_mp=%d parity=OPEN")
     :format(audit.ClassScopes, audit.RanksExamined,
         audit.SourceRowsReviewed,
-        audit.OtherRankRowsNotSourceVerified))
+        audit.OtherRankRowsNotSourceVerified,
+        audit.ReviewedRowsWithDifferentMp))
