@@ -82,24 +82,24 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(report.SourceAuditedBranches == 4
-        and report.RankSchedulesMappedBranches == 3
+        and report.RankSchedulesMappedBranches == 4
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
-    check(warrior.Status == "SkillRankParityOutstanding"
+    check(warrior.Status == "RankScheduleMappedEffectsPending"
         and warrior.SourceRankEntriesThroughCap == 62
         and warrior.SourceRankEntriesByLevel[20] == 20
         and warrior.SourceRankEntriesByLevel[24] == 19
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
-    check(warrior.TrainerMappedRankEntries == 61
-        and warrior.MissingRankScheduleEntries == 1
-        and not warrior.SourceRankScheduleMapped
+    check(warrior.TrainerMappedRankEntries == 62
+        and warrior.MissingRankScheduleEntries == 0
+        and warrior.SourceRankScheduleMapped
         and not warrior.ExactSourceRankCoverageCertified
         and not warrior.LaunchSkillCatalogueReady,
-        "Warrior maps 61 of 62 source rank opportunities after real "
-            .. "paid HP regeneration; timed HP surge remains")
+        "Warrior maps all 62 source training rows; its original C4 "
+            .. "gameplay mechanics and class release remain uncertified")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "RankScheduleMappedEffectsPending"
         and knight.SourceRankEntriesThroughCap == 55
