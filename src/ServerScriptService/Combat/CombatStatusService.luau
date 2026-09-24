@@ -127,13 +127,15 @@ function CombatStatusService.apply_self(
         return false
     end
     local fortress = definition.BUFF_KIND == "Fortress"
-    local root = if fortress then character:FindFirstChild(
-        "HumanoidRootPart"
-    ) else nil
-    if fortress and (not root or not root:IsA("BasePart")
-        or definition.IMMOBILIZES_CASTER ~= true)
-    then
-        return false
+    local root: BasePart? = nil
+    if fortress then
+        local candidate = character:FindFirstChild("HumanoidRootPart")
+        if not candidate or not candidate:IsA("BasePart")
+            or definition.IMMOBILIZES_CASTER ~= true
+        then
+            return false
+        end
+        root = candidate
     end
 
     local prior = CombatStatusService.get(
