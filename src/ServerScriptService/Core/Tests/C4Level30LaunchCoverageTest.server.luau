@@ -93,13 +93,13 @@ local function main()
         and warrior.SourceRankEntriesByLevel[24] == 19
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
-    check(warrior.TrainerMappedRankEntries == 44
-        and warrior.MissingRankScheduleEntries == 18
+    check(warrior.TrainerMappedRankEntries == 53
+        and warrior.MissingRankScheduleEntries == 9
         and not warrior.SourceRankScheduleMapped
         and not warrior.ExactSourceRankCoverageCertified
         and not warrior.LaunchSkillCatalogueReady,
-        "Warrior maps 44 of 62 source training ranks after its "
-            .. "independent nine-rank polearm area skill; 18 remain")
+        "Warrior maps 53 of 62 source training ranks after genuine "
+            .. "independent blunt-control and area skills; 9 remain")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "RankScheduleMappedEffectsPending"
         and knight.SourceRankEntriesThroughCap == 55
