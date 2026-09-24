@@ -609,6 +609,82 @@ local function verify_knight_common_crafting(
 end
 
 --[[
+Exercises the other three independent one-crafting-profession careers.
+
+A genuine quest-awarded Knight snapshot is copied only into three
+disposable isolated in-memory profile adapters. The same player ID
+preserves personal quest ownership; none of these snapshots are saved
+to the actual player's persistent account or granted a second career.
+
+Args:
+    profiles (any): Original genuine earned Knight and bought ranks.
+
+Returns:
+    nil: Proves each career's rank-one and rank-two recipes consume
+        materials, create actual inventory outputs and reject other crafts.
+]]
+local function verify_other_common_careers(profiles: any)
+    local earned = Schema.deep_clone(
+        assert(profiles:get_character(USER_ID))
+    )
+    local choices = {
+        {"Herbalism", "Alchemy", "knight_distill_oil"},
+        {"Skinning", "Leatherworking", "knight_cure_hide"},
+        {"Mining", "Enchanting", "knight_inscribe_rune"},
+    }
+    for _, choice in ipairs(choices) do
+        local other_profiles = Profiles.new(Adapter.new())
+        check(other_profiles:load(USER_ID),
+            "Independent crafting career fixture opens its own profile")
+        local fresh = Schema.create_default(USER_ID).Characters.Slot1
+        check(other_profiles:mutate(USER_ID, function(profile: any)
+            local owner = profile.Characters.Slot1
+            owner.Identity = Schema.deep_clone(earned.Identity)
+            owner.ClassAdvancement = Schema.deep_clone(
+                earned.ClassAdvancement
+            )
+            owner.Level = 28
+            owner.Progression = Schema.deep_clone(
+                earned.Progression
+            )
+            owner.ProfessionSlots = Schema.deep_clone(
+                fresh.ProfessionSlots
+            )
+            owner.Professions = Schema.deep_clone(fresh.Professions)
+        end), "Crafting test preserves an authenticated earned Knight")
+        local inventory = Inventory.new(other_profiles)
+        local professions = Professions.new(other_profiles, inventory)
+        check(professions:choose_profession(
+            USER_ID, choice[1]
+        ).ok, "One original gathering career is selected")
+        check(professions:choose_profession(
+            USER_ID, choice[2]
+        ).ok, "One original creation career is selected")
+        local first = assert(ProfessionRecipes.get(
+            choice[3] .. "_rank_1"
+        ))
+        local second = assert(ProfessionRecipes.get(
+            choice[3] .. "_rank_2"
+        ))
+        check(CraftRules.can_make_knight_common(
+            assert(other_profiles:get_character(USER_ID)),
+            choice[2], 2
+        ), "Purchased Knight rank two authorizes its chosen career")
+        for _ = 1, 2 do
+            craft_knight_recipe(
+                other_profiles, inventory, professions, first
+            )
+        end
+        craft_knight_recipe(
+            other_profiles, inventory, professions, second
+        )
+        check(not professions:prepare_craft(
+            USER_ID, "knight_forge_weapon_rank_1"
+        ).ok, "A distinct creation career cannot forge a second craft")
+    end
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -770,6 +846,7 @@ local function award(profiles: any, pending: any)
     verify_sword_blunt_mastery(profiles, service)
     verify_equipment_expertise(profiles, service)
     verify_knight_common_crafting(profiles, service)
+    verify_other_common_careers(profiles)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
         "Knight quest, rune, recovery, shield, stance and drain persist")
 end
