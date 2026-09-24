@@ -1,3 +1,33 @@
+## 24 September 2026 — v2.09 verified Knight timed defence
+
+[Current class roadmap](../roadmap/DungeonMMO_Roadmap_v2_09_Knight_Steadfast_Stance_20260924.md)
+and [exact playtest evidence](
+../testing/oathguard-steadfast-stance-v2-09-20260924.md).
+On branch `wip/phase-4-test-hud-integration-v1`,
+level-20 earned-only Oathguard Steadfast Stance requires
+purchased basic Fighter armour rank 3 and the actual Knight
+trainer. Authenticated client Play consumes 14 stamina,
+applies ten seconds of server PhysicalGuard reducing
+100-base physical enemy melee/area damage to 90 actual
+player HP, with a 24-second cooldown. Enemy magic, ordinary
+player attacks and expired buff still deal 100; an immediate
+recast did not extend expiry and a forged Fighter is denied.
+Fresh Base/Dungeon Rojo PASS, original Knight quest/foundation
+70/67 assertions PASS, rank audit 27 PASS, independent Play
+`VERIFIED_PLAY_MODE_PASS`. Source Knight **38/54 mapped**,
+**16 missing**, Warrior **27/62 mapped**, **35 missing**;
+**0/18** branches fully level-30 release certified.
+Earlier v2.08 Knight client healing 30/44 HP and 8-rank
+rune protection 95.2 damage from 100 also PASS.
+Earlier physical Base first-hold MISS recurred, but the
+bounded genuine client retry completed real NPC, owner item,
+mentor and client trainer flows; production first-try prompt
+reliability is not fixed or certified. Natural saved
+progression, live other-player isolation and cross-place
+acceptance remain open. Permanent source/docs in GitHub
+only; desktop for disposable builds/Studio and logs.
+No `main` merge, Roblox place publish or production save.
+
 24 September live verification addendum: both disposable Rojo builds
 PASS. Studio Knight quest/foundation 66/62 assertions PASS and
 level-30 launch audit 27 PASS. New unpublished full-Dungeon Play
