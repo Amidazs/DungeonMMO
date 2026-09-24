@@ -3063,6 +3063,15 @@ local function handle_defense_request(
     end
 
     if action == "BlockStart" then
+        if StaminaService.get(player)
+            < CombatConfig.DEFENSE.MIN_BLOCK_START_STAMINA
+        then
+            CombatValidationService.emit(
+                player, "BLOCK", "REJECT", "InsufficientStamina",
+                record.sequence_id
+            )
+            return
+        end
         local equipment_effects =
             ProgressionRuntimeState.get_equipment_effects(player.UserId)
 
