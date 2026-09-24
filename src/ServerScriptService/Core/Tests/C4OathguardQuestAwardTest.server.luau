@@ -15,6 +15,9 @@ local QuestService = require(
 local Transfer = require(SSS.Core.Services.OriginalFirstTransferService)
 local Inventory = require(SSS.Core.Services.InventoryService)
 local Equipment = require(SSS.Core.Services.EquipmentService)
+local Professions = require(SSS.Core.Services.ProfessionService)
+local ProfessionRecipes = require(Shared.ProfessionRecipes)
+local CraftRules = require(Shared.C4ProfessionSkillRules)
 local SkillService = require(SSS.Core.Services.SkillProgressionService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
 local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
@@ -427,6 +430,151 @@ local function verify_equipment_expertise(profiles: any, service: any)
 end
 
 --[[
+Stocks the exact server-owned inputs for one paid rank-restricted recipe.
+
+Args:
+    inventory (any): Genuine inventory mutation service.
+    profiles (any): Current authoritative Knight character.
+    recipe (any): Registered recipe with real consumable inputs.
+
+Returns:
+    nil: Confirms every input is owned before the actual craft.
+]]
+local function stock_knight_recipe(
+    inventory: any, profiles: any, recipe: any
+)
+    for _, input in ipairs(recipe.Inputs) do
+        local character = assert(profiles:get_character(USER_ID))
+        local available = Inventory.count_item(character, input.ItemId)
+        local needed = math.max(0, input.Quantity - available)
+        if needed > 0 then
+            check(inventory:add_item(
+                USER_ID, input.ItemId, needed
+            ).ok, "Knight has real cross-profession recipe inputs")
+        end
+    end
+end
+
+--[[
+Completes one material-backed, actual class-rank craft transaction.
+
+Args:
+    profiles (any): Persistent Knight owner profile.
+    inventory (any): Server inventory containing owned ingredients.
+    professions (any): Real selected-career minigame craft service.
+    recipe (any): Registered ranked common item recipe.
+
+Returns:
+    nil: Checks atomic input consumption and one real output grant.
+]]
+local function craft_knight_recipe(
+    profiles: any, inventory: any, professions: any, recipe: any
+)
+    stock_knight_recipe(inventory, profiles, recipe)
+    local character = assert(profiles:get_character(USER_ID))
+    local output_before = Inventory.count_item(
+        character, recipe.Output.ItemId
+    )
+    local primary = recipe.Inputs[1]
+    local ingredient_before = Inventory.count_item(
+        character, primary.ItemId
+    )
+    local prepared = professions:prepare_craft(USER_ID, recipe.Id)
+    check(prepared.ok, "Actual Knight craft prepared " .. recipe.Id)
+    local result = professions:complete_craft(
+        USER_ID, recipe.Id,
+        Professions.foundation_success_outcome(prepared.minigame_id)
+    )
+    check(result.ok, "Real Knight common item transaction failed "
+        .. tostring(result.reason))
+    character = assert(profiles:get_character(USER_ID))
+    check(Inventory.count_item(
+        character, recipe.Output.ItemId
+    ) == output_before + recipe.Output.Quantity,
+        "Knight rank craft must grant exactly its owned item output")
+    check(Inventory.count_item(
+        character, primary.ItemId
+    ) == ingredient_before - primary.Quantity,
+        "Knight craft must consume materials, never duplicate them")
+end
+
+--[[
+Purchases original common creation tiers 2/3 in ONE crafting career.
+
+Args:
+    profiles (any): Actual quest-awarded Knight owner.
+    service (any): Current class-trainer rank purchase service.
+
+Returns:
+    nil: Proves independent rank gates, craft output, career isolation.
+]]
+local function verify_knight_common_crafting(
+    profiles: any, service: any
+)
+    local inventory = Inventory.new(profiles)
+    local professions = Professions.new(profiles, inventory)
+    local skill_id = "OathguardCommonItemCreation"
+    check(professions:choose_profession(
+        USER_ID, "Mining"
+    ).ok, "Knight picks one independent gathering career")
+    check(professions:choose_profession(
+        USER_ID, "Blacksmithing"
+    ).ok, "Knight picks only one crafting career")
+    check(service:learn_trainer_skill(
+        USER_ID, "C4RecipeReading"
+    ).ok, "Knight must genuinely buy starter recipe literacy")
+    check(service:learn_trainer_skill(
+        USER_ID, "C4CommonItemCreation"
+    ).ok, "Knight must genuinely buy starter common creation")
+    local first = assert(ProfessionRecipes.get(
+        "knight_forge_weapon_rank_1"
+    ))
+    local second = assert(ProfessionRecipes.get(
+        "knight_forge_armor_rank_2"
+    ))
+    check(not professions:prepare_craft(
+        USER_ID, first.Id
+    ).ok, "Unpaid Knight cannot use source-tier common creation")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 20
+    end), "Knight reaches original source common creation tier2")
+    local first_purchase = service:learn_trainer_skill(
+        USER_ID, skill_id
+    )
+    check(first_purchase.ok and first_purchase.rank == 1,
+        "Earned Knight cannot buy its first source creation tier "
+            .. tostring(first_purchase.reason))
+    check(CraftRules.can_make_knight_common(
+        assert(profiles:get_character(USER_ID)),
+        "Blacksmithing", 1
+    ), "First personally paid Knight source rank must unlock craft")
+    check(not professions:prepare_craft(
+        USER_ID, second.Id
+    ).ok, "Rank-three common goods cannot be crafted at tier two")
+    for _ = 1, 5 do
+        craft_knight_recipe(profiles, inventory, professions, first)
+    end
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 28
+        profile.Characters.Slot1.Progression.SkillPointEntitlement
+            = 12000
+    end), "Knight reaches original source common creation tier3")
+    local last = service:purchase_rank(USER_ID, skill_id)
+    check(last.ok and last.rank == 2,
+        "Earned Knight must buy second independent common creation tier "
+            .. tostring(last.reason))
+    craft_knight_recipe(profiles, inventory, professions, second)
+    check(not professions:prepare_craft(
+        USER_ID, "knight_distill_oil_rank_1"
+    ).ok, "Buying Knight creation rank cannot grant Alchemy as second craft")
+    local character = assert(profiles:get_character(USER_ID))
+    check(character.ProfessionSlots.Creation == "Blacksmithing"
+        and character.ProfessionSlots.Gathering == "Mining"
+        and character.Progression.Skills[skill_id].PurchasedRank == 2,
+        "Two source ranks and exactly one crafting/gathering career persist")
+end
+
+--[[
 Buys every separately ranked Knight damage-to-heal spell.
 
 Args:
@@ -587,6 +735,7 @@ local function award(profiles: any, pending: any)
     verify_arrow_ward(profiles, service)
     verify_sword_blunt_mastery(profiles, service)
     verify_equipment_expertise(profiles, service)
+    verify_knight_common_crafting(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
         "Knight quest, rune, recovery, shield, stance and drain persist")
 end
