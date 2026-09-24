@@ -253,6 +253,35 @@ local function verify_shield_mastery(profiles: any, service: any)
 end
 
 --[[
+Purchases a separate timed Knight guard through the earned-class trainer.
+
+Args:
+    profiles (any): Isolated quest-awarded Oathguard profile service.
+    service (any): Actual authoritative trainer and skill-purchase service.
+
+Returns:
+    nil: Confirms paid Fighter armour prerequisite and saved Knight stance.
+]]
+local function verify_defensive_stance(profiles: any, service: any)
+    local stance_id = "OathguardSteadfastStance"
+    local denied = service:learn_trainer_skill(USER_ID, stance_id)
+    check(not denied.ok,
+        "Knight cannot skip basic Fighter armour training")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills
+            .FighterArmorTraining = {
+                Known = true, PurchasedRank = 3, Proficiency = 0,
+            }
+    end), "Knight has trained the Fighter armour prerequisite")
+    local result = service:learn_trainer_skill(USER_ID, stance_id)
+    check(result.ok and result.rank == 1,
+        "Earned Knight's own physical trainer sells its distinct stance")
+    check(profiles:get_character(USER_ID).Progression
+        .Skills[stance_id].PurchasedRank == 1,
+        "Purchased Knight stance persists in the authoritative profile")
+end
+
+--[[
 Awards Knight only at level twenty with one-use private mentor evidence.
 
 Args:
@@ -368,8 +397,9 @@ local function award(profiles: any, pending: any)
         .Progression.Skills[recovery_id].PurchasedRank == 3,
         "Three source-level-28 personal recovery ranks remain purchased")
     verify_shield_mastery(profiles, service)
+    verify_defensive_stance(profiles, service)
     check(profiles:save(USER_ID, "OathguardOriginalTransfer"),
-        "Knight quest, class, rune, self-heal and shield ranks persist")
+        "Knight quest, class, rune, recovery, shield and stance persist")
 end
 
 --[[
