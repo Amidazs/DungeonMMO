@@ -3,6 +3,8 @@
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Coverage = require(Shared.C4Level30LaunchCoverage)
+local Branches = require(Shared.C4FirstTransferBranches)
+local BaseInventory = require(Shared.C4BaseSkillInventory)
 
 local checks = 0
 
@@ -78,6 +80,28 @@ local function main()
         total = 77,
         brackets = {[20] = 26, [24] = 25, [28] = 26},
     })
+    local human_paths = assert(Branches.get("Human", "Fighter"))
+    local elven_paths = assert(Branches.get("Elf", "Fighter"))
+    check(#human_paths == 3
+        and human_paths[1].Id == "HumanWarrior"
+        and human_paths[2].Id == "HumanKnight"
+        and human_paths[3].Id == "HumanRogue",
+        "Human Fighter must keep its three separate first transfers")
+    check(#elven_paths == 2
+        and elven_paths[1].Id == "ElvenKnight"
+        and elven_paths[2].Id == "ElvenScout",
+        "Elven Fighter must keep both its Knight and Scout branches")
+    check(BaseInventory.get("Human", "Fighter") ~= nil
+        and BaseInventory.get("Elf", "Fighter") ~= nil,
+        "Human and Elven starter skill inventories must stay separate")
+    local elven_knight = assert(Coverage.for_branch("ElvenKnight"))
+    check(elven_knight.SourceClass == "Elven Knight"
+        and elven_knight.CurrentCareerId == nil
+        and elven_knight.SourceInventoryAuditedThroughCap == false
+        and elven_knight.TrainerMappedRankEntries == 0
+        and elven_knight.SourceRankScheduleMapped == false
+        and elven_knight.LaunchSkillCatalogueReady == false,
+        "Do not count the unimplemented Elven Knight as a Scout")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")

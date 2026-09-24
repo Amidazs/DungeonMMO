@@ -1,3 +1,7 @@
+## 24 September 2026 — CURRENT v2.24 Fighter class-tree correction
+
+[Class tree and follow-up roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_24_Human_Elven_Fighter_Path_Gap_20260924.md). Human level-1 Fighter branches at 20 into Warrior/Ironvow, Knight/Oathguard or Rogue/Ashenblade. Elven level-1 Fighter branches into Scout/GreenwardScout or **unimplemented Elven Knight** (proposed display name Greenward Warden; do not rename existing Scout). Human/Elf starter Fighter are separate source inventories despite the shared internal Fighter ID; do not count starter skills as first-transfer ranks. Existing first-transfer mapping 4/18, mechanically release-certified 0/18; Elven Knight is not one of the four. Focused source-audit test now guards three Human/two Elf first transfers and missing Elf Knight, not yet executed in Studio. New v2.23 stored-avatar recovery/surge Play tests remain pending. No main merge/publish/production saves or animation changes.
+
 ## 24 September 2026 — v2.23 follow-up: detached-avatar precharge guard (Studio Play pending)
 
 GitHub commit [39ba212](https://github.com/Amidazs/DungeonMMO/commit/39ba212654431c529b56309d6187e615e5fbb9b4)

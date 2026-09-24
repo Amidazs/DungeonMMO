@@ -1,3 +1,6 @@
+**Current class-tree checkpoint: v2.24 — Human Fighter has three first-transfer choices, Elven Fighter has two; Elven Knight is the unimplemented fifth fighter path.**
+[Class-tree checkpoint](docs/roadmap/DungeonMMO_Roadmap_v2_24_Human_Elven_Fighter_Path_Gap_20260924.md) records race-specific base Fighter source skills, keeps Greenward Scout distinct from the proposed Elven Knight/Warden, and does not mislabel Human Warrior as a level-1 starter. New focused coverage assertions are written but not yet Studio-executed. v2.23's stored-avatar security Play checks also remain pending.
+
 ## 24 September 2026 — v2.23 follow-up: detached-avatar precharge guard (Studio Play pending)
 
 GitHub commit [39ba212](https://github.com/Amidazs/DungeonMMO/commit/39ba212654431c529b56309d6187e615e5fbb9b4)
