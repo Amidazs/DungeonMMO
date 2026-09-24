@@ -1251,10 +1251,10 @@ local function enter_active(
                 )
                 melee_definition.REACH_STUDS = 7.0
                 melee_definition.ARC_DEGREES = 130
-                melee_definition.MAX_TARGETS = if
-                    ProgressionRuntimeState.get_skill_rank(
-                        player.UserId, "IronvowPolearmTraining"
-                    ) >= 1 then 10 else 5
+                melee_definition.MAX_TARGETS = 5
+                    + ProgressionRuntimeState.get_polearm_extra_targets(
+                        player.UserId
+                    )
                 melee_definition.HITBOX = {
                     SIZE = Vector3.new(10.0, 5.0, 7.0),
                     FORWARD_OFFSET = 3.5,
