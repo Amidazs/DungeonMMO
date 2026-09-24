@@ -1,4 +1,30 @@
-**Current DungeonMMO backend: v2.16 — source-grounded Warrior polearm mastery, real 5/10-NPC capped sweep and dual-handed shield abuse tests PASS; 27 Warrior rows remain.**
+**Current DungeonMMO backend: v2.17 — nine distinct original Warrior polearm area-attack ranks; 20/22 actual NPCs hit exactly once in each tested rank, 18 Warrior source rows remain.**
+[Current class roadmap](
+DungeonMMO_Roadmap_v2_17_Warrior_Crescent_Sweep_20260924.md)
+and [exact targeted Studio evidence](
+../testing/ironvow-crescent-sweep-v2-17-20260924.md).
+The earned Warrior `IronvowCrescentSweep` is a genuine
+20/24/28 three-rank-per-band skill with its own trainer,
+required real equipped polearm and learned mastery,
+source power 90–191 and MP 22–30 by independently bought
+rank. This is **not** the ordinary polearm melee swing.
+Actual server area acquisition caps 20 enemy targets
+independently of basic polearm 5/10 cap. One disposable
+22-NPC world test at ranks1/9 measured 20 actual HP losses
+once each, **46 assertions PASS**; Quest/Award/Foundation
+**31/118/96 PASS**; source audit **27 PASS**; disposable
+Base/Dungeon Rojo builds PASS. Warrior rank schedules now
+**44/62 mapped**, 18 still missing; Knight **55/55
+scheduled**, neither class has full historical C4 math,
+natural cross-place play or release certification. Roblox
+area power adapter 0.15 × historical C4 source power is
+provisional, not proven source damage scaling. The area
+HP fixture used a scripted attacker, not real mouse-input
+or live MP spending; these remain explicit open tests.
+No `main` merge, Roblox publishing, production saves
+or unrelated animation work changes.
+
+**Previous DungeonMMO backend: v2.16 — Warrior polearm mastery and physical multi-target basic swings passed, with 27 unmapped source ranks at that checkpoint.**
 [Current v2.16 C4 roadmap](
 DungeonMMO_Roadmap_v2_16_Warrior_Polearm_20260924.md)
 and [exact executed source/runtime/Play evidence](
