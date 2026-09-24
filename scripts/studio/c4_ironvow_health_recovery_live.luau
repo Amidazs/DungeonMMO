@@ -92,7 +92,11 @@ local function main()
     local received = Recovery.apply_tick(player, 1)
     assert(math.abs(received - 1.1) < 0.02
         and math.abs(humanoid.Health - before - received) < 0.02,
-        "Paid Warrior passive did not restore 1.1 actual owner HP")
+        "Paid Warrior passive did not restore 1.1 actual owner HP: "
+            .. "before=" .. tostring(before)
+            .. " received=" .. tostring(received)
+            .. " after=" .. tostring(humanoid.Health)
+            .. " max=" .. tostring(humanoid.MaxHealth))
     humanoid.Health = humanoid.MaxHealth - 0.5
     local capped = Recovery.apply_tick(player, 1)
     assert(math.abs(capped - 0.5) < 0.02
