@@ -1,4 +1,4 @@
-**Current DungeonMMO class backend: v2.08 — GitHub-only Oathguard shield-mastery candidate, Studio verification pending.**
+**Current DungeonMMO class backend: v2.08 — focused Studio and real-player shield damage PASS; new Base physical prompt FAIL; full acceptance pending.**
 [Latest level-30 roadmap](
 DungeonMMO_Roadmap_v2_08_Oathguard_Shield_Masteries_20260924.md)
 and [pending acceptance checklist](
@@ -19,6 +19,20 @@ Ironvow Base physical PASS remains historical evidence; its
 Knight healing/magic live-client effect tests are still
 pending. No level-30 release certification, main merge,
 Roblox publish or production DataStore operations occurred.
+
+New 24 September focused Studio quest/foundation **66/62 PASS**,
+level-30 source audit **27 PASS**, both disposable Rojo builds PASS,
+and live full-Dungeon **actual player-HP shield damage PASS**:
+99.2/98.4 from 100 base hostile melee at ranks one/two, 98.4
+hostile area at rank two, and zero shield benefit on magic, PvP,
+missing/wrong gear or forged class. This Play fixture uses an
+internally valid **synthetic** Knight quest/rank/equipment snapshot,
+not naturally client-purchased/equipped state. A separately executed
+**two-client physical Base test FAILED** at the visible, enabled
+Captain Rowan prompt: holding it did not fire server Triggered.
+Pending: targeted prompt transport fix, natural class/equipment
+path, live client heal/magic and cross-place save/rejoin.
+[Fresh detailed evidence](../testing/oathguard-shield-mastery-github-candidate-v2-08-20260924.md).
 
 **Previous DungeonMMO class backend: v2.07 — verified recovered Ironvow physical Base acceptance and additional Knight anti-magic and owner-healing ranks.**
 [Current level-30 class/skill roadmap](
