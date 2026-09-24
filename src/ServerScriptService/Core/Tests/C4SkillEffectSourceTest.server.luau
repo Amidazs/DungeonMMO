@@ -110,8 +110,11 @@ local function check_known_vectors()
         "Expertise D rank1 exact passive identity")
 
     local heal = assert(Effects.get_rank(58, 4))
-    check(heal.Sets.mpConsume == 53,
-        "Elven Elemental Heal C4 rank4 exact MP")
+    check(heal.Sets.mpInitialConsume == 11
+        and heal.Sets.mpConsume == 42
+        and heal.Sets.mpInitialConsume + heal.Sets.mpConsume == 53
+        and heal.Effects[1].power == 95,
+        "Elemental Heal rank4 exact split MP and heal power")
 end
 
 --[[
