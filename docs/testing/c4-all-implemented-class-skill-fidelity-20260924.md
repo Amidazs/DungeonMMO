@@ -53,3 +53,19 @@ This test is *not* a statement that matching skill-rank
 counts, names or a successfully functioning game
 proves original C4 damage, passives or PvP balance.
 The C4 source/runtime data and formulas still differ.
+
+## Final full-field audit rerun
+
+The completed full-definition candidate `ed570e51e36052f6093bb2da0195f711e33a20d5` was fast-forwarded,
+Rojo-built and run again in an unpublished disposable Dungeon place:
+`%TEMP%\\DungeonMMO_v242_all_classes_skill_audit_final\\audit.log`.
+The final run passed `VERIFIED_INVENTORY_NOT_PARITY` and reported
+13 race/class scopes, 1,353 class-scoped current rank rows, 32
+individually sourced numeric rank rows, **32/32 different numerical
+MP values**, and 1,321 rank occurrences still without an individual
+verified original C4 numerical record. Each row now also retains its
+full current progression/passive and resolved combat definition,
+including settings outside the compact numeric summary. A numeric
+mana mismatch by itself is not proof that the original and Roblox
+mana economies have comparable scales; no class is mechanically
+certified from this inventory result. No gameplay values changed.
