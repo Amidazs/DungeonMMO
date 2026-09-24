@@ -2073,6 +2073,81 @@ local GREENWARD_WARDEN_AGGRESSION = specialize_skill(
     }
 )
 
+-- Distinct original Elven Knight support passives activate only
+-- after a genuinely learned and server-accepted paid client cast.
+-- Percentage adapters and individual-vs-party aura effects remain
+-- provisional, and must not be mistaken for exact original C4 maths.
+local GREENWARD_WARDEN_DEFENSE_AURA = specialize_skill(
+    ELVEN_SCOUT_GUARD, "GreenwardWardenDefenseAura",
+    "Greenward Shielding Aura", {
+        MANA_COST = 10, STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 30, BUFF_KIND = "PhysicalGuard",
+        BUFF_MAGNITUDE = 0.07, BUFF_SECONDS = 120,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.07, BUFF_SECONDS = 120,
+            }),
+        }),
+    }
+)
+
+-- Non-stacking, immobilising dual defence still permits bounded
+-- hostile chip damage. Do not apply source flat stats as Roblox HP.
+local GREENWARD_WARDEN_LAST_STAND = specialize_skill(
+    OATHGUARD_LAST_BASTION, "GreenwardWardenLastStand",
+    "Greenward Last Stand", {
+        MANA_COST = 19, STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 1800, BUFF_SECONDS = 30,
+        IMMOBILIZES_CASTER = true,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.35, BUFF_SECONDS = 30,
+            }),
+        }),
+    }
+)
+
+-- Only a genuine server-recorded tier-three-or-lower poison is
+-- removable. Client-authored status attributes never count.
+local GREENWARD_WARDEN_POISON_RECOVERY = specialize_skill(
+    ELVEN_SCOUT_POISON_RECOVERY, "GreenwardWardenPoisonRecovery",
+    "Greenward Venom Cleansing", {
+        SELF_ONLY = true, MANA_COST = 10,
+        COOLDOWN_SECONDS = 6, TOTAL_HEAL = 0,
+        CURE_POISON_TIER = 3,
+        RANKS = table.freeze({
+            [1] = table.freeze({CURE_POISON_TIER = 3}),
+        }),
+    }
+)
+
+-- Bow-only timed protection cannot reduce hostile melee or spells.
+local GREENWARD_WARDEN_BOW_WARD = specialize_skill(
+    OATHGUARD_ARROW_WARD, "GreenwardWardenBowWard",
+    "Greenward Arrow Ward", {
+        MANA_COST = 22, BUFF_MAGNITUDE = 0.16,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                MANA_COST = 22, BUFF_MAGNITUDE = 0.16,
+            }),
+        }),
+    }
+)
+
+-- A paid short-lived physical-power aura, not an always-on bonus.
+local GREENWARD_WARDEN_ATTACK_AURA = specialize_skill(
+    ELVEN_SCOUT_BATTLE_FOCUS, "GreenwardWardenAttackAura",
+    "Greenward Battle Aura", {
+        MANA_COST = 11, STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 30, BUFF_SECONDS = 30,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.08, BUFF_SECONDS = 30,
+            }),
+        }),
+    }
+)
+
 -- A genuine longbow impact applies slow through RangerCombatService.
 local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
     CRIPPLING_SHOT, "ElvenScoutSnaringShot", "Snaring Shot", {
@@ -2329,6 +2404,11 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GreenwardWardenElementalHeal = GREENWARD_WARDEN_ELEMENTAL_HEAL,
     GreenwardWardenCharm = GREENWARD_WARDEN_CHARM,
     GreenwardWardenAggression = GREENWARD_WARDEN_AGGRESSION,
+    GreenwardWardenDefenseAura = GREENWARD_WARDEN_DEFENSE_AURA,
+    GreenwardWardenLastStand = GREENWARD_WARDEN_LAST_STAND,
+    GreenwardWardenPoisonRecovery = GREENWARD_WARDEN_POISON_RECOVERY,
+    GreenwardWardenBowWard = GREENWARD_WARDEN_BOW_WARD,
+    GreenwardWardenAttackAura = GREENWARD_WARDEN_ATTACK_AURA,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,

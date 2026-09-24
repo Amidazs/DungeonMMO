@@ -141,6 +141,8 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_fighter_armor_reduction(defender.UserId)
         local shield_reduction = ProgressionRuntimeState
             .get_oathguard_shield_reduction(defender.UserId)
+        local warden_shield_reduction = ProgressionRuntimeState
+            .get_greenward_warden_shield_reduction(defender.UserId)
         local mystic_reduction = ProgressionRuntimeState
             .get_mystic_armor_reduction(defender.UserId)
         local guard_bonus = CombatStatusService.get(
@@ -158,7 +160,7 @@ function DamageService.apply_damage(context: DamageContext): number
             else 0.50
         damage *= 1 - math.clamp(
             reduction + fighter_reduction + shield_reduction
-                + mystic_reduction + guard_bonus + novice_reduction
+                + warden_shield_reduction + mystic_reduction + guard_bonus + novice_reduction
                 + fortress_bonus + bow_bonus,
             0, max_reduction
         )

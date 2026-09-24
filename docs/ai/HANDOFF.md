@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.30 Warden defensive utilities
+
+[Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_30_Elven_Knight_Defensive_Utility_20260924.md). Greenward Warden now maps 53/56 rank schedules; missing common creation 2 and real player-bleed recovery 1. Independently paid Warden equipment expertise + own D Body, shield mastery with OffHand check and bounded hostile mitigation, timed self-status defensive/attack auras and ultimate defence, server poison cleanse and bow-only ward registered. Historical C4 aura target/formula parity NOT verified; actual physical quest monsters and live-client skill play pending. Updated source-audit/training tests not executed in Studio. No main merge/publish/production saves/animation changes.
+
 ## 24 September 2026 — v2.29 Warden active heal and aggro
 
 [Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_29_Elven_Knight_Heal_Charm_Taunt_20260924.md). Warden's ElementalHeal (9), Charm (9), Aggression (6) new separately bought combat families use actual MageHealService and single-target ThreatService owner-only reduce/taunt with MP spend and zero-damage threat skills. Six Warden families now map 45/56 source training ranks; 11 remaining. Focused in-memory rank purchase driver updated but NOT Studio run. Full C4 balancing/formula/source range parity and actual client/physical dungeon quest Play remain OPEN. No main merge/publish/production saves/animation changes.

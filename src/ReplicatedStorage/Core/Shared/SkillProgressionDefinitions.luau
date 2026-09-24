@@ -2005,6 +2005,81 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Distinct Elven Knight first-transfer utility and protection
+    -- families. No Human Knight or Scout trainer identity is shared.
+    GreenwardWardenEquipmentExpertise = table.freeze({
+        Id = "GreenwardWardenEquipmentExpertise",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20}),
+        AdvancedEquipmentEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenShieldMastery = table.freeze({
+        Id = "GreenwardWardenShieldMastery",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        PhysicalReductionPerRank = 0.008,
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenDefenseAura = table.freeze({
+        Id = "GreenwardWardenDefenseAura",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenLastStand = table.freeze({
+        Id = "GreenwardWardenLastStand",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenPoisonRecovery = table.freeze({
+        Id = "GreenwardWardenPoisonRecovery",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenBowWard = table.freeze({
+        Id = "GreenwardWardenBowWard",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 24}),
+        WeaponTags = table.freeze({}),
+    }),
+
+    GreenwardWardenAttackAura = table.freeze({
+        Id = "GreenwardWardenAttackAura",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 28}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The original Knight's seven dark-magic life-drain ranks occur
     -- at source brackets 20/24/28. Actual health is restored only after
     -- the server confirms damage to a valid opposing NPC.

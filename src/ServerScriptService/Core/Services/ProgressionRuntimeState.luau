@@ -613,6 +613,23 @@ function ProgressionRuntimeState.get_oathguard_shield_reduction(
 end
 
 --[[
+Returns independent earned Elven Knight mitigation with real OffHand.
+
+Args:
+    user_id (number): Authentic current server-owned player.
+
+Returns:
+    number: Zero without a verified Warden rank and shield.
+]]
+function ProgressionRuntimeState.get_greenward_warden_shield_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.greenward_warden_shield_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns verified original Knight resistance against enemy spell damage.
 
 Args:

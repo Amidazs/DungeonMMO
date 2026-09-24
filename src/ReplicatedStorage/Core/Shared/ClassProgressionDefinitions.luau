@@ -172,6 +172,13 @@ local DEFINITIONS = table.freeze({
             "GreenwardWardenElementalHeal",
             "GreenwardWardenCharm",
             "GreenwardWardenAggression",
+            "GreenwardWardenEquipmentExpertise",
+            "GreenwardWardenShieldMastery",
+            "GreenwardWardenDefenseAura",
+            "GreenwardWardenLastStand",
+            "GreenwardWardenPoisonRecovery",
+            "GreenwardWardenBowWard",
+            "GreenwardWardenAttackAura",
         }),
     }),
 

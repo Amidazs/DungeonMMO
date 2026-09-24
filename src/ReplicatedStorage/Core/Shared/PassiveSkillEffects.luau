@@ -284,6 +284,26 @@ function PassiveSkillEffects.has_oathguard_equipment_expertise(
 end
 
 --[[
+Checks whether an earned Elven Knight owns its distinct equipment rank.
+
+Args:
+    character (any): Current authoritative Warden owner and purchased ranks.
+
+Returns:
+    boolean: Permission for its own D-grade item only at level 20+.
+]]
+function PassiveSkillEffects.has_greenward_warden_equipment_expertise(
+    character: any
+): boolean
+    return type(character) == "table"
+        and (tonumber(character.Level) or 0) >= 20
+        and purchased_rank(
+            character,
+            SkillDefinitions.get("GreenwardWardenEquipmentExpertise")
+        ) >= 1
+end
+
+--[[
 Authorizes only genuinely advanced, paid level-20 Warrior D-grade gear.
 
 Args:
@@ -577,6 +597,36 @@ function PassiveSkillEffects.oathguard_shield_reduction(
     end
     return math.clamp(resolve_bonus(
         character, "OathguardShieldMastery", "PhysicalReductionPerRank"
+    ), 0, 0.016)
+end
+
+--[[
+Returns paid Warden shield mastery only with a valid equipped shield.
+
+Args:
+    character (any): Earned Elven Knight with authoritative OffHand.
+
+Returns:
+    number: 0 without a shield; otherwise capped at 1.6% reduction.
+]]
+function PassiveSkillEffects.greenward_warden_shield_reduction(
+    character: any
+): number
+    local equipment = type(character) == "table"
+        and character.Equipment
+    local offhand_id = type(equipment) == "table"
+        and equipment.OffHand
+    local shield = if type(offhand_id) == "string"
+        then ItemDefinitions.get(offhand_id) else nil
+    if not shield or shield.Kind ~= "Equipment"
+        or shield.Slot ~= "OffHand"
+        or shield.Category ~= "Shield"
+    then
+        return 0
+    end
+    return math.clamp(resolve_bonus(
+        character, "GreenwardWardenShieldMastery",
+        "PhysicalReductionPerRank"
     ), 0, 0.016)
 end
 

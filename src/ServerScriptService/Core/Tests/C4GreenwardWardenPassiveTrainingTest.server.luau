@@ -57,6 +57,34 @@ local FAMILIES = table.freeze({
         Id = "GreenwardWardenAggression",
         Levels = table.freeze({24, 24, 24, 28, 28, 28}),
     }),
+    table.freeze({
+        Id = "GreenwardWardenEquipmentExpertise",
+        Levels = table.freeze({20}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenShieldMastery",
+        Levels = table.freeze({20, 28}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenDefenseAura",
+        Levels = table.freeze({20}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenLastStand",
+        Levels = table.freeze({20}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenPoisonRecovery",
+        Levels = table.freeze({20}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenBowWard",
+        Levels = table.freeze({24}),
+    }),
+    table.freeze({
+        Id = "GreenwardWardenAttackAura",
+        Levels = table.freeze({28}),
+    }),
 })
 local assertions = 0
 
@@ -202,9 +230,11 @@ local function purchase_family(
         profile.Characters.Slot1.Level = 20
     end), "Training bracket resets before each family")
     local initial = assert(profiles:get_character(OWNER_ID))
-    check(not SkillRules.can_train(
-        initial, definition, definition.MaxRank
-    ), "Level-20 owner cannot skip into a level-28 rank")
+    if family.Levels[#family.Levels] > 20 then
+        check(not SkillRules.can_train(
+            initial, definition, definition.MaxRank
+        ), "Level-20 owner cannot skip a higher-rank bracket")
+    end
     for rank, level in ipairs(family.Levels) do
         check(profiles:mutate(OWNER_ID, function(profile: any)
             local owner = profile.Characters.Slot1
@@ -252,6 +282,8 @@ local function verify_equipment(
         "Fixture owner receives one genuine dagger")
     check(inventory:add_item(OWNER_ID, "marauder_sword").ok,
         "Fixture owner receives one genuine sword")
+    check(inventory:add_item(OWNER_ID, "marauder_shield").ok,
+        "Fixture owner receives a real registered shield")
     check(inventory:add_item(OWNER_ID, "marauder_armor").ok,
         "Fixture owner receives one genuine heavy Body item")
     check(equipment:equip(
@@ -267,12 +299,17 @@ local function verify_equipment(
     check(equipment:equip(
         OWNER_ID, "marauder_armor", "Body"
     ).ok, "Actual heavy armour equips")
+    check(equipment:equip(
+        OWNER_ID, "marauder_shield", "OffHand"
+    ).ok, "Actual one-handed sword and shield pairing is allowed")
     owner = assert(profiles:get_character(OWNER_ID))
     check(Passives.damage_bonus(
         owner, "GreenwardWardenSteelTraining"
     ) > 0 and Passives.fighter_armor_reduction(owner) > 0,
         "Correct equipped categories activate purchased mastery")
     Runtime.set_character(OWNER_ID, owner)
+    check(Passives.greenward_warden_shield_reduction(owner) > 0,
+        "A legitimate equipped shield activates paid Warden mastery")
     check(Runtime.get_physical_multiplier(OWNER_ID) > 1
         and Runtime.get_fighter_armor_reduction(OWNER_ID) > 0
         and Runtime.get_greenward_warden_magic_reduction(OWNER_ID) > 0,
@@ -334,8 +371,8 @@ local function main()
         purchase_family(profiles, skills, family)
     end
     local audit = assert(Coverage.for_branch(BRANCH_ID))
-    check(audit.TrainerMappedRankEntries == 45
-        and audit.MissingRankScheduleEntries == 11
+    check(audit.TrainerMappedRankEntries == 53
+        and audit.MissingRankScheduleEntries == 3
         and not audit.LaunchSkillCatalogueReady,
         "No incomplete Warden source family becomes release-certified")
     verify_equipment(profiles, Equipment.new(profiles, "Base"))

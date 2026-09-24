@@ -103,8 +103,8 @@ local function main()
         and elven_knight.SourceRankEntriesByLevel[24] == 18
         and elven_knight.SourceRankEntriesByLevel[28] == 20,
         "Elven Knight must keep its independently sourced 56 ranks")
-    check(elven_knight.TrainerMappedRankEntries == 45
-        and elven_knight.MissingRankScheduleEntries == 11
+    check(elven_knight.TrainerMappedRankEntries == 53
+        and elven_knight.MissingRankScheduleEntries == 3
         and not elven_knight.SourceRankScheduleMapped
         and not elven_knight.LaunchSkillCatalogueReady
         and elven_knight.Status == "SkillRankParityOutstanding",

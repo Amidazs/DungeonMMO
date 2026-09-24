@@ -158,16 +158,16 @@ local function main()
             "GreenwardWarden", "OathguardShieldImpact"
         ), "Human Knight abilities cannot leak into the Elven career")
     local trainer = assert(Trainers.get("GreenwardWardenTrainer"))
-    check(#trainer.Skills == 6
+    check(#trainer.Skills == 13
         and trainer.AllowedClasses[1] == "GreenwardWarden"
         and trainer.AllowedRaces[1] == "Elf",
-        "Warden trainer offers three passives and three active lines")
+        "Warden trainer offers only authored Warden ranks and effects")
     local service = QuestService.new(profiles, "Base", first_two_npcs())
     verify_quest(profiles, service)
     local audit = assert(Coverage.for_branch("ElvenKnight"))
     check(audit.CurrentCareerId == "GreenwardWarden"
-        and audit.TrainerMappedRankEntries == 45
-        and audit.MissingRankScheduleEntries == 11
+        and audit.TrainerMappedRankEntries == 53
+        and audit.MissingRankScheduleEntries == 3
         and not audit.LaunchSkillCatalogueReady,
         "Source inventory and class identity do not imply ready skills")
     print(("[Greenward Warden Foundation] PASS: %d assertions")

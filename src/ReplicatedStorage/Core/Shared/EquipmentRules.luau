@@ -103,6 +103,13 @@ function EquipmentRules.validate(
     then
         return result(false, "KnightEquipmentExpertiseRequired")
     end
+    if item.RequiredSkillId == "GreenwardWardenEquipmentExpertise"
+        and (item.Grade ~= "D" or item.RequiredSkillRank ~= 1
+            or not PassiveSkillEffects
+                .has_greenward_warden_equipment_expertise(character))
+    then
+        return result(false, "WardenEquipmentExpertiseRequired")
+    end
     if item.RequiredSkillId == "IronvowEquipmentExpertise"
         and (item.Grade ~= "D" or item.RequiredSkillRank ~= 1
             or not PassiveSkillEffects

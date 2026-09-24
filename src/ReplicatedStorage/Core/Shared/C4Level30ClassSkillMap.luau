@@ -87,6 +87,13 @@ local ELVEN_KNIGHT = table.freeze({
     ElementalHeal = "GreenwardWardenElementalHeal",
     Charm = "GreenwardWardenCharm",
     Aggression = "GreenwardWardenAggression",
+    EquipmentExpertise = "GreenwardWardenEquipmentExpertise",
+    ShieldMastery = "GreenwardWardenShieldMastery",
+    DefenseAura = "GreenwardWardenDefenseAura",
+    UltimateDefense = "GreenwardWardenLastStand",
+    PoisonRecovery = "GreenwardWardenPoisonRecovery",
+    BowDefense = "GreenwardWardenBowWard",
+    AttackAura = "GreenwardWardenAttackAura",
 })
 
 --[[

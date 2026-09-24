@@ -1,3 +1,5 @@
+**Current v2.30 Elven Knight: 53/56 source ranks mapped after seven new defensive/utility families; only creation 2 and bleed recovery 1 remain.** [Current roadmap](docs/roadmap/DungeonMMO_Roadmap_v2_30_Elven_Knight_Defensive_Utility_20260924.md). Rank mapping is not a live Play pass or exact C4 formula/party aura parity. Studio test runners remain pending; no public publish or main merge.
+
 **Current v2.29 Warden active backend: 45/56 historical source-rank schedules mapped across three passives plus independently purchased heal, Charm and Aggression (11 rows remaining).** [Current roadmap](docs/roadmap/DungeonMMO_Roadmap_v2_29_Elven_Knight_Heal_Charm_Taunt_20260924.md). Existing real server heal/threat authorities are wired to the distinct Elven Knight class, but their new Studio Play regressions and genuine physical quest monsters are OPEN. Matching schedules do not establish C4 combat formula equivalence. No main merge/publish/production saves.
 
 Focused Warden passive regression source added; Studio execution pending. [Current roadmap](docs/roadmap/DungeonMMO_Roadmap_v2_28_Elven_Knight_Three_Passive_Families_20260924.md).

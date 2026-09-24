@@ -83,6 +83,23 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Earned Elven Knight's own D-grade heavy Body item.
+    -- No free armour or appearance asset is granted by the class award.
+    greenward_d_grade_armor = table.freeze({
+        Id = "greenward_d_grade_armor",
+        Name = "Greenward D-Grade Cuirass",
+        Kind = "Equipment",
+        InventoryCategory = "Equipment",
+        Slot = "Body", Category = "HeavyArmor", Grade = "D",
+        AllowedRaces = ELF,
+        AllowedBaseClasses = FIGHTER,
+        AllowedClasses = table.freeze({"GreenwardWarden"}),
+        RequiredSkillId = "GreenwardWardenEquipmentExpertise",
+        RequiredSkillRank = 1,
+        Rarity = "Uncommon", Stackable = false,
+        CombatModifiers = table.freeze({MaxHealthFlat = 20}),
+    }),
+
     -- Warrior-only registered D-grade heavy armour (functional
     -- placeholder appearance). Does not borrow the Knight's licence.
     ironroot_d_grade_armor = table.freeze({
