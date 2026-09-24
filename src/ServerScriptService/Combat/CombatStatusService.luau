@@ -17,6 +17,10 @@ local BUFFS = table.freeze({
         Magnitude = "C4FortressDualDefenseBonus",
         ExpiresAt = "C4FortressDualDefenseExpiresAt",
     }),
+    BowGuard = table.freeze({
+        Magnitude = "C4BowGuardBonus",
+        ExpiresAt = "C4BowGuardExpiresAt",
+    }),
     Evasion = table.freeze({
         Magnitude = "C4EvasionBonus",
         ExpiresAt = "C4EvasionExpiresAt",
@@ -111,8 +115,10 @@ function CombatStatusService.apply_self(
     local fields = BUFFS[definition.BUFF_KIND]
     local magnitude = tonumber(definition.BUFF_MAGNITUDE)
     local seconds = tonumber(definition.BUFF_SECONDS)
-    local max_seconds = if definition.BUFF_KIND == "PhysicalGuard"
-        then 300 else 60
+    local max_seconds = if definition.BUFF_KIND == "BowGuard"
+        then 1200
+        elseif definition.BUFF_KIND == "PhysicalGuard" then 300
+        else 60
     if not fields or not magnitude or magnitude ~= magnitude
         or magnitude <= 0 or magnitude > 0.50
         or not seconds or seconds ~= seconds
@@ -161,6 +167,13 @@ function CombatStatusService.apply_self(
         )
         character:SetAttribute(
             "C4MajestyEvasionPenaltyExpiresAt", os.clock() + seconds
+        )
+    end
+
+    if definition.BUFF_KIND == "BowGuard" then
+        character:SetAttribute(
+            "C4BowGuardSourceAttribute",
+            tonumber(definition.SOURCE_BOW_DEFENCE_ATTRIBUTE) or 0
         )
     end
 
