@@ -85,6 +85,7 @@ local function forged(): any
         "OathguardUmbralSiphon", "OathguardLastBastion",
         "OathguardArrowWard", "OathguardSteelAndStoneTraining",
         "OathguardEquipmentExpertise",
+        "OathguardCommonItemCreation",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -123,6 +124,7 @@ local function main()
         "OathguardSteelAndStoneTraining", {20, 24, 28, 28}
     )
     check_ranks("OathguardEquipmentExpertise", {20})
+    check_ranks("OathguardCommonItemCreation", {20, 28})
     local bow_one = assert(Combat.get_for_rank(
         "OathguardArrowWard", 1
     ))
@@ -214,6 +216,7 @@ local function main()
         "OathguardUmbralSiphon", "OathguardLastBastion",
         "OathguardArrowWard", "OathguardSteelAndStoneTraining",
         "OathguardEquipmentExpertise",
+        "OathguardCommonItemCreation",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
