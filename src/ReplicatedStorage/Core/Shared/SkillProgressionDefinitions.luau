@@ -1630,6 +1630,20 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({"OneHandedBlunt"}),
     }),
 
+    -- Independent source D-grade equipment expertise at first transfer.
+    -- Grant permission only to actually personally awarded Warriors who
+    -- purchase this rank; do not give items or a borrowed Knight rank.
+    IronvowEquipmentExpertise = table.freeze({
+        Id = "IronvowEquipmentExpertise",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20}),
+        AdvancedEquipmentEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
