@@ -83,6 +83,7 @@ local function forged(): any
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
         "OathguardUmbralSiphon", "OathguardLastBastion",
+        "OathguardArrowWard",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -116,6 +117,22 @@ local function main()
     check_ranks("OathguardShieldMastery", {20, 28})
     check_ranks("OathguardSteadfastStance", {20})
     check_ranks("OathguardLastBastion", {20})
+    check_ranks("OathguardArrowWard", {24, 28})
+    local bow_one = assert(Combat.get_for_rank(
+        "OathguardArrowWard", 1
+    ))
+    local bow_two = assert(Combat.get_for_rank(
+        "OathguardArrowWard", 2
+    ))
+    check(bow_one.KIND == "Buff"
+        and bow_one.SELF_ONLY
+        and bow_one.BUFF_KIND == "BowGuard"
+        and bow_one.MANA_COST == 22
+        and bow_one.SOURCE_BOW_DEFENCE_ATTRIBUTE == -16
+        and bow_two.MANA_COST == 28
+        and bow_two.SOURCE_BOW_DEFENCE_ATTRIBUTE == -19
+        and bow_two.BUFF_MAGNITUDE > bow_one.BUFF_MAGNITUDE,
+        "Paid Knight bow defence has separate C4 rank effects")
     local bastion = assert(Combat.get_for_rank(
         "OathguardLastBastion", 1
     ))
@@ -190,6 +207,7 @@ local function main()
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
         "OathguardUmbralSiphon", "OathguardLastBastion",
+        "OathguardArrowWard",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
