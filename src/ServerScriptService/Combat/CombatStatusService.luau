@@ -176,7 +176,8 @@ function CombatStatusService.apply_self(
             "C4FortressSourceMagicDefence",
             tonumber(definition.SOURCE_MAGIC_DEFENCE) or 0
         )
-        (root :: BasePart).Anchored = true
+        local anchored_root = root :: BasePart
+        anchored_root.Anchored = true
     end
 
     task.delay(expires_at - os.clock(), function()
