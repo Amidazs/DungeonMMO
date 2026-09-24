@@ -136,11 +136,13 @@ local function main()
     ))
     check(stance.KIND == "Buff" and stance.SELF_ONLY
         and stance.BUFF_KIND == "PhysicalGuard"
-        and stance.BUFF_MAGNITUDE == 0.10
-        and stance.BUFF_SECONDS == 10
-        and stance.STAMINA_COST == 14
-        and stance.COOLDOWN_SECONDS == 24,
-        "Earned Knight stance gives timed paid self-only physical guard")
+        and stance.BUFF_MAGNITUDE == 0.07
+        and stance.BUFF_SECONDS == 300
+        and stance.MANA_COST == 10
+        and stance.STAMINA_COST == 0
+        and stance.EVASION_PENALTY_POINTS == 2
+        and stance.COOLDOWN_SECONDS == 3,
+        "Knight stance preserves C4's paid physical/evasion tradeoff")
     local early_heal = assert(Combat.get_for_rank(
         "OathguardMendingOath", 1
     ))
