@@ -47,6 +47,7 @@ type BlockDefenseRecord = {
 
 local block_records: {[Instance]: BlockDefenseRecord} = {}
 local dodge_records: {[Instance]: TimedDefenseRecord} = {}
+local parry_rearm_at: {[Instance]: number} = {}
 local guard_break_event = Instance.new("BindableEvent")
 
 
@@ -118,7 +119,7 @@ function DefenseService.begin_block(
     block_records[player] = {
         character = character,
         started_at = started_at,
-        parry_available = true,
+        parry_available = started_at >= (parry_rearm_at[player] or 0),
     }
 end
 
@@ -186,6 +187,7 @@ Returns:
 function DefenseService.clear(player: Player)
     block_records[player] = nil
     dodge_records[player] = nil
+    parry_rearm_at[player] = nil
 end
 
 
@@ -261,6 +263,8 @@ function DefenseService.resolve(
         and block_elapsed
             <= DefenseConfig.PARRY_WINDOW_SECONDS then
         block.parry_available = false
+        parry_rearm_at[player] = resolved_now
+            + DefenseConfig.PARRY_REARM_SECONDS
 
         player:SetAttribute(
             "CombatParryPulse",
