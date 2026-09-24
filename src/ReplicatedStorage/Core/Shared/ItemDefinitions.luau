@@ -43,6 +43,26 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Actually equippable D-grade Knight armour; an earned class skill
+    -- and original minimum level20 must authorize the real Equip action.
+    stonewatch_d_grade_armor = table.freeze({
+        Id = "stonewatch_d_grade_armor",
+        Name = "Stonewatch D-Grade Cuirass",
+        Kind = "Equipment",
+        Slot = "Body",
+        Category = "HeavyArmor",
+        Grade = "D",
+        AllowedBaseClasses = FIGHTER,
+        AllowedClasses = table.freeze({"Oathguard"}),
+        RequiredSkillId = "OathguardEquipmentExpertise",
+        RequiredSkillRank = 1,
+        Rarity = "Uncommon",
+        Stackable = false,
+        CombatModifiers = table.freeze({
+            MaxHealthFlat = 20,
+        }),
+    }),
+
     -- Original DungeonMMO rogue trial weapons: personal, non-tradeable
     -- inventory equipment granted ONLY inside Vela stage-two commit.
     -- These remain placeholders pending final historical meshes/art.
