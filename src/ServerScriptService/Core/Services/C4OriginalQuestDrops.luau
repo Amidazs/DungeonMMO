@@ -25,6 +25,11 @@ local FRONTLINE = table.freeze({
         Seal = "gloam_ward_seal",
         Required = 3,
     }),
+    ElvenKnight = table.freeze({
+        Marker = "verdant_patrol_report",
+        Seal = "verdant_guardian_seal",
+        Required = 3,
+    }),
 })
 local CINDER_ITEMS = table.freeze({
     StolenJewelry = "cinder_cipher",

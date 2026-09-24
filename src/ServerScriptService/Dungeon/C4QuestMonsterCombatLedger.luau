@@ -220,6 +220,8 @@ local function event_for_owner(
     end
     local proof_ids = if record.TargetId == "GloamBulwark"
         then {GloamBulwarkSeal = true}
+        elseif record.TargetId == "ThornboundColossus"
+        then {VerdantGuardianSeal = true}
         elseif record.TargetId == "Ridgebreaker"
         then {RidgebreakerSigil = true}
         elseif record.TargetId == "BrackenWarden"
@@ -235,6 +237,8 @@ local function event_for_owner(
         then {IronrootToken = true}
         elseif record.BranchId == "HumanKnight"
         then {StonewatchBadge = true}
+        elseif record.BranchId == "ElvenKnight"
+        then {VerdantPatrolReport = true}
         else next_proof(state)
     if not proof_ids then return nil end
     return {

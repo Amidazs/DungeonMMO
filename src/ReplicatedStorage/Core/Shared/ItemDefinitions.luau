@@ -165,6 +165,27 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    verdant_patrol_report = table.freeze({
+        Id = "verdant_patrol_report",
+        Name = "Verdant Patrol Report",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = true,
+        Bound = true,
+        Tradeable = false,
+    }),
+    verdant_guardian_seal = table.freeze({
+        Id = "verdant_guardian_seal",
+        Name = "Verdant Guardian Seal",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     ironroot_dispatch_marker = table.freeze({
         Id = "ironroot_dispatch_marker",
         Name = "Ironroot Dispatch Marker",

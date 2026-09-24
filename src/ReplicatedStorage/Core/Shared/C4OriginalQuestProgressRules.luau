@@ -16,6 +16,8 @@ local STAGE_PROOFS = table.freeze({
     GloamStriker = table.freeze({StonewatchBadge = true}),
     GloamBulwark = table.freeze({GloamBulwarkSeal = true}),
     Ridgebreaker = table.freeze({RidgebreakerSigil = true}),
+    RootboundMarauder = table.freeze({VerdantPatrolReport = true}),
+    ThornboundColossus = table.freeze({VerdantGuardianSeal = true}),
     BrackenRaider = LETTER_IDS,
     BrackenWarden = table.freeze({RustedKey = true}),
     CinderBrigand = table.freeze({
@@ -214,6 +216,32 @@ function Rules.can_progress(
             return false, "OriginalQuestLootProofRequired"
         end
     end
+    if quest.BranchId == "ElvenKnight" then
+        if step.TargetId == "RootboundMarauder"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.VerdantPatrolReport ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "WardenCaer" and current.Step == 4
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.VerdantPatrolReports3 ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "ThornboundColossus"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.VerdantGuardianSeal ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "SentinelIlyra" and current.Step == 6
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.VerdantGuardianSeal ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+    end
     if quest.BranchId == "HumanKnight" then
         if step.TargetId == "GloamStriker"
             and (type(event.VerifiedProofIds) ~= "table"
@@ -320,6 +348,11 @@ function Rules.advance(quest: any, current: any, event: any): any
         and current.Count == step.Required
     then
         current.Proofs.StonewatchBadge3 = true
+    end
+    if step.TargetId == "RootboundMarauder"
+        and current.Count == step.Required
+    then
+        current.Proofs.VerdantPatrolReports3 = true
     end
     if step.TargetId == "CryptSentinel"
         and current.Count == step.Required
