@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 1320,
         Name = "Create Common Item",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -16,7 +16,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -26,7 +26,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -44,7 +44,7 @@ local DATA = table.freeze({
         Id = 1322,
         Name = "Common Craft",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),

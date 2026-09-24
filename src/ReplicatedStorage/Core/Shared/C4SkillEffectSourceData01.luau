@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 3,
         Name = "Power Strike",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -30,7 +30,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -54,7 +54,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -78,7 +78,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -102,7 +102,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -126,7 +126,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -150,7 +150,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -174,7 +174,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -198,7 +198,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Big Sword, Blunt, Big Blunt",
@@ -230,7 +230,7 @@ local DATA = table.freeze({
         Id = 4,
         Name = "Dash",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -275,7 +275,7 @@ local DATA = table.freeze({
         Id = 15,
         Name = "Charm",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -315,7 +315,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -355,7 +355,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -395,7 +395,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -435,7 +435,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -475,7 +475,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -515,7 +515,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -555,7 +555,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -595,7 +595,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -643,7 +643,7 @@ local DATA = table.freeze({
         Id = 16,
         Name = "Mortal Blow",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -667,7 +667,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["10"] = table.freeze({
+            [10] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -691,7 +691,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["11"] = table.freeze({
+            [11] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -715,7 +715,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["12"] = table.freeze({
+            [12] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -739,7 +739,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["13"] = table.freeze({
+            [13] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -763,7 +763,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["14"] = table.freeze({
+            [14] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -787,7 +787,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["15"] = table.freeze({
+            [15] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -811,7 +811,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["16"] = table.freeze({
+            [16] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -835,7 +835,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["17"] = table.freeze({
+            [17] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -859,7 +859,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["18"] = table.freeze({
+            [18] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -883,7 +883,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -907,7 +907,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -931,7 +931,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -955,7 +955,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -979,7 +979,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -1003,7 +1003,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -1027,7 +1027,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -1051,7 +1051,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",
@@ -1083,7 +1083,7 @@ local DATA = table.freeze({
         Id = 21,
         Name = "Poison Recovery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1114,7 +1114,7 @@ local DATA = table.freeze({
         Id = 27,
         Name = "Unlock",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -1131,7 +1131,7 @@ local DATA = table.freeze({
                     target = "TARGET_UNLOCKABLE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -1148,7 +1148,7 @@ local DATA = table.freeze({
                     target = "TARGET_UNLOCKABLE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -1173,7 +1173,7 @@ local DATA = table.freeze({
         Id = 28,
         Name = "Aggression",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1196,7 +1196,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1219,7 +1219,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1242,7 +1242,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1265,7 +1265,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1288,7 +1288,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1319,7 +1319,7 @@ local DATA = table.freeze({
         Id = 45,
         Name = "Divine Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1340,7 +1340,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1361,7 +1361,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1390,7 +1390,7 @@ local DATA = table.freeze({
         Id = 56,
         Name = "Power Shot",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1414,7 +1414,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["10"] = table.freeze({
+            [10] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1438,7 +1438,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["11"] = table.freeze({
+            [11] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1462,7 +1462,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["12"] = table.freeze({
+            [12] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1486,7 +1486,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["13"] = table.freeze({
+            [13] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1510,7 +1510,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["14"] = table.freeze({
+            [14] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1534,7 +1534,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["15"] = table.freeze({
+            [15] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1558,7 +1558,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["16"] = table.freeze({
+            [16] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1582,7 +1582,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["17"] = table.freeze({
+            [17] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1606,7 +1606,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["18"] = table.freeze({
+            [18] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1630,7 +1630,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1654,7 +1654,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1678,7 +1678,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1702,7 +1702,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1726,7 +1726,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1750,7 +1750,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1774,7 +1774,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1798,7 +1798,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Bow",
@@ -1830,7 +1830,7 @@ local DATA = table.freeze({
         Id = 58,
         Name = "Elemental Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1852,7 +1852,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["10"] = table.freeze({
+            [10] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1874,7 +1874,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["11"] = table.freeze({
+            [11] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1896,7 +1896,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["12"] = table.freeze({
+            [12] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1918,7 +1918,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1940,7 +1940,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1962,7 +1962,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1984,7 +1984,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2006,7 +2006,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2028,7 +2028,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2050,7 +2050,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2072,7 +2072,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2102,7 +2102,7 @@ local DATA = table.freeze({
         Id = 61,
         Name = "Cure Bleeding",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2133,7 +2133,7 @@ local DATA = table.freeze({
         Id = 70,
         Name = "Drain Health",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2155,7 +2155,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2177,7 +2177,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2199,7 +2199,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2221,7 +2221,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2243,7 +2243,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2265,7 +2265,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -2295,7 +2295,7 @@ local DATA = table.freeze({
         Id = 77,
         Name = "Attack Aura",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2334,7 +2334,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2381,7 +2381,7 @@ local DATA = table.freeze({
         Id = 78,
         Name = "War Cry",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2426,7 +2426,7 @@ local DATA = table.freeze({
         Id = 82,
         Name = "Majesty",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2481,7 +2481,7 @@ local DATA = table.freeze({
         Id = 91,
         Name = "Defense Aura",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2520,7 +2520,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -2567,7 +2567,7 @@ local DATA = table.freeze({
         Id = 92,
         Name = "Shield Stun",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2602,7 +2602,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2637,7 +2637,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2672,7 +2672,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2707,7 +2707,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2742,7 +2742,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2777,7 +2777,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2812,7 +2812,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2847,7 +2847,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Shield",
@@ -2890,7 +2890,7 @@ local DATA = table.freeze({
         Id = 96,
         Name = "Bleed",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Dagger",

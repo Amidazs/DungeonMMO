@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 1011,
         Name = "Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -29,7 +29,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -52,7 +52,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -75,7 +75,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -98,7 +98,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -121,7 +121,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -152,7 +152,7 @@ local DATA = table.freeze({
         Id = 1012,
         Name = "Cure Poison",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -184,7 +184,7 @@ local DATA = table.freeze({
         Id = 1015,
         Name = "Battle Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -207,7 +207,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -230,7 +230,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -261,7 +261,7 @@ local DATA = table.freeze({
         Id = 1027,
         Name = "Group Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -283,7 +283,7 @@ local DATA = table.freeze({
                     target = "TARGET_PARTY",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -305,7 +305,7 @@ local DATA = table.freeze({
                     target = "TARGET_PARTY",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -335,7 +335,7 @@ local DATA = table.freeze({
         Id = 1040,
         Name = "Shield",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -384,7 +384,7 @@ local DATA = table.freeze({
         Id = 1068,
         Name = "Might",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({

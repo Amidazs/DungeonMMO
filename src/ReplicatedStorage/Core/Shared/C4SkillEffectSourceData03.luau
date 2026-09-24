@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 208,
         Name = "Bow Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -24,7 +24,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -42,7 +42,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -60,7 +60,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -78,7 +78,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -96,7 +96,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -114,7 +114,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -132,7 +132,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -150,7 +150,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -176,7 +176,7 @@ local DATA = table.freeze({
         Id = 209,
         Name = "Dagger Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -194,7 +194,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -212,7 +212,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -230,7 +230,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -256,7 +256,7 @@ local DATA = table.freeze({
         Id = 211,
         Name = "Boost HP",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -273,7 +273,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -298,7 +298,7 @@ local DATA = table.freeze({
         Id = 212,
         Name = "Fast HP Recovery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -323,7 +323,7 @@ local DATA = table.freeze({
         Id = 214,
         Name = "Mana Recovery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -349,7 +349,7 @@ local DATA = table.freeze({
         Id = 216,
         Name = "Polearm Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -374,7 +374,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -399,7 +399,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -424,7 +424,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -457,7 +457,7 @@ local DATA = table.freeze({
         Id = 217,
         Name = "Sword Blunt Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -475,7 +475,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -493,7 +493,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -511,7 +511,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -537,7 +537,7 @@ local DATA = table.freeze({
         Id = 225,
         Name = "Acrobatic Move",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -562,7 +562,7 @@ local DATA = table.freeze({
         Id = 226,
         Name = "Relax",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -604,7 +604,7 @@ local DATA = table.freeze({
         Id = 227,
         Name = "Light Armor Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -629,7 +629,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -654,7 +654,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -679,7 +679,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -704,7 +704,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -729,7 +729,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -754,7 +754,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -787,7 +787,7 @@ local DATA = table.freeze({
         Id = 231,
         Name = "Heavy Armor Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -805,7 +805,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -823,7 +823,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -841,7 +841,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -859,7 +859,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -877,7 +877,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -895,7 +895,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -921,7 +921,7 @@ local DATA = table.freeze({
         Id = 232,
         Name = "Heavy Armor Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -939,7 +939,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -957,7 +957,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -975,7 +975,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -993,7 +993,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1011,7 +1011,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1029,7 +1029,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1047,7 +1047,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1065,7 +1065,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1091,7 +1091,7 @@ local DATA = table.freeze({
         Id = 233,
         Name = "Light Armor Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1116,7 +1116,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1141,7 +1141,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1166,7 +1166,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1191,7 +1191,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1216,7 +1216,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1249,7 +1249,7 @@ local DATA = table.freeze({
         Id = 239,
         Name = "Expertise",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({}),
@@ -1268,7 +1268,7 @@ local DATA = table.freeze({
         Id = 244,
         Name = "Armor Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1285,7 +1285,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1302,7 +1302,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1327,7 +1327,7 @@ local DATA = table.freeze({
         Id = 245,
         Name = "Wild Sweep",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1352,7 +1352,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1377,7 +1377,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1402,7 +1402,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1427,7 +1427,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1452,7 +1452,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1477,7 +1477,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1502,7 +1502,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1527,7 +1527,7 @@ local DATA = table.freeze({
                     target = "TARGET_AREA",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Pole",
@@ -1560,7 +1560,7 @@ local DATA = table.freeze({
         Id = 249,
         Name = "Weapon Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1595,7 +1595,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1638,7 +1638,7 @@ local DATA = table.freeze({
         Id = 255,
         Name = "Power Smash",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1662,7 +1662,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1686,7 +1686,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1710,7 +1710,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1734,7 +1734,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["5"] = table.freeze({
+            [5] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1758,7 +1758,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["6"] = table.freeze({
+            [6] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1782,7 +1782,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["7"] = table.freeze({
+            [7] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1806,7 +1806,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["8"] = table.freeze({
+            [8] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1830,7 +1830,7 @@ local DATA = table.freeze({
                     target = "TARGET_ONE",
                 }),
             }),
-            ["9"] = table.freeze({
+            [9] = table.freeze({
                 Conditions = table.freeze({
                     table.freeze({
                         kind = "Sword, Blunt",
@@ -1862,7 +1862,7 @@ local DATA = table.freeze({
         Id = 256,
         Name = "Accuracy",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -1903,7 +1903,7 @@ local DATA = table.freeze({
         Id = 257,
         Name = "Sword Blunt Mastery",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1921,7 +1921,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1939,7 +1939,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({
@@ -1957,7 +1957,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["4"] = table.freeze({
+            [4] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({}),
                 Modifiers = table.freeze({

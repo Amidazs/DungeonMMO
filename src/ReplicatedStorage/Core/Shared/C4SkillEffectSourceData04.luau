@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 312,
         Name = "Vicious Stance",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -39,7 +39,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["2"] = table.freeze({
+            [2] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -72,7 +72,7 @@ local DATA = table.freeze({
                     target = "TARGET_SELF",
                 }),
             }),
-            ["3"] = table.freeze({
+            [3] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({

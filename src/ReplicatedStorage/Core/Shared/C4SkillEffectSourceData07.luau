@@ -6,7 +6,7 @@ local DATA = table.freeze({
         Id = 1206,
         Name = "Wind Shackle",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
@@ -59,7 +59,7 @@ local DATA = table.freeze({
         Id = 1216,
         Name = "Self Heal",
         Ranks = table.freeze({
-            ["1"] = table.freeze({
+            [1] = table.freeze({
                 Conditions = table.freeze({}),
                 Effects = table.freeze({
                     table.freeze({
