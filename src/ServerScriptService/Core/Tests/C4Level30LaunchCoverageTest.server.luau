@@ -93,12 +93,12 @@ local function main()
         and warrior.SourceRankEntriesByLevel[24] == 19
         and warrior.SourceRankEntriesByLevel[28] == 23,
         "Historical Warrior 20/24/28 rank inventory is now complete")
-    check(warrior.TrainerMappedRankEntries == 27
-        and warrior.MissingRankScheduleEntries == 35
+    check(warrior.TrainerMappedRankEntries == 31
+        and warrior.MissingRankScheduleEntries == 31
         and not warrior.SourceRankScheduleMapped
         and not warrior.LaunchSkillCatalogueReady,
-        "Ironvow has only four fully scheduled real trainer families; "
-            .. "blunt, polearm, HP and utility rows must remain outstanding")
+        "Warrior real sword AND blunt mastery now maps four additional "
+            .. "source ranks; polearm, HP and utility remain outstanding")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "RankScheduleMappedEffectsPending"
         and knight.SourceRankEntriesThroughCap == 55
