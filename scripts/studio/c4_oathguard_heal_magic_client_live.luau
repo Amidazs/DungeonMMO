@@ -207,6 +207,8 @@ local function check_heal(player, humanoid, rank)
     humanoid.Health = 400
     task.wait(0.2)
     local starting_hp = humanoid.Health
+    local model = assert(player.Character)
+    local starting_pulse = model:GetAttribute("MageHealPulse") or 0
     local starting_mana = Mana.get(player)
     receipts[player.UserId] = nil
     channel:FireClient(player, "LOAD", rank)
@@ -218,12 +220,19 @@ local function check_heal(player, humanoid, rank)
         "Client could not send the real Knight hotbar action")
     local deadline = os.clock() + 8
     repeat
-        if humanoid.Health > starting_hp then break end
+        if (model:GetAttribute("MageHealPulse") or 0)
+            > starting_pulse then break end
         task.wait(0.1)
     until os.clock() >= deadline
-    local received = humanoid.Health - starting_hp
-    assert(received > 0 and received <= 120,
-        "Client heal did not change owner's actual HP")
+    assert((model:GetAttribute("MageHealPulse") or 0)
+        > starting_pulse,
+        "Client cast did not execute a server-owned self-heal")
+    local received = model:GetAttribute("MageHealLastAmount")
+    assert(type(received) == "number" and received > 0
+        and received <= 120,
+        "No positive measured self-heal reached the server")
+    assert(humanoid.Health >= starting_hp + received - 0.1,
+        "Server heal receipt did not increase the actual owner's HP")
     assert(starting_mana - Mana.get(player) >= 14,
         "Actual Knight self-heal did not consume the mana cost")
     print("[Knight Recovery] REAL_CLIENT_HEAL_RANK_"
