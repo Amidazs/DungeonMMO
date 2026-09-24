@@ -1,4 +1,31 @@
-**Current DungeonMMO class backend: v2.09 — earned Oathguard timed defensive stance with real client/HP PASS; 16 Knight source ranks remain.**
+**Current DungeonMMO class backend: v2.10 — C4 source-derived Knight seven-rank life drain; fresh real client-hit/owner-HP playtest PASS.**
+[Current full roadmap](
+DungeonMMO_Roadmap_v2_10_C4_Skill_Fidelity_Knight_Drain_20260924.md)
+and [exact Studio evidence](
+../testing/oathguard-umbral-siphon-v2-10-20260924.md).
+Added `OathguardUmbralSiphon` as distinct *offensive dark-magic
+life drain*, with **seven** separately bought C4 level-20/24/28
+ranks, source power/MP per rank and **20% of actual dealt
+NPC damage returned to its owner as HP**. This is not the
+existing owner-only `OathguardMendingOath` healing spell.
+The latest disposable Base/Dungeon Rojo builds PASS,
+Knight quest/trainer **88 assertions PASS**, foundation
+**84 PASS**, strict launch-rank audit **27 PASS**.
+Fresh unpublished Dungeon Play confirmed the actual client
+damaged a training NPC for 20 and healed its owner 4 HP
+at rank one; rank seven damaged for 31 and healed 6.2 HP.
+Forged-class skill use was denied. Source skill *rank
+schedule* now maps Knight **45/54**, with **9 missing**,
+Warrior **27/62**, with **35 missing**. **0/18** original
+advancement careers are full level-30 release certified.
+C4's original magic attack formula, skill timings and other
+already-authored class abilities are not necessarily
+gameplay-identical just because their rank schedules map:
+see the explicitly audited outstanding mechanics differences
+in the v2.10 roadmap. No `main` merge, publication,
+production saves or remote-desktop permanent source edits.
+
+**Previous DungeonMMO class backend: v2.09 — earned Knight timed defensive stance with focused and live-client HP verification; 16 Knight ranks then unmapped.**
 [Latest class backend roadmap](
 DungeonMMO_Roadmap_v2_09_Knight_Steadfast_Stance_20260924.md)
 and [executed test evidence](
