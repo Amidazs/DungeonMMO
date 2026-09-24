@@ -176,6 +176,7 @@ local DEFINITIONS = table.freeze({
             "IronvowCriticalStance",
             "IronvowAccuracyStance",
             "IronvowFieldRecovery",
+            "IronvowEnduranceSurge",
             "IronvowLightArmorTraining",
             "IronvowHeavyArmorTraining",
             "IronvowBattleCall",
