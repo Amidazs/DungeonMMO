@@ -132,7 +132,7 @@ Returns:
 ]]
 local function warden_fixture(user_id, rank, offhand)
     local character = Schema.create_default(user_id).Characters.Slot1
-    local source = assert(Stages.get("ElvenWarden"))
+    local source = assert(Stages.get("ElvenKnight"))
     character.Level = 28
     character.Identity = {
         Version = 1, RaceId = "Elf", BaseClassId = "Fighter",
@@ -140,7 +140,7 @@ local function warden_fixture(user_id, rank, offhand)
     }
     local advancement = character.ClassAdvancement
     advancement.ActiveClassId = nil
-    advancement.OriginalFirstTransferChoiceId = "ElvenWarden"
+    advancement.OriginalFirstTransferChoiceId = "ElvenKnight"
     advancement.OriginalFirstTransferClassId = "GreenwardWarden"
     advancement.OriginalFirstTransferReceiptId = "TEMP_WardenStackPlay"
     local proofs = {}
@@ -148,7 +148,7 @@ local function warden_fixture(user_id, rank, offhand)
         proofs[proof_id] = true
     end
     advancement.OriginalFirstTransferQuest = {
-        QuestId = source.Id, BranchId = "ElvenWarden",
+        QuestId = source.Id, BranchId = "ElvenKnight",
         Step = #source.Steps + 1, Ready = true,
         Count = 0, Proofs = proofs, AppliedEvents = {},
     }
