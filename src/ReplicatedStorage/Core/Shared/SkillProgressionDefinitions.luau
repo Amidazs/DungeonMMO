@@ -1742,12 +1742,6 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
         RankLevels = table.freeze({[1] = 20}),
-        Prerequisites = table.freeze({
-            table.freeze({
-                SkillId = "FighterArmorTraining",
-                Rank = 3, Proficiency = 0,
-            }),
-        }),
         WeaponTags = table.freeze({}),
     }),
 
