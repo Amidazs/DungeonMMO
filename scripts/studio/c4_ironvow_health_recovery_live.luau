@@ -77,6 +77,19 @@ Returns:
 local function main()
     local player = Players:GetPlayers()[1] or Players.PlayerAdded:Wait()
     local character = player.Character or player.CharacterAdded:Wait()
+    if not character.Parent then
+        -- The unpublished Play fixture can hand us an unparented
+        -- spectator avatar. Spawn an actual live world character;
+        -- do not weaken the production service's owner/life checks.
+        player:LoadCharacter()
+        character = player.Character or player.CharacterAdded:Wait()
+    end
+    local deadline = os.clock() + 15
+    while not character.Parent and os.clock() < deadline do
+        task.wait(0.1)
+    end
+    assert(character.Parent == workspace,
+        "Warrior regeneration needs a real world-spawned character")
     local humanoid = character:WaitForChild("Humanoid")
     local owner = warrior_fixture(
         player.UserId, "stonewatch_training_mace"
@@ -89,14 +102,6 @@ local function main()
         Runtime.get_health_recovery_per_second(player.UserId) - 1.1
     ) < 0.001, "Genuine bought passive did not enable HP regeneration")
     local before = humanoid.Health
-    print("[Warrior Recovery] DIAGNOSTIC "
-        .. "playerParent=" .. tostring(player.Parent)
-        .. " characterParent=" .. tostring(character.Parent)
-        .. " actualCharacter=" .. tostring(player.Character == character)
-        .. " hp=" .. tostring(humanoid.Health)
-        .. " rate=" .. tostring(
-            Runtime.get_health_recovery_per_second(player.UserId)
-        ))
     local received = Recovery.apply_tick(player, 1)
     assert(math.abs(received - 1.1) < 0.02
         and math.abs(humanoid.Health - before - received) < 0.02,
