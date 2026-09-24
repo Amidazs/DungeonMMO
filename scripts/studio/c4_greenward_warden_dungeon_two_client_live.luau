@@ -1,8 +1,8 @@
 --!strict
 -- Two real unpublished clients and the unchanged Dungeon combat runtime.
 -- All source injections and prepared level-18 profiles are disposable.
--- The two genuine clients land first hits; only the final damaging
--- strike is a server-owned test shortcut, not a fully client kill.
+-- Both genuine clients must deliver every HP hit including the
+-- lethal strike. The profile state is still a disposable test fixture.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Source quest live test must use a local, unpublished Studio place.")
 
@@ -97,7 +97,6 @@ local channel = RS.GreenwardCombatChannel_TEMP
 local context = require(SSS.Dungeon.GreenwardCombatContext_TEMP)
 local sources = require(RS.Core.Shared.C4OriginalFirstTransferQuestStages)
 local inventory = require(SSS.Core.Services.InventoryService)
-local damage = require(SSS.Combat.DamageService)
 local responses = {}
 
 --[[
@@ -113,7 +112,7 @@ Returns:
 ]]
 local function on_response(player, action, accepted)
     responses[tostring(player.UserId) .. ":" .. action] =
-        accepted or true
+        if action == "READY" then true else accepted == true
 end
 channel.OnServerEvent:Connect(on_response)
 
@@ -177,40 +176,35 @@ local function prepare(profiles, player, stage)
 end
 
 --[[
-Uses the unchanged server combat damage path after a real client hit.
+Requests one normal attack through the actual owner's Play client.
 
 Args:
-    player (Player): Original real owner whose attack already hit target.
-    enemy (Model): Current-room registered physical source enemy.
-    amount (number): Server-only lethal hit for test time reduction.
+    player (Player): Connected owner of the real combat input.
 
 Returns:
-    number: Actual authenticated server damage after defence.
+    boolean: Whether the actual client sent a valid combat request.
 ]]
-local function finish_enemy(player, enemy, amount)
-    return damage.apply_damage({
-        attacker = player,
-        attacker_character = player.Character,
-        target = enemy,
-        source_kind = "Melee",
-        source_id = "GreenwardWorldLiveTest",
-        attack_id = "Slash1",
-        base_damage = amount,
-        multiplier = 1,
-    })
+local function request_real_attack(player)
+    local key = tostring(player.UserId) .. ":ATTACK_SENT"
+    responses[key] = nil
+    channel:FireClient(player, "ATTACK")
+    wait_for(function()
+        return responses[key] ~= nil
+    end, "real client attack receipt", 12)
+    return responses[key] == true
 end
 
 --[[
-Makes a genuine client normal attack hit its registered personal quest enemy.
+Requires only client-originated HP damage until the registered NPC dies.
 
 Args:
-    player (Player): Live admitted source quest owner and combat client.
-    enemy (Model): Server-owned living marauder or ridgebreaker.
+    player (Player): Real admitted owner, not a server attack proxy.
+    enemy (Model): Registered physical quest target with genuine HP.
 
 Returns:
-    nil: Confirms a physical client hit before server test finishing blow.
+    nil: Fails if a real client cannot deliver the actual lethal hit.
 ]]
-local function strike_and_finish(player, enemy)
+local function strike_until_dead(player, enemy)
     local humanoid = assert(enemy:FindFirstChildOfClass("Humanoid"))
     local root = assert(enemy.PrimaryPart)
     root.Anchored = true
@@ -222,16 +216,23 @@ local function strike_and_finish(player, enemy)
     player_root.AssemblyLinearVelocity = Vector3.zero
     task.wait(0.3)
     local initial_health = humanoid.Health
-    responses[tostring(player.UserId) .. ":ATTACK_SENT"] = nil
-    channel:FireClient(player, "ATTACK")
-    wait_for(function()
-        return responses[tostring(player.UserId) .. ":ATTACK_SENT"]
-    end, "genuine owner client attack sent", 12)
-    wait_for(function()
-        return humanoid.Health < initial_health
-    end, "real first-hit damage to original quest physical enemy", 15)
-    assert(finish_enemy(player, enemy, 1000) > 0,
-        "Authenticated player contributor could not finish quest enemy")
+    for attempt = 1, 45 do
+        if humanoid.Health <= 0 then break end
+        local before = humanoid.Health
+        local accepted = request_real_attack(player)
+        if accepted then
+            local deadline = os.clock() + 4
+            repeat
+                if humanoid.Health < before then break end
+                task.wait(0.1)
+            until os.clock() >= deadline
+        end
+        task.wait(0.25)
+    end
+    assert(humanoid.Health <= 0
+        and initial_health > humanoid.Health,
+        "Genuine client failed to land a lethal quest-monster hit")
+    print("[Greenward Live] REAL_CLIENT_LETHAL_" .. enemy.Name)
 end
 
 --[[
@@ -263,7 +264,7 @@ local function verify_warden_drops(
     assert(marauder:IsDescendantOf(workspace)
         and boss:IsDescendantOf(workspace),
         "Quest kills must be real registered physical enemy instances")
-    strike_and_finish(marauder_owner, marauder)
+    strike_until_dead(marauder_owner, marauder)
     wait_for(function()
         return inventory.count_item(
             profiles:get_character(marauder_owner.UserId),
@@ -276,7 +277,7 @@ local function verify_warden_drops(
     ) == 0, "Other player's independent boss stage received marauder loot")
     print("[Greenward Live] REAL_STRIKER_CLIENT_HIT_OWNER_MARKER_PASS")
 
-    strike_and_finish(boss_owner, boss)
+    strike_until_dead(boss_owner, boss)
     wait_for(function()
         local owner = profiles:get_character(boss_owner.UserId)
         local quest = owner.ClassAdvancement.OriginalFirstTransferQuest
@@ -288,7 +289,7 @@ local function verify_warden_drops(
         profiles:get_character(marauder_owner.UserId),
         "verdant_guardian_seal"
     ) == 0, "Marauder-stage player cannot collect unrelated boss seal")
-    print("[Greenward Live] REAL_BOSS_CLIENT_HIT_OWNER_SEAL_PASS")
+    print("[Greenward Live] REAL_BOSS_CLIENT_LETHAL_OWNER_SEAL_PASS")
 end
 
 --[[
