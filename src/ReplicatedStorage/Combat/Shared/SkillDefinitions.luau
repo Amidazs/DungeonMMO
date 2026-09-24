@@ -2737,12 +2737,24 @@ local function validate_mage_heal(definition: MageHealSkillDefinition)
     validate_timed(definition)
     assert(definition.MANA_COST > 0, "Mage Heal must cost Mana.")
     assert(definition.RANGE_STUDS > 0, "Mage Heal range must be positive.")
-    local cure_tier = definition.CURE_POISON_TIER or 0
+    local poison_tier = definition.CURE_POISON_TIER or 0
+    local bleed_tier = definition.CURE_BLEED_TIER or 0
     assert(
-        definition.TOTAL_HEAL > 0
+        type(poison_tier) == "number" and poison_tier % 1 == 0
+            and poison_tier >= 0 and poison_tier <= 7
+            and type(bleed_tier) == "number"
+            and bleed_tier % 1 == 0
+            and bleed_tier >= 0 and bleed_tier <= 7,
+        "Support cure tiers must be bounded nonnegative integers."
+    )
+    assert(
+        (definition.TOTAL_HEAL > 0
+            and poison_tier == 0 and bleed_tier == 0)
             or (definition.TOTAL_HEAL == 0
-                and cure_tier >= 1 and cure_tier <= 7),
-        "Mage support requires positive healing or authored poison cure."
+                and (poison_tier > 0) ~= (bleed_tier > 0)
+                and (bleed_tier == 0
+                    or definition.SELF_ONLY == true)),
+        "Support must heal, cure poison or self-cure bleed exclusively."
     )
     assert(
         definition.HUMAN_INSTANT_FRACTION >= 0
