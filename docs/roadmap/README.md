@@ -1,4 +1,35 @@
-**Current DungeonMMO backend: v2.17 — nine distinct original Warrior polearm area-attack ranks; 20/22 actual NPCs hit exactly once in each tested rank, 18 Warrior source rows remain.**
+**Current DungeonMMO backend: v2.18 — genuine Warrior nine-rank blunt-only stun cast from real client, NPC HP/shock/MP PASS; 9 utility source rows remain.**
+[Current roadmap](
+DungeonMMO_Roadmap_v2_18_Warrior_Stonebreaker_20260924.md)
+and [executed real-client proof](
+../testing/ironvow-stonebreaker-v2-18-20260924.md).
+Distinct personally bought `IronvowStonebreaker`
+level-20/24/28 blunt control preserves nine original
+source power/MP rows and a true one-target melee hit
+with server-owned shock. Actual unpublished client
+slot-one request spent **30 MP**, hit real spawned
+NPC for **21.3888 HP**, and applied **1.1 sec**
+stagger; premature second cast, real equipped sword
+and forged Fighter were denied. No shock refresh for
+already dazed targets is implemented but **two concurrent
+player stun attempts remain untested**. Quest/Award/
+Foundation **31/137/119 assertions PASS**, separate
+source rank audit **27 PASS**, both disposable Rojo
+builds PASS. Warrior now **53/62 source training
+rows mapped, 9 utility rows missing**; Knight
+**55/55 schedules mapped** but neither class
+is certified C4-effect-equivalent or release-ready.
+Actual skill uses a bounded Roblox stun and HP adapter,
+not the original C4 damage formula or stun duration.
+The client Play used an internally valid disposable
+earned-class fixture, not a naturally saved complete
+cross-place quest. Prior Marauder/Captain held Block
+chip exploit fix remains; broad boss/world-boss
+stacking audit and all 14 unimplemented first-transfer
+source inventories remain open. No `main` merge,
+Roblox publishing, production saves or animation edits.
+
+**Previous DungeonMMO backend: v2.17 — distinct nine-rank polearm area skill tested on 20/22 real NPC targets; 18 Warrior rows still missing at that checkpoint.**
 [Current class roadmap](
 DungeonMMO_Roadmap_v2_17_Warrior_Crescent_Sweep_20260924.md)
 and [exact targeted Studio evidence](
