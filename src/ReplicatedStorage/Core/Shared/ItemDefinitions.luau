@@ -26,6 +26,23 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Authored functional blunt-weapon prototype. Its final appearance
+    -- is intentionally deferred; no item may gain sword-only training.
+    stonewatch_training_mace = table.freeze({
+        Id = "stonewatch_training_mace",
+        Name = "Stonewatch Training Mace",
+        Kind = "Equipment",
+        Slot = "Weapon",
+        Category = "Blunt",
+        AllowedBaseClasses = FIGHTER,
+        Rarity = "Basic",
+        Stackable = false,
+        WeaponTags = table.freeze({"OneHandedBlunt"}),
+        CombatModifiers = table.freeze({
+            PhysicalDamageBonus = 0.10,
+        }),
+    }),
+
     -- Original DungeonMMO rogue trial weapons: personal, non-tradeable
     -- inventory equipment granted ONLY inside Vela stage-two commit.
     -- These remain placeholders pending final historical meshes/art.
