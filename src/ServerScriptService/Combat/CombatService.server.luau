@@ -1938,11 +1938,18 @@ local function apply_rogue_melee_target(
         local target_humanoid = target:FindFirstChildOfClass("Humanoid")
         if target_humanoid and target_humanoid.Health > 0 then
             local already_staggered = StaggerService.is_staggered(target)
-            StaggerService.apply(target, stagger_seconds)
-            DungeonProgressionBridge.award_control(
-                player, skill_definition.ID, target,
-                "Stagger", not already_staggered
-            )
+            -- Original Warrior blunt shock cannot re-stun or refresh
+            -- a currently dazed target. Other authored skills retain
+            -- their existing independent stagger behavior.
+            local may_stagger = skill_definition.NO_STAGGER_REFRESH ~= true
+                or (applied_damage > 0 and not already_staggered)
+            if may_stagger then
+                StaggerService.apply(target, stagger_seconds)
+                DungeonProgressionBridge.award_control(
+                    player, skill_definition.ID, target,
+                    "Stagger", not already_staggered
+                )
+            end
         end
     end
 
