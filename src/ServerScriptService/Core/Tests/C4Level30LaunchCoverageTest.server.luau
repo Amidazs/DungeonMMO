@@ -101,17 +101,17 @@ local function main()
             .. "blunt, polearm, HP and utility rows must remain outstanding")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "SkillRankParityOutstanding"
-        and knight.SourceRankEntriesThroughCap == 54
+        and knight.SourceRankEntriesThroughCap == 55
         and knight.SourceRankEntriesByLevel[20] == 16
         and knight.SourceRankEntriesByLevel[24] == 16
-        and knight.SourceRankEntriesByLevel[28] == 22,
+        and knight.SourceRankEntriesByLevel[28] == 23,
         "Historical Knight 20/24/28 inventory does not grant a class")
     check(knight.TrainerMappedRankEntries == 46
-        and knight.MissingRankScheduleEntries == 8
+        and knight.MissingRankScheduleEntries == 9
         and not knight.SourceRankScheduleMapped
         and not knight.LaunchSkillCatalogueReady,
-        "Separate C4 Knight dual defence now maps 46 of 54 "
-            .. "historical rank entries; eight remain outstanding")
+        "Source-audited C4 Knight ranks map 46 of 55; nine remain "
+            .. "including both distinct bow defence rank entries")
     check(Coverage.for_branch("UnknownCareer") == nil,
         "Invented classes must not count toward release coverage")
     print(("[Level 30 Launch] PASS: %d assertions")
