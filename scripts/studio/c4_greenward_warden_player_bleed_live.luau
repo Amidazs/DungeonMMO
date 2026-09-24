@@ -243,7 +243,7 @@ Returns:
     nil: Genuine mana-spending client cast clears only the bleed.
 ]]
 local function cast_and_verify(player, character, humanoid)
-    local before_hp = humanoid.Health
+    local before_pulse = character:GetAttribute("MageHealPulse")
     local before_mana = Mana.get(player)
     receipts[player.UserId] = nil
     channel:FireClient(player, "LOAD")
@@ -264,13 +264,26 @@ local function cast_and_verify(player, character, humanoid)
         "Authentic client cast did not clear owner player bleed")
     assert(Mana.get(player) < before_mana,
         "Bleed cure must spend real owner mana")
-    assert(humanoid.Health <= before_hp,
-        "Bleed cure must not heal HP")
-    local after_hp = humanoid.Health
+    assert(character:GetAttribute("MageHealPulse") == before_pulse,
+        "Bleed cure must not trigger the actual healing executor")
+    assert(character:GetAttribute("C4PlayerBleedTier") == 0,
+        "The actual server bleed must clear its presentation status")
+    local prior_health = humanoid.Health
+    local late_damage = false
+    local health_listener = humanoid.HealthChanged:Connect(
+        function(new_health)
+            if new_health < prior_health - 0.001 then
+                late_damage = true
+            end
+            prior_health = new_health
+        end
+    )
     task.wait(3.5)
+    health_listener:Disconnect()
     assert(not Bleed.is_bleeding(character)
-        and math.abs(humanoid.Health - after_hp) < 0.001,
-        "Cured bleed must not apply any delayed damage")
+        and character:GetAttribute("C4PlayerBleedTier") == 0
+        and not late_damage,
+        "No delayed server bleed tick may harm the cured owner")
     print("[Warden Bleed] REAL_CLIENT_CURE_NO_LATE_TICK_PASS")
 end
 
