@@ -10,7 +10,7 @@ local RECIPES = table.freeze({
     -- consumption and output, never an extra profession slot.
     warrior_forge_weapon_rank_1 = table.freeze({
         Id = "warrior_forge_weapon_rank_1",
-        Name = "Ironroot Common Mace",
+        Name = "Ironroot Common Halberd",
         ProfessionId = "Blacksmithing",
         StationId = "Blacksmithing",
         RequiredLevel = 1,
@@ -25,7 +25,7 @@ local RECIPES = table.freeze({
             ItemId = "ironroot_training_halberd", Quantity = 1,
         }),
         XP = 18,
-    })
+    }),
     warrior_forge_armor_rank_2 = table.freeze({
         Id = "warrior_forge_armor_rank_2",
         Name = "Ironroot Common Cuirass",
@@ -44,7 +44,7 @@ local RECIPES = table.freeze({
             ItemId = "ironroot_d_grade_armor", Quantity = 1,
         }),
         XP = 32,
-    })
+    }),
     warrior_cure_hide_rank_1 = table.freeze({
         Id = "warrior_cure_hide_rank_1",
         Name = "Warrior Common Hide",
@@ -62,7 +62,7 @@ local RECIPES = table.freeze({
             ItemId = "cured_leather", Quantity = 2,
         }),
         XP = 18,
-    })
+    }),
     warrior_cure_hide_rank_2 = table.freeze({
         Id = "warrior_cure_hide_rank_2",
         Name = "Warrior Reinforced Common Hide",
@@ -81,7 +81,7 @@ local RECIPES = table.freeze({
             ItemId = "cured_leather", Quantity = 3,
         }),
         XP = 32,
-    })
+    }),
     warrior_distill_oil_rank_1 = table.freeze({
         Id = "warrior_distill_oil_rank_1",
         Name = "Warrior Common Tempering Oil",
@@ -99,7 +99,7 @@ local RECIPES = table.freeze({
             ItemId = "tempering_oil", Quantity = 2,
         }),
         XP = 18,
-    })
+    }),
     warrior_distill_oil_rank_2 = table.freeze({
         Id = "warrior_distill_oil_rank_2",
         Name = "Warrior Reinforced Tempering Oil",
@@ -118,7 +118,7 @@ local RECIPES = table.freeze({
             ItemId = "tempering_oil", Quantity = 3,
         }),
         XP = 32,
-    })
+    }),
     warrior_inscribe_rune_rank_1 = table.freeze({
         Id = "warrior_inscribe_rune_rank_1",
         Name = "Warrior Common Warding Rune",
@@ -136,7 +136,7 @@ local RECIPES = table.freeze({
             ItemId = "warding_rune", Quantity = 2,
         }),
         XP = 18,
-    })
+    }),
     warrior_inscribe_rune_rank_2 = table.freeze({
         Id = "warrior_inscribe_rune_rank_2",
         Name = "Warrior Reinforced Warding Rune",
@@ -155,7 +155,7 @@ local RECIPES = table.freeze({
             ItemId = "warding_rune", Quantity = 3,
         }),
         XP = 32,
-    })
+    }),
     knight_forge_weapon_rank_1 = table.freeze({
         Id = "knight_forge_weapon_rank_1",
         Name = "Stonewatch Common Mace",
