@@ -109,6 +109,11 @@ assert_equal(
     "Parry stagger duration is wrong."
 )
 
+-- A malicious client cannot obtain another free parry by releasing
+-- and immediately restarting the same block in the first 0.65 seconds.
+DefenseService.end_block(fake_player)
+DefenseService.begin_block(fake_player, character, 20.11)
+
 local same_press_second_hit = resolve_front_hit(
     fake_player,
     character,
@@ -154,6 +159,15 @@ local rear = DefenseService.resolve({
     parryable = true,
 }, 20.31)
 assert_equal(rear.outcome, "Hit", "Rear attack must bypass block.")
+DefenseService.end_block(fake_player)
+DefenseService.begin_block(fake_player, character, 20.20)
+local rapid_rearm = resolve_front_hit(
+    fake_player, character, 20.21, 0, true
+)
+assert_equal(
+    rapid_rearm.outcome, "Blocked",
+    "Repeated block taps cannot reset server parry cooldown."
+)
 DefenseService.end_block(fake_player)
 
 StaminaService.reset_player(fake_player)
