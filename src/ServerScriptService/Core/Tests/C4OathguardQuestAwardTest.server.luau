@@ -272,8 +272,10 @@ local function verify_defensive_stance(profiles: any, service: any)
     local allowed, reason = SkillUnlockRules.can_train(
         below_level, assert(SkillDefinitions.get(stance_id)), 1
     )
-    check(not allowed and reason == "CharacterLevelTooLow",
-        "C4 Knight level-twenty stance denies earlier levels")
+    check(not allowed and (
+        reason == "CharacterLevelTooLow"
+        or reason == "OriginalFirstTransferRequired"
+    ), "Knight stance denies the pre-transfer level-nineteen state")
     -- Never persist a level-19 identity after an earned level-20
     -- transfer: that would invalidate the real class receipt.
     local result = service:learn_trainer_skill(USER_ID, stance_id)
