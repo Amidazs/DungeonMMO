@@ -1,4 +1,36 @@
-**Current DungeonMMO class backend: v2.13 — true Knight sword AND blunt mastery family with bought source ranks and real NPC health PASS; three original Knight rank entries remain.**
+**Current DungeonMMO backend: v2.14 — Knight 55/55 C4 source rank schedules mapped, four crafting careers tested, full mechanic/balance parity still pending.**
+[Current class roadmap](
+DungeonMMO_Roadmap_v2_14_Knight_Common_Craft_C4_20260924.md)
+and [focused Studio evidence](
+../testing/knight-common-crafting-v2-14-20260924.md).
+Consolidated the single earned Knight `OathguardCommonItemCreation`
+rank family (20/28) after removing an accidental duplicate
+skill/recipe/server-rule implementation. Genuine owner-only
+ranked crafting requires one selected creation profession,
+consumes server-owned ingredients and creates real inventory
+items, including owned blunt mace/D-grade armour at a
+Blacksmithing station. Focused quest/foundation **247/112
+assertions PASS**, level-30 rank audit **27 assertions PASS**,
+both disposable Rojo builds PASS. Server transaction
+revalidates a rank revoked *after preparation*, refusing
+the output without materials loss or item duplication;
+all eight recipes across four isolated one-career profiles
+passed actual server crafting tests. Knight maps **55/55**
+historical skill rank rows; Warrior remains **27/62**,
+35 unmapped. All other first-transfer classes still need
+C4-level-30 source audit/implementation; **0/18** release
+certified. C4 Common Item Creation was automatically
+acquired in the original; DungeonMMO currently uses a
+class trainer and one-profession selection. This and the
+provisional combat-stat formulas remain documented design
+differences, **not** identical C4 economy or game balance.
+Previously verified shield-block exploit fix still ensures
+stacked Knight defences cannot make ordinary sustained
+Marauder/Captain hits do zero HP damage. Never claim
+boss/world-boss or end-to-end protection until tested.
+No `main` merge, Roblox publish or production DataStore use.
+
+**Previous DungeonMMO class backend: v2.13 — Knight sword and blunt damage proof; three common/expertise rows were still unmapped at that checkpoint.**
 [Current C4 class backend roadmap](
 DungeonMMO_Roadmap_v2_13_Knight_Sword_Blunt_20260924.md)
 and [exact focused plus live weapon damage evidence](
