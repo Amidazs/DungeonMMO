@@ -1225,8 +1225,12 @@ local function enter_active(
                 sequence_id
             )
         else
-            local is_sword =
+            -- Blunt weapons use the same prototype melee executor and
+            -- hitbox timing as swords until their own models/animations
+            -- are authored. They are still a separate equipment family.
+            local is_melee_weapon =
                 weapon_tags.OneHandedSword == true
+                or weapon_tags.OneHandedBlunt == true
             local melee_definition = attack_definition
             local base_damage =
                 CombatConfig.PROTOTYPE_WEAPON.BASE_DAMAGE
@@ -1235,7 +1239,7 @@ local function enter_active(
                             player.UserId
                         )
 
-            if not is_sword then
+            if not is_melee_weapon then
                 melee_definition = {}
 
                 for key, value in pairs(attack_definition) do
