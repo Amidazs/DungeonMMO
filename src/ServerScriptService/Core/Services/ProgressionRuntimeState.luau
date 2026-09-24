@@ -36,6 +36,12 @@ local PassiveSkillEffects = require(
 local ItemDefinitions = require(
     Shared:WaitForChild("ItemDefinitions")
 )
+local C4PrimaryStatReference = require(
+    Shared:WaitForChild("C4PrimaryStatReference")
+)
+local CharacterIdentityRules = require(
+    Shared:WaitForChild("CharacterIdentityRules")
+)
 
 local CombatStatusService = require(
     ServerScriptService.Combat.CombatStatusService
@@ -731,6 +737,51 @@ function ProgressionRuntimeState.get_support_multiplier(
     return AttributeConfig.support_multiplier(
         ProgressionRuntimeState.get_attribute(user_id, "Spirit")
     )
+end
+
+--[[
+Exposes C4 nine-path source vitals from the actual server-owned profile.
+
+This is an authoritative MIGRATION PREVIEW, not a live stat switch.
+Never trust a client-sent race/class/level or infer first-transfer
+ownership from a forged ClassId: use the full original mentor receipt.
+
+Args:
+    user_id (number): Current server-owned selected character user ID.
+
+Returns:
+    (any?, string?): Original C4 HP/MP/CP snapshot or denial reason.
+]]
+function ProgressionRuntimeState.get_c4_source_vitals(
+    user_id: number
+): (any?, string?)
+    local character = states[user_id]
+    if not character
+        or not CharacterIdentityRules.is_complete(character)
+    then
+        return nil, "OriginalCharacterIdentityNotVerified"
+    end
+    local reference = C4PrimaryStatReference.for_character(character)
+    if not reference then return nil, "OriginalClassNotVerified" end
+    local identity = character.Identity
+    local vitals, reason = C4PrimaryStatReference.get_level_vitals(
+        identity.RaceId, identity.ClassId, character.Level
+    )
+    if not vitals then return nil, reason end
+    return {
+        ClassId = identity.ClassId,
+        RaceId = identity.RaceId,
+        Level = vitals.Level,
+        MaxHealth = vitals.MaxHP,
+        MaxMana = vitals.MaxMP,
+        MaxCP = vitals.MaxCP,
+        ScopeId = reference.ScopeId,
+        SourceCommit = vitals.SourceCommit,
+        SourceOnly = true,
+        LiveApplied = false,
+        ItemBonusesIntegrated = false,
+        ActiveEffectsIntegrated = false,
+    }, nil
 end
 
 --[[
