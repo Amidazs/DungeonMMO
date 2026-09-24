@@ -1626,19 +1626,21 @@ local OATHGUARD_UMBRAL_SIPHON = specialize_skill(
     }
 )
 
--- Earned Knight stance uses server-owned temporary PhysicalGuard.
--- The caster pays real stamina and receives no magical resistance.
+-- C4's separate level-20 Knight stance gives 7% physical defence
+-- at a two-point Evasion penalty; it is NOT immobile Ultimate Defence.
+-- Source P.Def/Evasion units still need conversion to Roblox stat formulas.
 local OATHGUARD_STEADFAST_STANCE = specialize_skill(
     ELVEN_SCOUT_GUARD, "OathguardSteadfastStance",
     "Oathguard Steadfast Stance", {
-        MANA_COST = 0,
-        STAMINA_COST = 14,
-        COOLDOWN_SECONDS = 24,
-        BUFF_MAGNITUDE = 0.10,
-        BUFF_SECONDS = 10,
+        MANA_COST = 10,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 3,
+        BUFF_MAGNITUDE = 0.07,
+        BUFF_SECONDS = 300,
+        EVASION_PENALTY_POINTS = 2,
         RANKS = table.freeze({
             [1] = table.freeze({
-                BUFF_MAGNITUDE = 0.10, BUFF_SECONDS = 10,
+                BUFF_MAGNITUDE = 0.07, BUFF_SECONDS = 300,
             }),
         }),
     }
@@ -2034,8 +2036,10 @@ local function validate_buff(definition: BuffSkillDefinition)
         and definition.BUFF_MAGNITUDE <= 0.50,
         "Combat buff magnitude must be bounded."
     )
+    local max_seconds = if definition.BUFF_KIND == "PhysicalGuard"
+        then 300 else 60
     assert(definition.BUFF_SECONDS > 0
-        and definition.BUFF_SECONDS <= 60,
+        and definition.BUFF_SECONDS <= max_seconds,
         "Combat buff duration must be bounded."
     )
 end
