@@ -1,3 +1,33 @@
+## 24 September 2026 — CURRENT v2.19 genuine Warrior D-grade equipment
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_19_Warrior_Equipment_20260924.md)
+and [focused test evidence](
+../testing/ironvow-equipment-expertise-v2-19-20260924.md).
+Earned `IronvowEquipmentExpertise` is a separately paid
+source level20 passive. Registered functional prototype
+D-grade Warrior-only heavy body armour needs genuinely
+awarded owner, bought licence, correct level and actual
+inventory. Real server equip initially rejects without
+rank, then equips after purchase and changes max HP
++20. Copied class, wrong/underlevel gear denied;
+test ProfileService save/reload preserves both. Two
+disposable Rojo builds PASS; actual Quest/Award/
+Foundation **31/144/125** and source audit **27**
+assertions PASS. Warrior **54/62 source rank schedules
+mapped, 8 utility rows remain**: common creation 2,
+critical stance 3, health recovery 1, accuracy stance
+1, endurance surge 1. Knight 55/55 scheduled;
+0/18 careers release-certified; original C4 stat/
+economy formulas, natural full client cross-place
+quest/rejoin, all boss/world-boss shield-stack security
+and other 14 first-transfer inventories still OPEN.
+Avoid retesting unchanged green suites; continue
+utilities. Permanent scripts/docs GitHub only;
+desktop for safe fast-forward and targeted disposable
+unpublished Studio. No main merge, publish, production
+DataStores or parallel animation project edits.
+
 ## 24 September 2026 — CURRENT v2.18 Warrior source blunt control
 
 [Latest full roadmap](
