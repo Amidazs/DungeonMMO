@@ -1671,6 +1671,32 @@ local OATHGUARD_LAST_BASTION = specialize_skill(
     }
 )
 
+-- C4 Deflect Arrow effect ranks 1/2 are separate anti-bow defence,
+-- not regular melee armour; MP22/28 and source bow attributes -16/-19.
+-- Roblox's 16/19 percent incoming bow-damage translation is provisional.
+local OATHGUARD_ARROW_WARD = specialize_skill(
+    ELVEN_SCOUT_GUARD, "OathguardArrowWard",
+    "Oathguard Arrow Ward", {
+        MANA_COST = 22,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 3,
+        BUFF_KIND = "BowGuard",
+        BUFF_MAGNITUDE = 0.16,
+        BUFF_SECONDS = 1200,
+        SOURCE_BOW_DEFENCE_ATTRIBUTE = -16,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                MANA_COST = 22, BUFF_MAGNITUDE = 0.16,
+                SOURCE_BOW_DEFENCE_ATTRIBUTE = -16,
+            }),
+            [2] = table.freeze({
+                MANA_COST = 28, BUFF_MAGNITUDE = 0.19,
+                SOURCE_BOW_DEFENCE_ATTRIBUTE = -19,
+            }),
+        }),
+    }
+)
+
 -- Oathguard's personal recovery uses the existing server-owned heal
 -- executor; no client-selected healing target or arbitrary HP amount.
 local OATHGUARD_MENDING_OATH = specialize_skill(
@@ -1933,6 +1959,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
     OathguardSteadfastStance = OATHGUARD_STEADFAST_STANCE,
     OathguardLastBastion = OATHGUARD_LAST_BASTION,
+    OathguardArrowWard = OATHGUARD_ARROW_WARD,
     OathguardUmbralSiphon = OATHGUARD_UMBRAL_SIPHON,
     OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
@@ -2054,6 +2081,7 @@ local function validate_buff(definition: BuffSkillDefinition)
         definition.BUFF_KIND == "PhysicalPower"
             or definition.BUFF_KIND == "PhysicalGuard"
             or definition.BUFF_KIND == "Fortress"
+            or definition.BUFF_KIND == "BowGuard"
             or definition.BUFF_KIND == "MagicPower"
             or definition.BUFF_KIND == "Evasion"
             or definition.BUFF_KIND == "Movement",
@@ -2063,8 +2091,10 @@ local function validate_buff(definition: BuffSkillDefinition)
         and definition.BUFF_MAGNITUDE <= 0.50,
         "Combat buff magnitude must be bounded."
     )
-    local max_seconds = if definition.BUFF_KIND == "PhysicalGuard"
-        then 300 else 60
+    local max_seconds = if definition.BUFF_KIND == "BowGuard"
+        then 1200
+        elseif definition.BUFF_KIND == "PhysicalGuard" then 300
+        else 60
     assert(definition.BUFF_SECONDS > 0
         and definition.BUFF_SECONDS <= max_seconds,
         "Combat buff duration must be bounded."
