@@ -289,6 +289,9 @@ local function verify_armour_training(profiles: any)
     purchase_full_line(
         profiles, service, "IronvowStonebreaker"
     )
+    purchase_full_line(
+        profiles, service, "IronvowCriticalStance"
+    )
     check(equipment:equip(
         USER_ID, "ironroot_training_halberd", "Weapon"
     ).ok, "Genuine Warrior equips its separately registered polearm")
@@ -639,6 +642,8 @@ local function verify_reload(store: any, profiles: any)
             .IronvowCrescentSweep.PurchasedRank == 9
         and character.Progression.Skills
             .IronvowStonebreaker.PurchasedRank == 9
+        and character.Progression.Skills
+            .IronvowCriticalStance.PurchasedRank == 3
         and character.Progression.Skills
             .IronvowEquipmentExpertise.PurchasedRank == 1
         and character.Progression.Skills
