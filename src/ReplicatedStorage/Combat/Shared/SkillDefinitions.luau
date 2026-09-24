@@ -97,6 +97,15 @@ export type ScoutToggleSkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
+export type IronvowCriticalToggleSkillDefinition = {
+    KIND: "IronvowCriticalToggle", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, MANA_COST: number,
+    COOLDOWN_SECONDS: number,
+    CRITICAL_DAMAGE_BONUS: number, SOURCE_CRITICAL_POWER: number,
+    UPKEEP_MANA_PER_SECOND: number,
+    RANKS: {[number]: any}?,
+}
+
 export type ScoutAccuracyToggleSkillDefinition = {
     KIND: "ScoutAccuracyToggle", ID: string, DISPLAY_NAME: string,
     STAMINA_COST: number, COOLDOWN_SECONDS: number,
@@ -105,6 +114,7 @@ export type ScoutAccuracyToggleSkillDefinition = {
 }
 
 export type SkillDefinition = ScoutAccuracyToggleSkillDefinition
+    | IronvowCriticalToggleSkillDefinition
     | ScoutToggleSkillDefinition
     | MeleeSkillDefinition
     | BuffSkillDefinition
@@ -1939,6 +1949,40 @@ local ELVEN_SCOUT_SNARING_SHOT = specialize_skill(
 
 -- Genuine on/off C4 power stance: source-banded critical damage
 -- and continuous stamina upkeep, not a one-off timed buff.
+-- C4 source Vicious Stance tiers: +35/+48/+64 critical power,
+-- 4/5/5 MP on activation and continuous MP consumption.
+-- This temporary Roblox adapter converts original *flat* critical
+-- power into a bounded multiplier; original C4 damage math is pending.
+local IRONVOW_CRITICAL_STANCE: IronvowCriticalToggleSkillDefinition =
+    table.freeze({
+        KIND = "IronvowCriticalToggle",
+        ID = "IronvowCriticalStance",
+        DISPLAY_NAME = "Ironvow Critical Stance",
+        STAMINA_COST = 0,
+        MANA_COST = 4,
+        COOLDOWN_SECONDS = 0,
+        CRITICAL_DAMAGE_BONUS = 0.035,
+        SOURCE_CRITICAL_POWER = 35,
+        UPKEEP_MANA_PER_SECOND = 2,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                MANA_COST = 4,
+                SOURCE_CRITICAL_POWER = 35,
+                CRITICAL_DAMAGE_BONUS = 0.035,
+            }),
+            [2] = table.freeze({
+                MANA_COST = 5,
+                SOURCE_CRITICAL_POWER = 48,
+                CRITICAL_DAMAGE_BONUS = 0.048,
+            }),
+            [3] = table.freeze({
+                MANA_COST = 5,
+                SOURCE_CRITICAL_POWER = 64,
+                CRITICAL_DAMAGE_BONUS = 0.064,
+            }),
+        }),
+    })
+
 local SCOUT_CRITICAL_POWER_TOGGLE: ScoutToggleSkillDefinition =
     table.freeze({
         KIND = "ScoutToggle",
@@ -2109,6 +2153,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ArcherDraw = ARCHER_DRAW,
     ScoutFocusedShot = SCOUT_FOCUSED_SHOT,
     ScoutCriticalPowerToggle = SCOUT_CRITICAL_POWER_TOGGLE,
+    IronvowCriticalStance = IRONVOW_CRITICAL_STANCE,
     ScoutAccuracyToggle = SCOUT_ACCURACY_TOGGLE,
     ElvenRenewal = ELVEN_RENEWAL,
     ElvenCalmingShot = ELVEN_CALMING_SHOT,
@@ -2252,6 +2297,36 @@ Args:
 Returns:
     nil: Rejects cosmetic or resource-free toggle definitions.
 ]]
+--[[
+Validates one earned Warrior's source-ranked MP critical stance.
+
+Args:
+    definition (IronvowCriticalToggleSkillDefinition): Actual source
+        rank definitions supplied to the server-owned toggle.
+
+Returns:
+    nil: Rejects free, unbounded or incorrectly ordered rank stances.
+]]
+local function validate_ironvow_critical(
+    definition: IronvowCriticalToggleSkillDefinition
+)
+    assert(definition.STAMINA_COST == 0
+        and definition.MANA_COST >= 1
+        and definition.UPKEEP_MANA_PER_SECOND > 0
+        and definition.UPKEEP_MANA_PER_SECOND <= 5,
+        "Warrior critical stance must continuously spend bounded MP.")
+    local previous = 0
+    for rank, source_power in ipairs({35, 48, 64}) do
+        local row = assert(definition.RANKS[rank])
+        assert(row.SOURCE_CRITICAL_POWER == source_power
+            and row.MANA_COST == (if rank == 1 then 4 else 5)
+            and row.CRITICAL_DAMAGE_BONUS > previous
+            and row.CRITICAL_DAMAGE_BONUS <= 0.15,
+            "Warrior critical stance must retain genuine source ranks.")
+        previous = row.CRITICAL_DAMAGE_BONUS
+    end
+end
+
 local function validate_scout_toggle(definition: ScoutToggleSkillDefinition)
     assert(definition.STAMINA_COST > 0
         and definition.STAMINA_COST <= 20,
@@ -2435,6 +2510,10 @@ for _, definition in DEFINITIONS do
         )
     elseif definition.KIND == "ScoutToggle" then
         validate_scout_toggle(definition :: ScoutToggleSkillDefinition)
+    elseif definition.KIND == "IronvowCriticalToggle" then
+        validate_ironvow_critical(
+            definition :: IronvowCriticalToggleSkillDefinition
+        )
     elseif definition.KIND == "Buff" then
         validate_buff(definition :: BuffSkillDefinition)
     elseif definition.KIND == "Support" then
