@@ -1,3 +1,57 @@
+## 24 September 2026 — current v2.12 Knight security and C4 defence
+
+[Current roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_12_Knight_Defense_Exploit_Bow_20260924.md)
+and [exact executed evidence](
+../testing/knight-block-fortress-bow-anti-exploit-v2-12-20260924.md).
+Verified and fixed a real zero-HP shield-block exploit:
+Marauder and Captain attack controllers previously sent
+only Hit to DamageService, making sustained Blocked and
+GuardBroken outcomes HP-immune even with defence buffs.
+Server-authored blocked hostile melee/bow now deals
+45% post-mitigation chip subject to 20% incoming HP floor
+before a *separate* ward, guard break does ordinary
+unblocked damage, block start needs 20 server stamina,
+and block-release spam cannot reset 0.65s parry rearm.
+Genuine client Knight + purchased shield rank2/Majesty
+took 41.13 real HP three times from 100-base blocked hits,
+then 91.4 HP on guard break; zero-stamina reblock denied.
+Separate earned C4 Knight Ultimate Defence analogue
+`OathguardLastBastion` costs MP19 and immobilizes caster
+for actual 30s, protects physical+magic with explicit
+provisional 35% Roblox conversion; with shield, Majesty,
+Ultimate and server-trusted block, actual HP damage
+**25.38** from 100, not near-zero. Client Dodge while
+rooted and premature recast denied. Test waited full
+30s and verified unanchoring and restored normal damage.
+Focused Base Knight Quest/Foundation 89/89 PASS and
+live full Dungeon Bastion PASS after fixing an initial
+Luau parse error on the source branch.
+
+Re-audited original C4 Knight class page: source has
+*two* bow-defence ranks at 24 and 28, earlier source
+inventory omitted rank2. Corrected total from 54 to 55.
+Distinct earned/purchased `OathguardArrowWard` rank1/2
+MP22/28 and source bow attributes -16/-19. Genuine
+client/full-Dungeon HP bow tests PASS: 100-base injected
+server-authored EnemyBow hit causes 84/81 real HP;
+blocked bow causes 37.8/36.45 HP; regular melee/magic
+100. Focused Knight quest/foundation 96/95 assertions
+PASS, launch rank audit currently **48/55 mapped,
+7 missing**: equipment expertise1, common item creation2,
+true sword AND blunt mastery4. Warrior **27/62**,
+35 missing. Original bow attribute-to-HP reduction
+16/19%, buff timing and Fortress numeric conversion
+are *provisional Roblox adaptations*; no exact C4
+combat formula/balance certification, no real ranged
+NPC bow projectile playtest, no end-to-end saved journey
+or party-member owner-isolation proof. Other real boss/
+world-boss attack pipelines need block-outcome audit.
+No `main` merge, Roblox publish or production saves;
+permanent edits directly in GitHub, desktop only for
+fast-forward pull/disposable build/unpublished Studio.
+Separate animation sessions and worktrees untouched.
+
 ## 24 September — current Knight C4 mechanical parity v2.11
 
 [Latest roadmap](
