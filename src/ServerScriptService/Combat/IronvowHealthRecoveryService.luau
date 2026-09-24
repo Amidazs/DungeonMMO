@@ -1,5 +1,6 @@
 --!strict
--- Genuine C4 Warrior passive HP recovery. Never heals dead players.
+-- Genuine C4 Warrior passive HP recovery, including outside combat.
+-- Server-owned and never available to dead or unawarded characters.
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
@@ -27,7 +28,6 @@ function IronvowHealthRecoveryService.apply_tick(
         or type(seconds) ~= "number"
         or seconds ~= seconds
         or seconds <= 0 or seconds > 1.25
-        or player:GetAttribute("DungeonCombatAllowed") == false
     then
         return 0
     end
