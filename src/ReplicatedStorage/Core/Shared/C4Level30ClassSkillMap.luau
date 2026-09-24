@@ -46,6 +46,7 @@ local ELF = table.freeze({
 local WARRIOR = table.freeze({
     SwordPowerAttack = "IronvowDrivingStrike",
     SwordBluntMastery = "IronvowBladeTraining",
+    PolearmMastery = "IronvowPolearmTraining",
     LightArmorMastery = "IronvowLightArmorTraining",
     HeavyArmorMastery = "IronvowHeavyArmorTraining",
     BattleCry = "IronvowBattleCall",
