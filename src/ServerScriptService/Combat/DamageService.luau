@@ -14,6 +14,9 @@ local WardService = require(script.Parent:WaitForChild("WardService"))
 local CombatStatusService = require(
     script.Parent:WaitForChild("CombatStatusService")
 )
+local BlockedHitDamageRules = require(
+    script.Parent:WaitForChild("BlockedHitDamageRules")
+)
 local ScoutAccuracyToggleService = require(
     script.Parent:WaitForChild("ScoutAccuracyToggleService")
 )
@@ -30,6 +33,7 @@ export type DamageContext = {
     base_damage: number, multiplier: number, sequence_id: number?,
     critical_chance: number?, critical_damage_multiplier: number?,
     critical_roll: number?, accuracy_roll: number?,
+    blocked: boolean?,
 }
 
 local damage_callback:
@@ -92,6 +96,7 @@ function DamageService.apply_damage(context: DamageContext): number
         end
     end
     local damage = normal_damage * resolve_critical_multiplier(context)
+    local incoming_damage = damage
     local defender = Players:GetPlayerFromCharacter(context.target)
     if defender and context.source_kind == "EnemyMelee" then
         local moving = humanoid.MoveDirection.Magnitude > 0.1
@@ -147,6 +152,18 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_oathguard_magic_reduction(defender.UserId)
         damage *= 1 - math.clamp(
             mystic_reduction + oathguard_reduction, 0, 0.25
+        )
+    end
+    -- The genuine server DefenseService decides whether this was blocked.
+    -- Guard-break strikes are ordinary hits, and a timed parry/dodge never
+    -- enters this damage path. This resolves chip after earned mitigations,
+    -- before separate ward absorption; client flags are never trusted.
+    if defender then
+        damage = BlockedHitDamageRules.resolve(
+            incoming_damage,
+            damage,
+            context.source_kind,
+            context.blocked
         )
     end
     local health_damage, ward_absorbed = WardService.absorb_damage(
