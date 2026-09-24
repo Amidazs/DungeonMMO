@@ -562,6 +562,40 @@ local function verify_warrior_common_crafting(profiles: any)
     check(last.ok and last.rank == 2,
         "Warrior buys its second independent real common-creation rank")
     craft_warrior_recipe(profiles, inventory, professions, second)
+    stock_warrior_inputs(profiles, inventory, second)
+    local before = assert(profiles:get_character(USER_ID))
+    local primary = second.Inputs[1]
+    local materials_before = Inventory.count_item(
+        before, primary.ItemId
+    )
+    local output_before = Inventory.count_item(
+        before, second.Output.ItemId
+    )
+    local prepared = professions:prepare_craft(USER_ID, second.Id)
+    check(prepared.ok, "Paid Warrior can start second-rank crafting")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            skill_id
+        ].PurchasedRank = 1
+    end), "Disposable Warrior test revokes paid rank after preparation")
+    local denied = professions:complete_craft(
+        USER_ID, second.Id,
+        Professions.foundation_success_outcome(prepared.minigame_id)
+    )
+    check(not denied.ok
+        and denied.reason == "WarriorCommonItemCreationNotLearned",
+        "Revoked Warrior rank cannot commit a previously prepared craft")
+    local after = assert(profiles:get_character(USER_ID))
+    check(Inventory.count_item(after, primary.ItemId)
+        == materials_before
+        and Inventory.count_item(after, second.Output.ItemId)
+            == output_before,
+        "Denied Warrior craft must neither consume nor duplicate items")
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Progression.Skills[
+            skill_id
+        ].PurchasedRank = 2
+    end), "Restore previously purchased rank only in this test fixture")
     check(not professions:prepare_craft(
         USER_ID, "warrior_distill_oil_rank_1"
     ).ok, "Crafting mastery cannot grant a second creation career")
