@@ -1,3 +1,44 @@
+## 24 September 2026 — current Warrior v2.16 polearm, verified anti-stack
+
+[Latest class roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_16_Warrior_Polearm_20260924.md)
+and [exact focused/live Studio evidence](
+../testing/ironvow-polearm-mastery-v2-16-20260924.md).
+Source-verified Human Warrior Polearm Mastery ranks
+20/24/28/28, P.Atk 4.5/7.3/8.9/10.7 and +5 source
+hit targets implemented via new original
+`IronvowPolearmTraining`, registered two-handed
+`ironroot_training_halberd`, server-authenticated
+rank/weapon/class, separate 7-stud multi-target
+hitbox and 5/10 single-swing target cap. No copied
+rank, sword/blunt/dagger/empty equipment or raw
+Fighter may obtain source polearm attack bonus
+or extra targets. `EquipmentService` refuses
+BOTH shield→polearm and polearm→shield, preserving
+anti-invulnerability. Latest focused real Warrior
+quest/award/foundation 31/99/73 PASS on source
+`a4512b956a28c6fe983361e33137225a98eb6819`;
+12-NPC actual world-health capped sweep 26 assertions
+PASS, genuine spawned player→NPC health 110
+untrained vs 111.07 rank4 PASS, strict level30
+source audit 27 PASS. Fresh disposable Base and
+Dungeon Rojo PASS. Current Warrior **35/62**
+historical training rows mapped, **27 missing**;
+Knight **55/55** source schedules mapped, but
+source conversion to Roblox P.Atk currently
+provisional, full source-effect/economy parity,
+natural saved client, multiple-party and boss/
+world-boss exploit tests remain unverified;
+**0/18** first-transfer careers release certified.
+Four source-inventoried class branches, 14 unaudited
+branches and base skills 1–19 still pending.
+Desktop Commander reports 87% monthly usage;
+preserve remaining credits, use GitHub directly
+for scripts/docs and focused unpublished Studio
+only when necessary. Do not merge main, publish
+Roblox, use production saves or alter humanoid/
+quadruped animation worktrees.
+
 ## 24 September 2026 — latest v2.15 Warrior Sword/Blunt verification
 
 [Current v2.15 roadmap](
