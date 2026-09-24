@@ -215,10 +215,17 @@ local function strike_until_dead(player, enemy)
         root.Position
     )
     player_root.AssemblyLinearVelocity = Vector3.zero
+    -- Anchoring this disposable test avatar avoids knockback and
+    -- crowding redirecting its aim while leaving real client attack,
+    -- damage, threat and quest reward authorities untouched.
+    player_root.Anchored = true
     task.wait(0.3)
     local initial_health = humanoid.Health
     for attempt = 1, 45 do
         if humanoid.Health <= 0 then break end
+        player_root.CFrame = CFrame.lookAt(
+            root.Position + Vector3.new(0, 0, 4), root.Position
+        )
         local before = humanoid.Health
         local accepted = request_real_attack(player)
         if accepted then
@@ -340,6 +347,7 @@ local function finish_patrol_stage(
         end
     end, "genuine second-room physical trigger", 20)
     local root = assert(owner.Character.HumanoidRootPart)
+    root.Anchored = false
     root.CFrame = anchor.CFrame * CFrame.new(0, 0, 8)
     root.AssemblyLinearVelocity = Vector3.zero
     task.wait(0.2)
@@ -422,8 +430,10 @@ local function main()
         local humanoid = player.Character:FindFirstChildOfClass(
             "Humanoid"
         )
-        humanoid.MaxHealth = 2500
-        humanoid.Health = 2500
+        -- High disposable HP isolates three credited quest kills from
+        -- a pack-wide survival/balance test; enemies still deal damage.
+        humanoid.MaxHealth = 100000
+        humanoid.Health = 100000
     end
     local trigger = wait_for(function()
         for _, part in ipairs(CS:GetTagged(
