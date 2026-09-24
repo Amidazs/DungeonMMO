@@ -64,7 +64,6 @@ local KNIGHT = table.freeze({
     BowDefense = "OathguardArrowWard",
     SwordBluntMastery = "OathguardSteelAndStoneTraining",
     EquipmentExpertise = "OathguardEquipmentExpertise",
-    CommonItemCreation = "OathguardCommonCreation",
     CommonItemCreation = "OathguardCommonItemCreation",
     LifeDrain = "OathguardUmbralSiphon",
     SelfRecovery = "OathguardMendingOath",
