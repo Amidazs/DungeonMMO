@@ -114,6 +114,9 @@ local DEFINITIONS = table.freeze({
                 SkillId = "IronvowAccuracyStance", Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "IronvowFieldRecovery", Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "IronvowLightArmorTraining",
                 Mode = "LearnOrRank",
             }),
