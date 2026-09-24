@@ -58,7 +58,7 @@ local function forged_character(): any
         SWORD, BLADE, "IronvowPolearmTraining",
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
-        CALL, LIGHT, HEAVY,
+        "IronvowCriticalStance", CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -108,6 +108,20 @@ local function main()
     check_ranks("IronvowPolearmTraining", {20, 24, 28, 28})
     check_ranks("IronvowEquipmentExpertise", {20})
     check_ranks("IronvowCommonItemCreation", {20, 28})
+    check_ranks("IronvowCriticalStance", {20, 24, 28})
+    local critical_power = {35, 48, 64}
+    local critical_mana = {4, 5, 5}
+    for rank, power in ipairs(critical_power) do
+        local stance = assert(Combat.get_for_rank(
+            "IronvowCriticalStance", rank
+        ))
+        check(stance.KIND == "IronvowCriticalToggle"
+            and stance.SOURCE_CRITICAL_POWER == power
+            and stance.MANA_COST == critical_mana[rank]
+            and stance.UPKEEP_MANA_PER_SECOND > 0
+            and stance.STAMINA_COST == 0,
+            "C4 Warrior critical stance spends MP with correct rank")
+    end
     check_ranks(
         "IronvowCrescentSweep",
         {20, 20, 20, 24, 24, 24, 28, 28, 28}
@@ -195,7 +209,7 @@ local function main()
         SWORD, BLADE, "IronvowPolearmTraining",
         "IronvowCrescentSweep", "IronvowStonebreaker",
         "IronvowEquipmentExpertise", "IronvowCommonItemCreation",
-        CALL, LIGHT, HEAVY,
+        "IronvowCriticalStance", CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
