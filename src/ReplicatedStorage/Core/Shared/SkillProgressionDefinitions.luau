@@ -1757,6 +1757,27 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original C4 Knight's separate common item creation tiers 2/3.
+    -- The player retains ONE chosen crafting career and one gathering;
+    -- real ranked recipes must consume ingredients and produce inventory.
+    OathguardCommonItemCreation = table.freeze({
+        Id = "OathguardCommonItemCreation",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        RequiresCraftingProfessionChoice = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4CommonItemCreation",
+                Rank = 1, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The C4 Knight's source Expertise D rank: earned level20
     -- permits actual D-grade equipment, never a cosmetic UI badge.
     OathguardEquipmentExpertise = table.freeze({
