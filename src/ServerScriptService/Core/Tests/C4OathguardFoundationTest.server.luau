@@ -81,7 +81,7 @@ local function forged(): any
     for _, skill_id in ipairs({
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
-        "OathguardShieldMastery",
+        "OathguardShieldMastery", "OathguardSteadfastStance",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -113,6 +113,17 @@ local function main()
     )
     check_ranks("OathguardMendingOath", {28, 28, 28})
     check_ranks("OathguardShieldMastery", {20, 28})
+    check_ranks("OathguardSteadfastStance", {20})
+    local stance = assert(Combat.get_for_rank(
+        "OathguardSteadfastStance", 1
+    ))
+    check(stance.KIND == "Buff" and stance.SELF_ONLY
+        and stance.BUFF_KIND == "PhysicalGuard"
+        and stance.BUFF_MAGNITUDE == 0.10
+        and stance.BUFF_SECONDS == 10
+        and stance.STAMINA_COST == 14
+        and stance.COOLDOWN_SECONDS == 24,
+        "Earned Knight stance gives timed paid self-only physical guard")
     local early_heal = assert(Combat.get_for_rank(
         "OathguardMendingOath", 1
     ))
@@ -145,7 +156,7 @@ local function main()
     for _, skill_id in ipairs({
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
-        "OathguardShieldMastery",
+        "OathguardShieldMastery", "OathguardSteadfastStance",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
