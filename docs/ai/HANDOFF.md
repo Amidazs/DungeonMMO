@@ -1,3 +1,16 @@
+## 24 September 2026 — v2.48 all nine paths, 75 C4 source effects
+
+Generated structured, pinned C4 source effect data for every one of
+the 75 source skill IDs used by the v2.47 nine-path level<=30 tree,
+covering 272 unique source rank pairs behind 476
+class-scoped learning rows. Data resolves source sets plus passive
+modifiers/effects/weapon conditions, split by XML range and surfaced
+through C4SkillEffectSource. This is source metadata only; current
+creative skill executors still use old Roblox values. Next create
+complete source->creative family/rank map, compare divergences, then
+port C4 item/passive calculator order and coherent live migration.
+No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.47 all nine original paths C4 learning rows
 
 Added C4Level30SkillTreeSource for ALL current original paths:

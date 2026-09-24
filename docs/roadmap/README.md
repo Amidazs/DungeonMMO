@@ -1,3 +1,14 @@
+**Current v2.48 all-class C4 effect source:** the exact
+pinned C4 skill XML is now structured for all **75 source skill IDs /
+272 unique learned source ranks** used by the nine original
+paths through level 30. [Roadmap](
+DungeonMMO_Roadmap_v2_48_C4_75_Skill_Effect_Source_20260924.md);
+[evidence](../testing/c4-75-skill-effect-source-20260924.md).
+This covers active costs/power/timing/targets/status and passive source
+modifiers/weapon conditions. It is not yet live parity; next map every
+creative DungeonMMO family to these source IDs/ranks and implement the
+C4 equipment/passive calculator order before switching gameplay.
+
 **Current v2.47 all-class C4 skill source:** all nine
 implemented original paths now have an exact level<=30 learning-tree
 inventory: 476 C4 rows / 75 source skill IDs including source skill
