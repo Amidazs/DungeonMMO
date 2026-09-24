@@ -43,6 +43,26 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Source-distinct two-handed polearm. Authoritative equipment reserves
+    -- OffHand, so a shield cannot be stacked with the polearm's wide sweep.
+    -- Models and weapon animations remain placeholders for backend testing.
+    ironroot_training_halberd = table.freeze({
+        Id = "ironroot_training_halberd",
+        Name = "Ironroot Training Halberd",
+        Kind = "Equipment",
+        Slot = "Weapon",
+        Category = "Polearm",
+        AllowedBaseClasses = FIGHTER,
+        Rarity = "Basic",
+        Stackable = false,
+        CanBlock = false,
+        ReservedSlots = table.freeze({"OffHand"}),
+        WeaponTags = table.freeze({"Polearm"}),
+        CombatModifiers = table.freeze({
+            PhysicalDamageBonus = 0.10,
+        }),
+    }),
+
     -- Actually equippable D-grade Knight armour; an earned class skill
     -- and original minimum level20 must authorize the real Equip action.
     stonewatch_d_grade_armor = table.freeze({
