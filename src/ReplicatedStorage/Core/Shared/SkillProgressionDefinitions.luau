@@ -2100,6 +2100,17 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Level-24 distinct Elven Knight real self-only bleed cleanse.
+    GreenwardWardenBleedRecovery = table.freeze({
+        Id = "GreenwardWardenBleedRecovery",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 24}),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The original Knight's seven dark-magic life-drain ranks occur
     -- at source brackets 20/24/28. Actual health is restored only after
     -- the server confirms damage to a valid opposing NPC.

@@ -31,7 +31,7 @@ export type MageHealSkillDefinition = {
     STAMINA_COST: number, MANA_COST: number, COOLDOWN_SECONDS: number,
     WIND_UP_SECONDS: number, ACTIVE_SECONDS: number, RECOVERY_SECONDS: number,
     RANGE_STUDS: number, TOTAL_HEAL: number,
-    CURE_POISON_TIER: number?,
+    CURE_POISON_TIER: number?, CURE_BLEED_TIER: number?,
     HUMAN_INSTANT_FRACTION: number, HUMAN_HOT_SECONDS: number,
     ELF_INSTANT_FRACTION: number, ELF_HOT_SECONDS: number,
     HOT_TICK_SECONDS: number,
@@ -1094,6 +1094,25 @@ local ELVEN_SCOUT_POISON_RECOVERY = specialize_skill(
         CURE_POISON_TIER = 3,
         RANKS = table.freeze({
             [1] = table.freeze({CURE_POISON_TIER = 3}),
+        }),
+    }
+)
+
+-- A distinct Elven Knight bleed cure is only usable against the
+-- caster's actual server-tracked player bleed, with mana and cooldown.
+local GREENWARD_WARDEN_BLEED_RECOVERY = specialize_skill(
+    ELVEN_SCOUT_POISON_RECOVERY, "GreenwardWardenBleedRecovery",
+    "Greenward Wound Cleansing", {
+        SELF_ONLY = true,
+        MANA_COST = 11,
+        COOLDOWN_SECONDS = 8,
+        TOTAL_HEAL = 0,
+        CURE_POISON_TIER = 0,
+        CURE_BLEED_TIER = 1,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                CURE_POISON_TIER = 0, CURE_BLEED_TIER = 1,
+            }),
         }),
     }
 )
@@ -2409,6 +2428,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     GreenwardWardenPoisonRecovery = GREENWARD_WARDEN_POISON_RECOVERY,
     GreenwardWardenBowWard = GREENWARD_WARDEN_BOW_WARD,
     GreenwardWardenAttackAura = GREENWARD_WARDEN_ATTACK_AURA,
+    GreenwardWardenBleedRecovery = GREENWARD_WARDEN_BLEED_RECOVERY,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
     MysticLifeDrain = MYSTIC_LIFE_DRAIN,
     MysticPoisonCurse = MYSTIC_POISON_CURSE,

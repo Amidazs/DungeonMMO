@@ -15,6 +15,9 @@ local EnemyWeakeningService = require(
     Combat:WaitForChild("EnemyWeakeningService")
 )
 local DefenseService = require(Combat:WaitForChild("DefenseService"))
+local PlayerBleedStatusService = require(
+    Combat:WaitForChild("PlayerBleedStatusService")
+)
 local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
 local PresentationService = require(Combat:WaitForChild("MarauderPresentationService"))
@@ -161,7 +164,7 @@ local function resolve_hit(runtime: Runtime, player: Player, character: Model, a
     end
     if defense.outcome == "Hit" or defense.outcome == "Blocked"
         or defense.outcome == "GuardBroken" then
-        DamageService.apply_damage({
+        local health_damage = DamageService.apply_damage({
             attacker = nil,
             attacker_character = runtime.model,
             target = character,
@@ -175,6 +178,16 @@ local function resolve_hit(runtime: Runtime, player: Player, character: Model, a
             ),
             sequence_id = runtime.attackSequence,
         })
+        -- Only a genuine unblocked Captain Slash may apply bleed.
+        -- A shield's bounded chip damage does not create an extra DoT.
+        if attack_name == "CaptainSlash"
+            and defense.outcome ~= "Blocked"
+            and health_damage > 0
+        then
+            PlayerBleedStatusService.apply_from_captain(
+                runtime.model, character, health_damage
+            )
+        end
     end
 end
 

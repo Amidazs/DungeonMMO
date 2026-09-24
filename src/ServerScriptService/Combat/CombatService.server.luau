@@ -101,6 +101,9 @@ local PartyHealService = require(
 local PoisonStatusService = require(
     script.Parent:WaitForChild("PoisonStatusService")
 )
+local PlayerBleedStatusService = require(
+    script.Parent:WaitForChild("PlayerBleedStatusService")
+)
 local CombatStatusService = require(
     script.Parent:WaitForChild("CombatStatusService")
 )
@@ -2081,6 +2084,20 @@ local function resolve_skill_heal_target(
     local cure_tier = tonumber(
         skill_definition.CURE_POISON_TIER
     ) or 0
+    local bleed_tier = tonumber(
+        skill_definition.CURE_BLEED_TIER
+    ) or 0
+    if bleed_tier > 0 then
+        local character = player.Character
+        local humanoid = character
+            and character:FindFirstChildOfClass("Humanoid")
+        return if skill_definition.SELF_ONLY == true
+            and character ~= nil
+            and character:IsDescendantOf(workspace)
+            and humanoid ~= nil and humanoid.Health > 0
+            and PlayerBleedStatusService.is_bleeding(character)
+            then player else nil
+    end
     if skill_definition.SELF_ONLY ~= true then
         return MageHealService.find_target(
             player, skill_definition.RANGE_STUDS,
@@ -2448,6 +2465,19 @@ local function enter_skill_active(
                 )
 
         if target and (tonumber(
+            skill_definition.CURE_BLEED_TIER
+        ) or 0) > 0 then
+            local cleared = PlayerBleedStatusService.cure(
+                target.Character, skill_definition.CURE_BLEED_TIER
+            )
+            CombatValidationService.emit(
+                player, "MAGE_CURE",
+                if cleared then "APPLIED" else "REJECT",
+                if cleared then skill_definition.ID
+                    else "BleedUnavailable",
+                sequence_id
+            )
+        elseif target and (tonumber(
             skill_definition.CURE_POISON_TIER
         ) or 0) > 0 then
             local removed = PoisonStatusService.cure(

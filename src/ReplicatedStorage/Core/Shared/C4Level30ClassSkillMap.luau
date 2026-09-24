@@ -95,6 +95,7 @@ local ELVEN_KNIGHT = table.freeze({
     BowDefense = "GreenwardWardenBowWard",
     AttackAura = "GreenwardWardenAttackAura",
     CommonItemCreation = "GreenwardWardenCommonItemCreation",
+    BleedRecovery = "GreenwardWardenBleedRecovery",
 })
 
 --[[

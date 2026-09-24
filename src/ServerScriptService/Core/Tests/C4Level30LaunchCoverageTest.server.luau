@@ -103,17 +103,17 @@ local function main()
         and elven_knight.SourceRankEntriesByLevel[24] == 18
         and elven_knight.SourceRankEntriesByLevel[28] == 20,
         "Elven Knight must keep its independently sourced 56 ranks")
-    check(elven_knight.TrainerMappedRankEntries == 55
-        and elven_knight.MissingRankScheduleEntries == 1
+    check(elven_knight.TrainerMappedRankEntries == 56
+        and elven_knight.MissingRankScheduleEntries == 0
         and not elven_knight.SourceRankScheduleMapped
         and not elven_knight.LaunchSkillCatalogueReady
-        and elven_knight.Status == "SkillRankParityOutstanding",
+        and elven_knight.Status == "RankScheduleMappedEffectsPending",
         "Source-only Elven Knight cannot count as a playable Scout")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(report.SourceAuditedBranches == 5
-        and report.RankSchedulesMappedBranches == 4
+        and report.RankSchedulesMappedBranches == 5
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")

@@ -91,6 +91,10 @@ local FAMILIES = table.freeze({
         Id = "GreenwardWardenCommonItemCreation",
         Levels = table.freeze({20, 28}),
     }),
+    table.freeze({
+        Id = "GreenwardWardenBleedRecovery",
+        Levels = table.freeze({24}),
+    }),
 })
 local assertions = 0
 
@@ -434,8 +438,8 @@ local function main()
         purchase_family(profiles, skills, family)
     end
     local audit = assert(Coverage.for_branch(BRANCH_ID))
-    check(audit.TrainerMappedRankEntries == 55
-        and audit.MissingRankScheduleEntries == 1
+    check(audit.TrainerMappedRankEntries == 56
+        and audit.MissingRankScheduleEntries == 0
         and not audit.LaunchSkillCatalogueReady,
         "No incomplete Warden source family becomes release-certified")
     verify_equipment(profiles, Equipment.new(profiles, "Base"))

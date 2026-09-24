@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.32 Elven Knight source rank map 56/56
+
+[Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_32_Elven_Knight_Bleed_Recovery_20260924.md). A real tagged CaptainSlash positive, unblocked HP hit can now apply bounded, non-stacking server-owned player bleed through PlayerBleedStatusService; genuine Warden only, purchased level24 GreenwardWardenBleedRecovery mana/cooldown clears only owner active bleed and cancels old ticks. No client-attribute cure. All 56/56 original C4 source training rank SCHEDULES now mapped, 5 of 18 first-transfer paths fully rank-scheduled, 0 mechanically/release certified. Full physical Captain bleed/cure Play and all prior Warden focused source tests still need Studio execution. No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.31 Warden crafting
 
 [Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_31_Elven_Knight_Common_Creation_20260924.md). Two independently bought GreenwardWardenCommonItemCreation ranks (20/28) now authorize eight material-backed recipes across one selected creation career, with original Elven item identities and real armor expertise gate. Focused service test covers genuine material-consuming crafts but has not run inside Studio. Warden rank map 55/56; only real player Bleed Recovery remains unimplemented. No main merge/publish/production saves/animation edits.
