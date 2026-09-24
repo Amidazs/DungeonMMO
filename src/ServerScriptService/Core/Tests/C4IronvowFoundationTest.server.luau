@@ -102,6 +102,11 @@ Returns:
 local function main()
     check_ranks(SWORD, {20, 20, 20, 24, 24, 24, 28, 28, 28})
     check_ranks(BLADE, {20, 24, 28, 28})
+    local weapon_mastery = assert(Progression.get(BLADE))
+    check(weapon_mastery.DamageBonusPerRank == 0.014
+        and #weapon_mastery.WeaponTags == 0,
+        "Bought Warrior sword/blunt family does not require sword at trainer")
+
     check_ranks(LIGHT, {20, 20, 24, 24, 28, 28, 28})
     check_ranks(HEAVY, {20, 20, 24, 24, 28, 28, 28})
     check_ranks(CALL, {20, 24, 28})
@@ -140,6 +145,9 @@ local function main()
     end
     check(Passives.damage_bonus(unearned, BLADE) == 0,
         "Forged equipped sword must not receive Warrior passive damage")
+    unearned.Equipment.Weapon = "stonewatch_training_mace"
+    check(Passives.damage_bonus(unearned, BLADE) == 0,
+        "Forged Warrior cannot get the same mastery with blunt equipment")
     check(Passives.fighter_armor_reduction(unearned) == 0,
         "Forged Warrior cannot use a bought heavy-armour rank")
     print(("[Ironvow Foundation] PASS: %d assertions")
