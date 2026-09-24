@@ -82,7 +82,7 @@ local function forged(): any
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
-        "OathguardUmbralSiphon",
+        "OathguardUmbralSiphon", "OathguardLastBastion",
     }) do
         owner.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 9, Proficiency = 320,
@@ -115,6 +115,19 @@ local function main()
     check_ranks("OathguardMendingOath", {28, 28, 28})
     check_ranks("OathguardShieldMastery", {20, 28})
     check_ranks("OathguardSteadfastStance", {20})
+    check_ranks("OathguardLastBastion", {20})
+    local bastion = assert(Combat.get_for_rank(
+        "OathguardLastBastion", 1
+    ))
+    check(bastion.KIND == "Buff"
+        and bastion.SELF_ONLY
+        and bastion.BUFF_KIND == "Fortress"
+        and bastion.SOURCE_PHYSICAL_DEFENCE == 1800
+        and bastion.SOURCE_MAGIC_DEFENCE == 1350
+        and bastion.BUFF_SECONDS == 30
+        and bastion.MANA_COST == 19
+        and bastion.IMMOBILIZES_CASTER == true,
+        "Separate Knight bastion grants source dual defence and roots")
     check_ranks(
         "OathguardUmbralSiphon", {20, 20, 24, 24, 28, 28, 28}
     )
@@ -176,7 +189,7 @@ local function main()
         IMPACT, CHALLENGE, ARMOR,
         "OathguardRunicResistance", "OathguardMendingOath",
         "OathguardShieldMastery", "OathguardSteadfastStance",
-        "OathguardUmbralSiphon",
+        "OathguardUmbralSiphon", "OathguardLastBastion",
     }) do
         check(not Rules.can_train(
             owner, assert(Skills.get(skill_id)), 1
