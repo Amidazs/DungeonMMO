@@ -159,12 +159,14 @@ local function resolve_hit(runtime: Runtime, player: Player, character: Model, a
         StaggerService.apply(runtime.model, defense.attacker_stagger_seconds)
         return
     end
-    if defense.outcome == "Hit" then
+    if defense.outcome == "Hit" or defense.outcome == "Blocked"
+        or defense.outcome == "GuardBroken" then
         DamageService.apply_damage({
             attacker = nil,
             attacker_character = runtime.model,
             target = character,
             source_kind = if definition.RADIAL then "EnemyArea" else "EnemyMelee",
+            blocked = defense.outcome == "Blocked",
             source_id = attack_name,
             attack_id = attack_name,
             base_damage = definition.HEALTH_DAMAGE,
