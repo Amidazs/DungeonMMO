@@ -264,15 +264,15 @@ Returns:
 ]]
 local function verify_defensive_stance(profiles: any, service: any)
     local stance_id = "OathguardSteadfastStance"
+    check(profiles:mutate(USER_ID, function(profile: any)
+        profile.Characters.Slot1.Level = 19
+    end), "Knight starts below level twenty for strict source gate")
     local denied = service:learn_trainer_skill(USER_ID, stance_id)
     check(not denied.ok,
-        "Knight cannot skip basic Fighter armour training")
+        "Knight cannot learn C4 source stance before level twenty")
     check(profiles:mutate(USER_ID, function(profile: any)
-        profile.Characters.Slot1.Progression.Skills
-            .FighterArmorTraining = {
-                Known = true, PurchasedRank = 3, Proficiency = 0,
-            }
-    end), "Knight has trained the Fighter armour prerequisite")
+        profile.Characters.Slot1.Level = 20
+    end), "Knight reaches original C4 level-twenty stance bracket")
     local result = service:learn_trainer_skill(USER_ID, stance_id)
     check(result.ok and result.rank == 1,
         "Earned Knight's own physical trainer sells its distinct stance")
