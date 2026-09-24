@@ -147,6 +147,31 @@ local function equipped_weapon_has_tag(
     return false
 end
 
+--[[
+Checks an actual registered sword OR blunt weapon equipped by the owner.
+
+Only weapon-category metadata from the server's ItemDefinitions counts;
+a dagger that temporarily uses a sword animation is not a sword.
+
+Args:
+    character (any): Authoritative player equipment and identity.
+
+Returns:
+    boolean: True only for a registered Sword or Blunt weapon category.
+]]
+local function equipped_sword_or_blunt(character: any): boolean
+    local equipment = type(character) == "table"
+        and character.Equipment
+    local item_id = type(equipment) == "table"
+        and equipment.Weapon
+    local item = if type(item_id) == "string"
+        then ItemDefinitions.get(item_id) else nil
+    return item ~= nil
+        and item.Kind == "Equipment"
+        and item.Slot == "Weapon"
+        and (item.Category == "Sword" or item.Category == "Blunt")
+end
+
 -- Resolves a purchased physical or magical damage passive.
 --
 -- Args:
@@ -165,6 +190,11 @@ function PassiveSkillEffects.damage_bonus(
     end
     if skill_id == "IronvowBladeTraining"
         and not equipped_weapon_has_tag(character, "OneHandedSword")
+    then
+        return 0
+    end
+    if skill_id == "OathguardSteelAndStoneTraining"
+        and not equipped_sword_or_blunt(character)
     then
         return 0
     end
