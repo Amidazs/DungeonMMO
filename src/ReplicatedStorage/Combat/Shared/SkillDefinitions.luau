@@ -97,6 +97,14 @@ export type ScoutToggleSkillDefinition = {
     RANKS: {[number]: any}?,
 }
 
+export type IronvowHealthSurgeSkillDefinition = {
+    KIND: "HealthSurge", ID: string, DISPLAY_NAME: string,
+    STAMINA_COST: number, MANA_COST: number,
+    COOLDOWN_SECONDS: number, DURATION_SECONDS: number,
+    MAX_HP_BONUS: number, RESTORE_FRACTION: number,
+    RANKS: {[number]: any}?,
+}
+
 export type IronvowAccuracyToggleSkillDefinition = {
     KIND: "IronvowAccuracyToggle", ID: string, DISPLAY_NAME: string,
     STAMINA_COST: number, MANA_COST: number,
@@ -125,6 +133,7 @@ export type ScoutAccuracyToggleSkillDefinition = {
 export type SkillDefinition = ScoutAccuracyToggleSkillDefinition
     | IronvowCriticalToggleSkillDefinition
     | IronvowAccuracyToggleSkillDefinition
+    | IronvowHealthSurgeSkillDefinition
     | ScoutToggleSkillDefinition
     | MeleeSkillDefinition
     | BuffSkillDefinition
@@ -2035,6 +2044,29 @@ local IRONVOW_ACCURACY_STANCE: IronvowAccuracyToggleSkillDefinition =
         }),
     })
 
+-- Source C4 Warrior level28 Battle Roar analogue: +10% maximum HP
+-- and immediate 10% heal, paid 13 MP. Cooldown is provisional.
+local IRONVOW_ENDURANCE_SURGE: IronvowHealthSurgeSkillDefinition =
+    table.freeze({
+        KIND = "HealthSurge",
+        ID = "IronvowEnduranceSurge",
+        DISPLAY_NAME = "Ironvow Endurance Surge",
+        STAMINA_COST = 0,
+        MANA_COST = 13,
+        COOLDOWN_SECONDS = 120,
+        DURATION_SECONDS = 600,
+        MAX_HP_BONUS = 0.10,
+        RESTORE_FRACTION = 0.10,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                MANA_COST = 13,
+                MAX_HP_BONUS = 0.10,
+                RESTORE_FRACTION = 0.10,
+                DURATION_SECONDS = 600,
+            }),
+        }),
+    })
+
 local SCOUT_ACCURACY_TOGGLE: ScoutAccuracyToggleSkillDefinition =
     table.freeze({
         KIND = "ScoutAccuracyToggle",
@@ -2188,6 +2220,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     ScoutCriticalPowerToggle = SCOUT_CRITICAL_POWER_TOGGLE,
     IronvowCriticalStance = IRONVOW_CRITICAL_STANCE,
     IronvowAccuracyStance = IRONVOW_ACCURACY_STANCE,
+    IronvowEnduranceSurge = IRONVOW_ENDURANCE_SURGE,
     ScoutAccuracyToggle = SCOUT_ACCURACY_TOGGLE,
     ElvenRenewal = ELVEN_RENEWAL,
     ElvenCalmingShot = ELVEN_CALMING_SHOT,
@@ -2351,6 +2384,27 @@ Args:
 Returns:
     nil: Rejects free resource toggles and invalid accuracy magnitudes.
 ]]
+--[[
+Checks the independent paid Warrior maximum-HP and healing surge.
+
+Args:
+    definition (IronvowHealthSurgeSkillDefinition): Authored C4 rank.
+
+Returns:
+    nil: Rejects an unbounded or free status before real combat.
+]]
+local function validate_ironvow_health_surge(
+    definition: IronvowHealthSurgeSkillDefinition
+)
+    assert(definition.STAMINA_COST == 0
+        and definition.MANA_COST == 13
+        and definition.MAX_HP_BONUS == 0.10
+        and definition.RESTORE_FRACTION == 0.10
+        and definition.DURATION_SECONDS == 600
+        and definition.COOLDOWN_SECONDS > 0,
+        "Warrior source HP surge must be paid, bounded and finite.")
+end
+
 local function validate_ironvow_accuracy(
     definition: IronvowAccuracyToggleSkillDefinition
 )
@@ -2574,6 +2628,10 @@ for _, definition in DEFINITIONS do
     elseif definition.KIND == "IronvowAccuracyToggle" then
         validate_ironvow_accuracy(
             definition :: IronvowAccuracyToggleSkillDefinition
+        )
+    elseif definition.KIND == "HealthSurge" then
+        validate_ironvow_health_surge(
+            definition :: IronvowHealthSurgeSkillDefinition
         )
     elseif definition.KIND == "Buff" then
         validate_buff(definition :: BuffSkillDefinition)
