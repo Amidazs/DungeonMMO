@@ -89,6 +89,14 @@ local function main()
         Runtime.get_health_recovery_per_second(player.UserId) - 1.1
     ) < 0.001, "Genuine bought passive did not enable HP regeneration")
     local before = humanoid.Health
+    print("[Warrior Recovery] DIAGNOSTIC "
+        .. "playerParent=" .. tostring(player.Parent)
+        .. " characterParent=" .. tostring(character.Parent)
+        .. " actualCharacter=" .. tostring(player.Character == character)
+        .. " hp=" .. tostring(humanoid.Health)
+        .. " rate=" .. tostring(
+            Runtime.get_health_recovery_per_second(player.UserId)
+        ))
     local received = Recovery.apply_tick(player, 1)
     assert(math.abs(received - 1.1) < 0.02
         and math.abs(humanoid.Health - before - received) < 0.02,
