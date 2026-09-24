@@ -166,4 +166,52 @@ function C4ProfessionSkillRules.can_make_knight_common(
         and state.PurchasedRank <= 2
 end
 
+--[[
+Authorizes a personally awarded Warrior's source common-creation tier.
+
+A bought ability never adds a second profession or bypasses recipe
+literacy. Each authored recipe still consumes actual owned materials.
+
+Args:
+    character (any): Server-owned selected and earned Warrior profile.
+    profession_id (string): Only this character's chosen creation career.
+    required_rank (number): First or second original advanced tier.
+
+Returns:
+    boolean: Whether the exact career, level, source quest and paid
+        crafting rank permit the requested real craft transaction.
+]]
+function C4ProfessionSkillRules.can_make_warrior_common(
+    character: any,
+    profession_id: string,
+    required_rank: number
+): boolean
+    if type(character) ~= "table"
+        or type(required_rank) ~= "number"
+        or required_rank % 1 ~= 0
+        or required_rank < 1 or required_rank > 2
+        or not C4ProfessionSkillRules.can_make_common(
+            character, profession_id
+        )
+    then
+        return false
+    end
+    local career = FirstTransfers.awarded(character)
+    if not career or career.Id ~= "Ironvow" then
+        return false
+    end
+    local levels = {20, 28}
+    if (tonumber(character.Level) or 0) < levels[required_rank] then
+        return false
+    end
+    local skills = character.Progression
+        and character.Progression.Skills
+    local state = skills and skills.IronvowCommonItemCreation
+    return type(state) == "table"
+        and state.Known == true
+        and type(state.PurchasedRank) == "number"
+        and state.PurchasedRank >= required_rank
+        and state.PurchasedRank <= 2
+end
+
 return table.freeze(C4ProfessionSkillRules)
