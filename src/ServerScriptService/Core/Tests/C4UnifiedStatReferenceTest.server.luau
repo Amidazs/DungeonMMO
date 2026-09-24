@@ -106,6 +106,14 @@ local function check_equipment_and_class_gates()
         {Weapon = "Bow", Bonus = "Heavy"}, {})
     check(invalid == "InvalidOriginalEquipmentLoadout",
         "Unrecognised source-equipment slots fail closed")
+    local _, false_body = C4.get("Human", "Oathguard", 30,
+        {Weapon = "Heavy"}, {{SkillId = 232, Rank = 1}})
+    check(false_body == "InvalidOriginalEquipmentLoadout",
+        "Weapon slot cannot impersonate source heavy armour")
+    local _, false_weapon = C4.get("Elf", "GreenwardScout", 30,
+        {Body = "Bow"}, {{SkillId = 208, Rank = 1}})
+    check(false_weapon == "InvalidOriginalEquipmentLoadout",
+        "Armour slot cannot impersonate a C4 bow")
 end
 
 --[[

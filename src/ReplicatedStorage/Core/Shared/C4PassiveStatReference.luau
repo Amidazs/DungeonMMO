@@ -215,6 +215,17 @@ local function valid_loadout(loadout: any): boolean
         if not slots[slot] or type(kind) ~= "string"
             or kind == ""
         then return false end
+        if slot == "Body"
+            and kind ~= "Heavy" and kind ~= "Light"
+            and kind ~= "Robe"
+        then return false end
+        if slot == "OffHand" and kind ~= "Shield" then
+            return false
+        end
+        if slot == "Weapon"
+            and (kind == "Heavy" or kind == "Light"
+                or kind == "Robe" or kind == "Shield")
+        then return false end
     end
     return true
 end
