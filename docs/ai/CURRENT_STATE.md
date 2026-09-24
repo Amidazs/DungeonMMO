@@ -1,3 +1,40 @@
+## 24 September 2026 — CURRENT v2.20 earned Warrior common creation
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_20_Warrior_Common_Craft_20260924.md)
+and [actual source service proof](
+../testing/ironvow-common-crafting-v2-20-20260924.md).
+Warrior two distinct source common creation ranks
+20/28 bought at the real earned-class trainer;
+starter recipe-reading/basic creation prerequisites,
+ONE gathering/ONE creation profession. Eight material-
+backed real server recipes for four careers; focused
+Blacksmithing rank1 crafted real two-handed halberd,
+rank2 crafted owned D-grade Warrior body item. Actual
+real server material spend and output/reload PASS.
+After preparing high-rank craft, revoking that rank
+before commit causes atomic denial with NO materials
+lost and NO output duplication. Base/Dungeon fresh
+unpublished Rojo PASS. Quest/Award/Foundation
+**31/182/131 assertions PASS**, source rank audit
+**27 PASS**. Warrior **56/62 source rank rows mapped,
+6 utility rows remain**: CriticalStance 3 at20/24/28,
+HealthRecovery 1 at24, AccuracyStance 1 at24,
+EnduranceSurge 1 at28. Knight **55/55 scheduled**,
+all **0/18 first-transfer release-certified**.
+The three other Warrior creation career registrations
+and authority require separate full craft transaction
+tests; original C4 automatically learned common creation
+versus DungeonMMO one-career purchased analogue
+remains explicit. True client UI/gather, C4 formula,
+natural cross-place save and boss/world-boss
+Block stacking require tests; v2.12 Marauder/Captain
+block-chip proof must NOT be broadened to those paths.
+Avoid rerunning unchanged green suites. GitHub for
+all permanent edits; desktop only safe fast-forward
+and targeted unpublished tests. No `main` merge,
+Roblox publish, production DataStores or animation edits.
+
 ## 24 September 2026 — CURRENT v2.19 genuine Warrior D-grade equipment
 
 [Latest roadmap](
