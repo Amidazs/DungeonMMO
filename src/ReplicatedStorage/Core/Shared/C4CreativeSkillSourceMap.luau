@@ -27,6 +27,7 @@ local MAPS = table.freeze({
         [1147] = table.freeze({SkillId = "MysticLifeDrain"}),
         [1168] = table.freeze({SkillId = "MysticPoisonCurse"}),
         [1177] = table.freeze({SkillId = "MysticWindBolt", Offset = 1, StarterSkillId = "WindStrike"}),
+        [1164] = table.freeze({SkillId = "MysticFeebleCurse"}),
         [1184] = table.freeze({SkillId = "MysticFrostBolt"}),
         [1216] = table.freeze({SkillId = "MageHeal"}),
         [1320] = table.freeze({SkillId = "C4CommonItemCreation"}),
@@ -54,7 +55,9 @@ local MAPS = table.freeze({
         [1040] = table.freeze({SkillId = "MysticStoneSkin"}),
         [1068] = table.freeze({SkillId = "MysticBattleChant"}),
         [1177] = table.freeze({SkillId = "MysticWindBolt", Offset = 1, StarterSkillId = "WindStrike"}),
+        [1164] = table.freeze({SkillId = "MysticFeebleCurse"}),
         [1184] = table.freeze({SkillId = "MysticFrostBolt"}),
+        [1206] = table.freeze({SkillId = "ElvenMysticLanguor"}),
         [1216] = table.freeze({SkillId = "MageHeal"}),
         [1320] = table.freeze({SkillId = "C4CommonItemCreation"}),
     }),
@@ -167,7 +170,7 @@ local GAPS = table.freeze({
         [118] = "Magicians Movement has no verified creative analogue",
         [163] = "Spellcraft has no verified creative analogue",
         [194] = "Lucky has no verified creative analogue",
-        [1164] = "Curse Weakness exists but is absent from the Mystic trainer",
+
         [1322] = "Common Craft is not the current recipe-reading passive",
     }),
     ElvenFighter = table.freeze({
@@ -178,8 +181,8 @@ local GAPS = table.freeze({
         [118] = "Magicians Movement has no verified creative analogue",
         [163] = "Spellcraft has no verified creative analogue",
         [194] = "Lucky has no verified creative analogue",
-        [1164] = "Curse Weakness exists but is absent from the Mystic trainer",
-        [1206] = "Wind Shackle exists but is absent from the Elven Mystic trainer",
+
+
         [1322] = "Common Craft is not the current recipe-reading passive",
     }),
     HumanWarrior = table.freeze({
