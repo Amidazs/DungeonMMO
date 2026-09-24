@@ -1,3 +1,17 @@
+## 24 September 2026 — v2.45 C4 derived-stat reference engine
+
+Added read-only C4DerivedStatReference on pinned C4 source
+`Neco-spain/l2jadmins_C4-Scions-of-Destiny@07f85363`.
+It implements source stat-bonus equations, level modifier, naked
+PAtk/PDef/MAtk/MDef, physical/cast/run speed, accuracy/evasion and
+critical-rate units on top of v2.44 exact nine HP/MP/CP templates.
+It intentionally excludes equipment, mastery, buffs/dyes and target
+mods until C4 calculator order is ported. Live AttributeConfig,
+CharacterCombatStats, ManaService, HP/HUD and skills remain untouched.
+Next port equipment + physical/magic damage/heal/status formula layer,
+then coherent live migration and all-class skill source values.
+No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.44 exact C4 nine-template growth source
 
 Pinned actual C4 Scions of Destiny source/datapack

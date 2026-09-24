@@ -1,3 +1,13 @@
+**Current v2.45 C4 stat work:** a read-only C4 derived-stat
+engine now sits on top of the exact nine source templates, covering
+source stat bonuses, level modifier, naked P.Atk/P.Def/M.Atk/M.Def,
+attack/cast/run speed, accuracy, evasion and critical-rate semantics.
+[Roadmap](DungeonMMO_Roadmap_v2_45_C4_Derived_Stat_Engine_20260924.md);
+[evidence](../testing/c4-derived-stat-formulas-source-20260924.md).
+Equipment/mastery/buff calculator order and damage/heal/status formulas
+are the next migration layer. Live Roblox stats/skills remain unchanged;
+no publish/main merge/production saves.
+
 **Current v2.44 C4 stat source:** exact C4 Scions of Destiny
 class-template and HP/MP/CP growth data now exists for all nine
 implemented original paths (4 starters + 5 first transfers), pinned to
