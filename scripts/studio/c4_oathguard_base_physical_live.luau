@@ -28,6 +28,9 @@ local shown = {}
 local prompts = game:GetService("ProximityPromptService")
 prompts.PromptShown:Connect(function(prompt) shown[prompt] = true end)
 prompts.PromptHidden:Connect(function(prompt) shown[prompt] = nil end)
+prompts.PromptTriggered:Connect(function(prompt)
+    signal:FireServer("CLIENT_TRIGGERED", prompt:GetFullName())
+end)
 RS.Core.Remotes.ProgressionActionResult.OnClientEvent:Connect(
     function(event)
         if event.action == "SkillLearn" then
@@ -106,9 +109,6 @@ local function hold(player, part)
     root.Anchored = true
     root.CFrame = part.CFrame * CFrame.new(0, 0, 4)
     root.AssemblyLinearVelocity = Vector3.zero
-    responses.PROMPT_VISIBLE = nil
-    responses.HELD = nil
-    task.wait(1.2)
     local prompt = assert(part:FindFirstChildOfClass(
         "ProximityPrompt"
     ))
@@ -116,23 +116,50 @@ local function hold(player, part)
     local connection = prompt.Triggered:Connect(function(actor)
         if actor == player then confirmed = true end
     end)
-    signal:FireClient(player, "HOLD", part)
-    await_state(function()
-        return responses.HELD or responses.FAIL
-    end, "client held " .. part.Name, 12)
-    assert(responses.FAIL == nil,
-        "Real client could not hold the physical NPC ProximityPrompt")
-    if responses.PROMPT_VISIBLE ~= true then
-        warn("[Oathguard Physical] CLIENT_PROMPT_VISIBILITY_NOT_CONFIRMED "
-            .. part.Name)
+    local prompt_service = game:GetService("ProximityPromptService")
+    local competing_prompt = nil
+    local observer = prompt_service.PromptTriggered:Connect(function(
+        triggered_prompt, actor
+    )
+        if actor == player and triggered_prompt ~= prompt then
+            competing_prompt = triggered_prompt:GetFullName()
+        end
+    end)
+    for attempt = 1, 3 do
+        responses.PROMPT_VISIBLE = nil
+        responses.HELD = nil
+        responses.FAIL = nil
+        responses.CLIENT_TRIGGERED = nil
+        task.wait(1.2)
+        signal:FireClient(player, "HOLD", part)
+        await_state(function()
+            return responses.HELD or responses.FAIL
+        end, "client held " .. part.Name, 12)
+        assert(responses.FAIL == nil,
+            "Real client prompt input error: " .. tostring(
+                responses.FAIL
+            ))
+        local deadline = os.clock() + 2
+        repeat
+            if confirmed then break end
+            task.wait(0.1)
+        until os.clock() >= deadline
+        if confirmed then break end
+        warn("[Oathguard Physical] PROMPT_ATTEMPT_MISSED "
+            .. tostring(attempt) .. " target=" .. prompt:GetFullName()
+            .. " visible=" .. tostring(responses.PROMPT_VISIBLE)
+            .. " clientTriggered=" .. tostring(
+                responses.CLIENT_TRIGGERED
+            ) .. " competingServer=" .. tostring(competing_prompt))
     end
-    local deadline = os.clock() + 3
-    repeat task.wait(0.1) until confirmed
-        or os.clock() >= deadline
     connection:Disconnect()
+    observer:Disconnect()
     assert(confirmed,
         "Client hold never triggered actual server NPC " .. part.Name
             .. ", visible=" .. tostring(responses.PROMPT_VISIBLE)
+            .. ", clientTriggered=" .. tostring(
+                responses.CLIENT_TRIGGERED
+            ) .. ", competingServer=" .. tostring(competing_prompt)
             .. ", enabled=" .. tostring(prompt.Enabled)
             .. ", distance=" .. tostring(
                 (root.Position - part.Position).Magnitude
