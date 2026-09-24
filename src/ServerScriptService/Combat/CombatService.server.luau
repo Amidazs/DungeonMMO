@@ -3184,6 +3184,18 @@ local function handle_defense_request(
         return
     end
 
+    -- Ultimate Defence is immobile. Reject the client Dodge remote
+    -- before its dash movement or i-frames can bypass server anchoring.
+    if CombatStatusService.get(
+        player.Character, "Fortress"
+    ) > 0 then
+        CombatValidationService.emit(
+            player, "DODGE", "REJECT",
+            "FortressMovementLocked", record.sequence_id
+        )
+        return
+    end
+
     if not StateRules.can_transition(
         record.state_name,
         State.DODGING
