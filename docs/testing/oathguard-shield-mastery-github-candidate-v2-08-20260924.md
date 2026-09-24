@@ -67,6 +67,35 @@ equipped-shield hostile physical hit measurements, multiplayer owner
 isolation and end-to-end saved cross-place journey. No publication
 or production DataStore mutation occurred.
 
+## Follow-up physical Base rerun — bounded prompt retries
+
+After the recorded earlier failure, the GitHub-only disposable test
+driver was updated to try the *same genuine client*
+`ProximityPrompt:InputHoldBegin/End` up to three times, checking
+`ProximityPrompt.Triggered` on the server after each attempt.
+It also records actual client and server prompt-trigger events.
+No production NPC prompt, quest, trainer or combat code was changed.
+
+In a fresh two-client unpublished Base run at commit `6dfd4fb`,
+the first Captain Rowan hold again produced no `PromptTriggered`
+event despite the client reporting `visible=true` (and the
+client/server trigger diagnostics were both nil). The subsequent
+attempt succeeded. The remaining physical NPC interactions and real
+mentor/trainer flow passed in the *same* run:
+
+- Server Studio log `0.740.0.7400927_20260924T083102Z_Studio_59EF1_last.log`:
+  `REAL_NPC_START_PASS`, `REAL_OWNER_ITEM_TURNINS_PASS`,
+  `REAL_MENTOR_CLASS_PASS` and
+  `REAL_CLIENT_TRAINER_PURCHASE_PASS`.
+- Coordinating Studio log
+  `0.740.0.7400927_20260924T083054Z_Studio_17148_last.log`:
+  `VERIFIED_LIVE_BASE_PASS`.
+
+This resolves the previously failed *acceptance run*, not the
+underlying cause of intermittent missing first-hold input. It does
+not prove that production input is guaranteed on the first attempt;
+track that separately if it persists for real users.
+
 ## Fresh actual player-HP combat acceptance (24 September)
 
 A new permanent, source-controlled Studio test driver
@@ -104,8 +133,9 @@ two-client Base physical NPC test remains FAILED as recorded above.
   level-30 audit: **27 PASS**, verified from separate Studio logs.
 - [x] Disposable Base and Dungeon Rojo builds both PASS;
   canonical `DungeonMMO.rbxl` unchanged.
-- [ ] Two-client Base physical NPC input: **FAILED** at visible,
-  enabled four-stud Captain Rowan prompt; needs targeted diagnosis.
+- [x] Fresh two-client physical Base quest, personal marker/seal
+  turn-ins, mentor and client trainer **PASS with bounded genuine-input
+  retry**; first client hold still missed the server event.
 - [x] Genuine spawned Play character's HP: deterministic 99.2/98.4
   hostile melee and 98.4 hostile area with synthesized, internally valid
   paid-rank/equipment snapshot; unequipping eliminates the reduction.
@@ -119,7 +149,7 @@ two-client Base physical NPC test remains FAILED as recorded above.
 - [ ] Save/rejoin, cross-place transfer and existing dungeon
   multiplayer/party-difficulty rules require independent proof.
 
-Status: **FOCUSED STUDIO PASS / REAL PLAYER HP PASS / BASE PHYSICAL
-PROMPT FAIL / END-TO-END PENDING**. Not a complete class or
+Status: **FOCUSED STUDIO PASS / REAL PLAYER HP PASS / TWO-CLIENT
+PHYSICAL BASE PASS WITH ONE PROMPT RETRY / END-TO-END PENDING**. Not a complete class or
 release-ready, published or merged. No production DataStore
 or paid-product operations were performed.
