@@ -140,18 +140,30 @@ function DamageService.apply_damage(context: DamageContext): number
         )
         local novice_reduction = ProgressionRuntimeState
             .get_novice_physical_reduction(defender.UserId)
+        local fortress_bonus = CombatStatusService.get(
+            context.target, "Fortress"
+        )
+        local max_reduction = if fortress_bonus > 0 then 0.70
+            else 0.50
         damage *= 1 - math.clamp(
             reduction + fighter_reduction + shield_reduction
-                + mystic_reduction + guard_bonus + novice_reduction,
-            0, 0.50
+                + mystic_reduction + guard_bonus + novice_reduction
+                + fortress_bonus,
+            0, max_reduction
         )
     elseif defender and context.source_kind == "EnemyMagic" then
         local mystic_reduction = ProgressionRuntimeState
             .get_mystic_magic_reduction(defender.UserId)
         local oathguard_reduction = ProgressionRuntimeState
             .get_oathguard_magic_reduction(defender.UserId)
+        local fortress_bonus = CombatStatusService.get(
+            context.target, "Fortress"
+        )
+        local max_reduction = if fortress_bonus > 0 then 0.70
+            else 0.25
         damage *= 1 - math.clamp(
-            mystic_reduction + oathguard_reduction, 0, 0.25
+            mystic_reduction + oathguard_reduction + fortress_bonus,
+            0, max_reduction
         )
     end
     -- The genuine server DefenseService decides whether this was blocked.
