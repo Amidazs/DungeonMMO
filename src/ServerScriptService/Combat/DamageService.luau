@@ -20,6 +20,9 @@ local BlockedHitDamageRules = require(
 local ScoutAccuracyToggleService = require(
     script.Parent:WaitForChild("ScoutAccuracyToggleService")
 )
+local IronvowAccuracyToggleService = require(
+    script.Parent:WaitForChild("IronvowAccuracyToggleService")
+)
 local ProgressionRuntimeState = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
@@ -81,7 +84,11 @@ function DamageService.apply_damage(context: DamageContext): number
     then
         local evasion = context.target:GetAttribute("CombatEvasionChance")
         if type(evasion) == "number" and evasion > 0 then
-            local accuracy = ScoutAccuracyToggleService.get_bonus(attacker)
+            local accuracy = math.clamp(
+                ScoutAccuracyToggleService.get_bonus(attacker)
+                    + IronvowAccuracyToggleService.get_bonus(attacker),
+                0, 0.20
+            )
             local roll = context.accuracy_roll
             if type(roll) ~= "number" then
                 roll = critical_random:NextNumber()
