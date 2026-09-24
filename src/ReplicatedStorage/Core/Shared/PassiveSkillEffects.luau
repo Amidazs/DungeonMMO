@@ -222,6 +222,26 @@ function PassiveSkillEffects.has_scout_equipment_expertise(
 end
 
 --[[
+Returns whether the personally awarded Knight owns source D-grade training.
+
+Args:
+    character (any): Authoritative owned character and paid skill ranks.
+
+Returns:
+    boolean: True only at level20+ with real Knight transfer and rank1.
+]]
+function PassiveSkillEffects.has_oathguard_equipment_expertise(
+    character: any
+): boolean
+    return type(character) == "table"
+        and (tonumber(character.Level) or 0) >= 20
+        and purchased_rank(
+            character,
+            SkillDefinitions.get("OathguardEquipmentExpertise")
+        ) >= 1
+end
+
+--[[
 Computes the extra real underwater oxygen reserve from source training.
 
 Args:
