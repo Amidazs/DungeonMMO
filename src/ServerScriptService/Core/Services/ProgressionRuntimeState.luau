@@ -422,6 +422,23 @@ function ProgressionRuntimeState.get_physical_multiplier(
 end
 
 --[[
+Returns extra targets for a real earned Warrior wielding a polearm.
+
+Args:
+    user_id (number): Server-owned selected character and current gear.
+
+Returns:
+    number: Five targets for bought C4 polearm mastery or zero otherwise.
+]]
+function ProgressionRuntimeState.get_polearm_extra_targets(
+    user_id: number
+): number
+    return PassiveSkillEffects.polearm_extra_targets(
+        state_for(user_id)
+    )
+end
+
+--[[
 Returns Dexterity-led physical ranged scaling for Ranger damage.
 
 Args:
