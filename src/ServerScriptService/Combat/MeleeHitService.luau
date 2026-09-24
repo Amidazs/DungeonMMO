@@ -379,6 +379,9 @@ function MeleeHitService.collect_targets(
 
     local targets: {Model} = {}
     local candidates_seen: {[Model]: boolean} = {}
+    local max_targets = tonumber(attack_definition.MAX_TARGETS)
+    local total_hit = 0
+    for _ in pairs(already_hit) do total_hit += 1 end
 
     for _, part in parts do
         local target_model =
@@ -431,7 +434,15 @@ function MeleeHitService.collect_targets(
             continue
         end
 
+        -- Only source-authorized polearm targets fit in one swing.
+        -- The count persists between all sample frames of this same hit;
+        -- multiple body parts or repeated samples cannot duplicate hits.
+        if max_targets and total_hit >= max_targets then
+            report_rejection(context, target_model, "TargetCap")
+            continue
+        end
         already_hit[target_model] = true
+        total_hit += 1
 
         table.insert(
             targets,
