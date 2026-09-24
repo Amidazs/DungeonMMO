@@ -13,8 +13,9 @@ test fixtures have been updated directly in GitHub. Knight
 source-rank schedule mapping is now a candidate **37/54** with
 **17** missing, Warrior **27/62** with **35** missing; two
 source-audited Scout paths retain 59/59 and 77/77 mapped
-training schedules. **No new Studio tests or disposable Rojo
-builds have run** while desktop is unavailable. Prior v2.07
+training schedules. **At the initial GitHub-only checkpoint, no new Studio tests or
+disposable Rojo builds had run**; the fresh verified results below
+supersede that pending status. Prior v2.07
 Ironvow Base physical PASS remains historical evidence; its
 Knight healing/magic live-client effect tests are still
 pending. No level-30 release certification, main merge,
