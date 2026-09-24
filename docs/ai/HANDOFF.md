@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.33 Warden physical quest enemy binder
+
+[Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_33_Elven_Knight_Physical_Quest_Enemies_20260924.md). `C4QuestEncounterSpawns` now adds two RootboundMarauders per eligible instanced room at ElvenKnight quest stage3 and exactly one ThornboundColossus at stage5, using existing actual Marauder factory/runtimes, unique server encounter registration and owned quest kill ledger. Existing Base stage1/2/4/6 NPCs and personal report/seal rules remain. New isolated world-model contract test/runner is Studio-pending; actual live human Play and Base/Dungeon/rejoin still OPEN. All 56/56 Warden source rank schedules mapped, no mechanical/release certification. No main merge/publish/production saves/animation changes.
+
 ## v2.32 focused tests corrected
 
 The v2.32 Elven Knight source test now expects independently mapped

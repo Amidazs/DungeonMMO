@@ -25,6 +25,18 @@ local CHALLENGES = table.freeze({
         Step = 5,
         Health = 135,
     }),
+    ElvenKnight = table.freeze({
+        Name = "Rootbound Marauder",
+        SourceId = "RootboundMarauder",
+        Health = 82,
+    }),
+    ElvenKnightFive = table.freeze({
+        Name = "Thornbound Colossus",
+        SourceId = "ThornboundColossus",
+        BranchId = "ElvenKnight",
+        Step = 5,
+        Health = 142,
+    }),
     HumanWarrior = table.freeze({
         Name = "Ridge Marauder",
         SourceId = "RidgeMarauder",
@@ -85,7 +97,10 @@ function Spawns.eligible_branches(
         local branch = state and state.BranchId
         local quest = branch and Source.get(branch)
         local challenge_id = if state and state.Step == 5
-            and branch == "HumanKnight"
+            and branch == "ElvenKnight"
+            then "ElvenKnightFive"
+            elseif state and state.Step == 5
+                and branch == "HumanKnight"
             then "HumanKnightFive"
             elseif state and state.Step == 5
                 and branch == "HumanWarrior"
@@ -176,6 +191,7 @@ function Spawns.augment(options: any, factory: any?): any
     for branch_index, branch in ipairs(branches) do
         local challenge = CHALLENGES[branch]
         local count = if branch == "ElvenScoutSix"
+            or branch == "ElvenKnightFive"
             or branch == "HumanKnightFive"
             or branch == "HumanWarriorFive"
             or branch == "HumanRogueSix"
