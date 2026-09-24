@@ -1757,6 +1757,19 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- The C4 Knight's source Expertise D rank: earned level20
+    -- permits actual D-grade equipment, never a cosmetic UI badge.
+    OathguardEquipmentExpertise = table.freeze({
+        Id = "OathguardEquipmentExpertise",
+        Tier = "Common", MaxRank = 1, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({[1] = 20}),
+        AdvancedEquipmentEnabled = true,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 Knight sword AND blunt mastery: real held weapon categories
     -- must gate this effect, never unarmed, dagger or a fake client tag.
     OathguardSteelAndStoneTraining = table.freeze({
