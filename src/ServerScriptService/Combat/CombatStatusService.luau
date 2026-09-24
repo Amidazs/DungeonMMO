@@ -57,6 +57,34 @@ function CombatStatusService.get(
 end
 
 --[[
+Returns the active Knight stance's C4 Evasion penalty, converted to the
+current Roblox percentage-based evasion model. This is not a literal
+C4 Evasion-stat formula; the full defence model still needs parity work.
+
+Args:
+    character (Model?): Current server-owned defensive player.
+
+Returns:
+    number: Chance penalty, zero if the separate status has expired.
+]]
+function CombatStatusService.get_evasion_penalty_chance(
+    character: Model?
+): number
+    if not character or not character.Parent then return 0 end
+    local expiry = character:GetAttribute(
+        "C4MajestyEvasionPenaltyExpiresAt"
+    )
+    if type(expiry) ~= "number" or expiry <= os.clock() then
+        return 0
+    end
+    local points = character:GetAttribute(
+        "C4MajestyEvasionPenaltyPoints"
+    )
+    if type(points) ~= "number" then return 0 end
+    return math.clamp(points * 0.01, 0, 0.10)
+end
+
+--[[
 Applies a non-stacking, bounded self-buff only to the authenticated
 living player at the moment the server executes its bought skill.
 
@@ -79,10 +107,12 @@ function CombatStatusService.apply_self(
     local fields = BUFFS[definition.BUFF_KIND]
     local magnitude = tonumber(definition.BUFF_MAGNITUDE)
     local seconds = tonumber(definition.BUFF_SECONDS)
+    local max_seconds = if definition.BUFF_KIND == "PhysicalGuard"
+        then 300 else 60
     if not fields or not magnitude or magnitude ~= magnitude
         or magnitude <= 0 or magnitude > 0.50
         or not seconds or seconds ~= seconds
-        or seconds <= 0 or seconds > 60
+        or seconds <= 0 or seconds > max_seconds
     then
         return false
     end
@@ -106,6 +136,18 @@ function CombatStatusService.apply_self(
         fields.Magnitude, math.max(prior, magnitude)
     )
     character:SetAttribute(fields.ExpiresAt, expires_at)
+    local evasion_points = tonumber(definition.EVASION_PENALTY_POINTS)
+    if definition.BUFF_KIND == "PhysicalGuard"
+        and evasion_points and evasion_points > 0
+        and evasion_points <= 10
+    then
+        character:SetAttribute(
+            "C4MajestyEvasionPenaltyPoints", evasion_points
+        )
+        character:SetAttribute(
+            "C4MajestyEvasionPenaltyExpiresAt", os.clock() + seconds
+        )
+    end
 
     task.delay(expires_at - os.clock(), function()
         if character.Parent and character:GetAttribute(
