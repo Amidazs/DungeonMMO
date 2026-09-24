@@ -90,3 +90,29 @@ animation project edits. Source/roadmap changes
 through GitHub; Remote Desktop only for safe
 fast-forward, disposable Rojo builds and unpublished
 Studio/test logs. Do not repeat unchanged broad suites.
+
+## Follow-up after v2.23: stored character protection
+
+GitHub commit [39ba212](https://github.com/Amidazs/DungeonMMO/commit/39ba212654431c529b56309d6187e615e5fbb9b4)
+tightens Warrior HP recovery and endurance surge to require the actual
+owner character to be descended from Workspace. A stored or detached
+Player.Character cannot regenerate or pass the surge's pre-MP-spend
+activation check. The previous world-parented owner, purchased-rank,
+living-Humanoid, no-stack and expiry checks remain intact.
+
+The existing disposable recovery and genuine-client surge drivers now
+exercise a temporarily ServerStorage-parented character and require
+recovery denial and surge precharge denial, followed by valid restored
+character acceptance. These **new test assertions have not yet been
+executed in Studio**. The earlier v2.23 real-client success remains
+evidence for the prior source revision only. Both Base and Dungeon
+disposable Rojo builds succeeded locally after fast-forward to 39ba212;
+a PowerShell quoting diagnostic also appeared in the wrapper, not in
+either Rojo build. No production-place or production-save changes.
+
+The 62/62 Warrior, 55/55 Knight, 59/59 Rogue and 77/77 Scout numbers
+remain historical rank-row schedules only. Full C4 formula/effect parity,
+natural persistent Base->Dungeon->Base->rejoin journey, boss/world-boss
+stacking acceptance and 14 remaining source class inventories are OPEN.
+No main merge, public publish or animation-project edits.
+
