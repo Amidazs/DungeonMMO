@@ -56,7 +56,8 @@ local function forged_character(): any
     character.Equipment.Body = "marauder_armor"
     for _, skill_id in ipairs({
         SWORD, BLADE, "IronvowPolearmTraining",
-        "IronvowCrescentSweep", CALL, LIGHT, HEAVY,
+        "IronvowCrescentSweep", "IronvowStonebreaker",
+        CALL, LIGHT, HEAVY,
     }) do
         character.Progression.Skills[skill_id] = {
             Known = true, PurchasedRank = 3, Proficiency = 350,
@@ -108,6 +109,28 @@ local function main()
         "IronvowCrescentSweep",
         {20, 20, 20, 24, 24, 24, 28, 28, 28}
     )
+    check_ranks(
+        "IronvowStonebreaker",
+        {20, 20, 20, 24, 24, 24, 28, 28, 28}
+    )
+    local stun = assert(Progression.get("IronvowStonebreaker"))
+    check(stun.WeaponTags[1] == "OneHandedBlunt"
+        and stun.Prerequisites[1].SkillId == "IronvowBladeTraining",
+        "Source blunt control requires earned mastery and actual blunt gear")
+    local powers = {30, 33, 35, 41, 44, 48, 55, 59, 64}
+    local costs = {22, 22, 22, 23, 24, 25, 27, 29, 30}
+    for rank, expected in ipairs(powers) do
+        local ability = assert(Combat.get_for_rank(
+            "IronvowStonebreaker", rank
+        ))
+        check(ability.SOURCE_POWER == expected
+            and ability.MANA_COST == costs[rank]
+            and ability.STAMINA_COST == 0
+            and ability.MAX_TARGETS == 1
+            and ability.NO_STAGGER_REFRESH == true
+            and ability.STAGGER_SECONDS > 0,
+            "Blunt control preserves original C4 single-target power/MP")
+    end
     local sweep = assert(Progression.get("IronvowCrescentSweep"))
     check(sweep.WeaponTags[1] == "Polearm"
         and sweep.Prerequisites[1].SkillId == "IronvowPolearmTraining",
@@ -167,7 +190,8 @@ local function main()
         "Unawarded forged advanced character fails identity validation")
     for _, skill_id in ipairs({
         SWORD, BLADE, "IronvowPolearmTraining",
-        "IronvowCrescentSweep", CALL, LIGHT, HEAVY,
+        "IronvowCrescentSweep", "IronvowStonebreaker",
+        CALL, LIGHT, HEAVY,
     }) do
         local permitted = Rules.can_train(
             unearned, assert(Progression.get(skill_id)), 1
