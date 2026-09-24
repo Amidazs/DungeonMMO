@@ -300,6 +300,18 @@ local function verify_armour_training(profiles: any)
     check(equipped.Weapon == "ironroot_training_halberd"
         and equipped.OffHand == nil,
         "Rejected shield equip preserves genuine polearm only")
+    check(equipment:unequip(USER_ID, "Weapon").ok,
+        "Real Warrior can stow its two-handed polearm")
+    check(equipment:equip(
+        USER_ID, "marauder_shield", "OffHand"
+    ).ok, "A real shield can be worn when polearm is not equipped")
+    check(not equipment:equip(
+        USER_ID, "ironroot_training_halberd", "Weapon"
+    ).ok, "Equipping polearm after shield also refuses illegal dual gear")
+    check(equipment:unequip(USER_ID, "OffHand").ok
+        and equipment:equip(
+            USER_ID, "ironroot_training_halberd", "Weapon"
+        ).ok, "Removing shield restores a legal genuine polearm equip")
 
     purchase_full_line(
         profiles, service, "IronvowLightArmorTraining"
