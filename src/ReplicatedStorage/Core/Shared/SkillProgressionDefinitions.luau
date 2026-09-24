@@ -1574,6 +1574,34 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Source C4 Wild Sweep: an independently learned area skill (not
+    -- a renamed ordinary polearm attack), with nine purchased ranks.
+    -- Its server skill executor must require a real equipped polearm,
+    -- use source MP costs and cap affected PvE NPCs independently.
+    IronvowCrescentSweep = table.freeze({
+        Id = "IronvowCrescentSweep",
+        Tier = "Common", MaxRank = 9, Kind = "Physical",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0, [5] = 0,
+            [6] = 0, [7] = 0, [8] = 0, [9] = 0,
+        }),
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "IronvowPolearmTraining",
+                Rank = 1, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({"Polearm"}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
