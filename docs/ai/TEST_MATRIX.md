@@ -1,3 +1,36 @@
+## 24 September — current backend v2.14, Knight common craft and anti-duplication
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_14_Knight_Common_Craft_C4_20260924.md)
+and [exact executed proof](
+../testing/knight-common-crafting-v2-14-20260924.md).
+Duplicate Knight common crafting skill/recipe/server-rule implementations
+discovered on GitHub were consolidated into the **single**
+`OathguardCommonItemCreation` skill before validation. Its
+level20/28 source-tier ranks, one selected creation career,
+source-first-transfer owner and material-backed eight real
+recipes across four distinct professions are server-authoritative.
+Blacksmith tier1 makes a real blunt mace; tier2 makes real D-grade
+body armour. A prepared rank2 recipe cannot finish after that
+rank is revoked: actual input/output counts remain unchanged.
+Disposable Base and Dungeon Rojo builds PASS; focused Knight
+quest/foundation **247/112 assertions PASS**, level-30 audit
+**27 assertions PASS**. Knight **55/55 C4 source training
+ranks mapped, 0 missing**, but full original C4 effect/economy,
+automatic Common Item Creation source learning and math
+parity are **not certified**. Warrior **27/62**, 35 missing,
+other 14 first-transfer class source audits outstanding,
+**0/18** careers release certified. Prior v2.12 real HP
+Marauder/Captain stacked-block exploit fixes remain in source:
+genuine blocked hits spend stamina and chip real HP, guard
+break takes ordinary unblocked HP. Other boss/world-boss
+pipelines, real world-recipe UI, natural saved cross-place
+and live multiplayer exploit regressions still OPEN.
+No `main` merge, Roblox publishing or production saves.
+Permanent edits through GitHub, desktop only for
+fast-forward pull, disposable builds, unpublished Studio
+playtesting/logs; animation worktrees remain untouched.
+
 ## 24 September 2026 — current v2.12 Knight security and C4 defence
 
 [Current roadmap](
