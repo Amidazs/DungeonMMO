@@ -1644,6 +1644,31 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original Warrior common-item tiers two and three at source
+    -- levels20/28. Keep a single selected creation profession and
+    -- actual level-five recipe literacy. No extra profession is granted.
+    IronvowCommonItemCreation = table.freeze({
+        Id = "IronvowCommonItemCreation",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        RequiresCraftingProfessionChoice = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4RecipeReading", Rank = 1,
+                Proficiency = 0,
+            }),
+            table.freeze({
+                SkillId = "C4CommonItemCreation", Rank = 1,
+                Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Light and heavy body-armour training require the corresponding
     -- currently equipped server-registered Body item. Bought ranks
     -- alone must not shield a naked player or a caster in robes.
