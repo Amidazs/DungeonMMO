@@ -1,4 +1,29 @@
-**Current DungeonMMO backend: v2.14 — Knight 55/55 C4 source rank schedules mapped, four crafting careers tested, full mechanic/balance parity still pending.**
+**Current DungeonMMO backend: v2.15 — genuine earned Warrior sword AND blunt mastery tested on real NPC HP; 31 Warrior rank rows still missing.**
+[Current class roadmap](
+DungeonMMO_Roadmap_v2_15_Warrior_Sword_Blunt_20260924.md)
+and [exact focused/live Studio evidence](
+../testing/ironvow-sword-blunt-mastery-v2-15-20260924.md).
+Corrected stable saved Ironvow `IronvowBladeTraining`
+from sword-only to real registered equipped Sword or Blunt,
+at four separate C4 source ranks 20/24/28/28. Genuine
+class trainer/equip/forgery focused Quest/Award/Foundation
+**31/81/60 assertions PASS**. Fresh disposable Base and
+Dungeon Rojo PASS. Actual Dungeon player-owned physical
+hit on real NPC HP increased from **110 to 115.6** at
+rank four with BOTH Sword and Blunt, while unequipped,
+Dagger, Bow and forged Fighter denied. Strict source
+audit **27 assertions PASS**: Warrior **31/62 mapped**,
+31 missing; Knight **55/55 mapped**, with both first-
+transfer classes still pending complete C4 mechanical
+equivalence and full release proof. `0/18` first
+transfers release certified. The provisional 0.014 per-
+rank Roblox attack conversion does NOT prove C4 balance.
+Historical v2.12 held-shield exploit patch on Marauder/
+Captain still enforces chip damage and guard break;
+all boss/world-boss attack paths require separate audit.
+No `main` merge, Roblox publishing or production saves.
+
+**Previous DungeonMMO backend: v2.14 — Knight 55/55 source schedules mapped; four crafting careers passed focused service tests, not full C4 parity.**
 [Current class roadmap](
 DungeonMMO_Roadmap_v2_14_Knight_Common_Craft_C4_20260924.md)
 and [focused Studio evidence](
