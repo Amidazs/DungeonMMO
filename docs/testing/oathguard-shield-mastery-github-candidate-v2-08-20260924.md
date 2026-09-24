@@ -28,13 +28,53 @@ PASS results as verification of these new shield changes.
   equipment snapshot; `DamageService` consumes it only on hostile
   `EnemyMelee`/`EnemyArea` branches.
 
-## Required verification, not yet executed
+## 24 September — desktop returned: executed v2.08 focused validation
 
-- [ ] Run both focused Studio suites through
-  `scripts/studio/c4_oathguard_quest_focus.luau` and
-  `scripts/studio/c4_level30_launch_coverage_focus.luau`.
-- [ ] Build temporary Base and Dungeon compositions using Rojo;
-  do not overwrite `DungeonMMO.rbxl`.
+The source-controlled branch fast-forwarded cleanly from
+`1ad9e53` to `485c693`. The pre-existing unrelated quadruped
+`__pycache__` directories were left untouched. Both disposable
+v2.08 Base and Dungeon Rojo compositions **PASS**; the canonical
+`DungeonMMO.rbxl` was not overwritten.
+
+Unpublished Studio `c4_oathguard_quest_focus.luau` executed on the
+fresh Base: Knight quest **66 assertions PASS**, foundation
+**62 assertions PASS**; both suite verification markers appear in
+the specific `20260924T081822Z_Studio_D8441_last.log` process log.
+The separately launched `c4_level30_launch_coverage_focus.luau`
+reported **27 assertions PASS** and its verification marker in
+`20260924T081854Z_Studio_9DE3E_last.log`. These results
+verify the isolated training, ownership and shield-equipment test
+fixtures, not actual client damage.
+
+The one fresh two-client Base physical playtest
+`c4_oathguard_base_physical_live.luau` **FAILED**, not passed:
+the client confirmed `PROMPT_VISIBLE=true`, and the prompt was
+enabled at distance 4 studs, but its held input never produced
+the server-side `CaptainRowan` `ProximityPrompt.Triggered` event.
+See the server instance
+`20260924T081936Z_Studio_ECDA7_last.log`:
+`[Oathguard Physical] FAIL ... Client hold never triggered
+actual server NPC CaptainRowan, visible=true, enabled=true, distance=4`.
+It failed *before* mentor, purchase or shield gameplay; the
+existing v2.06 physical PASS is historical and does not override this
+v2.08 failure. Do not classify the failure as a proved shield-code
+regression without a controlled comparison.
+
+Still open: diagnose the physical prompt transport once (avoid
+repeating the full quest without a concrete fix), live client-controlled
+Knight first/third self-heal and enemy spell mitigation, actual
+equipped-shield hostile physical hit measurements, multiplayer owner
+isolation and end-to-end saved cross-place journey. No publication
+or production DataStore mutation occurred.
+
+## Remaining live gameplay verification
+
+- [x] Focused Knight quest/foundation suites: **66 + 62 PASS**;
+  level-30 audit: **27 PASS**, verified from separate Studio logs.
+- [x] Disposable Base and Dungeon Rojo builds both PASS;
+  canonical `DungeonMMO.rbxl` unchanged.
+- [ ] Two-client Base physical NPC input: **FAILED** at visible,
+  enabled four-stud Captain Rowan prompt; needs targeted diagnosis.
 - [ ] Real client: genuine Oathguard with bought rank 1 and rank 2
   receives the correct reduction from the **same** enemy melee/area
   hit with an equipped shield. Unequipping eliminates the bonus.
