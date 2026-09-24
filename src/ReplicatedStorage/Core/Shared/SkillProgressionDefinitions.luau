@@ -1712,6 +1712,27 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- The original Knight's seven dark-magic life-drain ranks occur
+    -- at source brackets 20/24/28. Actual health is restored only after
+    -- the server confirms damage to a valid opposing NPC.
+    OathguardUmbralSiphon = table.freeze({
+        Id = "OathguardUmbralSiphon",
+        Tier = "Common", MaxRank = 7, Kind = "Magic",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20,
+            [3] = 24, [4] = 24,
+            [5] = 28, [6] = 28, [7] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- A paid, short, active guard stance; learnt by an awarded Knight.
     -- Its protection is timed, never free passive armour or spell defence.
     OathguardSteadfastStance = table.freeze({
