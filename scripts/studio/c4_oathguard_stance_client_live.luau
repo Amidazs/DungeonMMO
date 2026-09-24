@@ -57,7 +57,7 @@ local Careers = require(
 )
 local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local Damage = require(SSS.Combat.DamageService)
-local Stamina = require(SSS.Combat.StaminaService)
+local Mana = require(SSS.Combat.ManaService)
 local Status = require(SSS.Combat.CombatStatusService)
 local channel = RS:WaitForChild("TEMP_KnightStanceInput")
 local SKILL_ID = "OathguardSteadfastStance"
@@ -160,19 +160,17 @@ end
 
 
 --[[
-Prepares only source-owned earned armour training and the bought stance.
+Prepares an earned level-twenty Knight and its paid C4 physical stance.
 
 Args:
     player (Player): Actual authenticated local client.
 
 Returns:
-    nil: Server-owned prerequisite, combat hotbar and fresh stamina state.
+    nil: Server-owned class, level, combat hotbar and fresh mana state.
 ]]
 local function seed_stance(player)
     local owner = knight_fixture(player.UserId, 0, nil)
-    owner.Progression.Skills.FighterArmorTraining = {
-        Known = true, PurchasedRank = 3, Proficiency = 0,
-    }
+    owner.Level = 20
     owner.Progression.Skills[SKILL_ID] = {
         Known = true, PurchasedRank = 1, Proficiency = 0,
     }
@@ -182,7 +180,7 @@ local function seed_stance(player)
         player.UserId, SKILL_ID
     )
     assert(usable, "Knight stance not learnable: " .. tostring(reason))
-    Stamina.reset_player(player)
+    Mana.reset_player(player)
 end
 
 --[[
@@ -221,8 +219,8 @@ Args:
     humanoid (Humanoid): Server-side actual damage target.
 
 Returns:
-    nil: Verifies stamina, hostile physical mitigation, no spell/PvP
-        protection, expiry and an unearned class denial.
+    nil: Verifies mana, 7% physical guard, stat penalty, no spell/PvP
+        protection, rejected recast and unearned class denial.
 ]]
 local function verify_stance(player, model, humanoid)
     seed_stance(player)
@@ -231,25 +229,32 @@ local function verify_stance(player, model, humanoid)
     channel:FireClient(player, "LOAD")
     assert(await_receipt(player, "LOADED").accepted,
         "Real client refused purchased stance skill")
-    local starting_stamina = Stamina.get(player)
+    local starting_mana = Mana.get(player)
     receipts[player.UserId] = nil
     channel:FireClient(player, "CAST")
     assert(await_receipt(player, "CAST").accepted == true,
         "Real client could not send Knight stance hotbar action")
     local deadline = os.clock() + 8
     repeat
-        if Status.get(model, "PhysicalGuard") >= 0.10 then break end
+        if Status.get(model, "PhysicalGuard") >= 0.07 then break end
         task.wait(0.1)
     until os.clock() >= deadline
-    assert(Status.get(model, "PhysicalGuard") >= 0.10,
-        "Real client cast did not apply authoritative timed physical guard")
-    assert(starting_stamina - Stamina.get(player) >= 13.5,
-        "Real Knight defensive stance did not spend its stamina")
-    verify_hit(model, humanoid, "EnemyMelee", 90)
-    verify_hit(model, humanoid, "EnemyArea", 90)
+    assert(Status.get(model, "PhysicalGuard") >= 0.07,
+        "Real client cast did not apply earned Knight physical guard")
+    assert(starting_mana - Mana.get(player) >= 9.5,
+        "Real Knight source stance did not spend 10 MP")
+    assert(math.abs(
+        Status.get_evasion_penalty_chance(model) - 0.02
+    ) < EPSILON, "Source two-point evasion cost did not activate")
+    verify_hit(model, humanoid, "EnemyMelee", 93)
+    verify_hit(model, humanoid, "EnemyArea", 93)
     verify_hit(model, humanoid, "EnemyMagic", 100)
     verify_hit(model, humanoid, "Melee", 100)
     local expires_at = model:GetAttribute("C4PhysicalGuardExpiresAt")
+    assert(type(expires_at) == "number"
+        and expires_at - os.clock() > 295
+        and expires_at - os.clock() <= 300,
+        "C4 Knight guard did not receive its five-minute expiry")
     receipts[player.UserId] = nil
     channel:FireClient(player, "CAST")
     assert(await_receipt(player, "CAST").accepted == true,
@@ -257,10 +262,15 @@ local function verify_stance(player, model, humanoid)
     task.wait(0.4)
     assert(model:GetAttribute("C4PhysicalGuardExpiresAt") == expires_at,
         "Premature second stance cast bypassed server cooldown")
-    local remaining = (expires_at or os.clock()) - os.clock()
-    if remaining > 0 then task.wait(remaining + 0.3) end
-    assert(Status.get(model, "PhysicalGuard") == 0,
-        "Knight guard did not expire at server-authored time")
+    -- Simulate expiry only in this disposable Play fixture: the
+    -- separate real five-minute wall-clock expiry is not claimed.
+    model:SetAttribute("C4PhysicalGuardExpiresAt", os.clock() - 1)
+    model:SetAttribute(
+        "C4MajestyEvasionPenaltyExpiresAt", os.clock() - 1
+    )
+    assert(Status.get(model, "PhysicalGuard") == 0
+        and Status.get_evasion_penalty_chance(model) == 0,
+        "Expired Knight stance retained protection or evasion penalty")
     verify_hit(model, humanoid, "EnemyMelee", 100)
     local unawarded = knight_fixture(player.UserId, 0, nil)
     unawarded.Identity.ClassId = "Fighter"
