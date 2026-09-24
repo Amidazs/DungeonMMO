@@ -1,3 +1,36 @@
+## 24 September 2026 — latest v2.17 source-ranked Warrior area skill
+
+[Current roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_17_Warrior_Crescent_Sweep_20260924.md)
+and [executed Studio evidence](
+../testing/ironvow-crescent-sweep-v2-17-20260924.md).
+Personally earned Ironvow receives independently paid
+`IronvowCrescentSweep`, 9 source rank rows at 20/24/28,
+true equipped polearm + polearm mastery prerequisites.
+Each rank retains real C4 90..191 source power and
+22..30 MP cost; actual DamageService Roblox HP formula
+uses explicitly **provisional** 0.15× adapter. Source
+combat area skill has a separate twenty-NPC cap (not the
+regular polearm five/ten-target sweep), preserved across
+all swing samples. Two ranks' actual twenty of twenty-two
+real NPC Humanoid HP tests **46 PASS**. Quest, paid ranks,
+saved reload and forged-class Foundation **31/118/96
+PASS**; independent source audit **27 PASS**. Base and
+Dungeon disposable Rojo builds PASS. Warrior **44/62**
+original training rows mapped, **18 remain**; Knight
+**55/55 mapped** but source mechanics and launch
+still NOT certified. Area fixture used a scripted server
+attacker, not real user skill input/MP spending.
+Next: true nine-rank blunt-only stun family with sourced
+Power/MP, actual target stun and no refresh while dazed,
+then nine utility source rows. Do not repeat already
+green suites unless changing their dependencies.
+Previous genuine Marauder/Captain stacked shield Block
+chip damage fix remains, boss/world-boss paths pending.
+No `main` merge, Roblox publish, production saves
+or separate animation changes. Edit sources/docs on GitHub;
+desktop only for targeted unpublished test builds/logs.
+
 ## 24 September 2026 — current Warrior v2.16 polearm, verified anti-stack
 
 [Latest class roadmap](
