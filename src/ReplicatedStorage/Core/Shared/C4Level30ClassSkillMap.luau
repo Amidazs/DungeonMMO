@@ -47,6 +47,7 @@ local WARRIOR = table.freeze({
     SwordPowerAttack = "IronvowDrivingStrike",
     SwordBluntMastery = "IronvowBladeTraining",
     PolearmMastery = "IronvowPolearmTraining",
+    PolearmAreaAttack = "IronvowCrescentSweep",
     LightArmorMastery = "IronvowLightArmorTraining",
     HeavyArmorMastery = "IronvowHeavyArmorTraining",
     BattleCry = "IronvowBattleCall",
