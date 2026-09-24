@@ -18,8 +18,10 @@ local RS = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local channel = RS:WaitForChild("TEMP_WarriorStonebreakerInput")
 local scripts = Players.LocalPlayer:WaitForChild("PlayerScripts")
-local state = require(scripts.Core.ProgressionClientState)
-local input = require(scripts.Combat.CombatInputActions)
+local state = require(scripts:WaitForChild("Core")
+    :WaitForChild("ProgressionClientState"))
+local input = require(scripts:WaitForChild("Combat")
+    :WaitForChild("CombatInputActions"))
 local SKILL_ID = "IronvowStonebreaker"
 
 channel.OnClientEvent:Connect(function(action)
