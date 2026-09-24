@@ -110,6 +110,13 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
     then
         return "ScoutCommonItemCreationNotLearned"
     end
+    if recipe.RequiredSkillId == "OathguardCommonItemCreation"
+        and not C4ProfessionSkillRules.can_make_knight_common(
+            character, recipe.ProfessionId, recipe.RequiredSkillRank
+        )
+    then
+        return "KnightCommonItemCreationNotLearned"
+    end
 
     local professions = ensure_professions(character)
     local state = professions[recipe.ProfessionId]
@@ -275,9 +282,16 @@ function ProfessionService:build_snapshot(user_id: number): any
                     character, recipe.ProfessionId,
                     recipe.RequiredSkillRank
                 )
+        local knight_skill_unlocked =
+            recipe.RequiredSkillId ~= "OathguardCommonItemCreation"
+                or C4ProfessionSkillRules.can_make_knight_common(
+                    character, recipe.ProfessionId,
+                    recipe.RequiredSkillRank
+                )
         recipes[recipe_id] = {
             Unlocked = level_unlocked and knowledge_rejection == nil
                 and common_skill_unlocked and scout_skill_unlocked
+                and knight_skill_unlocked
                 and ProfessionSelectionRules.can_use(
                     slots, recipe.ProfessionId
                 ),
