@@ -1,4 +1,26 @@
-**Current DungeonMMO backend: v2.18 — genuine Warrior nine-rank blunt-only stun cast from real client, NPC HP/shock/MP PASS; 9 utility source rows remain.**
+**Current DungeonMMO backend: v2.19 — real personally earned Warrior level20 D-grade expertise buys actual wearable server-owned gear; eight original Warrior utility ranks remain.**
+[Current roadmap](
+DungeonMMO_Roadmap_v2_19_Warrior_Equipment_20260924.md)
+and [focused actual server equip/save proof](
+../testing/ironvow-equipment-expertise-v2-19-20260924.md).
+The Warrior's distinct `IronvowEquipmentExpertise`
+requires genuine first-transfer class, level20 and its
+own paid rank; it does not create items or borrow the
+Knight's gear. Actual Inventory/Equipment services
+denied an owned D-grade cuirass until purchase, then
+equipped it and applied +20 server max-HP; forged/
+underlevel denied and test profile rank/item survived
+save/reload. Fresh Base/Dungeon disposable Rojo PASS,
+Quest/Award/Foundation **31/144/125 PASS** and source
+audit **27 PASS**. Warrior **54/62 training ranks
+mapped**, eight utility rows remain; Knight **55/55
+mapped**, no original class certified for complete
+C4 mechanics, exact original stat formula, natural
+cross-place save or release (**0/18**).
+No `main` merge, Roblox publication, production saves
+or separate animation worktree changes.
+
+**Previous DungeonMMO backend: v2.18 — true-client Warrior stun/MP/HP verified; D-grade expertise was not mapped at that checkpoint.**
 [Current roadmap](
 DungeonMMO_Roadmap_v2_18_Warrior_Stonebreaker_20260924.md)
 and [executed real-client proof](
