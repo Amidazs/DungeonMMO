@@ -91,7 +91,7 @@ local function check_known_vectors()
         and stun.Sets.saveVs == "CON",
         "Warrior Stun Attack rank3 exact status fields")
 
-    local bow = assert(Effects.get_rank(208, 18))
+    local bow = assert(Effects.get_rank(208, 9))
     local bow_attack = find_modifier(bow, "PHYSICAL_ATTACK")
     check(bow_attack ~= nil
         and bow_attack.Operation == "add"
