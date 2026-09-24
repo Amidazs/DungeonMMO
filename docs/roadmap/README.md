@@ -1,4 +1,50 @@
-**Current DungeonMMO class backend: v2.11 — C4-informed Knight Majesty correction with fresh real-client combat PASS; full source formula parity and nine rank rows still open.**
+**Current DungeonMMO class backend: v2.12 — real Knight block/shield/buff exploit FIXED and Play-tested; separate C4 Ultimate Defence plus two bow-defence ranks implemented.**
+[Current C4 backend roadmap](
+DungeonMMO_Roadmap_v2_12_Knight_Defense_Exploit_Bow_20260924.md)
+and [actual focused and live Studio evidence](
+../testing/knight-block-fortress-bow-anti-exploit-v2-12-20260924.md).
+
+Previous real Marauder/Captain shield block yielded **zero HP**
+even on GuardBroken: these server attack paths now route blocked
+HP chip and guard-break hit through actual player damage.
+Genuine local-client shield+Majesty held block loses **41.13 HP**
+per 100-base strike, and the fourth guard-breaking hit loses
+**91.4 HP**; the client cannot re-block/parry at zero stamina.
+Dedicated independently paid C4 Knight Ultimate Defence
+(`OathguardLastBastion`) spends MP19, anchors the caster
+for an actual tested 30 seconds, protects both physical and
+magic; stacked shield, Majesty, Ultimate and blocked hit still
+lose **25.38 HP** on real Humanoid, not near-zero. No Dodge
+bypass, delayed-expiry immunity or premature recast accepted.
+
+A source audit found the original C4 Knight has **two**
+bow-protection ranks (24/28); previous 54-rank inventory
+omitted level28. Corrected to **55**, Knight source training
+rows mapped **48/55**, **7** left (equipment expertise 1,
+common-item creation 2, sword **and blunt** mastery 4).
+Two independently bought `OathguardArrowWard` ranks
+cost original MP22/28 and protect *only* authored enemy bow
+damage. Actual client Play on spawned player HP PASS at
+84/81 HP for 100 base enemy bow; blocked bow HP 37.8/36.45;
+ordinary melee and magic remain 100. Bow defence/duration,
+Ultimate and Majesty source defence-stat conversions to
+Roblox are **provisional**: no complete C4 maths or balance
+equivalence. There is no implemented actual hostile NPC bow
+projectile yet: bow Play injected authoritative damage
+source kind, not full ranged enemy simulation. Only the
+Marauder and Captain real enemy blocked-hit controllers
+were directly fixed; audit all boss/world-boss attack paths.
+
+Fresh disposable Base/Dungeon Rojo builds and exact
+Quest/Foundation **96/95 assertions PASS** plus dedicated
+skill/stacked-block Play tests PASS. These are targeted
+results, NOT a fully green global regression or natural
+saved cross-place journey. Warrior maps 27/62 with 35
+unmapped; other 14 original first-transfer source
+inventories incomplete; **0/18** careers release-certified.
+No `main` merge, Roblox publish or production save changes.
+
+**Previous DungeonMMO class backend: v2.11 — documented source Majesty corrections and earlier genuine client playtest, superseded by v2.12 current defence checks.**
 [Current Knight C4-fidelity roadmap](
 DungeonMMO_Roadmap_v2_11_C4_Knight_Majesty_20260924.md)
 and [exact live Studio test evidence](
