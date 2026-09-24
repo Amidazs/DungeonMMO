@@ -1646,6 +1646,31 @@ local OATHGUARD_STEADFAST_STANCE = specialize_skill(
     }
 )
 
+-- A distinct C4 Ultimate Defence analogue: +1800 physical and
+-- +1350 magic DEF source statistics, immobilised for 30 seconds.
+-- The current Roblox combat reduction conversion is provisional;
+-- the source numbers are retained separately for future exact formulas.
+local OATHGUARD_LAST_BASTION = specialize_skill(
+    ELVEN_SCOUT_GUARD, "OathguardLastBastion",
+    "Oathguard Last Bastion", {
+        MANA_COST = 19,
+        STAMINA_COST = 0,
+        COOLDOWN_SECONDS = 1800,
+        BUFF_KIND = "Fortress",
+        BUFF_MAGNITUDE = 0.35,
+        BUFF_SECONDS = 30,
+        SOURCE_PHYSICAL_DEFENCE = 1800,
+        SOURCE_MAGIC_DEFENCE = 1350,
+        IMMOBILIZES_CASTER = true,
+        RANKS = table.freeze({
+            [1] = table.freeze({
+                BUFF_MAGNITUDE = 0.35,
+                BUFF_SECONDS = 30,
+            }),
+        }),
+    }
+)
+
 -- Oathguard's personal recovery uses the existing server-owned heal
 -- executor; no client-selected healing target or arbitrary HP amount.
 local OATHGUARD_MENDING_OATH = specialize_skill(
@@ -1907,6 +1932,7 @@ local DEFINITIONS: {[string]: SkillDefinition} = table.freeze({
     OathguardShieldImpact = OATHGUARD_SHIELD_IMPACT,
     OathguardMendingOath = OATHGUARD_MENDING_OATH,
     OathguardSteadfastStance = OATHGUARD_STEADFAST_STANCE,
+    OathguardLastBastion = OATHGUARD_LAST_BASTION,
     OathguardUmbralSiphon = OATHGUARD_UMBRAL_SIPHON,
     OathguardChallenge = OATHGUARD_CHALLENGE,
     ElvenScoutSnaringShot = ELVEN_SCOUT_SNARING_SHOT,
@@ -2027,6 +2053,7 @@ local function validate_buff(definition: BuffSkillDefinition)
     assert(
         definition.BUFF_KIND == "PhysicalPower"
             or definition.BUFF_KIND == "PhysicalGuard"
+            or definition.BUFF_KIND == "Fortress"
             or definition.BUFF_KIND == "MagicPower"
             or definition.BUFF_KIND == "Evasion"
             or definition.BUFF_KIND == "Movement",
