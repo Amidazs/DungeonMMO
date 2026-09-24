@@ -26,6 +26,19 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Material-crafted Elven Knight blunt weapon, independently
+    -- restricted to the earned Warden rather than Human Stonewatch.
+    greenward_training_mace = table.freeze({
+        Id = "greenward_training_mace",
+        Name = "Greenward Training Mace",
+        Kind = "Equipment", Slot = "Weapon", Category = "Blunt",
+        AllowedRaces = ELF, AllowedBaseClasses = FIGHTER,
+        AllowedClasses = table.freeze({"GreenwardWarden"}),
+        Rarity = "Basic", Stackable = false,
+        WeaponTags = table.freeze({"OneHandedBlunt"}),
+        CombatModifiers = table.freeze({PhysicalDamageBonus = 0.10}),
+    }),
+
     -- Authored functional blunt-weapon prototype. Its final appearance
     -- is intentionally deferred; no item may gain sword-only training.
     stonewatch_training_mace = table.freeze({

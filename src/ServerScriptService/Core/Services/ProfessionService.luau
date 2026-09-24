@@ -117,6 +117,13 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
     then
         return "KnightCommonItemCreationNotLearned"
     end
+    if recipe.RequiredSkillId == "GreenwardWardenCommonItemCreation"
+        and not C4ProfessionSkillRules.can_make_warden_common(
+            character, recipe.ProfessionId, recipe.RequiredSkillRank
+        )
+    then
+        return "WardenCommonItemCreationNotLearned"
+    end
     if recipe.RequiredSkillId == "IronvowCommonItemCreation"
         and not C4ProfessionSkillRules.can_make_warrior_common(
             character, recipe.ProfessionId, recipe.RequiredSkillRank
@@ -295,6 +302,12 @@ function ProfessionService:build_snapshot(user_id: number): any
                     character, recipe.ProfessionId,
                     recipe.RequiredSkillRank
                 )
+        local warden_skill_unlocked =
+            recipe.RequiredSkillId ~= "GreenwardWardenCommonItemCreation"
+                or C4ProfessionSkillRules.can_make_warden_common(
+                    character, recipe.ProfessionId,
+                    recipe.RequiredSkillRank
+                )
         local warrior_skill_unlocked =
             recipe.RequiredSkillId ~= "IronvowCommonItemCreation"
                 or C4ProfessionSkillRules.can_make_warrior_common(
@@ -305,6 +318,7 @@ function ProfessionService:build_snapshot(user_id: number): any
             Unlocked = level_unlocked and knowledge_rejection == nil
                 and common_skill_unlocked and scout_skill_unlocked
                 and knight_skill_unlocked and warrior_skill_unlocked
+                and warden_skill_unlocked
                 and ProfessionSelectionRules.can_use(
                     slots, recipe.ProfessionId
                 ),

@@ -214,4 +214,47 @@ function C4ProfessionSkillRules.can_make_warrior_common(
         and state.PurchasedRank <= 2
 end
 
+--[[
+Checks the Elven Knight's earned class, literacy and selected craft.
+
+Args:
+    character (any): Authoritative original Warden owner and bought ranks.
+    profession_id (string): Character's one chosen creation profession.
+    required_rank (number): Source rank tier one or two.
+
+Returns:
+    boolean: True only with level, class, profession and paid creation rank.
+]]
+function C4ProfessionSkillRules.can_make_warden_common(
+    character: any,
+    profession_id: string,
+    required_rank: number
+): boolean
+    if type(character) ~= "table"
+        or type(required_rank) ~= "number"
+        or required_rank % 1 ~= 0
+        or required_rank < 1 or required_rank > 2
+        or not C4ProfessionSkillRules.can_make_common(
+            character, profession_id
+        )
+    then
+        return false
+    end
+    local earned = FirstTransfers.awarded(character)
+    if not earned or earned.Id ~= "GreenwardWarden" then
+        return false
+    end
+    local level = if required_rank == 1 then 20 else 28
+    if (tonumber(character.Level) or 0) < level then
+        return false
+    end
+    local skills = character.Progression
+        and character.Progression.Skills
+    local state = skills and skills.GreenwardWardenCommonItemCreation
+    return type(state) == "table" and state.Known == true
+        and type(state.PurchasedRank) == "number"
+        and state.PurchasedRank >= required_rank
+        and state.PurchasedRank <= 2
+end
+
 return table.freeze(C4ProfessionSkillRules)

@@ -179,6 +179,7 @@ local DEFINITIONS = table.freeze({
             "GreenwardWardenPoisonRecovery",
             "GreenwardWardenBowWard",
             "GreenwardWardenAttackAura",
+            "GreenwardWardenCommonItemCreation",
         }),
     }),
 

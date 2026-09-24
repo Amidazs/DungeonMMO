@@ -10,6 +10,8 @@ local Profiles = require(Services.ProfileService)
 local Transfers = require(Services.OriginalFirstTransferService)
 local Skills = require(Services.SkillProgressionService)
 local Inventory = require(Services.InventoryService)
+local Professions = require(Services.ProfessionService)
+local CraftRules = require(Shared.C4ProfessionSkillRules)
 local Equipment = require(Services.EquipmentService)
 local Loadout = require(Services.LoadoutService)
 local Runtime = require(Services.ProgressionRuntimeState)
@@ -85,6 +87,10 @@ local FAMILIES = table.freeze({
         Id = "GreenwardWardenAttackAura",
         Levels = table.freeze({28}),
     }),
+    table.freeze({
+        Id = "GreenwardWardenCommonItemCreation",
+        Levels = table.freeze({20, 28}),
+    }),
 })
 local assertions = 0
 
@@ -151,6 +157,13 @@ local function seed_owner(profiles: any)
             CreationStage = "Complete",
         }
         owner.Progression.SkillPointEntitlement = 5000
+        owner.ProfessionSlots.Creation = "Blacksmithing"
+        owner.Progression.Skills.C4RecipeReading = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
+        owner.Progression.Skills.C4CommonItemCreation = {
+            Known = true, PurchasedRank = 1, Proficiency = 0,
+        }
         local proofs = {}
         for _, proof_id in ipairs(source.RequiredProofIds) do
             proofs[proof_id] = true
@@ -323,6 +336,56 @@ local function verify_equipment(
 end
 
 --[[
+Tests real material-consuming paid crafting at the chosen Warden station.
+
+Args:
+    profiles (any): Earned Warden's isolated profile and purchased ranks.
+
+Returns:
+    nil: Produces real owned equipment without extra profession slots.
+]]
+local function verify_crafting(profiles: any)
+    local owner = assert(profiles:get_character(OWNER_ID))
+    check(CraftRules.can_make_warden_common(
+        owner, "Blacksmithing", 1
+    ) and CraftRules.can_make_warden_common(
+        owner, "Blacksmithing", 2
+    ), "Both real paid Elven Knight creation tiers are owned")
+    check(not CraftRules.can_make_warden_common(
+        owner, "Leatherworking", 1
+    ), "Unchosen craft career must not unlock through Warden ranks")
+    local inventory = Inventory.new(profiles)
+    check(inventory:add_item(OWNER_ID, "iron_bar", 8).ok
+        and inventory:add_item(OWNER_ID, "forging_flux", 2).ok
+        and inventory:add_item(OWNER_ID, "cured_leather", 1).ok
+        and inventory:add_item(OWNER_ID, "warding_rune", 1).ok,
+        "Test-only materials belong to one exclusive owner")
+    local service = Professions.new(profiles, inventory)
+    local weapon = "warden_forge_weapon_rank_1"
+    local armour = "warden_forge_armor_rank_2"
+    check(service:prepare_craft(OWNER_ID, weapon).ok,
+        "Paid class owner can prepare the registered Warden recipe")
+    check(not service:prepare_craft(
+        OWNER_ID, "knight_forge_armor_rank_2"
+    ).ok, "Warden cannot use a Human Knight recipe")
+    check(service:craft(OWNER_ID, weapon).ok
+        and service:craft(OWNER_ID, weapon).ok,
+        "Real two material-consuming crafts grant chosen profession XP")
+    owner = assert(profiles:get_character(OWNER_ID))
+    check(Inventory.count_item(
+        owner, "greenward_training_mace"
+    ) == 2, "Two real crafts produce two Elven Knight weapons")
+    check(service:craft(OWNER_ID, armour).ok,
+        "Paid rank-two craft consumes actual cross-profession inputs")
+    owner = assert(profiles:get_character(OWNER_ID))
+    check(Inventory.count_item(
+        owner, "greenward_d_grade_armor"
+    ) == 1, "Warden high-tier recipe produces owned D-grade armour")
+    check(owner.ProfessionSlots.Creation == "Blacksmithing",
+        "Warden common creation does not grant a second profession")
+end
+
+--[[
 Checks a copied purchase cannot grant real cross-class combat bonuses.
 
 Args:
@@ -371,11 +434,12 @@ local function main()
         purchase_family(profiles, skills, family)
     end
     local audit = assert(Coverage.for_branch(BRANCH_ID))
-    check(audit.TrainerMappedRankEntries == 53
-        and audit.MissingRankScheduleEntries == 3
+    check(audit.TrainerMappedRankEntries == 55
+        and audit.MissingRankScheduleEntries == 1
         and not audit.LaunchSkillCatalogueReady,
         "No incomplete Warden source family becomes release-certified")
     verify_equipment(profiles, Equipment.new(profiles, "Base"))
+    verify_crafting(profiles)
     verify_forgeries(profiles)
     print(("[Greenward Warden Passives] PASS: %d assertions")
         :format(assertions))

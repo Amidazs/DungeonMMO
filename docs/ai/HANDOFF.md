@@ -1,3 +1,7 @@
+## 24 September 2026 — v2.31 Warden crafting
+
+[Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_31_Elven_Knight_Common_Creation_20260924.md). Two independently bought GreenwardWardenCommonItemCreation ranks (20/28) now authorize eight material-backed recipes across one selected creation career, with original Elven item identities and real armor expertise gate. Focused service test covers genuine material-consuming crafts but has not run inside Studio. Warden rank map 55/56; only real player Bleed Recovery remains unimplemented. No main merge/publish/production saves/animation edits.
+
 ## 24 September 2026 — v2.30 Warden defensive utilities
 
 [Roadmap](../roadmap/docs/roadmap/DungeonMMO_Roadmap_v2_30_Elven_Knight_Defensive_Utility_20260924.md). Greenward Warden now maps 53/56 rank schedules; missing common creation 2 and real player-bleed recovery 1. Independently paid Warden equipment expertise + own D Body, shield mastery with OffHand check and bounded hostile mitigation, timed self-status defensive/attack auras and ultimate defence, server poison cleanse and bow-only ward registered. Historical C4 aura target/formula parity NOT verified; actual physical quest monsters and live-client skill play pending. Updated source-audit/training tests not executed in Studio. No main merge/publish/production saves/animation changes.

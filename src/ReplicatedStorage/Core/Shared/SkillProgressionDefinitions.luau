@@ -2080,6 +2080,26 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Original Elven Knight common creation has two independent paid
+    -- ranks for the character's single selected creation profession.
+    GreenwardWardenCommonItemCreation = table.freeze({
+        Id = "GreenwardWardenCommonItemCreation",
+        Tier = "Common", MaxRank = 2, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({[1] = 20, [2] = 28}),
+        RankThresholds = table.freeze({[2] = 0}),
+        RequiresCraftingProfessionChoice = true,
+        Prerequisites = table.freeze({
+            table.freeze({
+                SkillId = "C4CommonItemCreation",
+                Rank = 1, Proficiency = 0,
+            }),
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The original Knight's seven dark-magic life-drain ranks occur
     -- at source brackets 20/24/28. Actual health is restored only after
     -- the server confirms damage to a valid opposing NPC.
