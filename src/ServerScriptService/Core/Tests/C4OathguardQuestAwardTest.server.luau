@@ -17,6 +17,7 @@ local Inventory = require(SSS.Core.Services.InventoryService)
 local SkillService = require(SSS.Core.Services.SkillProgressionService)
 local Loadout = require(SSS.Core.Services.LoadoutService)
 local SkillDefinitions = require(Shared.SkillProgressionDefinitions)
+local SkillUnlockRules = require(Shared.SkillUnlockRules)
 local PassiveEffects = require(Shared.PassiveSkillEffects)
 local RuntimeState = require(
     SSS.Core.Services.ProgressionRuntimeState
@@ -264,15 +265,17 @@ Returns:
 ]]
 local function verify_defensive_stance(profiles: any, service: any)
     local stance_id = "OathguardSteadfastStance"
-    check(profiles:mutate(USER_ID, function(profile: any)
-        profile.Characters.Slot1.Level = 19
-    end), "Knight starts below level twenty for strict source gate")
-    local denied = service:learn_trainer_skill(USER_ID, stance_id)
-    check(not denied.ok,
-        "Knight cannot learn C4 source stance before level twenty")
-    check(profiles:mutate(USER_ID, function(profile: any)
-        profile.Characters.Slot1.Level = 20
-    end), "Knight reaches original C4 level-twenty stance bracket")
+    local below_level = Schema.deep_clone(
+        assert(profiles:get_character(USER_ID))
+    )
+    below_level.Level = 19
+    local allowed, reason = SkillUnlockRules.can_train(
+        below_level, assert(SkillDefinitions.get(stance_id)), 1
+    )
+    check(not allowed and reason == "CharacterLevelTooLow",
+        "C4 Knight level-twenty stance denies earlier levels")
+    -- Never persist a level-19 identity after an earned level-20
+    -- transfer: that would invalidate the real class receipt.
     local result = service:learn_trainer_skill(USER_ID, stance_id)
     check(result.ok and result.rank == 1,
         "Earned Knight trainer stance failed: " .. tostring(result.reason))
