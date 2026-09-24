@@ -24,10 +24,19 @@ Continues [v2.07](DungeonMMO_Roadmap_v2_07_Ironvow_Resume_Knight_Magic_Healing_2
 - [x] Added focused source-owned assertions for correct 20/28 schedule,
   forged/unawarded profiles, real trainer purchase, shield removal,
   real shield equipment and authenticated runtime mitigation.
-- [ ] Roblox Studio focused tests, disposable Base/Dungeon builds,
-  client-triggered physical damage comparison, player isolation,
-  save/rejoin and full regression are **NOT RUN** in this GitHub-only
-  session. No pass claim can be made before their results are inspected.
+- [x] Fresh disposable Base and Dungeon Rojo builds PASS; focused
+  unpublished Knight quest/foundation **66 + 62 assertions PASS** and
+  level-30 source audit **27 PASS**, each in its own process log.
+- [x] New full-Dungeon unpublished Play test verified actual spawned
+  player HP loses exactly 99.2/98.4 on 100 base hostile physical
+  hits with test-owned rank 1/2 shield snapshots; no shield bonus
+  on magic, PvP, absent/wrong gear or forged class. See linked evidence.
+- [ ] Fresh two-client physical Base test **FAILED**: first Captain
+  Rowan prompt was visible and enabled at four studs, but client hold
+  did not emit server Triggered. Diagnosis needed before retesting.
+- [ ] Real naturally purchased/equipped/player-controlled abilities,
+  personal Knight heal and enemy spell-hit effects, multiplayer owner
+  isolation, save/rejoin and full cross-place regression remain open.
 
 ## Measured scope
 
@@ -45,15 +54,13 @@ source-rank inventoried; **0 of 18** are release certified.
 
 ## Continue when Studio is available
 
-1. Pull the same branch fast-forward-only. Run the existing
-   `scripts/studio/c4_oathguard_quest_focus.luau` and
-   `scripts/studio/c4_level30_launch_coverage_focus.luau` in
-   disposable unpublished Base. Correct actual failures in GitHub.
-2. Run disposable Base and Dungeon Rojo builds; verify that shield
-   damage reduction affects a real equipped Knight on enemy physical
-   hits, not spells, PvP, other classes or shieldless Knight profiles.
-   Separately perform pending client-originated first/third self-heal
-   and enemy spell-hit damage checks from v2.07.
+1. Diagnose the genuine physical first-NPC prompt hold failure
+   without rerunning the entire quest repeatedly. Confirm the exact
+   client/server input transport before accepting mentor/trainer flow.
+2. Extend the passing real player-HP damage fixture with a naturally
+   earned and bought/equipped class path, separately perform pending
+   client-originated first/third self-heal and enemy spell-hit damage
+   checks from v2.07, and verify a second player's isolation.
 3. Finish 17 outstanding Knight and 35 Warrior source ranks with
    distinct implemented gameplay, then source-audit and implement
    the other original first-transfer branches and 1–19 starter
