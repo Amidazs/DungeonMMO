@@ -1,3 +1,14 @@
+**Current v2.46 C4 formula work:** the pinned source
+physical/magic damage, instant-heal, attack/cast timing, hit chance and
+magic-level resistance formulas now have deterministic read-only
+transcriptions and tests. [Roadmap](
+DungeonMMO_Roadmap_v2_46_C4_Combat_Formula_Reference_20260924.md);
+[evidence](../testing/c4-combat-formula-source-vectors-20260924.md).
+This is the bridge that lets original C4 skill power remain skill power
+instead of being mistaken for direct Roblox HP damage. Equipment/
+passive calculator order and complete all-class skill source rows are
+next; live combat remains unchanged.
+
 **Current v2.45 C4 stat work:** a read-only C4 derived-stat
 engine now sits on top of the exact nine source templates, covering
 source stat bonuses, level modifier, naked P.Atk/P.Def/M.Atk/M.Def,

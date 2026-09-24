@@ -1,0 +1,270 @@
+--!strict
+-- Pure Chronicle 4 combat formula transcription for deterministic tests.
+-- Runtime integration comes only after equipment/stat calculator migration.
+local C4CombatFormulaReference = {}
+
+local SOURCE_COMMIT =
+    "07f8536384e799f128d44198dd7ab23519660eea"
+local FORMULAS_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/manager/"
+    .. "character/skills/stats/Formulas.java"
+local HEAL_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/manager/"
+    .. "character/skills/effects/type/EffectHeal.java"
+
+--[[
+Checks one finite positive numeric combat argument.
+
+Args:
+    value (number): Formula input.
+    label (string): Error label.
+
+Returns:
+    number: Validated unchanged value.
+]]
+local function positive(value: number, label: string): number
+    assert(type(value) == "number"
+        and value == value
+        and value > 0
+        and value < math.huge,
+        label .. " must be finite and positive")
+    return value
+end
+
+--[[
+Computes Chronicle 4 physical damage before external race/item effects.
+
+This implements calcPhysDam's main arithmetic exactly when callers
+provide the already-calculated P.Atk/P.Def and explicit multipliers.
+Random weapon variance is passed in, allowing deterministic tests.
+
+Args:
+    values (any): PAtk/PDef, optional skill power, shield, shots,
+        critical modifiers, vulnerabilities, random and PvP multipliers.
+
+Returns:
+    number: C4 physical formula result before HP rounding/application.
+]]
+function C4CombatFormulaReference.physical_damage(values: any): number
+    local p_atk = positive(values.PAtk, "PAtk")
+    local p_def = positive(values.PDef, "PDef")
+    local skill_power = tonumber(values.SkillPower) or 0
+    assert(skill_power >= 0 and skill_power < math.huge,
+        "SkillPower must be finite and nonnegative")
+    p_atk += skill_power
+
+    if values.Soulshot == true then
+        p_atk *= 2
+    end
+    if values.Shield == true then
+        if values.PerfectShield == true then
+            return 1
+        end
+        p_def += math.max(tonumber(values.ShieldDefense) or 0, 0)
+    end
+
+    if values.Critical == true then
+        local critical_power = tonumber(
+            values.CriticalPowerMultiplier
+        ) or 1
+        local critical_add = tonumber(values.CriticalPowerAdd) or 0
+        p_atk = 2 * critical_power * ((70 * p_atk) / p_def)
+        p_atk += (critical_add * 70) / p_def
+    else
+        p_atk = (70 * p_atk) / p_def
+    end
+
+    p_atk *= tonumber(values.WeaponVulnerabilityMultiplier) or 1
+    p_atk *= tonumber(values.RandomDamageMultiplier) or 1
+    p_atk *= tonumber(values.RaceMultiplier) or 1
+    p_atk = math.max(p_atk, 0)
+    p_atk *= tonumber(values.PvpMultiplier) or 1
+    if values.NoblePvp == true then
+        p_atk *= 1.05
+    end
+    return p_atk
+end
+
+--[[
+Computes Chronicle 4 magical damage main formula.
+
+Args:
+    values (any): MAtk/MDef, source skill power, shot state, magic
+        critical and already-resolved failure/element/PvP multipliers.
+
+Returns:
+    number: C4 magic damage result before target HP application.
+]]
+function C4CombatFormulaReference.magic_damage(values: any): number
+    local m_atk = positive(values.MAtk, "MAtk")
+    local m_def = positive(values.MDef, "MDef")
+    local power = positive(values.SkillPower, "SkillPower")
+
+    if values.BlessedSpiritshot == true then
+        m_atk *= 4
+    elseif values.Spiritshot == true then
+        m_atk *= 2
+    end
+
+    local damage = ((91 * math.sqrt(m_atk)) / m_def) * power
+    if values.Failure == "Resisted" then
+        damage = 1
+    elseif values.Failure == "Half" then
+        damage /= 2
+    elseif values.MagicCritical == true then
+        damage *= 4
+    end
+
+    damage *= tonumber(values.PvpMultiplier) or 1
+    if values.NoblePvp == true then
+        damage *= 1.05
+    end
+    damage *= tonumber(values.ElementalMultiplier) or 1
+    return damage
+end
+
+--[[
+Computes the Chronicle 4 instant heal amount in EffectHeal.
+
+The C4 handler applies skill/effect power directly, with ordinary
+Spiritshot x1.3 or Blessed Spiritshot x1.5. It does not multiply
+this effect by the caster's M.Atk in the reviewed C4 source.
+
+Args:
+    power (number): Historical heal effect power.
+    spiritshot (boolean): Ordinary Spiritshot state.
+    blessed_spiritshot (boolean): Blessed Spiritshot state.
+
+Returns:
+    number: Exact source heal amount before MaxHP clamping.
+]]
+function C4CombatFormulaReference.heal_amount(
+    power: number, spiritshot: boolean,
+    blessed_spiritshot: boolean
+): number
+    local amount = positive(power, "Heal power")
+    if blessed_spiritshot then
+        return amount * 1.5
+    end
+    if spiritshot then
+        return amount * 1.3
+    end
+    return amount
+end
+
+--[[
+Returns C4 normal-attack delay in milliseconds from physical attack speed.
+
+Args:
+    physical_attack_speed (number): Final source attack-speed stat.
+
+Returns:
+    number: Source attack delay, truncated like the Java integer cast.
+]]
+function C4CombatFormulaReference.physical_attack_delay(
+    physical_attack_speed: number
+): number
+    positive(physical_attack_speed, "Physical attack speed")
+    if physical_attack_speed < 2 then
+        return 2700
+    end
+    return math.floor(470000 / physical_attack_speed)
+end
+
+--[[
+Returns C4 skill animation/cast time after attack/cast speed scaling.
+
+Args:
+    source_time_ms (number): Authored source skill time.
+    attack_speed (number): Final physical or magical attack speed.
+
+Returns:
+    number: Positive Java integer-division equivalent in milliseconds.
+]]
+function C4CombatFormulaReference.skill_cast_time(
+    source_time_ms: number, attack_speed: number
+): number
+    positive(source_time_ms, "Source skill time")
+    positive(attack_speed, "Attack speed")
+    return math.floor(
+        math.floor(source_time_ms * 333) / attack_speed
+    )
+end
+
+--[[
+Returns the C4 raw hit chance before positional condition multiplier.
+
+The source stores the chance in thousandths: 905 means 90.5%.
+
+Args:
+    accuracy (number): Final attacker accuracy.
+    evasion (number): Final target evasion.
+
+Returns:
+    number: Bounded source hit chance from 275 to 980 per thousand.
+]]
+function C4CombatFormulaReference.hit_chance_per_thousand(
+    accuracy: number, evasion: number
+): number
+    local delta = math.floor(accuracy - evasion)
+    if delta >= 10 then return 980 end
+    local exact = {
+        [9] = 975, [8] = 970, [7] = 965, [6] = 960,
+        [5] = 955, [4] = 945, [3] = 935, [2] = 925,
+        [1] = 915, [0] = 905, [-1] = 890, [-2] = 875,
+        [-3] = 860, [-4] = 845, [-5] = 830, [-6] = 815,
+        [-7] = 800, [-8] = 785, [-9] = 770, [-10] = 755,
+        [-11] = 735, [-12] = 715, [-13] = 695,
+        [-14] = 675, [-15] = 655, [-16] = 625,
+        [-17] = 595, [-18] = 565, [-19] = 535,
+        [-20] = 505, [-21] = 455, [-22] = 405,
+        [-23] = 355, [-24] = 305,
+    }
+    return exact[delta] or 275
+end
+
+--[[
+Returns the C4 pre-random magic success threshold.
+
+Source success compares a 0-9999-like random value against this
+rounded resistance threshold. This function avoids inventing a Roblox
+status chance while preserving the exact level-difference arithmetic.
+
+Args:
+    target_level (number): Target character level.
+    magic_level (number): Skill magic level, or attacker level fallback.
+
+Returns:
+    number: Rounded C4 resistance threshold.
+]]
+function C4CombatFormulaReference.magic_resist_threshold(
+    target_level: number, magic_level: number
+): number
+    local difference = target_level - magic_level
+    return math.floor((1.3 ^ difference) * 100 + 0.5)
+end
+
+--[[
+Returns pinned source provenance for formula audits.
+
+Args:
+    None.
+
+Returns:
+    any: Pinned C4 source commit and formula/heal file URLs.
+]]
+function C4CombatFormulaReference.sources(): any
+    return {
+        SourceCommit = SOURCE_COMMIT,
+        FormulasUrl = FORMULAS_URL,
+        HealUrl = HEAL_URL,
+    }
+end
+
+return table.freeze(C4CombatFormulaReference)

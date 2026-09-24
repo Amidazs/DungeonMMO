@@ -1,3 +1,16 @@
+## 24 September 2026 — v2.46 pinned C4 combat formula layer
+
+Added read-only C4CombatFormulaReference from the same pinned C4 source:
+main physical formula, magic 91*sqrt(MAtk)/MDef*power, source instant
+heal + Spiritshot/BSS multipliers, PAtkSpd delay, skill cast-speed,
+hit-chance table and magic level threshold. This establishes how
+historical skill power must be consumed, so NEVER set Roblox HP damage
+equal to the source power. Pure source tests precede equipment/buff
+calculator and live migration. Next ingest full level<=30 source skill
+rows from skill_trees + exact skill XML for all nine original paths,
+then equipment/calculator and coherent runtime migration. No current
+gameplay values changed; no main merge/publish/production saves.
+
 ## 24 September 2026 — v2.45 C4 derived-stat reference engine
 
 Added read-only C4DerivedStatReference on pinned C4 source
