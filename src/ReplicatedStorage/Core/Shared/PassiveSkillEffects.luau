@@ -283,6 +283,26 @@ function PassiveSkillEffects.has_oathguard_equipment_expertise(
 end
 
 --[[
+Authorizes only genuinely advanced, paid level-20 Warrior D-grade gear.
+
+Args:
+    character (any): The actual server-owned selected character.
+
+Returns:
+    boolean: Whether this owner bought the separate Warrior source rank.
+]]
+function PassiveSkillEffects.has_ironvow_equipment_expertise(
+    character: any
+): boolean
+    return type(character) == "table"
+        and (tonumber(character.Level) or 0) >= 20
+        and purchased_rank(
+            character,
+            SkillDefinitions.get("IronvowEquipmentExpertise")
+        ) >= 1
+end
+
+--[[
 Computes the extra real underwater oxygen reserve from source training.
 
 Args:
