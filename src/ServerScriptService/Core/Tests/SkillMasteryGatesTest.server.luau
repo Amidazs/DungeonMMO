@@ -34,6 +34,7 @@ local Runtime = require(
     core.Services:WaitForChild("ProgressionRuntimeState")
 )
 local Dungeons = require(shared:WaitForChild("DungeonDefinitions"))
+local QuestDefinitions = require(shared:WaitForChild("QuestDefinitions"))
 local CombatSkills = require(
     RS.Combat.Shared:WaitForChild("SkillDefinitions")
 )
@@ -157,7 +158,7 @@ end
 --   quests (any): Existing trusted event and quest service.
 --   advancement (any): Existing class trial and claim service.
 -- Returns:
---   nil: Verifies the rank, proficiency and level gates on trials.
+--   nil: Separates preserved legacy mastery from new C4 branch choice.
 local function test_advancement(
     profiles: any,
     quests: any,
@@ -165,30 +166,50 @@ local function test_advancement(
 )
     set_skill(profiles, "ShieldBash", 3, 399)
     set_skill(profiles, "Mend", 3, 300)
-    local blocked = advancement:start_trial(USER_ID)
+    local trial = assert(QuestDefinitions.get("FighterAdvancementTrial"))
     check(
-        blocked.reason == "AdvancementRequirementsNotMet"
-            and blocked.requirement_reason
-                == "PrerequisiteSkillProficiency",
-        "Full skill ranks alone cannot bypass earned mastery."
+        advancement:start_trial(USER_ID).reason
+            == "OriginalC4BranchChoiceRequired",
+        "New Human Fighters must choose an original first-transfer path."
+    )
+    check(
+        select(2, Rules.can_start_trial(
+            assert(profiles:get_character(USER_ID)), trial
+        )) == "PrerequisiteSkillProficiency",
+        "Full legacy trial ranks alone cannot bypass earned mastery."
     )
     set_skill(profiles, "ShieldBash", 2, 400)
     check(
-        advancement:start_trial(USER_ID).requirement_reason
-            == "PrerequisiteSkillRank",
+        select(2, Rules.can_start_trial(
+            assert(profiles:get_character(USER_ID)), trial
+        )) == "PrerequisiteSkillRank",
         "Proficiency alone cannot replace a full purchased skill rank."
     )
     set_skill(profiles, "ShieldBash", 3, 400)
     set_level(profiles, 19)
     check(
-        advancement:start_trial(USER_ID).requirement_reason
-            == "CharacterLevelTooLow",
+        select(2, Rules.can_start_trial(
+            assert(profiles:get_character(USER_ID)), trial
+        )) == "CharacterLevelTooLow",
         "Two mastered skills cannot bypass the class level gate."
     )
     set_level(profiles, 20)
     check(
-        advancement:start_trial(USER_ID).ok,
-        "Level 20 plus two fully mastered skills unlocks the trial."
+        select(1, Rules.can_start_trial(
+            assert(profiles:get_character(USER_ID)), trial
+        )),
+        "Level 20 plus two mastered skills meets legacy trial rules."
+    )
+    check(
+        advancement:start_trial(USER_ID).reason
+            == "OriginalC4BranchChoiceRequired",
+        "A fully mastered new Fighter still cannot auto-start Vanguard."
+    )
+    -- Simulate an actual unfinished pre-migration trial, not a new
+    -- original Fighter entry. Production still honors its claim.
+    check(
+        quests:start(USER_ID, trial.Id).ok,
+        "Grandfathered pre-C4 legacy quest is active in isolation."
     )
     check(
         quests:record_event(USER_ID, {
