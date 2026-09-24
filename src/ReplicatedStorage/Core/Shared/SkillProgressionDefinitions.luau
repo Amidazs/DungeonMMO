@@ -1757,6 +1757,24 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 Knight sword AND blunt mastery: real held weapon categories
+    -- must gate this effect, never unarmed, dagger or a fake client tag.
+    OathguardSteelAndStoneTraining = table.freeze({
+        Id = "OathguardSteelAndStoneTraining",
+        Tier = "Common", MaxRank = 4, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28, [4] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+        }),
+        DamageBonusPerRank = 0.012,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- Distinct C4 Knight Deflect Arrow source ranks at 24 and 28.
     -- Only an actual authored ranged bow hit receives protection.
     OathguardArrowWard = table.freeze({
