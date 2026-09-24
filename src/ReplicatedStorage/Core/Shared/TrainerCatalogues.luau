@@ -79,15 +79,28 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
-    -- Physical Elven Knight station is independently restricted.
-    -- Skills remain unavailable until real source effects are authored.
+    -- Physical Elven Knight station is independently race/class bound.
+    -- Only earned personal class owners may purchase its distinct ranks.
     GreenwardWardenTrainer = table.freeze({
         Id = "GreenwardWardenTrainer",
         DisplayName = "Greenward Warden Training",
         AllowedRaces = table.freeze({"Elf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedClasses = table.freeze({"GreenwardWarden"}),
-        Skills = table.freeze({}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "GreenwardWardenSteelTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardWardenHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardWardenMagicResistance",
+                Mode = "LearnOrRank",
+            }),
+        }),
     }),
     IronvowTrainer = table.freeze({
         Id = "IronvowTrainer",

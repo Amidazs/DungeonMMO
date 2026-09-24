@@ -155,9 +155,8 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
-    -- Elven Knight first-transfer identity. Its quest is not finishable
-    -- until distinct monster and item proofs are physically implemented.
-    -- No source rank is advertised as trained by this empty class yet.
+    -- Elven Knight first-transfer identity. Distinct purchased skills
+    -- require its own original personal quest and mentor receipt.
     GreenwardWarden = table.freeze({
         Id = "GreenwardWarden",
         DisplayName = "Greenward Warden",
@@ -166,7 +165,11 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Elf"}),
         StarterSkills = table.freeze({}),
         StarterEquipment = table.freeze({}),
-        TeachableSkills = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "GreenwardWardenSteelTraining",
+            "GreenwardWardenHeavyArmorTraining",
+            "GreenwardWardenMagicResistance",
+        }),
     }),
 
     -- Original Human Warrior foundation, intentionally unclaimable

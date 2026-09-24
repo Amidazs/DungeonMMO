@@ -420,6 +420,8 @@ function ProgressionRuntimeState.get_physical_multiplier(
         character, "IronvowPolearmTraining"
     ) + PassiveSkillEffects.damage_bonus(
         character, "OathguardSteelAndStoneTraining"
+    ) + PassiveSkillEffects.damage_bonus(
+        character, "GreenwardWardenSteelTraining"
     )
     return math.max(
         0, base_multiplier + equipment_bonus + passive_bonus
@@ -623,6 +625,23 @@ function ProgressionRuntimeState.get_oathguard_magic_reduction(
     user_id: number
 ): number
     return PassiveSkillEffects.oathguard_magic_reduction(
+        state_for(user_id)
+    )
+end
+
+--[[
+Returns independently purchased Elven Knight magical mitigation.
+
+Args:
+    user_id (number): Actual current server-authoritative owner.
+
+Returns:
+    number: Bounded magic mitigation for an earned Warden, otherwise zero.
+]]
+function ProgressionRuntimeState.get_greenward_warden_magic_reduction(
+    user_id: number
+): number
+    return PassiveSkillEffects.greenward_warden_magic_reduction(
         state_for(user_id)
     )
 end

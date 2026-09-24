@@ -167,13 +167,16 @@ function DamageService.apply_damage(context: DamageContext): number
             .get_mystic_magic_reduction(defender.UserId)
         local oathguard_reduction = ProgressionRuntimeState
             .get_oathguard_magic_reduction(defender.UserId)
+        local greenward_reduction = ProgressionRuntimeState
+            .get_greenward_warden_magic_reduction(defender.UserId)
         local fortress_bonus = CombatStatusService.get(
             context.target, "Fortress"
         )
         local max_reduction = if fortress_bonus > 0 then 0.70
             else 0.25
         damage *= 1 - math.clamp(
-            mystic_reduction + oathguard_reduction + fortress_bonus,
+            mystic_reduction + oathguard_reduction
+                + greenward_reduction + fortress_bonus,
             0, max_reduction
         )
     end

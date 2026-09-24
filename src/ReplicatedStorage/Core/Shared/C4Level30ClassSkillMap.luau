@@ -80,6 +80,12 @@ local KNIGHT = table.freeze({
     TargetTaunt = "OathguardChallenge",
 })
 
+local ELVEN_KNIGHT = table.freeze({
+    SwordBluntMastery = "GreenwardWardenSteelTraining",
+    HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
+    MagicResistance = "GreenwardWardenMagicResistance",
+})
+
 --[[
 Resolves the explicitly reviewed source family without legacy class aliases.
 
@@ -98,6 +104,9 @@ function SkillMap.get(
     end
     if branch_id == "HumanKnight" then
         return KNIGHT[source_category]
+    end
+    if branch_id == "ElvenKnight" then
+        return ELVEN_KNIGHT[source_category]
     end
     if branch_id ~= "HumanRogue" and branch_id ~= "ElvenScout"
     then

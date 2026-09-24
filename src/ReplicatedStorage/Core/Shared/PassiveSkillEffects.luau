@@ -193,7 +193,8 @@ function PassiveSkillEffects.damage_bonus(
     then
         return 0
     end
-    if skill_id == "OathguardSteelAndStoneTraining"
+    if (skill_id == "OathguardSteelAndStoneTraining"
+        or skill_id == "GreenwardWardenSteelTraining")
         and not equipped_sword_or_blunt(character)
     then
         return 0
@@ -483,6 +484,10 @@ function PassiveSkillEffects.fighter_armor_reduction(
             character, "OathguardHeavyArmorTraining",
             "PhysicalReductionPerRank"
         )
+        advanced += resolve_bonus(
+            character, "GreenwardWardenHeavyArmorTraining",
+            "PhysicalReductionPerRank"
+        )
     end
     -- Every original class passive requires the saved, verified personal
     -- advancement receipt and matching registered Body-armour category.
@@ -594,6 +599,24 @@ function PassiveSkillEffects.oathguard_magic_reduction(
         ),
         0, 0.048
     )
+end
+
+--[[
+Returns the Elven Knight's separately purchased magical mitigation.
+
+Args:
+    character (any): Genuine earned Greenward Warden and skill rank.
+
+Returns:
+    number: Bounded magic damage reduction; never free from class ID.
+]]
+function PassiveSkillEffects.greenward_warden_magic_reduction(
+    character: any
+): number
+    return math.clamp(resolve_bonus(
+        character, "GreenwardWardenMagicResistance",
+        "MagicReductionPerRank"
+    ), 0, 0.048)
 end
 
 --[[

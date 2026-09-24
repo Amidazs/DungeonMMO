@@ -1884,6 +1884,66 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Distinct Elven Knight sword/blunt mastery. A trained rank only
+    -- strengthens an actually equipped registered Sword or Blunt.
+    GreenwardWardenSteelTraining = table.freeze({
+        Id = "GreenwardWardenSteelTraining",
+        Tier = "Common", MaxRank = 4, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 24, [3] = 28, [4] = 28,
+        }),
+        RankThresholds = table.freeze({[2] = 0, [3] = 0, [4] = 0}),
+        DamageBonusPerRank = 0.012,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Each of the nine original armour ranks must be bought separately.
+    -- The Roblox percentage reduction remains a provisional C4 adapter.
+    GreenwardWardenHeavyArmorTraining = table.freeze({
+        Id = "GreenwardWardenHeavyArmorTraining",
+        Tier = "Common", MaxRank = 9, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20, [3] = 20,
+            [4] = 24, [5] = 24, [6] = 24,
+            [7] = 28, [8] = 28, [9] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0,
+            [8] = 0, [9] = 0,
+        }),
+        PhysicalReductionPerRank = 0.006,
+        ArmorCategory = "HeavyArmor",
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Magic defence is independent of physical armour and shield
+    -- blocks. DamageService caps stacked mitigation on hostile spells.
+    GreenwardWardenMagicResistance = table.freeze({
+        Id = "GreenwardWardenMagicResistance",
+        Tier = "Common", MaxRank = 8, Kind = "Passive",
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardWarden"}),
+        RankLevels = table.freeze({
+            [1] = 20, [2] = 20,
+            [3] = 24, [4] = 24, [5] = 24,
+            [6] = 28, [7] = 28, [8] = 28,
+        }),
+        RankThresholds = table.freeze({
+            [2] = 0, [3] = 0, [4] = 0,
+            [5] = 0, [6] = 0, [7] = 0, [8] = 0,
+        }),
+        MagicReductionPerRank = 0.006,
+        WeaponTags = table.freeze({}),
+    }),
+
     -- The original Knight's seven dark-magic life-drain ranks occur
     -- at source brackets 20/24/28. Actual health is restored only after
     -- the server confirms damage to a valid opposing NPC.
