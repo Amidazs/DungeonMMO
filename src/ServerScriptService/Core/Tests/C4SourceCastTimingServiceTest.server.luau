@@ -191,6 +191,8 @@ local function check_ember_bolt_timing()
     )
     check(
         normal.SourceAuthoredReuseDelayMs == 6000
+            and normal.SourceCastRange == 750
+            and normal.SourceEffectRange == 1250
             and normal.SourceMagicReuseMultiplier == 1
             and normal.PreMasteryReuseDelayMs == 6000
             and normal.FinalReuseDelayMs == 6000
@@ -266,7 +268,9 @@ local function check_frost_lance_cool_time()
     )
     check(
         result.SourceAuthoredCoolTimeMs == 200
-            and result.FinalCoolTimeMs == 140,
+            and result.FinalCoolTimeMs == 140
+            and result.SourceCastRange == 600
+            and result.SourceEffectRange == 1100,
         "source cool time accelerates without the 500 ms hit-time floor"
     )
     check(
@@ -422,6 +426,7 @@ local function main()
             and capability.FinalMagicCoolTimeIntegrated
             and capability.ReadOnlyShotAccelerationIntegrated
             and capability.CastInterruptWindowIntegrated
+            and capability.SourceCastAndEffectRangesIntegrated
             and capability.MagicReuseMultiplierIntegrated
             and capability.ZeroMasteryFinalReuseIntegrated
             and not capability.SkillMasteryRollIntegrated
