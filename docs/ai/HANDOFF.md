@@ -1,3 +1,20 @@
+## 25 September 2026 — v2.67 reversible C4 resource cutover GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_67_C4_Reversible_Resource_Cutover_20260925.md);
+[evidence](../testing/c4-reversible-resource-cutover-v2-67-20260925.md).
+C4ResourceCutoverService is now wired into CombatService but remains
+disabled-by-default. Explicit server opt-in switches real HP/MP/CP to the
+authenticated source candidate, preserves resource fractions, runs source
+three-second regen, routes playable damage through CP, lets NPC damage bypass
+CP, reapplies on respawn and rolls back cleanly. Base focus 12/12 and Dungeon
+14/14 are green. Final genuine two-player Play passed with both
+`DEFAULT_OFF_FRACTION_CP_REGEN_RESPAWN_ROLLBACK_PASS` and
+`VERIFIED_PLAY_MODE_PASS` at e2fb63d1. Earlier timeouts were caused by the
+test runner admitting only one Studio client; production code was not the
+cause. Keep the production gate OFF. Next build a similarly reversible,
+disabled source-combat formula provider for physical/magic/healing paths. No
+main merge/publish/production saves.
+
 ## 25 September 2026 — v2.66 resource regen + armor sets GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_66_C4_Resource_Regen_Armor_Sets_20260925.md);
