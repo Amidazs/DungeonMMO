@@ -89,11 +89,6 @@ function FakeResources.disable_player(player: any)
     active_players[player] = nil
 end
 
-function FakeResources.remove_player(player: any)
-    table.insert(events, "player-remove:" .. tostring(player.UserId))
-    active_players[player] = nil
-end
-
 function FakeResources.is_active(player: any): boolean
     return resource_gate and active_players[player] == true
 end
@@ -298,8 +293,9 @@ local function main()
             and active_players[player_b] == true
             and after_first_remove.Enabled
             and after_first_remove.ActivePlayerCount == 1
-            and dispatch_gate,
-        "removing one participant keeps remaining source mode active"
+            and dispatch_gate
+            and table.find(events, "player-:4") ~= nil,
+        "removing one participant rolls resources back and keeps others active"
     )
 
     local removed_b, remove_b_reason =
