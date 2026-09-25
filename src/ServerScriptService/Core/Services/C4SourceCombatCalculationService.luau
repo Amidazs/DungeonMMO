@@ -772,9 +772,10 @@ Calculates C4 MDAM skill damage between source-ready players.
 
 The final source magical critical rate is resolved with a private server roll.
 The optional C4 magic-failure algorithm is represented exactly, while the
-pinned source default keeps MagicFailures disabled. Spiritshots, elemental and
-PvP multipliers remain neutral until their authoritative runtime sources are
-integrated.
+pinned source default keeps MagicFailures disabled. The reviewed source skill
+element resolves against the defender's authenticated elemental vulnerability.
+Spiritshots and PvP multipliers remain neutral until their authoritative
+runtime sources are integrated.
 
 Args:
     attacker_user_id (number): Authenticated source-ready caster.
@@ -844,12 +845,27 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, failure_reason
     end
 
+    local element = effect.Sets.element
+    if type(element) ~= "string" or element == "" then
+        return nil, "OriginalMagicElementUnavailable"
+    end
+
+    local elemental_multiplier, elemental_reason =
+        Formula.elemental_vulnerability(
+            element,
+            defender.SourceStatCandidate
+        )
+    if elemental_multiplier == nil then
+        return nil, elemental_reason
+    end
+
     local amount = Formula.magic_damage({
         MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
         MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
         SkillPower = effect.Sets.power,
         Failure = failure.Failure,
         MagicCritical = critical.Critical,
+        ElementalMultiplier = elemental_multiplier,
     })
 
     return {
@@ -868,6 +884,8 @@ function C4SourceCombatCalculationService.magic_skill(
             critical.ChancePerThousand,
         MagicCriticalRoll = critical.Roll,
         SourceMagicalCriticalRate = critical_rate,
+        SourceElement = element,
+        ElementalMultiplier = elemental_multiplier,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -980,7 +998,8 @@ function C4SourceCombatCalculationService.capability(): any
         MagicFailureResolutionIntegrated = true,
         MagicFailuresSourceDefaultEnabled =
             Formula.magic_failures_default_enabled(),
-        ElementalResolutionIntegrated = false,
+        ElementalResolutionIntegrated = true,
+        ElementalPlayerTargetSourceStatsIntegrated = true,
         PvpFormulaModifiersIntegrated = false,
         LiveDamageApplied = false,
     }
