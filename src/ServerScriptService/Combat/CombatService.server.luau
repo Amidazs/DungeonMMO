@@ -2042,6 +2042,8 @@ Args:
     record (PlayerCombatState): Authoritative combat record.
     sequence_id (number): Skill sequence identifier captured at start.
     skill_definition (table): Authoritative active-skill definition.
+    skill_rank (number): Purchased rank paired to the resolved definition.
+    skill_aim (Vector3?): Server-resolved optional ground aim.
 
 Returns:
     None.
@@ -2130,7 +2132,8 @@ Args:
     player (Player): Player using Shield Bash.
     record (PlayerCombatState): Authoritative combat record.
     sequence_id (number): Skill sequence identifier captured at start.
-    skill_definition (table): Authoritative Shield Bash definition.
+    skill_definition (table): Authoritative rank-resolved skill definition.
+    skill_rank (number): Purchased rank paired to this cast.
 
 Returns:
     None.
@@ -2139,7 +2142,8 @@ local function enter_skill_active(
     player: Player,
     record: PlayerCombatState,
     sequence_id: number,
-    skill_definition: any
+    skill_definition: any,
+    skill_rank: number
 )
     if not sequence_is_current(
         player,
@@ -2412,7 +2416,9 @@ local function enter_skill_active(
         )
     elseif character and skill_definition.KIND == "Buff" then
         local applied = CombatStatusService.apply_self(
-            player, skill_definition
+            player,
+            skill_definition,
+            skill_rank
         )
         if applied and skill_definition.BUFF_KIND == "Movement" then
             -- Combat state transitions remain the sole authority for
@@ -2568,6 +2574,7 @@ local function start_skill(
     player: Player,
     record: PlayerCombatState,
     skill_definition: any,
+    skill_rank: number,
     skill_aim: Vector3?
 ): boolean
     record.sequence_id += 1
@@ -2612,7 +2619,8 @@ local function start_skill(
             player,
             record,
             sequence_id,
-            skill_definition
+            skill_definition,
+            skill_rank
         )
     end)
 
@@ -3168,6 +3176,7 @@ local function handle_skill_request(
         player,
         record,
         skill_definition,
+        rank,
         resolved_skill_aim
     )
 end
@@ -3829,6 +3838,58 @@ IronvowCriticalToggleService.set_source_effect_state(
 IronvowAccuracyToggleService.set_source_effect_state(
     update_c4_toggle_source_effect
 )
+
+--[[
+Records a successful server-owned timed buff in C4 migration state.
+
+Unresolved mappings are retained by the registry as explicit blockers rather
+than rejecting the currently live pre-cutover gameplay effect.
+
+Args:
+    player (Player): Authenticated buff owner.
+    skill_id (string): Server-selected creative skill ID.
+    rank (number): Server-selected purchased rank.
+    duration_seconds (number): Live server-owned timed effect duration.
+
+Returns:
+    nil: The source registry is updated without changing live gameplay.
+]]
+local function observe_c4_timed_source_effect(
+    player: Player,
+    skill_id: string,
+    rank: number,
+    duration_seconds: number
+)
+    C4ActiveSourceEffectState.observe_timed(
+        player,
+        skill_id,
+        rank,
+        duration_seconds
+    )
+end
+
+CombatStatusService.set_source_effect_observer(
+    observe_c4_timed_source_effect
+)
+IronvowEnduranceSurgeService.set_source_effect_state(function(
+    player: Player,
+    skill_id: string,
+    rank: number,
+    enabled: boolean,
+    duration_seconds: number
+)
+    if enabled then
+        observe_c4_timed_source_effect(
+            player,
+            skill_id,
+            rank,
+            duration_seconds
+        )
+        return
+    end
+
+    C4ActiveSourceEffectState.deactivate(player, skill_id)
+end)
 
 -- This callback never trusts a client-supplied rank or toggle strength.
 -- Any respec, loadout change, class/race change or Dungeon exclusion
