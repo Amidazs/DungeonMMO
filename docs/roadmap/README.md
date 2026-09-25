@@ -1,3 +1,15 @@
+**v2.71 PHYSICAL RANDOM VARIANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_71_C4_Physical_Random_Variance_20260925.md)
+and [green evidence](
+../testing/c4-physical-random-variance-v2-71-20260925.md).
+C4 physical random damage now comes only from the authenticated reviewed
+source weapon rnd_dam or the original unarmed level fallback. The private
+server roll uses the exact inclusive source range and PDAM source calculations
+consume the resulting multiplier. Fresh unpublished Studio: Base **14/14
+PASS**, Dungeon **16/16 PASS**, launch gear **12 assertions PASS**, formula
+**30 assertions PASS**, source combat **15 assertions PASS**. Next: source
+shield/perfect-shield handling. No main merge, publish or production saves.
+
 **v2.70 PHYSICAL CRITICAL RESOLUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md)
 and [green evidence](
