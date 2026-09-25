@@ -74,13 +74,13 @@ local function check_template(
 end
 
 --[[
-Validates all four starters and five current original first transfers.
+Validates all four starters and six current original first transfers.
 
 Args:
     None.
 
 Returns:
-    nil: Nine exact C4 templates retain their class-specific identities.
+    nil: Ten exact C4 templates retain their class-specific identities.
 ]]
 local function check_all_templates()
     local human = {
@@ -106,6 +106,7 @@ local function check_all_templates()
     check_template("Human", "Ironvow", 1, 20, human)
     check_template("Human", "Oathguard", 4, 20, human)
     check_template("Human", "Ashenblade", 7, 20, human)
+    check_template("Human", "Emberweaver", 11, 20, human_mage)
     check_template("Elf", "GreenwardWarden", 19, 20, elf)
     check_template("Elf", "GreenwardScout", 22, 20, elf)
 end
@@ -192,6 +193,11 @@ local function check_growth_vectors()
         RawHP = 983.313, RawMP = 320.896,
         RawCP = 399.582,
     })
+    check_vitals("Human", "Emberweaver", 30, {
+        HP = 705, MP = 492, CP = 355,
+        RawHP = 705.943, RawMP = 492.396,
+        RawCP = 355.348,
+    })
     check_vitals("Elf", "GreenwardWarden", 30, {
         HP = 902, MP = 325, CP = 453,
         RawHP = 902.848, RawMP = 325.91,
@@ -215,12 +221,12 @@ Returns:
 ]]
 local function check_scope_boundaries()
     local coverage = Source.coverage()
-    check(coverage.PathCount == 9
-        and coverage.VerifiedPrimaryStatTemplates == 9
-        and coverage.VerifiedLevelGrowthTemplates == 9
+    check(coverage.PathCount == 10
+        and coverage.VerifiedPrimaryStatTemplates == 10
+        and coverage.VerifiedLevelGrowthTemplates == 10
         and coverage.VerifiedLevelCap == 30
         and not coverage.LiveCombatIntegrated,
-        "Nine exact templates do not imply live combat migration")
+        "Ten exact templates do not imply live combat migration")
     check(Source.get("Human", "Ranger") == nil
         and Source.get("Elf", "Rogue") == nil
         and Source.get("Elf", "Oathguard") == nil,
@@ -251,7 +257,7 @@ local function check_scope_boundaries()
 end
 
 --[[
-Runs the exact C4 nine-template source regression.
+Runs the exact C4 ten-template source regression.
 
 Args:
     None.
@@ -264,7 +270,7 @@ local function main()
     check_growth_vectors()
     check_scope_boundaries()
     print(("[C4 Primary Stats] EXACT_SOURCE_PASS: %d assertions, "
-        .. "9 templates, 9 growth curves through level 30, live=false")
+        .. "10 templates, 10 growth curves through level 30, live=false")
         :format(checks))
 end
 
