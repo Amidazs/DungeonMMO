@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.73 magic failure/critical GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_73_C4_Magic_Failure_Critical_20260925.md)
+and [green evidence](
+../testing/c4-magic-failure-critical-v2-73-20260925.md).
+Final source M.Crit is now authenticated and server-rolled; the exact optional
+C4 magic-failure two-roll algorithm is represented while honoring the pinned
+`MagicFailures=false` default. Current-scope source M.Crit base is 8, capped
+at 300/1000, and successful magic criticals feed the existing x4 MDAM branch.
+Fresh focused Studio Base **14/14 PASS**, Dungeon **16/16 PASS**, formula **46
+assertions PASS**, source combat **23 assertions PASS**. Next integrate source
+elemental damage/vulnerability inputs. No main merge, publish, production save
+mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.72 source shield resolution GREEN
 
 [Latest roadmap](
