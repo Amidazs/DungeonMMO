@@ -759,6 +759,33 @@ function C4SourceCombatExecutor:_run_npc_status_tick(
 end
 
 --[[
+Checks whether one player-to-NPC source status launch is currently legal.
+
+This is a read-only hit-time preflight. It does not roll status success,
+consume a magical shot, schedule ticks or mutate HP.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (any): Current reviewed server NPC Model.
+
+Returns:
+    (boolean, string?): Ready state or strict live/source denial reason.
+]]
+function C4SourceCombatExecutor:can_status_skill_npc(
+    attacker: any,
+    enemy: any
+): (boolean, string?)
+    local boundary, reason =
+        self:_validate_npc_target(attacker, enemy)
+
+    if not boundary then
+        return false, reason
+    end
+
+    return true, nil
+end
+
+--[[
 Executes one reviewed source DEBUFF cast against a server NPC.
 
 A resisted cast schedules nothing. A successful cast replaces only an existing
@@ -1402,6 +1429,7 @@ function C4SourceCombatExecutor:capability(): any
         NpcPhysicalSkillLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
         NpcMagicSkillReadOnlyPreflight = true,
+        NpcStatusSkillReadOnlyPreflight = true,
         NpcPeriodicStatusLiveApplication = true,
         NpcPeriodicStatusNonlethal = true,
         NpcPeriodicStatusRefreshBySourceSkill = true,
