@@ -53,6 +53,68 @@ local function state_for(owner: any): any
 end
 
 --[[
+Stores one resolved or unresolved server-observed active effect.
+
+Args:
+    owner (any): Valid server-owned effect owner.
+    creative_skill_id (string): Server-selected creative skill ID.
+    creative_rank (number): Server-selected purchased rank.
+    source (any?): Reviewed C4 source row when resolution succeeded.
+    reason (string?): Source-resolution reason when it did not.
+    expires_at (number?): Server monotonic expiry for timed effects.
+
+Returns:
+    nil: Replaces only the same creative skill's prior observation.
+]]
+local function store_effect(
+    owner: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source: any?,
+    reason: string?,
+    expires_at: number?
+)
+    local record = {
+        Character = owner.Character,
+        CreativeSkillId = creative_skill_id,
+        CreativeRank = creative_rank,
+        ExpiresAt = expires_at,
+        ResolutionReason = reason,
+    }
+
+    if source then
+        record.SourceSkillId = source.SkillId
+        record.SourceRank = source.Rank
+        record.OperateType = source.OperateType
+    end
+
+    state_for(owner)[creative_skill_id] = record
+end
+
+--[[
+Removes stale, respawned or expired observations from one owner.
+
+Args:
+    owner (any): Current server-owned Player or disposable test owner.
+    state (any): Mutable active-effect dictionary for that owner.
+
+Returns:
+    nil: Leaves only observations still bound to the current character.
+]]
+local function purge_stale(owner: any, state: any)
+    local now = os.clock()
+
+    for creative_skill_id, record in pairs(state) do
+        local expired = type(record.ExpiresAt) == "number"
+            and record.ExpiresAt <= now
+
+        if record.Character ~= owner.Character or expired then
+            state[creative_skill_id] = nil
+        end
+    end
+end
+
+--[[
 Registers one effect only after an existing server executor activates it.
 
 Source IDs are never accepted from callers. They are resolved again from the
@@ -86,16 +148,76 @@ function C4ActiveSourceEffectState.activate(
         return false, reason
     end
 
-    state_for(owner)[creative_skill_id] = {
-        Character = owner.Character,
-        CreativeSkillId = creative_skill_id,
-        CreativeRank = creative_rank,
-        SourceSkillId = source.SkillId,
-        SourceRank = source.Rank,
-        OperateType = source.OperateType,
-    }
+    store_effect(
+        owner,
+        creative_skill_id,
+        creative_rank,
+        source,
+        nil,
+        nil
+    )
 
     return true, nil
+end
+
+--[[
+Observes one server-applied timed effect without changing live gameplay.
+
+Unlike strict toggle activation, a timed live effect is retained even when its
+creative rank has no reviewed C4 active mapping. That unresolved observation
+keeps later source migration fail-closed instead of silently dropping a live
+custom effect from the source-stat candidate.
+
+Args:
+    owner (any): Server-owned Player or disposable test owner.
+    creative_skill_id (string): Server-applied creative skill ID.
+    creative_rank (number): Server-selected purchased creative rank.
+    duration_seconds (number): Server-owned live effect duration.
+
+Returns:
+    (boolean, string?): True when the live observation was recorded, plus the
+        source-resolution reason when the effect is currently unmapped.
+]]
+function C4ActiveSourceEffectState.observe_timed(
+    owner: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    duration_seconds: number
+): (boolean, string?)
+    if not valid_owner(owner) then
+        return false, "InvalidActiveEffectOwner"
+    end
+
+    if type(creative_skill_id) ~= "string"
+        or creative_skill_id == ""
+        or type(creative_rank) ~= "number"
+        or creative_rank % 1 ~= 0
+        or creative_rank < 1
+        or type(duration_seconds) ~= "number"
+        or duration_seconds ~= duration_seconds
+        or duration_seconds <= 0
+        or duration_seconds > 3600
+    then
+        return false, "InvalidTimedActiveEffect"
+    end
+
+    local source, reason =
+        ProgressionRuntimeState.resolve_c4_active_source_effect(
+            owner.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+
+    store_effect(
+        owner,
+        creative_skill_id,
+        creative_rank,
+        source,
+        reason,
+        os.clock() + duration_seconds
+    )
+
+    return true, reason
 end
 
 --[[
@@ -147,14 +269,17 @@ Args:
     owner (any): Server-owned Player or disposable test owner.
 
 Returns:
-    any: Sorted detached Source SkillId/Rank rows and authority metadata.
+    any: Resolved source ranks, unresolved live effects and authority metadata.
 ]]
 function C4ActiveSourceEffectState.snapshot(owner: any): any
     if not valid_owner(owner) then
         C4ActiveSourceEffectState.clear(owner)
         return {
             SourceRanks = {},
+            UnresolvedEffects = {},
             ActiveCount = 0,
+            ResolvedCount = 0,
+            Ready = true,
             Authoritative = true,
         }
     end
@@ -163,23 +288,45 @@ function C4ActiveSourceEffectState.snapshot(owner: any): any
     if not state then
         return {
             SourceRanks = {},
+            UnresolvedEffects = {},
             ActiveCount = 0,
+            ResolvedCount = 0,
+            Ready = true,
             Authoritative = true,
         }
     end
 
-    local rows = {}
+    purge_stale(owner, state)
 
-    for creative_skill_id, record in pairs(state) do
-        if record.Character ~= owner.Character then
-            state[creative_skill_id] = nil
+    local by_source_skill = {}
+    local unresolved = {}
+    local active_count = 0
+
+    for _, record in pairs(state) do
+        active_count += 1
+
+        if type(record.SourceSkillId) == "number"
+            and type(record.SourceRank) == "number"
+        then
+            local current = by_source_skill[record.SourceSkillId]
+
+            if not current
+                or record.SourceRank > current.Rank
+            then
+                by_source_skill[record.SourceSkillId] = {
+                    SkillId = record.SourceSkillId,
+                    Rank = record.SourceRank,
+                    CreativeSkillId = record.CreativeSkillId,
+                    CreativeRank = record.CreativeRank,
+                    OperateType = record.OperateType,
+                }
+            end
         else
-            table.insert(rows, {
-                SkillId = record.SourceSkillId,
-                Rank = record.SourceRank,
+            table.insert(unresolved, {
                 CreativeSkillId = record.CreativeSkillId,
                 CreativeRank = record.CreativeRank,
-                OperateType = record.OperateType,
+                Reason = record.ResolutionReason
+                    or "CreativeSkillNotActiveSourceCandidate",
             })
         end
     end
@@ -188,16 +335,27 @@ function C4ActiveSourceEffectState.snapshot(owner: any): any
         active_by_owner[owner] = nil
     end
 
+    local rows = {}
+    for _, row in pairs(by_source_skill) do
+        table.insert(rows, row)
+    end
+
     table.sort(rows, function(left, right)
         if left.SkillId == right.SkillId then
             return left.Rank < right.Rank
         end
         return left.SkillId < right.SkillId
     end)
+    table.sort(unresolved, function(left, right)
+        return left.CreativeSkillId < right.CreativeSkillId
+    end)
 
     return {
         SourceRanks = rows,
-        ActiveCount = #rows,
+        UnresolvedEffects = unresolved,
+        ActiveCount = active_count,
+        ResolvedCount = #rows,
+        Ready = #unresolved == 0,
         Authoritative = true,
     }
 end
