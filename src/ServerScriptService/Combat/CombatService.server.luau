@@ -3871,6 +3871,31 @@ end
 CombatStatusService.set_source_effect_observer(
     observe_c4_timed_source_effect
 )
+
+--[[
+Returns the private active C4 source snapshot for one connected owner.
+
+Args:
+    user_id (number): Server-owned runtime character user ID.
+
+Returns:
+    any?: Authoritative active-effect snapshot, or nil when disconnected.
+]]
+local function active_source_snapshot_for_user(
+    user_id: number
+): any?
+    local player = Players:GetPlayerByUserId(user_id)
+
+    if not player then
+        return nil
+    end
+
+    return C4ActiveSourceEffectState.snapshot(player)
+end
+
+ProgressionRuntimeState.set_c4_active_effect_snapshot_provider(
+    active_source_snapshot_for_user
+)
 IronvowEnduranceSurgeService.set_source_effect_state(function(
     player: Player,
     skill_id: string,
