@@ -1,3 +1,19 @@
+**v3.00 HUMAN WIZARD DIRECT MDAM BRIDGE — VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_00_Human_Wizard_Direct_MDAM_Bridge_20260926.md)
+and [pending validation plan](
+../testing/c4-human-wizard-direct-mdam-bridge-v3-00-pending-20260926.md).
+Human Wizard v3.00 direct-MDAM handoff is now implemented in
+GitHub but deliberately **not marked green yet** because local/Studio access is
+off tonight. The new bridge is default-off, accepts only
+`EmberweaverEmberBolt`, binds one reviewed NPC at cast start, revalidates that
+same target before launch-time MP, then hands the scheduler payload to the
+existing source executor. Shot consumption remains owned by the existing source
+calculation layer, so the bridge cannot double-consume it. Dungeon runtime now
+composes the source cast services and clears cast/scheduler/shot state on player
+departure. The Human Wizard focused runner has been expanded to **11 suites**.
+Tomorrow's first task is fresh diff/build/Studio validation; v2.99 remains the
+latest fully validated point until that passes.
+
 **v2.99 HUMAN WIZARD SOURCE CAST SCHEDULER GREEN:** [roadmap](
 DungeonMMO_Roadmap_v2_99_Human_Wizard_Source_Cast_Scheduler_20260925.md)
 and [green evidence](
