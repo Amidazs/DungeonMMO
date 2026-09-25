@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.72 source shield resolution BUILT
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_72_C4_Shield_Resolution_20260925.md)
+and [acceptance record](
+../testing/c4-shield-resolution-v2-72-20260925.md).
+Reviewed C4 shield rate/power, DEX scaling, bow x1.3 block-rate handling,
+strict server-owned block/perfect rolls and PDAM formula application are now
+wired behind the disabled source-combat gate. Shielded PDAM fails closed unless
+trusted server code supplies facing eligibility; the later live executor must
+derive that from authoritative world transforms. Pure formula and provider
+regressions are authored, the focused runner is extended through v2.72, and
+fresh unpublished Base/Dungeon Rojo builds PASS. Final focused Studio
+Base/Dungeon execution is still required before v2.72 is GREEN. Next after
+acceptance: magic failure/resistance and magic critical resolution. No main
+merge, publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.71 physical random variance GREEN
 
 [Latest roadmap](
