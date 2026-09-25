@@ -1,3 +1,24 @@
+## 25 September 2026 — v2.99 Human Wizard source scheduler GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_99_Human_Wizard_Source_Cast_Scheduler_20260925.md);
+[evidence](
+../testing/c4-human-wizard-source-cast-scheduler-v2-99-20260925.md).
+Human Wizard source casts now have a private server-owned
+scheduler that bridges exact timing/reuse to the existing split-MP launch
+boundary. It records interrupt/hit/finalizer/reuse deadlines, rejects early or
+replayed launches, preserves reuse after cancellation, blocks overlap, and
+clears stale authority receipts exactly once. A successful deadline commit is
+marked `ReadyForSourceEffectExecution=true` while still
+`LiveDamageIntegrated=false` and `ShotStateConsumed=false`. Fresh scheduler
+**15 PASS**, full Human Wizard source-cast runner **9/9 PASS**, Base/Dungeon
+builds and diff check PASS. Next gate: one disabled-by-default direct-MDAM
+scheduler-to-source-executor handoff with exact one-use magical shot
+consumption at hit time.
+
+Permanent edits remain GitHub-only; Desktop Commander remains limited to
+fast-forward, disposable builds and unpublished Studio validation.
+
 ## 25 September 2026 — v2.98 Human Wizard exact source reuse GREEN
 
 [Roadmap](
