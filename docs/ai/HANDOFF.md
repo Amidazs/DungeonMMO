@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.91 live player-to-NPC rehearsal GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md);
+[green evidence](../testing/c4-live-player-npc-rehearsal-v2-91-20260925.md).
+Real Play now proves the full existing client-input -> CombatService ->
+C4-dispatch -> reviewed NPC-health path and reverse rollback. Source mode
+applied ~2.567 damage to a 48-HP Room1 Marauder, contribution was accepted,
+threat was recorded, and the quest observer was invoked but correctly rejected
+ordinary non-quest credit. Atomic disable restored all source gates OFF and
+player MaxHealth ~113.4; the same client input then applied the current-model
+10.0 damage. Fresh focused Base 24/24 and Dungeon 27/27 passed. Next perform
+one bounded two-player source-cutover rehearsal, then return to larger backend
+content rather than repeating single-player combat gates. Permanent edits
+remain GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.90 runtime cutover rehearsal GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_90_C4_Runtime_Rehearsal_20260925.md);
