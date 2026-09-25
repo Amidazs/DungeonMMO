@@ -1,3 +1,25 @@
+## 25 September 2026 — CURRENT v2.95 Human Wizard source combat
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_95_Human_Wizard_Source_Combat_20260925.md);
+[evidence](
+../testing/c4-human-wizard-source-combat-v2-95-20260925.md).
+Human Wizard exact source integration is now green through the disabled C4
+combat calculator. Exact tracked coverage is **10 paths / 569 learning rows /
+95 source skill IDs / 362 required source effect rank pairs**. Emberweaver
+rank-6 `EmberweaverEmberBolt` resolves authenticated source skill **1220:6**
+(power 38, magic level 30, FIRE) through the accepted MDAM formula.
+Human Wizard remains **74/93 non-companion rows mapped** with **19 companion
+rows intentionally unresolved**. Fresh source-combat **43 assertions PASS**,
+skill-tree **586 PASS**, source-effects **579 PASS**, primary-stats **147
+PASS**, creative link audit **569/528/41/0**, authenticated preview **649
+PASS**, and the combined focused runner **6/6 PASS**. This is still
+`live=false`: next add exact server-owned source MP/cast/reuse authority
+before exposing live Emberweaver direct spells.
+
+Use the focused source-combat runner for later Human Wizard source changes;
+do not rerun unrelated cutover rehearsals unless their contracts change.
+
 ## 25 September 2026 — CURRENT v2.94 Human Wizard foundation
 
 [Roadmap](
