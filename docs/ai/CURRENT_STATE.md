@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.58 reviewed launch core gear complete
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_58_C4_Launch_Core_Gear_Source_Expansion_20260925.md)
+and [focused test scope](
+../testing/c4-launch-core-gear-source-v2-58-20260925.md).
+All 18 current Weapon/Body/OffHand creative equipment definitions now resolve
+to reviewed pinned C4 source records. Added original Trident291, NetiBow1181,
+NetiDagger1182, Brigandine352 and Manticore395 exact source values. The actual
+server-owned resource boundary now reports reviewed source core-loadout IDs,
+while Helmet/Gloves/Boots fail closed because multi-slot source P.Def ordering
+is not yet integrated. This narrows OriginalInventoryMappingIncomplete to the
+remaining paperdoll slots rather than core equipment. No live HP/MP/CP switch
+yet. v2.55-v2.58 new tests remain pending until the resumed local playtest pass.
+Next local action: fast-forward the Phase4 HUD worktree, disposable Base/Dungeon
+Rojo builds, then focused Studio tests only; avoid rerunning unrelated green
+suites. No main merge/publish/production saves or animation changes.
+
 ## 25 September 2026 — CURRENT v2.57 reviewed C4 item mapping
 
 [Latest roadmap](
