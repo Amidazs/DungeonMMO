@@ -36,6 +36,24 @@ local ITEM_REFERENCES = table.freeze({
         PhysicalCriticalRate = 12, Accuracy = -3,
         AttackSpeed = 293, TwoHanded = true,
     }),
+    [291] = table.freeze({
+        Id = 291, Slot = "Weapon", Kind = "Polearm", Grade = "D",
+        PhysicalAttack = 40, MagicalAttack = 10,
+        PhysicalCriticalRate = 8, Accuracy = -3,
+        AttackSpeed = 325, TwoHanded = true,
+    }),
+    [1181] = table.freeze({
+        Id = 1181, Slot = "Weapon", Kind = "Bow",
+        PhysicalAttack = 45, MagicalAttack = 5,
+        PhysicalCriticalRate = 12, Accuracy = -3,
+        AttackSpeed = 293, TwoHanded = true,
+    }),
+    [1182] = table.freeze({
+        Id = 1182, Slot = "Weapon", Kind = "Dagger",
+        PhysicalAttack = 19, MagicalAttack = 5,
+        PhysicalCriticalRate = 12, Accuracy = -3,
+        AttackSpeed = 433,
+    }),
     [22] = table.freeze({
         Id = 22, Slot = "Body", Kind = "Light",
         PhysicalDefence = 43,
@@ -43,6 +61,14 @@ local ITEM_REFERENCES = table.freeze({
     [25] = table.freeze({
         Id = 25, Slot = "Body", Kind = "Heavy",
         PhysicalDefence = 62,
+    }),
+    [352] = table.freeze({
+        Id = 352, Slot = "Body", Kind = "Heavy", Grade = "D",
+        PhysicalDefence = 103,
+    }),
+    [395] = table.freeze({
+        Id = 395, Slot = "Body", Kind = "Light", Grade = "D",
+        PhysicalDefence = 77,
     }),
     [425] = table.freeze({
         Id = 425, Slot = "Body", Kind = "Robe",
