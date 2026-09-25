@@ -1,3 +1,16 @@
+## 25 September 2026 — v2.71 physical random variance GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_71_C4_Physical_Random_Variance_20260925.md);
+[green evidence](../testing/c4-physical-random-variance-v2-71-20260925.md).
+Pinned rnd_dam is now present for all eight reviewed source weapons. The
+disabled source-combat provider owns the exact inclusive C4 random roll,
+supports the original level-based unarmed fallback and feeds the resulting
+multiplier into PDAM calculations. Fresh Studio: Base **14/14**, Dungeon
+**16/16**, launch gear **12 assertions**, formula **30 assertions**, source
+combat **15 assertions**. No live HP/CP damage. Next integrate shield success,
+shield defence power and perfect-shield handling. Permanent edits remain
+GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.70 physical critical resolution GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md);
