@@ -87,11 +87,10 @@ Args:
     None.
 
 Returns:
-    (any, {string}): Mapping table plus any ambiguous/reviewed rows.
+    any: Mapping by creative rank with ambiguity/review metadata.
 ]]
-local function source_active_ranks(): (any, {string})
+local function source_active_ranks(): any
     local mapped = {}
-    local issues = {}
 
     for _, scope_id in ipairs(SCOPES) do
         local scope = assert(Tree.get(scope_id))
@@ -127,35 +126,23 @@ local function source_active_ranks(): (any, {string})
                         prior.SkillId ~= row.SkillId
                         or prior.Rank ~= row.SkillLevel
                     ) then
-                        table.insert(
-                            issues,
-                            skill_id .. "#" .. tostring(rank)
-                                .. ":AmbiguousSourceRank"
-                        )
+                        prior.Ambiguous = true
                     else
                         ranks[rank] = {
                             SkillId = row.SkillId,
                             Rank = row.SkillLevel,
+                            Review = link.Review,
+                            Ambiguous = false,
                         }
                         mapped[skill_id] = ranks
-                    end
-
-                    if link.Review ~= nil then
-                        table.insert(
-                            issues,
-                            skill_id .. "#" .. tostring(rank)
-                                .. ":ReviewRequired"
-                        )
                     end
                 end
             end
         end
     end
 
-    table.sort(issues)
-    return mapped, issues
+    return mapped
 end
-
 --[[
 Audits every persistent stat-effect rank actually reachable by level 30.
 
@@ -163,14 +150,16 @@ Args:
     mapped (any): Reviewed source active/toggle mapping by creative rank.
 
 Returns:
-    (number, number, {string}): Skill count, rank count and missing rows.
+    (number, number, {string}, {string}): Skill count, rank count, missing
+        rows and mapped rows that still require review.
 ]]
 local function audit_launch_ranks(
     mapped: any
-): (number, number, {string})
+): (number, number, {string}, {string})
     local skill_count = 0
     local rank_count = 0
     local missing = {}
+    local issues = {}
 
     for skill_id, definition in pairs(
         CombatDefinitions.all()
@@ -193,13 +182,25 @@ local function audit_launch_ranks(
                     has_launch_rank = true
                     rank_count += 1
 
-                    if not (
-                        mapped[skill_id]
+                    local source_rank = mapped[skill_id]
                         and mapped[skill_id][rank]
-                    ) then
+
+                    if not source_rank then
                         table.insert(
                             missing,
                             skill_id .. "#" .. tostring(rank)
+                        )
+                    elseif source_rank.Ambiguous then
+                        table.insert(
+                            issues,
+                            skill_id .. "#" .. tostring(rank)
+                                .. ":AmbiguousSourceRank"
+                        )
+                    elseif source_rank.Review ~= nil then
+                        table.insert(
+                            issues,
+                            skill_id .. "#" .. tostring(rank)
+                                .. ":ReviewRequired"
                         )
                     end
                 end
@@ -212,7 +213,8 @@ local function audit_launch_ranks(
     end
 
     table.sort(missing)
-    return skill_count, rank_count, missing
+    table.sort(issues)
+    return skill_count, rank_count, missing, issues
 end
 
 --[[
@@ -225,8 +227,8 @@ Returns:
     nil: Prints a bounded source-only success marker.
 ]]
 local function main()
-    local mapped, mapping_issues = source_active_ranks()
-    local skill_count, rank_count, missing =
+    local mapped = source_active_ranks()
+    local skill_count, rank_count, missing, mapping_issues =
         audit_launch_ranks(mapped)
 
     check(
