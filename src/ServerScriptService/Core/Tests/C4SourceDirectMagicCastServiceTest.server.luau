@@ -16,6 +16,25 @@ local enemy = {
 }
 local checks = 0
 
+local REVIEWED_PLANS = table.freeze({
+    EmberweaverEmberBolt = table.freeze({
+        CreativeRank = 6,
+        SourceSkillId = 1220,
+        SourceRank = 6,
+    }),
+    EmberweaverFlameBurst = table.freeze({
+        CreativeRank = 6,
+        SourceSkillId = 1172,
+        SourceRank = 6,
+    }),
+    EmberweaverFocusedBolt = table.freeze({
+        CreativeRank = 3,
+        SourceSkillId = 1274,
+        SourceRank = 3,
+    }),
+})
+
+
 local scheduler_state = {
     BeginCalls = 0,
     CancelCalls = 0,
@@ -25,6 +44,8 @@ local scheduler_state = {
     PendingCastId = nil,
     LaunchReason = nil,
     LaunchRankOverride = nil,
+    SourceSkillOverride = nil,
+    PendingSkillId = nil,
 }
 
 local executor_state = {
@@ -57,23 +78,25 @@ function FakeScheduler:begin_cast(
 ): (any?, string?)
     scheduler_state.BeginCalls += 1
 
-    if subject ~= player
-        or creative_skill_id ~= "EmberweaverEmberBolt"
-    then
+    local plan = REVIEWED_PLANS[creative_skill_id]
+    if subject ~= player or not plan then
         return nil, "C4SourceCastOwnerInvalid"
     end
 
     scheduler_state.NextCastId += 1
     scheduler_state.PendingCastId =
         scheduler_state.NextCastId
+    scheduler_state.PendingSkillId = creative_skill_id
 
     local now = supplied_now or 100
     return {
         CastId = scheduler_state.PendingCastId,
         CreativeSkillId = creative_skill_id,
-        CreativeRank = 6,
-        SourceSkillId = 1220,
-        SourceRank = 6,
+        CreativeRank = plan.CreativeRank,
+        SourceSkillId =
+            scheduler_state.SourceSkillOverride
+            or plan.SourceSkillId,
+        SourceRank = plan.SourceRank,
         StartedAt = now,
         InterruptAt = now + 2,
         LaunchAt = now + 4,
@@ -105,6 +128,7 @@ function FakeScheduler:cancel_cast(
     end
 
     scheduler_state.PendingCastId = nil
+    scheduler_state.PendingSkillId = nil
     return true, nil
 end
 
@@ -135,14 +159,19 @@ function FakeScheduler:launch_if_ready(
         return nil, scheduler_state.LaunchReason
     end
 
+    local skill_id = scheduler_state.PendingSkillId
+    local plan = assert(REVIEWED_PLANS[skill_id])
+
     scheduler_state.PendingCastId = nil
+    scheduler_state.PendingSkillId = nil
     return {
         CastId = cast_id,
-        CreativeSkillId = "EmberweaverEmberBolt",
+        CreativeSkillId = skill_id,
         CreativeRank =
-            scheduler_state.LaunchRankOverride or 6,
-        SourceSkillId = 1220,
-        SourceRank = 6,
+            scheduler_state.LaunchRankOverride
+            or plan.CreativeRank,
+        SourceSkillId = plan.SourceSkillId,
+        SourceRank = plan.SourceRank,
         ReadyForSourceEffectExecution = true,
         InitialMpSpent = 6,
         LaunchMpSpent = 21,
@@ -221,7 +250,7 @@ function FakeExecutor:magic_skill_npc(
 
     assert(subject == player)
     assert(target == enemy)
-    assert(creative_skill_id == "EmberweaverEmberBolt")
+    assert(REVIEWED_PLANS[creative_skill_id] ~= nil)
 
     return {
         Kind = "C4LiveNpcMagicSkill",
@@ -268,6 +297,8 @@ local function reset_fakes()
     scheduler_state.PendingCastId = nil
     scheduler_state.LaunchReason = nil
     scheduler_state.LaunchRankOverride = nil
+    scheduler_state.SourceSkillOverride = nil
+    scheduler_state.PendingSkillId = nil
 
     executor_state.PreflightCalls = 0
     executor_state.MagicCalls = 0
@@ -329,7 +360,7 @@ local function check_gate_and_allowlist()
         blocked == nil
             and blocked_reason == "C4DirectMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "first live bridge accepts only reviewed Ember Bolt"
+        "bridge rejects MDAM families with unimplemented side effects"
     )
 end
 
@@ -342,15 +373,20 @@ Args:
 Returns:
     (any, any): Enabled bridge and its successful start evidence.
 ]]
-local function started_bridge(start_time: number): (any, any)
+local function started_bridge(
+    start_time: number,
+    creative_skill_id: string?
+): (any, any)
     reset_fakes()
     local bridge = service()
     bridge:set_enabled(true)
 
+    local skill_id =
+        creative_skill_id or "EmberweaverEmberBolt"
     local started = assert(bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverEmberBolt",
+        skill_id,
         start_time
     ))
 
@@ -598,8 +634,8 @@ local function main()
             and capability.DefaultEnabled == false
             and not capability.CurrentlyEnabled
             and capability.ReviewedDirectMdamOnly
-            and capability.ReviewedSkill
-                == "EmberweaverEmberBolt"
+            and capability.ReviewedSkillCount == 3
+            and #capability.ReviewedSkills == 3
             and capability.TargetBoundAtCastStart
             and capability.TargetRevalidatedBeforeLaunchMp
             and capability.LaunchMpCommittedBeforeEffectExecution
@@ -609,7 +645,81 @@ local function main()
         "capability keeps first direct-MDAM bridge narrow and server-only"
     )
 
+--[[
+Checks all pure single-target Human Wizard MDAM families enter the bridge.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms reviewed source IDs/ranks are accepted and target-bound.
+]]
+local function check_reviewed_direct_families()
+    local skill_ids = {
+        "EmberweaverEmberBolt",
+        "EmberweaverFlameBurst",
+        "EmberweaverFocusedBolt",
+    }
+
+    for index, skill_id in ipairs(skill_ids) do
+        local bridge, started = started_bridge(
+            150 + index,
+            skill_id
+        )
+        local plan = assert(REVIEWED_PLANS[skill_id])
+
+        check(
+            started.CreativeSkillId == skill_id
+                and started.CreativeRank == plan.CreativeRank
+                and started.SourceSkillId == plan.SourceSkillId
+                and started.SourceRank == plan.SourceRank,
+            skill_id .. " enters the reviewed direct-MDAM bridge"
+        )
+
+        local cancelled = bridge:cancel_cast(
+            player,
+            started.CastId
+        )
+        check(
+            cancelled,
+            skill_id .. " reviewed bridge receipt cancels cleanly"
+        )
+    end
+end
+
+--[[
+Checks a reviewed creative ID cannot drift to another historical source skill.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms cast start cancels mismatched source mapping immediately.
+]]
+local function check_reviewed_source_mismatch()
+    reset_fakes()
+    local bridge = service()
+    bridge:set_enabled(true)
+    scheduler_state.SourceSkillOverride = 9999
+
+    local started, reason = bridge:begin_cast(
+        player,
+        enemy,
+        "EmberweaverFocusedBolt",
+        175
+    )
+    check(
+        started == nil
+            and reason == "C4DirectMagicReviewedSourceMismatch"
+            and scheduler_state.CancelCalls == 1
+            and not bridge:snapshot(player).Pending,
+        "reviewed creative skill cannot drift to another source skill"
+    )
+end
+
     check_gate_and_allowlist()
+    check_reviewed_direct_families()
+    check_reviewed_source_mismatch()
     check_target_bound_start()
     check_successful_launch()
     check_target_revalidation()
