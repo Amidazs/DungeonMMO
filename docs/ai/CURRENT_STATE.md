@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.77 PDAM skill criticals GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_77_C4_PDAM_Criticals_20260925.md)
+and [green evidence](
+../testing/c4-pdam-criticals-v2-77-20260925.md).
+Reviewed C4 PDAM skill-critical semantics are now integrated: authored
+baseCritRate ×10 × authenticated STR bonus, strict private 0–999 roll, then
+final PDAM ×2 after ordinary calcPhysDam. The current Power Strike source rank
+correctly has zero skill-critical chance. Fresh Studio Base **15/15 PASS**,
+Dungeon **17/17 PASS**, formula **51 assertions PASS**, source combat **30
+assertions PASS**. Next close source spatial hit/shield inputs before the live
+source-combat executor. No main merge, publish, production save mutation or
+animation edits.
+
 ## 25 September 2026 — CURRENT v2.76 normal attack/PvP composition GREEN
 
 [Latest roadmap](
