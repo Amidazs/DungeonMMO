@@ -1,3 +1,13 @@
+**v2.80 LIVE C4 SKILL EXECUTION GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_80_C4_Live_Skill_Execution_20260925.md)
+and [green evidence](
+../testing/c4-live-skill-execution-v2-80-20260925.md).
+The disabled live executor now applies ordinary attacks, PDAM, MDAM and
+self-HEAL through server resource authority. PvP damage is CP-first then HP and
+PDAM keeps trusted shield spatial context. Fresh Studio Base **17/17 PASS**,
+Dungeon **19/19 PASS**, executor **13 assertions PASS**. Next: controlled
+disabled adapter into existing combat entry points.
+
 **v2.79 LIVE C4 EXECUTOR FOUNDATION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_79_C4_Live_Combat_Executor_20260925.md)
 and [green evidence](
