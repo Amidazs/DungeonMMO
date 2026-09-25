@@ -1,4 +1,13 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_SINGLETON_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[C4 Combat Dispatch] SKIP: singleton regression runs in focused Edit mode"
+    )
+    return
+end
 -- Disabled source dispatch bridge regression.
 
 local ServerScriptService = game:GetService("ServerScriptService")
