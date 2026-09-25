@@ -1,3 +1,19 @@
+**v2.67 REVERSIBLE RESOURCE CUTOVER GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_67_C4_Reversible_Resource_Cutover_20260925.md)
+and [acceptance evidence](
+../testing/c4-reversible-resource-cutover-v2-67-20260925.md).
+The authenticated C4 HP/MP/CP candidate now has a disabled-by-default,
+reversible live transport: fraction-preserving enable/refresh/rollback,
+three-second source regeneration, PvP CP-before-HP routing, NPC CP bypass,
+respawn reapply and global rollback. CombatService wires it into normal player
+damage/lifecycle but the gate remains OFF unless server code explicitly opts a
+player in. Final Base focused 12/12 PASS, Dungeon 14/14 PASS, and genuine
+two-player unpublished Play emitted
+`DEFAULT_OFF_FRACTION_CP_REGEN_RESPAWN_ROLLBACK_PASS` plus
+`VERIFIED_PLAY_MODE_PASS`. Earlier live timeouts were a two-client Studio
+admission fixture problem and were repaired test-only. No main merge, publish
+or production saves.
+
 **v2.66 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_66_C4_Resource_Regen_Armor_Sets_20260925.md)
 and [test evidence](
