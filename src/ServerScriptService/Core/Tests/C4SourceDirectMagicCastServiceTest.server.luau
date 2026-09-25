@@ -21,16 +21,22 @@ local REVIEWED_PLANS = table.freeze({
         CreativeRank = 6,
         SourceSkillId = 1220,
         SourceRank = 6,
+        CastRange = 750,
+        EffectRange = 1250,
     }),
     EmberweaverFlameBurst = table.freeze({
         CreativeRank = 6,
         SourceSkillId = 1172,
         SourceRank = 6,
+        CastRange = 150,
+        EffectRange = 650,
     }),
     EmberweaverFocusedBolt = table.freeze({
         CreativeRank = 3,
         SourceSkillId = 1274,
         SourceRank = 3,
+        CastRange = 400,
+        EffectRange = 900,
     }),
 })
 
@@ -56,6 +62,7 @@ local executor_state = {
     LastEnemy = nil,
     LastRank = nil,
     LastSequence = nil,
+    LastRange = nil,
 }
 
 local FakeScheduler = {}
@@ -97,6 +104,8 @@ function FakeScheduler:begin_cast(
             scheduler_state.SourceSkillOverride
             or plan.SourceSkillId,
         SourceRank = plan.SourceRank,
+        SourceCastRange = plan.CastRange,
+        SourceEffectRange = plan.EffectRange,
         StartedAt = now,
         InterruptAt = now + 2,
         LaunchAt = now + 4,
@@ -172,6 +181,8 @@ function FakeScheduler:launch_if_ready(
             or plan.CreativeRank,
         SourceSkillId = plan.SourceSkillId,
         SourceRank = plan.SourceRank,
+        SourceCastRange = plan.CastRange,
+        SourceEffectRange = plan.EffectRange,
         ReadyForSourceEffectExecution = true,
         InitialMpSpent = 6,
         LaunchMpSpent = 21,
@@ -207,10 +218,12 @@ Returns:
 ]]
 function FakeExecutor:can_magic_skill_npc(
     subject: any,
-    target: any
+    target: any,
+    source_range: number?
 ): (boolean, string?)
     executor_state.PreflightCalls += 1
     executor_state.LastEnemy = target
+    executor_state.LastRange = source_range
 
     if subject ~= player or target ~= enemy then
         return false, "InvalidC4LiveNpcTarget"
@@ -307,6 +320,7 @@ local function reset_fakes()
     executor_state.LastEnemy = nil
     executor_state.LastRank = nil
     executor_state.LastSequence = nil
+    executor_state.LastRange = nil
 end
 
 --[[
@@ -457,6 +471,7 @@ local function check_successful_launch()
             and executor_state.LastEnemy == enemy
             and executor_state.LastRank == 6
             and executor_state.LastSequence == 901
+            and executor_state.LastRange == 1250
             and not bridge:snapshot(player).Pending,
         "ready cast hands one bound rank-six spell to source executor"
     )
@@ -643,7 +658,8 @@ local function check_reviewed_direct_families()
             started.CreativeSkillId == skill_id
                 and started.CreativeRank == plan.CreativeRank
                 and started.SourceSkillId == plan.SourceSkillId
-                and started.SourceRank == plan.SourceRank,
+                and started.SourceRank == plan.SourceRank
+                and executor_state.LastRange == plan.CastRange,
             skill_id .. " enters the reviewed direct-MDAM bridge"
         )
 
@@ -709,6 +725,8 @@ local function main()
             and capability.ReviewedSkillCount == 3
             and #capability.ReviewedSkills == 3
             and capability.TargetBoundAtCastStart
+            and capability.SourceCastRangeAtStart
+            and capability.SourceEffectRangeAtLaunch
             and capability.TargetRevalidatedBeforeLaunchMp
             and capability.LaunchMpCommittedBeforeEffectExecution
             and capability.ShotConsumptionDelegatedToSourceCalculation
