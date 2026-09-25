@@ -1,6 +1,6 @@
 --!strict
--- Exact level<=30 learning rows for every currently implemented original
--- Human/Elf C4 path. This is source metadata, not a live trainer switch.
+-- Exact level<=30 learning rows for currently implemented original paths.
+-- This is source metadata, not a live trainer switch.
 local C4Level30SkillTreeSource = {}
 
 local SOURCE_COMMIT =
@@ -115,6 +115,125 @@ local CLASSES = table.freeze({
         {1177, 5, "Wind Strike", 1100, 14, "PinnedC4SkillTree"},
         {1184, 3, "Ice Bolt", 1100, 14, "PinnedC4SkillTree"},
         {1184, 4, "Ice Bolt", 1100, 14, "PinnedC4SkillTree"},
+        }),
+    }),
+    HumanWizard = table.freeze({
+        ScopeId = "HumanWizard",
+        RaceId = "Human",
+        ClassId = "Emberweaver",
+        SourceClassId = 11,
+        Rows = table.freeze({
+        {239, 1, "Expertise D", 0, 20, "L2HubC4Automatic"},
+        {1320, 2, "Create Common Item", 0, 20, "L2HubC4Automatic"},
+        {146, 5, "Anti Magic", 1400, 20, "PinnedC4SkillTree"},
+        {146, 6, "Anti Magic", 1400, 20, "PinnedC4SkillTree"},
+        {164, 1, "Quick Recovery", 2900, 20, "PinnedC4SkillTree"},
+        {213, 1, "Boost Mana", 2900, 20, "PinnedC4SkillTree"},
+        {234, 1, "Robe Mastery", 1400, 20, "PinnedC4SkillTree"},
+        {234, 2, "Robe Mastery", 1400, 20, "PinnedC4SkillTree"},
+        {249, 3, "Weapon Mastery", 2900, 20, "PinnedC4SkillTree"},
+        {285, 1, "Higher Mana Gain", 1400, 20, "PinnedC4SkillTree"},
+        {285, 2, "Higher Mana Gain", 1400, 20, "PinnedC4SkillTree"},
+        {1078, 1, "Concentration", 2900, 20, "PinnedC4SkillTree"},
+        {1111, 1, "Summon Mana Companion", 2900, 20,
+            "PinnedC4SkillTree"},
+        {1127, 1, "Servitor Heal", 960, 20, "PinnedC4SkillTree"},
+        {1127, 2, "Servitor Heal", 960, 20, "PinnedC4SkillTree"},
+        {1127, 3, "Servitor Heal", 960, 20, "PinnedC4SkillTree"},
+        {1147, 3, "Vampiric Touch", 1400, 20, "PinnedC4SkillTree"},
+        {1147, 4, "Vampiric Touch", 1400, 20, "PinnedC4SkillTree"},
+        {1164, 2, "Curse: Weakness", 2900, 20, "PinnedC4SkillTree"},
+        {1168, 2, "Curse: Poison", 2900, 20, "PinnedC4SkillTree"},
+        {1172, 1, "Aura Burn", 1400, 20, "PinnedC4SkillTree"},
+        {1172, 2, "Aura Burn", 1400, 20, "PinnedC4SkillTree"},
+        {1181, 1, "Flame Strike", 2900, 20, "PinnedC4SkillTree"},
+        {1184, 5, "Ice Bolt", 1400, 20, "PinnedC4SkillTree"},
+        {1184, 6, "Ice Bolt", 1400, 20, "PinnedC4SkillTree"},
+        {1220, 1, "Blaze", 1400, 20, "PinnedC4SkillTree"},
+        {1220, 2, "Blaze", 1400, 20, "PinnedC4SkillTree"},
+        {1225, 1, "Summon Combat Companion", 2900, 20,
+            "PinnedC4SkillTree"},
+        {1274, 1, "Energy Bolt", 2900, 20, "PinnedC4SkillTree"},
+
+        {146, 7, "Anti Magic", 2800, 25, "PinnedC4SkillTree"},
+        {146, 8, "Anti Magic", 2800, 25, "PinnedC4SkillTree"},
+        {228, 1, "Fast Spell Casting", 5500, 25, "PinnedC4SkillTree"},
+        {229, 1, "Fast Mana Recovery", 5500, 25, "PinnedC4SkillTree"},
+        {234, 3, "Robe Mastery", 2800, 25, "PinnedC4SkillTree"},
+        {234, 4, "Robe Mastery", 2800, 25, "PinnedC4SkillTree"},
+        {249, 4, "Weapon Mastery", 2800, 25, "PinnedC4SkillTree"},
+        {249, 5, "Weapon Mastery", 2800, 25, "PinnedC4SkillTree"},
+        {285, 3, "Higher Mana Gain", 2800, 25, "PinnedC4SkillTree"},
+        {285, 4, "Higher Mana Gain", 2800, 25, "PinnedC4SkillTree"},
+        {1069, 1, "Sleep", 1800, 25, "PinnedC4SkillTree"},
+        {1069, 2, "Sleep", 1800, 25, "PinnedC4SkillTree"},
+        {1069, 3, "Sleep", 1800, 25, "PinnedC4SkillTree"},
+        {1083, 1, "Surrender To Fire", 5500, 25,
+            "PinnedC4SkillTree"},
+        {1111, 2, "Summon Mana Companion", 5500, 25,
+            "PinnedC4SkillTree"},
+        {1126, 1, "Servitor Recharge", 2800, 25,
+            "PinnedC4SkillTree"},
+        {1126, 2, "Servitor Recharge", 2800, 25,
+            "PinnedC4SkillTree"},
+        {1127, 4, "Servitor Heal", 1800, 25, "PinnedC4SkillTree"},
+        {1127, 5, "Servitor Heal", 1800, 25, "PinnedC4SkillTree"},
+        {1127, 6, "Servitor Heal", 1800, 25, "PinnedC4SkillTree"},
+        {1147, 5, "Vampiric Touch", 2800, 25, "PinnedC4SkillTree"},
+        {1147, 6, "Vampiric Touch", 2800, 25, "PinnedC4SkillTree"},
+        {1157, 1, "Body To Mind", 5500, 25, "PinnedC4SkillTree"},
+        {1164, 3, "Curse: Weakness", 5500, 25, "PinnedC4SkillTree"},
+        {1167, 1, "Poisonous Cloud", 5500, 25, "PinnedC4SkillTree"},
+        {1172, 3, "Aura Burn", 2800, 25, "PinnedC4SkillTree"},
+        {1172, 4, "Aura Burn", 2800, 25, "PinnedC4SkillTree"},
+        {1181, 2, "Flame Strike", 5500, 25, "PinnedC4SkillTree"},
+        {1220, 3, "Blaze", 2800, 25, "PinnedC4SkillTree"},
+        {1220, 4, "Blaze", 2800, 25, "PinnedC4SkillTree"},
+        {1225, 2, "Summon Combat Companion", 5500, 25,
+            "PinnedC4SkillTree"},
+        {1274, 2, "Energy Bolt", 5500, 25, "PinnedC4SkillTree"},
+
+        {1320, 3, "Create Common Item", 0, 28, "L2HubC4Automatic"},
+
+        {146, 9, "Anti Magic", 5300, 30, "PinnedC4SkillTree"},
+        {146, 10, "Anti Magic", 5300, 30, "PinnedC4SkillTree"},
+        {164, 2, "Quick Recovery", 11000, 30, "PinnedC4SkillTree"},
+        {213, 2, "Boost Mana", 11000, 30, "PinnedC4SkillTree"},
+        {234, 5, "Robe Mastery", 5300, 30, "PinnedC4SkillTree"},
+        {234, 6, "Robe Mastery", 5300, 30, "PinnedC4SkillTree"},
+        {249, 6, "Weapon Mastery", 5300, 30, "PinnedC4SkillTree"},
+        {249, 7, "Weapon Mastery", 5300, 30, "PinnedC4SkillTree"},
+        {285, 5, "Higher Mana Gain", 5300, 30, "PinnedC4SkillTree"},
+        {285, 6, "Higher Mana Gain", 5300, 30, "PinnedC4SkillTree"},
+        {1069, 4, "Sleep", 3500, 30, "PinnedC4SkillTree"},
+        {1069, 5, "Sleep", 3500, 30, "PinnedC4SkillTree"},
+        {1069, 6, "Sleep", 3500, 30, "PinnedC4SkillTree"},
+        {1078, 2, "Concentration", 11000, 30, "PinnedC4SkillTree"},
+        {1083, 2, "Surrender To Fire", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1111, 3, "Summon Mana Companion", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1126, 3, "Servitor Recharge", 5300, 30,
+            "PinnedC4SkillTree"},
+        {1126, 4, "Servitor Recharge", 5300, 30,
+            "PinnedC4SkillTree"},
+        {1127, 7, "Servitor Heal", 3500, 30, "PinnedC4SkillTree"},
+        {1127, 8, "Servitor Heal", 3500, 30, "PinnedC4SkillTree"},
+        {1127, 9, "Servitor Heal", 3500, 30, "PinnedC4SkillTree"},
+        {1151, 1, "Corpse Life Drain", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1164, 4, "Curse: Weakness", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1168, 3, "Curse: Poison", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1172, 5, "Aura Burn", 5300, 30, "PinnedC4SkillTree"},
+        {1172, 6, "Aura Burn", 5300, 30, "PinnedC4SkillTree"},
+        {1181, 3, "Flame Strike", 11000, 30, "PinnedC4SkillTree"},
+        {1220, 5, "Blaze", 5300, 30, "PinnedC4SkillTree"},
+        {1220, 6, "Blaze", 5300, 30, "PinnedC4SkillTree"},
+        {1225, 3, "Summon Combat Companion", 11000, 30,
+            "PinnedC4SkillTree"},
+        {1274, 3, "Energy Bolt", 11000, 30, "PinnedC4SkillTree"},
         }),
     }),
     ElvenFighter = table.freeze({
@@ -592,8 +711,7 @@ end
 Returns exact learning rows for one current original C4 path.
 
 Args:
-    scope_id (string): HumanFighter, HumanMystic, ElvenFighter,
-        ElvenMystic or one of the five first-transfer scope IDs.
+    scope_id (string): Starter or implemented first-transfer scope ID.
 
 Returns:
     any?: Source class metadata plus copied level<=30 learning rows.
@@ -618,7 +736,7 @@ end
 Finds exact learning rows for one source skill within a source class.
 
 Args:
-    scope_id (string): One of the nine original source scopes.
+    scope_id (string): One currently tracked original source scope.
     skill_id (number): Historical C4 skill ID.
 
 Returns:
@@ -645,14 +763,14 @@ Args:
     None.
 
 Returns:
-    any: Nine paths, exact row count and source provenance.
+    any: Tracked paths, exact row count and source provenance.
 ]]
 function C4Level30SkillTreeSource.coverage(): any
     local scopes = {}
     local total_rows = 0
     local skills = {}
     for _, scope_id in ipairs({
-        "HumanFighter", "HumanMystic",
+        "HumanFighter", "HumanMystic", "HumanWizard",
         "ElvenFighter", "ElvenMystic",
         "HumanWarrior", "HumanKnight", "HumanRogue",
         "ElvenKnight", "ElvenScout",
