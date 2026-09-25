@@ -33,22 +33,31 @@ local LINKS = table.freeze({
     scout_expert_leather_vest = 395,
     apprentice_mystic_robe = 425,
     marauder_shield = 102,
+    marauder_helmet = 43,
+    test_elf_helmet = 44,
+    marauder_gloves = 49,
+    ironbound_gloves = 51,
+    leatherbound_gloves = 50,
+    tempered_ironbound_gloves = 63,
+    runic_ironbound_gloves = 61,
+    warded_leatherbound_gloves = 61,
+    marauder_boots = 38,
 })
 
 local SLOT_MAP = table.freeze({
     Weapon = "Weapon",
     Body = "Body",
     OffHand = "OffHand",
+    Helmet = "Head",
+    Gloves = "Gloves",
+    Boots = "Feet",
 })
 
 local CORE_SLOTS = table.freeze({
     "Weapon",
-    "Body",
     "OffHand",
-})
-
-local UNINTEGRATED_SLOTS = table.freeze({
     "Helmet",
+    "Body",
     "Gloves",
     "Boots",
 })
@@ -106,7 +115,7 @@ function C4CreativeItemSourceMap.resolve(
 end
 
 --[[
-Converts only a fully reviewed current Weapon/Body/OffHand loadout.
+Converts a fully reviewed current six-slot equipment loadout.
 
 Empty slots are allowed. Any equipped current item without an explicit reviewed
 link fails the whole conversion so mixed custom/source equipment cannot leak
@@ -123,12 +132,6 @@ function C4CreativeItemSourceMap.resolve_loadout(
 ): (any?, string?)
     if type(equipment) ~= "table" then
         return nil, "InvalidCreativeEquipmentLoadout"
-    end
-
-    for _, slot in ipairs(UNINTEGRATED_SLOTS) do
-        if equipment[slot] ~= nil then
-            return nil, "AdditionalCreativeEquipmentSlotsNotIntegrated"
-        end
     end
 
     local result = {}
@@ -168,7 +171,7 @@ function C4CreativeItemSourceMap.resolve_loadout(
 end
 
 --[[
-Lists all reviewed creative-to-source core equipment links.
+Lists all reviewed creative-to-source equipment links.
 
 Args:
     None.
