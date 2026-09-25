@@ -294,6 +294,8 @@ local function seed_characters()
 
     local wizard = starter_character(WIZARD_ID, "Emberweaver")
     own_skill(wizard, "EmberweaverEmberBolt", 6)
+    own_skill(wizard, "EmberweaverFlameBurst", 6)
+    own_skill(wizard, "EmberweaverFocusedBolt", 3)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -933,6 +935,81 @@ local function check_human_wizard_magic()
 end
 
 --[[
+Checks reviewed Human Wizard neutral MDAM families use multiplier one.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source magic without an element stays neutral, not invalid.
+]]
+local function check_human_wizard_neutral_magic()
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(WIZARD_ID)
+    )
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+
+    local cases = {
+        {
+            CreativeSkillId = "EmberweaverFlameBurst",
+            CreativeRank = 6,
+            SourceSkillId = 1172,
+            SourceRank = 6,
+            Power = 30,
+        },
+        {
+            CreativeSkillId = "EmberweaverFocusedBolt",
+            CreativeRank = 3,
+            SourceSkillId = 1274,
+            SourceRank = 3,
+            Power = 19,
+        },
+    }
+
+    for _, case in ipairs(cases) do
+        shot_state.Spiritshot = false
+        shot_state.BlessedSpiritshot = false
+
+        local result = assert(Combat.magic_skill(
+            WIZARD_ID,
+            TARGET_ID,
+            case.CreativeSkillId,
+            case.CreativeRank
+        ))
+        local expected = Formula.magic_damage({
+            MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            SkillPower = case.Power,
+            Spiritshot = false,
+            BlessedSpiritshot = false,
+            Failure = result.MagicFailure,
+            MagicCritical = result.MagicCritical,
+            ElementalMultiplier = 1,
+            PvpMultiplier = result.PvpMultiplier,
+        })
+
+        check_close(
+            result.Amount,
+            expected,
+            case.CreativeSkillId
+                .. " uses neutral source magic damage"
+        )
+        check(
+            result.SourceSkillId == case.SourceSkillId
+                and result.SourceRank == case.SourceRank
+                and result.SourceSkillPower == case.Power
+                and result.SourceElement == nil
+                and not result.SourceElemental
+                and result.ElementalMultiplier == 1,
+            case.CreativeSkillId
+                .. " resolves exact non-elemental source rank"
+        )
+    end
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1233,6 +1310,7 @@ local function main()
     check_physical()
     check_magic()
     check_human_wizard_magic()
+    check_human_wizard_neutral_magic()
     check_heal()
     check_npc_targets()
     check_denials()
