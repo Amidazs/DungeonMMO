@@ -4,12 +4,72 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Services = ServerScriptService.Core.Services
-
 local DefaultCastContract = require(
     Services.C4SourceCastContractService
 )
+
 local C4SourceCastResourceService = {}
 C4SourceCastResourceService.__index = C4SourceCastResourceService
+
+--[[
+Validates one server-owned cast owner without accepting client identity data.
+
+Args:
+    player (any): Player instance or isolated server test owner.
+
+Returns:
+    boolean: True when a numeric integral UserId is available.
+]]
+local function valid_owner(player: any): boolean
+    if type(player) ~= "table"
+        and typeof(player) ~= "Instance"
+    then
+        return false
+    end
+
+    return type(player.UserId) == "number"
+        and player.UserId % 1 == 0
+end
+
+--[[
+Checks that a pending receipt still matches the currently owned source rank.
+
+Args:
+    record (any): Private cast-start receipt.
+    current (any): Newly resolved authoritative source cast contract.
+
+Returns:
+    boolean: True only when skill/rank and launch cost are unchanged.
+]]
+local function same_authority(record: any, current: any): boolean
+    return current.CreativeRank == record.CreativeRank
+        and current.SourceSkillId == record.SourceSkillId
+        and current.SourceRank == record.SourceRank
+        and current.SourceMpConsume == record.SourceMpConsume
+end
+
+--[[
+Creates detached cast-start evidence from one private pending record.
+
+Args:
+    record (any): Private cast-start transaction.
+
+Returns:
+    any: Non-mutable diagnostic/start evidence.
+]]
+local function begin_evidence(record: any): any
+    return {
+        CastId = record.CastId,
+        CreativeSkillId = record.CreativeSkillId,
+        CreativeRank = record.CreativeRank,
+        SourceSkillId = record.SourceSkillId,
+        SourceRank = record.SourceRank,
+        InitialMpSpent = record.SourceMpInitialConsume,
+        LaunchMpPending = record.SourceMpConsume,
+        SourceOnly = true,
+        LiveDamageIntegrated = false,
+    }
+end
 
 --[[
 Builds a source-cast resource lifecycle around explicit server dependencies.
@@ -90,6 +150,38 @@ function C4SourceCastResourceService:cancel_cast(
 end
 
 --[[
+Creates and stores one pending receipt after the source initial MP spend.
+
+Args:
+    player (any): Valid server-owned cast owner.
+    creative_skill_id (string): Selected creative skill.
+    contract (any): Authenticated current source cast contract.
+
+Returns:
+    any: Private pending record now owned by this lifecycle.
+]]
+function C4SourceCastResourceService:_start_record(
+    player: any,
+    creative_skill_id: string,
+    contract: any
+): any
+    self._next_cast_id += 1
+
+    local record = {
+        CastId = self._next_cast_id,
+        CreativeSkillId = creative_skill_id,
+        CreativeRank = contract.CreativeRank,
+        SourceSkillId = contract.SourceSkillId,
+        SourceRank = contract.SourceRank,
+        SourceMpInitialConsume =
+            contract.SourceMpInitialConsume,
+        SourceMpConsume = contract.SourceMpConsume,
+    }
+    self._active_by_owner[player] = record
+    return record
+end
+
+--[[
 Begins one exact source split-MP cast for a source-cutover participant.
 
 The complete source cost must be affordable. Only mpInitialConsume is spent at
@@ -106,14 +198,7 @@ function C4SourceCastResourceService:begin_cast(
     player: any,
     creative_skill_id: string
 ): (any?, string?)
-    if type(player) ~= "table"
-        and typeof(player) ~= "Instance"
-    then
-        return nil, "C4SourceCastOwnerInvalid"
-    end
-    if type(player.UserId) ~= "number"
-        or player.UserId % 1 ~= 0
-    then
+    if not valid_owner(player) then
         return nil, "C4SourceCastOwnerInvalid"
     end
     if self._active_by_owner[player] then
@@ -144,19 +229,27 @@ function C4SourceCastResourceService:begin_cast(
         return nil, "C4SourceCastManaInsufficient"
     end
 
-    self._next_cast_id += 1
-    local record = {
-        CastId = self._next_cast_id,
-        CreativeSkillId = creative_skill_id,
-        CreativeRank = contract.CreativeRank,
-        SourceSkillId = contract.SourceSkillId,
-        SourceRank = contract.SourceRank,
-        SourceMpInitialConsume =
-            contract.SourceMpInitialConsume,
-        SourceMpConsume = contract.SourceMpConsume,
-    }
-    self._active_by_owner[player] = record
+    return begin_evidence(self:_start_record(
+        player,
+        creative_skill_id,
+        contract
+    )), nil
+end
 
+--[[
+Builds detached successful launch evidence after the ongoing MP spend.
+
+Args:
+    record (any): Private cast-start receipt.
+    launch_spent (number): Actual launch-time MP removed.
+
+Returns:
+    any: Source-only completed-cast evidence.
+]]
+local function commit_evidence(
+    record: any,
+    launch_spent: number
+): any
     return {
         CastId = record.CastId,
         CreativeSkillId = record.CreativeSkillId,
@@ -164,10 +257,12 @@ function C4SourceCastResourceService:begin_cast(
         SourceSkillId = record.SourceSkillId,
         SourceRank = record.SourceRank,
         InitialMpSpent = record.SourceMpInitialConsume,
-        LaunchMpPending = record.SourceMpConsume,
+        LaunchMpRequested = record.SourceMpConsume,
+        LaunchMpSpent = launch_spent,
+        Completed = true,
         SourceOnly = true,
         LiveDamageIntegrated = false,
-    }, nil
+    }
 end
 
 --[[
@@ -189,13 +284,11 @@ function C4SourceCastResourceService:commit_cast(
     cast_id: number
 ): (any?, string?)
     local record = self._active_by_owner[player]
-
     if not record or record.CastId ~= cast_id then
         return nil, "C4SourceCastReceiptInvalid"
     end
 
     self._active_by_owner[player] = nil
-
     if self._resources.is_active(player) ~= true then
         return nil, "C4SourceCastResourceCutoverInactive"
     end
@@ -208,11 +301,7 @@ function C4SourceCastResourceService:commit_cast(
     if not current then
         return nil, current_reason
     end
-    if current.CreativeRank ~= record.CreativeRank
-        or current.SourceSkillId ~= record.SourceSkillId
-        or current.SourceRank ~= record.SourceRank
-        or current.SourceMpConsume ~= record.SourceMpConsume
-    then
+    if not same_authority(record, current) then
         return nil, "C4SourceCastAuthorityChanged"
     end
 
@@ -220,20 +309,7 @@ function C4SourceCastResourceService:commit_cast(
         player,
         record.SourceMpConsume
     )
-
-    return {
-        CastId = record.CastId,
-        CreativeSkillId = record.CreativeSkillId,
-        CreativeRank = record.CreativeRank,
-        SourceSkillId = record.SourceSkillId,
-        SourceRank = record.SourceRank,
-        InitialMpSpent = record.SourceMpInitialConsume,
-        LaunchMpRequested = record.SourceMpConsume,
-        LaunchMpSpent = launch_spent,
-        Completed = true,
-        SourceOnly = true,
-        LiveDamageIntegrated = false,
-    }, nil
+    return commit_evidence(record, launch_spent), nil
 end
 
 --[[
