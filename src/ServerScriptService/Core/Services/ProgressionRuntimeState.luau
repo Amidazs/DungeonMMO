@@ -85,6 +85,7 @@ end
 local ProgressionRuntimeState = {}
 
 local states: {[number]: any} = {}
+local active_effect_snapshot_provider: ((number) -> any?)? = nil
 
 --[[
 Builds a fresh default character used only for neutral runtime fallbacks.
@@ -806,6 +807,30 @@ Returns:
     (any?, string?): Strict C4 source catalogue or identity denial.
 ]]
 --[[
+Installs the server-only provider for authoritative active C4 effect state.
+
+This avoids a require cycle between the progression runtime and the private
+active-effect registry. CombatService owns the wiring because it already owns
+the live effect executors.
+
+Args:
+    callback ((number) -> any?): Returns the private active snapshot for one
+        user ID, or nil when no live owner is available.
+
+Returns:
+    nil: Later migration-boundary reads use this provider.
+]]
+function ProgressionRuntimeState.set_c4_active_effect_snapshot_provider(
+    callback: any
+)
+    assert(
+        type(callback) == "function",
+        "Active effect snapshot provider is required"
+    )
+    active_effect_snapshot_provider = callback
+end
+
+--[[
 Returns the coordinated C4 resource cutover boundary for the real owner.
 
 This is intentionally fail-closed. It exposes exact source base HP/MP/CP but
@@ -827,7 +852,23 @@ function ProgressionRuntimeState.get_c4_resource_migration_boundary(
         return nil, "OriginalCharacterIdentityNotVerified"
     end
 
-    return C4ResourceMigrationBoundary.for_character(character)
+    local active_snapshot = nil
+
+    if active_effect_snapshot_provider then
+        local ok, snapshot = pcall(
+            active_effect_snapshot_provider,
+            user_id
+        )
+
+        if ok then
+            active_snapshot = snapshot
+        end
+    end
+
+    return C4ResourceMigrationBoundary.for_character(
+        character,
+        active_snapshot
+    )
 end
 
 function ProgressionRuntimeState.get_c4_source_skill_tree(
