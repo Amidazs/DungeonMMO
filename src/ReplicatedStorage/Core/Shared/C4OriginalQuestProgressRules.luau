@@ -3,6 +3,7 @@
 local SourceQuests = require(
     script.Parent.C4OriginalFirstTransferQuestStages
 )
+local Branches = require(script.Parent.C4FirstTransferBranches)
 local Rules = {}
 
 local LETTER_IDS = table.freeze({
@@ -16,6 +17,10 @@ local STAGE_PROOFS = table.freeze({
     GloamStriker = table.freeze({StonewatchBadge = true}),
     GloamBulwark = table.freeze({GloamBulwarkSeal = true}),
     Ridgebreaker = table.freeze({RidgebreakerSigil = true}),
+    AshveilAcolyte = table.freeze({AetherglassShard = true}),
+    CinderboundConjurer = table.freeze({
+        CinderboundEmberSigil = true,
+    }),
     RootboundMarauder = table.freeze({VerdantPatrolReport = true}),
     ThornboundColossus = table.freeze({VerdantGuardianSeal = true}),
     BrackenRaider = LETTER_IDS,
@@ -26,6 +31,33 @@ local STAGE_PROOFS = table.freeze({
     }),
 })
 
+
+--[[
+Resolves the original race and starter family for one first-transfer branch.
+
+Args:
+    branch_id (string): Stable original first-transfer branch identifier.
+
+Returns:
+    (string?, string?): Source race and starter family, or nil values.
+]]
+local function branch_identity(
+    branch_id: string
+): (string?, string?)
+    for _, race_id in ipairs(Branches.races()) do
+        for _, base_class_id in ipairs({"Fighter", "Mage"}) do
+            for _, branch in ipairs(
+                Branches.get(race_id, base_class_id) or {}
+            ) do
+                if branch.Id == branch_id then
+                    return race_id, base_class_id
+                end
+            end
+        end
+    end
+
+    return nil, nil
+end
 
 --[[
 Starts a source quest only for a saved original branch choice and starter.
@@ -49,12 +81,12 @@ function Rules.can_start(
         return false, "OriginalCharacterUnavailable", nil
     end
     local identity = character.Identity
-    local expected_race = if branch_id == "ElvenScout"
-        or branch_id == "ElvenKnight"
-        then "Elf" else "Human"
-    if identity.RaceId ~= expected_race
-        or identity.BaseClassId ~= "Fighter"
-        or identity.ClassId ~= "Fighter"
+    local expected_race, expected_base_class =
+        branch_identity(branch_id)
+    if expected_race == nil or expected_base_class == nil
+        or identity.RaceId ~= expected_race
+        or identity.BaseClassId ~= expected_base_class
+        or identity.ClassId ~= expected_base_class
         or identity.CreationStage ~= "Complete"
         or character.ClassAdvancement.OriginalFirstTransferChoiceId
             ~= branch_id
@@ -216,6 +248,32 @@ function Rules.can_progress(
             return false, "OriginalQuestLootProofRequired"
         end
     end
+    if quest.BranchId == "HumanWizard" then
+        if step.TargetId == "AshveilAcolyte"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.AetherglassShard ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "ArchivistNeris" and current.Step == 4
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.AetherglassShards3 ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "CinderboundConjurer"
+            and (type(event.VerifiedProofIds) ~= "table"
+                or event.VerifiedProofIds.CinderboundEmberSigil ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+        if step.TargetId == "MagisterOrwyn" and current.Step == 6
+            and (type(current.Proofs) ~= "table"
+                or current.Proofs.CinderboundEmberSigil ~= true)
+        then
+            return false, "OriginalQuestLootProofRequired"
+        end
+    end
     if quest.BranchId == "ElvenKnight" then
         if step.TargetId == "RootboundMarauder"
             and (type(event.VerifiedProofIds) ~= "table"
@@ -348,6 +406,11 @@ function Rules.advance(quest: any, current: any, event: any): any
         and current.Count == step.Required
     then
         current.Proofs.StonewatchBadge3 = true
+    end
+    if step.TargetId == "AshveilAcolyte"
+        and current.Count == step.Required
+    then
+        current.Proofs.AetherglassShards3 = true
     end
     if step.TargetId == "RootboundMarauder"
         and current.Count == step.Required
