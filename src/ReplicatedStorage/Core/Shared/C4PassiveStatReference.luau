@@ -2,36 +2,11 @@
 -- Read-only source C4 passive stat operations on supplied source stats.
 -- This is NOT connected to live combat, items, buffs or player profiles.
 local Source = require(script.Parent.C4SkillEffectSource)
+local EquipmentConditions = require(
+    script.Parent.C4EquipmentConditionRules
+)
 
 local C4PassiveStatReference = {}
-
---[[
-Checks a source equipment condition without guessing Roblox item tags.
-
-Args:
-    allowed (string?): Source comma-separated weapon or armour kinds.
-    equipment (any): Historical kind or reviewed source paperdoll.
-
-Returns:
-    boolean: Whether an equipped original item meets this exact kind.
-]]
-local function uses_kind(allowed: string?, equipment: any): boolean
-    if allowed == nil then return true end
-    if not equipment then return false end
-    for kind in string.gmatch(allowed, "[^,]+") do
-        local trimmed = kind:match("^%s*(.-)%s*$")
-        if type(equipment) == "table" then
-            for _, slot in ipairs({"Weapon", "Body", "OffHand"}) do
-                if trimmed == equipment[slot] then
-                    return true
-                end
-            end
-        elseif trimmed == equipment then
-            return true
-        end
-    end
-    return false
-end
 
 --[[
 Checks every source-wide equipment condition on one original skill.
@@ -51,7 +26,7 @@ local function meets_conditions(
         then
             return false, "UnsupportedSourceCondition"
         end
-        if not uses_kind(condition.kind, equipped_kind) then
+        if not EquipmentConditions.matches(condition.kind, equipped_kind) then
             return false, nil
         end
     end
@@ -137,7 +112,7 @@ local function collect_passives(
         if issue then return nil, issue end
         if allowed then
             for _, modifier in ipairs(rank.Modifiers) do
-                if uses_kind(modifier.UsingKind, equipped_kind) then
+                if EquipmentConditions.matches(modifier.UsingKind, equipped_kind) then
                     local item, reason = source_operation(
                         modifier, #modifiers + 1
                     )
@@ -217,6 +192,8 @@ local function valid_loadout(loadout: any): boolean
 
     local slot_kinds = {
         Body = {Heavy = true, Light = true, Magic = true},
+        Legs = {Heavy = true, Light = true, Magic = true},
+        BodyPart = {Chest = true, FullArmor = true},
         OffHand = {Shield = true},
         Head = {Helmet = true},
         Gloves = {Gloves = true},
