@@ -147,17 +147,17 @@ local function main()
             .. "gameplay mechanics and class release remain uncertified")
     local knight = assert(Coverage.for_branch("HumanKnight"))
     check(knight.Status == "RankScheduleMappedEffectsPending"
-        and knight.SourceRankEntriesThroughCap == 55
+        and knight.SourceRankEntriesThroughCap == 54
         and knight.SourceRankEntriesByLevel[20] == 16
         and knight.SourceRankEntriesByLevel[24] == 16
-        and knight.SourceRankEntriesByLevel[28] == 23,
+        and knight.SourceRankEntriesByLevel[28] == 22,
         "Historical Knight 20/24/28 inventory does not grant a class")
-    check(knight.TrainerMappedRankEntries == 55
+    check(knight.TrainerMappedRankEntries == 54
         and knight.MissingRankScheduleEntries == 0
         and knight.SourceRankScheduleMapped
         and not knight.ExactSourceRankCoverageCertified
         and not knight.LaunchSkillCatalogueReady,
-        "Knight has all 55 source rank schedules, but live mechanic "
+        "Knight has all 54 source rank schedules, but live mechanic "
             .. "parity and launch certification are still outstanding")
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
