@@ -30,6 +30,8 @@ local boundary_state = {
     SourceStatCandidateReady = true,
     SourceStatCandidate = {
         MAGICAL_ATTACK_SPEED = 333,
+        MAGICAL_SKILL_REUSE = 1,
+        SKILL_MASTERY = 0,
     },
 }
 
@@ -189,11 +191,12 @@ local function check_ember_bolt_timing()
     )
     check(
         normal.SourceAuthoredReuseDelayMs == 6000
-            and normal.UnmodifiedReuseDelayMs == 6000
-            and not normal.FinalReuseDelayReady
-            and normal.ReuseBlocker
-                == "OriginalSkillReuseRateNotIntegrated",
-        "reuse stays fail-closed while exposing neutral diagnostic scaling"
+            and normal.SourceMagicReuseMultiplier == 1
+            and normal.PreMasteryReuseDelayMs == 6000
+            and normal.FinalReuseDelayMs == 6000
+            and normal.FinalReuseDelayReady
+            and normal.ReuseBlocker == nil,
+        "neutral source reuse is final when source mastery chance is zero"
     )
     check(
         snapshot_calls == 1
@@ -268,9 +271,10 @@ local function check_frost_lance_cool_time()
     )
     check(
         result.SourceAuthoredReuseDelayMs == 8000
-            and result.UnmodifiedReuseDelayMs == 8000
-            and not result.FinalReuseDelayReady,
-        "Frost Lance final reuse also remains explicitly unresolved"
+            and result.PreMasteryReuseDelayMs == 8000
+            and result.FinalReuseDelayMs == 8000
+            and result.FinalReuseDelayReady,
+        "Frost Lance final reuse is exact with zero source mastery chance"
     )
 end
 
@@ -297,8 +301,9 @@ local function check_boundary_rules()
     check(
         fast.FinalHitTimeMs == 2000
             and fast.CastInterruptTimeMs == 1000
-            and fast.UnmodifiedReuseDelayMs == 3000,
-        "double source M.Atk.Spd halves hit and neutral reuse timing"
+            and fast.FinalReuseDelayMs == 3000
+            and fast.FinalReuseDelayReady,
+        "double source M.Atk.Spd halves hit and final zero-mastery reuse"
     )
 
     boundary_state.SourceStatCandidate.MAGICAL_ATTACK_SPEED = 0
@@ -308,7 +313,8 @@ local function check_boundary_rules()
     )
     check(
         invalid == nil
-            and invalid_reason == "OriginalMagicAttackSpeedUnavailable",
+            and invalid_reason
+                == "OriginalSourceStatUnavailable:MAGICAL_ATTACK_SPEED",
         "nonpositive source M.Atk.Spd fails closed"
     )
 
@@ -337,6 +343,67 @@ local function check_boundary_rules()
 end
 
 --[[
+Checks owned source reuse multipliers and mastery fail-closed behavior.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms Quick Recovery can drive reuse without guessing mastery.
+]]
+local function check_reuse_multiplier_and_mastery()
+    boundary_state.ScopeId = "HumanWizard"
+    boundary_state.SourceStatCandidateReady = true
+    boundary_state.SourceStatCandidate.MAGICAL_ATTACK_SPEED = 333
+    boundary_state.SourceStatCandidate.MAGICAL_SKILL_REUSE = 0.75
+    boundary_state.SourceStatCandidate.SKILL_MASTERY = 0
+    shot_state.Spiritshot = false
+    shot_state.BlessedSpiritshot = false
+
+    local recovered = assert(service():resolve(
+        USER_ID,
+        "EmberweaverEmberBolt"
+    ))
+    check(
+        recovered.SourceMagicReuseMultiplier == 0.75
+            and recovered.PreMasteryReuseDelayMs == 4500
+            and recovered.FinalReuseDelayMs == 4500
+            and recovered.FinalReuseDelayReady
+            and recovered.ReuseBlocker == nil,
+        "Quick Recovery rank two produces exact 4500 ms Ember Bolt reuse"
+    )
+
+    boundary_state.SourceStatCandidate.SKILL_MASTERY = 1
+    local mastery = assert(service():resolve(
+        USER_ID,
+        "EmberweaverEmberBolt"
+    ))
+    check(
+        mastery.PreMasteryReuseDelayMs == 4500
+            and mastery.FinalReuseDelayMs == nil
+            and not mastery.FinalReuseDelayReady
+            and mastery.ReuseBlocker
+                == "OriginalSkillMasteryRollNotIntegrated",
+        "nonzero source mastery chance blocks final reuse until its roll exists"
+    )
+
+    boundary_state.SourceStatCandidate.SKILL_MASTERY = 0
+    boundary_state.SourceStatCandidate.MAGICAL_SKILL_REUSE = nil
+    local missing, missing_reason = service():resolve(
+        USER_ID,
+        "EmberweaverEmberBolt"
+    )
+    check(
+        missing == nil
+            and missing_reason
+                == "OriginalSourceStatUnavailable:MAGICAL_SKILL_REUSE",
+        "missing source reuse multiplier fails closed"
+    )
+
+    boundary_state.SourceStatCandidate.MAGICAL_SKILL_REUSE = 1
+end
+
+--[[
 Runs Human Wizard source cast-time planning acceptance.
 
 Args:
@@ -355,10 +422,11 @@ local function main()
             and capability.FinalMagicCoolTimeIntegrated
             and capability.ReadOnlyShotAccelerationIntegrated
             and capability.CastInterruptWindowIntegrated
-            and capability.UnmodifiedReuseDiagnosticIntegrated
-            and not capability.FinalReuseDelayIntegrated
-            and capability.ReuseBlocker
-                == "OriginalSkillReuseRateNotIntegrated"
+            and capability.MagicReuseMultiplierIntegrated
+            and capability.ZeroMasteryFinalReuseIntegrated
+            and not capability.SkillMasteryRollIntegrated
+            and capability.MasteryReuseBlocker
+                == "OriginalSkillMasteryRollNotIntegrated"
             and not capability.LiveSchedulingIntegrated
             and not capability.ClientAuthority,
         "capability exposes exact cast timing and fail-closed final reuse"
@@ -367,12 +435,14 @@ local function main()
     check_ember_bolt_timing()
     check_frost_lance_cool_time()
     check_boundary_rules()
+    check_reuse_multiplier_and_mastery()
 
     Runtime.clear_character(USER_ID)
 
     print((
         "[C4 Source Cast Timing] SOURCE_ONLY_PASS: %d assertions "
-        .. "hit=true cool=true shots=peek reuse=blocked live=false"
+        .. "hit=true cool=true shots=peek reuse=true mastery=blocked "
+        .. "live=false"
     ):format(checks))
 end
 
