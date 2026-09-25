@@ -279,7 +279,8 @@ Args:
     record (any): Private target-bound cast record.
 
 Returns:
-    (boolean, string?): True when target remains valid, otherwise denial reason.
+    (boolean, string?): True when target remains valid, otherwise a strict
+        denial reason.
 ]]
 local function validate_launch_target(
     self: any,
