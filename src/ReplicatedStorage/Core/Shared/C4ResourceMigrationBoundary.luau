@@ -25,10 +25,11 @@ local ACTIVATION_BLOCKERS = table.freeze({
 })
 
 --[[
-Copies the fixed activation blockers so callers cannot mutate shared state.
+Copies the activation blockers so callers cannot mutate shared state.
 
 Args:
-    None.
+    equipment_ready (boolean): Whether the current equipment migration is
+        source-mapped and valid for the character's C4 Expertise level.
 
 Returns:
     {string}: Independent list of unresolved live-migration requirements.
