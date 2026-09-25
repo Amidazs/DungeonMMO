@@ -268,7 +268,48 @@ function C4SourceCombatExecutor:_validate_participants(
 end
 
 --[[
-Applies one already-calculated player-vs-player source hit through CP then HP.
+Checks independent authorities required for one self-contained source action.
+
+This is used for actions such as self-healing that have no separate defender.
+
+Args:
+    actor (any): Server-owned source-combat participant.
+
+Returns:
+    (boolean, string?): Ready state or strict gate denial reason.
+]]
+function C4SourceCombatExecutor:_validate_actor(
+    actor: any
+): (boolean, string?)
+    if not self._enabled then
+        return false, "C4LiveCombatExecutorDisabled"
+    end
+    if type(actor) ~= "userdata" and type(actor) ~= "table" then
+        return false, "InvalidC4LiveCombatActor"
+    end
+    if type(actor.UserId) ~= "number" then
+        return false, "InvalidC4LiveCombatActor"
+    end
+    if not self._combat.is_enabled() then
+        return false, "C4SourceCombatCalculationDisabled"
+    end
+    if type(self._resources) ~= "table" then
+        return false, "C4LiveResourceAuthorityUnavailable"
+    end
+    if not self._resources.is_enabled() then
+        return false, "C4ResourceCutoverDisabled"
+    end
+    if not self._resources.is_active(actor) then
+        return false, "C4LiveCombatParticipantNotCutOver"
+    end
+
+    return true, nil
+end
+
+--[[
+Applies one already-calculated player-versus-player source hit through CP then
+HP.
+
 
 Args:
     defender (any): Server-owned defending player.
@@ -322,6 +363,239 @@ function C4SourceCombatExecutor:_apply_player_damage(
         HealthDamage = health_damage,
         HealthBefore = health_before,
         HealthAfter = humanoid.Health,
+    }, nil
+end
+
+--[[
+Applies one accepted source heal to server-owned Humanoid Health.
+
+Args:
+    actor (any): Server-owned healing participant.
+    amount (number): Accepted source healing amount.
+
+Returns:
+    (any?, string?): Applied heal evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:_apply_player_heal(
+    actor: any,
+    amount: number
+): (any?, string?)
+    if type(amount) ~= "number"
+        or amount ~= amount
+        or amount < 0
+        or amount >= math.huge
+    then
+        return nil, "InvalidC4LiveCombatHeal"
+    end
+
+    local humanoid, humanoid_reason =
+        self._humanoid_provider(actor)
+    if not humanoid then
+        return nil, humanoid_reason
+    end
+
+    local health_before = humanoid.Health
+    local max_health = humanoid.MaxHealth
+    if type(max_health) ~= "number"
+        or max_health ~= max_health
+        or max_health <= 0
+        or max_health >= math.huge
+    then
+        return nil, "InvalidC4LiveCombatMaximumHealth"
+    end
+
+    humanoid.Health = math.min(
+        max_health,
+        health_before + amount
+    )
+
+    return {
+        RawHeal = amount,
+        EffectiveHeal = humanoid.Health - health_before,
+        HealthBefore = health_before,
+        HealthAfter = humanoid.Health,
+    }, nil
+end
+
+--[[
+Executes one live player-versus-player source PDAM skill.
+
+The source calculation provider owns skill identity, criticals, shots,
+vulnerability, PvP modifiers and shield arithmetic. This executor owns only
+trusted spatial context and final CP/HP mutation.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    defender (any): Server-owned defending player.
+    creative_skill_id (string): Server-selected creative skill identifier.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live PDAM application evidence or denial reason.
+]]
+function C4SourceCombatExecutor:physical_skill(
+    attacker: any,
+    defender: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason =
+        self:_validate_participants(attacker, defender)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local spatial, spatial_reason =
+        self._spatial_context_provider(
+            self,
+            attacker,
+            defender
+        )
+    if not spatial then
+        return nil, spatial_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_skill(
+            attacker.UserId,
+            defender.UserId,
+            creative_skill_id,
+            creative_rank,
+            spatial
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason =
+        self:_apply_player_damage(
+            defender,
+            calculated.Amount
+        )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LivePhysicalSkill",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = applied.CPAbsorbed,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+    }, nil
+end
+
+--[[
+Executes one live player-versus-player source MDAM skill.
+
+Args:
+    attacker (any): Server-owned casting player.
+    defender (any): Server-owned defending player.
+    creative_skill_id (string): Server-selected creative skill identifier.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live MDAM application evidence or denial reason.
+]]
+function C4SourceCombatExecutor:magic_skill(
+    attacker: any,
+    defender: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason =
+        self:_validate_participants(attacker, defender)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.magic_skill(
+            attacker.UserId,
+            defender.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason =
+        self:_apply_player_damage(
+            defender,
+            calculated.Amount
+        )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveMagicSkill",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = applied.CPAbsorbed,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+    }, nil
+end
+
+--[[
+Executes one live source self-heal.
+
+The current accepted source HEAL provider resolves a caster-owned heal rank
+without a separate target. This executor therefore applies that result only to
+the authenticated caster.
+
+Args:
+    caster (any): Server-owned healing player.
+    creative_skill_id (string): Server-selected creative heal identifier.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live heal application evidence or denial reason.
+]]
+function C4SourceCombatExecutor:heal_skill(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.heal_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason =
+        self:_apply_player_heal(
+            caster,
+            calculated.Amount
+        )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveHealSkill",
+        Calculation = calculated,
+        Applied = true,
+        RawHeal = applied.RawHeal,
+        EffectiveHeal = applied.EffectiveHeal,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
     }, nil
 end
 
@@ -432,6 +706,9 @@ function C4SourceCombatExecutor:capability(): any
         ClientShieldAuthority = false,
         ClientShotAuthority = false,
         NormalAttackLiveApplication = true,
+        PhysicalSkillLiveApplication = true,
+        MagicSkillLiveApplication = true,
+        SelfHealLiveApplication = true,
     }
 end
 
