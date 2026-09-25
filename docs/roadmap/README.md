@@ -1,3 +1,12 @@
+**v2.77 PDAM SKILL CRITICALS GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_77_C4_PDAM_Criticals_20260925.md)
+and [green evidence](../testing/c4-pdam-criticals-v2-77-20260925.md).
+Exact C4 SkillPdam critical-rate/STR arithmetic and post-PDAM ×2 handling are
+now source-authoritative. Fresh focused Studio Base **15/15 PASS**, Dungeon
+**17/17 PASS**, formula **51 assertions PASS**, source combat **30 assertions
+PASS**. Next close source spatial hit/shield inputs before live combat cutover.
+No main merge, publish or production saves.
+
 **v2.76 NORMAL ATTACK / PVP COMPOSITION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_76_C4_Normal_Attack_PvP_Composition_20260925.md)
 and [green evidence](
