@@ -27,6 +27,7 @@ end
 local activation_audit_provider: any = function(): boolean
     return DamageFamilies.activation_ready()
 end
+local participant_provider: any? = nil
 
 --[[
 Checks the minimal executor contract required by this dispatch layer.
@@ -215,6 +216,33 @@ function C4CombatDispatchAdapter.set_activation_audit_provider_for_test(
 end
 
 --[[
+Binds the server-owned participant selector used during staged cutover.
+
+Only explicitly opted-in players may use source dispatch while the global
+adapter gate is enabled. Clearing the provider also disables dispatch so a
+missing participant authority can never widen source combat accidentally.
+
+Args:
+    provider (any?): Callback returning true for an opted-in attacker.
+
+Returns:
+    nil: Updates only the server-local participant scope.
+]]
+function C4CombatDispatchAdapter.bind_participant_provider(
+    provider: any?
+)
+    assert(
+        provider == nil or type(provider) == "function",
+        "C4 dispatch participant provider must be a function or nil"
+    )
+
+    participant_provider = provider
+    if not participant_provider then
+        feature_enabled = false
+    end
+end
+
+--[[
 Captures mutable adapter wiring for isolated server tests.
 
 This exists only to stop Studio test scripts from destroying the real runtime
@@ -233,6 +261,7 @@ function C4CombatDispatchAdapter.capture_test_state(): any
         NpcDamageObserver = npc_damage_observer,
         SkillRankProvider = skill_rank_provider,
         ActivationAuditProvider = activation_audit_provider,
+        ParticipantProvider = participant_provider,
     }
 end
 
@@ -256,6 +285,7 @@ function C4CombatDispatchAdapter.restore_test_state(state: any)
     npc_damage_observer = state.NpcDamageObserver
     skill_rank_provider = state.SkillRankProvider
     activation_audit_provider = state.ActivationAuditProvider
+    participant_provider = state.ParticipantProvider
 
     assert(
         type(skill_rank_provider) == "function",
@@ -264,6 +294,11 @@ function C4CombatDispatchAdapter.restore_test_state(state: any)
     assert(
         type(activation_audit_provider) == "function",
         "C4 dispatch audit provider must be restorable"
+    )
+    assert(
+        participant_provider == nil
+            or type(participant_provider) == "function",
+        "C4 dispatch participant provider must be restorable"
     )
 
     if bound_executor then
@@ -314,6 +349,9 @@ function C4CombatDispatchAdapter.set_enabled(
     end
     if not bound_executor:is_enabled() then
         return false, "C4LiveCombatExecutorDisabled"
+    end
+    if type(participant_provider) ~= "function" then
+        return false, "C4CombatParticipantScopeUnavailable"
     end
     if activation_audit_provider() ~= true then
         return false, "C4CombatDispatchAuditBlockingFamilies"
@@ -377,8 +415,9 @@ end
 Attempts to route one existing trusted DamageService context through C4.
 
 When disabled, the result is explicitly not handled and DamageService keeps its
-current formula path unchanged. Once enabled, supported player-to-NPC damage
-never falls back to legacy formulas after a source denial.
+current formula path unchanged. While enabled, unselected players stay on the
+current model. Selected player-to-NPC damage never falls back after a source
+denial.
 
 Args:
     context (any): Existing server-created DamageService context.
@@ -405,6 +444,21 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
     local user_id = attacker_user_id(attacker)
     local target = context.target
     if not user_id or not is_npc_target(target) then
+        return {
+            Handled = false,
+        }
+    end
+
+    if type(participant_provider) ~= "function" then
+        return denied("C4CombatParticipantScopeUnavailable")
+    end
+
+    local scope_ok, selected =
+        pcall(participant_provider, attacker)
+    if not scope_ok then
+        return denied("C4CombatParticipantScopeUnavailable")
+    end
+    if selected ~= true then
         return {
             Handled = false,
         }
@@ -563,6 +617,9 @@ function C4CombatDispatchAdapter.capability(): any
         DefaultEnabled = false,
         CurrentlyEnabled = feature_enabled,
         ExecutorBound = bound_executor ~= nil,
+        ParticipantProviderBound =
+            type(participant_provider) == "function",
+        ExplicitParticipantScope = true,
         ExistingDamageContextInput = true,
         DisabledFallsBackToCurrentCombat = true,
         EnabledSourceFailureFallsClosed = true,
