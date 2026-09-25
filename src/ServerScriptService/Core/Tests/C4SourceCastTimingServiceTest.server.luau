@@ -388,7 +388,7 @@ local function check_reuse_multiplier_and_mastery()
             and not mastery.FinalReuseDelayReady
             and mastery.ReuseBlocker
                 == "OriginalSkillMasteryRollNotIntegrated",
-        "nonzero source mastery chance blocks final reuse until its roll exists"
+        "nonzero source mastery blocks reuse until its roll exists"
     )
 
     boundary_state.SourceStatCandidate.SKILL_MASTERY = 0
