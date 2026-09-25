@@ -89,6 +89,11 @@ function FakeResources.disable_player(player: any)
     active_players[player] = nil
 end
 
+function FakeResources.remove_player(player: any)
+    table.insert(events, "player-remove:" .. tostring(player.UserId))
+    active_players[player] = nil
+end
+
 function FakeResources.is_active(player: any): boolean
     return resource_gate and active_players[player] == true
 end
@@ -182,6 +187,7 @@ local function main()
             and capability.DefaultEnabled == false
             and capability.TransactionalRollback
             and capability.RequiresDispatchAuditReady
+            and capability.ParticipantRemovalSupported
             and not capability.ClientAuthority,
         "coordinator starts disabled with server-only rollback authority"
     )
@@ -280,6 +286,58 @@ local function main()
             and snapshot.DispatchGate
             and snapshot.ActivePlayerCount == 2,
         "cutover snapshot exposes complete active transaction state"
+    )
+
+    local removed_a, remove_a_reason =
+        cutover:remove_player(player_a)
+    local after_first_remove = cutover:snapshot()
+    check(
+        removed_a
+            and remove_a_reason == nil
+            and active_players[player_a] == nil
+            and active_players[player_b] == true
+            and after_first_remove.Enabled
+            and after_first_remove.ActivePlayerCount == 1
+            and dispatch_gate,
+        "removing one participant keeps remaining source mode active"
+    )
+
+    local removed_b, remove_b_reason =
+        cutover:remove_player(player_b)
+    local after_last_remove = cutover:snapshot()
+    check(
+        removed_b
+            and remove_b_reason == nil
+            and not after_last_remove.Enabled
+            and after_last_remove.ActivePlayerCount == 0
+            and not resource_gate
+            and not combat_gate
+            and not executor_gate
+            and not dispatch_gate,
+        "removing the last participant disables every global source gate"
+    )
+
+    local repeated, repeated_reason =
+        cutover:remove_player(player_b)
+    check(
+        not repeated
+            and repeated_reason == "C4CutoverPlayerNotActive",
+        "repeated participant removal is rejected without mutation"
+    )
+
+    reset_fixture()
+    cutover = coordinator()
+    local final_player = {UserId = 6}
+    local final_enabled = cutover:enable(
+        {final_player},
+        45,
+        function(): boolean
+            return false
+        end
+    )
+    check(
+        final_enabled and cutover:is_enabled(),
+        "coordinator can activate again after participant-cleanup coverage"
     )
 
     cutover:disable()
