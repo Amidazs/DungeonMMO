@@ -15,21 +15,6 @@ local state_by_owner: {[any]: any} = setmetatable(
 )
 
 --[[
-Checks whether an owner has the minimum server identity needed by the runtime.
-
-Args:
-    owner (any): Player or disposable server-owned test owner.
-
-Returns:
-    boolean: True when UserId and Character are server-observable.
-]]
-local function valid_owner(owner: any): boolean
-    return type(owner) == "table"
-        or typeof(owner) == "Instance"
-        and false
-end
-
---[[
 Checks the concrete owner fields without trusting client resource values.
 
 Args:
