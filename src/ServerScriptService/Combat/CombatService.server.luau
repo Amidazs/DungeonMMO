@@ -181,7 +181,7 @@ local function record_applied_damage(
     applied_damage: number,
     lethal_hit: boolean
 )
-    DungeonContributionBridge.record_damage(
+    local contribution = DungeonContributionBridge.record_damage(
         context,
         applied_damage,
         lethal_hit
@@ -201,16 +201,37 @@ local function record_applied_damage(
         )
     end
 
+    local threat_total = nil
     if context.attacker
         and context.target
         and context.target:IsA("Model")
         and applied_damage > 0
     then
-        ThreatService.record_damage(
+        threat_total = ThreatService.record_damage(
             context.target,
             context.attacker,
             applied_damage
         )
+    end
+
+    if RunService:IsStudio()
+        and context.target
+        and context.target:IsA("Model")
+        and context.target:GetAttribute("C4RehearsalTarget") == true
+    then
+        print((
+            "[C4 Combat Rehearsal Observer] target=%s damage=%.3f "
+                .. "contribution=%s threat=%s lethal=%s"
+        ):format(
+            context.target.Name,
+            applied_damage,
+            tostring(
+                type(contribution) == "table"
+                    and contribution.ok == true
+            ),
+            tostring(threat_total),
+            tostring(lethal_hit == true)
+        ))
     end
 end
 
