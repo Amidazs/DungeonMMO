@@ -17,6 +17,7 @@ local FIXTURES = table.freeze({
     "C4SourceCastResourceServiceTest",
     "C4SourceCastTimingServiceTest",
     "C4SourceCastSchedulerServiceTest",
+    "C4SourceDirectMagicCastServiceTest",
     "C4SourceCombatCalculationServiceTest",
 })
 
@@ -57,7 +58,7 @@ local function run_test(test_name: string): boolean
 end
 
 --[[
-Runs the Human Wizard passive, timing, resource and MDAM regressions.
+Runs the Human Wizard passive, cast, scheduler and direct-MDAM regressions.
 
 Args:
     None.
