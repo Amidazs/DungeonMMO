@@ -1,3 +1,15 @@
+**v2.57 GitHub-only, STUDIO PENDING:** [current roadmap](
+DungeonMMO_Roadmap_v2_57_C4_Creative_Item_Source_Map_20260925.md)
+and [pending test scope](
+../testing/c4-creative-item-source-map-v2-57-20260925.md).
+Nine current creative equipment items now have explicit reviewed links to the
+nine pinned C4 source items. Full Weapon/Body/OffHand conversion fails closed
+if any equipped item is unreviewed, so current custom modifiers cannot leak
+into source stat math. The inventory blocker is narrowed, not closed; polearm,
+D-grade/expert gear and other current equipment still require real source
+references. New tests are authored but not executed. No Remote Desktop
+Commander edits, main merge, publish or production saves.
+
 **v2.56 GitHub-only, STUDIO PENDING:** [current roadmap](
 DungeonMMO_Roadmap_v2_56_C4_Resource_Migration_Boundary_20260925.md)
 and [pending test scope](
