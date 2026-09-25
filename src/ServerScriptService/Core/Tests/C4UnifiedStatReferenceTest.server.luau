@@ -27,7 +27,7 @@ Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all nine paths.
+    nil: Confirms exact archived HP, MP and CP across all ten paths.
 ]]
 local function check_ten_class_vitals()
     local vectors = {
@@ -192,7 +192,7 @@ local function main()
     check_equipment_and_class_gates()
     check_human_wizard_reuse()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "nine_paths=9 live=false"):format(checks))
+        .. "paths=10 live=false"):format(checks))
 end
 
 main()
