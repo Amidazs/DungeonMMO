@@ -1,3 +1,16 @@
+## 25 September 2026 — v2.84 C4 damage-family audit GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_84_C4_Damage_Family_Audit_20260925.md);
+[green evidence](../testing/c4-damage-family-audit-v2-84-20260925.md).
+Current player-to-NPC DamageService families are audited. Source-ready:
+Melee, RangedPhysical, Skill and MagicSkill. Activation blockers: MagicBasic,
+RangerArea, StatusPhysical and StatusMagic. Periodic bleed/poison ticks now use
+explicit status kinds and cannot be routed as fresh PDAM/MDAM. The production
+dispatch gate itself refuses enable while blockers remain. Fresh focused
+Studio Base 20/20 and Dungeon 23/23 passed; family audit 24 and dispatch 17
+assertions passed. Next migrate exact source Bleed/Poison periodic execution.
+Permanent edits remain GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.81 C4 NPC source boundary GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_81_C4_NPC_Source_Boundary_20260925.md);
