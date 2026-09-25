@@ -1,11 +1,11 @@
 --!strict
 -- Server-owned source cast contract for authenticated creative active skills.
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
-local Shared = ReplicatedStorage.Core.Shared
-local Effects = require(Shared.C4SkillEffectSource)
+local Effects = require(
+    game:GetService("ReplicatedStorage").Core.Shared.C4SkillEffectSource
+)
 local Runtime = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
@@ -20,7 +20,7 @@ Args:
     field_name (string): Stable source key used in denial reasons.
 
 Returns:
-    (number?, string?): Valid finite value or a strict invalid-field reason.
+    (number?, string?): Valid finite value or an invalid-field reason.
 ]]
 local function optional_nonnegative(
     value: any,
@@ -49,7 +49,7 @@ Args:
     field_name (string): Required source field key.
 
 Returns:
-    (number?, string?): Valid finite value or strict missing/invalid reason.
+    (number?, string?): Valid value or a strict missing/invalid reason.
 ]]
 local function required_nonnegative(
     sets: any,
@@ -67,6 +67,100 @@ local function required_nonnegative(
     end
 
     return value, nil
+end
+
+--[[
+Resolves the server-owned creative rank to its exact active source effect.
+
+Args:
+    user_id (number): Authenticated runtime character owner.
+    creative_skill_id (string): Server-selected creative skill identifier.
+
+Returns:
+    (any?, any?, number?, string?): Source link, effect, creative rank, reason.
+]]
+local function resolve_source_effect(
+    user_id: number,
+    creative_skill_id: string
+): (any?, any?, number?, string?)
+    local creative_rank = Runtime.get_skill_rank(
+        user_id,
+        creative_skill_id
+    )
+    if creative_rank <= 0 then
+        return nil, nil, nil, "CreativeCastSkillRankNotOwned"
+    end
+
+    local source, source_reason =
+        Runtime.resolve_c4_active_source_effect(
+            user_id,
+            creative_skill_id,
+            creative_rank
+        )
+    if not source then
+        return nil, nil, nil, source_reason
+    end
+
+    local effect = Effects.get_rank(source.SkillId, source.Rank)
+    if not effect or type(effect.Sets) ~= "table" then
+        return nil, nil, nil, "OriginalCastEffectUnavailable"
+    end
+
+    return source, effect, creative_rank, nil
+end
+
+--[[
+Extracts validated source MP, timing and range values from one source effect.
+
+Args:
+    sets (any): Exact source effect Set table.
+
+Returns:
+    (any?, string?): Validated detached source fields or denial reason.
+]]
+local function source_fields(sets: any): (any?, string?)
+    local required = {}
+    for _, field_name in ipairs({
+        "mpInitialConsume",
+        "mpConsume",
+        "hitTime",
+        "reuseDelay",
+    }) do
+        local value, reason = required_nonnegative(
+            sets,
+            field_name
+        )
+        if value == nil then
+            return nil, reason
+        end
+        required[field_name] = value
+    end
+
+    local optional = {}
+    for _, field_name in ipairs({
+        "coolTime",
+        "castRange",
+        "effectRange",
+    }) do
+        local value, reason = optional_nonnegative(
+            sets[field_name],
+            field_name
+        )
+        if reason then
+            return nil, reason
+        end
+        optional[field_name] = value
+    end
+
+    return {
+        InitialMp = required.mpInitialConsume,
+        OngoingMp = required.mpConsume,
+        HitTimeMs = required.hitTime,
+        ReuseDelayMs = required.reuseDelay,
+        CoolTimeMs = optional.coolTime,
+        CastRange = optional.castRange,
+        EffectRange = optional.effectRange,
+    }, nil
 end
 
 --[[
@@ -95,30 +189,10 @@ function C4SourceCastContractService.resolve(
         return nil, "InvalidOriginalCastRequest"
     end
 
-    local creative_rank = Runtime.get_skill_rank(
-        user_id,
-        creative_skill_id
-    )
-    if creative_rank <= 0 then
-        return nil, "CreativeCastSkillRankNotOwned"
-    end
-
-    local source, source_reason =
-        Runtime.resolve_c4_active_source_effect(
-            user_id,
-            creative_skill_id,
-            creative_rank
-        )
-    if not source then
+    local source, effect, creative_rank, source_reason =
+        resolve_source_effect(user_id, creative_skill_id)
+    if not source or not effect or not creative_rank then
         return nil, source_reason
-    end
-
-    local effect = Effects.get_rank(
-        source.SkillId,
-        source.Rank
-    )
-    if not effect or type(effect.Sets) ~= "table" then
-        return nil, "OriginalCastEffectUnavailable"
     end
 
     local sets = effect.Sets
@@ -128,46 +202,9 @@ function C4SourceCastContractService.resolve(
         return nil, "UnsupportedOriginalCastOperateType"
     end
 
-    local mp_initial, initial_reason =
-        required_nonnegative(sets, "mpInitialConsume")
-    if mp_initial == nil then
-        return nil, initial_reason
-    end
-
-    local mp_consume, consume_reason =
-        required_nonnegative(sets, "mpConsume")
-    if mp_consume == nil then
-        return nil, consume_reason
-    end
-
-    local hit_time, hit_reason =
-        required_nonnegative(sets, "hitTime")
-    if hit_time == nil then
-        return nil, hit_reason
-    end
-
-    local reuse_delay, reuse_reason =
-        required_nonnegative(sets, "reuseDelay")
-    if reuse_delay == nil then
-        return nil, reuse_reason
-    end
-
-    local cool_time, cool_reason =
-        optional_nonnegative(sets.coolTime, "coolTime")
-    if cool_reason then
-        return nil, cool_reason
-    end
-
-    local cast_range, cast_reason =
-        optional_nonnegative(sets.castRange, "castRange")
-    if cast_reason then
-        return nil, cast_reason
-    end
-
-    local effect_range, effect_range_reason =
-        optional_nonnegative(sets.effectRange, "effectRange")
-    if effect_range_reason then
-        return nil, effect_range_reason
+    local fields, fields_reason = source_fields(sets)
+    if not fields then
+        return nil, fields_reason
     end
 
     return table.freeze({
@@ -180,14 +217,14 @@ function C4SourceCastContractService.resolve(
         SourceSkillType = sets.skillType,
         SourceTarget = sets.target,
         SourceIsMagic = sets.isMagic == true,
-        SourceMpInitialConsume = mp_initial,
-        SourceMpConsume = mp_consume,
-        SourceMpTotal = mp_initial + mp_consume,
-        SourceHitTimeMs = hit_time,
-        SourceCoolTimeMs = cool_time,
-        SourceReuseDelayMs = reuse_delay,
-        SourceCastRange = cast_range,
-        SourceEffectRange = effect_range,
+        SourceMpInitialConsume = fields.InitialMp,
+        SourceMpConsume = fields.OngoingMp,
+        SourceMpTotal = fields.InitialMp + fields.OngoingMp,
+        SourceHitTimeMs = fields.HitTimeMs,
+        SourceCoolTimeMs = fields.CoolTimeMs,
+        SourceReuseDelayMs = fields.ReuseDelayMs,
+        SourceCastRange = fields.CastRange,
+        SourceEffectRange = fields.EffectRange,
         SourceOnly = true,
         LiveResourceSpendIntegrated = false,
         LiveTimingIntegrated = false,
