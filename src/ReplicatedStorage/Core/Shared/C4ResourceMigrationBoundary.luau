@@ -12,11 +12,13 @@ local C4PrimaryStatReference = require(
 local C4CreativeItemSourceMap = require(
     Shared:WaitForChild("C4CreativeItemSourceMap")
 )
+local C4EquipmentExpertiseRules = require(
+    Shared:WaitForChild("C4EquipmentExpertiseRules")
+)
 
 local C4ResourceMigrationBoundary = {}
 
 local ACTIVATION_BLOCKERS = table.freeze({
-    "OriginalInventoryMappingIncomplete",
     "OriginalOwnedPassiveMappingIncomplete",
     "ActiveEffectOrderingIncomplete",
     "LiveCPRuntimeUnavailable",
@@ -82,6 +84,19 @@ function C4ResourceMigrationBoundary.for_character(
         C4CreativeItemSourceMap.resolve_loadout(
             character.Equipment or {}
         )
+    local equipment_expertise = nil
+    local equipment_reason = loadout_reason
+
+    if reviewed_loadout then
+        equipment_expertise, equipment_reason =
+            C4EquipmentExpertiseRules.validate(
+                character.Level,
+                reviewed_loadout.SourceItemIds
+            )
+    end
+
+    local inventory_ready = reviewed_loadout ~= nil
+        and equipment_expertise ~= nil
 
     return {
         RaceId = identity.RaceId,
@@ -93,15 +108,18 @@ function C4ResourceMigrationBoundary.for_character(
         SourceBaseMaxMana = vitals.MaxMP,
         SourceBaseMaxCP = vitals.MaxCP,
         ExactBaseVitalsCertified = true,
-        ReviewedCoreLoadoutReady = reviewed_loadout ~= nil,
-        ReviewedCoreLoadoutReason = loadout_reason,
+        ReviewedSixSlotLoadoutReady = reviewed_loadout ~= nil,
+        ReviewedSixSlotLoadoutReason = loadout_reason,
         ReviewedSourceItemIds = if reviewed_loadout
             then reviewed_loadout.SourceItemIds
             else nil,
         ReviewedSourceKinds = if reviewed_loadout
             then reviewed_loadout.SourceKinds
             else nil,
-        OriginalInventoryIntegrated = false,
+        OriginalEquipmentExpertiseReady =
+            equipment_expertise ~= nil,
+        OriginalEquipmentExpertiseReason = equipment_reason,
+        OriginalInventoryIntegrated = inventory_ready,
         OriginalOwnedPassivesIntegrated = false,
         ActiveEffectsIntegrated = false,
         LiveHealthIntegrated = false,
