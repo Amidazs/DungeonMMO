@@ -591,6 +591,51 @@ function C4CombatFormulaReference.resolve_physical_critical(
 end
 
 --[[
+Resolves one exact C4 PDAM skill critical roll.
+
+SkillPdam does not use the normal physical critical stat/cap. It multiplies
+the skill's authored baseCritRate by 10 and by the attacker's STR bonus, then
+passes that raw rate directly to calcCrit. A successful skill critical doubles
+the final PDAM result after calcPhysDam.
+
+Args:
+    base_critical_rate (number): Authored source skill baseCritRate.
+    str_bonus (number): Authenticated source STR bonus.
+    roll (number): Server-owned integer roll from 0 through 999.
+
+Returns:
+    any: Exact source skill-critical chance and result evidence.
+]]
+function C4CombatFormulaReference.resolve_physical_skill_critical(
+    base_critical_rate: number,
+    str_bonus: number,
+    roll: number
+): any
+    assert(
+        type(base_critical_rate) == "number"
+            and base_critical_rate == base_critical_rate
+            and base_critical_rate >= 0
+            and base_critical_rate < math.huge,
+        "Skill base critical rate must be finite and nonnegative"
+    )
+    positive(str_bonus, "STR bonus")
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 999,
+        "Skill critical roll must be an integer from 0 through 999"
+    )
+
+    local chance = base_critical_rate * 10 * str_bonus
+    return {
+        ChancePerThousand = chance,
+        Roll = roll,
+        Critical = chance > roll,
+    }
+end
+
+--[[
 Returns the C4 pre-random magic success threshold.
 
 The source computes round(pow(1.3, levelDifference) * 100), where
