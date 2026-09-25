@@ -24,6 +24,20 @@ local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
 local checks = 0
 
+local FRONT_CONTEXT = {
+    AttackerPosition = Vector3.new(0, 0, -10),
+    DefenderCFrame = CFrame.new(0, 0, 0),
+    HeightDeltaSourceUnits = 0,
+    IsNight = false,
+}
+
+local BACK_CONTEXT = {
+    AttackerPosition = Vector3.new(0, 0, 10),
+    DefenderCFrame = CFrame.new(0, 0, 0),
+    HeightDeltaSourceUnits = 0,
+    IsNight = false,
+}
+
 local shot_state = {
     Soulshot = false,
     Spiritshot = false,
@@ -306,7 +320,8 @@ local function check_default_off()
             and capability.DefaultEnabled == false
             and capability.NormalAttackHitResolution
             and capability.NormalAttackHitRollServerOwned
-            and not capability.NormalAttackHitConditionIntegrated
+            and capability.NormalAttackHitConditionIntegrated
+            and capability.SpatialConditionInputServerOwned
             and capability.NormalAttackPhysicalCriticalResolution
             and capability.NormalAttackPhysicalCriticalRollServerOwned
             and capability.NormalAttackCriticalPowerIntegrated
@@ -316,7 +331,8 @@ local function check_default_off()
             and capability.ShieldSourceResolutionAvailable
             and capability.ShieldRollServerOwned
             and capability.ShieldPhysicalFormulaIntegrated
-            and not capability.ShieldFacingRuntimeIntegrated
+            and capability.ShieldFacingRuntimeIntegrated
+            and capability.ShieldResolutionIntegrated
             and capability.NormalAttackDamageComposition
             and capability.WeaponVulnerabilityIntegrated
             and capability.PvpFormulaModifiersIntegrated
@@ -376,7 +392,8 @@ local function check_normal_attack_hit()
 
     local result = assert(Combat.normal_attack_hit(
         FIGHTER_ID,
-        TARGET_ID
+        TARGET_ID,
+        FRONT_CONTEXT
     ))
     local expected_chance =
         Formula.hit_chance_with_condition(
@@ -398,7 +415,10 @@ local function check_normal_attack_hit()
                 == (result.ChancePerThousand >= result.Roll)
             and result.Miss ~= result.Hit
             and result.SourceConditionMultiplier == 1
-            and not result.SourceConditionIntegrated
+            and result.SourceConditionIntegrated
+            and result.SourcePositionRelation == "Front"
+            and result.SourceElevationRelation == "Level"
+            and not result.SourceNight
             and not result.LiveApplied,
         "normal attack roll is server-owned and source comparison is exact"
     )
@@ -516,7 +536,8 @@ local function check_normal_attack_composition()
     for _ = 1, 100 do
         result = assert(Combat.normal_attack(
             BOW_ATTACKER_ID,
-            TARGET_ID
+            TARGET_ID,
+            FRONT_CONTEXT
         ))
 
         if result.Hit then
@@ -596,7 +617,7 @@ local function check_shield_resolution()
     local wrong_facing = assert(Combat.shield_resolution(
         FIGHTER_ID,
         SHIELD_TARGET_ID,
-        false
+        BACK_CONTEXT
     ))
     check(
         wrong_facing.ShieldEquipped
@@ -611,7 +632,7 @@ local function check_shield_resolution()
     local facing = assert(Combat.shield_resolution(
         FIGHTER_ID,
         SHIELD_TARGET_ID,
-        true
+        FRONT_CONTEXT
     ))
     check(
         facing.Blocked
@@ -635,7 +656,7 @@ local function check_shield_resolution()
     )
     check(
         missing == nil
-            and missing_reason == "ShieldFacingEligibilityRequired",
+            and missing_reason == "SourceSpatialContextRequired",
         "shielded PDAM refuses to invent facing state"
     )
 
@@ -644,7 +665,7 @@ local function check_shield_resolution()
         SHIELD_TARGET_ID,
         "IronCleave",
         1,
-        true
+        FRONT_CONTEXT
     ))
     local attacker = assert(
         Runtime.get_c4_resource_migration_boundary(FIGHTER_ID)
