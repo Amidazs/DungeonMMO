@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.94 Human Wizard foundation GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_94_Human_Wizard_Foundation_20260925.md);
+[evidence](
+../testing/c4-human-wizard-foundation-v2-94-20260925.md).
+The Human Wizard branch is now partially playable in backend terms under the
+creative **Emberweaver** identity: authenticated branch selection, ordered
+level-18 quest transactions, bound proof items, level-20 mentor receipt,
+saved Mage-family class identity and class-bound trainer are all implemented.
+The generalized transfer-skill gate now requires the real mentor receipt for
+Mage as well as Fighter paths. **74/93** launch-cap Wizard source rows are
+mapped to 24 non-servitor training families; **19/93** companion-dependent
+rows remain intentionally unmapped. Fresh Base/Dungeon builds PASS; Wizard
+foundation **166 assertions**, quest/transfer **22**, level-30 audit **37**,
+focused runner **3/3** all PASS. Next backend work is exact Human Wizard
+source/effect integration followed by server-owned companions. No main merge,
+publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.93 Human Wizard source audit GREEN
 
 [Roadmap](
