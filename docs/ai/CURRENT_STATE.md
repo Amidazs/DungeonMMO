@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.66 pre-cutover source parity GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_66_C4_Resource_Regen_Armor_Sets_20260925.md)
+and [green evidence](
+../testing/c4-resource-regen-armor-sets-v2-66-20260925.md).
+Unified C4 candidates now include exact ordinary REG_HP/MP/CP calculator stats,
+so owned regen passives and active effects execute in source order. The
+creative six-slot inventory also reproduces C4 Chest+Legs internally: all
+eight current Body items map to matching source sets, exact armor conditions
+require the matching set, and FuncPDefMod includes Legs. Fresh Base **12/12
+PASS** and Dungeon **13/13 PASS** at b610d05c. Clean source prerequisites are
+still zero-blocker and CutoverPrerequisitesReady=true, while CanApplyLive and
+all live HP/MP/CP flags remain false. Next build the reversible,
+disabled-by-default resource cutover service, source three-second regen, PvP CP
+routing, respawn handling and rollback. Permanent code/docs stay GitHub-only;
+no main merge, publish, production save mutation or animation changes.
+
 ## 25 September 2026 — CURRENT v2.65 C4 resource prerequisites GREEN
 
 [Latest roadmap](
