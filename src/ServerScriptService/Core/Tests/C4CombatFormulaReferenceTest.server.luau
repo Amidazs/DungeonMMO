@@ -122,6 +122,37 @@ local function main()
         "Source hit chance upper cap is 98 percent")
     check(Formula.hit_chance_per_thousand(30, 60) == 275,
         "Source hit chance lower cap is 27.5 percent")
+    check_close(
+        Formula.hit_chance_with_condition(60, 60, 1.05),
+        950.25,
+        "Source side-style condition multiplier applies before final cap"
+    )
+    check(
+        Formula.hit_chance_with_condition(60, 60, 1.10) == 980,
+        "Source condition bonus still obeys 98 percent final cap"
+    )
+
+    local equal_roll = Formula.resolve_normal_attack_hit(
+        60,
+        60,
+        1,
+        905
+    )
+    check(
+        equal_roll.Hit and not equal_roll.Miss,
+        "Source roll equal to hit chance still lands"
+    )
+
+    local miss_roll = Formula.resolve_normal_attack_hit(
+        60,
+        60,
+        1,
+        906
+    )
+    check(
+        miss_roll.Miss and not miss_roll.Hit,
+        "Source roll above hit chance misses"
+    )
 
     check(Formula.magic_resist_threshold(30, 30) == 100,
         "Equal magic/target level source resistance threshold")
