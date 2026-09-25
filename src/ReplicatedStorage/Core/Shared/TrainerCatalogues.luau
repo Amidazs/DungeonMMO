@@ -18,6 +18,111 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    EmberweaverTrainer = table.freeze({
+        Id = "EmberweaverTrainer",
+        DisplayName = "Emberweaver Training",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedClasses = table.freeze({"Emberweaver"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "EmberweaverEquipmentExpertise",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverCommonItemCreation",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverFocusTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverManaChanneling",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverQuickWeave",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverFrostLance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverLifeSiphon",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverEmberBolt",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverFlameBurst",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverWitheringHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverFocusedBolt",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverEmberField",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverVenomHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverSlumberHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverScorchMark",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverVenomCloud",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverBloodToMana",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverCorpseSiphon",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     -- The physical Knight trainer requires an authentic personal quest
     -- and first-transfer mentor; server checks proximity and ownership.
     OathguardTrainer = table.freeze({
