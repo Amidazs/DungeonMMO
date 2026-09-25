@@ -106,6 +106,10 @@ local fixtures = {
         Parent = core_tests,
         Name = "C4CombatCutoverRegistryTest",
     },
+    {
+        Parent = core_tests,
+        Name = "C4CombatCutoverStudioBridgeTest",
+    },
 }
 
 if combat_tests then
