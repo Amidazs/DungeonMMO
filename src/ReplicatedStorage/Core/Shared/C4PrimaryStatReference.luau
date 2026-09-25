@@ -73,6 +73,22 @@ local TEMPLATES = table.freeze({
         CpBase = 50.5, CpAdd = 7.84, CpMod = 0.22,
         ConBonus = 0.98, MenBonus = 1.48,
     }),
+    HumanWizard = table.freeze({
+        SourceClassId = 11,
+        SourceClassName = "WIZARD",
+        ClassBaseLevel = 20,
+        STR = 22, DEX = 21, CON = 27,
+        INT = 41, WIT = 20, MEN = 39,
+        BasePAtk = 3, BasePDef = 54, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 28, BaseCritRate = 40,
+        BaseAccuracy = 28, BaseRunSpd = 120,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 424, HpAdd = 27.60, HpMod = 0.37,
+        MpBase = 192, MpAdd = 13.30, MpMod = 0.14,
+        CpBase = 212, CpAdd = 13.85, CpMod = 0.22,
+        ConBonus = 0.98, MenBonus = 1.48,
+    }),
     ElvenFighter = table.freeze({
         SourceClassId = 18,
         SourceClassName = "ELF_FIGHTER",
@@ -202,6 +218,7 @@ local FIRST_TRANSFERS = table.freeze({
     Ironvow = "HumanWarrior",
     Oathguard = "HumanKnight",
     Ashenblade = "HumanRogue",
+    Emberweaver = "HumanWizard",
     GreenwardWarden = "ElvenKnight",
     GreenwardScout = "ElvenScout",
 })
@@ -417,7 +434,7 @@ Args:
     None.
 
 Returns:
-    any: All nine current original paths and migration status.
+    any: All currently sourced original paths and migration status.
 ]]
 function C4PrimaryStatReference.coverage(): any
     local paths = {
@@ -442,8 +459,8 @@ function C4PrimaryStatReference.coverage(): any
     end
     return {
         PathCount = #result,
-        VerifiedPrimaryStatTemplates = 9,
-        VerifiedLevelGrowthTemplates = 9,
+        VerifiedPrimaryStatTemplates = #result,
+        VerifiedLevelGrowthTemplates = #result,
         VerifiedLevelCap = 30,
         SourceCommit = SOURCE_COMMIT,
         SourceUrls = SOURCE_URLS,
