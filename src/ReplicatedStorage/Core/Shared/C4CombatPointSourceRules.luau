@@ -3,11 +3,8 @@
 
 local Shared = script.Parent
 
-local C4DerivedStatReference = require(
-    Shared:WaitForChild("C4DerivedStatReference")
-)
-local C4PrimaryStatReference = require(
-    Shared:WaitForChild("C4PrimaryStatReference")
+local C4ResourceRegenSourceRules = require(
+    Shared:WaitForChild("C4ResourceRegenSourceRules")
 )
 
 local C4CombatPointSourceRules = {}
@@ -39,59 +36,34 @@ function C4CombatPointSourceRules.regen_per_tick(
     level: number,
     movement_state: string
 ): (number?, string?)
-    local reference = C4PrimaryStatReference.get(
-        race_id,
-        class_id
-    )
-    local template = reference and reference.Template
-
-    if not template then
-        return nil, "OriginalClassNotVerified"
-    end
-
-    local vitals, vital_reason =
-        C4PrimaryStatReference.get_level_vitals(
+    local base_stats, base_reason =
+        C4ResourceRegenSourceRules.base_calculator_stats(
             race_id,
             class_id,
             level
         )
 
-    if not vitals then
-        return nil, vital_reason
+    if not base_stats then
+        if base_reason == "OriginalClassNotVerified" then
+            return nil, base_reason
+        end
+        return nil, base_reason
     end
 
-    local level_modifier =
-        C4DerivedStatReference.level_modifier(level)
+    local tick, tick_reason =
+        C4ResourceRegenSourceRules.apply_movement(
+            base_stats,
+            movement_state
+        )
 
-    if not level_modifier then
-        return nil, "UnreviewedClassOrLevel"
+    if not tick then
+        if tick_reason == "InvalidOriginalResourceMovementState" then
+            return nil, "InvalidOriginalCPMovementState"
+        end
+        return nil, tick_reason
     end
 
-    local movement_multiplier = nil
-
-    if movement_state == "Sitting" then
-        movement_multiplier = 1.5
-    elseif movement_state == "Standing" then
-        movement_multiplier = 1.1
-    elseif movement_state == "Walking" then
-        movement_multiplier = 1
-    elseif movement_state == "Running" then
-        movement_multiplier = 0.7
-    else
-        return nil, "InvalidOriginalCPMovementState"
-    end
-
-    local level_add = if level > 10
-        then math.floor((level - 1) / 10)
-        else 0.5
-    local base_regen = template.BaseHpRegen + level_add
-
-    base_regen *= level_modifier * template.ConBonus
-    base_regen = math.max(1, base_regen)
-
-    return base_regen
-        * CP_REGEN_MULTIPLIER
-        * movement_multiplier, nil
+    return tick.CP * CP_REGEN_MULTIPLIER, nil
 end
 
 --[[
@@ -159,6 +131,8 @@ function C4CombatPointSourceRules.metadata(): any
         PlayableAttackerOnly = true,
         NpcDamageBypassesCP = true,
         SourceCommit = SOURCE_COMMIT,
+        MovementMultipliers =
+            C4ResourceRegenSourceRules.metadata().MovementMultipliers,
         SourceOnly = true,
     }
 end
