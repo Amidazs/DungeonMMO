@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.78 spatial combat inputs GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_78_C4_Spatial_Combat_20260925.md)
+and [green evidence](
+../testing/c4-spatial-combat-v2-78-20260925.md).
+Reviewed C4 front/side/back, elevation and night hit-condition semantics plus
+120-degree shield facing are now server-spatial inputs. Ordinary hit resolution
+consumes the exact source condition multiplier and shielded PDAM no longer
+accepts a raw facing boolean. Height is supplied explicitly in source
+coordinate units so no Roblox-stud conversion is invented. Fresh Studio Base
+**16/16 PASS**, Dungeon **18/18 PASS**, spatial reference **11 assertions
+PASS**, formula **51 assertions PASS**, source combat **30 assertions PASS**.
+Next: separately gated live source-combat executor. No main merge, publish,
+production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.77 PDAM skill criticals GREEN
 
 [Latest roadmap](
