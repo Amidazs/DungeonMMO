@@ -54,7 +54,7 @@ local CLASSES = table.freeze({
                 HeavyArmorMastery = 3, MagicResistance = 3,
                 LifeDrain = 3, ShieldControl = 3,
                 TargetTaunt = 3, SelfRecovery = 3,
-                ShieldMastery = 1, BowDefense = 1,
+                ShieldMastery = 1,
             }),
         }),
     }),
