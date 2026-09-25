@@ -1,3 +1,15 @@
+**v2.62 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_62_C4_Authoritative_Active_Source_State_20260925.md)
+and [test evidence](
+../testing/c4-authoritative-active-source-state-v2-62-20260925.md).
+A server-only active C4 source-effect registry now records the four existing
+live toggle executors only after genuine server activation, independently
+re-resolves creative rank -> source rank, and clears on deactivation, upkeep
+failure, respawn and player removal. Learned skills and forged attributes do
+not count as active. Fresh Base **9/9 PASS**, Dungeon **10/10 PASS** at
+`d379e966`. Timed buffs remain to be bridged, so the active-effect blocker
+stays in place; CP remains after that. No publish/main merge/production saves.
+
 **v2.61 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_61_C4_Active_Effect_Calculator_Ordering_20260925.md)
 and [test evidence](
