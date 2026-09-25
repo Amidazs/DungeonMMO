@@ -61,6 +61,16 @@ local function check_reviewed_links()
         warded_leatherbound_gloves = 61,
         marauder_boots = 38,
     }
+    local expected_legs = {
+        scout_leather_vest = 29,
+        ironroot_light_vest = 29,
+        marauder_armor = 32,
+        stonewatch_d_grade_armor = 2378,
+        greenward_d_grade_armor = 2378,
+        ironroot_d_grade_armor = 2378,
+        scout_expert_leather_vest = 417,
+        apprentice_mystic_robe = 461,
+    }
 
     local rows = ItemMap.all()
     check(#rows == 27, "all twenty-seven creative equipment items are reviewed")
@@ -78,6 +88,18 @@ local function check_reviewed_links()
                 and link.CurrentCombatModifiersIgnored
                 and not link.LiveIntegrated,
             creative_item_id .. " keeps source stats separate from custom stats"
+        )
+    end
+
+    for creative_item_id, source_legs_item_id in pairs(
+        expected_legs
+    ) do
+        local link = assert(ItemMap.resolve(creative_item_id))
+        check(
+            link.SourceLegsItemId == source_legs_item_id
+                and link.CompleteSourceArmorSet,
+            creative_item_id
+                .. " resolves its reviewed C4 chest+legs source set"
         )
     end
 end
@@ -110,9 +132,11 @@ local function check_loadout_boundary()
             and loadout.SourceItemIds.OffHand == 102
             and loadout.SourceItemIds.Head == 43
             and loadout.SourceItemIds.Body == 25
+            and loadout.SourceItemIds.Legs == 32
             and loadout.SourceItemIds.Gloves == 49
             and loadout.SourceItemIds.Feet == 38
             and loadout.CompleteReviewedLoadout
+            and loadout.OriginalBodyLegSemanticsIntegrated
             and not loadout.LiveIntegrated,
         "reviewed loadout resolves exact source item IDs"
     )
@@ -133,7 +157,8 @@ local function check_loadout_boundary()
     check(
         d_grade ~= nil
             and d_grade_reason == nil
-            and d_grade.SourceItemIds.Body == 352,
+            and d_grade.SourceItemIds.Body == 352
+            and d_grade.SourceItemIds.Legs == 2378,
         "current D-grade heavy body resolves to Brigandine source stats"
     )
 
@@ -151,7 +176,8 @@ local function check_loadout_boundary()
     check(
         empty ~= nil
             and empty_reason == nil
-            and empty.CompleteReviewedLoadout,
+            and empty.CompleteReviewedLoadout
+            and empty.OriginalBodyLegSemanticsIntegrated,
         "empty equipment remains a valid naked source loadout"
     )
 end
@@ -171,7 +197,7 @@ local function main()
 
     print((
         "[C4 Creative Item Map] SOURCE_ONLY_PASS: %d assertions "
-        .. "reviewed_items=27 six_slots=complete live=false"
+        .. "reviewed_items=27 body_sets=8 source_legs=true live=false"
     ):format(checks))
 end
 
