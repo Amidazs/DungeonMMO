@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.85 MagicBasic source-normal routing GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_85_C4_Magic_Basic_Normal_Routing_20260925.md)
+and [green evidence](
+../testing/c4-magic-basic-normal-routing-v2-85-20260925.md).
+The original Spirit Orb delivery remains creative, but its disabled source-mode
+damage now uses the accepted C4 ordinary attack route instead of inventing a
+separate magic-basic formula. The activation audit is reduced from four to
+three blockers: RangerArea, StatusPhysical and StatusMagic. Production dispatch
+still refuses enable. Fresh Studio Base **20/20 PASS**, Dungeon **23/23 PASS**,
+family audit **24 assertions PASS** and dispatch **17 assertions PASS**. Next:
+exact C4 Bleed/Poison DEBUFF application plus periodic execution. No main
+merge, publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.84 C4 damage-family audit GREEN
 
 [Latest roadmap](
