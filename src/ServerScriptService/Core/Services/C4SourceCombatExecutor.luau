@@ -933,6 +933,33 @@ function C4SourceCombatExecutor:physical_skill_npc(
 end
 
 --[[
+Checks whether one player-to-NPC source magic launch is currently legal.
+
+This is a read-only preflight used by the private cast scheduler handoff. It
+does not calculate damage, consume a shot or mutate HP.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (any): Current reviewed server NPC Model.
+
+Returns:
+    (boolean, string?): Ready state or strict live/source denial reason.
+]]
+function C4SourceCombatExecutor:can_magic_skill_npc(
+    attacker: any,
+    enemy: any
+): (boolean, string?)
+    local boundary, reason =
+        self:_validate_npc_target(attacker, enemy)
+
+    if not boundary then
+        return false, reason
+    end
+
+    return true, nil
+end
+
+--[[
 Executes one live player-to-NPC source MDAM skill.
 
 Args:
@@ -1374,6 +1401,7 @@ function C4SourceCombatExecutor:capability(): any
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
+        NpcMagicSkillReadOnlyPreflight = true,
         NpcPeriodicStatusLiveApplication = true,
         NpcPeriodicStatusNonlethal = true,
         NpcPeriodicStatusRefreshBySourceSkill = true,
