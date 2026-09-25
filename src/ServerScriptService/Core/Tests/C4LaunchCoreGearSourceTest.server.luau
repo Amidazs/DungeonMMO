@@ -101,6 +101,42 @@ local function check_random_damage()
 end
 
 --[[
+Checks exact source shot counts and grades for reviewed launch weapons.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source shot inventory requirements are pinned to weapon data.
+]]
+local function check_shot_requirements()
+    check(
+        assert(SourceItems.get(1)).Grade == "None"
+            and assert(SourceItems.get(1)).SoulShotCount == 1
+            and assert(SourceItems.get(1)).SpiritShotCount == 1
+            and assert(SourceItems.get(4)).SoulShotCount == 1
+            and assert(SourceItems.get(6)).SpiritShotCount == 1
+            and assert(SourceItems.get(10)).SoulShotCount == 1
+            and assert(SourceItems.get(13)).SpiritShotCount == 1,
+        "starter source weapons use one no-grade shot"
+    )
+    check(
+        assert(SourceItems.get(291)).Grade == "D"
+            and assert(SourceItems.get(291)).SoulShotCount == 2
+            and assert(SourceItems.get(291)).SpiritShotCount == 2,
+        "Trident uses two D-grade shots"
+    )
+    check(
+        assert(SourceItems.get(1181)).Grade == "None"
+            and assert(SourceItems.get(1181)).SoulShotCount == 7
+            and assert(SourceItems.get(1181)).SpiritShotCount == 2
+            and assert(SourceItems.get(1182)).SoulShotCount == 2
+            and assert(SourceItems.get(1182)).SpiritShotCount == 2,
+        "Neti source weapons retain exact multi-shot requirements"
+    )
+end
+
+--[[
 Checks the additional original D-grade body source records.
 
 Args:
@@ -171,6 +207,7 @@ Returns:
 local function main()
     check_weapons()
     check_random_damage()
+    check_shot_requirements()
     check_body_armour()
     check_loadout_rules()
 
