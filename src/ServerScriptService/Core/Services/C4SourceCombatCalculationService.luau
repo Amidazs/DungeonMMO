@@ -18,6 +18,8 @@ local Runtime = require(
 
 local C4SourceCombatCalculationService = {}
 
+local HIT_RANDOM = Random.new()
+
 local feature_enabled = false
 
 --[[
@@ -143,6 +145,74 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.is_enabled(): boolean
     return feature_enabled
+end
+
+--[[
+Resolves one source C4 normal-attack hit/miss roll between ready players.
+
+This path intentionally belongs to ordinary physical attacks, not PDAM skills:
+the reviewed C4 SkillPdam handler calculates PDAM directly and does not call
+the normal-attack calcHitMiss path. Accuracy and Evasion come only from the
+authenticated final source stat candidate. The random 0-999 roll is created
+inside this server-only module.
+
+The original positional/night/elevation hit-condition multiplier remains
+neutral at 1 until Roblox equivalents are explicitly mapped and owned by the
+server. That limitation is returned in the result rather than silently treated
+as certified source parity.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_user_id (number): Authenticated source-ready defender.
+
+Returns:
+    (any?, string?): Source normal-attack hit result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.normal_attack_hit(
+    attacker_user_id: number,
+    defender_user_id: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, defender_reason =
+        source_boundary(defender_user_id)
+    if not defender then
+        return nil, defender_reason
+    end
+
+    local accuracy =
+        attacker.SourceStatCandidate.ACCURACY_COMBAT
+    local evasion =
+        defender.SourceStatCandidate.EVASION_RATE
+    local roll = HIT_RANDOM:NextInteger(0, 999)
+    local resolved = Formula.resolve_normal_attack_hit(
+        accuracy,
+        evasion,
+        1,
+        roll
+    )
+
+    return {
+        Kind = "NormalAttackHit",
+        Hit = resolved.Hit,
+        Miss = resolved.Miss,
+        ChancePerThousand = resolved.ChancePerThousand,
+        Roll = resolved.Roll,
+        SourceAccuracy = accuracy,
+        SourceEvasion = evasion,
+        SourceConditionMultiplier = 1,
+        SourceConditionIntegrated = false,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
 end
 
 --[[
@@ -361,12 +431,17 @@ function C4SourceCombatCalculationService.capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = feature_enabled,
+        NormalAttackHitResolution = true,
+        NormalAttackHitRollServerOwned = true,
+        NormalAttackHitConditionIntegrated = false,
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
         ShotsIntegrated = false,
         RandomWeaponVarianceIntegrated = false,
         CriticalResolutionIntegrated = false,
+        ShieldResolutionIntegrated = false,
+        MagicFailureResolutionIntegrated = false,
         ElementalResolutionIntegrated = false,
         PvpFormulaModifiersIntegrated = false,
         LiveDamageApplied = false,
