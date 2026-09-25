@@ -1,5 +1,5 @@
 --!strict
--- All nine original C4 learnable trees from real server-owned identity.
+-- All ten tracked C4 learnable trees from real server-owned identity.
 local RS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
 local Shared = RS.Core.Shared
@@ -26,7 +26,7 @@ Returns:
 ]]
 local function check(valid: boolean, label: string)
     checks += 1
-    assert(valid, "[C4 Nine-Class Skills] " .. label)
+    assert(valid, "[C4 Ten-Path Skills] " .. label)
 end
 
 --[[
@@ -63,7 +63,7 @@ local function seed(
             Version = 1,
             OriginalFirstTransferChoiceId = career.BranchId,
             OriginalFirstTransferClassId = career.Id,
-            OriginalFirstTransferReceiptId = "TEMP_NineSourceSkillMentor",
+            OriginalFirstTransferReceiptId = "TEMP_SourceSkillMentor",
             OriginalFirstTransferQuest = {
                 QuestId = source.Id, BranchId = career.BranchId,
                 Step = #source.Steps + 1, Ready = true,
@@ -104,12 +104,13 @@ Args:
     None.
 
 Returns:
-    nil: Checks all 476 level-30 source rows and 22 unresolved gaps.
+    nil: Checks all 569 level-30 source rows and 41 unresolved gaps.
 ]]
-local function check_nine_class_trees()
+local function check_tracked_class_trees()
     local paths = {
         {"Human", "Fighter", 39},
         {"Human", "Mage", 44},
+        {"Human", "Emberweaver", 93},
         {"Elf", "Fighter", 43},
         {"Elf", "Mage", 42},
         {"Human", "Ironvow", 62},
@@ -143,8 +144,8 @@ local function check_nine_class_trees()
         gaps += preview.ExplicitMissingRows
         Runtime.clear_character(OWNER_ID)
     end
-    check(rows == 476 and candidates == 454 and gaps == 22,
-        "All nine source trees still expose 476/454/22 rank inventory")
+    check(rows == 569 and candidates == 528 and gaps == 41,
+        "Ten tracked source trees expose 569/528/41 rank inventory")
 end
 
 --[[
@@ -269,7 +270,7 @@ local function check_scout_heal_migration_plan()
 end
 
 --[[
-Executes all nine authenticated historical skill-source trees.
+Executes all ten authenticated historical skill-source trees.
 
 Args:
     None.
@@ -278,11 +279,11 @@ Returns:
     nil: Counts source checks and never activates custom C4 combat.
 ]]
 local function main()
-    check_nine_class_trees()
+    check_tracked_class_trees()
     check_heal_source_and_denials()
     check_scout_heal_migration_plan()
-    print(("[C4 Nine-Class Skills] SOURCE_ONLY_PASS: %d assertions "
-        .. "rows=476 candidates=454 gaps=22 live=false")
+    print(("[C4 Ten-Path Skills] SOURCE_ONLY_PASS: %d assertions "
+        .. "rows=569 candidates=528 gaps=41 live=false")
         :format(checks))
 end
 
