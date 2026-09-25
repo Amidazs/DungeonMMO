@@ -8,6 +8,9 @@ local Passives = require(Shared.C4PassiveStatReference)
 local CombinedEffects = require(
     Shared.C4CombinedStatEffectReference
 )
+local ResourceRegen = require(
+    Shared.C4ResourceRegenSourceRules
+)
 local Tree = require(Shared.C4Level30SkillTreeSource)
 local Items = require(Shared.C4SourceItemReference)
 local Gear = require(Shared.C4EquippedStatReference)
@@ -65,7 +68,20 @@ Args:
 Returns:
     any: Fresh source-name stat table suitable for C4 passive functions.
 ]]
-local function source_stats(naked: any): any
+local function source_stats(
+    naked: any,
+    race_id: string,
+    class_id: string,
+    level: number
+): any
+    local regen = assert(
+        ResourceRegen.base_calculator_stats(
+            race_id,
+            class_id,
+            level
+        )
+    )
+
     return {
         PHYSICAL_ATTACK = naked.NakedPAtk,
         PHYSICAL_DEFENCE = naked.NakedPDef,
@@ -80,6 +96,9 @@ local function source_stats(naked: any): any
         MAX_HP = naked.MaxHP,
         MAX_MP = naked.MaxMP,
         MAX_CP = naked.MaxCP,
+        REG_HP_RATE = regen.REG_HP_RATE,
+        REG_MP_RATE = regen.REG_MP_RATE,
+        REG_CP_RATE = regen.REG_CP_RATE,
     }
 end
 
@@ -120,7 +139,7 @@ function C4UnifiedStatReference.get(
         end
     end
     local result, issue = Passives.apply_loadout(
-        source_stats(naked), loadout, source_ranks
+        source_stats(naked, race_id, class_id, level), loadout, source_ranks
     )
     if not result then return nil, issue end
     return {
@@ -179,7 +198,7 @@ function C4UnifiedStatReference.get_with_source_items(
         end
     end
     local staged = Gear.stage(
-        source_stats(naked), naked, resolved, class_id == "Mage"
+        source_stats(naked, race_id, class_id, level), naked, resolved, class_id == "Mage"
     )
     local passive, passive_reason = Passives.apply_loadout(
         staged.Stats, resolved.Kinds, source_ranks
@@ -267,7 +286,7 @@ function C4UnifiedStatReference.get_with_source_effects(
     end
 
     local staged = Gear.stage(
-        source_stats(naked),
+        source_stats(naked, race_id, class_id, level),
         naked,
         resolved,
         class_id == "Mage"
