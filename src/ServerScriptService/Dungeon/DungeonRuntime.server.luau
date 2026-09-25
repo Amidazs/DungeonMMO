@@ -34,6 +34,9 @@ local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
 local C4CombatCutoverRegistry = require(
     Services:WaitForChild("C4CombatCutoverRegistry")
 )
+local C4CombatCutoverStudioBridge = require(
+    Services:WaitForChild("C4CombatCutoverStudioBridge")
+)
 local DungeonDifficultyTuning = require(
     Services:WaitForChild("DungeonDifficultyTuning")
 )
@@ -153,6 +156,9 @@ assert(
     "Dungeon runtime requires C4 cutover coordinator"
 )
 C4CombatCutoverRegistry.bind(
+    runtime.C4CombatCutoverCoordinator
+)
+C4CombatCutoverStudioBridge.bind(
     runtime.C4CombatCutoverCoordinator
 )
 ProgressionService.bind_default(runtime.ProgressionService)
