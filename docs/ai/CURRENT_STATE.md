@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.58 local acceptance GREEN
+
+Fresh unpublished local acceptance is now complete at
+`e61eeb803bd0725aa89581a352583017d32f9fc5`. Both Base and Dungeon Rojo
+builds PASS. Base focused v2.55-v2.58 source/resource runner PASS **5/5**:
+C4 skill-runtime rules 13 assertions, nine-class authenticated skill preview
+554, resource boundary 42, creative item map 43 and launch core gear 8.
+Dungeon focused runner PASS **6/6**, adding ManaService 13 assertions. The
+earlier combined runner exposed two test-harness bugs only: Base has no
+Combat.Tests folder, and the expanded skill-preview fixture called a
+nonexistent Runtime.get_character helper. Both were corrected in GitHub before
+the final green rerun. All 18 current Weapon/Body/OffHand items remain reviewed
+against pinned C4 source items; Helmet/Gloves/Boots still fail closed and the
+live HP/MP/CP switch remains blocked by remaining inventory paperdoll,
+owned-passive, active-effect and CP-runtime work. No publish, production saves,
+main merge or animation changes.
+
 ## 25 September 2026 — CURRENT v2.58 reviewed launch core gear complete
 
 [Latest roadmap](
