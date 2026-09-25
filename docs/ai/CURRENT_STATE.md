@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.79 live C4 executor foundation GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_79_C4_Live_Combat_Executor_20260925.md)
+and [green evidence](
+../testing/c4-live-combat-executor-v2-79-20260925.md).
+A separately gated server-only live C4 normal-attack executor now exists. It
+requires explicit spatial scale/night configuration, the independent source
+calculation gate, global resource cutover and per-player cutover before it can
+mutate anything. Hits route playable damage through CP before HP; misses do
+not mutate resources. The executor is still OFF and no production spatial
+mapping has been chosen. Fresh Studio Base **17/17 PASS**, Dungeon **19/19
+PASS**, live executor **10 assertions PASS**. Runtime probe: Dungeon has live
+resource authority but remains disabled; Base deliberately has no live
+resource authority. Next extend live execution to PDAM/MDAM/HEAL. No main
+merge, publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.78 spatial combat inputs GREEN
 
 [Latest roadmap](
