@@ -1,3 +1,14 @@
+**v2.75 C4 SOURCE SHOT AUTHORITY GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_75_C4_Source_Shot_Authority_20260925.md)
+and [green evidence](
+../testing/c4-source-shot-authority-v2-75-20260925.md).
+Exact reviewed weapon shot grade/count now drives server-authoritative
+inventory consumption and private one-use Kinetic/Mystic charge state for
+source PDAM, MDAM and HEAL. Fresh Studio Base **15/15 PASS**, Dungeon **17/17
+PASS**, source-shot **11 assertions PASS** and source-combat **25 assertions
+PASS**. Next: PvP/source-target modifiers plus full normal-attack composition.
+No main merge, publish or production saves.
+
 **v2.74 C4 ELEMENTAL RESOLUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_74_C4_Elemental_Resolution_20260925.md)
 and [green evidence](
