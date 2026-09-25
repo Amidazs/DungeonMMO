@@ -67,6 +67,7 @@ local BRANCHES = table.freeze({
                 SourceIndexUrl = SOURCE_URL,
                 SourceQuestUrl = QUEST_URL,
                 GameplayStatus = "NotImplemented",
+                SourceSkillInventory = "C4HumanWizardLevel30Sources",
             }),
             table.freeze({
                 Id = "HumanCleric",
