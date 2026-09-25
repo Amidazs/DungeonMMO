@@ -1,5 +1,8 @@
 --!strict
 local SkillProgressionDefinitions = {}
+local HumanWizardSkills = require(
+    script.Parent.C4HumanWizardSkillDefinitions
+)
 
 local DEFINITIONS = table.freeze({
     -- C4 level-one starting-class protection analogue. The actual
@@ -2989,11 +2992,20 @@ local DEFINITIONS = table.freeze({
 function SkillProgressionDefinitions.get(
     skill_id: string
 ): any?
-    return DEFINITIONS[skill_id]
+    return DEFINITIONS[skill_id] or HumanWizardSkills.get(skill_id)
 end
 
 function SkillProgressionDefinitions.all(): any
-    return DEFINITIONS
+    local combined = {}
+
+    for skill_id, definition in pairs(DEFINITIONS) do
+        combined[skill_id] = definition
+    end
+    for skill_id, definition in pairs(HumanWizardSkills.all()) do
+        combined[skill_id] = definition
+    end
+
+    return table.freeze(combined)
 end
 
 return table.freeze(
