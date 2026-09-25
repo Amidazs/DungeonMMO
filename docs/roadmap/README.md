@@ -1,3 +1,20 @@
+**v2.98 HUMAN WIZARD EXACT SOURCE REUSE GREEN:** [roadmap](
+DungeonMMO_Roadmap_v2_98_Human_Wizard_Source_Reuse_20260925.md)
+and [green evidence](
+../testing/c4-human-wizard-source-reuse-v2-98-20260925.md).
+Human Wizard final source reuse now flows through the
+actually-owned passive pipeline. `EmberweaverQuickWeave` rank 1/2 resolves
+Quick Recovery 164:1/2, producing exact magical reuse multipliers **0.8/0.75**
+in the authenticated source stat candidate. Rank-6 Ember Bolt at M.Atk.Spd 333
+therefore resolves **6000 ms** neutral, **4800 ms** with rank 1 and **4500 ms**
+with rank 2; zero source mastery makes that reuse final, while nonzero mastery
+still fails closed. Human Wizard is now included in unified/resource
+**10-path** coverage. Fresh owned-passive **8 PASS**, unified stats **42 PASS**,
+resource boundary **52 PASS**, runtime rules **19 PASS**, cast contract **11
+PASS**, split-MP **12 PASS**, timing **17 PASS**, source combat **43 PASS**,
+focused runner **8/8 PASS**, Base/Dungeon builds PASS. Next: private
+server-owned cast scheduler; no live damage or shot consumption yet.
+
 **v2.97 HUMAN WIZARD SOURCE CAST TIMING GREEN:** [roadmap](
 DungeonMMO_Roadmap_v2_97_Human_Wizard_Source_Cast_Timing_20260925.md)
 and [green evidence](
