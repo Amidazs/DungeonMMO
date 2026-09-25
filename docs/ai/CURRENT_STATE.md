@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.70 physical critical resolution GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md)
+and [green evidence](
+../testing/c4-physical-critical-resolution-v2-70-20260925.md).
+Normal physical C4 critical resolution is now source-authenticated and
+server-owned behind the disabled combat gate. Final source CRITICAL_RATE is
+integer-truncated and capped at 500/1000; a private 0-999 roll uses the exact
+strict-greater-than source comparison. Final source stat candidates now carry
+the C4 critical-power neutral bases (multiplier 1, additive 0), allowing owned
+passives/active effects to compose without a second custom critical layer.
+Fresh focused Studio Base **14/14 PASS**, Dungeon **16/16 PASS**, formula **26
+assertions PASS**, source combat **13 assertions PASS**. PDAM skill criticals,
+magic criticals and target-specific critical modifiers remain explicitly
+incomplete. Next: exact source weapon random-damage variance. No main merge,
+publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.69 normal-attack hit resolution GREEN
 
 [Latest roadmap](
