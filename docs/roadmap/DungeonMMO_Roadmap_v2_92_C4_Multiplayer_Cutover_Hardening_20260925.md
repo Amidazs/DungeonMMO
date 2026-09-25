@@ -5,6 +5,27 @@ Branch: `wip/phase-4-test-hud-integration-v1`.
 Previous: [v2.91](
 DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md).
 
+## Status
+
+**GREEN — the final bounded two-player cutover rehearsal passed.**
+
+Acceptance evidence:
+[ C4 multiplayer cutover v2.92 ](
+../testing/c4-multiplayer-cutover-v2-92-20260925.md).
+
+Fresh focused Studio:
+
+- Base: **24/24 PASS**;
+- Dungeon: **27/27 PASS**;
+- dispatch: **20 assertions PASS**;
+- coordinator: **11 assertions PASS**.
+
+The real two-client rehearsal proved source damage for both participants,
+per-player threat and highest-threat targeting, safe one-player withdrawal,
+existing-model fallback for the removed participant, continued source combat
+for the remaining participant, final-participant gate shutdown and a subsequent
+full-group rollback.
+
 ## Goal
 
 Close the last cutover-hardening gap before returning to the wider MMORPG
@@ -108,9 +129,9 @@ requests fail closed.
 
 ## Static/build acceptance
 
-Implementation candidate:
+Accepted candidate:
 
-`c85ab93d8595d3845d53862fc016e57ef6cb7776`.
+`55bd1f2154f2ba70e15b5b081bbbd390d4b4726f`.
 
 Fresh local verification after fast-forwarding the GitHub branch:
 
@@ -122,26 +143,31 @@ The only pre-existing local untracked files were Python `__pycache__`
 directories under the quadruped animation tools. They were not edited or
 committed.
 
-## Remaining live acceptance
+## Live multiplayer acceptance
 
-One bounded unpublished multiplayer rehearsal remains:
+The final bounded unpublished multiplayer rehearsal is complete.
 
-1. start two connected Dungeon players;
-2. diagnose both source boundaries;
-3. atomically enable both participants;
-4. prove both have source resource authority;
-5. make both damage the same reviewed NPC through existing client input;
-6. verify contribution and threat are tracked separately by player;
-7. verify the higher threat participant is the active aggro target;
-8. remove or disconnect one selected participant;
-9. verify the remaining participant still uses source combat;
-10. verify the removed/unselected participant cannot use source dispatch;
-11. remove the final participant and prove all source gates shut down;
-12. re-enable both, then use coordinator-wide disable and prove both return to
-    the existing model.
+Verified:
 
-This should be the final cutover-hardening rehearsal. It should not become
-another repeated single-player combat test.
+1. two connected Dungeon players passed source-boundary diagnostics;
+2. both were atomically enabled;
+3. both received source resource authority;
+4. both damaged the same reviewed NPC through existing client input;
+5. contribution and threat remained separate per player;
+6. highest-threat targeting selected the correct participant;
+7. withdrawing one participant performed full resource rollback;
+8. the remaining participant continued using source combat;
+9. the removed participant used the existing combat model while global source
+   dispatch remained enabled for the selected participant;
+10. removing the final participant shut every global source gate down;
+11. re-enabling both and coordinator-wide disable returned both to the existing
+    model.
+
+The first rehearsal exposed and fixed one real lifecycle issue: connected
+participant withdrawal must call the full resource `disable_player()`
+rollback rather than lightweight departure cleanup.
+
+The cutover-hardening phase is now closed.
 
 ## Safety boundary
 
