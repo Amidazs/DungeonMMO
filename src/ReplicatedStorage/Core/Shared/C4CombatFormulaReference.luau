@@ -230,6 +230,87 @@ function C4CombatFormulaReference.hit_chance_per_thousand(
 end
 
 --[[
+Applies the C4 hit-condition multiplier and final source caps.
+
+The historical source multiplies the raw Accuracy/Evasion chance by the
+server-calculated positional/environment condition bonus, then clamps the
+result to 27.5%-98%. A neutral multiplier of 1 represents no condition bonus.
+
+Args:
+    accuracy (number): Final attacker source accuracy.
+    evasion (number): Final defender source evasion.
+    condition_multiplier (number): Server-owned source condition multiplier.
+
+Returns:
+    number: Final bounded C4 hit chance per thousand.
+]]
+function C4CombatFormulaReference.hit_chance_with_condition(
+    accuracy: number,
+    evasion: number,
+    condition_multiplier: number
+): number
+    assert(
+        type(condition_multiplier) == "number"
+            and condition_multiplier == condition_multiplier
+            and condition_multiplier >= 0
+            and condition_multiplier < math.huge,
+        "Hit condition multiplier must be finite and nonnegative"
+    )
+
+    local chance = C4CombatFormulaReference.hit_chance_per_thousand(
+        accuracy,
+        evasion
+    ) * condition_multiplier
+
+    return math.max(math.min(chance, 980), 275)
+end
+
+--[[
+Resolves one exact C4 normal-attack hit roll.
+
+The source draws an integer in the inclusive 0-999 range and misses only when
+the final hit chance is strictly lower than that roll. A roll equal to the
+chance still lands.
+
+Args:
+    accuracy (number): Final attacker source accuracy.
+    evasion (number): Final defender source evasion.
+    condition_multiplier (number): Server-owned source condition multiplier.
+    roll (number): Server-owned integer random roll from 0 through 999.
+
+Returns:
+    any: Detached hit/miss result containing chance and roll evidence.
+]]
+function C4CombatFormulaReference.resolve_normal_attack_hit(
+    accuracy: number,
+    evasion: number,
+    condition_multiplier: number,
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 999,
+        "Hit roll must be an integer from 0 through 999"
+    )
+
+    local chance = C4CombatFormulaReference.hit_chance_with_condition(
+        accuracy,
+        evasion,
+        condition_multiplier
+    )
+    local missed = chance < roll
+
+    return {
+        ChancePerThousand = chance,
+        Roll = roll,
+        Hit = not missed,
+        Miss = missed,
+    }
+end
+
+--[[
 Returns the C4 pre-random magic success threshold.
 
 Source success compares a 0-9999-like random value against this
