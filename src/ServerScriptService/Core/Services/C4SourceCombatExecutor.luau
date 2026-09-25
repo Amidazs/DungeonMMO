@@ -822,6 +822,7 @@ consume a magical shot, schedule ticks or mutate HP.
 Args:
     attacker (any): Server-owned casting player.
     enemy (any): Current reviewed server NPC Model.
+    source_range (number?): Optional reviewed source-unit range.
 
 Returns:
     (boolean, string?): Ready state or strict live/source denial reason.
@@ -1031,6 +1032,7 @@ does not calculate damage, consume a shot or mutate HP.
 Args:
     attacker (any): Server-owned casting player.
     enemy (any): Current reviewed server NPC Model.
+    source_range (number?): Optional reviewed source-unit range.
 
 Returns:
     (boolean, string?): Ready state or strict live/source denial reason.
