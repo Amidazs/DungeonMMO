@@ -213,6 +213,8 @@ function C4UnifiedStatReference.get_with_source_items(
         Naked = naked, EquippedStats = values,
         AppliedSourceModifiers = passive.AppliedModifiers,
         CurrentSixSlotPaperdollIntegrated = true,
+        OriginalBodyLegSemanticsIntegrated =
+            staged.OriginalLegsSemanticsIntegrated,
         FullOriginalPaperdollIntegrated = false,
         EnchantmentsIntegrated = false, ActiveBuffsIntegrated = false,
         LiveCombatIntegrated = false,
