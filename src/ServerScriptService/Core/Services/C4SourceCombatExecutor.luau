@@ -403,6 +403,61 @@ function C4SourceCombatExecutor:_validate_npc_target(
 end
 
 --[[
+Checks one source-unit range against authoritative Roblox root positions.
+
+The configured source-units-per-stud scale is the same explicit conversion
+owned by the C4 combat cutover. No client position or range value is accepted.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (any): Current reviewed server NPC Model.
+    source_range (number): Reviewed C4 cast/effect range.
+
+Returns:
+    (boolean, string?): Range readiness or strict spatial denial reason.
+]]
+function C4SourceCombatExecutor:_validate_npc_source_range(
+    attacker: any,
+    enemy: any,
+    source_range: number
+): (boolean, string?)
+    if type(source_range) ~= "number"
+        or source_range ~= source_range
+        or source_range <= 0
+        or source_range >= math.huge
+    then
+        return false, "InvalidC4SourceCastRange"
+    end
+    if type(self._source_units_per_stud) ~= "number" then
+        return false, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local attacker_model = combat_model(attacker)
+    local enemy_model = combat_model(enemy)
+    if not attacker_model or not enemy_model then
+        return false, "C4LiveCombatCharacterUnavailable"
+    end
+
+    local attacker_root =
+        attacker_model:FindFirstChild("HumanoidRootPart")
+    local enemy_root =
+        enemy_model:FindFirstChild("HumanoidRootPart")
+    if not attacker_root or not enemy_root then
+        return false, "C4LiveCombatRootUnavailable"
+    end
+
+    local distance_source =
+        (attacker_root.Position - enemy_root.Position).Magnitude
+        * self._source_units_per_stud
+
+    if distance_source > source_range then
+        return false, "C4SourceCastTargetOutOfRange"
+    end
+
+    return true, nil
+end
+
+--[[
 Applies one already-calculated player-versus-player source hit through CP then
 HP.
 
@@ -773,13 +828,21 @@ Returns:
 ]]
 function C4SourceCombatExecutor:can_status_skill_npc(
     attacker: any,
-    enemy: any
+    enemy: any,
+    source_range: number?
 ): (boolean, string?)
     local boundary, reason =
         self:_validate_npc_target(attacker, enemy)
 
     if not boundary then
         return false, reason
+    end
+    if source_range ~= nil then
+        return self:_validate_npc_source_range(
+            attacker,
+            enemy,
+            source_range
+        )
     end
 
     return true, nil
@@ -974,13 +1037,21 @@ Returns:
 ]]
 function C4SourceCombatExecutor:can_magic_skill_npc(
     attacker: any,
-    enemy: any
+    enemy: any,
+    source_range: number?
 ): (boolean, string?)
     local boundary, reason =
         self:_validate_npc_target(attacker, enemy)
 
     if not boundary then
         return false, reason
+    end
+    if source_range ~= nil then
+        return self:_validate_npc_source_range(
+            attacker,
+            enemy,
+            source_range
+        )
     end
 
     return true, nil
@@ -1430,6 +1501,7 @@ function C4SourceCombatExecutor:capability(): any
         NpcMagicSkillLiveApplication = true,
         NpcMagicSkillReadOnlyPreflight = true,
         NpcStatusSkillReadOnlyPreflight = true,
+        NpcSourceRangePreflight = true,
         NpcPeriodicStatusLiveApplication = true,
         NpcPeriodicStatusNonlethal = true,
         NpcPeriodicStatusRefreshBySourceSkill = true,
