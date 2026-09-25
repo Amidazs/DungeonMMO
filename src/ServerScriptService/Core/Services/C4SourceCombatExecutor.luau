@@ -8,6 +8,9 @@ local Services = ServerScriptService.Core.Services
 local SourceCombat = require(
     Services.C4SourceCombatCalculationService
 )
+local NpcBoundaries = require(
+    Services.C4NpcSourceBoundaryService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -58,6 +61,33 @@ local function default_humanoid_provider(
 end
 
 --[[
+Returns the authoritative combat Model for a player-like owner or NPC Model.
+
+Args:
+    actor (any): Player-like owner or direct server NPC Model.
+
+Returns:
+    Model?: Current combat Model, otherwise nil.
+]]
+local function combat_model(actor: any): Model?
+    if typeof(actor) == "Instance" and actor:IsA("Model") then
+        return actor
+    end
+
+    local ok, character = pcall(function()
+        return actor and actor.Character
+    end)
+    if ok
+        and typeof(character) == "Instance"
+        and character:IsA("Model")
+    then
+        return character
+    end
+
+    return nil
+end
+
+--[[
 Builds trusted C4 spatial context from authoritative Roblox character roots.
 
 The Y difference is converted only through an explicitly configured
@@ -83,8 +113,8 @@ local function default_spatial_context_provider(
         return nil, "C4SourceNightProviderUnconfigured"
     end
 
-    local attacker_character = attacker and attacker.Character
-    local defender_character = defender and defender.Character
+    local attacker_character = combat_model(attacker)
+    local defender_character = combat_model(defender)
     if not attacker_character or not defender_character then
         return nil, "C4LiveCombatCharacterUnavailable"
     end
@@ -132,6 +162,10 @@ function C4SourceCombatExecutor.new(options: any?): any
         _enabled = false,
         _combat = config.CombatProvider or SourceCombat,
         _resources = config.ResourceAuthority,
+        _npc_boundary_provider =
+            config.NpcBoundaryProvider
+            or NpcBoundaries.for_model,
+        _npc_damage_observer = config.NpcDamageObserver,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -166,6 +200,29 @@ function C4SourceCombatExecutor:configure_spatial_rules(
         "C4 source night provider must be a function"
     )
     self._night_provider = night_provider
+end
+
+--[[
+Installs the trusted post-application NPC damage observer.
+
+The observer is how a later combat adapter preserves contribution, quest and
+threat bookkeeping after source damage has already been applied. An NPC live
+action fails closed while no observer is installed.
+
+Args:
+    observer (any?): Server callback receiving context, damage and lethal flag.
+
+Returns:
+    nil: Replaces only this executor's NPC damage observer.
+]]
+function C4SourceCombatExecutor:set_npc_damage_observer(
+    observer: any?
+)
+    assert(
+        observer == nil or type(observer) == "function",
+        "C4 NPC damage observer must be a function or nil"
+    )
+    self._npc_damage_observer = observer
 end
 
 --[[
@@ -307,6 +364,38 @@ function C4SourceCombatExecutor:_validate_actor(
 end
 
 --[[
+Validates one player attacker and one current server-owned NPC target.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (any): Current server NPC Model.
+
+Returns:
+    (any?, string?): Reviewed NPC boundary or strict denial reason.
+]]
+function C4SourceCombatExecutor:_validate_npc_target(
+    attacker: any,
+    enemy: any
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(attacker)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model") then
+        return nil, "InvalidC4LiveNpcTarget"
+    end
+    if type(self._npc_boundary_provider) ~= "function" then
+        return nil, "C4NpcSourceBoundaryUnavailable"
+    end
+    if type(self._npc_damage_observer) ~= "function" then
+        return nil, "C4NpcDamageObserverUnavailable"
+    end
+
+    return self._npc_boundary_provider(enemy)
+end
+
+--[[
 Applies one already-calculated player-versus-player source hit through CP then
 HP.
 
@@ -414,6 +503,213 @@ function C4SourceCombatExecutor:_apply_player_heal(
         EffectiveHeal = humanoid.Health - health_before,
         HealthBefore = health_before,
         HealthAfter = humanoid.Health,
+    }, nil
+end
+
+--[[
+Applies one accepted source hit to a server NPC and emits trusted bookkeeping.
+
+Args:
+    attacker (any): Authenticated server player.
+    enemy (Model): Server-owned NPC target.
+    amount (number): Accepted source damage.
+    source_kind (string): Existing combat callback category.
+    source_id (string): Server-owned attack or skill identifier.
+    sequence_id (number?): Existing server action sequence.
+
+Returns:
+    (any?, string?): Applied NPC damage evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:_apply_npc_damage(
+    attacker: any,
+    enemy: Model,
+    amount: number,
+    source_kind: string,
+    source_id: string,
+    sequence_id: number?
+): (any?, string?)
+    if type(amount) ~= "number"
+        or amount ~= amount
+        or amount < 0
+        or amount >= math.huge
+    then
+        return nil, "InvalidC4LiveCombatDamage"
+    end
+    if type(self._npc_damage_observer) ~= "function" then
+        return nil, "C4NpcDamageObserverUnavailable"
+    end
+
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        return nil, "C4LiveCombatNpcUnavailable"
+    end
+
+    local health_before = humanoid.Health
+    humanoid:TakeDamage(amount)
+    local health_after = humanoid.Health
+    local applied_damage = math.max(
+        0,
+        health_before - health_after
+    )
+    local lethal = health_after <= 0
+
+    if applied_damage > 0 then
+        self._npc_damage_observer({
+            attacker = attacker,
+            attacker_character = combat_model(attacker),
+            target = enemy,
+            source_kind = source_kind,
+            source_id = source_id,
+            attack_id = source_id,
+            base_damage = amount,
+            multiplier = 1,
+            sequence_id = sequence_id,
+            C4SourceResolved = true,
+        }, applied_damage, lethal)
+    end
+
+    return {
+        RawDamage = amount,
+        CPAbsorbed = 0,
+        HealthDamage = applied_damage,
+        HealthBefore = health_before,
+        HealthAfter = health_after,
+        Lethal = lethal,
+    }, nil
+end
+
+--[[
+Executes one live player-to-NPC source PDAM skill.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative skill identifier.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live NPC PDAM evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:physical_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local spatial, spatial_reason =
+        self._spatial_context_provider(
+            self,
+            attacker,
+            enemy
+        )
+    if not spatial then
+        return nil, spatial_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank,
+            spatial
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "Skill",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalSkill",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+    }, nil
+end
+
+--[[
+Executes one live player-to-NPC source MDAM skill.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative skill identifier.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live NPC MDAM evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:magic_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.magic_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "MagicSkill",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcMagicSkill",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
     }, nil
 end
 
@@ -612,6 +908,87 @@ Args:
 Returns:
     (any?, string?): Live attack evidence or strict denial reason.
 ]]
+--[[
+Executes one complete live player-to-NPC C4 ordinary attack.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Current reviewed server NPC.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live NPC ordinary-attack evidence or denial reason.
+]]
+function C4SourceCombatExecutor:normal_attack_npc(
+    attacker: any,
+    enemy: Model,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local spatial, spatial_reason =
+        self._spatial_context_provider(
+            self,
+            attacker,
+            enemy
+        )
+    if not spatial then
+        return nil, spatial_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.normal_attack(
+            attacker.UserId,
+            boundary,
+            spatial
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Miss then
+        return {
+            Kind = "C4LiveNpcNormalAttack",
+            Hit = false,
+            Miss = true,
+            Calculation = calculated,
+            Applied = false,
+            CPAbsorbed = 0,
+            HealthDamage = 0,
+        }, nil
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "Melee",
+        "C4NormalAttack",
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcNormalAttack",
+        Hit = true,
+        Miss = false,
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+    }, nil
+end
+
 function C4SourceCombatExecutor:normal_attack(
     attacker: any,
     defender: any
@@ -709,6 +1086,15 @@ function C4SourceCombatExecutor:capability(): any
         PhysicalSkillLiveApplication = true,
         MagicSkillLiveApplication = true,
         SelfHealLiveApplication = true,
+        NpcBoundaryProviderConfigured =
+            type(self._npc_boundary_provider) == "function",
+        NpcDamageObserverConfigured =
+            type(self._npc_damage_observer) == "function",
+        NpcNormalAttackLiveApplication = true,
+        NpcPhysicalSkillLiveApplication = true,
+        NpcMagicSkillLiveApplication = true,
+        NpcDamageBypassesCombatPoints = true,
+        NpcDamageCallbackPreservation = true,
     }
 end
 
