@@ -174,6 +174,27 @@ local DEFINITIONS = table.freeze({
     -- DungeonMMO source-monster quest materials belong to their earning
     -- character. Live drops require a verified one-use server-owned
     -- instanced combat receipt; an arbitrary item flag is not enough.
+    aetherglass_shard = table.freeze({
+        Id = "aetherglass_shard",
+        Name = "Aetherglass Shard",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = true,
+        Bound = true,
+        Tradeable = false,
+    }),
+    cinderbound_ember_sigil = table.freeze({
+        Id = "cinderbound_ember_sigil",
+        Name = "Cinderbound Ember Sigil",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     stonewatch_badge = table.freeze({
         Id = "stonewatch_badge",
         Name = "Stonewatch Signal Badge",
