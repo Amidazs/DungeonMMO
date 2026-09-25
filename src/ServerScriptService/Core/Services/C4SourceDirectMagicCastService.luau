@@ -6,7 +6,21 @@ C4SourceDirectMagicCastService.__index =
     C4SourceDirectMagicCastService
 
 local ALLOWED_DIRECT_MDAM = table.freeze({
-    EmberweaverEmberBolt = true,
+    EmberweaverEmberBolt = table.freeze({
+        SourceSkillId = 1220,
+    }),
+    EmberweaverFlameBurst = table.freeze({
+        SourceSkillId = 1172,
+    }),
+    EmberweaverFocusedBolt = table.freeze({
+        SourceSkillId = 1274,
+    }),
+})
+
+local REVIEWED_SKILLS = table.freeze({
+    "EmberweaverEmberBolt",
+    "EmberweaverFlameBurst",
+    "EmberweaverFocusedBolt",
 })
 
 --[[
@@ -38,10 +52,10 @@ Args:
 Returns:
     boolean: True only for the reviewed direct-MDAM family.
 ]]
-local function allowed_skill(
+local function reviewed_skill(
     creative_skill_id: string
-): boolean
-    return ALLOWED_DIRECT_MDAM[creative_skill_id] == true
+): any?
+    return ALLOWED_DIRECT_MDAM[creative_skill_id]
 end
 
 --[[
@@ -164,6 +178,7 @@ local function store_pending(
         CastId = started.CastId,
         CreativeSkillId = started.CreativeSkillId,
         CreativeRank = started.CreativeRank,
+        SourceSkillId = started.SourceSkillId,
         Enemy = enemy,
     }
 
@@ -198,7 +213,8 @@ function C4SourceDirectMagicCastService:begin_cast(
     if not valid_owner(player) then
         return nil, "C4DirectMagicCastOwnerInvalid"
     end
-    if not allowed_skill(creative_skill_id) then
+    local review = reviewed_skill(creative_skill_id)
+    if not review then
         return nil, "C4DirectMagicSkillNotReviewed"
     end
     if self._pending_by_owner[player] then
@@ -219,6 +235,10 @@ function C4SourceDirectMagicCastService:begin_cast(
         )
     if not started then
         return nil, start_reason
+    end
+    if started.SourceSkillId ~= review.SourceSkillId then
+        self._scheduler:cancel_cast(player, started.CastId)
+        return nil, "C4DirectMagicReviewedSourceMismatch"
     end
 
     store_pending(self, player, enemy, started)
@@ -315,6 +335,7 @@ local function launch_plan_matches(
 ): boolean
     return launch.CreativeSkillId == record.CreativeSkillId
         and launch.CreativeRank == record.CreativeRank
+        and launch.SourceSkillId == record.SourceSkillId
         and launch.ReadyForSourceEffectExecution == true
 end
 
@@ -481,7 +502,8 @@ function C4SourceDirectMagicCastService:capability(): any
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
         ReviewedDirectMdamOnly = true,
-        ReviewedSkill = "EmberweaverEmberBolt",
+        ReviewedSkillCount = #REVIEWED_SKILLS,
+        ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
         TargetRevalidatedBeforeLaunchMp = true,
         LaunchMpCommittedBeforeEffectExecution = true,
