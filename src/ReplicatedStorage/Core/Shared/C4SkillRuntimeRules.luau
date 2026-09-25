@@ -227,6 +227,86 @@ function C4SkillRuntimeRules.magic_cast_time(
 end
 
 --[[
+Returns Chronicle 4 magic cool-time scaling without the hit-time floor.
+
+The source scales coolTime with the same M.Atk.Spd and shot acceleration as
+hitTime, but the later 500 ms minimum applies only to hitTime.
+
+Args:
+    source_time_ms (number): Original skill coolTime.
+    magic_attack_speed (number): Final source M.Atk.Spd.
+    spiritshot (boolean): Ordinary Spiritshot charge.
+    blessed_spiritshot (boolean): Blessed Spiritshot charge.
+
+Returns:
+    number: Source-equivalent final magic cool time in milliseconds.
+]]
+function C4SkillRuntimeRules.magic_cool_time(
+    source_time_ms: number,
+    magic_attack_speed: number,
+    spiritshot: boolean,
+    blessed_spiritshot: boolean
+): number
+    local cool_ms = Formulas.skill_cast_time(
+        source_time_ms,
+        magic_attack_speed
+    )
+
+    if spiritshot or blessed_spiritshot then
+        cool_ms = math.floor(cool_ms * 0.70)
+    end
+
+    return cool_ms
+end
+
+--[[
+Returns source reuse delay after reuse-rate and attack-speed scaling.
+
+This reproduces the pinned source calculation order but does not determine
+skill mastery. A caller must supply the already-resolved source reuse multiplier.
+
+Args:
+    source_reuse_ms (number): Authored skill reuseDelay.
+    attack_speed (number): Final M.Atk.Spd or P.Atk.Spd as appropriate.
+    reuse_multiplier (number): Final MAGICAL/PHYSICAL_SKILL_REUSE multiplier.
+
+Returns:
+    number: Source-equivalent reuse delay before skill-mastery override.
+]]
+function C4SkillRuntimeRules.skill_reuse_delay(
+    source_reuse_ms: number,
+    attack_speed: number,
+    reuse_multiplier: number
+): number
+    assert(
+        type(source_reuse_ms) == "number"
+            and source_reuse_ms == source_reuse_ms
+            and source_reuse_ms >= 0
+            and source_reuse_ms < math.huge,
+        "Source reuse delay must be finite and nonnegative"
+    )
+    assert(
+        type(attack_speed) == "number"
+            and attack_speed == attack_speed
+            and attack_speed > 0
+            and attack_speed < math.huge,
+        "Attack speed must be finite and positive"
+    )
+    assert(
+        type(reuse_multiplier) == "number"
+            and reuse_multiplier == reuse_multiplier
+            and reuse_multiplier >= 0
+            and reuse_multiplier < math.huge,
+        "Reuse multiplier must be finite and nonnegative"
+    )
+
+    local rate_scaled = math.floor(
+        source_reuse_ms * reuse_multiplier
+    )
+    return math.floor(rate_scaled * 333 / attack_speed)
+end
+
+--[[
 Returns the exact pinned source files used for split-MP/cast semantics.
 
 Args:
