@@ -1,0 +1,86 @@
+--!strict
+-- Disposable unpublished focused runner for C4 v2.55-v2.58 resource work.
+
+assert(
+    game.PlaceId == 0 and game.GameId == 0,
+    "C4 v2.55-v2.58 focus requires an unpublished local place"
+)
+
+local ServerScriptService = game:GetService("ServerScriptService")
+local core_tests = ServerScriptService.Core.Tests
+local combat_tests = ServerScriptService.Combat.Tests
+
+local fixtures = {
+    {
+        Parent = core_tests,
+        Name = "C4SkillRuntimeRulesTest",
+    },
+    {
+        Parent = combat_tests,
+        Name = "ManaServiceTest",
+    },
+    {
+        Parent = core_tests,
+        Name = "C4NineClassAuthenticatedSkillPreviewTest",
+    },
+    {
+        Parent = core_tests,
+        Name = "C4ResourceMigrationBoundaryTest",
+    },
+    {
+        Parent = core_tests,
+        Name = "C4CreativeItemSourceMapTest",
+    },
+    {
+        Parent = core_tests,
+        Name = "C4LaunchCoreGearSourceTest",
+    },
+}
+
+local function run_test(fixture: any): boolean
+    local source = assert(
+        fixture.Parent:FindFirstChild(fixture.Name),
+        "Missing focused test: " .. fixture.Name
+    )
+    local module = Instance.new("ModuleScript")
+    module.Name = "TEMP_" .. fixture.Name
+    module.Source = source.Source .. "\nreturn true\n"
+    module.Parent = fixture.Parent
+
+    local ok, result = pcall(require, module)
+    module:Destroy()
+
+    if not ok or result ~= true then
+        warn(
+            "[C4 v2.55-v2.58 Focus] FAIL "
+                .. fixture.Name
+                .. ": "
+                .. tostring(result)
+        )
+        return false
+    end
+
+    print("[C4 v2.55-v2.58 Focus] PASS " .. fixture.Name)
+    return true
+end
+
+local function main()
+    local passed = 0
+
+    for _, fixture in ipairs(fixtures) do
+        if run_test(fixture) then
+            passed += 1
+        end
+    end
+
+    print((
+        "[C4 v2.55-v2.58 Focus] RESULT passed=%d total=%d"
+    ):format(passed, #fixtures))
+
+    assert(
+        passed == #fixtures,
+        "One or more C4 v2.55-v2.58 focused regressions failed"
+    )
+end
+
+main()
