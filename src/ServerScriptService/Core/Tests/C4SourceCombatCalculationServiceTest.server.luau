@@ -208,7 +208,11 @@ local function check_default_off()
             and capability.ShieldPhysicalFormulaIntegrated
             and not capability.ShieldFacingRuntimeIntegrated
             and not capability.PhysicalSkillCriticalIntegrated
-            and not capability.MagicCriticalIntegrated
+            and capability.MagicCriticalIntegrated
+            and capability.MagicCriticalRollServerOwned
+            and capability.MagicFailureFormulaAvailable
+            and capability.MagicFailureResolutionIntegrated
+            and not capability.MagicFailuresSourceDefaultEnabled
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -529,6 +533,8 @@ local function check_magic()
         MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
         MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
         SkillPower = 12,
+        Failure = result.MagicFailure,
+        MagicCritical = result.MagicCritical,
     })
 
     check_close(
@@ -537,10 +543,33 @@ local function check_magic()
         "Wind Strike source damage equals pinned formula"
     )
     check(
+        attacker.SourceStatCandidate.MAGICAL_CRITICAL_RATE == 8
+            and result.SourceMagicalCriticalRate == 8
+            and result.MagicCriticalChancePerThousand == 8
+            and result.MagicCriticalRoll >= 0
+            and result.MagicCriticalRoll <= 999
+            and result.MagicCriticalRoll % 1 == 0
+            and result.MagicCritical
+                == (result.MagicCriticalChancePerThousand
+                    > result.MagicCriticalRoll),
+        "magic provider uses source base M.Crit and server-owned roll"
+    )
+    check(
+        result.MagicLevel == 1
+            and not result.MagicFailureEnabled
+            and result.MagicFailure == "None"
+            and result.MagicFailureFirstRoll == nil
+            and result.MagicFailureSecondRoll == nil
+            and result.MagicFailureThreshold
+                == Formula.magic_resist_threshold(30, 1),
+        "pinned source default keeps optional magic failures disabled"
+    )
+    check(
         result.SourceSkillId == 1177
             and result.SourceRank == 1
             and result.SourceSkillPower == 12
-            and result.Kind == "MagicDamage",
+            and result.Kind == "MagicDamage"
+            and not result.LiveApplied,
         "magic provider resolves exact source Wind Strike rank"
     )
 end
@@ -638,7 +667,8 @@ local function main()
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
         .. "hit=true critical=true variance=true shield=true "
-        .. "pdam=true mdam=true heal=true live=false"
+        .. "magiccrit=true magicfailure=true pdam=true "
+        .. "mdam=true heal=true live=false"
     ):format(checks))
 end
 
