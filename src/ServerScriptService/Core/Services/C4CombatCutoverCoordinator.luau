@@ -51,6 +51,7 @@ function C4CombatCutoverCoordinator.new(options: any): any
     require_method(resources, "set_enabled", "Resource authority")
     require_method(resources, "enable_player", "Resource authority")
     require_method(resources, "disable_player", "Resource authority")
+    require_method(resources, "remove_player", "Resource authority")
     require_method(resources, "is_active", "Resource authority")
     require_method(combat, "is_enabled", "Combat provider")
     require_method(combat, "set_enabled", "Combat provider")
@@ -214,6 +215,44 @@ function C4CombatCutoverCoordinator:disable(): boolean
 end
 
 --[[
+Removes one opted-in participant without widening or stranding source mode.
+
+A departing participant is cleared through the resource authority without
+trying to restore a character that is leaving the server. If the last active
+participant is removed, every global source gate is disabled immediately.
+
+Args:
+    player (any): Server-owned participant being removed from source mode.
+
+Returns:
+    (boolean, string?): Success or a stable inactive-participant reason.
+]]
+function C4CombatCutoverCoordinator:remove_player(
+    player: any
+): (boolean, string?)
+    local removed = false
+
+    for index = #self._active_players, 1, -1 do
+        if self._active_players[index] == player then
+            table.remove(self._active_players, index)
+            removed = true
+        end
+    end
+
+    if not removed then
+        return false, "C4CutoverPlayerNotActive"
+    end
+
+    self._resources.remove_player(player)
+
+    if #self._active_players == 0 and self._enabled then
+        self:_rollback()
+    end
+
+    return true, nil
+end
+
+--[[
 Returns detached cutover-state evidence.
 
 Args:
@@ -251,6 +290,7 @@ function C4CombatCutoverCoordinator:capability(): any
         RequiresDispatchAuditReady = true,
         RequiresExplicitPlayers = true,
         RequiresExplicitSpatialRules = true,
+        ParticipantRemovalSupported = true,
         TransactionalRollback = true,
         ReverseOrderDisable = true,
         ClientAuthority = false,
