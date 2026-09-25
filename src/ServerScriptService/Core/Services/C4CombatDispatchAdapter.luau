@@ -471,7 +471,7 @@ function C4CombatDispatchAdapter.capability(): any
         PhysicalSkillSupported = true,
         MagicSkillSupported = true,
         RangerAreaActivationBlocked = true,
-        MagicBasicActivationBlocked = true,
+        MagicBasicUsesSourceNormalAttack = true,
         PeriodicStatusActivationBlocked = true,
         NpcOnly = true,
         ClientDamageAuthority = false,
