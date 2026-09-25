@@ -127,7 +127,7 @@ local function apply_tick(
         attacker = attacker,
         attacker_character = current.attacker_character,
         target = target,
-        source_kind = if attacker then "MagicSkill" else "EnemyMagic",
+        source_kind = if attacker then "StatusMagic" else "EnemyMagic",
         source_id = current.source_id,
         attack_id = current.source_id,
         base_damage = damage,
