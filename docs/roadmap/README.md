@@ -1,3 +1,13 @@
+**v2.89 ATOMIC C4 COMBAT CUTOVER GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_89_C4_Atomic_Combat_Cutover_20260925.md)
+and [green evidence](
+../testing/c4-atomic-combat-cutover-v2-89-20260925.md).
+A server-only coordinator now enables and disables resource cutover, explicit
+player opt-in, source calculation, live executor and dispatch transactionally.
+Failure at any stage rolls previous gates back. Fresh Studio Base **22/22
+PASS**, Dungeon **25/25 PASS**, coordinator **7 assertions PASS**. Next:
+genuine unpublished Dungeon cutover + rollback rehearsal.
+
 **v2.88 LEVEL-30 SOURCE DISPATCH AUDIT GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_88_C4_Level30_Dispatch_Audit_Closure_20260925.md)
 and [green evidence](
