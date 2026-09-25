@@ -1,20 +1,19 @@
-## 25 September 2026 — CURRENT v2.69 normal-attack hit resolution BUILT
+## 25 September 2026 — CURRENT v2.69 normal-attack hit resolution GREEN
 
 [Latest roadmap](
 ../roadmap/DungeonMMO_Roadmap_v2_69_C4_Normal_Attack_Hit_Resolution_20260925.md)
-and [acceptance record](
+and [green evidence](
 ../testing/c4-normal-attack-hit-resolution-v2-69-20260925.md).
-Exact C4 ordinary-attack hit resolution is now implemented behind the existing
-disabled source-combat gate. Final authenticated source Accuracy/Evasion feed
-the original delta table; the pure formula layer applies source condition
-multipliers and the 27.5%-98% caps, while the server provider owns the 0-999
-random roll. PDAM skills are deliberately not routed through calcHitMiss,
-matching the reviewed C4 SkillPdam path. Runtime positional/elevation/night
-condition mapping is still neutral and explicitly reported incomplete. Fresh
-unpublished Base and Dungeon Rojo builds PASS at local GitHub candidate
-6c45baec; focused Studio Base/Dungeon execution is still required before this
-milestone can be called GREEN. No main merge, publish, production save mutation
-or animation edits.
+Exact C4 ordinary-attack hit resolution is now accepted behind the disabled
+source-combat gate. Final authenticated source Accuracy/Evasion feed the
+original delta table; source condition multiplication and 27.5%-98% caps are
+implemented; the provider owns the 0-999 roll. PDAM remains separate exactly
+as in the reviewed C4 SkillPdam path. Fresh unpublished Base **14/14 PASS** and
+Dungeon **16/16 PASS**; formula **22 assertions PASS** and source combat **11
+assertions PASS**. Runtime position/elevation/night condition mapping remains
+neutral and explicit. Next implement source physical critical roll and critical
+power components. No main merge, publish, production save mutation or animation
+edits.
 
 ## 25 September 2026 — CURRENT v2.68 source PDAM/MDAM/HEAL calculator GREEN
 
