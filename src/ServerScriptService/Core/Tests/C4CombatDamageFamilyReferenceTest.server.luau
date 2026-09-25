@@ -70,8 +70,8 @@ local function main()
     check_family("Skill", "SourcePDAM", false)
     check_family("MagicSkill", "SourceMDAM", false)
 
+    check_family("MagicBasic", "SourceNormal", false)
     check_family("RangerArea", "Unsupported", true)
-    check_family("MagicBasic", "Unsupported", true)
     check_family(
         "StatusPhysical",
         "PeriodicStatusPending",
@@ -101,14 +101,13 @@ local function main()
 
     local blockers = Families.activation_blockers()
     check(
-        #blockers == 4,
-        "exactly four current player-to-NPC families block activation"
+        #blockers == 3,
+        "exactly three current player-to-NPC families block activation"
     )
     check(
-        blockers[1] == "MagicBasic"
-            and blockers[2] == "RangerArea"
-            and blockers[3] == "StatusMagic"
-            and blockers[4] == "StatusPhysical",
+        blockers[1] == "RangerArea"
+            and blockers[2] == "StatusMagic"
+            and blockers[3] == "StatusPhysical",
         "activation blocker list remains deterministic"
     )
     check(
@@ -122,7 +121,7 @@ local function main()
 
     print((
         "[C4 Damage Family Audit] FAMILY_AUDIT_PASS: "
-            .. "%d assertions blockers=4 activation_ready=false"
+            .. "%d assertions blockers=3 activation_ready=false"
     ):format(checks))
 end
 
