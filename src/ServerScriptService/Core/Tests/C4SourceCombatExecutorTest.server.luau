@@ -2,6 +2,7 @@
 -- Isolated live-executor gating/resource mutation regression.
 
 local ServerScriptService = game:GetService("ServerScriptService")
+local Workspace = game:GetService("Workspace")
 
 local ExecutorModule = require(
     ServerScriptService.Core.Services.C4SourceCombatExecutor
@@ -17,6 +18,13 @@ local attacker_active = true
 local defender_active = true
 local combat_mode = "Hit"
 local last_spatial = nil
+local npc_events = {}
+
+local NPC_BOUNDARY = {
+    SourceTargetKind = "Npc",
+    SourceNpcId = 525,
+    SourceNpcRace = "ANIMAL",
+}
 
 local FakeCombat = {}
 local FakeResources = {}
@@ -62,11 +70,14 @@ Returns:
 ]]
 function FakeCombat.normal_attack(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     spatial_context: any
 ): (any?, string?)
     assert(attacker_user_id == ATTACKER_ID)
-    assert(defender_user_id == DEFENDER_ID)
+    assert(
+        defender_target == DEFENDER_ID
+            or defender_target == NPC_BOUNDARY
+    )
     last_spatial = spatial_context
 
     if combat_mode == "Miss" then
@@ -101,13 +112,16 @@ Returns:
 ]]
 function FakeCombat.physical_skill(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     creative_skill_id: string,
     creative_rank: number,
     spatial_context: any
 ): (any?, string?)
     assert(attacker_user_id == ATTACKER_ID)
-    assert(defender_user_id == DEFENDER_ID)
+    assert(
+        defender_target == DEFENDER_ID
+            or defender_target == NPC_BOUNDARY
+    )
     assert(creative_skill_id == "IronCleave")
     assert(creative_rank == 1)
     last_spatial = spatial_context
@@ -132,12 +146,15 @@ Returns:
 ]]
 function FakeCombat.magic_skill(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     creative_skill_id: string,
     creative_rank: number
 ): (any?, string?)
     assert(attacker_user_id == ATTACKER_ID)
-    assert(defender_user_id == DEFENDER_ID)
+    assert(
+        defender_target == DEFENDER_ID
+            or defender_target == NPC_BOUNDARY
+    )
     assert(creative_skill_id == "WindStrike")
     assert(creative_rank == 1)
 
@@ -263,6 +280,34 @@ local function fixture_player(
 end
 
 --[[
+Builds one disposable server NPC with a real root and Humanoid.
+
+Args:
+    position (Vector3): NPC root world position.
+
+Returns:
+    Model: Workspace-owned disposable NPC target.
+]]
+local function fixture_npc(position: Vector3): Model
+    local enemy = Instance.new("Model")
+    enemy.Name = "TEMP_C4ExecutorNpc"
+
+    local root = Instance.new("Part")
+    root.Name = "HumanoidRootPart"
+    root.Anchored = true
+    root.CFrame = CFrame.new(position)
+    root.Parent = enemy
+
+    local humanoid = Instance.new("Humanoid")
+    humanoid.MaxHealth = 100
+    humanoid.Health = 100
+    humanoid.Parent = enemy
+
+    enemy.Parent = Workspace
+    return enemy
+end
+
+--[[
 Runs disabled-gate, spatial-authority, CP and HP executor regressions.
 
 Args:
@@ -280,10 +325,26 @@ local function main()
         DEFENDER_ID,
         Vector3.new(0, 0, 0)
     )
+    local enemy = fixture_npc(Vector3.new(0, 0, 0))
 
     local executor = ExecutorModule.new({
         CombatProvider = FakeCombat,
         ResourceAuthority = FakeResources,
+        NpcBoundaryProvider = function(target: Model): any
+            assert(target == enemy)
+            return NPC_BOUNDARY, nil
+        end,
+        NpcDamageObserver = function(
+            context: any,
+            damage: number,
+            lethal: boolean
+        )
+            table.insert(npc_events, {
+                Context = context,
+                Damage = damage,
+                Lethal = lethal,
+            })
+        end,
     })
 
     local capability = executor:capability()
@@ -296,6 +357,13 @@ local function main()
             and capability.PhysicalSkillLiveApplication
             and capability.MagicSkillLiveApplication
             and capability.SelfHealLiveApplication
+            and capability.NpcBoundaryProviderConfigured
+            and capability.NpcDamageObserverConfigured
+            and capability.NpcNormalAttackLiveApplication
+            and capability.NpcPhysicalSkillLiveApplication
+            and capability.NpcMagicSkillLiveApplication
+            and capability.NpcDamageBypassesCombatPoints
+            and capability.NpcDamageCallbackPreservation
             and not capability.ClientDamageAuthority,
         "live executor starts disabled with server-only authority"
     )
@@ -433,6 +501,66 @@ local function main()
         "live HEAL applies accepted source healing to server Humanoid"
     )
 
+    combat_mode = "Hit"
+    local npc_normal = assert(executor:normal_attack_npc(
+        attacker,
+        enemy,
+        201
+    ))
+    check(
+        npc_normal.Hit
+            and npc_normal.Applied
+            and npc_normal.RawDamage == 10
+            and npc_normal.CPAbsorbed == 0
+            and npc_normal.HealthDamage == 10
+            and npc_normal.HealthAfter == 90,
+        "live NPC normal attack applies source damage without CP"
+    )
+
+    local npc_physical = assert(executor:physical_skill_npc(
+        attacker,
+        enemy,
+        "IronCleave",
+        1,
+        202
+    ))
+    check(
+        npc_physical.Kind == "C4LiveNpcPhysicalSkill"
+            and npc_physical.RawDamage == 12
+            and npc_physical.CPAbsorbed == 0
+            and npc_physical.HealthAfter == 78,
+        "live NPC PDAM applies accepted source damage directly to HP"
+    )
+
+    local npc_magic = assert(executor:magic_skill_npc(
+        attacker,
+        enemy,
+        "WindStrike",
+        1,
+        203
+    ))
+    check(
+        npc_magic.Kind == "C4LiveNpcMagicSkill"
+            and npc_magic.RawDamage == 8
+            and npc_magic.CPAbsorbed == 0
+            and npc_magic.HealthAfter == 70,
+        "live NPC MDAM applies accepted source damage directly to HP"
+    )
+
+    check(
+        #npc_events == 3
+            and npc_events[1].Context.source_kind == "Melee"
+            and npc_events[1].Context.C4SourceResolved == true
+            and npc_events[1].Context.sequence_id == 201
+            and npc_events[2].Context.source_kind == "Skill"
+            and npc_events[2].Context.source_id == "IronCleave"
+            and npc_events[3].Context.source_kind == "MagicSkill"
+            and npc_events[3].Context.source_id == "WindStrike"
+            and npc_events[3].Damage == 8
+            and not npc_events[3].Lethal,
+        "NPC source damage emits existing trusted bookkeeping context"
+    )
+
     local self_attack, self_reason =
         executor:normal_attack(attacker, attacker)
     check(
@@ -449,10 +577,11 @@ local function main()
 
     attacker.Character:Destroy()
     defender.Character:Destroy()
+    enemy:Destroy()
 
     print((
         "[C4 Source Combat Executor] LIVE_EXECUTOR_PASS: %d assertions "
-            .. "default_off=true live_fixture=true"
+            .. "default_off=true live_fixture=true npc=true"
     ):format(checks))
 end
 
