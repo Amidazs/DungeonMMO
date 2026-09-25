@@ -1,3 +1,15 @@
+## 25 September 2026 — v2.77 PDAM skill criticals GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_77_C4_PDAM_Criticals_20260925.md);
+[green evidence](../testing/c4-pdam-criticals-v2-77-20260925.md).
+The source-only combat provider now implements exact SkillPdam criticals using
+authored baseCritRate ×10 × source STR bonus with a strict server-owned roll,
+then doubles final PDAM without using normal critical-power modifiers. Fresh
+Studio Base 15/15 and Dungeon 17/17 passed; formula 51 and source combat 30
+assertions passed. Next close spatial hit-condition/shield-facing authority,
+then build the separately gated live executor. Permanent edits remain
+GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.76 normal attack/PvP composition GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_76_C4_Normal_Attack_PvP_Composition_20260925.md);
