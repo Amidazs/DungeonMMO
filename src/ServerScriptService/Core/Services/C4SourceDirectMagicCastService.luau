@@ -8,12 +8,18 @@ C4SourceDirectMagicCastService.__index =
 local ALLOWED_DIRECT_MDAM = table.freeze({
     EmberweaverEmberBolt = table.freeze({
         SourceSkillId = 1220,
+        CastRange = 750,
+        EffectRange = 1250,
     }),
     EmberweaverFlameBurst = table.freeze({
         SourceSkillId = 1172,
+        CastRange = 150,
+        EffectRange = 650,
     }),
     EmberweaverFocusedBolt = table.freeze({
         SourceSkillId = 1274,
+        CastRange = 400,
+        EffectRange = 900,
     }),
 })
 
@@ -179,6 +185,8 @@ local function store_pending(
         CreativeSkillId = started.CreativeSkillId,
         CreativeRank = started.CreativeRank,
         SourceSkillId = started.SourceSkillId,
+        CastRange = started.SourceCastRange,
+        EffectRange = started.SourceEffectRange,
         Enemy = enemy,
     }
 
@@ -222,7 +230,11 @@ function C4SourceDirectMagicCastService:begin_cast(
     end
 
     local target_ready, target_reason =
-        self._executor:can_magic_skill_npc(player, enemy)
+        self._executor:can_magic_skill_npc(
+            player,
+            enemy,
+            review.CastRange
+        )
     if not target_ready then
         return nil, target_reason
     end
@@ -236,7 +248,10 @@ function C4SourceDirectMagicCastService:begin_cast(
     if not started then
         return nil, start_reason
     end
-    if started.SourceSkillId ~= review.SourceSkillId then
+    if started.SourceSkillId ~= review.SourceSkillId
+        or started.SourceCastRange ~= review.CastRange
+        or started.SourceEffectRange ~= review.EffectRange
+    then
         self._scheduler:cancel_cast(player, started.CastId)
         return nil, "C4DirectMagicReviewedSourceMismatch"
     end
@@ -286,7 +301,8 @@ local function revalidate_target(
 ): (boolean, string?)
     return self._executor:can_magic_skill_npc(
         player,
-        record.Enemy
+        record.Enemy,
+        record.EffectRange
     )
 end
 
@@ -336,6 +352,8 @@ local function launch_plan_matches(
     return launch.CreativeSkillId == record.CreativeSkillId
         and launch.CreativeRank == record.CreativeRank
         and launch.SourceSkillId == record.SourceSkillId
+        and launch.SourceCastRange == record.CastRange
+        and launch.SourceEffectRange == record.EffectRange
         and launch.ReadyForSourceEffectExecution == true
 end
 
@@ -505,6 +523,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
+        SourceCastRangeAtStart = true,
+        SourceEffectRangeAtLaunch = true,
         TargetRevalidatedBeforeLaunchMp = true,
         LaunchMpCommittedBeforeEffectExecution = true,
         ShotConsumptionDelegatedToSourceCalculation = true,
