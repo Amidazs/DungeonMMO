@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.79 live C4 executor foundation GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_79_C4_Live_Combat_Executor_20260925.md);
+[green evidence](../testing/c4-live-combat-executor-v2-79-20260925.md).
+The first disabled live source-combat executor now derives server transforms,
+requires an explicit source elevation scale/night provider, calls the accepted
+source normal-attack calculation, routes PvP through CP first and then mutates
+server Humanoid HP. All independent gates remain required. Fresh focused
+Studio Base 17/17 and Dungeon 19/19 passed; executor fixture 10 assertions
+passed. Dungeon runtime composes resource authority but stays disabled; Base
+cannot enable because live resource authority is intentionally absent. Next:
+PDAM/MDAM/HEAL executor paths. Permanent edits remain GitHub-only; no main
+merge/publish/prod saves.
+
 ## 25 September 2026 — v2.78 spatial combat inputs GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_78_C4_Spatial_Combat_20260925.md);
