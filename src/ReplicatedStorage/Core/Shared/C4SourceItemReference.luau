@@ -103,7 +103,7 @@ local ITEM_REFERENCES = table.freeze({
         PhysicalDefence = 77,
     }),
     [425] = table.freeze({
-        Id = 425, Slot = "Body", Kind = "Robe",
+        Id = 425, Slot = "Body", Kind = "Magic",
         PhysicalDefence = 17, MaxMpAfterModifiers = 19,
     }),
     [102] = table.freeze({
