@@ -118,6 +118,66 @@ local function check_equipment_and_class_gates()
 end
 
 --[[
+Checks exact Human Wizard Quick Recovery reuse multipliers.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms neutral reuse 1 receives source rank-one/two multipliers.
+]]
+local function check_human_wizard_reuse()
+    local neutral = assert(C4.get(
+        "Human",
+        "Emberweaver",
+        30,
+        {},
+        {}
+    ))
+    check(
+        neutral.PassiveStatSnapshot.MAGICAL_SKILL_REUSE == 1
+            and neutral.PassiveStatSnapshot.SKILL_MASTERY == 0,
+        "Human Wizard source reuse and mastery start at exact neutral values"
+    )
+
+    local first = assert(C4.get(
+        "Human",
+        "Emberweaver",
+        20,
+        {},
+        {{SkillId = 164, Rank = 1}}
+    ))
+    check(
+        first.PassiveStatSnapshot.MAGICAL_SKILL_REUSE == 0.8,
+        "Quick Recovery rank one multiplies magical reuse by 0.8"
+    )
+
+    local second = assert(C4.get(
+        "Human",
+        "Emberweaver",
+        30,
+        {},
+        {{SkillId = 164, Rank = 2}}
+    ))
+    check(
+        second.PassiveStatSnapshot.MAGICAL_SKILL_REUSE == 0.75,
+        "Quick Recovery rank two multiplies magical reuse by 0.75"
+    )
+
+    local _, early = C4.get(
+        "Human",
+        "Emberweaver",
+        20,
+        {},
+        {{SkillId = 164, Rank = 2}}
+    )
+    check(
+        early == "OriginalPassiveNotLearnableByClassOrLevel",
+        "level twenty cannot borrow level-thirty Quick Recovery rank two"
+    )
+end
+
+--[[
 Executes complete nine-class source-only stat and loadout acceptance.
 
 Args:
@@ -129,6 +189,7 @@ Returns:
 local function main()
     check_nine_class_vitals()
     check_equipment_and_class_gates()
+    check_human_wizard_reuse()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
         .. "nine_paths=9 live=false"):format(checks))
 end
