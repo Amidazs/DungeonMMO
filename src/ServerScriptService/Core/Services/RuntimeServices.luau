@@ -119,8 +119,18 @@ function RuntimeServices.new(place_kind: string): any
     C4SourceCombatCalculationService.set_shot_authority(
         c4_source_shots
     )
+
+    local c4_resource_cutover = nil
+    if place_kind == "Dungeon" then
+        c4_resource_cutover = require(
+            Services:WaitForChild("C4ResourceCutoverService")
+        )
+    end
+
     local c4_source_combat_executor =
-        C4SourceCombatExecutor.new()
+        C4SourceCombatExecutor.new({
+            ResourceAuthority = c4_resource_cutover,
+        })
     local recipe_knowledge = RecipeKnowledgeService.new(
         profiles,
         inventory
