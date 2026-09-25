@@ -93,6 +93,8 @@ local function source_stats(
         ACCURACY_COMBAT = naked.Accuracy,
         EVASION_RATE = naked.Evasion,
         CRITICAL_RATE = naked.PhysicalCriticalRate,
+        PHYSICAL_CRITICAL_POWER = 1,
+        PHYSICAL_CRITICAL_POWER_ADD = 0,
         MAX_HP = naked.MaxHP,
         MAX_MP = naked.MaxMP,
         MAX_CP = naked.MaxCP,
