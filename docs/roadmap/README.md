@@ -1,3 +1,16 @@
+**v2.60 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_60_C4_Owned_Passive_Source_Resolution_20260925.md)
+and [test evidence](
+../testing/c4-owned-passive-source-resolution-v2-60-20260925.md).
+Actually owned creative passive ranks now resolve to one highest reviewed C4
+source rank per passive family, including inherited starter passives on
+first-transfer characters. Level eligibility alone grants nothing; unmapped
+custom passives and over-range saved ranks fail closed. The authenticated
+resource boundary composes reviewed six-slot source gear plus owned source
+passives. Fresh Base focused **7/7 PASS** and Dungeon **8/8 PASS**. Only fixed
+cutover blockers now remain active-effect ordering and CP runtime authority.
+No main merge, publish or production saves.
+
 **v2.59 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_59_C4_Six_Slot_Paperdoll_Expertise_20260925.md)
 and [test evidence](
