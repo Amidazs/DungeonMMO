@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.91 live player-to-NPC rehearsal GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md)
+and [green evidence](
+../testing/c4-live-player-npc-rehearsal-v2-91-20260925.md).
+A real unpublished Dungeon Play client used the existing
+`CombatInputActions.begin_attack()` path against a reviewed Room1 Marauder
+while the actual runtime coordinator was source-cut-over. The server accepted
+Slash1, applied approximately **2.567 C4-source damage**, reduced NPC HP
+48 -> ~45.433, preserved contribution/threat, and invoked the quest observer
+without granting invalid quest credit. The same coordinator then rolled all
+five source/live gates OFF, restored player MaxHealth to ~113.4, and the same
+client input applied the existing-model **10.0 damage**, leaving the reset NPC
+at 38 HP. Fresh focused Base **24/24 PASS**, Dungeon **27/27 PASS**. One final
+bounded multiplayer cutover rehearsal remains before returning to the larger
+MMORPG backend roadmap. No main merge, publish, production save mutation or
+animation edits.
+
 ## 25 September 2026 — CURRENT v2.90 runtime cutover rehearsal GREEN
 
 [Latest roadmap](
