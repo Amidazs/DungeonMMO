@@ -9,6 +9,9 @@ local Data5 = require(script.Parent.C4SkillEffectSourceData05)
 local Data6 = require(script.Parent.C4SkillEffectSourceData06)
 local Data7 = require(script.Parent.C4SkillEffectSourceData07)
 local Data8 = require(script.Parent.C4SkillEffectSourceData08)
+local Data9 = require(
+    script.Parent.C4SkillEffectSourceData09HumanWizard
+)
 
 local C4SkillEffectSource = {}
 
@@ -23,14 +26,68 @@ local SOURCES = table.freeze({
     Data6,
     Data7,
     Data8,
+    Data9,
 })
 
 local BY_ID = {}
+
+--[[
+Merges one additional rank subset for a source skill already catalogued.
+
+Human Wizard inherits several Human Mystic source skills at later ranks.
+Keeping those later ranks in a separate generated file avoids rewriting the
+previously accepted source shards while still producing one immutable runtime
+definition per historical skill ID.
+
+Args:
+    current (any): Existing rank-resolved source skill definition.
+    incoming (any): Additional source ranks from the same XML skill.
+
+Returns:
+    any: Frozen merged definition with no duplicate rank ambiguity.
+]]
+local function merge_skill(current: any, incoming: any): any
+    assert(
+        current.Id == incoming.Id
+            and current.Name == incoming.Name
+            and current.SourceFile == incoming.SourceFile,
+        "C4 source shards disagree for skill "
+            .. tostring(current.Id)
+    )
+
+    local ranks = {}
+    for rank, definition in pairs(current.Ranks) do
+        ranks[rank] = definition
+    end
+    for rank, definition in pairs(incoming.Ranks) do
+        assert(
+            ranks[rank] == nil,
+            "Duplicate C4 source rank "
+                .. tostring(current.Id)
+                .. ":"
+                .. tostring(rank)
+        )
+        ranks[rank] = definition
+    end
+
+    return table.freeze({
+        Id = current.Id,
+        Name = current.Name,
+        Ranks = table.freeze(ranks),
+        SourceFile = current.SourceFile,
+        XmlLevels = math.max(
+            current.XmlLevels or 0,
+            incoming.XmlLevels or 0
+        ),
+    })
+end
+
 for _, source in ipairs(SOURCES) do
     for skill_id, definition in pairs(source) do
-        assert(BY_ID[skill_id] == nil,
-            "Duplicate C4 source skill " .. tostring(skill_id))
-        BY_ID[skill_id] = definition
+        local current = BY_ID[skill_id]
+        BY_ID[skill_id] = if current
+            then merge_skill(current, definition)
+            else definition
     end
 end
 
