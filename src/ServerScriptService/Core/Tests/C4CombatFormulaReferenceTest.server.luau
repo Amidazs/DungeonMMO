@@ -109,6 +109,26 @@ local function main()
     check_close(Formula.heal_amount(95, false, true), 142.5,
         "Blessed Spiritshot increases source heal by 50 percent")
 
+    check(
+        Formula.unarmed_random_damage_range(30) == 10,
+        "Level-30 unarmed source variance range is ten percent"
+    )
+    check_close(
+        Formula.physical_random_damage_multiplier(10, -10),
+        0.90,
+        "Source minimum random physical multiplier is exact"
+    )
+    check_close(
+        Formula.physical_random_damage_multiplier(10, 0),
+        1,
+        "Source zero random physical roll is neutral"
+    )
+    check_close(
+        Formula.physical_random_damage_multiplier(10, 10),
+        1.10,
+        "Source maximum random physical multiplier is exact"
+    )
+
     check(Formula.physical_attack_delay(330) == 1424,
         "C4 330 PAtkSpd maps to source attack delay")
     check(Formula.skill_cast_time(1000, 333) == 1000,
