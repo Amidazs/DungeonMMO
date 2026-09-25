@@ -1757,12 +1757,6 @@ local IRONVOW_BATTLE_CALL = specialize_skill(
             [1] = table.freeze({
                 BUFF_MAGNITUDE = 0.08, BUFF_SECONDS = 12,
             }),
-            [2] = table.freeze({
-                BUFF_MAGNITUDE = 0.10, BUFF_SECONDS = 12,
-            }),
-            [3] = table.freeze({
-                BUFF_MAGNITUDE = 0.12, BUFF_SECONDS = 12,
-            }),
         }),
     }
 )
