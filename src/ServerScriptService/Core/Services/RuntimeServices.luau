@@ -23,6 +23,12 @@ local DungeonDifficultyProgressionService = require(
 )
 local ProgressionService = require(Services:WaitForChild("ProgressionService"))
 local InventoryService = require(Services:WaitForChild("InventoryService"))
+local C4SourceShotService = require(
+    Services:WaitForChild("C4SourceShotService")
+)
+local C4SourceCombatCalculationService = require(
+    Services:WaitForChild("C4SourceCombatCalculationService")
+)
 local RewardService = require(Services:WaitForChild("RewardService"))
 local WeeklyWorldBossService = require(
     Services:WaitForChild("WeeklyWorldBossService")
@@ -106,6 +112,10 @@ function RuntimeServices.new(place_kind: string): any
     local contributions = ContributionService.new(sessions)
     local progression = ProgressionService.new(profiles)
     local inventory = InventoryService.new(profiles)
+    local c4_source_shots = C4SourceShotService.new(inventory)
+    C4SourceCombatCalculationService.set_shot_authority(
+        c4_source_shots
+    )
     local recipe_knowledge = RecipeKnowledgeService.new(
         profiles,
         inventory
@@ -155,6 +165,7 @@ function RuntimeServices.new(place_kind: string): any
         RateLimitService = rate_limits,
         ProgressionService = progression,
         InventoryService = inventory,
+        C4SourceShotService = c4_source_shots,
         RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
         WeeklyWorldBossService = weekly_world_boss,
