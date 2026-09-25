@@ -1,3 +1,17 @@
+**v2.61 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_61_C4_Active_Effect_Calculator_Ordering_20260925.md)
+and [test evidence](
+../testing/c4-active-effect-calculator-ordering-v2-61-20260925.md).
+C4 passives, timed active buffs and toggles can now share one source calculator
+queue with original operation ordering and named stack-group priority. The
+unified source API exposes ordered item+passive+active snapshots but explicitly
+keeps `ActiveEffectStateAuthoritative=false`; learned skills are not assumed
+active. Fresh Base focused **8/8 PASS** and Dungeon **9/9 PASS** at
+`0801508622a59c229af909a2d91a8769563a7b7e`. Next wire existing
+server-owned live toggles/buffs into an authoritative source-effect registry.
+The active-effect blocker remains until that runtime state is complete; CP is
+then the final fixed blocker. No main merge, publish or production saves.
+
 **v2.60 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_60_C4_Owned_Passive_Source_Resolution_20260925.md)
 and [test evidence](
