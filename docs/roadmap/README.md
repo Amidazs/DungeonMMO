@@ -1,3 +1,14 @@
+**v2.90 RUNTIME C4 CUTOVER REHEARSAL GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_90_C4_Runtime_Rehearsal_20260925.md)
+and [green evidence](
+../testing/c4-runtime-rehearsal-v2-90-20260925.md).
+Fresh focused Studio Base **24/24 PASS** and Dungeon **27/27 PASS**. A genuine
+unpublished Dungeon Play server with one connected player proved the real
+runtime coordinator can atomically move all source/live gates OFF -> ON ->
+OFF and restore the player's current resource model after rollback. Test-only
+spatial scale/daylight were explicit; production mapping is still unset. Next:
+real source-mode player-to-NPC combat rehearsal through existing input.
+
 **v2.89 ATOMIC C4 COMBAT CUTOVER GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_89_C4_Atomic_Combat_Cutover_20260925.md)
 and [green evidence](
