@@ -2031,6 +2031,7 @@ function C4SourceCombatCalculationService.capability(): any
         MagicFailuresSourceDefaultEnabled =
             Formula.magic_failures_default_enabled(),
         ElementalResolutionIntegrated = true,
+        NeutralNonElementalMagicIntegrated = true,
         ElementalPlayerTargetSourceStatsIntegrated = true,
         ElementalNpcTargetSourceStatsIntegrated = true,
         NpcTargetSourceBoundaryIntegrated = true,
