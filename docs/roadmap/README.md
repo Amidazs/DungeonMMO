@@ -13,15 +13,6 @@ then a fresh two-player enable/full rollback also passed. Fresh focused Base
 coordinator **11 assertions PASS**. Cutover hardening is closed; resume the
 broader MMORPG backend roadmap.
 
-**v2.92 MULTIPLAYER CUTOVER HARDENING READY:** [current roadmap](
-DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md).
-Source dispatch is now explicitly scoped to server-selected cutover
-participants, participant removal is coordinator-owned, the last participant
-leaving shuts every source gate down, and the real Dungeon disconnect path now
-performs that cleanup. Fresh `git diff --check`, Base Rojo build and Dungeon
-Rojo build PASS. Next: one bounded two-player unpublished Studio rehearsal,
-then return to the broader MMORPG backend roadmap.
-
 **v2.91 LIVE PLAYER-TO-NPC REHEARSAL GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md)
 and [green evidence](
