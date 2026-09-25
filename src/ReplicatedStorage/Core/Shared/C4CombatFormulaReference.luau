@@ -35,8 +35,16 @@ local RND_URL =
     .. "l2jadmins_C4-Scions-of-Destiny/blob/"
     .. SOURCE_COMMIT
     .. "/L2jAdmins_Core/src/l2j/util/Rnd.java"
+local CHAR_STAT_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/manager/"
+    .. "character/stat/CharStat.java"
 
 local PERFECT_SHIELD_CONFIG_RATE = 5
+local MAX_MAGIC_CRITICAL_RATE = 300
+local MAGIC_FAILURES_DEFAULT_ENABLED = false
 
 --[[
 Checks one finite positive numeric combat argument.
@@ -585,22 +593,218 @@ end
 --[[
 Returns the C4 pre-random magic success threshold.
 
-Source success compares a 0-9999-like random value against this
-rounded resistance threshold. This function avoids inventing a Roblox
-status chance while preserving the exact level-difference arithmetic.
+The source computes round(pow(1.3, levelDifference) * 100), where
+levelDifference is target level minus skill magic level.
 
 Args:
-    target_level (number): Target character level.
-    magic_level (number): Skill magic level, or attacker level fallback.
+    target_level (number): Positive integer target character level.
+    magic_level (number): Positive integer skill magic level.
 
 Returns:
     number: Rounded C4 resistance threshold.
 ]]
 function C4CombatFormulaReference.magic_resist_threshold(
-    target_level: number, magic_level: number
+    target_level: number,
+    magic_level: number
 ): number
+    assert(
+        type(target_level) == "number"
+            and target_level % 1 == 0
+            and target_level >= 1,
+        "Target level must be a positive integer"
+    )
+    assert(
+        type(magic_level) == "number"
+            and magic_level % 1 == 0
+            and magic_level >= 1,
+        "Magic level must be a positive integer"
+    )
+
     local difference = target_level - magic_level
     return math.floor((1.3 ^ difference) * 100 + 0.5)
+end
+
+--[[
+Resolves one exact C4 magic-success roll.
+
+Rnd.get(10000) yields an integer from 0 through 9999. Source magic succeeds
+only when that roll is strictly greater than the rounded resistance threshold.
+
+Args:
+    target_level (number): Positive integer target level.
+    magic_level (number): Positive integer skill magic level.
+    roll (number): Server-owned integer roll from 0 through 9999.
+
+Returns:
+    any: Success state plus exact threshold and roll evidence.
+]]
+function C4CombatFormulaReference.resolve_magic_success(
+    target_level: number,
+    magic_level: number,
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 9999,
+        "Magic success roll must be an integer from 0 through 9999"
+    )
+
+    local threshold =
+        C4CombatFormulaReference.magic_resist_threshold(
+            target_level,
+            magic_level
+        )
+
+    return {
+        Threshold = threshold,
+        Roll = roll,
+        Success = roll > threshold,
+    }
+end
+
+--[[
+Classifies the optional C4 player-cast magic failure branch.
+
+The reviewed source performs a first magic-success roll. If that fails, a
+second independent success roll can downgrade the result to half damage only
+when the target is at most nine levels above the attacker. Otherwise damage is
+fully resisted to one point.
+
+Args:
+    attacker_level (number): Positive integer caster level.
+    target_level (number): Positive integer target level.
+    magic_level (number): Positive integer skill magic level.
+    first_roll (number): First server-owned 0-9999 success roll.
+    second_roll (number): Second server-owned 0-9999 success roll.
+
+Returns:
+    any: None, Half or Resisted classification with roll evidence.
+]]
+function C4CombatFormulaReference.resolve_magic_failure(
+    attacker_level: number,
+    target_level: number,
+    magic_level: number,
+    first_roll: number,
+    second_roll: number
+): any
+    assert(
+        type(attacker_level) == "number"
+            and attacker_level % 1 == 0
+            and attacker_level >= 1,
+        "Attacker level must be a positive integer"
+    )
+
+    local first = C4CombatFormulaReference.resolve_magic_success(
+        target_level,
+        magic_level,
+        first_roll
+    )
+
+    if first.Success then
+        return {
+            Failure = "None",
+            Threshold = first.Threshold,
+            FirstRoll = first.Roll,
+            SecondRoll = nil,
+            FirstSuccess = true,
+            SecondSuccess = nil,
+        }
+    end
+
+    local second = C4CombatFormulaReference.resolve_magic_success(
+        target_level,
+        magic_level,
+        second_roll
+    )
+    local can_half = second.Success
+        and (target_level - attacker_level) <= 9
+
+    return {
+        Failure = if can_half then "Half" else "Resisted",
+        Threshold = first.Threshold,
+        FirstRoll = first.Roll,
+        SecondRoll = second.Roll,
+        FirstSuccess = false,
+        SecondSuccess = second.Success,
+    }
+end
+
+--[[
+Returns the C4 magical critical chance in thousandths.
+
+CharStat truncates the final MAGICAL_CRITICAL_RATE and caps only the upper
+bound at Config.MaxMCritRate=300. Negative values are equivalent to no chance.
+
+Args:
+    critical_rate (number): Final source magical critical-rate stat.
+
+Returns:
+    number: Integer source critical chance from 0 through 300 per thousand.
+]]
+function C4CombatFormulaReference.magic_critical_rate_per_thousand(
+    critical_rate: number
+): number
+    assert(
+        type(critical_rate) == "number"
+            and critical_rate == critical_rate
+            and math.abs(critical_rate) < math.huge,
+        "Magical critical rate must be finite"
+    )
+
+    local truncated = math.floor(critical_rate)
+    return math.min(math.max(truncated, 0), MAX_MAGIC_CRITICAL_RATE)
+end
+
+--[[
+Resolves one exact C4 magical critical roll.
+
+calcMCrit uses the same strict-greater-than comparison as physical criticals
+against an integer Rnd.get(1000) roll from 0 through 999.
+
+Args:
+    critical_rate (number): Final source magical critical-rate stat.
+    roll (number): Server-owned integer roll from 0 through 999.
+
+Returns:
+    any: Critical state plus exact chance and roll evidence.
+]]
+function C4CombatFormulaReference.resolve_magic_critical(
+    critical_rate: number,
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 999,
+        "Magical critical roll must be an integer from 0 through 999"
+    )
+
+    local chance =
+        C4CombatFormulaReference.magic_critical_rate_per_thousand(
+            critical_rate
+        )
+
+    return {
+        ChancePerThousand = chance,
+        Roll = roll,
+        Critical = chance > roll,
+    }
+end
+
+--[[
+Reports the pinned default source setting for alternative magic failures.
+
+Args:
+    None.
+
+Returns:
+    boolean: False, matching Config MagicFailures default.
+]]
+function C4CombatFormulaReference.magic_failures_default_enabled(): boolean
+    return MAGIC_FAILURES_DEFAULT_ENABLED
 end
 
 --[[
@@ -619,7 +823,11 @@ function C4CombatFormulaReference.sources(): any
         HealUrl = HEAL_URL,
         ConfigUrl = CONFIG_URL,
         CharacterUrl = CHARACTER_URL,
+        CharStatUrl = CHAR_STAT_URL,
         RndUrl = RND_URL,
+        MagicFailuresDefaultEnabled =
+            MAGIC_FAILURES_DEFAULT_ENABLED,
+        MaxMagicCriticalRate = MAX_MAGIC_CRITICAL_RATE,
     }
 end
 
