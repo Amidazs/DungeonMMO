@@ -1,3 +1,16 @@
+## 25 September 2026 — v2.76 normal attack/PvP composition GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_76_C4_Normal_Attack_PvP_Composition_20260925.md);
+[green evidence](../testing/c4-normal-attack-pvp-composition-v2-76-20260925.md).
+The source-only combat provider now has complete ordinary single-target attack
+composition plus source weapon vulnerability and player PvP modifiers for
+normal, PDAM and MDAM paths. Deflect Arrow is exercised on a valid Oathguard
+target and produces reviewed BOW_WPN_VULN 0.84. Misses preserve Soulshot;
+successful attacks consume it once. Fresh Studio Base 15/15 and Dungeon 17/17
+passed; source combat 30 assertions passed. Next close authoritative spatial
+hit/shield inputs, then build the separately gated live source-combat executor.
+Permanent edits remain GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.75 C4 source shot authority GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_75_C4_Source_Shot_Authority_20260925.md);
