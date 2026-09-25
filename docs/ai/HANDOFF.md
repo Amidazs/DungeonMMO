@@ -1,3 +1,19 @@
+## 25 September 2026 — v2.56 fail-closed C4 resource migration boundary
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_56_C4_Resource_Migration_Boundary_20260925.md);
+[pending test scope](../testing/c4-resource-migration-boundary-v2-56-20260925.md).
+Added C4ResourceMigrationBoundary and authenticated
+ProgressionRuntimeState.get_c4_resource_migration_boundary(user_id). All nine
+current original paths expose exact reviewed source base HP/MP/CP, but live
+activation deliberately stays false behind four explicit blockers: incomplete
+original inventory mapping, actually owned passive mapping, active-effect
+ordering and missing CP runtime authority. This prevents current custom
+equipment/passives/buffs being silently stacked onto C4 base resources. Added
+nine-path/forgery/level-cap regression, **not yet executed**. Next close those
+four blockers in dependency order, then perform one coherent HP/MP/CP cutover
+before enabling Scout Elemental Heal or other C4 active families. Permanent
+edits GitHub only; no main merge/publish/production saves/animation edits.
+
 ## 25 September 2026 — v2.55 shared C4 heal/split-MP runtime rules
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_55_C4_Shared_Heal_And_Split_MP_Rules_20260925.md);
