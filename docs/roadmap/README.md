@@ -1,3 +1,18 @@
+**v2.70 PHYSICAL CRITICAL RESOLUTION GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md)
+and [green evidence](
+../testing/c4-physical-critical-resolution-v2-70-20260925.md).
+Ordinary C4 physical critical chance now resolves from authenticated final
+source CRITICAL_RATE with integer truncation, the source 500/1000 cap and a
+private 0-999 server roll. The final source candidate also carries the exact
+critical-power neutral bases, multiplier 1 and additive 0, so reviewed
+passive/active effects compose in the C4 calculator rather than stacking a
+custom damage layer. Fresh unpublished Studio: Base **14/14 PASS**, Dungeon
+**16/16 PASS**, formula **26 assertions PASS**, source combat **13 assertions
+PASS**. PDAM-skill and magical critical resolution remain explicit later work.
+Next: source weapon random-damage variance. No main merge, publish or
+production saves.
+
 **v2.69 NORMAL-ATTACK HIT RESOLUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_69_C4_Normal_Attack_Hit_Resolution_20260925.md)
 and [green evidence](
