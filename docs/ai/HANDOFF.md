@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.60 actually-owned C4 passive resolution GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_60_C4_Owned_Passive_Source_Resolution_20260925.md);
+[evidence](../testing/c4-owned-passive-source-resolution-v2-60-20260925.md).
+C4OwnedPassiveSourceResolver now translates only real Known/PurchasedRank
+creative passives into the highest actually owned C4 source rank, combining
+inherited starter and current first-transfer scopes. It does not infer passive
+ownership from level. Unmapped custom combat passives and saved ranks beyond
+reviewed source coverage are explicit blockers. C4ResourceMigrationBoundary
+now composes reviewed source equipment + owned source passives through the
+unified source calculator. Base 7/7 and Dungeon 8/8 focused Studio suites are
+green at e6925d66 after a clean Base retry. Remaining fixed blockers:
+active-effect ordering, then CP authority. No publish/prod saves/main merge.
+
 ## 25 September 2026 — v2.59 six-slot C4 paperdoll GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_59_C4_Six_Slot_Paperdoll_Expertise_20260925.md);
