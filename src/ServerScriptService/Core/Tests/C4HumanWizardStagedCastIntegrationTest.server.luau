@@ -1,5 +1,5 @@
 --!strict
--- Cross-service Human Wizard staged cast integration without live world damage.
+-- Cross-service Human Wizard staged cast integration.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -364,7 +364,7 @@ local function wizard_character(): any
 end
 
 --[[
-Builds the real staged source cast services around disposable world authorities.
+Builds the real staged cast services around disposable authorities.
 
 Args:
     None.
