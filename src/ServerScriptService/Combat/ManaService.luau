@@ -15,6 +15,12 @@ local AttributeConfig = require(
         :WaitForChild("Shared")
         :WaitForChild("AttributeConfig")
 )
+local C4SkillRuntimeRules = require(
+    ReplicatedStorage
+        :WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("C4SkillRuntimeRules")
+)
 local ProgressionRuntimeState = require(
     ServerScriptService
         :WaitForChild("Core")
@@ -127,6 +133,96 @@ function ManaService.try_spend(
     record.last_spend_at = os.clock()
     replicate(subject, record)
     return true
+end
+
+--[[
+Starts a Chronicle 4 split-MP cast after checking the complete cost.
+
+This spends only the source mpInitialConsume amount. If the cast is
+interrupted, that initial charge remains spent and the launch charge is
+never applied.
+
+Args:
+    subject (Instance): Authoritative mana owner.
+    initial_amount (number): Source mpInitialConsume amount.
+    completion_amount (number): Source mpConsume amount.
+
+Returns:
+    boolean: True when total MP was affordable and initial MP was spent.
+]]
+function ManaService.try_begin_split_spend(
+    subject: Instance,
+    initial_amount: number,
+    completion_amount: number
+): boolean
+    local record = records[subject]
+    if not record then
+        return false
+    end
+
+    refresh_limits(subject, record)
+
+    if not C4SkillRuntimeRules.can_begin_split_mana_cast(
+        record.current,
+        initial_amount,
+        completion_amount
+    ) then
+        replicate(subject, record)
+        return false
+    end
+
+    local remaining = C4SkillRuntimeRules.begin_split_mana_cast(
+        record.current,
+        initial_amount,
+        completion_amount
+    )
+    assert(remaining ~= nil)
+
+    record.current = remaining
+    if initial_amount > 0 then
+        record.last_spend_at = os.clock()
+    end
+    replicate(subject, record)
+    return true
+end
+
+--[[
+Applies the Chronicle 4 launch-time portion of a split MP cost.
+
+The original source does not repeat the total-affordability check here.
+It simply reduces current MP and clamps at zero. Callers must invoke this
+only for a cast that previously passed try_begin_split_spend.
+
+Args:
+    subject (Instance): Authoritative mana owner.
+    completion_amount (number): Source mpConsume amount.
+
+Returns:
+    number: Actual MP removed at launch, or zero without a mana record.
+]]
+function ManaService.finish_split_spend(
+    subject: Instance,
+    completion_amount: number
+): number
+    local record = records[subject]
+    if not record then
+        return 0
+    end
+
+    refresh_limits(subject, record)
+
+    local before = record.current
+    record.current = C4SkillRuntimeRules.finish_split_mana_cast(
+        record.current,
+        completion_amount
+    )
+
+    local spent = before - record.current
+    if spent > 0 then
+        record.last_spend_at = os.clock()
+    end
+    replicate(subject, record)
+    return spent
 end
 
 RunService.Heartbeat:Connect(function(delta_time: number)
