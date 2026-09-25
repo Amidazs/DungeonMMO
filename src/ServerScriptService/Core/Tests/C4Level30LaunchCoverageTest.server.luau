@@ -113,11 +113,22 @@ local function main()
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
-    check(report.SourceAuditedBranches == 6
-        and report.RankSchedulesMappedBranches == 5
-        and report.VerifiedCompleteBranches == 0
-        and not report.ReleaseSkillGatePassed,
-        "Do not certify unreviewed source branches or incomplete trees")
+    check(
+        report.SourceAuditedBranches == 6,
+        "Exactly six first-transfer branches have source inventories"
+    )
+    check(
+        report.RankSchedulesMappedBranches == 5,
+        "Only the five implemented Fighter transfers map trainer ranks"
+    )
+    check(
+        report.VerifiedCompleteBranches == 0,
+        "Source inventories and rank schedules do not certify a class"
+    )
+    check(
+        not report.ReleaseSkillGatePassed,
+        "Incomplete first-transfer trees must keep the release gate closed"
+    )
     local wizard = assert(Coverage.for_branch("HumanWizard"))
     check(wizard.SourceClass == "Human Wizard"
         and wizard.SourceInventoryAuditedThroughCap == true
