@@ -322,7 +322,9 @@ local function check_default_off()
             and capability.PvpFormulaModifiersIntegrated
             and capability.PlayerTargetPvpModifiersIntegrated
             and not capability.NpcRacePhysicalModifiersIntegrated
-            and not capability.PhysicalSkillCriticalIntegrated
+            and capability.CriticalResolutionIntegrated
+            and capability.PhysicalSkillCriticalIntegrated
+            and capability.PhysicalSkillCriticalRollServerOwned
             and capability.MagicCriticalIntegrated
             and capability.MagicCriticalRollServerOwned
             and capability.MagicFailureFormulaAvailable
@@ -702,8 +704,14 @@ local function check_physical()
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = 25,
         Soulshot = result.Soulshot,
+        WeaponVulnerabilityMultiplier =
+            result.WeaponVulnerabilityMultiplier,
         RandomDamageMultiplier = result.RandomDamageMultiplier,
+        PvpMultiplier = result.PvpMultiplier,
     })
+    if result.PhysicalSkillCritical then
+        expected *= 2
+    end
 
     check_close(
         result.Amount,
@@ -724,6 +732,12 @@ local function check_physical()
             and result.WeaponVulnerabilityMultiplier == 1
             and result.PvpStat == "PVP_PHYS_SKILL_DMG"
             and result.PvpMultiplier == 1
+            and result.SourceSkillBaseCriticalRate == 0
+            and result.PhysicalSkillCriticalChancePerThousand == 0
+            and result.PhysicalSkillCriticalRoll == nil
+            and not result.PhysicalSkillCritical
+            and type(result.SourceStrBonus) == "number"
+            and result.SourceStrBonus > 0
             and not result.LiveApplied,
         "physical provider retains exact source identity without applying HP"
     )
@@ -915,8 +929,8 @@ local function main()
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
         .. "hit=true critical=true variance=true shield=true "
-        .. "normal=true vuln=true pvp=true magiccrit=true "
-        .. "magicfailure=true element=true shots=true "
+        .. "normal=true vuln=true pvp=true pdamcrit=true "
+        .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
