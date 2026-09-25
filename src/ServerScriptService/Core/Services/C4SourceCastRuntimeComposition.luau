@@ -16,6 +16,9 @@ local CastScheduler = require(
 local DirectMagic = require(
     Services.C4SourceDirectMagicCastService
 )
+local PeriodicMagic = require(
+    Services.C4SourcePeriodicMagicCastService
+)
 
 local C4SourceCastRuntimeComposition = {}
 C4SourceCastRuntimeComposition.__index =
@@ -54,6 +57,10 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local periodic_magic = PeriodicMagic.new(
+        scheduler,
+        source_executor
+    )
 
     return setmetatable({
         SourceShots = source_shots,
@@ -61,6 +68,7 @@ function C4SourceCastRuntimeComposition.new(
         Timing = timing,
         Scheduler = scheduler,
         DirectMagic = direct_magic,
+        PeriodicMagic = periodic_magic,
     }, C4SourceCastRuntimeComposition)
 end
 
@@ -77,6 +85,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     player: any
 )
     self.DirectMagic:clear_owner(player)
+    self.PeriodicMagic:clear_owner(player)
 
     if player and type(player.UserId) == "number" then
         self.SourceShots:remove_player(player.UserId)
@@ -94,6 +103,7 @@ Returns:
 ]]
 function C4SourceCastRuntimeComposition:capability(): any
     local direct = self.DirectMagic:capability()
+    local periodic = self.PeriodicMagic:capability()
 
     return {
         Available = true,
@@ -106,6 +116,11 @@ function C4SourceCastRuntimeComposition:capability(): any
             direct.DefaultEnabled == true,
         DirectMagicCurrentlyEnabled =
             direct.CurrentlyEnabled == true,
+        PeriodicMagicBridge = true,
+        PeriodicMagicDefaultEnabled =
+            periodic.DefaultEnabled == true,
+        PeriodicMagicCurrentlyEnabled =
+            periodic.CurrentlyEnabled == true,
     }
 end
 
