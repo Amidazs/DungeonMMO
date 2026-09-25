@@ -18,6 +18,12 @@ local HEAL_URL =
     .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/manager/"
     .. "character/skills/effects/type/EffectHeal.java"
 
+local CONFIG_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/Config.java"
+
 --[[
 Checks one finite positive numeric combat argument.
 
@@ -311,6 +317,72 @@ function C4CombatFormulaReference.resolve_normal_attack_hit(
 end
 
 --[[
+Returns the C4 normal physical critical chance in thousandths.
+
+The reviewed source truncates the calculated PHYSICAL_CRITICAL_RATE to an
+integer, then caps it at Config.MaxPCritRate=500 before calcCrit performs its
+0-999 roll. Negative rates are equivalent to zero chance.
+
+Args:
+    critical_rate (number): Final source physical critical-rate stat.
+
+Returns:
+    number: Integer source critical chance from 0 through 500 per thousand.
+]]
+function C4CombatFormulaReference.physical_critical_rate_per_thousand(
+    critical_rate: number
+): number
+    assert(
+        type(critical_rate) == "number"
+            and critical_rate == critical_rate
+            and math.abs(critical_rate) < math.huge,
+        "Physical critical rate must be finite"
+    )
+
+    local truncated = math.floor(critical_rate)
+    return math.min(math.max(truncated, 0), 500)
+end
+
+--[[
+Resolves one exact C4 normal physical critical roll.
+
+The source uses calcCrit(rate), which returns true only when the capped source
+rate is strictly greater than an integer random roll from 0 through 999. A
+roll equal to the critical rate is therefore not a critical hit.
+
+Args:
+    critical_rate (number): Final source physical critical-rate stat.
+    roll (number): Server-owned integer random roll from 0 through 999.
+
+Returns:
+    any: Detached critical result containing chance and roll evidence.
+]]
+function C4CombatFormulaReference.resolve_physical_critical(
+    critical_rate: number,
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 999,
+        "Physical critical roll must be an integer from 0 through 999"
+    )
+
+    local chance =
+        C4CombatFormulaReference.physical_critical_rate_per_thousand(
+            critical_rate
+        )
+    local critical = chance > roll
+
+    return {
+        ChancePerThousand = chance,
+        Roll = roll,
+        Critical = critical,
+    }
+end
+
+--[[
 Returns the C4 pre-random magic success threshold.
 
 Source success compares a 0-9999-like random value against this
@@ -345,6 +417,7 @@ function C4CombatFormulaReference.sources(): any
         SourceCommit = SOURCE_COMMIT,
         FormulasUrl = FORMULAS_URL,
         HealUrl = HEAL_URL,
+        ConfigUrl = CONFIG_URL,
     }
 end
 
