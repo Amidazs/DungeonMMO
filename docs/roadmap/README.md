@@ -1,3 +1,20 @@
+**v2.96 HUMAN WIZARD SOURCE CAST AUTHORITY GREEN:** [roadmap](
+DungeonMMO_Roadmap_v2_96_Human_Wizard_Source_Cast_Authority_20260925.md)
+and [green evidence](
+../testing/c4-human-wizard-source-cast-authority-v2-96-20260925.md).
+Human Wizard cast authority now preserves exact source
+`mpInitialConsume`, `mpConsume`, hit/reuse metadata and ranges from the
+server-owned purchased rank. The new split-MP lifecycle requires active source
+resource cutover, checks the full source cost before start, spends only the
+initial charge at cast start, leaves it spent on interruption, revalidates
+class/rank authority, and spends the launch charge only on commit. Rank-6
+Ember Bolt proves **6 + 21 = 27 MP** with exact **4000 ms** authored hit time
+and **6000 ms** reuse metadata. Fresh cast-contract **11 assertions PASS**,
+resource lifecycle **12 PASS**, source combat **43 PASS**, focused runner
+**3/3 PASS**, Base/Dungeon builds PASS. Live damage/timer/cooldown remain
+disabled; next add final cast-time/reuse planning using source M.Atk.Spd and
+charged shot state.
+
 **v2.95 HUMAN WIZARD EXACT SOURCE COMBAT GREEN:** [roadmap](
 DungeonMMO_Roadmap_v2_95_Human_Wizard_Source_Combat_20260925.md)
 and [green evidence](
