@@ -186,6 +186,21 @@ local function record_applied_damage(
         applied_damage,
         lethal_hit
     )
+
+    if context.C4PeriodicStatus == true
+        and context.attacker
+        and context.target
+        and applied_damage > 0
+    then
+        DungeonProgressionBridge.award_damage(
+            context.attacker,
+            context.source_id,
+            context.target,
+            applied_damage,
+            1
+        )
+    end
+
     if context.attacker
         and context.target
         and context.target:IsA("Model")
