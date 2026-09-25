@@ -253,8 +253,7 @@ local function check_scout_heal_migration_plan()
                 "Scout source plan does not become a fake live candidate")
         end
     end
-    seed("Elf", "GreenwardWarden", 30)
-    local warden = assert(Runtime.get_character(OWNER_ID))
+    local warden = seed("Elf", "GreenwardWarden", 30)
     check(select(1, ScoutHeal.for_character(warden)) == nil,
         "Scout cannot borrow Warden's independent heal entitlement")
     local warden_preview = assert(
