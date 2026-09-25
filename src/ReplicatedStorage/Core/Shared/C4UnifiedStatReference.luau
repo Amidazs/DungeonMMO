@@ -260,6 +260,12 @@ function C4UnifiedStatReference.get_with_source_effects(
         end
     end
 
+    for _, rank_id in ipairs(active_ranks) do
+        if not is_learnable(reference.ScopeId, rank_id, level) then
+            return nil, "OriginalActiveNotLearnableByClassOrLevel"
+        end
+    end
+
     local staged = Gear.stage(
         source_stats(naked),
         naked,
