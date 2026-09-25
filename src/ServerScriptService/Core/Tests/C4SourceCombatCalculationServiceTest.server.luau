@@ -213,6 +213,8 @@ local function check_default_off()
             and capability.MagicFailureFormulaAvailable
             and capability.MagicFailureResolutionIntegrated
             and not capability.MagicFailuresSourceDefaultEnabled
+            and capability.ElementalResolutionIntegrated
+            and capability.ElementalPlayerTargetSourceStatsIntegrated
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -535,6 +537,7 @@ local function check_magic()
         SkillPower = 12,
         Failure = result.MagicFailure,
         MagicCritical = result.MagicCritical,
+        ElementalMultiplier = result.ElementalMultiplier,
     })
 
     check_close(
@@ -563,6 +566,12 @@ local function check_magic()
             and result.MagicFailureThreshold
                 == Formula.magic_resist_threshold(30, 1),
         "pinned source default keeps optional magic failures disabled"
+    )
+    check(
+        defender.SourceStatCandidate.WIND_VULN == 1
+            and result.SourceElement == "WIND"
+            and result.ElementalMultiplier == 1,
+        "Wind Strike uses authenticated target WIND vulnerability"
     )
     check(
         result.SourceSkillId == 1177
@@ -667,8 +676,8 @@ local function main()
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
         .. "hit=true critical=true variance=true shield=true "
-        .. "magiccrit=true magicfailure=true pdam=true "
-        .. "mdam=true heal=true live=false"
+        .. "magiccrit=true magicfailure=true element=true "
+        .. "pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
 
