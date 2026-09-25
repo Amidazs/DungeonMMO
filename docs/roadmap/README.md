@@ -1,3 +1,16 @@
+**v2.64 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_64_C4_Active_Effect_Boundary_20260925.md)
+and [test evidence](
+../testing/c4-active-effect-boundary-v2-64-20260925.md).
+Timed buffs and Endurance Surge now feed the private active C4 source registry;
+unresolved live effects remain explicit blockers. All **21** current
+persistent stat-effect skills / **25** launch-reachable ranks are covered
+25/25 by reviewed C4 ACTIVE/TOGGLE source rows. The authenticated resource
+boundary composes equipment + actually-owned passives + real active effects,
+leaving only `LiveCPRuntimeUnavailable`. Fresh Base **10/10 PASS** and
+Dungeon **11/11 PASS** at `1e01640f`. No live resource cutover, publish,
+production save or main merge.
+
 **v2.62 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_62_C4_Authoritative_Active_Source_State_20260925.md)
 and [test evidence](
