@@ -1,3 +1,19 @@
+**v2.93 HUMAN WIZARD SOURCE AUDIT GREEN:** [roadmap](
+DungeonMMO_Roadmap_v2_93_Human_Wizard_Source_Audit_20260925.md)
+and [green evidence](
+../testing/c4-human-wizard-level30-source-audit-v2-93-20260925.md).
+Human Wizard's C4 first-transfer source inventory is now independently
+audited through the level-30 launch cap: **93 rank rows** at
+20/25/28/30. The class remains unimplemented and **0/93 mapped**; this is not
+a playable-class claim. The launch aggregate is now **6/18 source-audited,
+5/18 trainer-mapped, 0/18 release-certified**. Fresh acceptance also corrected
+a stale Human Knight audit error: its launch-cap source total is **54**, not
+55; the older inventory incorrectly duplicated bow defence at level 28 even
+though the next source rank is beyond the level-30 cap. Focused source audit
+**37 assertions PASS**, Base/Dungeon Rojo PASS. Next: creative Human Wizard
+career/quest/trainer and real source-family effects, including a
+server-authoritative summon design before any summon rows can count.
+
 **v2.92 MULTIPLAYER CUTOVER GREEN:** [roadmap](
 DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md)
 and [green evidence](
