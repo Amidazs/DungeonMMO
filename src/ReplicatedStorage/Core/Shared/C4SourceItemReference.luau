@@ -54,6 +54,38 @@ local ITEM_REFERENCES = table.freeze({
         PhysicalCriticalRate = 12, Accuracy = -3,
         AttackSpeed = 433,
     }),
+    [38] = table.freeze({
+        Id = 38, Slot = "Feet", Kind = "Boots",
+        PhysicalDefence = 15,
+    }),
+    [43] = table.freeze({
+        Id = 43, Slot = "Head", Kind = "Helmet",
+        PhysicalDefence = 19,
+    }),
+    [44] = table.freeze({
+        Id = 44, Slot = "Head", Kind = "Helmet",
+        PhysicalDefence = 23,
+    }),
+    [49] = table.freeze({
+        Id = 49, Slot = "Gloves", Kind = "Gloves",
+        PhysicalDefence = 13,
+    }),
+    [50] = table.freeze({
+        Id = 50, Slot = "Gloves", Kind = "Gloves",
+        PhysicalDefence = 15,
+    }),
+    [51] = table.freeze({
+        Id = 51, Slot = "Gloves", Kind = "Gloves",
+        PhysicalDefence = 17,
+    }),
+    [61] = table.freeze({
+        Id = 61, Slot = "Gloves", Kind = "Gloves", Grade = "D",
+        PhysicalDefence = 29,
+    }),
+    [63] = table.freeze({
+        Id = 63, Slot = "Gloves", Kind = "Gloves", Grade = "D",
+        PhysicalDefence = 24,
+    }),
     [22] = table.freeze({
         Id = 22, Slot = "Body", Kind = "Light",
         PhysicalDefence = 43,
@@ -109,7 +141,14 @@ function C4SourceItemReference.resolve(
     if type(item_ids) ~= "table" then
         return nil, "InvalidOriginalItemLoadout"
     end
-    local allowed = {Weapon = true, Body = true, OffHand = true}
+    local allowed = {
+        Weapon = true,
+        Body = true,
+        OffHand = true,
+        Head = true,
+        Gloves = true,
+        Feet = true,
+    }
     local kinds = {}
     local items = {}
     for slot, item_id in pairs(item_ids) do
