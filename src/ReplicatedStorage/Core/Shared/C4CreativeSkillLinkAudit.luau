@@ -16,6 +16,7 @@ local Audit = {}
 local CAREERS = table.freeze({
     HumanFighter = "Fighter", ElvenFighter = "Fighter",
     HumanMystic = "Mage", ElvenMystic = "Mage",
+    HumanWizard = "Emberweaver",
     HumanWarrior = "Ironvow", HumanKnight = "Oathguard",
     HumanRogue = "Ashenblade",
     ElvenKnight = "GreenwardWarden",
@@ -75,7 +76,7 @@ end
 Checks the exact skill ID, rank and learning level of one source row.
 
 Args:
-    scope_id (string): One of the nine verified original C4 paths.
+    scope_id (string): One tracked original C4 path.
     row (any): An original learning-tree row with its source rank.
     taught ({[string]: boolean}): Currently offered creative skill IDs.
 
@@ -167,7 +168,7 @@ local function inspect_class(scope_id: string): any
 end
 
 --[[
-Audits all nine original paths without mutating live progression/combat.
+Audits all tracked original paths without mutating live progression/combat.
 
 Args:
     None.
