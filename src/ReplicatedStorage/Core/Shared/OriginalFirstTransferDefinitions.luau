@@ -27,6 +27,17 @@ local ENTRIES = table.freeze({
         SkillId = "IronvowDrivingStrike",
         TrainerId = "IronvowTrainer",
     }),
+    HumanWizard = table.freeze({
+        BranchId = "HumanWizard",
+        Id = "Emberweaver",
+        DisplayName = "Emberweaver",
+        RaceId = "Human",
+        BaseClassId = "Mage",
+        MentorId = "MagisterOrwyn",
+        MentorName = "Magister Orwyn",
+        SkillId = "EmberweaverEmberBolt",
+        TrainerId = "EmberweaverTrainer",
+    }),
     HumanRogue = table.freeze({
         BranchId = "HumanRogue",
         Id = "Ashenblade",
@@ -64,6 +75,7 @@ local BY_ID = table.freeze({
     Oathguard = ENTRIES.HumanKnight,
     Ironvow = ENTRIES.HumanWarrior,
     Ashenblade = ENTRIES.HumanRogue,
+    Emberweaver = ENTRIES.HumanWizard,
     GreenwardScout = ENTRIES.ElvenScout,
     GreenwardWarden = ENTRIES.ElvenKnight,
 })
@@ -106,8 +118,8 @@ Returns:
 function Definitions.all(): {any}
     return table.freeze({
         ENTRIES.HumanKnight, ENTRIES.HumanWarrior,
-        ENTRIES.HumanRogue, ENTRIES.ElvenScout,
-        ENTRIES.ElvenKnight,
+        ENTRIES.HumanRogue, ENTRIES.HumanWizard,
+        ENTRIES.ElvenScout, ENTRIES.ElvenKnight,
     })
 end
 
@@ -164,7 +176,7 @@ local function earned_quest(
 end
 
 --[[
-Checks an unadvanced Fighter for the single eligible first-class award.
+Checks an unadvanced starter for one eligible first-transfer class award.
 
 Args:
     character (any): Actual selected server-authoritative character.
