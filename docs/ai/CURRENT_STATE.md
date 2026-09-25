@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.65 C4 resource prerequisites GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_65_C4_Combat_Point_Runtime_20260925.md)
+and [green evidence](
+../testing/c4-combat-point-runtime-v2-65-20260925.md).
+The final CP prerequisite is implemented: exact pinned source regen and
+playable-attacker CP absorption are represented by a private server runtime,
+with NPC damage bypass and certified-source-only max CP configuration. Clean
+reviewed characters now report **zero migration blockers** and
+`CutoverPrerequisitesReady=true`. This is readiness only:
+`CanApplyLive=false` and live Health/Mana/CP integration remain false, so
+current Dungeon gameplay has not been switched. Fresh Base **11/11 PASS** and
+Dungeon **12/12 PASS** at 2aae5124. Next build a reversible,
+disabled-by-default resource cutover service and acceptance-test enable,
+updates, respawn, playable CP absorption, NPC bypass and rollback before any
+default activation. Permanent edits stay GitHub-only; no main merge, publish,
+production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.64 active source boundary complete
 
 [Latest roadmap](
