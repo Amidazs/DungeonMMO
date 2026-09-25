@@ -36,8 +36,8 @@ end
 Applies original C4 armour P.Def and paperdoll deductions in source order.
 
 Every armour item's 0x10 P.Def add is summed before FuncPDefMod's 0x20
-slot deductions and level multiplier. DungeonMMO has no separate Legs slot,
-so only its current Head, Body, Gloves and Boots/Feet paperdoll is staged.
+slot deductions and level multiplier. Creative one-slot body items may resolve
+to a reviewed C4 chest+legs source set before this stage.
 
 Args:
     stats (any): Fresh original naked-stat dictionary.
@@ -46,7 +46,7 @@ Args:
     is_mystic (boolean): Actual starter Mystic class identity.
 
 Returns:
-    nil: Replaces P.Def with the reviewed six-slot source calculation.
+    nil: Replaces P.Def with the reviewed source paperdoll calculation.
 ]]
 local function apply_armour(
     stats: any,
@@ -68,6 +68,19 @@ local function apply_armour(
         deduction += if is_mystic then 15 else 31
     end
 
+    if items.Legs then
+        additive += items.Legs.PhysicalDefence
+    end
+
+    if items.Legs
+        or (
+            items.Body
+            and items.Body.BodyPart == "FullArmor"
+        )
+    then
+        deduction += if is_mystic then 8 else 18
+    end
+
     if items.Gloves then
         additive += items.Gloves.PhysicalDefence
         deduction += 8
@@ -86,8 +99,8 @@ end
 --[[
 Stages verified original gear stats before separate passive operations.
 
-Original Robe MP at 0x60 must be applied after skill/passive stages.
-Unreviewed enchantments, multi-slot armour and spell effects are excluded.
+Original magic armor MP at 0x60 must be applied after skill/passive stages.
+Unreviewed enchantments and spell effects remain excluded.
 
 Args:
     stats (any): Fresh source stat values, without passive modifiers.
@@ -104,10 +117,12 @@ function C4EquippedStatReference.stage(
     local values = table.clone(stats)
     local weapon = resolved.Items.Weapon
     local body = resolved.Items.Body
+    local legs = resolved.Items.Legs
     local offhand = resolved.Items.OffHand
     if weapon then apply_weapon(values, naked, weapon) end
     if resolved.Items.Head
         or body
+        or legs
         or resolved.Items.Gloves
         or resolved.Items.Feet
     then
@@ -120,9 +135,12 @@ function C4EquippedStatReference.stage(
     end
     return {
         Stats = values,
-        DeferredMaxMp = if body
-            then body.MaxMpAfterModifiers or 0 else 0,
-        SourceOnly = true, LiveCombatIntegrated = false,
+        DeferredMaxMp =
+            (if body then body.MaxMpAfterModifiers or 0 else 0)
+            + (if legs then legs.MaxMpAfterModifiers or 0 else 0),
+        OriginalLegsSemanticsIntegrated = true,
+        SourceOnly = true,
+        LiveCombatIntegrated = false,
     }
 end
 
