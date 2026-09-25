@@ -279,6 +279,7 @@ local function seed_characters()
     local mage = starter_character(MAGE_ID, "Mage")
     own_skill(mage, "WindStrike", 1)
     own_skill(mage, "MageHeal", 1)
+    own_skill(mage, "MysticPoisonCurse", 1)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -357,6 +358,9 @@ local function check_default_off()
             and capability.PhysicalSoulshotIntegrated
             and capability.MagicSpiritshotIntegrated
             and capability.HealSpiritshotIntegrated
+            and capability.PeriodicStatusCalculation
+            and capability.PeriodicStatusEffectSuccessIntegrated
+            and capability.PeriodicStatusNonlethalSemanticsIntegrated
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -1048,6 +1052,39 @@ local function check_npc_targets()
         "NPC MDAM uses source target defence/vulnerability without PvP"
     )
 
+    shot_state.Spiritshot = false
+    shot_state.BlessedSpiritshot = false
+    local poison = assert(Combat.status_skill(
+        MAGE_ID,
+        marauder,
+        "MysticPoisonCurse",
+        1
+    ))
+    check(
+        poison.Kind == "PeriodicStatus"
+            and poison.TargetKind == "Npc"
+            and poison.SourceNpcId == 325
+            and poison.SourceSkillId == 1168
+            and poison.SourceRank == 1
+            and poison.EffectType == "POISON"
+            and poison.SaveVs == "MEN"
+            and poison.TickDamage == 8
+            and poison.TickCount == 10
+            and poison.TickSeconds == 3
+            and poison.Nonlethal,
+        "player-to-NPC poison resolves exact reviewed source periodic plan"
+    )
+    check(
+        poison.Roll >= 0
+            and poison.Roll <= 99
+            and poison.Roll % 1 == 0
+            and poison.Landed == (poison.Roll < poison.Rate)
+            and not poison.Spiritshot
+            and not poison.BlessedSpiritshot
+            and not poison.LiveApplied,
+        "poison effect-success roll is private server source state"
+    )
+
     local malformed = table.clone(marauder)
     malformed.SourceCommit = "wrong"
     local denied, denied_reason = Combat.normal_attack_hit(
@@ -1135,7 +1172,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "pdam=true mdam=true heal=true npc=true live=false"
+        .. "status=true pdam=true mdam=true heal=true npc=true live=false"
     ):format(checks))
 end
 
