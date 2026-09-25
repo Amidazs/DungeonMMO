@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.80 live C4 skill execution GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_80_C4_Live_Skill_Execution_20260925.md)
+and [green evidence](
+../testing/c4-live-skill-execution-v2-80-20260925.md).
+The disabled live source executor now applies accepted ordinary attacks, PDAM,
+MDAM and self-HEAL. PvP damage routes through C4 CP before server Humanoid HP;
+HEAL clamps through server MaxHealth; shielded PDAM receives trusted executor
+spatial context. All gates remain OFF and no current CombatService route has
+been switched. Fresh Studio Base **17/17 PASS**, Dungeon **19/19 PASS**, live
+executor **13 assertions PASS**. Next: controlled disabled adapter at existing
+combat entry points. No main merge, publish, production save mutation or
+animation edits.
+
 ## 25 September 2026 — CURRENT v2.79 live C4 executor foundation GREEN
 
 [Latest roadmap](
