@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.59 six-slot C4 paperdoll GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_59_C4_Six_Slot_Paperdoll_Expertise_20260925.md);
+[evidence](../testing/c4-six-slot-paperdoll-expertise-v2-59-20260925.md).
+All 27 current Equipment definitions now map to reviewed C4 source items.
+Head/Body/Gloves/Feet source P.Def is staged using the exact original
+paperdoll deductions (12, Fighter/Mystic 31/15, 8, 7) before level
+multiplication. C4 Expertise skill 239 thresholds D20/C40/B52/A61/S76 are
+represented; under-level D-grade loadouts fail closed. Authenticated valid
+six-slot loadouts now set OriginalInventoryIntegrated=true. Fresh Base
+build/focus 6/6 PASS and Dungeon 7/7 PASS at e93d46bd. Next implement
+actually-owned passive source resolution; do not infer passives from level.
+Permanent edits GitHub-only; no publish/prod saves/main merge.
+
 ## 25 September 2026 — v2.58 focused local acceptance complete
 
 Fresh local unpublished Base/Dungeon builds and focused Studio RunScript
