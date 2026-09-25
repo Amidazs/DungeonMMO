@@ -6,8 +6,7 @@ The gated live executor now covers ordinary attacks plus source PDAM, MDAM and
 caster-only HEAL. Damage is applied CP-first then HP; heals mutate only
 server-owned caster HP. PDAM carries trusted spatial state into shield
 resolution. Fresh focused Studio Base 17/17 and Dungeon 19/19 passed; executor
-13 assertions passed. No gameplay dispatch has been switched yet. Next build
-a reversible disabled adapter into current combat entry points. Permanent edits
+13 assertions passed. No gameplay dispatch has been switched yet. Next build the source-ready C4 NPC stat boundary before the reversible dispatch adapter. Permanent edits
 remain GitHub-only; no main merge/publish/prod saves.
 
 ## 25 September 2026 — v2.79 live C4 executor foundation GREEN
