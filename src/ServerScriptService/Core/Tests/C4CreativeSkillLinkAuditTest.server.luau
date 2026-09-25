@@ -1,5 +1,5 @@
 --!strict
--- All nine C4 classes: every original rank must have a linked candidate
+-- All tracked C4 classes: every original rank needs a candidate
 -- or an explicit documented gap. A mapped ID is not matching damage.
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
@@ -7,9 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 9 and report.SourceLearningRows == 476,
-    "All original level-30 classes and source ranks must be audited")
-assert(report.CandidateRows + report.ExplicitMissingRows == 476,
+assert(report.ClassPaths == 10 and report.SourceLearningRows == 569,
+    "All tracked level-30 classes and source ranks must be audited")
+assert(report.CandidateRows == 528
+    and report.ExplicitMissingRows == 41,
+    "Tracked source rows must preserve candidate and explicit-gap totals")
+assert(report.CandidateRows + report.ExplicitMissingRows == 569,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -26,6 +29,8 @@ local elven_heal = assert(Map.resolve("ElvenKnight", 58, 4))
 local rogue_blade = assert(Map.resolve("HumanRogue", 16, 10))
 local elf_aura = assert(Map.resolve("ElvenScout", 91, 2))
 local elf_gap = assert(Map.resolve("ElvenScout", 58, 4))
+local wizard_bolt = assert(Map.resolve("HumanWizard", 1220, 1))
+local wizard_companion = assert(Map.resolve("HumanWizard", 1111, 1))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -36,6 +41,11 @@ assert(elven_heal.CreativeRank == 1
     and elf_aura.CreativeRank == 1
     and elf_gap.Status == "Missing",
     "Original first-transfer offsets and missing Elf Scout heal matter")
+assert(wizard_bolt.Status == "Candidate"
+    and wizard_bolt.CreativeSkillId == "EmberweaverEmberBolt"
+    and wizard_bolt.CreativeRank == 1
+    and wizard_companion.Status == "Missing",
+    "Wizard direct spell maps while companion skill stays explicit gap")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
