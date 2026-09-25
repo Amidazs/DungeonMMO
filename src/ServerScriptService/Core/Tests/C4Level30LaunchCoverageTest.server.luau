@@ -113,11 +113,27 @@ local function main()
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
-    check(report.SourceAuditedBranches == 5
+    check(report.SourceAuditedBranches == 6
         and report.RankSchedulesMappedBranches == 5
         and report.VerifiedCompleteBranches == 0
         and not report.ReleaseSkillGatePassed,
         "Do not certify unreviewed source branches or incomplete trees")
+    local wizard = assert(Coverage.for_branch("HumanWizard"))
+    check(wizard.SourceClass == "Human Wizard"
+        and wizard.SourceInventoryAuditedThroughCap == true
+        and wizard.SourceRankEntriesThroughCap == 93
+        and wizard.SourceRankEntriesByLevel[20] == 29
+        and wizard.SourceRankEntriesByLevel[25] == 32
+        and wizard.SourceRankEntriesByLevel[28] == 1
+        and wizard.SourceRankEntriesByLevel[30] == 31,
+        "Human Wizard C4 source ranks must be inventoried through level 30")
+    check(wizard.CurrentCareerId == nil
+        and wizard.TrainerMappedRankEntries == 0
+        and wizard.MissingRankScheduleEntries == 93
+        and not wizard.SourceRankScheduleMapped
+        and wizard.Status == "SourceRanksAuditedClassUnimplemented",
+        "Human Wizard source audit cannot imply a playable transfer class")
+
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
     check(warrior.Status == "RankScheduleMappedEffectsPending"
         and warrior.SourceRankEntriesThroughCap == 62
