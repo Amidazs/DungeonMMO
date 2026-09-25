@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.81 C4 NPC source boundary GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_81_C4_NPC_Source_Boundary_20260925.md)
+and [green evidence](
+../testing/c4-npc-source-boundary-v2-81-20260925.md).
+Standard creative Marauder and Wolf enemies now have pinned internal C4 NPC
+source records and exact ordinary-NPC derived combat stats. Combat-pack spawns
+retain server-owned `DungeonEnemyArchetypeId`; the NPC boundary service
+requires a living Workspace Model and a reviewed mapping. Source normal,
+PDAM and MDAM calculations now accept reviewed NPC targets, keep PvP
+multipliers neutral against NPCs and apply exact C4 NPC race semantics. Fresh
+Studio Base **18/18 PASS**, Dungeon **20/20 PASS**, NPC boundary **13
+assertions PASS**, source combat **38 assertions PASS**; targeted combat-pack
+identity **16 assertions PASS**. Next: disabled live player-to-NPC executor
+while preserving threat/quest/contribution callbacks. No main merge, publish,
+production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.80 live C4 skill execution GREEN
 
 [Latest roadmap](
