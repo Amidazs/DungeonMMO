@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.65 C4 Combat Point runtime GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_65_C4_Combat_Point_Runtime_20260925.md);
+[evidence](../testing/c4-combat-point-runtime-v2-65-20260925.md).
+Pinned C4 Formulas/Config/PcStatus were rechecked: CP regenerates every three
+seconds from BaseHpRegen + level band, level mod and CON with movement
+1.5/1.1/1/0.7; only L2Playable attackers consume CP, so NPC damage bypasses
+it. C4CombatPointRuntime is server-only and disabled by default. Its public
+configuration accepts only certified migration-boundary SourceStatCandidate
+MAX_CP. Resource boundary now has zero blockers for clean reviewed characters,
+while CanApplyLive and all live HP/MP/CP flags remain false. Fresh Base 11/11
+and Dungeon 12/12 focused suites are green at 2aae5124. Next implement the
+reversible disabled-by-default coordinated HP/MP/CP cutover. No publish/prod
+saves/main merge.
+
 ## 25 September 2026 — v2.64 active-effect boundary GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_64_C4_Active_Effect_Boundary_20260925.md);
