@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.74 elemental resolution GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_74_C4_Elemental_Resolution_20260925.md)
+and [green evidence](
+../testing/c4-elemental-resolution-v2-74-20260925.md).
+Current source-ready player targets now carry all six C4 elemental
+vulnerability bases and MDAM resolves the reviewed source skill element against
+the authenticated final matching target stat. Wind Strike therefore consumes
+final WIND_VULN rather than an invented custom multiplier. Fresh Studio Base
+**14/14 PASS**, Dungeon **16/16 PASS**, formula **49 assertions PASS**, source
+combat **24 assertions PASS**. Next: server-authoritative Soulshot/Spiritshot/
+Blessed Spiritshot ownership and consumption. No main merge, publish,
+production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.73 magic failure/critical GREEN
 
 [Latest roadmap](
