@@ -110,25 +110,6 @@ local function main()
         and not elven_knight.LaunchSkillCatalogueReady
         and elven_knight.Status == "RankScheduleMappedEffectsPending",
         "All Warden ranks map independently, without release certification")
-    local report = Coverage.report()
-    check(report.FirstTransferBranches == 18,
-        "All original first-transfer branches belong in launch audit")
-    check(
-        report.SourceAuditedBranches == 6,
-        "Exactly six first-transfer branches have source inventories"
-    )
-    check(
-        report.RankSchedulesMappedBranches == 5,
-        "Only the five implemented Fighter transfers map trainer ranks"
-    )
-    check(
-        report.VerifiedCompleteBranches == 0,
-        "Source inventories and rank schedules do not certify a class"
-    )
-    check(
-        not report.ReleaseSkillGatePassed,
-        "Incomplete first-transfer trees must keep the release gate closed"
-    )
     local wizard = assert(Coverage.for_branch("HumanWizard"))
     check(wizard.SourceClass == "Human Wizard"
         and wizard.SourceInventoryAuditedThroughCap == true
@@ -178,6 +159,25 @@ local function main()
         and not knight.LaunchSkillCatalogueReady,
         "Knight has all 55 source rank schedules, but live mechanic "
             .. "parity and launch certification are still outstanding")
+    local report = Coverage.report()
+    check(report.FirstTransferBranches == 18,
+        "All original first-transfer branches belong in launch audit")
+    check(
+        report.SourceAuditedBranches == 6,
+        "Exactly six first-transfer branches have source inventories"
+    )
+    check(
+        report.RankSchedulesMappedBranches == 5,
+        "Only the five implemented Fighter transfers map trainer ranks"
+    )
+    check(
+        report.VerifiedCompleteBranches == 0,
+        "Source inventories and rank schedules do not certify a class"
+    )
+    check(
+        not report.ReleaseSkillGatePassed,
+        "Incomplete first-transfer trees must keep the release gate closed"
+    )
     check(Coverage.for_branch("UnknownCareer") == nil,
         "Invented classes must not count toward release coverage")
     print(("[Level 30 Launch] PASS: %d assertions")
