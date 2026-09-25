@@ -21,7 +21,7 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all nine separate source templates at the level-30 launch cap.
+Checks all ten separate source templates at the level-30 launch cap.
 
 Args:
     None.
@@ -29,7 +29,7 @@ Args:
 Returns:
     nil: Confirms exact archived HP, MP and CP across all nine paths.
 ]]
-local function check_nine_class_vitals()
+local function check_ten_class_vitals()
     local vectors = {
         {"Human", "Fighter", 922, 319, 418},
         {"Human", "Mage", 699, 466, 366},
@@ -38,6 +38,7 @@ local function check_nine_class_vitals()
         {"Human", "Ironvow", 1070, 320, 849},
         {"Human", "Oathguard", 1018, 320, 610},
         {"Human", "Ashenblade", 983, 320, 399},
+        {"Human", "Emberweaver", 705, 492, 355},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
     }
@@ -178,7 +179,7 @@ local function check_human_wizard_reuse()
 end
 
 --[[
-Executes complete nine-class source-only stat and loadout acceptance.
+Executes complete ten-class source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -187,7 +188,7 @@ Returns:
     nil: Prints a bounded source-only check count upon success.
 ]]
 local function main()
-    check_nine_class_vitals()
+    check_ten_class_vitals()
     check_equipment_and_class_gates()
     check_human_wizard_reuse()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
