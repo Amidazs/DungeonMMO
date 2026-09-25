@@ -1,3 +1,14 @@
+**v2.78 SPATIAL COMBAT INPUTS GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_78_C4_Spatial_Combat_20260925.md)
+and [green evidence](
+../testing/c4-spatial-combat-v2-78-20260925.md).
+Reviewed C4 front/side/back, elevation/night hit conditions and shield facing
+now use trusted server spatial context. Ordinary hit resolution consumes the
+source condition multiplier and shielded PDAM derives facing from the same
+context. Fresh Studio Base **16/16 PASS**, Dungeon **18/18 PASS**, spatial
+**11 assertions PASS**, formula **51 assertions PASS**, source combat **30
+assertions PASS**. Next: disabled live source-combat executor.
+
 **v2.77 PDAM SKILL CRITICALS GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_77_C4_PDAM_Criticals_20260925.md)
 and [green evidence](../testing/c4-pdam-criticals-v2-77-20260925.md).
