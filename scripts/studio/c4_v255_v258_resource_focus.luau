@@ -1,9 +1,9 @@
 --!strict
--- Disposable unpublished focused runner for C4 v2.55-v2.61 resource work.
+-- Disposable unpublished focused runner for C4 v2.55-v2.62 resource work.
 
 assert(
     game.PlaceId == 0 and game.GameId == 0,
-    "C4 v2.55-v2.61 focus requires an unpublished local place"
+    "C4 v2.55-v2.62 focus requires an unpublished local place"
 )
 
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -46,6 +46,10 @@ local fixtures = {
         Parent = core_tests,
         Name = "C4CombinedStatEffectReferenceTest",
     },
+    {
+        Parent = core_tests,
+        Name = "C4ActiveSourceEffectStateTest",
+    },
 }
 
 if combat_tests then
@@ -70,7 +74,7 @@ local function run_test(fixture: any): boolean
 
     if not ok or result ~= true then
         warn(
-            "[C4 v2.55-v2.61 Focus] FAIL "
+            "[C4 v2.55-v2.62 Focus] FAIL "
                 .. fixture.Name
                 .. ": "
                 .. tostring(result)
@@ -78,7 +82,7 @@ local function run_test(fixture: any): boolean
         return false
     end
 
-    print("[C4 v2.55-v2.61 Focus] PASS " .. fixture.Name)
+    print("[C4 v2.55-v2.62 Focus] PASS " .. fixture.Name)
     return true
 end
 
@@ -94,13 +98,13 @@ local function main()
     local environment = if combat_tests then "Dungeon" else "Base"
 
     print((
-        "[C4 v2.55-v2.61 Focus] RESULT "
+        "[C4 v2.55-v2.62 Focus] RESULT "
             .. "environment=%s passed=%d total=%d"
     ):format(environment, passed, #fixtures))
 
     assert(
         passed == #fixtures,
-        "One or more C4 v2.55-v2.61 focused regressions failed"
+        "One or more C4 v2.55-v2.62 focused regressions failed"
     )
 end
 
