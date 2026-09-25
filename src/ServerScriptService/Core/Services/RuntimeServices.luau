@@ -35,6 +35,9 @@ local C4SourceCombatExecutor = require(
 local C4CombatDispatchAdapter = require(
     Services:WaitForChild("C4CombatDispatchAdapter")
 )
+local C4CombatCutoverCoordinator = require(
+    Services:WaitForChild("C4CombatCutoverCoordinator")
+)
 local RewardService = require(Services:WaitForChild("RewardService"))
 local WeeklyWorldBossService = require(
     Services:WaitForChild("WeeklyWorldBossService")
@@ -135,10 +138,19 @@ function RuntimeServices.new(place_kind: string): any
             ResourceAuthority = c4_resource_cutover,
         })
 
+    local c4_combat_cutover_coordinator = nil
     if place_kind == "Dungeon" then
         C4CombatDispatchAdapter.bind_executor(
             c4_source_combat_executor
         )
+        c4_combat_cutover_coordinator =
+            C4CombatCutoverCoordinator.new({
+                ResourceAuthority = c4_resource_cutover,
+                CombatProvider =
+                    C4SourceCombatCalculationService,
+                Executor = c4_source_combat_executor,
+                Dispatch = C4CombatDispatchAdapter,
+            })
     end
 
     local recipe_knowledge = RecipeKnowledgeService.new(
@@ -192,6 +204,8 @@ function RuntimeServices.new(place_kind: string): any
         InventoryService = inventory,
         C4SourceShotService = c4_source_shots,
         C4SourceCombatExecutor = c4_source_combat_executor,
+        C4CombatCutoverCoordinator =
+            c4_combat_cutover_coordinator,
         RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
         WeeklyWorldBossService = weekly_world_boss,
