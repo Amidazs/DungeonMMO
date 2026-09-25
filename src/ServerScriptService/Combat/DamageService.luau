@@ -41,6 +41,8 @@ export type DamageContext = {
 
 local damage_callback:
     ((DamageContext, number, boolean) -> ())? = nil
+local player_resource_damage_resolver:
+    ((Player, number, boolean) -> (number, number))? = nil
 
 function DamageService.calculate_damage(base_damage: number, multiplier: number): number
     return math.max(0, base_damage * multiplier)
@@ -50,6 +52,26 @@ function DamageService.set_damage_callback(
     callback: ((DamageContext, number, boolean) -> ())?
 )
     damage_callback = callback
+end
+
+--[[
+Installs the optional server-only player resource damage resolver.
+
+The resolver receives damage only after ordinary mitigation and ward
+absorption. While the C4 cutover is inactive it must return the original
+damage unchanged.
+
+Args:
+    callback ((Player, number, boolean) -> (number, number))?: Server-owned
+        defender resolver returning HP damage and CP absorbed.
+
+Returns:
+    nil: Future player hits may pass through the optional resource layer.
+]]
+function DamageService.set_player_resource_damage_resolver(
+    callback: ((Player, number, boolean) -> (number, number))?
+)
+    player_resource_damage_resolver = callback
 end
 
 local function resolve_critical_multiplier(context: DamageContext): number
@@ -197,7 +219,23 @@ function DamageService.apply_damage(context: DamageContext): number
     local health_damage, ward_absorbed = WardService.absorb_damage(
         context.target, damage
     )
-    if health_damage > 0 then humanoid:TakeDamage(health_damage) end
+    local cp_absorbed = 0
+
+    if defender
+        and health_damage > 0
+        and player_resource_damage_resolver
+    then
+        health_damage, cp_absorbed =
+            player_resource_damage_resolver(
+                defender,
+                health_damage,
+                attacker ~= nil
+            )
+    end
+
+    if health_damage > 0 then
+        humanoid:TakeDamage(health_damage)
+    end
 
     local observer = context.attacker
     if not observer then observer = Players:GetPlayerFromCharacter(context.target) end
@@ -208,7 +246,16 @@ function DamageService.apply_damage(context: DamageContext): number
         context.target.Name
     )
     if ward_absorbed > 0 then
-        detail ..= string.format(" (%.1f absorbed by Arcane Ward)", ward_absorbed)
+        detail ..= string.format(
+            " (%.1f absorbed by Arcane Ward)",
+            ward_absorbed
+        )
+    end
+    if cp_absorbed > 0 then
+        detail ..= string.format(
+            " (%.1f absorbed by C4 CP)",
+            cp_absorbed
+        )
     end
     CombatValidationService.emit(observer, "DAMAGE", "APPLIED", detail, context.sequence_id)
     if CombatConfig.DEBUG.PRINT_DAMAGE then
