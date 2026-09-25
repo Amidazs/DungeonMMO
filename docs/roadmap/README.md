@@ -1,3 +1,15 @@
+**v2.76 NORMAL ATTACK / PVP COMPOSITION GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_76_C4_Normal_Attack_PvP_Composition_20260925.md)
+and [green evidence](
+../testing/c4-normal-attack-pvp-composition-v2-76-20260925.md).
+The disabled source provider now composes ordinary player-target attacks from
+hit, shield, critical/power, random variance, source weapon vulnerability,
+player PvP modifier and one-use Soulshot. PDAM/MDAM now consume their matching
+source PvP stat families. Fresh focused Studio Base **15/15 PASS**, Dungeon
+**17/17 PASS**, formula **49 assertions PASS**, source combat **30 assertions
+PASS**. Next close server-owned spatial hit/shield inputs before live cutover.
+No main merge, publish or production saves.
+
 **v2.75 C4 SOURCE SHOT AUTHORITY GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_75_C4_Source_Shot_Authority_20260925.md)
 and [green evidence](
