@@ -94,6 +94,23 @@ function DamageService.set_source_damage_adapter(
     source_damage_adapter = callback
 end
 
+--[[
+Returns the current source damage adapter for isolated server tests.
+
+This prevents Studio regressions from permanently clearing the real runtime
+adapter after temporarily installing a fixture callback.
+
+Args:
+    None.
+
+Returns:
+    ((DamageContext) -> any)?: Current server-local adapter callback.
+]]
+function DamageService.get_source_damage_adapter_for_test():
+    ((DamageContext) -> any)?
+    return source_damage_adapter
+end
+
 local function resolve_critical_multiplier(context: DamageContext): number
     if type(context.critical_chance) ~= "number"
         or type(context.critical_damage_multiplier) ~= "number" then return 1 end
