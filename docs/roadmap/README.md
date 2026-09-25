@@ -1,3 +1,16 @@
+**v2.58 GitHub-only, PLAYTEST NEXT:** [current roadmap](
+DungeonMMO_Roadmap_v2_58_C4_Launch_Core_Gear_Source_Expansion_20260925.md)
+and [test scope](
+../testing/c4-launch-core-gear-source-v2-58-20260925.md).
+Five more pinned C4 source items are represented: Trident 291, Neti's Bow
+1181, Neti's Dagger 1182, Brigandine Tunic 352 and Manticore Skin Shirt 395.
+All 18 current Weapon/Body/OffHand creative equipment items now have reviewed
+source links. Helmet/Gloves/Boots explicitly fail closed because their source
+paperdoll operations are not integrated yet. The authenticated resource
+boundary now surfaces reviewed source core-loadout IDs without enabling live
+HP/MP/CP. Pending v2.55-v2.58 focused tests should now be executed locally.
+No main merge, publish or production save changes.
+
 **v2.57 GitHub-only, STUDIO PENDING:** [current roadmap](
 DungeonMMO_Roadmap_v2_57_C4_Creative_Item_Source_Map_20260925.md)
 and [pending test scope](
