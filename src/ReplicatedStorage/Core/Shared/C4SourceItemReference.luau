@@ -88,23 +88,45 @@ local ITEM_REFERENCES = table.freeze({
     }),
     [22] = table.freeze({
         Id = 22, Slot = "Body", Kind = "Light",
-        PhysicalDefence = 43,
+        BodyPart = "Chest", PhysicalDefence = 43,
+    }),
+    [29] = table.freeze({
+        Id = 29, Slot = "Legs", Kind = "Light",
+        PhysicalDefence = 27,
     }),
     [25] = table.freeze({
         Id = 25, Slot = "Body", Kind = "Heavy",
-        PhysicalDefence = 62,
+        BodyPart = "Chest", PhysicalDefence = 62,
+    }),
+    [32] = table.freeze({
+        Id = 32, Slot = "Legs", Kind = "Heavy",
+        PhysicalDefence = 39,
     }),
     [352] = table.freeze({
         Id = 352, Slot = "Body", Kind = "Heavy", Grade = "D",
-        PhysicalDefence = 103,
+        BodyPart = "Chest", PhysicalDefence = 103,
+    }),
+    [2378] = table.freeze({
+        Id = 2378, Slot = "Legs", Kind = "Heavy", Grade = "D",
+        PhysicalDefence = 64,
     }),
     [395] = table.freeze({
         Id = 395, Slot = "Body", Kind = "Light", Grade = "D",
-        PhysicalDefence = 77,
+        BodyPart = "Chest", PhysicalDefence = 77,
+    }),
+    [417] = table.freeze({
+        Id = 417, Slot = "Legs", Kind = "Light", Grade = "D",
+        -- Pinned XML operation is 51 even though armor.sql lists 48.
+        PhysicalDefence = 51,
     }),
     [425] = table.freeze({
         Id = 425, Slot = "Body", Kind = "Magic",
+        BodyPart = "Chest",
         PhysicalDefence = 17, MaxMpAfterModifiers = 19,
+    }),
+    [461] = table.freeze({
+        Id = 461, Slot = "Legs", Kind = "Magic",
+        PhysicalDefence = 10, MaxMpAfterModifiers = 10,
     }),
     [102] = table.freeze({
         Id = 102, Slot = "OffHand", Kind = "Shield",
@@ -130,7 +152,7 @@ end
 Resolves only reviewed original item IDs in their verified paperdoll slots.
 
 Args:
-    item_ids (any): Optional Weapon, Body and OffHand source item IDs.
+    item_ids (any): Optional reviewed source paperdoll item IDs.
 
 Returns:
     (any?, string?): Verified original kinds and records, or refusal.
@@ -144,6 +166,7 @@ function C4SourceItemReference.resolve(
     local allowed = {
         Weapon = true,
         Body = true,
+        Legs = true,
         OffHand = true,
         Head = true,
         Gloves = true,
@@ -163,6 +186,18 @@ function C4SourceItemReference.resolve(
         kinds[slot] = item.Kind
         items[slot] = item
     end
+
+    if items.Body then
+        kinds.BodyPart = items.Body.BodyPart or "Chest"
+    end
+
+    if items.Body
+        and items.Body.BodyPart == "FullArmor"
+        and items.Legs
+    then
+        return nil, "FullArmorSourceItemCannotCarryLegs"
+    end
+
     if items.Weapon and items.Weapon.TwoHanded and items.OffHand then
         return nil, "TwoHandedSourceWeaponCannotCarryShield"
     end
