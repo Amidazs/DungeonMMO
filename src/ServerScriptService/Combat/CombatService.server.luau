@@ -128,6 +128,11 @@ local CombatValidationService = require(
 local ProgressionRuntimeState = require(
     ServerScriptService:WaitForChild("Core"):WaitForChild("Services"):WaitForChild("ProgressionRuntimeState")
 )
+local C4ActiveSourceEffectState = require(
+    ServerScriptService:WaitForChild("Core")
+        :WaitForChild("Services")
+        :WaitForChild("C4ActiveSourceEffectState")
+)
 local DungeonProgressionBridge = require(
     ServerScriptService:WaitForChild("Dungeon"):WaitForChild("DungeonProgressionBridge")
 )
@@ -3736,6 +3741,7 @@ local function on_character_added(
     IronvowCriticalToggleService.stop(player)
     IronvowAccuracyToggleService.stop(player)
     IronvowEnduranceSurgeService.stop(player)
+    C4ActiveSourceEffectState.clear(player)
     StaminaService.reset_player(player)
     ManaService.reset_player(player)
     ProgressionRuntimeState.apply_max_health(player)
@@ -3776,6 +3782,53 @@ local function on_player_added(player: Player)
     end
 end
 
+
+--[[
+Updates the server-only C4 source-effect registry for a real live toggle.
+
+The toggle services pass only the creative ID and rank that survived their
+normal server authorization. The registry independently resolves the C4 source
+rank from the private progression snapshot; no source ID comes from a client.
+
+Args:
+    player (Player): Authenticated live toggle owner.
+    skill_id (string): Server-selected creative toggle ID.
+    rank (number): Server-selected purchased creative rank.
+    enabled (boolean): Whether the executor activated or ended the toggle.
+
+Returns:
+    boolean: True when the registry accepted the transition.
+]]
+local function update_c4_toggle_source_effect(
+    player: Player,
+    skill_id: string,
+    rank: number,
+    enabled: boolean
+): boolean
+    if enabled then
+        return C4ActiveSourceEffectState.activate(
+            player,
+            skill_id,
+            rank
+        )
+    end
+
+    C4ActiveSourceEffectState.deactivate(player, skill_id)
+    return true
+end
+
+ScoutCriticalToggleService.set_source_effect_state(
+    update_c4_toggle_source_effect
+)
+ScoutAccuracyToggleService.set_source_effect_state(
+    update_c4_toggle_source_effect
+)
+IronvowCriticalToggleService.set_source_effect_state(
+    update_c4_toggle_source_effect
+)
+IronvowAccuracyToggleService.set_source_effect_state(
+    update_c4_toggle_source_effect
+)
 
 -- This callback never trusts a client-supplied rank or toggle strength.
 -- Any respec, loadout change, class/race change or Dungeon exclusion
@@ -3888,6 +3941,7 @@ Players.PlayerRemoving:Connect(function(player)
     IronvowCriticalToggleService.stop(player)
     IronvowAccuracyToggleService.stop(player)
     IronvowEnduranceSurgeService.stop(player)
+    C4ActiveSourceEffectState.clear(player)
     StaminaService.remove_player(player)
     ManaService.remove_player(player)
     SkillCooldownService.remove_owner(player)
