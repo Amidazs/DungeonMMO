@@ -13,6 +13,9 @@ local Boundary = require(Shared.C4ResourceMigrationBoundary)
 local Runtime = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
+local CombatPoints = require(
+    ServerScriptService.Core.Services.C4CombatPointRuntime
+)
 
 local TEST_OWNER = 938176
 local checks = 0
@@ -170,14 +173,15 @@ local function check_nine_paths()
             row[2] .. " exact source values remain fail-closed"
         )
         check(
-            #plan.ActivationBlockers == 1
-                and plan.ActivationBlockers[1]
-                    == "LiveCPRuntimeUnavailable"
+            #plan.ActivationBlockers == 0
                 and plan.OriginalOwnedPassiveMappingIntegrated
                 and plan.ActiveEffectsIntegrated
                 and plan.CombinedSourceStatCandidateReady
-                and plan.SourceStatCandidateIncludesActiveEffects,
-            row[2] .. " leaves only the CP runtime blocker"
+                and plan.SourceStatCandidateIncludesActiveEffects
+                and plan.CombatPointRuntimeAuthoritative
+                and plan.CombatPointRuntimeReady
+                and plan.CutoverPrerequisitesReady,
+            row[2] .. " has all source cutover prerequisites ready"
         )
 
         Runtime.clear_character(TEST_OWNER)
@@ -226,7 +230,9 @@ local function check_reviewed_equipment_boundary()
             and not reviewed.CanApplyLive
             and reviewed.ActiveEffectsIntegrated
             and reviewed.CombinedSourceStatCandidateReady
-            and #reviewed.ActivationBlockers == 1,
+            and reviewed.CombatPointRuntimeReady
+            and reviewed.CutoverPrerequisitesReady
+            and #reviewed.ActivationBlockers == 0,
         "level-30 six-slot inventory migration is source-ready"
     )
 
@@ -246,7 +252,9 @@ local function check_reviewed_equipment_boundary()
                 == "OriginalEquipmentGradeExpertiseRequired"
             and blocked.OriginalOwnedPassiveMappingIntegrated
             and blocked.ActiveEffectsIntegrated
-            and #blocked.ActivationBlockers == 2,
+            and blocked.CombatPointRuntimeReady
+            and not blocked.CutoverPrerequisitesReady
+            and #blocked.ActivationBlockers == 1,
         "level-19 D-grade equipment keeps migration fail-closed"
     )
 
@@ -281,7 +289,9 @@ local function check_owned_passive_boundary()
             and plan.UnsupportedOwnedCreativePassives[1]
                 == "MysticRobeCasting"
             and plan.ActiveEffectsIntegrated
-            and #plan.ActivationBlockers == 2,
+            and plan.CombatPointRuntimeReady
+            and not plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 1,
         "unmapped owned combat passive adds the passive migration blocker"
     )
 
@@ -325,8 +335,10 @@ local function check_active_effect_boundary()
             and active_plan.SourceStatCandidateIncludesActiveEffects
             and active_plan.ReviewedActiveSourceRanks[1].SkillId == 82
             and active_plan.SourceModifiersApplied == 2
-            and #active_plan.ActivationBlockers == 1,
-        "real Majesty source state composes before the final CP blocker"
+            and active_plan.CombatPointRuntimeReady
+            and active_plan.CutoverPrerequisitesReady
+            and #active_plan.ActivationBlockers == 0,
+        "real Majesty source state composes with CP capability ready"
     )
 
     active_snapshot = {
@@ -352,7 +364,9 @@ local function check_active_effect_boundary()
             and not unresolved.CombinedSourceStatCandidateReady
             and unresolved.UnresolvedActiveSourceEffects[1].CreativeSkillId
                 == "UnmappedTimedBuff"
-            and #unresolved.ActivationBlockers == 2,
+            and unresolved.CombatPointRuntimeReady
+            and not unresolved.CutoverPrerequisitesReady
+            and #unresolved.ActivationBlockers == 1,
         "unresolved live active effect keeps active migration fail-closed"
     )
 
@@ -374,7 +388,9 @@ local function check_active_effect_boundary()
         not forged.ActiveEffectsIntegrated
             and forged.ActiveEffectSourceStateReason
                 == "OriginalActiveNotLearnableByClassOrLevel"
-            and #forged.ActivationBlockers == 2,
+            and forged.CombatPointRuntimeReady
+            and not forged.CutoverPrerequisitesReady
+            and #forged.ActivationBlockers == 1,
         "source rank valid for another class cannot forge active state"
     )
 
@@ -387,11 +403,13 @@ local function check_active_effect_boundary()
         Authoritative = true,
     }
 
-    local fixed = Boundary.blockers()
+    local missing_cp = Boundary.blockers()
+    local ready = Boundary.blockers(CombatPoints.capability())
     check(
-        #fixed == 1
-            and fixed[1] == "LiveCPRuntimeUnavailable",
-        "CP authority is the only fixed coordinated blocker"
+        #missing_cp == 1
+            and missing_cp[1] == "LiveCPRuntimeUnavailable"
+            and #ready == 0,
+        "CP capability closes the final coordinated source blocker"
     )
 
     Runtime.clear_character(TEST_OWNER)
@@ -466,7 +484,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "nine_paths=9 live=false blockers=1"
+        .. "nine_paths=9 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
