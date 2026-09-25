@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.88 level-30 source dispatch audit GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_88_C4_Level30_Dispatch_Audit_Closure_20260925.md)
+and [green evidence](
+../testing/c4-level30-dispatch-audit-closure-v2-88-20260925.md).
+The intended level-30 player-to-NPC C4 damage-family audit now has **zero
+activation blockers**. The old generic Ranger is already legacy/not
+fresh-creatable, and its level-1 creative Volley is deliberately **not** mapped
+to C4 Burst Shot because pinned source skill 24 starts at magic level 44,
+outside the agreed level-30 launch scope. Legacy RangerArea therefore fails
+closed after source cutover instead of inventing a low-level C4 equivalent.
+Fresh Studio Base **21/21 PASS**, Dungeon **24/24 PASS**, family audit **24
+assertions PASS**, `blockers=0 activation_ready=true`. All live/source gates
+remain OFF. Next: one reversible server-only cutover coordinator for the
+independent gates. No main merge, publish, production saves or animation edits.
+
 ## 25 September 2026 — CURRENT v2.87 live C4 periodic status GREEN
 
 [Latest roadmap](
