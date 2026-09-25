@@ -1,3 +1,18 @@
+**v2.92 MULTIPLAYER CUTOVER GREEN:** [roadmap](
+DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md)
+and [green evidence](
+../testing/c4-multiplayer-cutover-v2-92-20260925.md).
+Two real unpublished Dungeon clients both reached C4 source damage and retained
+separate threat; highest-threat targeting passed. Withdrawing one participant
+fully restored that player to the existing resource/combat model while the
+other remained source-active. The removed player's next real client strike was
+10.0 existing-model damage; the remaining participant later landed ~2.567
+C4-source damage. Removing the final participant shut every source gate down,
+then a fresh two-player enable/full rollback also passed. Fresh focused Base
+**24/24 PASS**, Dungeon **27/27 PASS**, dispatch **20 assertions PASS** and
+coordinator **11 assertions PASS**. Cutover hardening is closed; resume the
+broader MMORPG backend roadmap.
+
 **v2.92 MULTIPLAYER CUTOVER HARDENING READY:** [current roadmap](
 DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md).
 Source dispatch is now explicitly scoped to server-selected cutover
