@@ -74,9 +74,13 @@ local function check_equipment_and_class_gates()
         {Weapon = "Sword", Body = "Heavy"}, {
             {SkillId = 232, Rank = 1},
         }))
-    check(knight.PassiveStatSnapshot.PHYSICAL_DEFENCE
-            == knight.Naked.NakedPDef + 17.7,
-        "Heavy mastery adds source P.Def on correctly equipped Knight")
+    check(
+        math.abs(
+            knight.PassiveStatSnapshot.PHYSICAL_DEFENCE
+                - (knight.Naked.NakedPDef + 17.7)
+        ) < 0.000001,
+        "Heavy mastery adds source P.Def on correctly equipped Knight"
+    )
     local scout = assert(C4.get("Elf", "GreenwardScout", 30,
         {Weapon = "Bow", Body = "Light"}, {
             {SkillId = 208, Rank = 1},
