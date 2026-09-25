@@ -242,6 +242,7 @@ local function main()
 
     Adapter.set_enabled(false)
     Adapter.bind_executor(nil)
+    Adapter.bind_participant_provider(nil)
     Adapter.set_npc_damage_observer(nil)
     Adapter.set_activation_audit_provider_for_test(nil)
     Adapter.set_skill_rank_provider_for_test(function(
@@ -305,10 +306,42 @@ local function main()
             return true
         end
     )
+
+    local unscoped, unscoped_reason =
+        Adapter.set_enabled(true)
+    check(
+        not unscoped
+            and unscoped_reason
+                == "C4CombatParticipantScopeUnavailable",
+        "dispatch cannot enable without explicit participant authority"
+    )
+
+    Adapter.bind_participant_provider(
+        function(attacker: any): boolean
+            return attacker.UserId == 979181
+        end
+    )
+
     local enabled = Adapter.set_enabled(true)
     check(
         enabled and Adapter.is_enabled(),
-        "test-ready dispatch gate enables only after audit readiness"
+        "test-ready dispatch gate enables only after participant scope"
+    )
+
+    local legacy_context =
+        damage_context(
+            target,
+            "Melee",
+            "PrototypeWeapon",
+            10
+        )
+    legacy_context.attacker.UserId = 979182
+    local call_count = #calls
+    local unselected = Adapter.try_damage(legacy_context)
+    check(
+        unselected.Handled == false
+            and #calls == call_count,
+        "unselected player stays on the existing combat model"
     )
 
     local normal = Adapter.try_damage(
@@ -473,6 +506,8 @@ local function main()
     check(
         capability.DefaultEnabled == false
             and capability.ExecutorBound
+            and capability.ParticipantProviderBound
+            and capability.ExplicitParticipantScope
             and capability.DisabledFallsBackToCurrentCombat
             and capability.EnabledSourceFailureFallsClosed
             and capability.ActivationAuditReady
