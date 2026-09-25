@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.59 C4 inventory migration source-ready
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_59_C4_Six_Slot_Paperdoll_Expertise_20260925.md)
+and [green evidence](
+../testing/c4-six-slot-paperdoll-expertise-v2-59-20260925.md).
+The complete current six-slot equipment model is now source-mapped: **27/27**
+Equipment definitions have reviewed C4 item records. Helmet/Gloves/Boots are
+no longer ignored; they convert to source Head/Gloves/Feet and participate in
+exact original 0x10 item adds plus 0x20 paperdoll deductions. Original
+Expertise 239 thresholds are enforced by source grade. Fresh Base 6/6 and
+Dungeon 7/7 focused suites are green. The global inventory mapping blocker is
+closed. Remaining coordinated live C4 resource blockers are owned passive
+translation, active-effect ordering and CP runtime. Next resolve only actually
+purchased/currently owned passives into highest owned C4 ranks and surface
+unmapped custom passives instead of stacking their authored bonuses on C4.
+No main merge, Roblox publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.58 local acceptance GREEN
 
 Fresh unpublished local acceptance is now complete at
