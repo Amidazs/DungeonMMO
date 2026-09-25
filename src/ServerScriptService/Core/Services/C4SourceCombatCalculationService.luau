@@ -24,6 +24,7 @@ local C4SourceCombatCalculationService = {}
 local COMBAT_RANDOM = Random.new()
 
 local feature_enabled = false
+local shot_authority = nil
 
 --[[
 Returns a source-ready stat boundary for one authoritative runtime owner.
@@ -320,6 +321,91 @@ local function source_magic_failure(
         FirstRoll = resolved.FirstRoll,
         SecondRoll = resolved.SecondRoll,
     }, nil
+end
+
+--[[
+Consumes the private one-use physical shot state.
+
+Args:
+    user_id (number): Authenticated source-ready attacker.
+
+Returns:
+    (any?, string?): Validated shot state or strict authority reason.
+]]
+local function consume_physical_shot(
+    user_id: number
+): (any?, string?)
+    if not shot_authority
+        or type(shot_authority.consume_physical) ~= "function"
+    then
+        return nil, "C4SourceShotAuthorityUnavailable"
+    end
+
+    local state = shot_authority:consume_physical(user_id)
+    if type(state) ~= "table"
+        or type(state.Soulshot) ~= "boolean"
+    then
+        return nil, "InvalidSourcePhysicalShotState"
+    end
+
+    return state, nil
+end
+
+--[[
+Consumes the private one-use magical shot state.
+
+Args:
+    user_id (number): Authenticated source-ready caster.
+
+Returns:
+    (any?, string?): Validated magical shot state or strict authority reason.
+]]
+local function consume_magic_shot(
+    user_id: number
+): (any?, string?)
+    if not shot_authority
+        or type(shot_authority.consume_magic) ~= "function"
+    then
+        return nil, "C4SourceShotAuthorityUnavailable"
+    end
+
+    local state = shot_authority:consume_magic(user_id)
+    if type(state) ~= "table"
+        or type(state.Spiritshot) ~= "boolean"
+        or type(state.BlessedSpiritshot) ~= "boolean"
+        or (state.Spiritshot and state.BlessedSpiritshot)
+    then
+        return nil, "InvalidSourceMagicShotState"
+    end
+
+    return state, nil
+end
+
+--[[
+Installs the private server shot authority used by source calculations.
+
+The authority owns inventory consumption and charged state. This provider only
+consumes already-authorized one-use charges.
+
+Args:
+    authority (any?): C4SourceShotService-compatible server authority.
+
+Returns:
+    nil: Replaces only the server-local authority reference.
+]]
+function C4SourceCombatCalculationService.set_shot_authority(
+    authority: any?
+)
+    if authority ~= nil then
+        assert(
+            type(authority) == "table"
+                and type(authority.consume_physical) == "function"
+                and type(authority.consume_magic) == "function",
+            "C4 source shot authority has an invalid contract"
+        )
+    end
+
+    shot_authority = authority
 end
 
 --[[
@@ -734,10 +820,17 @@ function C4SourceCombatCalculationService.physical_skill(
         shield = shield_result
     end
 
+    local shot, shot_reason =
+        consume_physical_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
     local amount = Formula.physical_damage({
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = effect.Sets.power,
+        Soulshot = shot.Soulshot,
         Shield = shield.Blocked,
         PerfectShield = shield.PerfectShield,
         ShieldDefense = shield.ShieldDefencePower,
@@ -747,6 +840,7 @@ function C4SourceCombatCalculationService.physical_skill(
     return {
         Kind = "PhysicalDamage",
         Amount = amount,
+        Soulshot = shot.Soulshot,
         RandomDamage = variance.RandomDamage,
         RandomDamageRoll = variance.Roll,
         RandomDamageMultiplier = variance.Multiplier,
@@ -859,10 +953,18 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, elemental_reason
     end
 
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
     local amount = Formula.magic_damage({
         MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
         MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
         SkillPower = effect.Sets.power,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
         Failure = failure.Failure,
         MagicCritical = critical.Critical,
         ElementalMultiplier = elemental_multiplier,
@@ -871,6 +973,8 @@ function C4SourceCombatCalculationService.magic_skill(
     return {
         Kind = "MagicDamage",
         Amount = amount,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
         MagicLevel = failure.MagicLevel,
         MagicFailureEnabled = failure.Enabled,
         MagicFailure = failure.Failure,
@@ -942,13 +1046,21 @@ function C4SourceCombatCalculationService.heal_skill(
         return nil, power_reason
     end
 
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
     return {
         Kind = "Heal",
         Amount = Formula.heal_amount(
             power,
-            false,
-            false
+            shot.Spiritshot,
+            shot.BlessedSpiritshot
         ),
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceHealPower = power,
@@ -981,7 +1093,11 @@ function C4SourceCombatCalculationService.capability(): any
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
-        ShotsIntegrated = false,
+        ShotsIntegrated = true,
+        ShotAuthorityInstalled = shot_authority ~= nil,
+        PhysicalSoulshotIntegrated = true,
+        MagicSpiritshotIntegrated = true,
+        HealSpiritshotIntegrated = true,
         PhysicalRandomVarianceResolution = true,
         RandomWeaponVarianceIntegrated = true,
         UnarmedRandomVarianceIntegrated = true,
