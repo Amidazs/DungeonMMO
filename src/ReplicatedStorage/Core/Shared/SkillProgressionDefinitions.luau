@@ -1330,7 +1330,7 @@ local DEFINITIONS = table.freeze({
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
-        RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        RankLevels = table.freeze({[1] = 24, [2] = 32}),
         RankThresholds = table.freeze({[2] = 80}),
         Prerequisites = table.freeze({
             table.freeze({
@@ -1799,14 +1799,17 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- C4 Human Warrior learns War Cry rank 1 at level 20. Rank 2 belongs
+    -- to a later second-transfer class at level 43, so it is not an
+    -- Ironvow first-transfer rank and must not leak into the level-30 game.
     IronvowBattleCall = table.freeze({
         Id = "IronvowBattleCall",
-        Tier = "Common", MaxRank = 3, Kind = "Support",
+        Tier = "Common", MaxRank = 1, Kind = "Support",
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Ironvow"}),
-        RankLevels = table.freeze({[1] = 20, [2] = 24, [3] = 28}),
-        RankThresholds = table.freeze({[2] = 0, [3] = 0}),
+        RankLevels = table.freeze({[1] = 20}),
+        RankThresholds = table.freeze({}),
         Prerequisites = table.freeze({
             table.freeze({
                 SkillId = "FighterPhysicalTraining",
@@ -2208,8 +2211,8 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
-    -- Distinct C4 Knight Deflect Arrow source ranks at 24 and 28.
-    -- Only an actual authored ranged bow hit receives protection.
+    -- C4 Human Knight Deflect Arrow ranks unlock at levels 24 and 32.
+    -- Rank 2 therefore remains outside the initial level-30 launch cap.
     OathguardArrowWard = table.freeze({
         Id = "OathguardArrowWard",
         Tier = "Common", MaxRank = 2, Kind = "Support",
