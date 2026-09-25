@@ -9,6 +9,9 @@ assert(
 local tests = game:GetService("ServerScriptService").Core.Tests
 
 local FIXTURES = table.freeze({
+    "C4OwnedPassiveSourceResolverTest",
+    "C4UnifiedStatReferenceTest",
+    "C4ResourceMigrationBoundaryTest",
     "C4SkillRuntimeRulesTest",
     "C4SourceCastContractServiceTest",
     "C4SourceCastResourceServiceTest",
@@ -53,13 +56,13 @@ local function run_test(test_name: string): boolean
 end
 
 --[[
-Runs the bounded source cast and direct MDAM regressions.
+Runs the Human Wizard passive, timing, resource and MDAM regressions.
 
 Args:
     None.
 
 Returns:
-    nil: Raises unless both source-only contracts pass.
+    nil: Raises unless every bounded source-only dependency passes.
 ]]
 local function main()
     local passed = 0
