@@ -1,3 +1,14 @@
+**v2.73 C4 MAGIC FAILURE/CRITICAL GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_73_C4_Magic_Failure_Critical_20260925.md)
+and [green evidence](
+../testing/c4-magic-failure-critical-v2-73-20260925.md).
+Authenticated final source M.Crit now drives a private server 0-999 roll with
+the pinned 300/1000 cap; the exact optional two-roll magic-failure path is
+represented while source configuration keeps MagicFailures=false. Fresh Studio
+Base **14/14 PASS**, Dungeon **16/16 PASS**, formula **46 assertions PASS** and
+source combat **23 assertions PASS**. Next: elemental resolution. No main
+merge, publish or production saves.
+
 **v2.72 SOURCE SHIELD RESOLUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_72_C4_Shield_Resolution_20260925.md)
 and [acceptance record](
