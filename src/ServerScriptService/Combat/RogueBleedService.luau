@@ -98,7 +98,7 @@ local function run_tick(target: Model, record: any)
         attacker = record.player,
         attacker_character = record.character,
         target = target,
-        source_kind = "Skill",
+        source_kind = "StatusPhysical",
         source_id = record.skill_id,
         attack_id = nil,
         base_damage = record.tick_damage,
