@@ -143,6 +143,35 @@ function C4SourceDirectMagicCastService:is_enabled(): boolean
 end
 
 --[[
+Stores one private target-bound record after the scheduler accepts the cast.
+
+Args:
+    self (any): Direct magic bridge instance.
+    player (any): Server-owned cast owner.
+    enemy (any): Reviewed NPC target captured at cast start.
+    started (any): Source scheduler start evidence.
+
+Returns:
+    any: Private bridge record.
+]]
+local function store_pending(
+    self: any,
+    player: any,
+    enemy: any,
+    started: any
+): any
+    local record = {
+        CastId = started.CastId,
+        CreativeSkillId = started.CreativeSkillId,
+        CreativeRank = started.CreativeRank,
+        Enemy = enemy,
+    }
+
+    self._pending_by_owner[player] = record
+    return record
+end
+
+--[[
 Begins one target-bound direct-MDAM cast through the source scheduler.
 
 The target is validated before any initial MP spend and then captured privately
@@ -192,13 +221,7 @@ function C4SourceDirectMagicCastService:begin_cast(
         return nil, start_reason
     end
 
-    self._pending_by_owner[player] = {
-        CastId = started.CastId,
-        CreativeSkillId = started.CreativeSkillId,
-        CreativeRank = started.CreativeRank,
-        Enemy = enemy,
-    }
-
+    store_pending(self, player, enemy, started)
     return start_evidence(started), nil
 end
 
@@ -248,6 +271,101 @@ local function revalidate_target(
 end
 
 --[[
+Cancels one target-bound cast when hit-time NPC validation fails.
+
+Args:
+    self (any): Direct magic bridge instance.
+    player (any): Server-owned cast owner.
+    record (any): Private target-bound cast record.
+
+Returns:
+    (boolean, string?): True when target remains valid, otherwise denial reason.
+]]
+local function validate_launch_target(
+    self: any,
+    player: any,
+    record: any
+): (boolean, string?)
+    local ready, reason =
+        revalidate_target(self, player, record)
+
+    if ready then
+        return true, nil
+    end
+
+    self._pending_by_owner[player] = nil
+    self._scheduler:cancel_cast(player, record.CastId)
+    return false, reason
+end
+
+--[[
+Checks the scheduler launch payload still matches the captured cast identity.
+
+Args:
+    record (any): Private target-bound cast record.
+    launch (any): Source scheduler launch payload.
+
+Returns:
+    boolean: True only when creative identity/rank and readiness are unchanged.
+]]
+local function launch_plan_matches(
+    record: any,
+    launch: any
+): boolean
+    return launch.CreativeSkillId == record.CreativeSkillId
+        and launch.CreativeRank == record.CreativeRank
+        and launch.ReadyForSourceEffectExecution == true
+end
+
+--[[
+Executes one validated scheduler launch through the existing source executor.
+
+Args:
+    self (any): Direct magic bridge instance.
+    player (any): Server-owned cast owner.
+    record (any): Private target-bound cast record.
+    launch (any): Source-effect-ready scheduler payload.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Direct-MDAM application evidence or executor denial.
+]]
+local function execute_launch(
+    self: any,
+    player: any,
+    record: any,
+    launch: any,
+    sequence_id: number?
+): (any?, string?)
+    local applied, reason =
+        self._executor:magic_skill_npc(
+            player,
+            record.Enemy,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            sequence_id
+        )
+    if not applied then
+        return nil, reason
+    end
+
+    return {
+        Kind = "C4ScheduledDirectMagic",
+        CastId = record.CastId,
+        CreativeSkillId = launch.CreativeSkillId,
+        CreativeRank = launch.CreativeRank,
+        SourceSkillId = launch.SourceSkillId,
+        SourceRank = launch.SourceRank,
+        Launch = launch,
+        Application = applied,
+        Applied = applied.Applied == true,
+        SourceOnly = false,
+        ShotConsumedBySourceCalculation = true,
+        ClientAuthority = false,
+    }, nil
+end
+
+--[[
 Launches one ready direct-MDAM cast into the existing source executor.
 
 The NPC is revalidated before the scheduler commits launch-time MP. The source
@@ -279,10 +397,8 @@ function C4SourceDirectMagicCastService:launch_if_ready(
     end
 
     local target_ready, target_reason =
-        revalidate_target(self, player, record)
+        validate_launch_target(self, player, record)
     if not target_ready then
-        self._pending_by_owner[player] = nil
-        self._scheduler:cancel_cast(player, cast_id)
         return nil, target_reason
     end
 
@@ -298,39 +414,17 @@ function C4SourceDirectMagicCastService:launch_if_ready(
 
     self._pending_by_owner[player] = nil
 
-    if launch.CreativeSkillId ~= record.CreativeSkillId
-        or launch.CreativeRank ~= record.CreativeRank
-        or launch.ReadyForSourceEffectExecution ~= true
-    then
+    if not launch_plan_matches(record, launch) then
         return nil, "C4DirectMagicLaunchPlanChanged"
     end
 
-    local applied, apply_reason =
-        self._executor:magic_skill_npc(
-            player,
-            record.Enemy,
-            launch.CreativeSkillId,
-            launch.CreativeRank,
-            sequence_id
-        )
-    if not applied then
-        return nil, apply_reason
-    end
-
-    return {
-        Kind = "C4ScheduledDirectMagic",
-        CastId = cast_id,
-        CreativeSkillId = launch.CreativeSkillId,
-        CreativeRank = launch.CreativeRank,
-        SourceSkillId = launch.SourceSkillId,
-        SourceRank = launch.SourceRank,
-        Launch = launch,
-        Application = applied,
-        Applied = applied.Applied == true,
-        SourceOnly = false,
-        ShotConsumedBySourceCalculation = true,
-        ClientAuthority = false,
-    }, nil
+    return execute_launch(
+        self,
+        player,
+        record,
+        launch,
+        sequence_id
+    )
 end
 
 --[[
