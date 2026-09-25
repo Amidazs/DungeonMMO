@@ -318,6 +318,11 @@ local function spawn_entry(
                 PositionIndex = position_index,
             })
         end
+
+        enemy:SetAttribute(
+            "DungeonEnemyArchetypeId",
+            entry_execution.Entry.EnemyArchetypeId
+        )
         table.insert(enemies, enemy)
     end
 
