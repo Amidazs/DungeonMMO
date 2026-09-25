@@ -43,6 +43,8 @@ local damage_callback:
     ((DamageContext, number, boolean) -> ())? = nil
 local player_resource_damage_resolver:
     ((Player, number, boolean) -> (number, number))? = nil
+local source_damage_adapter:
+    ((DamageContext) -> any)? = nil
 
 function DamageService.calculate_damage(base_damage: number, multiplier: number): number
     return math.max(0, base_damage * multiplier)
@@ -74,6 +76,24 @@ function DamageService.set_player_resource_damage_resolver(
     player_resource_damage_resolver = callback
 end
 
+--[[
+Installs the optional server-only source damage dispatch adapter.
+
+The adapter receives the existing trusted DamageService context. A disabled
+adapter returns Handled=false and leaves the current damage path unchanged.
+
+Args:
+    callback (((DamageContext) -> any)?): Source dispatch callback or nil.
+
+Returns:
+    nil: Future eligible damage contexts may use the optional source path.
+]]
+function DamageService.set_source_damage_adapter(
+    callback: ((DamageContext) -> any)?
+)
+    source_damage_adapter = callback
+end
+
 local function resolve_critical_multiplier(context: DamageContext): number
     if type(context.critical_chance) ~= "number"
         or type(context.critical_damage_multiplier) ~= "number" then return 1 end
@@ -93,7 +113,58 @@ function DamageService.apply_damage(context: DamageContext): number
     end
     local humanoid = context.target:FindFirstChildOfClass("Humanoid")
     if not humanoid or humanoid.Health <= 0 then return 0 end
-    local normal_damage = DamageService.calculate_damage(context.base_damage, context.multiplier)
+
+    if source_damage_adapter then
+        local source_result = source_damage_adapter(context)
+        if type(source_result) == "table"
+            and source_result.Handled == true
+        then
+            local applied_damage =
+                tonumber(source_result.AppliedDamage) or 0
+            applied_damage = math.max(applied_damage, 0)
+
+            if source_result.Miss == true then
+                CombatValidationService.emit(
+                    attacker,
+                    "DAMAGE",
+                    "MISSED",
+                    tostring(context.source_id),
+                    context.sequence_id
+                )
+            elseif applied_damage > 0 then
+                CombatValidationService.emit(
+                    attacker,
+                    "DAMAGE",
+                    "APPLIED",
+                    string.format(
+                        "%s %.1fHP -> %s (C4 source)",
+                        context.attack_id or context.source_id,
+                        applied_damage,
+                        context.target.Name
+                    ),
+                    context.sequence_id
+                )
+            else
+                CombatValidationService.emit(
+                    attacker,
+                    "DAMAGE",
+                    "REJECT",
+                    tostring(
+                        source_result.Reason
+                            or "C4SourceDamageNotApplied"
+                    ),
+                    context.sequence_id
+                )
+            end
+
+            return applied_damage
+        end
+    end
+
+    local normal_damage = DamageService.calculate_damage(
+        context.base_damage,
+        context.multiplier
+    )
     if normal_damage <= 0 then return 0 end
     -- Only actual player-owned physical attacks against server-tagged NPCs
     -- with authored evasiveness can miss. An ordinary NPC with no
