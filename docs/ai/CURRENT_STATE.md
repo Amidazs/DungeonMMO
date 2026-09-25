@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.60 owned passive migration source-ready
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_60_C4_Owned_Passive_Source_Resolution_20260925.md)
+and [green evidence](
+../testing/c4-owned-passive-source-resolution-v2-60-20260925.md).
+The current six-slot source equipment candidate now composes with **actually
+owned**, authenticated C4 passive ranks. Starter inheritance for first-transfer
+classes is included; level alone never grants a rank. Unsupported custom
+passives or impossible saved ranks remain explicit dynamic blockers. Fresh
+Base focus **7/7 PASS** and Dungeon **8/8 PASS** at e6925d66. Global equipment
+and owned-passive mapping blockers are now closed for clean reviewed character
+state. The two fixed coordinated blockers left before live C4 resources are
+active-effect ordering and a live CP runtime. Next implement active/toggle
+source effect ordering from authoritative runtime state, without treating
+learned skills as active. Permanent code/docs stay GitHub-only; no main merge,
+publish, production save mutation or animation changes.
+
 ## 25 September 2026 — CURRENT v2.59 C4 inventory migration source-ready
 
 [Latest roadmap](
