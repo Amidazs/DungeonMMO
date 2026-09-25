@@ -50,6 +50,10 @@ local fixtures = {
         Parent = core_tests,
         Name = "C4ActiveSourceEffectStateTest",
     },
+    {
+        Parent = core_tests,
+        Name = "C4PersistentActiveCoverageTest",
+    },
 }
 
 if combat_tests then
