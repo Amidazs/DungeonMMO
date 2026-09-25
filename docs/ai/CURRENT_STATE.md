@@ -1,3 +1,25 @@
+## 25 September 2026 — CURRENT v2.92 multiplayer cutover GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md)
+and [green evidence](
+../testing/c4-multiplayer-cutover-v2-92-20260925.md).
+The last bounded C4 cutover-hardening gate is green. Two real unpublished
+Dungeon clients both reached source damage against the same reviewed Room1 NPC,
+with independent contribution/threat and correct highest-threat targeting.
+Participant dispatch is explicitly scoped to server-selected resource-active
+players. Withdrawing one selected player now performs full resource rollback:
+that player immediately returned to the existing combat model and applied
+10.0 damage while the remaining selected player continued source combat and
+later landed ~2.567 source damage. Removing the final participant shut all
+source gates down; re-enable plus whole-group rollback also passed. Fresh
+focused Base **24/24 PASS**, Dungeon **27/27 PASS**, dispatch **20 assertions
+PASS**, coordinator **11 assertions PASS**; fresh diff/build checks also pass.
+Cutover hardening is closed. Current backend direction returns to progression,
+advancement quests and level-30 launch content, followed by professions/economy,
+guild/raid systems and PvP/castle capture. No main merge, publish, production
+save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.91 live player-to-NPC rehearsal GREEN
 
 [Latest roadmap](
