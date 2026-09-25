@@ -92,14 +92,14 @@ local function check_stack_group()
         {},
         {},
         {
-            {SkillId = 77, Rank = 1},
-            {SkillId = 1068, Rank = 2},
+            {SkillId = 77, Rank = 2},
+            {SkillId = 1068, Rank = 1},
         }
     ))
 
     check(
         math.abs(result.Stats.PHYSICAL_ATTACK - 112) < 0.0001,
-        "Might rank 2 wins pAtk stack over Attack Aura rank 1"
+        "Attack Aura rank 2 wins pAtk stack over Might rank 1"
     )
     check(
         #result.SelectedActiveEffects == 1
