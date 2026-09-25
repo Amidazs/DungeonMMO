@@ -10,6 +10,7 @@ local tests = game:GetService("ServerScriptService").Core.Tests
 
 local FIXTURES = table.freeze({
     "C4SourceCastContractServiceTest",
+    "C4SourceCastResourceServiceTest",
     "C4SourceCombatCalculationServiceTest",
 })
 
