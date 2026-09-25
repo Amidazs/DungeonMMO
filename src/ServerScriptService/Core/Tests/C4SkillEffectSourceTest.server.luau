@@ -48,7 +48,7 @@ Args:
     None.
 
 Returns:
-    nil: All nine paths' exact source ranks are present.
+    nil: Every tracked path's exact source ranks are present.
 ]]
 local function check_all_tree_rows()
     for _, scope in ipairs(Tree.coverage().Scopes) do
@@ -109,6 +109,31 @@ local function check_known_vectors()
         and expertise.Sets.operateType == "PASSIVE",
         "Expertise D rank1 exact passive identity")
 
+    local wizard_blaze = assert(Effects.get_rank(1220, 6))
+    check(wizard_blaze.Sets.mpInitialConsume == 6
+        and wizard_blaze.Sets.mpConsume == 21
+        and wizard_blaze.Sets.power == 38
+        and wizard_blaze.Sets.magicLvl == 30
+        and wizard_blaze.Sets.element == "FIRE"
+        and wizard_blaze.Sets.skillType == "MDAM",
+        "Human Wizard Blaze rank6 exact source fields")
+
+    local wizard_sleep = assert(Effects.get_rank(1069, 6))
+    check(wizard_sleep.Sets.mpInitialConsume == 6
+        and wizard_sleep.Sets.mpConsume == 21
+        and wizard_sleep.Sets.magicLvl == 30
+        and wizard_sleep.Sets.effectType == "SLEEP"
+        and wizard_sleep.Effects[1].abnormal == "SLEEP"
+        and wizard_sleep.Effects[1].time == 30,
+        "Human Wizard Sleep rank6 exact source control fields")
+
+    local wizard_servitor = assert(Effects.get_rank(1127, 9))
+    check(wizard_servitor.Sets.target == "TARGET_PET"
+        and wizard_servitor.Sets.mpInitialConsume == 9
+        and wizard_servitor.Sets.mpConsume == 35
+        and wizard_servitor.Effects[1].power == 294,
+        "Human Wizard Servitor Heal rank9 exact source fields")
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -130,12 +155,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 75
-        and coverage.RequiredSkillRankPairs == 272
+    check(coverage.SkillCount == 95
+        and coverage.RequiredSkillRankPairs == 362
         and not coverage.LiveCombatIntegrated,
-        "All required source skill/rank definitions are catalogued")
+        "All ten-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=75 uniqueRankPairs=272 live=false")
+        .. "skills=95 uniqueRankPairs=362 live=false")
         :format(checks))
 end
 
