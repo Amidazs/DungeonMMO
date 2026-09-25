@@ -366,6 +366,7 @@ local function check_default_off()
             and capability.MagicFailureResolutionIntegrated
             and not capability.MagicFailuresSourceDefaultEnabled
             and capability.ElementalResolutionIntegrated
+            and capability.NeutralNonElementalMagicIntegrated
             and capability.ElementalPlayerTargetSourceStatsIntegrated
             and capability.ElementalNpcTargetSourceStatsIntegrated
             and capability.NpcTargetSourceBoundaryIntegrated
