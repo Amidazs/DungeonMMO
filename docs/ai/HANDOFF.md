@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.68 C4 source combat calculation provider GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_68_C4_Source_Combat_Calculation_Provider_20260925.md);
+[evidence](../testing/c4-source-combat-calculation-provider-v2-68-20260925.md).
+C4SourceCombatCalculationService now provides disabled source-only PDAM/MDAM/
+HEAL calculations from authenticated final source stats plus actually-owned
+reviewed source skill ranks. Power Strike3r1/power25, WindStrike1177r1/power12
+and SelfHeal1216r1/heal42 are covered. No HP/MP is modified and the gate is OFF
+by default. Fresh Base 13/13 and Dungeon 15/15 focused suites are green at
+0e859222. Next make hit/critical/random weapon/shield/magic-failure/element/
+shots/PvP inputs server-authoritative, then add a separately gated live source
+combat executor. v2.67 live resource cutover remains reversible and default
+OFF. No main merge/publish/production saves.
+
 ## 25 September 2026 — v2.67 reversible C4 resource cutover GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_67_C4_Reversible_Resource_Cutover_20260925.md);
