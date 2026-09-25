@@ -9,6 +9,9 @@ local Shared = ReplicatedStorage.Core.Shared
 local Formula = require(
     Shared.C4CombatFormulaReference
 )
+local Spatial = require(
+    Shared.C4CombatSpatialReference
+)
 local SkillEffects = require(
     Shared.C4SkillEffectSource
 )
@@ -33,6 +36,71 @@ local WEAPON_VULNERABILITY_STATS = table.freeze({
 
 local feature_enabled = false
 local shot_authority = nil
+
+--[[
+Resolves trusted server spatial inputs into reviewed C4 combat conditions.
+
+Height delta is supplied in source coordinate units so this layer does not
+invent a Roblox-stud conversion. The later live executor owns that mapping.
+
+Args:
+    spatial_context (any): Server-owned attacker/defender transform context.
+
+Returns:
+    (any?, string?): Hit-condition and shield-facing evidence.
+]]
+local function source_spatial_state(
+    spatial_context: any
+): (any?, string?)
+    if type(spatial_context) ~= "table" then
+        return nil, "SourceSpatialContextRequired"
+    end
+
+    local attacker_position = spatial_context.AttackerPosition
+    local defender_cframe = spatial_context.DefenderCFrame
+    local height_delta = spatial_context.HeightDeltaSourceUnits
+    local is_night = spatial_context.IsNight
+
+    if typeof(attacker_position) ~= "Vector3"
+        or typeof(defender_cframe) ~= "CFrame"
+        or type(height_delta) ~= "number"
+        or type(is_night) ~= "boolean"
+    then
+        return nil, "InvalidSourceSpatialContext"
+    end
+
+    local relation, relation_reason = Spatial.classify_position(
+        attacker_position,
+        defender_cframe
+    )
+    if not relation then
+        return nil, relation_reason
+    end
+
+    local hit_condition, hit_reason = Spatial.hit_condition(
+        relation,
+        height_delta,
+        is_night
+    )
+    if not hit_condition then
+        return nil, hit_reason
+    end
+
+    local shield_facing, shield_reason = Spatial.shield_facing(
+        attacker_position,
+        defender_cframe,
+        120
+    )
+    if not shield_facing then
+        return nil, shield_reason
+    end
+
+    return {
+        PositionRelation = relation,
+        HitCondition = hit_condition,
+        ShieldFacing = shield_facing,
+    }, nil
+end
 
 --[[
 Returns a source-ready stat boundary for one authoritative runtime owner.
@@ -588,7 +656,8 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.normal_attack_hit(
     attacker_user_id: number,
-    defender_user_id: number
+    defender_user_id: number,
+    spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -606,15 +675,22 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         return nil, defender_reason
     end
 
+    local spatial, spatial_reason =
+        source_spatial_state(spatial_context)
+    if not spatial then
+        return nil, spatial_reason
+    end
+
     local accuracy =
         attacker.SourceStatCandidate.ACCURACY_COMBAT
     local evasion =
         defender.SourceStatCandidate.EVASION_RATE
     local roll = COMBAT_RANDOM:NextInteger(0, 999)
+    local condition = spatial.HitCondition
     local resolved = Formula.resolve_normal_attack_hit(
         accuracy,
         evasion,
-        1,
+        condition.Multiplier,
         roll
     )
 
@@ -626,8 +702,15 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         Roll = resolved.Roll,
         SourceAccuracy = accuracy,
         SourceEvasion = evasion,
-        SourceConditionMultiplier = 1,
-        SourceConditionIntegrated = false,
+        SourceConditionMultiplier = condition.Multiplier,
+        SourceConditionIntegrated = true,
+        SourcePositionRelation = condition.PositionRelation,
+        SourcePositionBonusPercent = condition.PositionBonusPercent,
+        SourceElevationRelation = condition.ElevationRelation,
+        SourceElevationBonusPercent = condition.ElevationBonusPercent,
+        SourceDarkBonusPercent = condition.DarkBonusPercent,
+        SourceHeightDeltaUnits = condition.HeightDeltaSourceUnits,
+        SourceNight = condition.IsNight,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -719,15 +802,19 @@ Returns:
 function C4SourceCombatCalculationService.shield_resolution(
     attacker_user_id: number,
     defender_user_id: number,
-    facing_eligible: boolean
+    spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
     end
 
-    if type(facing_eligible) ~= "boolean" then
-        return nil, "InvalidShieldFacingEligibility"
+    local spatial, spatial_reason =
+        source_spatial_state(spatial_context)
+    if not spatial then
+        return nil, spatial_reason
     end
+
+    local facing_eligible = spatial.ShieldFacing.Eligible
 
     local attacker, attacker_reason =
         source_boundary(attacker_user_id)
@@ -870,7 +957,7 @@ Returns:
 function C4SourceCombatCalculationService.normal_attack(
     attacker_user_id: number,
     defender_user_id: number,
-    facing_eligible: boolean?
+    spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -888,10 +975,17 @@ function C4SourceCombatCalculationService.normal_attack(
         return nil, defender_reason
     end
 
+    local spatial, spatial_reason =
+        source_spatial_state(spatial_context)
+    if not spatial then
+        return nil, spatial_reason
+    end
+
+    local condition = spatial.HitCondition
     local hit = Formula.resolve_normal_attack_hit(
         attacker.SourceStatCandidate.ACCURACY_COMBAT,
         defender.SourceStatCandidate.EVASION_RATE,
-        1,
+        condition.Multiplier,
         COMBAT_RANDOM:NextInteger(0, 999)
     )
 
@@ -905,8 +999,11 @@ function C4SourceCombatCalculationService.normal_attack(
             HitRoll = hit.Roll,
             Soulshot = false,
             SoulshotConsumed = false,
-            SourceConditionMultiplier = 1,
-            SourceConditionIntegrated = false,
+            SourceConditionMultiplier = condition.Multiplier,
+            SourceConditionIntegrated = true,
+            SourcePositionRelation = condition.PositionRelation,
+            SourceElevationRelation = condition.ElevationRelation,
+            SourceNight = condition.IsNight,
             SourceOnly = true,
             LiveApplied = false,
         }, nil
@@ -921,19 +1018,15 @@ function C4SourceCombatCalculationService.normal_attack(
         Blocked = false,
         PerfectShield = false,
         ShieldDefencePower = 0,
-        FacingEligible = facing_eligible,
+        FacingEligible = spatial.ShieldFacing.Eligible,
     }
 
     if shield_equipped then
-        if type(facing_eligible) ~= "boolean" then
-            return nil, "ShieldFacingEligibilityRequired"
-        end
-
         local shield_result, shield_reason =
             C4SourceCombatCalculationService.shield_resolution(
                 attacker_user_id,
                 defender_user_id,
-                facing_eligible
+                spatial_context
             )
         if not shield_result then
             return nil, shield_reason
@@ -1023,8 +1116,15 @@ function C4SourceCombatCalculationService.normal_attack(
         ShieldFacingEligible = shield.FacingEligible,
         ShieldBlockRoll = shield.BlockRoll,
         ShieldPerfectRoll = shield.PerfectRoll,
-        SourceConditionMultiplier = 1,
-        SourceConditionIntegrated = false,
+        SourceConditionMultiplier = condition.Multiplier,
+        SourceConditionIntegrated = true,
+        SourcePositionRelation = condition.PositionRelation,
+        SourcePositionBonusPercent = condition.PositionBonusPercent,
+        SourceElevationRelation = condition.ElevationRelation,
+        SourceElevationBonusPercent = condition.ElevationBonusPercent,
+        SourceDarkBonusPercent = condition.DarkBonusPercent,
+        SourceHeightDeltaUnits = condition.HeightDeltaSourceUnits,
+        SourceNight = condition.IsNight,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -1054,7 +1154,7 @@ function C4SourceCombatCalculationService.physical_skill(
     defender_user_id: number,
     creative_skill_id: string,
     creative_rank: number,
-    facing_eligible: boolean?
+    spatial_context: any?
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -1148,19 +1248,19 @@ function C4SourceCombatCalculationService.physical_skill(
         Blocked = false,
         PerfectShield = false,
         ShieldDefencePower = 0,
-        FacingEligible = facing_eligible,
+        FacingEligible = nil,
     }
 
     if shield_equipped then
-        if type(facing_eligible) ~= "boolean" then
-            return nil, "ShieldFacingEligibilityRequired"
+        if spatial_context == nil then
+            return nil, "SourceSpatialContextRequired"
         end
 
         local shield_result, shield_reason =
             C4SourceCombatCalculationService.shield_resolution(
                 attacker_user_id,
                 defender_user_id,
-                facing_eligible
+                spatial_context
             )
         if not shield_result then
             return nil, shield_reason
@@ -1461,7 +1561,8 @@ function C4SourceCombatCalculationService.capability(): any
         CurrentlyEnabled = feature_enabled,
         NormalAttackHitResolution = true,
         NormalAttackHitRollServerOwned = true,
-        NormalAttackHitConditionIntegrated = false,
+        NormalAttackHitConditionIntegrated = true,
+        SpatialConditionInputServerOwned = true,
         NormalAttackPhysicalCriticalResolution = true,
         NormalAttackPhysicalCriticalRollServerOwned = true,
         NormalAttackCriticalPowerIntegrated = true,
@@ -1487,8 +1588,8 @@ function C4SourceCombatCalculationService.capability(): any
         ShieldSourceResolutionAvailable = true,
         ShieldRollServerOwned = true,
         ShieldPhysicalFormulaIntegrated = true,
-        ShieldFacingRuntimeIntegrated = false,
-        ShieldResolutionIntegrated = false,
+        ShieldFacingRuntimeIntegrated = true,
+        ShieldResolutionIntegrated = true,
         MagicFailureFormulaAvailable = true,
         MagicFailureResolutionIntegrated = true,
         MagicFailuresSourceDefaultEnabled =
