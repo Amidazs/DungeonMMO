@@ -38,9 +38,13 @@ Args:
     level (number): Source level, up to 30.
 
 Returns:
-    nil: Genuine server-owned identity with test-only quest receipt.
+    any: Genuine server-owned identity with test-only quest receipt.
 ]]
-local function seed(race_id: string, class_id: string, level: number)
+local function seed(
+    race_id: string,
+    class_id: string,
+    level: number
+): any
     local character = Schema.create_default(OWNER_ID).Characters.Slot1
     local career = Careers.for_class(class_id)
     character.Level = level
@@ -68,6 +72,7 @@ local function seed(race_id: string, class_id: string, level: number)
         }
     end
     Runtime.set_character(OWNER_ID, character)
+    return character
 end
 
 --[[
@@ -225,8 +230,11 @@ local function check_scout_heal_migration_plan()
     for _, bracket in ipairs({
         {20, 3}, {24, 6}, {28, 9}, {30, 9},
     }) do
-        seed("Elf", "GreenwardScout", bracket[1])
-        local character = assert(Runtime.get_character(OWNER_ID))
+        local character = seed(
+            "Elf",
+            "GreenwardScout",
+            bracket[1]
+        )
         local plan, reason = ScoutHeal.for_character(character)
         check(plan ~= nil and reason == nil
             and #plan.Rows == bracket[2]
