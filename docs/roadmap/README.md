@@ -1,3 +1,17 @@
+**v2.56 GitHub-only, STUDIO PENDING:** [current roadmap](
+DungeonMMO_Roadmap_v2_56_C4_Resource_Migration_Boundary_20260925.md)
+and [pending test scope](
+../testing/c4-resource-migration-boundary-v2-56-20260925.md).
+Added a fail-closed authenticated C4 resource migration boundary for all nine
+current original Human/Elf paths. It exposes exact source base HP/MP/CP but
+explicitly refuses live activation until original inventory mapping, actually
+owned passive mapping, active-effect ordering and CP runtime authority are
+integrated. ProgressionRuntimeState now exposes the boundary from server-owned
+character state only; forged first-transfer ownership remains denied. New
+nine-path tests are authored but not executed. No live Humanoid/ManaService
+switch, main merge, publish, production saves or Remote Desktop Commander
+editing.
+
 **v2.55 GitHub-only, STUDIO PENDING:** [current roadmap](
 DungeonMMO_Roadmap_v2_55_C4_Shared_Heal_And_Split_MP_Rules_20260925.md)
 and [pending test scope](
