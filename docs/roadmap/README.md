@@ -1,3 +1,15 @@
+**v2.91 LIVE PLAYER-TO-NPC REHEARSAL GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md)
+and [green evidence](
+../testing/c4-live-player-npc-rehearsal-v2-91-20260925.md).
+The real existing Play-client attack path now reaches C4 source dispatch against
+a reviewed Dungeon NPC, mutates actual NPC HP, preserves contribution/threat
+and quest-observer delivery, then reverses cleanly to the existing combat model
+through the same atomic coordinator. Source strike: ~2.567 damage; rollback
+comparison strike: 10.0 existing-model damage. Fresh Base **24/24 PASS** and
+Dungeon **27/27 PASS**. Next: one bounded multiplayer cutover rehearsal, then
+resume the broader MMORPG backend roadmap.
+
 **v2.90 RUNTIME C4 CUTOVER REHEARSAL GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_90_C4_Runtime_Rehearsal_20260925.md)
 and [green evidence](
