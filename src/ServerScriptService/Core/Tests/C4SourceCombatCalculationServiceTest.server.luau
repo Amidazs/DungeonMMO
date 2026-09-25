@@ -1,4 +1,13 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_SINGLETON_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[C4 Source Combat] SKIP: singleton regression runs in focused Edit mode"
+    )
+    return
+end
 -- Authenticated source-only physical, magic and heal calculation regression.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
