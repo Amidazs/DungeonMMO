@@ -365,6 +365,8 @@ local function check_start_identity()
         started.CreativeRank == 2
             and started.SourceSkillId == 1168
             and started.SourceRank == 3
+            and started.SourceCastRange == 600
+            and started.SourceEffectRange == 1100
             and started.TargetBoundServerSide
             and executor_state.PreflightCalls == 1
             and executor_state.LastRange == 600
