@@ -137,7 +137,10 @@ function C4ResourceMigrationBoundary.for_character(
     end
 
     local passives_ready = passive_mapping_ready
-        and stat_candidate ~= nil
+
+    if inventory_ready and passive_mapping_ready then
+        passives_ready = stat_candidate ~= nil
+    end
 
     return {
         RaceId = identity.RaceId,
@@ -180,6 +183,8 @@ function C4ResourceMigrationBoundary.for_character(
         SourcePassiveModifiersApplied = if stat_candidate
             then stat_candidate.AppliedSourceModifiers
             else nil,
+        OriginalOwnedPassiveMappingIntegrated =
+            passive_mapping_ready,
         OriginalOwnedPassivesIntegrated = passives_ready,
         ActiveEffectsIntegrated = false,
         LiveHealthIntegrated = false,
