@@ -34,6 +34,41 @@ local WEAPON_VULNERABILITY_STATS = table.freeze({
     Sword = "SWORD_WPN_VULN",
 })
 
+local SOURCE_COMMIT =
+    "07f8536384e799f128d44198dd7ab23519660eea"
+
+local NPC_RACE_ATTACK_STATS = table.freeze({
+    NONE = table.freeze({}),
+    UNDEAD = table.freeze({
+        "PHYSICAL_ATK_UNDEAD",
+        "PHYSICAL_ATK_MONSTERS",
+    }),
+    BEAST = table.freeze({
+        "PHYSICAL_ATK_MONSTERS",
+    }),
+    ANIMAL = table.freeze({
+        "PHYSICAL_ATK_ANIMALS",
+    }),
+    PLANT = table.freeze({
+        "PHYSICAL_ATK_PLANTS",
+    }),
+    DRAGON = table.freeze({
+        "PHYSICAL_ATK_DRAGONS",
+    }),
+    GIANT = table.freeze({
+        "PHYSICAL_ATK_GIANTS",
+    }),
+    MAGIC_CREATURE = table.freeze({
+        "PHYSICAL_ATK_MAGIC_CREATURES",
+    }),
+    BUG = table.freeze({
+        "PHYSICAL_ATK_INSECTS",
+    }),
+    CREATURE_VALAKAS = table.freeze({
+        "VALAKAS_PHYSICAL_DMG",
+    }),
+})
+
 local feature_enabled = false
 local shot_authority = nil
 
@@ -129,6 +164,94 @@ local function source_boundary(
     end
 
     return boundary, nil
+end
+
+--[[
+Validates one detached server-owned C4 NPC combat boundary.
+
+Args:
+    boundary (any): Candidate NPC source boundary from server authority.
+
+Returns:
+    (any?, string?): Validated boundary or strict denial reason.
+]]
+local function npc_source_boundary(
+    boundary: any
+): (any?, string?)
+    if type(boundary) ~= "table"
+        or boundary.SourceTargetKind ~= "Npc"
+        or boundary.SourceCommit ~= SOURCE_COMMIT
+        or boundary.SourceCombatPrerequisitesReady ~= true
+        or boundary.SourceStatCandidateReady ~= true
+        or type(boundary.SourceStatCandidate) ~= "table"
+        or type(boundary.SourceNpcId) ~= "number"
+        or boundary.SourceNpcId % 1 ~= 0
+        or boundary.SourceNpcId <= 0
+        or type(boundary.SourceNpcRace) ~= "string"
+        or type(boundary.Level) ~= "number"
+        or boundary.Level % 1 ~= 0
+        or boundary.Level <= 0
+    then
+        return nil, "InvalidC4NpcSourceBoundary"
+    end
+
+    local required_stats = {
+        "PHYSICAL_DEFENCE",
+        "MAGICAL_DEFENCE",
+        "EVASION_RATE",
+        "FIRE_VULN",
+        "WIND_VULN",
+        "WATER_VULN",
+        "EARTH_VULN",
+        "HOLY_VULN",
+        "DARK_VULN",
+        "BOW_WPN_VULN",
+        "BLUNT_WPN_VULN",
+        "DAGGER_WPN_VULN",
+        "POLE_WPN_VULN",
+        "SWORD_WPN_VULN",
+    }
+
+    for _, stat_name in ipairs(required_stats) do
+        local value = boundary.SourceStatCandidate[stat_name]
+        if type(value) ~= "number"
+            or value ~= value
+            or value < 0
+            or value >= math.huge
+        then
+            return nil, "InvalidC4NpcSourceStats"
+        end
+    end
+
+    return boundary, nil
+end
+
+--[[
+Resolves either an authenticated player or reviewed server NPC target.
+
+Args:
+    target (any): Player UserId or detached server-owned NPC boundary.
+
+Returns:
+    (any?, string?, string?): Boundary, Player/Npc kind, or denial reason.
+]]
+local function source_target_boundary(
+    target: any
+): (any?, string?, string?)
+    if type(target) == "number" then
+        local boundary, reason = source_boundary(target)
+        if not boundary then
+            return nil, nil, reason
+        end
+        return boundary, "Player", nil
+    end
+
+    local boundary, reason = npc_source_boundary(target)
+    if not boundary then
+        return nil, nil, reason
+    end
+
+    return boundary, "Npc", nil
 end
 
 --[[
@@ -341,6 +464,89 @@ local function source_pvp_multiplier(
         stat_name,
         "OriginalPvpDamageMultiplierUnavailable"
     )
+end
+
+--[[
+Resolves the PvP multiplier only when the target is another player.
+
+Chronicle 4 applies these stats only to L2Playable-versus-L2Playable damage.
+NPC targets therefore use an exact neutral multiplier of one.
+
+Args:
+    attacker (any): Authenticated source-ready attacker boundary.
+    target_kind (string): Player or Npc.
+    stat_name (string): Exact C4 PvP damage stat.
+
+Returns:
+    (number?, string?): Applicable multiplier or strict denial reason.
+]]
+local function source_target_pvp_multiplier(
+    attacker: any,
+    target_kind: string,
+    stat_name: string
+): (number?, string?)
+    if target_kind == "Npc" then
+        return 1, nil
+    end
+
+    return source_pvp_multiplier(attacker, stat_name)
+end
+
+--[[
+Resolves Chronicle 4 player-to-NPC physical race modifiers.
+
+The reviewed source intentionally falls through UNDEAD into BEAST, so undead
+targets consume both PHYSICAL_ATK_UNDEAD and PHYSICAL_ATK_MONSTERS.
+
+Args:
+    attacker (any): Authenticated source-ready player attacker.
+    defender (any): Source-ready target boundary.
+    target_kind (string): Player or Npc.
+
+Returns:
+    (any?, string?): Race multiplier evidence or strict denial reason.
+]]
+local function source_npc_race_multiplier(
+    attacker: any,
+    defender: any,
+    target_kind: string
+): (any?, string?)
+    if target_kind ~= "Npc" then
+        return {
+            Multiplier = 1,
+            SourceNpcRace = nil,
+            AppliedStats = {},
+        }, nil
+    end
+
+    local race = defender.SourceNpcRace
+    local stat_names = NPC_RACE_ATTACK_STATS[race]
+    if not stat_names then
+        return nil, "UnsupportedC4NpcRace"
+    end
+
+    local multiplier = 1
+    local applied = {}
+
+    for _, stat_name in ipairs(stat_names) do
+        local value, reason = source_multiplier(
+            attacker,
+            stat_name,
+            "OriginalNpcRaceAttackMultiplierUnavailable"
+        )
+        if value == nil then
+            return nil, reason
+        end
+
+        multiplier *= value
+        table.insert(applied, stat_name)
+    end
+
+    return {
+        Multiplier = multiplier,
+        SourceNpcRace = race,
+        AppliedStats = applied,
+    }, nil
 end
 
 --[[
@@ -656,7 +862,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.normal_attack_hit(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
@@ -669,9 +875,9 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -711,6 +917,9 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         SourceDarkBonusPercent = condition.DarkBonusPercent,
         SourceHeightDeltaUnits = condition.HeightDeltaSourceUnits,
         SourceNight = condition.IsNight,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -736,7 +945,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.normal_attack_critical(
     attacker_user_id: number,
-    defender_user_id: number
+    defender_target: any
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -777,6 +986,9 @@ function C4SourceCombatCalculationService.normal_attack_critical(
         CriticalPowerMultiplier = multiplier,
         CriticalPowerAdd = additive,
         TargetSourceReady = defender ~= nil,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         TargetSpecificCriticalModifiersIntegrated = false,
         SourceOnly = true,
         LiveApplied = false,
@@ -801,7 +1013,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.shield_resolution(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
@@ -956,7 +1168,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.normal_attack(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     spatial_context: any
 ): (any?, string?)
     if not feature_enabled then
@@ -1151,7 +1363,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.physical_skill(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     creative_skill_id: string,
     creative_rank: number,
     spatial_context: any?
@@ -1347,7 +1559,7 @@ Returns:
 ]]
 function C4SourceCombatCalculationService.magic_skill(
     attacker_user_id: number,
-    defender_user_id: number,
+    defender_target: any,
     creative_skill_id: string,
     creative_rank: number
 ): (any?, string?)
