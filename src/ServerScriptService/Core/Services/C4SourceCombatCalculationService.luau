@@ -18,7 +18,7 @@ local Runtime = require(
 
 local C4SourceCombatCalculationService = {}
 
-local HIT_RANDOM = Random.new()
+local COMBAT_RANDOM = Random.new()
 
 local feature_enabled = false
 
@@ -112,6 +112,42 @@ local function heal_power(effect: any): (number?, string?)
     return nil, "OriginalHealPowerUnavailable"
 end
 
+
+--[[
+Returns exact source critical-power calculator inputs.
+
+C4 calcPhysDam reads PHYSICAL_CRITICAL_POWER with a neutral base of 1 and
+PHYSICAL_CRITICAL_POWER_ADD with a neutral base of 0. Both must already be
+present in the authenticated final source stat candidate so this service never
+invents a combat modifier.
+
+Args:
+    boundary (any): Authenticated source-ready migration boundary.
+
+Returns:
+    (number?, number?, string?): Multiplier, additive power, or strict reason.
+]]
+local function critical_power_inputs(
+    boundary: any
+): (number?, number?, string?)
+    local stats = boundary.SourceStatCandidate
+    local multiplier = stats.PHYSICAL_CRITICAL_POWER
+    local additive = stats.PHYSICAL_CRITICAL_POWER_ADD
+
+    if type(multiplier) ~= "number"
+        or multiplier ~= multiplier
+        or multiplier < 0
+        or multiplier >= math.huge
+        or type(additive) ~= "number"
+        or additive ~= additive
+        or math.abs(additive) >= math.huge
+    then
+        return nil, nil, "OriginalPhysicalCriticalPowerUnavailable"
+    end
+
+    return multiplier, additive, nil
+end
+
 --[[
 Changes the calculation-provider gate.
 
@@ -192,7 +228,7 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         attacker.SourceStatCandidate.ACCURACY_COMBAT
     local evasion =
         defender.SourceStatCandidate.EVASION_RATE
-    local roll = HIT_RANDOM:NextInteger(0, 999)
+    local roll = COMBAT_RANDOM:NextInteger(0, 999)
     local resolved = Formula.resolve_normal_attack_hit(
         accuracy,
         evasion,
@@ -210,6 +246,73 @@ function C4SourceCombatCalculationService.normal_attack_hit(
         SourceEvasion = evasion,
         SourceConditionMultiplier = 1,
         SourceConditionIntegrated = false,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one source C4 normal physical critical roll between ready players.
+
+This path belongs to ordinary weapon attacks. The reviewed C4 normal-attack
+flow calls getCriticalHit, caps the final source rate at 500 per thousand and
+then calls calcCrit. PDAM skill critical behaviour is separate in SkillPdam
+and is deliberately not claimed here.
+
+Critical-power multiplier/additive values come from the authenticated final
+source stat candidate. The random 0-999 roll is private server state.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_user_id (number): Authenticated source-ready defender.
+
+Returns:
+    (any?, string?): Source critical result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.normal_attack_critical(
+    attacker_user_id: number,
+    defender_user_id: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, defender_reason =
+        source_boundary(defender_user_id)
+    if not defender then
+        return nil, defender_reason
+    end
+
+    local multiplier, additive, power_reason =
+        critical_power_inputs(attacker)
+    if multiplier == nil or additive == nil then
+        return nil, power_reason
+    end
+
+    local critical_rate =
+        attacker.SourceStatCandidate.CRITICAL_RATE
+    local roll = COMBAT_RANDOM:NextInteger(0, 999)
+    local resolved = Formula.resolve_physical_critical(
+        critical_rate,
+        roll
+    )
+
+    return {
+        Kind = "NormalAttackCritical",
+        Critical = resolved.Critical,
+        ChancePerThousand = resolved.ChancePerThousand,
+        Roll = resolved.Roll,
+        SourceCriticalRate = critical_rate,
+        CriticalPowerMultiplier = multiplier,
+        CriticalPowerAdd = additive,
+        TargetSourceReady = defender ~= nil,
+        TargetSpecificCriticalModifiersIntegrated = false,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -434,12 +537,18 @@ function C4SourceCombatCalculationService.capability(): any
         NormalAttackHitResolution = true,
         NormalAttackHitRollServerOwned = true,
         NormalAttackHitConditionIntegrated = false,
+        NormalAttackPhysicalCriticalResolution = true,
+        NormalAttackPhysicalCriticalRollServerOwned = true,
+        NormalAttackCriticalPowerIntegrated = true,
+        NormalAttackTargetSpecificCriticalModifiersIntegrated = false,
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
         ShotsIntegrated = false,
         RandomWeaponVarianceIntegrated = false,
         CriticalResolutionIntegrated = false,
+        PhysicalSkillCriticalIntegrated = false,
+        MagicCriticalIntegrated = false,
         ShieldResolutionIntegrated = false,
         MagicFailureResolutionIntegrated = false,
         ElementalResolutionIntegrated = false,
