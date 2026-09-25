@@ -101,6 +101,8 @@ local function start_evidence(started: any): any
         LaunchAt = started.LaunchAt,
         FinalizerAt = started.FinalizerAt,
         ReuseReadyAt = started.ReuseReadyAt,
+        SourceCastRange = started.SourceCastRange,
+        SourceEffectRange = started.SourceEffectRange,
         TargetBoundServerSide = true,
         SourceOnly = true,
         StatusResolved = false,
