@@ -4,7 +4,8 @@ local RunService = game:GetService("RunService")
 
 if RunService:IsRunning() then
     print(
-        "[C4 Source Combat] SKIP: singleton regression runs in focused Edit mode"
+        "[C4 Source Combat] SKIP: singleton regression runs "
+            .. "in focused Edit mode"
     )
     return
 end
@@ -626,7 +627,8 @@ end
 Checks source shield rate, facing, perfect roll and PDAM formula wiring.
 
 The shield-facing boolean is supplied only by this server-side test call. The
-future live executor still has to derive it from authoritative world transforms.
+future live executor still has to derive it from authoritative world
+transforms.
 
 Args:
     None.
