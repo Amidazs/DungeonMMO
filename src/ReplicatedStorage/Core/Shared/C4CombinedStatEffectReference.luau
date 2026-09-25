@@ -2,6 +2,9 @@
 -- C4 calculator ordering across owned passive and currently active effects.
 
 local Source = require(script.Parent.C4SkillEffectSource)
+local EquipmentConditions = require(
+    script.Parent.C4EquipmentConditionRules
+)
 
 local C4CombinedStatEffectReference = {}
 
@@ -9,38 +12,6 @@ local NEUTRAL_STATS = table.freeze({
     BOW_WPN_VULN = 1,
     PHYSICAL_CRITICAL_POWER_ADD = 0,
 })
-
---[[
-Checks a source equipment kind condition against reviewed paperdoll kinds.
-
-Args:
-    allowed (string?): Source comma-separated equipment kinds.
-    equipment (any): Reviewed source-kind loadout.
-
-Returns:
-    boolean: True when at least one equipped source kind matches.
-]]
-local function uses_kind(allowed: string?, equipment: any): boolean
-    if allowed == nil then
-        return true
-    end
-
-    if type(equipment) ~= "table" then
-        return false
-    end
-
-    for kind in string.gmatch(allowed, "[^,]+") do
-        local trimmed = kind:match("^%s*(.-)%s*$")
-
-        for _, slot in ipairs({"Weapon", "Body", "OffHand"}) do
-            if equipment[slot] == trimmed then
-                return true
-            end
-        end
-    end
-
-    return false
-end
 
 --[[
 Validates source-wide passive equipment conditions.
@@ -63,7 +34,7 @@ local function meets_passive_conditions(
             return false, "UnsupportedSourceCondition"
         end
 
-        if not uses_kind(condition.kind, equipment) then
+        if not EquipmentConditions.matches(condition.kind, equipment) then
             return false, nil
         end
     end
@@ -195,7 +166,7 @@ local function collect_passives(
 
         if allowed then
             for _, modifier in ipairs(rank.Modifiers) do
-                if uses_kind(modifier.UsingKind, equipment) then
+                if EquipmentConditions.matches(modifier.UsingKind, equipment) then
                     local operation, reason = source_operation(
                         modifier,
                         #operations + 1,
@@ -328,7 +299,7 @@ local function collect_active(
 
     for _, effect in ipairs(selected) do
         for _, modifier in ipairs(effect.Modifiers) do
-            if uses_kind(modifier.UsingKind, equipment) then
+            if EquipmentConditions.matches(modifier.UsingKind, equipment) then
                 local operation, operation_reason = source_operation(
                     modifier,
                     #operations + 1,
