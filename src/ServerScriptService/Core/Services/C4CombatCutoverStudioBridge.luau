@@ -22,6 +22,7 @@ local function valid_coordinator(coordinator: any): boolean
     return type(coordinator) == "table"
         and type(coordinator.enable) == "function"
         and type(coordinator.disable) == "function"
+        and type(coordinator.remove_player) == "function"
         and type(coordinator.snapshot) == "function"
 end
 
@@ -141,6 +142,27 @@ function C4CombatCutoverStudioBridge.bind(
             coordinator:disable()
             return {
                 ok = true,
+                snapshot = coordinator:snapshot(),
+            }
+        end
+
+        if action == "remove" then
+            local players, player_reason =
+                resolve_players(payload and payload.UserIds)
+            if not players or #players ~= 1 then
+                return {
+                    ok = false,
+                    reason = player_reason
+                        or "InvalidC4RehearsalPlayers",
+                    snapshot = coordinator:snapshot(),
+                }
+            end
+
+            local removed, remove_reason =
+                coordinator:remove_player(players[1])
+            return {
+                ok = removed,
+                reason = remove_reason,
                 snapshot = coordinator:snapshot(),
             }
         end
