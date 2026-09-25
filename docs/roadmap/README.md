@@ -1,3 +1,18 @@
+**v2.66 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_66_C4_Resource_Regen_Armor_Sets_20260925.md)
+and [test evidence](
+../testing/c4-resource-regen-armor-sets-v2-66-20260925.md).
+A pre-cutover source audit found and closed two remaining parity gaps:
+REG_HP/MP/CP calculator inputs and C4 Chest+Legs armor semantics. Every current
+creative Body now expands to its reviewed historical chest+legs set while the
+player-facing inventory remains six slots. C4 Heavy/Light/Magic conditions now
+require matching chest+legs exactly, and regen-changing source skills compose
+through the unified stat candidate. Fresh Base **12/12 PASS** and Dungeon
+**13/13 PASS** at `b610d05c`. Source prerequisites remain green with zero
+blockers; the live HP/MP/CP switch is still disabled. Next build the reversible
+disabled-by-default resource cutover service. No main merge, publish or
+production saves.
+
 **v2.65 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_65_C4_Combat_Point_Runtime_20260925.md)
 and [test evidence](
