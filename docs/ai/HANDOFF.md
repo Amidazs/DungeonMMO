@@ -1,16 +1,16 @@
-## 25 September 2026 — v2.69 normal-attack hit resolution BUILT
+## 25 September 2026 — v2.69 normal-attack hit resolution GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_69_C4_Normal_Attack_Hit_Resolution_20260925.md);
-[acceptance record](../testing/c4-normal-attack-hit-resolution-v2-69-20260925.md).
-The source-combat provider now owns ordinary C4 hit rolls using authenticated
-final Accuracy/Evasion and an internal server Random 0-999 roll. Formula
-coverage includes source condition multiplication, final 275-980 caps, equal
-roll = hit, and above-chance = miss. PDAM remains separate because reviewed C4
-SkillPdam does not call normal-attack calcHitMiss. Runtime position/night/
-elevation condition mapping remains neutral and explicit. Safe local
-fast-forward plus fresh unpublished Base/Dungeon Rojo builds PASS at
-6c45baec. Focused Studio execution is still pending, so do not label v2.69
-GREEN yet. Permanent edits stayed GitHub-only; no main merge/publish/prod
+[green evidence](../testing/c4-normal-attack-hit-resolution-v2-69-20260925.md).
+The source-combat provider owns ordinary C4 hit rolls using authenticated final
+Accuracy/Evasion and an internal server Random 0-999 roll. Formula coverage
+includes source condition multiplication, final 275-980 caps, equal roll = hit
+and above-chance = miss. PDAM remains separate because reviewed C4 SkillPdam
+does not call normal-attack calcHitMiss. Fresh unpublished Studio focus is green:
+Base **14/14**, Dungeon **16/16**, formula **22 assertions**, source combat
+**11 assertions**. Runtime position/night/elevation condition mapping remains
+neutral and explicit. Next: source physical critical roll + critical-power
+components. Permanent edits stayed GitHub-only; no main merge/publish/prod
 saves.
 
 ## 25 September 2026 — v2.68 C4 source combat calculation provider GREEN
