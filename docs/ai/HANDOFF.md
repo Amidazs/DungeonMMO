@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.64 active-effect boundary GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_64_C4_Active_Effect_Boundary_20260925.md);
+[evidence](../testing/c4-active-effect-boundary-v2-64-20260925.md).
+Timed CombatStatusService buffs + Ironvow Endurance Surge now mirror into the
+private active C4 registry, which keeps unresolved live effects fail-closed.
+The launch persistent catalogue is now 21 skills / 25 reachable ranks with
+25/25 reviewed ACTIVE/TOGGLE source coverage. Ironvow Battle Call invented
+first-transfer ranks 2/3 were removed and Oathguard Arrow Ward rank 2 was
+corrected to level 32. C4ResourceMigrationBoundary now consumes the private
+active snapshot and composes it with source equipment/passives. Base 10/10,
+Dungeon 11/11 green at 1e01640f. Only fixed blocker: CP runtime authority.
+No live HP/MP/CP switch, publish, production saves or main merge.
+
 ## 25 September 2026 — v2.62 authoritative active source state GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_62_C4_Authoritative_Active_Source_State_20260925.md);
