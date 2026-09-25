@@ -1,3 +1,16 @@
+**v2.59 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_59_C4_Six_Slot_Paperdoll_Expertise_20260925.md)
+and [test evidence](
+../testing/c4-six-slot-paperdoll-expertise-v2-59-20260925.md).
+All 27 current Equipment definitions now resolve to reviewed pinned C4 source
+items across the complete current six-slot paperdoll. Exact Head/Chest/Gloves/
+Feet 0x10/0x20 P.Def ordering is represented, and original Expertise skill 239
+grade thresholds are enforced in the migration boundary. Base build + focused
+6/6 PASS; Dungeon build + focused 7/7 PASS. The global inventory mapping
+blocker is closed. Remaining live-cutover blockers: actually-owned passive
+resolution, active-effect ordering and CP authority. No publish/production
+save/main merge.
+
 **v2.58 LOCAL ACCEPTANCE GREEN:** Both disposable Base and Dungeon
 Rojo builds passed at
 `e61eeb803bd0725aa89581a352583017d32f9fc5`. Focused Base v2.55-v2.58
