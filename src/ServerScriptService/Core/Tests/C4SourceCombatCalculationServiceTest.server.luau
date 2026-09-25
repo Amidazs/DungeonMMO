@@ -187,6 +187,11 @@ local function check_default_off()
             and capability.NormalAttackHitResolution
             and capability.NormalAttackHitRollServerOwned
             and not capability.NormalAttackHitConditionIntegrated
+            and capability.NormalAttackPhysicalCriticalResolution
+            and capability.NormalAttackPhysicalCriticalRollServerOwned
+            and capability.NormalAttackCriticalPowerIntegrated
+            and not capability.PhysicalSkillCriticalIntegrated
+            and not capability.MagicCriticalIntegrated
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -251,6 +256,51 @@ local function check_normal_attack_hit()
             and not result.SourceConditionIntegrated
             and not result.LiveApplied,
         "normal attack roll is server-owned and source comparison is exact"
+    )
+end
+
+--[[
+Checks ordinary physical critical chance and power use final source stats.
+
+The provider owns the random roll. The test checks the returned roll against
+the exact source strict-greater-than comparison and confirms neutral C4
+critical-power calculator bases are present in the authenticated candidate.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source critical rate, roll and critical-power inputs.
+]]
+local function check_normal_attack_critical()
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(FIGHTER_ID)
+    )
+    local result = assert(Combat.normal_attack_critical(
+        FIGHTER_ID,
+        TARGET_ID
+    ))
+    local expected_chance =
+        Formula.physical_critical_rate_per_thousand(
+            attacker.SourceStatCandidate.CRITICAL_RATE
+        )
+
+    check(
+        result.ChancePerThousand == expected_chance
+            and result.Roll >= 0
+            and result.Roll <= 999
+            and result.Roll % 1 == 0
+            and result.Critical
+                == (result.ChancePerThousand > result.Roll),
+        "normal physical critical roll matches exact source comparison"
+    )
+    check(
+        result.CriticalPowerMultiplier == 1
+            and result.CriticalPowerAdd == 0
+            and result.TargetSourceReady
+            and not result.TargetSpecificCriticalModifiersIntegrated
+            and not result.LiveApplied,
+        "normal critical exposes authenticated source power inputs only"
     )
 end
 
@@ -417,6 +467,7 @@ local function main()
 
     Combat.set_enabled(true)
     check_normal_attack_hit()
+    check_normal_attack_critical()
     check_physical()
     check_magic()
     check_heal()
@@ -429,7 +480,7 @@ local function main()
 
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
-        .. "hit=true pdam=true mdam=true heal=true live=false"
+        .. "hit=true critical=true pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
 
