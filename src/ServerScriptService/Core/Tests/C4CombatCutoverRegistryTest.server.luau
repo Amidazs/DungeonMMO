@@ -34,6 +34,8 @@ Returns:
     nil: Prints deterministic registry acceptance evidence.
 ]]
 local function main()
+    local previous = Registry.get()
+
     Registry.clear()
     check(
         Registry.get() == nil,
@@ -56,6 +58,15 @@ local function main()
     check(
         Registry.get() == nil,
         "registry clear removes only the server-local binding"
+    )
+
+    if previous then
+        Registry.bind(previous)
+    end
+
+    check(
+        Registry.get() == previous,
+        "isolated registry test restores the pre-existing runtime binding"
     )
 
     print((
