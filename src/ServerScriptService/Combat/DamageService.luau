@@ -131,6 +131,15 @@ function DamageService.apply_damage(context: DamageContext): number
                     tostring(context.source_id),
                     context.sequence_id
                 )
+            elseif source_result.StatusApplied == true then
+                CombatValidationService.emit(
+                    attacker,
+                    "STATUS",
+                    "APPLIED",
+                    tostring(context.source_id)
+                        .. " (C4 source)",
+                    context.sequence_id
+                )
             elseif applied_damage > 0 then
                 CombatValidationService.emit(
                     attacker,
