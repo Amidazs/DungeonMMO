@@ -833,38 +833,6 @@ function C4SourceCombatCalculationService.physical_random_variance(
         return nil, attacker_reason
     end
 
-    local base_critical_rate =
-        tonumber(effect.Sets.baseCritRate) or 0
-    if base_critical_rate < 0
-        or base_critical_rate >= math.huge
-    then
-        return nil, "OriginalPhysicalSkillCriticalRateInvalid"
-    end
-
-    local skill_critical = {
-        Critical = false,
-        ChancePerThousand = 0,
-        Roll = nil,
-    }
-
-    if base_critical_rate > 0 then
-        local str_bonus = attacker.SourceStrBonus
-        if type(str_bonus) ~= "number"
-            or str_bonus ~= str_bonus
-            or str_bonus <= 0
-            or str_bonus >= math.huge
-        then
-            return nil, "OriginalStrBonusUnavailable"
-        end
-
-        skill_critical =
-            Formula.resolve_physical_skill_critical(
-                base_critical_rate,
-                str_bonus,
-                COMBAT_RANDOM:NextInteger(0, 999)
-            )
-    end
-
     local variance, variance_reason =
         source_random_variance(attacker)
     if not variance then
@@ -1117,6 +1085,38 @@ function C4SourceCombatCalculationService.physical_skill(
         or type(effect.Sets.power) ~= "number"
     then
         return nil, "UnsupportedOriginalPhysicalSkillType"
+    end
+
+    local base_critical_rate =
+        tonumber(effect.Sets.baseCritRate) or 0
+    if base_critical_rate < 0
+        or base_critical_rate >= math.huge
+    then
+        return nil, "OriginalPhysicalSkillCriticalRateInvalid"
+    end
+
+    local skill_critical = {
+        Critical = false,
+        ChancePerThousand = 0,
+        Roll = nil,
+    }
+
+    if base_critical_rate > 0 then
+        local str_bonus = attacker.SourceStrBonus
+        if type(str_bonus) ~= "number"
+            or str_bonus ~= str_bonus
+            or str_bonus <= 0
+            or str_bonus >= math.huge
+        then
+            return nil, "OriginalStrBonusUnavailable"
+        end
+
+        skill_critical =
+            Formula.resolve_physical_skill_critical(
+                base_critical_rate,
+                str_bonus,
+                COMBAT_RANDOM:NextInteger(0, 999)
+            )
     end
 
     local variance, variance_reason =
