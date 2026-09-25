@@ -7,6 +7,8 @@ local IronvowEnduranceSurgeService = {}
 local active: {[Player]: any} = {}
 local authorizer: ((Player, any) -> boolean)? = nil
 local recalculate: ((Player) -> ())? = nil
+local update_source_effect:
+    ((Player, string, number, boolean, number) -> ())? = nil
 
 --[[
 Installs the genuine class/rank and current-combat authorization callback.
@@ -37,6 +39,67 @@ function IronvowEnduranceSurgeService.set_recalculator(callback: any)
 end
 
 --[[
+Installs a server-only observer for this timed source-equivalent effect.
+
+The observer does not control the live health change. It mirrors successful
+activation and early termination into the C4 migration registry.
+
+Args:
+    callback ((Player, string, number, boolean, number) -> ()): Receives the
+        creative ID/rank, active state and server-owned duration.
+
+Returns:
+    nil: Future activation and stop events are reported to the observer.
+]]
+function IronvowEnduranceSurgeService.set_source_effect_state(
+    callback: any
+)
+    assert(
+        type(callback) == "function",
+        "Source effect state callback is required"
+    )
+    update_source_effect = callback
+end
+
+--[[
+Reports a source-effect transition without allowing migration diagnostics to
+interrupt the already-authoritative live health executor.
+
+Args:
+    player (Player): Authenticated effect owner.
+    record (any): Server-created active surge record.
+    enabled (boolean): True on activation and false on termination.
+
+Returns:
+    nil: Observer failures are diagnostic only until the C4 cutover.
+]]
+local function report_source_effect(
+    player: Player,
+    record: any,
+    enabled: boolean
+)
+    if not update_source_effect then
+        return
+    end
+
+    local ok, issue = pcall(
+        update_source_effect,
+        player,
+        record.Definition.ID,
+        record.Rank,
+        enabled,
+        record.Definition.DURATION_SECONDS
+    )
+
+    if not ok then
+        warn(
+            "[C4 Active Source] Endurance observer failed: "
+                .. tostring(issue)
+        )
+    end
+end
+
+--[[
 Ends one owner's temporary maximum HP without refreshing its heal.
 
 Args:
@@ -49,6 +112,8 @@ function IronvowEnduranceSurgeService.stop(player: Player)
     local record = active[player]
     active[player] = nil
     if not record then return end
+
+    report_source_effect(player, record, false)
     if record.Character and record.Character.Parent then
         record.Character:SetAttribute("IronvowEnduranceActive", false)
         record.Character:SetAttribute("IronvowEnduranceExpiresAt", nil)
@@ -172,6 +237,8 @@ function IronvowEnduranceSurgeService.activate(
                 * definition.RESTORE_FRACTION
         )
     end
+
+    report_source_effect(player, record, true)
     return true
 end
 
