@@ -1,3 +1,24 @@
+## 25 September 2026 — v2.97 Human Wizard source timing GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_97_Human_Wizard_Source_Cast_Timing_20260925.md);
+[evidence](
+../testing/c4-human-wizard-source-cast-timing-v2-97-20260925.md).
+Human Wizard source timing now uses authenticated final
+M.Atk.Spd and read-only Spiritshot/Blessed Spiritshot state. Rank-6 Ember Bolt
+is 4000 ms / 2000 ms interrupt uncharged and 2800 ms / 1400 ms with either
+magic shot; Frost Lance proves 200 ms authored cool time becomes 140 ms with
+Spiritshot and does not inherit the hit-time 500 ms floor. Source reuse
+arithmetic is implemented, but final reuse deliberately remains blocked by
+`OriginalSkillReuseRateNotIntegrated` rather than ignoring Quick Recovery.
+Fresh runtime-rules **19 PASS**, cast-contract **11 PASS**, split-MP **12
+PASS**, timing **14 PASS**, source-combat **43 PASS**, combined runner **5/5
+PASS**, Base/Dungeon builds PASS. Next integrate actual owned
+`MAGICAL_SKILL_REUSE` into the authenticated source stat candidate.
+
+Permanent edits remain GitHub-only; Desktop Commander remains for
+fast-forward, disposable builds and unpublished Studio evidence only.
+
 ## 25 September 2026 — v2.96 Human Wizard source cast authority GREEN
 
 [Roadmap](
