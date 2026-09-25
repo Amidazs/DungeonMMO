@@ -154,6 +154,34 @@ local function main()
         "Source roll above hit chance misses"
     )
 
+    check(
+        Formula.physical_critical_rate_per_thousand(650) == 500,
+        "Source physical critical rate obeys the 50 percent cap"
+    )
+    check(
+        Formula.physical_critical_rate_per_thousand(99.9) == 99,
+        "Source physical critical rate truncates like Java int cast"
+    )
+
+    local critical_roll = Formula.resolve_physical_critical(
+        100,
+        99
+    )
+    check(
+        critical_roll.Critical
+            and critical_roll.ChancePerThousand == 100,
+        "Source critical roll below rate succeeds"
+    )
+
+    local equal_critical_roll = Formula.resolve_physical_critical(
+        100,
+        100
+    )
+    check(
+        not equal_critical_roll.Critical,
+        "Source critical roll equal to rate does not crit"
+    )
+
     check(Formula.magic_resist_threshold(30, 30) == 100,
         "Equal magic/target level source resistance threshold")
     check(Formula.magic_resist_threshold(31, 30) == 130,
