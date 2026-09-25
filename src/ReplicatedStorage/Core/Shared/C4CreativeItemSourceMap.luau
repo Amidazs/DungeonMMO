@@ -151,7 +151,7 @@ function C4CreativeItemSourceMap.resolve_loadout(
                 return nil, reason
             end
 
-            result[slot] = link.SourceItemId
+            result[link.SourceSlot] = link.SourceItemId
         end
     end
 
