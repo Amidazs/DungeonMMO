@@ -1,9 +1,13 @@
 --!strict
 -- Disabled-by-default live player-vs-player C4 source-combat executor.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Services = ServerScriptService.Core.Services
+local StatusEffects = require(
+    ReplicatedStorage.Core.Shared.C4StatusEffectReference
+)
 
 local SourceCombat = require(
     Services.C4SourceCombatCalculationService
@@ -171,6 +175,9 @@ function C4SourceCombatExecutor.new(options: any?): any
         _spatial_context_provider =
             config.SpatialContextProvider
             or default_spatial_context_provider,
+        _status_delay = config.DelayProvider or task.delay,
+        _npc_periodic_statuses = {},
+        _next_status_serial = 0,
         _source_units_per_stud = nil,
         _night_provider = nil,
     }, C4SourceCombatExecutor)
@@ -575,6 +582,280 @@ function C4SourceCombatExecutor:_apply_npc_damage(
         HealthBefore = health_before,
         HealthAfter = health_after,
         Lethal = lethal,
+    }, nil
+end
+
+--[[
+Returns the current periodic-status record for one target/source skill.
+
+Args:
+    enemy (Model): Server-owned NPC target.
+    source_skill_id (number): Reviewed source skill identifier.
+
+Returns:
+    any?: Current status record, otherwise nil.
+]]
+function C4SourceCombatExecutor:_npc_status_record(
+    enemy: Model,
+    source_skill_id: number
+): any?
+    local target_records = self._npc_periodic_statuses[enemy]
+    if type(target_records) ~= "table" then
+        return nil
+    end
+
+    return target_records[source_skill_id]
+end
+
+--[[
+Clears one exact periodic-status generation.
+
+Args:
+    enemy (Model): Server-owned NPC target.
+    source_skill_id (number): Reviewed source skill identifier.
+    serial (number): Exact generation to clear.
+
+Returns:
+    nil: Removes only the matching source status generation.
+]]
+function C4SourceCombatExecutor:_clear_npc_status(
+    enemy: Model,
+    source_skill_id: number,
+    serial: number
+)
+    local target_records = self._npc_periodic_statuses[enemy]
+    if type(target_records) ~= "table" then
+        return
+    end
+
+    local current = target_records[source_skill_id]
+    if not current or current.Serial ~= serial then
+        return
+    end
+
+    target_records[source_skill_id] = nil
+    if next(target_records) == nil then
+        self._npc_periodic_statuses[enemy] = nil
+    end
+end
+
+--[[
+Schedules the next exact source periodic-status tick.
+
+Args:
+    record (any): Current immutable-identity status record.
+
+Returns:
+    nil: Queues one server-owned delayed callback.
+]]
+function C4SourceCombatExecutor:_schedule_npc_status_tick(
+    record: any
+)
+    self._status_delay(record.TickSeconds, function()
+        self:_run_npc_status_tick(record)
+    end)
+end
+
+--[[
+Executes one nonlethal source periodic-status tick.
+
+The live gates and NPC boundary are revalidated on every delayed callback.
+Reapplication of the same source skill invalidates older callbacks by serial.
+
+Args:
+    record (any): Current scheduled status generation.
+
+Returns:
+    nil: Applies at most one nonlethal tick and reschedules if required.
+]]
+function C4SourceCombatExecutor:_run_npc_status_tick(
+    record: any
+)
+    local current = self:_npc_status_record(
+        record.Target,
+        record.SourceSkillId
+    )
+    if current ~= record then
+        return
+    end
+
+    local boundary = self:_validate_npc_target(
+        record.Attacker,
+        record.Target
+    )
+    if not boundary then
+        self:_clear_npc_status(
+            record.Target,
+            record.SourceSkillId,
+            record.Serial
+        )
+        return
+    end
+
+    local humanoid =
+        record.Target:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        self:_clear_npc_status(
+            record.Target,
+            record.SourceSkillId,
+            record.Serial
+        )
+        return
+    end
+
+    local planned = StatusEffects.nonlethal_tick(
+        humanoid.Health,
+        record.TickDamage
+    )
+    if not planned then
+        self:_clear_npc_status(
+            record.Target,
+            record.SourceSkillId,
+            record.Serial
+        )
+        return
+    end
+
+    local health_before = humanoid.Health
+    if planned.AppliedDamage > 0 then
+        humanoid:TakeDamage(planned.AppliedDamage)
+    end
+    local health_after = humanoid.Health
+    local applied_damage = math.max(
+        0,
+        health_before - health_after
+    )
+
+    if applied_damage > 0 then
+        self._npc_damage_observer({
+            attacker = record.Attacker,
+            attacker_character = combat_model(record.Attacker),
+            target = record.Target,
+            source_kind = record.SourceKind,
+            source_id = record.CreativeSkillId,
+            attack_id = record.CreativeSkillId,
+            base_damage = record.TickDamage,
+            multiplier = 1,
+            sequence_id = nil,
+            C4SourceResolved = true,
+            C4PeriodicStatus = true,
+            C4SourceSkillId = record.SourceSkillId,
+            C4SourceRank = record.SourceRank,
+            C4SourceCastSequenceId = record.SequenceId,
+        }, applied_damage, false)
+    end
+
+    record.Remaining -= 1
+    if record.Remaining <= 0 then
+        self:_clear_npc_status(
+            record.Target,
+            record.SourceSkillId,
+            record.Serial
+        )
+        return
+    end
+
+    self:_schedule_npc_status_tick(record)
+end
+
+--[[
+Executes one reviewed source DEBUFF cast against a server NPC.
+
+A resisted cast schedules nothing. A successful cast replaces only an existing
+generation of the same reviewed source skill and starts exact nonlethal ticks.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative status skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Source status application evidence or denial reason.
+]]
+function C4SourceCombatExecutor:status_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.status_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcPeriodicStatus",
+            Calculation = calculated,
+            Applied = false,
+            StatusApplied = false,
+            Landed = false,
+            Scheduled = false,
+            HealthDamage = 0,
+        }, nil
+    end
+
+    local source_kind
+    if calculated.EffectType == "BLEED" then
+        source_kind = "StatusPhysical"
+    elseif calculated.EffectType == "POISON" then
+        source_kind = "StatusMagic"
+    else
+        return nil, "UnsupportedC4LivePeriodicStatusType"
+    end
+
+    self._next_status_serial += 1
+    local record = {
+        Serial = self._next_status_serial,
+        Attacker = attacker,
+        Target = enemy,
+        CreativeSkillId = creative_skill_id,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+        SourceKind = source_kind,
+        TickDamage = calculated.TickDamage,
+        TickSeconds = calculated.TickSeconds,
+        Remaining = calculated.TickCount,
+        SequenceId = sequence_id,
+    }
+
+    local target_records = self._npc_periodic_statuses[enemy]
+    if type(target_records) ~= "table" then
+        target_records = {}
+        self._npc_periodic_statuses[enemy] = target_records
+    end
+    target_records[calculated.SourceSkillId] = record
+    self:_schedule_npc_status_tick(record)
+
+    return {
+        Kind = "C4LiveNpcPeriodicStatus",
+        Calculation = calculated,
+        Applied = true,
+        StatusApplied = true,
+        Landed = true,
+        Scheduled = true,
+        SourceKind = source_kind,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+        TickDamage = calculated.TickDamage,
+        TickCount = calculated.TickCount,
+        TickSeconds = calculated.TickSeconds,
+        HealthDamage = 0,
     }, nil
 end
 
@@ -1093,6 +1374,9 @@ function C4SourceCombatExecutor:capability(): any
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
+        NpcPeriodicStatusLiveApplication = true,
+        NpcPeriodicStatusNonlethal = true,
+        NpcPeriodicStatusRefreshBySourceSkill = true,
         NpcDamageBypassesCombatPoints = true,
         NpcDamageCallbackPreservation = true,
     }
