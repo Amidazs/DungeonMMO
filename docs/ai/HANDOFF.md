@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.58 complete reviewed core-slot item mapping
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_58_C4_Launch_Core_Gear_Source_Expansion_20260925.md);
+[test scope](../testing/c4-launch-core-gear-source-v2-58-20260925.md).
+Added pinned C4 Trident291, NetiBow1181, NetiDagger1182, Brigandine352 and
+Manticore395 values. C4CreativeItemSourceMap now covers all 18 current
+Weapon/Body/OffHand creative items, including Warrior polearm, all three
+class-specific D-grade heavy bodies and the exact Neti quest weapons. Current
+Helmet/Gloves/Boots now fail closed instead of being silently ignored.
+C4ResourceMigrationBoundary exposes reviewed server-owned source core-loadout
+IDs but keeps OriginalInventoryIntegrated=false and CanApplyLive=false.
+Tests for v2.55-v2.58 are authored; user has re-enabled local playtesting, so
+fast-forward/build/focused Studio execution is the immediate next action.
+Permanent edits remain GitHub-only; no main merge/publish/production saves.
+
 ## 25 September 2026 — v2.57 reviewed creative-to-C4 item links
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_57_C4_Creative_Item_Source_Map_20260925.md);
