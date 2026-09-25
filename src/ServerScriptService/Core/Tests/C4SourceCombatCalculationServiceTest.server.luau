@@ -29,6 +29,7 @@ local Runtime = require(
 
 local FIGHTER_ID = 938181
 local MAGE_ID = 938182
+local WIZARD_ID = 938186
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -111,6 +112,7 @@ Returns:
 local function empty_active_snapshot(user_id: number): any?
     if user_id ~= FIGHTER_ID
         and user_id ~= MAGE_ID
+        and user_id ~= WIZARD_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -273,7 +275,7 @@ local function check_close(
 end
 
 --[[
-Seeds three authenticated source-ready starter characters.
+Seeds authenticated source-ready starter and transfer characters.
 
 Args:
     None.
@@ -290,8 +292,12 @@ local function seed_characters()
     own_skill(mage, "MageHeal", 1)
     own_skill(mage, "MysticPoisonCurse", 1)
 
+    local wizard = starter_character(WIZARD_ID, "Emberweaver")
+    own_skill(wizard, "EmberweaverEmberBolt", 6)
+
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
+    Runtime.set_character(WIZARD_ID, wizard)
     Runtime.set_character(
         TARGET_ID,
         starter_character(TARGET_ID, "Oathguard")
@@ -865,6 +871,68 @@ local function check_magic()
 end
 
 --[[
+Checks Human Wizard direct magic uses the exact mapped C4 rank and class stats.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms Emberweaver rank-six Ember Bolt resolves Blaze rank six.
+]]
+local function check_human_wizard_magic()
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(WIZARD_ID)
+    )
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+
+    shot_state.Spiritshot = true
+    local result = assert(Combat.magic_skill(
+        WIZARD_ID,
+        TARGET_ID,
+        "EmberweaverEmberBolt",
+        6
+    ))
+    local expected = Formula.magic_damage({
+        MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
+        MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
+        SkillPower = 38,
+        Spiritshot = result.Spiritshot,
+        BlessedSpiritshot = result.BlessedSpiritshot,
+        Failure = result.MagicFailure,
+        MagicCritical = result.MagicCritical,
+        ElementalMultiplier = result.ElementalMultiplier,
+        PvpMultiplier = result.PvpMultiplier,
+    })
+
+    check_close(
+        result.Amount,
+        expected,
+        "Human Wizard Blaze rank six uses exact source magic formula"
+    )
+    check(
+        result.SourceSkillId == 1220
+            and result.SourceRank == 6
+            and result.SourceSkillPower == 38
+            and result.MagicLevel == 30
+            and result.SourceElement == "FIRE"
+            and result.Spiritshot
+            and not result.BlessedSpiritshot
+            and result.Kind == "MagicDamage"
+            and not result.LiveApplied,
+        "Emberweaver Ember Bolt resolves exact Human Wizard source rank"
+    )
+    check(
+        attacker.ScopeId == "HumanWizard"
+            and attacker.SourceClassId == 11
+            and attacker.SourceStatCandidate.MAGICAL_ATTACK > 0
+            and attacker.SourceStatCandidate.MAGICAL_CRITICAL_RATE >= 0,
+        "Human Wizard direct spell uses its own source class candidate"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1164,6 +1232,7 @@ local function main()
     check_shield_resolution()
     check_physical()
     check_magic()
+    check_human_wizard_magic()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1172,6 +1241,7 @@ local function main()
 
     Runtime.clear_character(FIGHTER_ID)
     Runtime.clear_character(MAGE_ID)
+    Runtime.clear_character(WIZARD_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
@@ -1181,7 +1251,8 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true heal=true npc=true live=false"
+        .. "status=true pdam=true mdam=true wizard=true "
+        .. "heal=true npc=true live=false"
     ):format(checks))
 end
 
