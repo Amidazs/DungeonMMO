@@ -1,3 +1,15 @@
+## 25 September 2026 — v2.86 C4 periodic-status source GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_86_C4_Periodic_Status_Source_20260925.md);
+[green evidence](../testing/c4-periodic-status-source-v2-86-20260925.md).
+C4 Bleed rank one is pinned at 13 x4 every 5s; Poison rank one at 8 x10 every
+3s. Exact CON/MEN save, magic M.Atk/M.Def, shot, level, vulnerability and
+0-99 roll arithmetic is implemented, and ticks are source-nonlethal. Fresh
+focused Studio Base 21/21 and Dungeon 24/24 passed; status reference 14
+assertions passed. Live status dispatch is still blocked. Next build the
+source DEBUFF calculation/executor path. Permanent edits remain GitHub-only;
+no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.85 MagicBasic source-normal routing GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_85_C4_Magic_Basic_Normal_Routing_20260925.md);
