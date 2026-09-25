@@ -1,3 +1,16 @@
+## 25 September 2026 — v2.89 atomic C4 combat cutover GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_89_C4_Atomic_Combat_Cutover_20260925.md);
+[green evidence](../testing/c4-atomic-combat-cutover-v2-89-20260925.md).
+The independent source combat gates are now orchestrated by one server-only
+transaction. Audit readiness, explicit participants and explicit spatial/night
+rules are required; partial player failure or late dispatch failure reverses
+everything. Fresh focused Base 22/22 and Dungeon 25/25 passed; coordinator
+7 assertions passed. Nothing invokes source cutover during normal bootstrap.
+Next run a genuine unpublished Dungeon cutover/revert rehearsal against real
+runtime services and connected Studio players. Permanent edits remain
+GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.88 level-30 dispatch audit GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_88_C4_Level30_Dispatch_Audit_Closure_20260925.md);
