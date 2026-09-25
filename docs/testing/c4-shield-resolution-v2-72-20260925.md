@@ -5,10 +5,8 @@ Branch: `wip/phase-4-test-hud-integration-v1`.
 
 ## Status
 
-**IMPLEMENTED / ROJO BUILD PASS / FINAL STUDIO FOCUSED EXECUTION PENDING**
+**GREEN — fresh Base and Dungeon focused Studio acceptance passed.**
 
-Do not describe v2.72 as GREEN until the current focused Base and Dungeon
-Studio runner has passed.
 
 ## Candidate
 
@@ -57,24 +55,23 @@ Artifacts:
 - `%TEMP%\DungeonMMO_v272_Base.rbxl`;
 - `%TEMP%\DungeonMMO_v272_Dungeon.rbxl`.
 
-## Final Studio gate still required
+## Fresh Studio evidence
 
-Run:
+Base focused result:
 
-`scripts/studio/c4_v255_v258_resource_focus.luau`
+`environment=Base passed=14 total=14`
 
-against fresh unpublished Base and Dungeon compositions.
+Dungeon focused result:
 
-Expected runner label:
+`environment=Dungeon passed=16 total=16`
 
-`[C4 v2.55-v2.72 Focus]`.
+Relevant exact outputs:
 
-Relevant expected source tests include:
+- `[C4 Combat Formula] SOURCE_FORMULA_PASS: 37 assertions, live=false`;
+- `[C4 Source Combat] SOURCE_ONLY_PASS: 21 assertions hit=true critical=true variance=true shield=true pdam=true mdam=true heal=true live=false`;
+- `[C4 Resource Cutover] SOURCE_ONLY_PASS: 7 assertions default_off=true reversible=true` in Dungeon.
 
-- `C4CombatFormulaReferenceTest`;
-- `C4SourceCombatCalculationServiceTest`.
-
-Record actual assertion totals only from the fresh Studio output.
+No focused failure was reported.
 
 ## Safety boundary
 
