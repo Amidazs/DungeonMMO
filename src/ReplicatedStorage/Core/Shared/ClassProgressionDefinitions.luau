@@ -83,6 +83,44 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    -- Human Mystic first-transfer identity. Rank schedules may be
+    -- mapped before individual combat/summon mechanics are release-ready.
+    Emberweaver = table.freeze({
+        Id = "Emberweaver",
+        DisplayName = "Emberweaver",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Human"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "EmberweaverEquipmentExpertise",
+            "EmberweaverCommonItemCreation",
+            "EmberweaverFocusTraining",
+            "EmberweaverRobeTraining",
+            "EmberweaverArcaneResistance",
+            "EmberweaverManaChanneling",
+            "EmberweaverManaReservoir",
+            "EmberweaverQuickWeave",
+            "EmberweaverFrostLance",
+            "EmberweaverLifeSiphon",
+            "EmberweaverEmberBolt",
+            "EmberweaverFlameBurst",
+            "EmberweaverWitheringHex",
+            "EmberweaverFocusedBolt",
+            "EmberweaverEmberField",
+            "EmberweaverVenomHex",
+            "EmberweaverConcentration",
+            "EmberweaverFastCasting",
+            "EmberweaverManaRecovery",
+            "EmberweaverSlumberHex",
+            "EmberweaverScorchMark",
+            "EmberweaverVenomCloud",
+            "EmberweaverBloodToMana",
+            "EmberweaverCorpseSiphon",
+        }),
+    }),
+
     -- An original first-transfer award is separate from legacy Rogue/
     -- Ranger starter profiles and their old specialist class identities.
     Ashenblade = table.freeze({
