@@ -1,3 +1,24 @@
+## 25 September 2026 — CURRENT v2.56 C4 resource migration boundary
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_56_C4_Resource_Migration_Boundary_20260925.md)
+and [pending test scope](
+../testing/c4-resource-migration-boundary-v2-56-20260925.md).
+A new server-authenticated C4ResourceMigrationBoundary now returns exact source
+base HP/MP/CP for all nine current original Human/Elf starter and first-transfer
+paths from the actual selected character, while **CanApplyLive=false**. Four
+cutover blockers are explicit: full original inventory mapping, actually owned
+source-passive mapping, active-effect ordering and a live CP runtime. This
+prevents exact C4 base vitals from being mixed with the current custom
+equipment/passive/buff model. ProgressionRuntimeState exposes the boundary;
+forged first-transfer identity and level>30 still fail closed. New focused
+tests are authored but **no v2.56 Rojo/Studio execution is claimed**. v2.55
+split-MP/heal tests are also still pending execution. Next implement the
+current-item→reviewed-source-item migration map, then owned passive resolution,
+active-effect/CP ordering, and only then a coherent all-nine HP/MP/CP live
+switch. No main merge, Roblox publish, production save mutation or animation
+worktree edits. Permanent code/docs remain GitHub-only.
+
 ## 24 September 2026 — CURRENT v2.23 Warrior final six skill ranks
 
 [Latest roadmap](
