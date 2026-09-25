@@ -74,7 +74,7 @@ local function store_effect(
     reason: string?,
     expires_at: number?
 )
-    local record = {
+    local record: any = {
         Character = owner.Character,
         CreativeSkillId = creative_skill_id,
         CreativeRank = creative_rank,
