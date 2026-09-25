@@ -1,3 +1,13 @@
+**v2.88 LEVEL-30 SOURCE DISPATCH AUDIT GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_88_C4_Level30_Dispatch_Audit_Closure_20260925.md)
+and [green evidence](
+../testing/c4-level30-dispatch-audit-closure-v2-88-20260925.md).
+The intended level-30 player-to-NPC C4 dispatch audit now has **zero blockers**.
+Legacy Volley is not invented into low-level C4 Burst Shot; it fails closed
+outside the current source scope. Fresh Studio Base **21/21 PASS**, Dungeon
+**24/24 PASS**, family audit **24 assertions PASS** with
+`activation_ready=true`. Next: reversible server-only cutover coordinator.
+
 **v2.87 LIVE C4 PERIODIC STATUS GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_87_C4_Live_Periodic_Status_20260925.md)
 and [green evidence](
