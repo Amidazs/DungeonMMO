@@ -29,6 +29,9 @@ local C4SourceShotService = require(
 local C4SourceCombatCalculationService = require(
     Services:WaitForChild("C4SourceCombatCalculationService")
 )
+local C4SourceCombatExecutor = require(
+    Services:WaitForChild("C4SourceCombatExecutor")
+)
 local RewardService = require(Services:WaitForChild("RewardService"))
 local WeeklyWorldBossService = require(
     Services:WaitForChild("WeeklyWorldBossService")
@@ -116,6 +119,8 @@ function RuntimeServices.new(place_kind: string): any
     C4SourceCombatCalculationService.set_shot_authority(
         c4_source_shots
     )
+    local c4_source_combat_executor =
+        C4SourceCombatExecutor.new()
     local recipe_knowledge = RecipeKnowledgeService.new(
         profiles,
         inventory
@@ -166,6 +171,7 @@ function RuntimeServices.new(place_kind: string): any
         ProgressionService = progression,
         InventoryService = inventory,
         C4SourceShotService = c4_source_shots,
+        C4SourceCombatExecutor = c4_source_combat_executor,
         RecipeKnowledgeService = recipe_knowledge,
         RewardService = rewards,
         WeeklyWorldBossService = weekly_world_boss,
