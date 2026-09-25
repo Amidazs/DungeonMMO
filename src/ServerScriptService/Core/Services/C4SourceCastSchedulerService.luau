@@ -229,6 +229,75 @@ local function pending_record(
 end
 
 --[[
+Checks owner, overlap and reuse gates before any source planning.
+
+Args:
+    self (any): Scheduler instance.
+    player (any): Server-owned cast owner.
+    creative_skill_id (string): Creative skill key.
+    now (number): Resolved server process time.
+
+Returns:
+    string?: Strict denial reason, or nil when planning may continue.
+]]
+local function begin_denial(
+    self: any,
+    player: any,
+    creative_skill_id: string,
+    now: number
+): string?
+    if type(player) ~= "table"
+        and typeof(player) ~= "Instance"
+    then
+        return "C4SourceCastOwnerInvalid"
+    end
+    if type(player.UserId) ~= "number" then
+        return "C4SourceCastOwnerInvalid"
+    end
+    if self._pending_by_owner[player] then
+        return "C4SourceCastAlreadyScheduled"
+    end
+    if self:_reuse_ready_at(player, creative_skill_id) > now then
+        return "C4SourceCastReusePending"
+    end
+
+    return nil
+end
+
+--[[
+Starts the split-MP receipt after timing/reuse is source-ready.
+
+Args:
+    self (any): Scheduler instance.
+    player (any): Server-owned cast owner.
+    creative_skill_id (string): Creative skill key.
+    timing (any): Exact source timing plan.
+
+Returns:
+    (any?, string?): Matching resource receipt or strict denial reason.
+]]
+local function start_resource_receipt(
+    self: any,
+    player: any,
+    creative_skill_id: string,
+    timing: any
+): (any?, string?)
+    local started, reason = self._resources:begin_cast(
+        player,
+        creative_skill_id
+    )
+    if not started then
+        return nil, reason
+    end
+    if not same_cast_identity(timing, started) then
+        self._resources:cancel_cast(player, started.CastId)
+        return nil, "C4SourceCastPlanChanged"
+    end
+
+    return started, nil
+end
+
+--[[
 Begins one source cast and captures immutable timing/reuse deadlines.
 
 Timing must be fully source-ready before initial MP is spent. Source reuse
@@ -248,21 +317,15 @@ function C4SourceCastSchedulerService:begin_cast(
     creative_skill_id: string,
     supplied_now: number?
 ): (any?, string?)
-    if type(player) ~= "table"
-        and typeof(player) ~= "Instance"
-    then
-        return nil, "C4SourceCastOwnerInvalid"
-    end
-    if type(player.UserId) ~= "number" then
-        return nil, "C4SourceCastOwnerInvalid"
-    end
-    if self._pending_by_owner[player] then
-        return nil, "C4SourceCastAlreadyScheduled"
-    end
-
     local now = resolve_now(supplied_now)
-    if self:_reuse_ready_at(player, creative_skill_id) > now then
-        return nil, "C4SourceCastReusePending"
+    local denied = begin_denial(
+        self,
+        player,
+        creative_skill_id,
+        now
+    )
+    if denied then
+        return nil, denied
     end
 
     local timing, timing_reason = self._timing:resolve(
@@ -278,17 +341,14 @@ function C4SourceCastSchedulerService:begin_cast(
         return nil, reuse_reason
     end
 
-    local started, start_reason = self._resources:begin_cast(
+    local started, start_reason = start_resource_receipt(
+        self,
         player,
-        creative_skill_id
+        creative_skill_id,
+        timing
     )
     if not started then
         return nil, start_reason
-    end
-
-    if not same_cast_identity(timing, started) then
-        self._resources:cancel_cast(player, started.CastId)
-        return nil, "C4SourceCastPlanChanged"
     end
 
     local record = pending_record(timing, started, now, reuse_ms)
