@@ -833,6 +833,38 @@ function C4SourceCombatCalculationService.physical_random_variance(
         return nil, attacker_reason
     end
 
+    local base_critical_rate =
+        tonumber(effect.Sets.baseCritRate) or 0
+    if base_critical_rate < 0
+        or base_critical_rate >= math.huge
+    then
+        return nil, "OriginalPhysicalSkillCriticalRateInvalid"
+    end
+
+    local skill_critical = {
+        Critical = false,
+        ChancePerThousand = 0,
+        Roll = nil,
+    }
+
+    if base_critical_rate > 0 then
+        local str_bonus = attacker.SourceStrBonus
+        if type(str_bonus) ~= "number"
+            or str_bonus ~= str_bonus
+            or str_bonus <= 0
+            or str_bonus >= math.huge
+        then
+            return nil, "OriginalStrBonusUnavailable"
+        end
+
+        skill_critical =
+            Formula.resolve_physical_skill_critical(
+                base_critical_rate,
+                str_bonus,
+                COMBAT_RANDOM:NextInteger(0, 999)
+            )
+    end
+
     local variance, variance_reason =
         source_random_variance(attacker)
     if not variance then
@@ -1033,9 +1065,10 @@ end
 --[[
 Calculates C4 PDAM skill damage between source-ready players.
 
-Weapon/unarmed variance, source weapon vulnerability, shots and the player
-PvP physical-skill multiplier are server-authoritative. PDAM skill criticals
-and NPC race-specific modifiers remain outside this player-only provider.
+Weapon/unarmed variance, source weapon vulnerability, shots, authored PDAM
+critical rate and the player PvP physical-skill multiplier are
+server-authoritative. NPC race-specific modifiers remain outside this
+player-only provider.
 
 Args:
     attacker_user_id (number): Authenticated source-ready attacker.
@@ -1154,6 +1187,10 @@ function C4SourceCombatCalculationService.physical_skill(
         PvpMultiplier = pvp_multiplier,
     })
 
+    if skill_critical.Critical then
+        amount *= 2
+    end
+
     return {
         Kind = "PhysicalDamage",
         Amount = amount,
@@ -1168,6 +1205,12 @@ function C4SourceCombatCalculationService.physical_skill(
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
         PvpStat = "PVP_PHYS_SKILL_DMG",
         PvpMultiplier = pvp_multiplier,
+        PhysicalSkillCritical = skill_critical.Critical,
+        PhysicalSkillCriticalChancePerThousand =
+            skill_critical.ChancePerThousand,
+        PhysicalSkillCriticalRoll = skill_critical.Roll,
+        SourceSkillBaseCriticalRate = base_critical_rate,
+        SourceStrBonus = attacker.SourceStrBonus,
         ShieldEquipped = shield.ShieldEquipped,
         ShieldBlocked = shield.Blocked,
         PerfectShield = shield.PerfectShield,
@@ -1436,8 +1479,9 @@ function C4SourceCombatCalculationService.capability(): any
         PhysicalRandomVarianceResolution = true,
         RandomWeaponVarianceIntegrated = true,
         UnarmedRandomVarianceIntegrated = true,
-        CriticalResolutionIntegrated = false,
-        PhysicalSkillCriticalIntegrated = false,
+        CriticalResolutionIntegrated = true,
+        PhysicalSkillCriticalIntegrated = true,
+        PhysicalSkillCriticalRollServerOwned = true,
         MagicCriticalIntegrated = true,
         MagicCriticalRollServerOwned = true,
         ShieldSourceResolutionAvailable = true,
