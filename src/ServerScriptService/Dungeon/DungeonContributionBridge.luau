@@ -185,19 +185,44 @@ function DungeonContributionBridge.record_damage(
             VerifiedLethalHit = lethal_hit == true,
         }
     )
+    local quest_observer_invoked = false
+    local quest_observer_accepted: boolean? = nil
+
     if credited.ok == true and quest_damage_observer then
-        local observed, reason = pcall(
+        quest_observer_invoked = true
+
+        local observed, observer_result = pcall(
             quest_damage_observer.record_damage,
             quest_damage_observer,
             context,
             applied_damage,
             lethal_hit == true
         )
-        if not observed then
+
+        if observed then
+            quest_observer_accepted =
+                observer_result == true
+        else
             warn("[C4 Quest Combat] Damage observer failed: "
-                .. tostring(reason))
+                .. tostring(observer_result))
         end
     end
+
+    if RunService:IsStudio()
+        and typeof(context.target) == "Instance"
+        and context.target:IsA("Model")
+        and context.target:GetAttribute("C4RehearsalTarget") == true
+    then
+        print((
+            "[C4 Quest Rehearsal Observer] target=%s "
+                .. "invoked=%s accepted=%s"
+        ):format(
+            context.target.Name,
+            tostring(quest_observer_invoked),
+            tostring(quest_observer_accepted)
+        ))
+    end
+
     return credited
 end
 
