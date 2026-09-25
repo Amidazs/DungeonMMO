@@ -1,3 +1,12 @@
+**v2.86 C4 PERIODIC-STATUS SOURCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_86_C4_Periodic_Status_Source_20260925.md)
+and [green evidence](
+../testing/c4-periodic-status-source-v2-86-20260925.md).
+Exact C4 Bleed/Poison plans, effect-success arithmetic, CON/MEN saves and
+nonlethal periodic ticks are accepted. Fresh Studio Base **21/21 PASS**,
+Dungeon **24/24 PASS**, status reference **14 assertions PASS**. StatusPhysical
+and StatusMagic remain dispatch blockers until live DEBUFF scheduling is wired.
+
 **v2.85 MAGICBASIC SOURCE-NORMAL ROUTING GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_85_C4_Magic_Basic_Normal_Routing_20260925.md)
 and [green evidence](
