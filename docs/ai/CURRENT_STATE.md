@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.68 source PDAM/MDAM/HEAL calculator GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_68_C4_Source_Combat_Calculation_Provider_20260925.md)
+and [green evidence](
+../testing/c4-source-combat-calculation-provider-v2-68-20260925.md).
+After the green reversible v2.67 HP/MP/CP cutover, the next source-combat layer
+is now in place: a disabled server-only provider calculates C4 PDAM, MDAM and
+instant HEAL from the authenticated final source stat candidate and genuinely
+owned source skill rank. Source skill power is formula input, never copied
+directly into Roblox damage. Fresh Base **13/13 PASS** and Dungeon **15/15
+PASS** at 0e859222. Nothing applies live damage yet; shot, hit, critical,
+random weapon range, shield, magic failure, elemental and PvP inputs remain
+neutral until server-authoritative. Resource cutover and combat calculation
+gates both stay OFF by default. No main merge, publish, production save
+mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.67 reversible live resource cutover GREEN
 
 [Latest roadmap](
