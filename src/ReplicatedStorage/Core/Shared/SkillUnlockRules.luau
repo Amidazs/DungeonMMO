@@ -102,13 +102,10 @@ function SkillUnlockRules.can_train(
         end
     end
 
-    -- Fighter-family characters cannot train a transfer skill merely
-    -- because the normal legacy Ranger/Rogue definition permits it.
-    -- Purchased advanced abilities require an actual saved mentor receipt.
+    -- Any original first-transfer skill requires the actual saved mentor
+    -- receipt. This applies to Fighter and Mystic families alike.
     local first_transfer_classes = definition.AllowedFirstTransferClasses
-    if identity.BaseClassId == "Fighter"
-        and type(first_transfer_classes) == "table"
-    then
+    if type(first_transfer_classes) == "table" then
         local earned = FirstTransfers.awarded(character)
         local authorized = false
         for _, class_id in ipairs(first_transfer_classes) do
