@@ -4,6 +4,9 @@ local Players = game:GetService("Players")
 
 local CombatStatusService = {}
 
+local observe_source_effect:
+    ((Player, string, number, number) -> ())? = nil
+
 local BUFFS = table.freeze({
     PhysicalPower = table.freeze({
         Magnitude = "C4PhysicalPowerBonus",
@@ -93,19 +96,43 @@ function CombatStatusService.get_evasion_penalty_chance(
 end
 
 --[[
+Installs a server-only observer for C4 source-effect migration state.
+
+The observer cannot approve, reject or alter the live buff. It receives only
+the creative ID/rank and duration after the existing server executor has
+successfully applied the status.
+
+Args:
+    callback ((Player, string, number, number) -> ()): Records one real timed
+        creative effect in the server-only C4 migration registry.
+
+Returns:
+    nil: Future successful timed buffs are reported to the observer.
+]]
+function CombatStatusService.set_source_effect_observer(callback: any)
+    assert(
+        type(callback) == "function",
+        "Source effect observer is required"
+    )
+    observe_source_effect = callback
+end
+
+--[[
 Applies a non-stacking, bounded self-buff only to the authenticated
 living player at the moment the server executes its bought skill.
 
 Args:
     player (Player): Genuine caster owning the character.
     definition (any): Server-authored and rank-resolved Buff skill.
+    rank (number?): Authoritative purchased rank paired to the definition.
 
 Returns:
     boolean: True when a living player received a valid timed status.
 ]]
 function CombatStatusService.apply_self(
     player: Player,
-    definition: any
+    definition: any,
+    rank: number?
 ): boolean
     if player.Parent ~= Players or type(definition) ~= "table"
         or definition.KIND ~= "Buff"
@@ -191,6 +218,27 @@ function CombatStatusService.apply_self(
         )
         local anchored_root = root :: BasePart
         anchored_root.Anchored = true
+    end
+
+    if observe_source_effect
+        and type(definition.ID) == "string"
+        and type(rank) == "number"
+        and rank % 1 == 0
+        and rank >= 1
+    then
+        local ok, issue = pcall(
+            observe_source_effect,
+            player,
+            definition.ID,
+            rank,
+            seconds
+        )
+        if not ok then
+            warn(
+                "[C4 Active Source] Timed buff observer failed: "
+                    .. tostring(issue)
+            )
+        end
     end
 
     task.delay(expires_at - os.clock(), function()
