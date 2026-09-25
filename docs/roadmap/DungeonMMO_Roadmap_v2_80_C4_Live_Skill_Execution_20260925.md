@@ -73,11 +73,31 @@ existing CombatService action dispatch.
 Therefore this milestone validates the live application layer without changing
 normal DungeonMMO gameplay.
 
-## Next backend implementation
+## Integration audit and next backend implementation
 
-Add a controlled, disabled-by-default adapter at the existing combat entry
-points.
+A post-acceptance entry-point audit found an important dependency before the
+adapter can be wired safely:
 
-The adapter must preserve current combat whenever source mode is not explicitly
-active, must never allow clients to select formulas or damage values, and must
-be independently reversible before multiplayer cutover testing.
+- current Dungeon combat is PvE-first;
+- `CombatTargetRules` explicitly rejects player targets;
+- `MeleeHitService` and projectile services currently resolve NPC Models;
+- the accepted C4 source calculation provider currently authenticates
+  player-source boundaries by UserId;
+- Dungeon NPCs do not yet expose equivalent source-ready C4 stat boundaries.
+
+Therefore directly wiring the live executor into current melee/projectile
+dispatch would either bypass the source provider for NPCs or mix old and new
+formula families. That is not an acceptable cutover.
+
+The next backend milestone is now:
+
+1. create a server-owned C4 NPC source-stat boundary for Dungeon enemies;
+2. map creative Dungeon enemy archetypes to reviewed source stat records while
+   keeping player-facing monster names original;
+3. support source normal/PDAM/MDAM calculations against NPC boundaries;
+4. preserve existing quest/contribution/threat callbacks;
+5. only then add the reversible dispatch adapter.
+
+PvP/castle combat remains later work. Its target-legality rules should be
+introduced with the PvP/castle system rather than weakening current PvE target
+rules early.
