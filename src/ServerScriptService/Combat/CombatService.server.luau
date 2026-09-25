@@ -133,6 +133,11 @@ local C4ResourceCutoverService = require(
         :WaitForChild("Services")
         :WaitForChild("C4ResourceCutoverService")
 )
+local C4CombatDispatchAdapter = require(
+    ServerScriptService:WaitForChild("Core")
+        :WaitForChild("Services")
+        :WaitForChild("C4CombatDispatchAdapter")
+)
 local C4ActiveSourceEffectState = require(
     ServerScriptService:WaitForChild("Core")
         :WaitForChild("Services")
@@ -157,7 +162,21 @@ DamageService.set_player_resource_damage_resolver(function(
     )
 end)
 
-DamageService.set_damage_callback(function(
+--[[
+Records one trusted post-damage event for contribution, quest and threat.
+
+Both the existing DamageService path and the optional C4 source executor use
+this same observer so enabling source dispatch cannot bypass bookkeeping.
+
+Args:
+    context (any): Server-created damage context.
+    applied_damage (number): Positive HP damage actually applied.
+    lethal_hit (boolean): Whether this hit killed the target.
+
+Returns:
+    nil: Records only existing server-owned combat bookkeeping.
+]]
+local function record_applied_damage(
     context: any,
     applied_damage: number,
     lethal_hit: boolean
@@ -178,6 +197,18 @@ DamageService.set_damage_callback(function(
             applied_damage
         )
     end
+end
+
+DamageService.set_damage_callback(record_applied_damage)
+
+C4CombatDispatchAdapter.set_npc_damage_observer(
+    record_applied_damage
+)
+
+DamageService.set_source_damage_adapter(function(
+    context: any
+): any
+    return C4CombatDispatchAdapter.try_damage(context)
 end)
 
 WardService.set_absorb_callback(function(
