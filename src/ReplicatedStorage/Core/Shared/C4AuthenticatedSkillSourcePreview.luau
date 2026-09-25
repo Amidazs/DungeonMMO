@@ -1,5 +1,5 @@
 --!strict
--- Original C4 learning/effect previews for actual nine-path identities.
+-- Original C4 learning/effect previews for authenticated path identities.
 -- This does not add skills, modify SP, or replace live combat executors.
 local Shared = script.Parent
 
@@ -57,7 +57,7 @@ local function inspect_row(scope_id: string, row: any): any
         CreativeSkillId = link.CreativeSkillId,
         CreativeSkillRank = link.CreativeRank,
         MissingReason = link.Reason,
-        -- The nine Scout self-heal gaps have a separate source contract,
+        -- The Scout self-heal gaps have a separate source contract,
         -- but no purchased rank or real original-formula executor yet.
         SourceOnlyMigrationPlan = planned_scout_heal,
         ExactC4EffectCertified = false,
