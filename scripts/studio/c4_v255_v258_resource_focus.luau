@@ -1,5 +1,5 @@
 --!strict
--- Disposable unpublished focused runner for C4 v2.55-v2.58 resource work.
+-- Disposable unpublished focused runner for C4 v2.55-v2.59 resource work.
 
 assert(
     game.PlaceId == 0 and game.GameId == 0,
@@ -33,6 +33,10 @@ local fixtures = {
     {
         Parent = core_tests,
         Name = "C4LaunchCoreGearSourceTest",
+    },
+    {
+        Parent = core_tests,
+        Name = "C4SixSlotPaperdollSourceTest",
     },
 }
 
