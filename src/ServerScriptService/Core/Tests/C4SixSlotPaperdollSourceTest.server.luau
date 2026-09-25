@@ -41,6 +41,11 @@ local function check_source_items()
     local bracer = assert(SourceItems.get(51))
     local mithril_gloves = assert(SourceItems.get(61))
     local gauntlets = assert(SourceItems.get(63))
+    local leather_pants = assert(SourceItems.get(29))
+    local bone_gaiters = assert(SourceItems.get(32))
+    local brigandine_gaiters = assert(SourceItems.get(2378))
+    local manticore_gaiters = assert(SourceItems.get(417))
+    local apprentice_stockings = assert(SourceItems.get(461))
 
     check(
         wooden_helmet.Slot == "Head"
@@ -66,6 +71,30 @@ local function check_source_items()
             and gauntlets.PhysicalDefence == 24,
         "D-grade glove source P.Def is exact"
     )
+    check(
+        leather_pants.Slot == "Legs"
+            and leather_pants.Kind == "Light"
+            and leather_pants.PhysicalDefence == 27
+            and bone_gaiters.Slot == "Legs"
+            and bone_gaiters.Kind == "Heavy"
+            and bone_gaiters.PhysicalDefence == 39,
+        "gradeless light and heavy source legs are exact"
+    )
+    check(
+        brigandine_gaiters.Grade == "D"
+            and brigandine_gaiters.Kind == "Heavy"
+            and brigandine_gaiters.PhysicalDefence == 64
+            and manticore_gaiters.Grade == "D"
+            and manticore_gaiters.Kind == "Light"
+            and manticore_gaiters.PhysicalDefence == 51,
+        "D-grade heavy and light source legs use pinned XML P.Def"
+    )
+    check(
+        apprentice_stockings.Kind == "Magic"
+            and apprentice_stockings.PhysicalDefence == 10
+            and apprentice_stockings.MaxMpAfterModifiers == 10,
+        "apprentice magic stockings preserve P.Def and deferred MP"
+    )
 end
 
 --[[
@@ -85,6 +114,7 @@ local function check_paperdoll_formula()
         {
             Head = 43,
             Body = 25,
+            Legs = 32,
             Gloves = 49,
             Feet = 38,
         },
@@ -92,14 +122,15 @@ local function check_paperdoll_formula()
     ))
 
     check(
-        fighter.EquippedStats.PHYSICAL_DEFENCE == 155,
-        "Fighter six-slot armour P.Def follows C4 source order"
+        fighter.EquippedStats.PHYSICAL_DEFENCE == 180,
+        "Fighter source chest+legs P.Def follows exact C4 paperdoll order"
     )
     check(
         fighter.CurrentSixSlotPaperdollIntegrated
+            and fighter.OriginalBodyLegSemanticsIntegrated
             and not fighter.FullOriginalPaperdollIntegrated
             and not fighter.LiveCombatIntegrated,
-        "current paperdoll is source-complete without claiming full C4 gear"
+        "creative paperdoll includes exact source legs without claiming accessories"
     )
 
     local mystic = assert(Stats.get_with_source_items(
@@ -109,6 +140,7 @@ local function check_paperdoll_formula()
         {
             Head = 43,
             Body = 425,
+            Legs = 461,
             Gloves = 49,
             Feet = 38,
         },
@@ -116,12 +148,12 @@ local function check_paperdoll_formula()
     ))
 
     check(
-        mystic.EquippedStats.PHYSICAL_DEFENCE == 90,
-        "Mystic uses its separate C4 chest paperdoll deduction"
+        mystic.EquippedStats.PHYSICAL_DEFENCE == 92,
+        "Mystic uses exact C4 chest and legs paperdoll deductions"
     )
     check(
-        mystic.EquippedStats.MAX_MP == mystic.Naked.MaxMP + 19,
-        "robe deferred MP remains after source passive stage"
+        mystic.EquippedStats.MAX_MP == mystic.Naked.MaxMP + 29,
+        "magic chest and stockings deferred MP remain at source 0x60"
     )
 end
 
@@ -157,7 +189,12 @@ local function check_expertise()
 
     local d_grade, d_grade_reason = Expertise.validate(
         20,
-        {Weapon = 291, Body = 352, Gloves = 61}
+        {
+            Weapon = 291,
+            Body = 352,
+            Legs = 2378,
+            Gloves = 61,
+        }
     )
     check(
         d_grade ~= nil
@@ -184,7 +221,7 @@ local function main()
 
     print((
         "[C4 Six-Slot Paperdoll] SOURCE_ONLY_PASS: %d assertions "
-        .. "six_slots=true expertise239=true live=false"
+        .. "six_slots=true source_legs=true expertise239=true live=false"
     ):format(checks))
 end
 
