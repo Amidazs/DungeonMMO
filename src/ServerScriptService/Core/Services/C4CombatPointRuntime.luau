@@ -72,36 +72,76 @@ local function current_record(owner: any): any?
 end
 
 --[[
-Configures current/max CP for a server-owned character.
+Extracts the certified maximum CP from a coordinated source boundary.
 
-This is not called by production gameplay before the C4 resource cutover. It
-exists now so the complete authoritative CP lifecycle can be accepted without
-silently changing existing dungeon PvE.
+The runtime never accepts an arbitrary maximum from a client or gameplay
+caller. Its public configuration route requires the reviewed C4 source
+candidate and matching pinned-source provenance.
+
+Args:
+    boundary (any): Authenticated C4 resource migration boundary.
+
+Returns:
+    (number?, string?): Certified source maximum CP or denial reason.
+]]
+local function source_max_cp(boundary: any): (number?, string?)
+    local metadata = SourceRules.metadata()
+
+    if type(boundary) ~= "table"
+        or boundary.CutoverPrerequisitesReady ~= true
+        or boundary.SourceStatCandidateReady ~= true
+        or boundary.ExactBaseVitalsCertified ~= true
+        or boundary.SourceCommit ~= metadata.SourceCommit
+        or type(boundary.SourceStatCandidate) ~= "table"
+    then
+        return nil, "UncertifiedCombatPointSourceBoundary"
+    end
+
+    local max_cp = boundary.SourceStatCandidate.MAX_CP
+
+    if type(max_cp) ~= "number"
+        or max_cp ~= max_cp
+        or max_cp < 0
+        or math.abs(max_cp) >= math.huge
+    then
+        return nil, "InvalidCombatPointMaximum"
+    end
+
+    return max_cp, nil
+end
+
+--[[
+Configures current/max CP from a certified C4 source boundary.
+
+This is not called automatically before the deliberate live resource cutover.
+The accepted maximum can only come from the authenticated source-stat
+candidate; arbitrary Roblox or client-selected maximums are rejected.
 
 Args:
     owner (any): Player or disposable server-owned test owner.
-    max_cp (number): Source-derived maximum CP.
+    boundary (any): Authenticated source-ready C4 migration boundary.
     refill (boolean): True to fill CP, false to preserve/clamp prior current CP.
 
 Returns:
     (boolean, string?): Success or strict validation reason.
 ]]
-function C4CombatPointRuntime.configure(
+function C4CombatPointRuntime.configure_from_boundary(
     owner: any,
-    max_cp: number,
+    boundary: any,
     refill: boolean
 ): (boolean, string?)
     if not has_owner_identity(owner) then
         return false, "InvalidCombatPointOwner"
     end
 
-    if type(max_cp) ~= "number"
-        or max_cp ~= max_cp
-        or max_cp < 0
-        or math.abs(max_cp) >= math.huge
-        or type(refill) ~= "boolean"
-    then
-        return false, "InvalidCombatPointMaximum"
+    if type(refill) ~= "boolean" then
+        return false, "InvalidCombatPointRefillMode"
+    end
+
+    local max_cp, source_reason = source_max_cp(boundary)
+
+    if not max_cp then
+        return false, source_reason
     end
 
     local prior = current_record(owner)
@@ -287,6 +327,7 @@ function C4CombatPointRuntime.capability(): any
         PlayableAttackerOnly = metadata.PlayableAttackerOnly,
         NpcDamageBypassesCP = metadata.NpcDamageBypassesCP,
         RegenPeriodSeconds = metadata.RegenPeriodSeconds,
+        SourceCommit = metadata.SourceCommit,
         LifecycleClearSupported = true,
         LiveConfiguredByDefault = false,
     }
