@@ -190,6 +190,9 @@ local function check_default_off()
             and capability.NormalAttackPhysicalCriticalResolution
             and capability.NormalAttackPhysicalCriticalRollServerOwned
             and capability.NormalAttackCriticalPowerIntegrated
+            and capability.PhysicalRandomVarianceResolution
+            and capability.RandomWeaponVarianceIntegrated
+            and capability.UnarmedRandomVarianceIntegrated
             and not capability.PhysicalSkillCriticalIntegrated
             and not capability.MagicCriticalIntegrated
             and not capability.LiveDamageApplied,
@@ -305,6 +308,39 @@ local function check_normal_attack_critical()
 end
 
 --[[
+Checks server-owned C4 physical random variance for the unarmed fixture.
+
+The source-ready starter has no reviewed weapon equipped, so level 30 uses
+5 + floor(sqrt(30)) = 10 as the inclusive percentage range.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact range, private roll and source multiplier.
+]]
+local function check_physical_random_variance()
+    local result = assert(Combat.physical_random_variance(
+        FIGHTER_ID
+    ))
+
+    check(
+        result.RandomDamage == 10
+            and result.Roll >= -10
+            and result.Roll <= 10
+            and result.Roll % 1 == 0
+            and result.Unarmed
+            and result.SourceWeaponId == nil,
+        "unarmed level-30 variance uses exact source range"
+    )
+    check_close(
+        result.Multiplier,
+        1 + (result.Roll / 100),
+        "server-owned random variance roll maps to source multiplier"
+    )
+end
+
+--[[
 Checks PDAM uses authenticated source P.Atk/P.Def and source skill power.
 
 Args:
@@ -331,6 +367,7 @@ local function check_physical()
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = 25,
+        RandomDamageMultiplier = result.RandomDamageMultiplier,
     })
 
     check_close(
@@ -343,6 +380,11 @@ local function check_physical()
             and result.SourceRank == 1
             and result.SourceSkillPower == 25
             and result.Kind == "PhysicalDamage"
+            and result.RandomDamage == 10
+            and result.RandomDamageRoll >= -10
+            and result.RandomDamageRoll <= 10
+            and result.Unarmed
+            and result.SourceWeaponId == nil
             and not result.LiveApplied,
         "physical provider retains exact source identity without applying HP"
     )
@@ -468,6 +510,7 @@ local function main()
     Combat.set_enabled(true)
     check_normal_attack_hit()
     check_normal_attack_critical()
+    check_physical_random_variance()
     check_physical()
     check_magic()
     check_heal()
@@ -480,7 +523,8 @@ local function main()
 
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
-        .. "hit=true critical=true pdam=true mdam=true heal=true live=false"
+        .. "hit=true critical=true variance=true pdam=true "
+        .. "mdam=true heal=true live=false"
     ):format(checks))
 end
 
