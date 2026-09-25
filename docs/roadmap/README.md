@@ -1,3 +1,14 @@
+**v2.74 C4 ELEMENTAL RESOLUTION GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_74_C4_Elemental_Resolution_20260925.md)
+and [green evidence](
+../testing/c4-elemental-resolution-v2-74-20260925.md).
+Reviewed C4 source elements now resolve against authenticated final player
+FIRE/WIND/WATER/EARTH/HOLY/DARK vulnerability stats before MDAM returns its
+source-only result. Fresh Studio Base **14/14 PASS**, Dungeon **16/16 PASS**,
+formula **49 assertions PASS**, source combat **24 assertions PASS**. Next:
+server-owned shot inventory/consumption. No main merge, publish or production
+saves.
+
 **v2.73 C4 MAGIC FAILURE/CRITICAL GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_73_C4_Magic_Failure_Critical_20260925.md)
 and [green evidence](
