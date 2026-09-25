@@ -153,6 +153,43 @@ function FakeExecutor:magic_skill_npc(
 end
 
 --[[
+Records one fake source DEBUFF cast against an NPC.
+
+Args:
+    attacker (any): Fixture attacker.
+    target (Model): Fixture NPC.
+    skill_id (string): Reviewed creative status skill.
+    rank (number): Server-resolved rank.
+    sequence_id (number?): Existing action sequence.
+
+Returns:
+    (any?, string?): Successful disposable source-status result.
+]]
+function FakeExecutor:status_skill_npc(
+    attacker: any,
+    target: Model,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    table.insert(calls, {
+        Kind = "Status",
+        UserId = attacker.UserId,
+        Target = target,
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+    })
+
+    return {
+        Applied = true,
+        StatusApplied = true,
+        Landed = true,
+        HealthDamage = 0,
+    }, nil
+end
+
+--[[
 Builds one trusted DamageService-shaped player-to-NPC context.
 
 Args:
@@ -203,6 +240,8 @@ local function main()
         if skill_id == "IronCleave"
             or skill_id == "WindStrike"
             or skill_id == "RangerSkill"
+            or skill_id == "WayfinderWound"
+            or skill_id == "MysticPoisonCurse"
         then
             return 1
         end
@@ -352,20 +391,53 @@ local function main()
         "creative Spirit Orb contact uses source normal attack damage"
     )
 
+    local bleed_cast = Adapter.try_damage(
+        damage_context(target, "Skill", "WayfinderWound", 18)
+    )
+    check(
+        bleed_cast.Handled
+            and bleed_cast.StatusApplied
+            and bleed_cast.AppliedDamage == 0
+            and calls[#calls].Kind == "Status"
+            and calls[#calls].SkillId == "WayfinderWound"
+            and calls[#calls].Rank == 1
+            and calls[#calls].SequenceId == 18,
+        "Wayfinder Wound routes as source DEBUFF before PDAM"
+    )
+
+    local poison_cast = Adapter.try_damage(
+        damage_context(
+            target,
+            "MagicSkill",
+            "MysticPoisonCurse",
+            19
+        )
+    )
+    check(
+        poison_cast.Handled
+            and poison_cast.StatusApplied
+            and poison_cast.AppliedDamage == 0
+            and calls[#calls].Kind == "Status"
+            and calls[#calls].SkillId == "MysticPoisonCurse"
+            and calls[#calls].Rank == 1
+            and calls[#calls].SequenceId == 19,
+        "Poison Curse routes as source DEBUFF before MDAM"
+    )
+
     local physical_status = Adapter.try_damage(
         damage_context(
             target,
             "StatusPhysical",
             "WayfinderWound",
-            18
+            20
         )
     )
     check(
         physical_status.Handled
             and physical_status.AppliedDamage == 0
             and physical_status.Reason
-                == "C4PhysicalPeriodicStatusPending",
-        "reviewed physical status ticks fail closed in source mode"
+                == "C4LegacyPeriodicTickSuppressed",
+        "legacy physical ticks are suppressed after source cutover"
     )
 
     local magic_status = Adapter.try_damage(
@@ -373,19 +445,19 @@ local function main()
             target,
             "StatusMagic",
             "MysticPoisonCurse",
-            19
+            21
         )
     )
     check(
         magic_status.Handled
             and magic_status.AppliedDamage == 0
             and magic_status.Reason
-                == "C4MagicPeriodicStatusPending",
-        "reviewed magical status ticks fail closed in source mode"
+                == "C4LegacyPeriodicTickSuppressed",
+        "legacy magical ticks are suppressed after source cutover"
     )
 
     local unaudited = Adapter.try_damage(
-        damage_context(target, "UnknownFamily", "Unknown", 20)
+        damage_context(target, "UnknownFamily", "Unknown", 22)
     )
     check(
         unaudited.Handled
@@ -402,10 +474,13 @@ local function main()
             and capability.DisabledFallsBackToCurrentCombat
             and capability.EnabledSourceFailureFallsClosed
             and not capability.ActivationAuditReady
-            and #capability.ActivationBlockers == 3
+            and #capability.ActivationBlockers == 1
+            and capability.ActivationBlockers[1] == "RangerArea"
             and capability.RangerAreaActivationBlocked
             and capability.MagicBasicUsesSourceNormalAttack
-            and capability.PeriodicStatusActivationBlocked
+            and capability.PeriodicStatusSupported
+            and not capability.PeriodicStatusActivationBlocked
+            and capability.LegacyPeriodicTicksSuppressed
             and not capability.ClientDamageAuthority,
         "dispatch capability exposes the remaining activation blockers"
     )
