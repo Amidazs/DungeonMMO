@@ -23,7 +23,7 @@ local function check(valid: boolean, label: string)
 end
 
 --[[
-Checks all nine reviewed creative equipment links.
+Checks every reviewed current core-slot equipment link.
 
 Args:
     None.
@@ -35,17 +35,26 @@ local function check_reviewed_links()
     local expected = {
         marauder_sword = 1,
         greenward_training_mace = 4,
+        stonewatch_training_mace = 4,
         apprentice_arcane_wand = 6,
         scout_dagger = 10,
         apprentice_longbow = 13,
+        neti_trial_dagger = 1182,
+        neti_trial_bow = 1181,
+        ironroot_training_halberd = 291,
         scout_leather_vest = 22,
+        ironroot_light_vest = 22,
         marauder_armor = 25,
+        stonewatch_d_grade_armor = 352,
+        greenward_d_grade_armor = 352,
+        ironroot_d_grade_armor = 352,
+        scout_expert_leather_vest = 395,
         apprentice_mystic_robe = 425,
         marauder_shield = 102,
     }
 
     local rows = ItemMap.all()
-    check(#rows == 9, "exactly nine creative items are reviewed")
+    check(#rows == 18, "all eighteen core-slot creative items are reviewed")
 
     for creative_item_id, source_item_id in pairs(expected) do
         local link, reason = ItemMap.resolve(creative_item_id)
@@ -93,20 +102,34 @@ local function check_loadout_boundary()
         "reviewed loadout resolves exact source item IDs"
     )
 
-    local _, polearm_reason = ItemMap.resolve_loadout({
+    local polearm, polearm_reason = ItemMap.resolve_loadout({
         Weapon = "ironroot_training_halberd",
     })
     check(
-        polearm_reason == "CreativeItemNotReviewedForC4",
-        "unreviewed current polearm fails closed"
+        polearm ~= nil
+            and polearm_reason == nil
+            and polearm.SourceItemIds.Weapon == 291,
+        "current polearm resolves to reviewed C4 Trident stats"
     )
 
-    local _, d_grade_reason = ItemMap.resolve_loadout({
+    local d_grade, d_grade_reason = ItemMap.resolve_loadout({
         Body = "stonewatch_d_grade_armor",
     })
     check(
-        d_grade_reason == "CreativeItemNotReviewedForC4",
-        "unreviewed D-grade body item fails closed"
+        d_grade ~= nil
+            and d_grade_reason == nil
+            and d_grade.SourceItemIds.Body == 352,
+        "current D-grade heavy body resolves to Brigandine source stats"
+    )
+
+    local _, extra_slot_reason = ItemMap.resolve_loadout({
+        Weapon = "marauder_sword",
+        Helmet = "marauder_helmet",
+    })
+    check(
+        extra_slot_reason
+            == "AdditionalCreativeEquipmentSlotsNotIntegrated",
+        "helmet blocks a falsely complete C4 loadout"
     )
 
     local empty, empty_reason = ItemMap.resolve_loadout({})
@@ -133,7 +156,7 @@ local function main()
 
     print((
         "[C4 Creative Item Map] SOURCE_ONLY_PASS: %d assertions "
-        .. "reviewed_items=9 live=false"
+        .. "reviewed_items=18 core_slots=complete live=false"
     ):format(checks))
 end
 
