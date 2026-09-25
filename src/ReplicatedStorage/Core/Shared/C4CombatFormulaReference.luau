@@ -24,6 +24,13 @@ local CONFIG_URL =
     .. SOURCE_COMMIT
     .. "/L2jAdmins_Core/src/l2j/Config.java"
 
+local CHARACTER_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/"
+    .. "L2Character.java"
+
 --[[
 Checks one finite positive numeric combat argument.
 
@@ -317,6 +324,64 @@ function C4CombatFormulaReference.resolve_normal_attack_hit(
 end
 
 --[[
+Returns the C4 unarmed random-damage percentage range.
+
+The reviewed source uses 5 + (int) sqrt(level) when no active weapon exists.
+
+Args:
+    level (number): Positive integer attacker level.
+
+Returns:
+    number: Integer percentage range used for the source random roll.
+]]
+function C4CombatFormulaReference.unarmed_random_damage_range(
+    level: number
+): number
+    assert(
+        type(level) == "number"
+            and level % 1 == 0
+            and level >= 1,
+        "Unarmed random-damage level must be a positive integer"
+    )
+
+    return 5 + math.floor(math.sqrt(level))
+end
+
+--[[
+Returns one exact C4 physical random-damage multiplier.
+
+The source rolls an inclusive integer from -random_damage through
++random_damage, then returns 1 + roll / 100.
+
+Args:
+    random_damage (number): Weapon or unarmed percentage range.
+    roll (number): Server-owned integer roll inside that exact range.
+
+Returns:
+    number: Source multiplier applied after weapon vulnerability.
+]]
+function C4CombatFormulaReference.physical_random_damage_multiplier(
+    random_damage: number,
+    roll: number
+): number
+    assert(
+        type(random_damage) == "number"
+            and random_damage % 1 == 0
+            and random_damage >= 0,
+        "Random damage range must be a nonnegative integer"
+    )
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= -random_damage
+            and roll <= random_damage,
+        "Random damage roll must be inside the source range"
+    )
+
+    return 1 + (roll / 100)
+end
+
+--[[
 Returns the C4 normal physical critical chance in thousandths.
 
 The reviewed source truncates the calculated PHYSICAL_CRITICAL_RATE to an
@@ -418,6 +483,7 @@ function C4CombatFormulaReference.sources(): any
         FormulasUrl = FORMULAS_URL,
         HealUrl = HEAL_URL,
         ConfigUrl = CONFIG_URL,
+        CharacterUrl = CHARACTER_URL,
     }
 end
 
