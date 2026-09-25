@@ -347,6 +347,38 @@ local function main()
         "Source magical critical roll equal to rate does not crit"
     )
 
+    local wind_multiplier = assert(
+        Formula.elemental_vulnerability("WIND", {
+            WIND_VULN = 1.25,
+        })
+    )
+    check_close(
+        wind_multiplier,
+        1.25,
+        "Source WIND skill uses final target WIND_VULN"
+    )
+
+    local unsupported_element, element_reason =
+        Formula.elemental_vulnerability("VOID", {
+            WIND_VULN = 1,
+        })
+    check(
+        unsupported_element == nil
+            and element_reason == "UnsupportedOriginalSkillElement",
+        "Unknown source element fails closed"
+    )
+
+    local missing_vulnerability, vulnerability_reason =
+        Formula.elemental_vulnerability("FIRE", {
+            WIND_VULN = 1,
+        })
+    check(
+        missing_vulnerability == nil
+            and vulnerability_reason
+                == "OriginalElementalVulnerabilityUnavailable",
+        "Missing target elemental stat fails closed"
+    )
+
     print(("[C4 Combat Formula] SOURCE_FORMULA_PASS: %d assertions, "
         .. "live=false"):format(checks))
 end
