@@ -206,6 +206,14 @@ local executed = executor:execute(
 )
 check(executed.ok == true, "Heterogeneous pack must execute.")
 check(#executed.Enemies == 3, "Pack must return all three enemies.")
+check(
+    executed.Enemies[1]:GetAttribute("DungeonEnemyArchetypeId")
+        == "Marauder"
+        and executed.Enemies[3]:GetAttribute(
+            "DungeonEnemyArchetypeId"
+        ) == "Elite",
+    "Spawned enemies must retain server-owned archetype identity."
+)
 check(#factory_calls == 3, "All entry factories must be called.")
 check(
     requested_spawn_group == "SyntheticEnemySpawns",
