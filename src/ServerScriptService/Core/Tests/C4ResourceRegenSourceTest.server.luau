@@ -250,6 +250,66 @@ local function check_active_regen_toggle()
 end
 
 --[[
+Checks C4 Magic armor conditions require the full reviewed chest+legs set.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms Mana Recovery does not activate from a chest alone.
+]]
+local function check_magic_armor_condition()
+    local baseline = assert(Regen.base_calculator_stats(
+        "Human",
+        "Mage",
+        1
+    ))
+    local chest_only = assert(Unified.get_with_source_items(
+        "Human",
+        "Mage",
+        1,
+        {
+            Body = 425,
+        },
+        {
+            {SkillId = 214, Rank = 1},
+        }
+    ))
+    local full_set = assert(Unified.get_with_source_items(
+        "Human",
+        "Mage",
+        1,
+        {
+            Body = 425,
+            Legs = 461,
+        },
+        {
+            {SkillId = 214, Rank = 1},
+        }
+    ))
+
+    check(
+        nearly_equal(
+            chest_only.EquippedStats.REG_MP_RATE,
+            baseline.REG_MP_RATE
+        ),
+        "Magic armor mastery condition rejects a chest without legs"
+    )
+    check(
+        nearly_equal(
+            full_set.EquippedStats.REG_MP_RATE,
+            baseline.REG_MP_RATE * 1.2
+        ),
+        "Magic chest+legs set activates exact Mana Recovery multiplier"
+    )
+    check(
+        full_set.EquippedStats.MAX_MP
+            == full_set.Naked.MaxMP + 29,
+        "complete apprentice magic set adds both deferred MP operations"
+    )
+end
+
+--[[
 Checks pinned source metadata for ordinary Dungeon resource regeneration.
 
 Args:
@@ -290,6 +350,7 @@ local function main()
     check_low_level_bands()
     check_owned_regen_passive()
     check_active_regen_toggle()
+    check_magic_armor_condition()
     check_metadata()
 
     print((
