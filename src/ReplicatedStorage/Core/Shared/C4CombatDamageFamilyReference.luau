@@ -36,16 +36,16 @@ local FAMILIES = table.freeze({
         ActivationBlocker = false,
     }),
     StatusPhysical = table.freeze({
-        Route = "PeriodicStatusPending",
+        Route = "LegacyPeriodicTickSuppressed",
         PlayerToNpc = true,
-        ActivationBlocker = true,
-        Reason = "C4PhysicalPeriodicStatusPending",
+        ActivationBlocker = false,
+        Reason = "C4LegacyPeriodicTickSuppressed",
     }),
     StatusMagic = table.freeze({
-        Route = "PeriodicStatusPending",
+        Route = "LegacyPeriodicTickSuppressed",
         PlayerToNpc = true,
-        ActivationBlocker = true,
-        Reason = "C4MagicPeriodicStatusPending",
+        ActivationBlocker = false,
+        Reason = "C4LegacyPeriodicTickSuppressed",
     }),
     EnemyMelee = table.freeze({
         Route = "LegacyEnemyOutgoing",
@@ -76,8 +76,11 @@ local FAMILIES = table.freeze({
 
 local BLOCKING_PLAYER_TO_NPC_FAMILIES = table.freeze({
     "RangerArea",
-    "StatusMagic",
-    "StatusPhysical",
+})
+
+local PERIODIC_STATUS_SKILLS = table.freeze({
+    WayfinderWound = true,
+    MysticPoisonCurse = true,
 })
 
 --[[
@@ -113,6 +116,26 @@ function C4CombatDamageFamilyReference.is_player_to_npc(
 ): boolean
     local family = C4CombatDamageFamilyReference.get(source_kind)
     return family ~= nil and family.PlayerToNpc == true
+end
+
+--[[
+Returns whether one creative damage source is actually a reviewed DEBUFF cast.
+
+These casts arrive through the existing Skill/MagicSkill delivery paths. They
+must be intercepted before generic PDAM/MDAM routing so source mode never
+applies the creative direct-damage placeholder.
+
+Args:
+    source_id (string): Existing server-owned creative skill identifier.
+
+Returns:
+    boolean: True only for reviewed periodic source DEBUFF skills.
+]]
+function C4CombatDamageFamilyReference.is_periodic_status_skill(
+    source_id: string
+): boolean
+    return type(source_id) == "string"
+        and PERIODIC_STATUS_SKILLS[source_id] == true
 end
 
 --[[
