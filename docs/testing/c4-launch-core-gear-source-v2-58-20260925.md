@@ -35,7 +35,43 @@ The intended local test pass includes:
 Both Base and Dungeon disposable Rojo builds should also be rebuilt before
 claiming this group green.
 
-## Current status
+## Executed local acceptance
 
-STUDIO PENDING at authoring time. No earlier green result is reused for these
-new commits.
+Fresh unpublished local execution completed after fast-forwarding the Phase 4
+HUD worktree to commit `e61eeb803bd0725aa89581a352583017d32f9fc5`.
+
+Both disposable Rojo compositions rebuilt successfully:
+
+- Base: PASS;
+- Dungeon: PASS.
+
+Focused Base runner:
+
+- C4SkillRuntimeRulesTest: PASS, 13 assertions;
+- C4NineClassAuthenticatedSkillPreviewTest: PASS, 554 assertions;
+- C4ResourceMigrationBoundaryTest: PASS, 42 assertions;
+- C4CreativeItemSourceMapTest: PASS, 43 assertions;
+- C4LaunchCoreGearSourceTest: PASS, 8 assertions;
+- focused result: 5/5 PASS.
+
+Focused Dungeon runner:
+
+- C4SkillRuntimeRulesTest: PASS, 13 assertions;
+- ManaServiceTest: PASS, 13 assertions;
+- C4NineClassAuthenticatedSkillPreviewTest: PASS, 554 assertions;
+- C4ResourceMigrationBoundaryTest: PASS, 42 assertions;
+- C4CreativeItemSourceMapTest: PASS, 43 assertions;
+- C4LaunchCoreGearSourceTest: PASS, 8 assertions;
+- focused result: 6/6 PASS.
+
+Two test-harness defects were exposed before the final green run and repaired
+in GitHub: the combined Base runner initially assumed Combat.Tests existed in
+the Base composition, and the expanded nine-class skill preview test attempted
+to call a nonexistent ProgressionRuntimeState.get_character helper. Neither
+was a production gameplay defect.
+
+Final local evidence directory:
+
+`%TEMP%\DungeonMMO_v258_resource_focus_r4`
+
+No Roblox place was published and no production DataStore was used.
