@@ -144,6 +144,101 @@ local function check_rank_six()
 end
 
 --[[
+Checks every currently staged Human Wizard targeted cast family.
+
+Args:
+    None.
+
+Returns:
+    nil: Verifies reviewed direct/periodic skills keep exact source metadata.
+]]
+local function check_staged_wizard_cast_families()
+    local character = wizard_character(6)
+    character.Progression.Skills.EmberweaverFlameBurst = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 6,
+        Proficiency = 0,
+    }
+    character.Progression.Skills.EmberweaverFocusedBolt = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 3,
+        Proficiency = 0,
+    }
+    character.Progression.Skills.EmberweaverVenomHex = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 2,
+        Proficiency = 0,
+    }
+    Runtime.set_character(USER_ID, character)
+
+    local cases = {
+        {
+            SkillId = "EmberweaverFlameBurst",
+            CreativeRank = 6,
+            SourceSkillId = 1172,
+            SourceRank = 6,
+            SkillType = "MDAM",
+            InitialMp = 6,
+            OngoingMp = 21,
+            HitTimeMs = 1500,
+            ReuseMs = 2500,
+            CastRange = 150,
+            EffectRange = 650,
+        },
+        {
+            SkillId = "EmberweaverFocusedBolt",
+            CreativeRank = 3,
+            SourceSkillId = 1274,
+            SourceRank = 3,
+            SkillType = "MDAM",
+            InitialMp = 3,
+            OngoingMp = 11,
+            HitTimeMs = 2000,
+            ReuseMs = 3000,
+            CastRange = 400,
+            EffectRange = 900,
+        },
+        {
+            SkillId = "EmberweaverVenomHex",
+            CreativeRank = 2,
+            SourceSkillId = 1168,
+            SourceRank = 3,
+            SkillType = "DEBUFF",
+            InitialMp = 6,
+            OngoingMp = 21,
+            HitTimeMs = 4000,
+            ReuseMs = 12000,
+            CastRange = 600,
+            EffectRange = 1100,
+        },
+    }
+
+    for _, case in ipairs(cases) do
+        local resolved = assert(CastContract.resolve(
+            USER_ID,
+            case.SkillId
+        ))
+        check(
+            resolved.CreativeRank == case.CreativeRank
+                and resolved.SourceSkillId == case.SourceSkillId
+                and resolved.SourceRank == case.SourceRank
+                and resolved.SourceSkillType == case.SkillType
+                and resolved.SourceTarget == "TARGET_ONE"
+                and resolved.SourceMpInitialConsume == case.InitialMp
+                and resolved.SourceMpConsume == case.OngoingMp
+                and resolved.SourceHitTimeMs == case.HitTimeMs
+                and resolved.SourceReuseDelayMs == case.ReuseMs
+                and resolved.SourceCastRange == case.CastRange
+                and resolved.SourceEffectRange == case.EffectRange,
+            case.SkillId .. " preserves reviewed exact source cast metadata"
+        )
+    end
+end
+
+--[[
 Checks that the contract always follows the currently purchased server rank.
 
 Args:
@@ -243,6 +338,7 @@ local function main()
     )
 
     check_rank_six()
+    check_staged_wizard_cast_families()
     check_server_rank_binding()
     check_denials()
 
