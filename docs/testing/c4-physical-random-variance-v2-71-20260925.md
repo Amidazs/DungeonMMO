@@ -1,6 +1,6 @@
 # C4 Physical Random Variance v2.71 — Acceptance
 
-Date: 25 September 2026.  
+Date: 25 September 2026.
 Branch: `wip/phase-4-test-hud-integration-v1`.
 
 ## Result
