@@ -51,10 +51,19 @@ local function check_reviewed_links()
         scout_expert_leather_vest = 395,
         apprentice_mystic_robe = 425,
         marauder_shield = 102,
+        marauder_helmet = 43,
+        test_elf_helmet = 44,
+        marauder_gloves = 49,
+        ironbound_gloves = 51,
+        leatherbound_gloves = 50,
+        tempered_ironbound_gloves = 63,
+        runic_ironbound_gloves = 61,
+        warded_leatherbound_gloves = 61,
+        marauder_boots = 38,
     }
 
     local rows = ItemMap.all()
-    check(#rows == 18, "all eighteen core-slot creative items are reviewed")
+    check(#rows == 27, "all twenty-seven creative equipment items are reviewed")
 
     for creative_item_id, source_item_id in pairs(expected) do
         local link, reason = ItemMap.resolve(creative_item_id)
@@ -74,7 +83,7 @@ local function check_reviewed_links()
 end
 
 --[[
-Checks full reviewed loadout conversion and explicit unsupported gear denial.
+Checks complete six-slot loadout conversion and strict source-slot mapping.
 
 Args:
     None.
@@ -85,8 +94,11 @@ Returns:
 local function check_loadout_boundary()
     local loadout, reason = ItemMap.resolve_loadout({
         Weapon = "marauder_sword",
-        Body = "marauder_armor",
         OffHand = "marauder_shield",
+        Helmet = "marauder_helmet",
+        Body = "marauder_armor",
+        Gloves = "marauder_gloves",
+        Boots = "marauder_boots",
     })
 
     check(
@@ -95,8 +107,11 @@ local function check_loadout_boundary()
     )
     check(
         loadout.SourceItemIds.Weapon == 1
-            and loadout.SourceItemIds.Body == 25
             and loadout.SourceItemIds.OffHand == 102
+            and loadout.SourceItemIds.Head == 43
+            and loadout.SourceItemIds.Body == 25
+            and loadout.SourceItemIds.Gloves == 49
+            and loadout.SourceItemIds.Feet == 38
             and loadout.CompleteReviewedLoadout
             and not loadout.LiveIntegrated,
         "reviewed loadout resolves exact source item IDs"
@@ -122,14 +137,14 @@ local function check_loadout_boundary()
         "current D-grade heavy body resolves to Brigandine source stats"
     )
 
-    local _, extra_slot_reason = ItemMap.resolve_loadout({
-        Weapon = "marauder_sword",
-        Helmet = "marauder_helmet",
+    local crafted, crafted_reason = ItemMap.resolve_loadout({
+        Gloves = "runic_ironbound_gloves",
     })
     check(
-        extra_slot_reason
-            == "AdditionalCreativeEquipmentSlotsNotIntegrated",
-        "helmet blocks a falsely complete C4 loadout"
+        crafted ~= nil
+            and crafted_reason == nil
+            and crafted.SourceItemIds.Gloves == 61,
+        "rare crafted gloves map to reviewed D-grade source gloves"
     )
 
     local empty, empty_reason = ItemMap.resolve_loadout({})
@@ -156,7 +171,7 @@ local function main()
 
     print((
         "[C4 Creative Item Map] SOURCE_ONLY_PASS: %d assertions "
-        .. "reviewed_items=18 core_slots=complete live=false"
+        .. "reviewed_items=27 six_slots=complete live=false"
     ):format(checks))
 end
 
