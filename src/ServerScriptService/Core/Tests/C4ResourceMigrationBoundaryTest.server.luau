@@ -149,15 +149,6 @@ local function check_nine_paths()
 end
 
 --[[
-Checks forged advancement and unsupported levels cannot expose a cutover plan.
-
-Args:
-    None.
-
-Returns:
-    nil: Confirms server-owned identity remains mandatory.
-]]
---[[
 Checks reviewed core gear is surfaced while extra paperdoll slots stay blocked.
 
 Args:
@@ -206,6 +197,15 @@ local function check_reviewed_equipment_boundary()
     Runtime.clear_character(TEST_OWNER)
 end
 
+--[[
+Checks forged advancement and unsupported levels cannot expose a cutover plan.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms server-owned identity remains mandatory.
+]]
 local function check_denials()
     local missing, missing_reason =
         Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
