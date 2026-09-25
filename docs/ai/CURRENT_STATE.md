@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.90 runtime cutover rehearsal GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_90_C4_Runtime_Rehearsal_20260925.md)
+and [green evidence](
+../testing/c4-runtime-rehearsal-v2-90-20260925.md).
+The real unpublished Dungeon runtime now exposes its exact atomic source-combat
+coordinator only through a Studio-only ServerStorage bridge. Fresh final
+focused runs pass **Base 24/24** and **Dungeon 27/27**. A genuine Studio Play
+server with one connected player started with every source/live gate OFF,
+atomically enabled resource/source/executor/dispatch together, moved the
+player from current MaxHealth ~113.4 to source MaxHealth 98 with
+`C4ResourceCutoverActive=true`, then atomically disabled everything and
+restored MaxHealth ~113.4 with the attribute false. The rehearsal used explicit
+test-only `SourceUnitsPerStud=1` and daylight; this is not a production
+spatial mapping. Next: real source-mode player-to-NPC attack rehearsal through
+existing combat input, including callback/threat/quest evidence and rollback.
+No main merge, publish, production saves or animation edits.
+
 ## 25 September 2026 — CURRENT v2.89 atomic C4 combat cutover GREEN
 
 [Latest roadmap](
