@@ -34,6 +34,9 @@ local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
 local C4CombatCutoverRegistry = require(
     Services:WaitForChild("C4CombatCutoverRegistry")
 )
+local C4CombatDispatchAdapter = require(
+    Services:WaitForChild("C4CombatDispatchAdapter")
+)
 local C4CombatCutoverStudioBridge = require(
     Services:WaitForChild("C4CombatCutoverStudioBridge")
 )
@@ -154,6 +157,9 @@ local runtime = RuntimeServices.new("Dungeon")
 assert(
     runtime.C4CombatCutoverCoordinator ~= nil,
     "Dungeon runtime requires C4 cutover coordinator"
+)
+C4CombatDispatchAdapter.bind_executor(
+    runtime.C4SourceCombatExecutor
 )
 C4CombatCutoverRegistry.bind(
     runtime.C4CombatCutoverCoordinator
