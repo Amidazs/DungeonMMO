@@ -8,6 +8,8 @@ local active: {[Player]: any} = {}
 local last_activation: {[Player]: number} = {}
 local authorizer: ((Player, any) -> boolean)? = nil
 local spend_stamina: ((Player, number) -> boolean)? = nil
+local update_source_effect:
+    ((Player, string, number, boolean) -> boolean)? = nil
 
 --[[
 Disables a toggle and immediately clears replicated character status.
@@ -21,6 +23,15 @@ Returns:
 function ScoutCriticalToggleService.stop(player: Player)
     local record = active[player]
     active[player] = nil
+
+    if record and update_source_effect then
+        update_source_effect(
+            player,
+            record.Definition.ID,
+            record.Rank,
+            false
+        )
+    end
     if record and record.Character.Parent then
         record.Character:SetAttribute("C4ScoutCriticalPowerActive", false)
         record.Character:SetAttribute("C4ScoutCriticalPowerBonus", 0)
@@ -55,6 +66,27 @@ Returns:
 function ScoutCriticalToggleService.set_stamina_spender(callback: any)
     assert(type(callback) == "function", "Stamina spender is required")
     spend_stamina = callback
+end
+
+--[[
+Installs the server-only C4 active-source-effect registry bridge.
+
+The callback receives only the creative ID/rank already selected by this
+authoritative executor. It resolves source IDs from server progression state.
+
+Args:
+    callback ((Player, string, number, boolean) -> boolean): Adds or removes
+        authoritative source-effect state for this live toggle.
+
+Returns:
+    nil: Future activations/deactivations update the source-effect registry.
+]]
+function ScoutCriticalToggleService.set_source_effect_state(callback: any)
+    assert(
+        type(callback) == "function",
+        "Source effect state callback is required"
+    )
+    update_source_effect = callback
 end
 
 --[[
@@ -143,9 +175,30 @@ function ScoutCriticalToggleService.toggle(
     if not is_valid(player, record) then
         return false, false, "ToggleUnavailable"
     end
+    local source_registered = false
+    if update_source_effect then
+        if not update_source_effect(
+            player,
+            definition.ID,
+            rank,
+            true
+        ) then
+            return false, false, "SourceEffectStateUnavailable"
+        end
+        source_registered = true
+    end
+
     if not spend_stamina
         or not spend_stamina(player, definition.STAMINA_COST)
     then
+        if source_registered and update_source_effect then
+            update_source_effect(
+                player,
+                definition.ID,
+                rank,
+                false
+            )
+        end
         return false, false, "Stamina"
     end
     last_activation[player] = now
