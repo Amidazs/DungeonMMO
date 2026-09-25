@@ -1,5 +1,5 @@
 --!strict
--- Authenticated all-nine-path C4 resource cutover boundary regression.
+-- Authenticated ten-path C4 resource cutover boundary regression.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -141,6 +141,7 @@ local function check_nine_paths()
         {"Human", "Ironvow", 1070, 320, 849},
         {"Human", "Oathguard", 1018, 320, 610},
         {"Human", "Ashenblade", 983, 320, 399},
+        {"Human", "Emberweaver", 705, 492, 355},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
     }
@@ -263,6 +264,54 @@ local function check_reviewed_equipment_boundary()
 
     Runtime.clear_character(TEST_OWNER)
 end
+--[[
+Checks Human Wizard Quick Recovery enters the authenticated stat candidate.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms owned rank two produces exact magical reuse multiplier.
+]]
+local function check_human_wizard_reuse_boundary()
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character(
+        "Human",
+        "Emberweaver",
+        30
+    )
+    character.Progression.Skills.EmberweaverQuickWeave = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 2,
+        Proficiency = 0,
+    }
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        plan.SourceStatCandidateReady
+            and plan.OriginalOwnedPassiveMappingIntegrated
+            and plan.SourceStatCandidate.MAGICAL_SKILL_REUSE == 0.75
+            and plan.SourceStatCandidate.SKILL_MASTERY == 0
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "owned Quick Recovery rank two reaches final source stat candidate"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
 --[[
 Checks unsupported actually-owned custom passives keep C4 cutover blocked.
 
@@ -481,13 +530,14 @@ Returns:
 local function main()
     check_nine_paths()
     check_reviewed_equipment_boundary()
+    check_human_wizard_reuse_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
     check_denials()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "nine_paths=9 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=10 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
