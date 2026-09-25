@@ -6,8 +6,10 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Shared = ReplicatedStorage.Core.Shared
 
+local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Formula = require(Shared.C4CombatFormulaReference)
 local ProfileSchema = require(Shared.ProfileSchema)
+local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
 local Combat = require(
     ServerScriptService.Core.Services.C4SourceCombatCalculationService
 )
@@ -154,17 +156,47 @@ local function starter_character(
 ): any
     local character = ProfileSchema
         .create_default(user_id).Characters.Slot1
+    local career = Careers.for_class(class_id)
+    local base_class = if career then career.BaseClassId else class_id
 
     character.Level = 30
     character.Identity = {
         Version = 1,
         RaceId = "Human",
-        BaseClassId = class_id,
+        BaseClassId = base_class,
         ClassId = class_id,
         CreationStage = "Complete",
     }
+
+    if not career then
+        character.ClassAdvancement = {
+            Version = 1,
+        }
+        return character
+    end
+
+    local stage = assert(QuestStages.get(career.BranchId))
+    local proofs = {}
+
+    for _, proof_id in ipairs(stage.RequiredProofIds) do
+        proofs[proof_id] = true
+    end
+
     character.ClassAdvancement = {
         Version = 1,
+        OriginalFirstTransferChoiceId = career.BranchId,
+        OriginalFirstTransferClassId = career.Id,
+        OriginalFirstTransferReceiptId =
+            "TEMP_C4SourceCombatMentor",
+        OriginalFirstTransferQuest = {
+            QuestId = stage.Id,
+            BranchId = career.BranchId,
+            Step = #stage.Steps + 1,
+            Count = 0,
+            Ready = true,
+            AppliedEvents = {},
+            Proofs = proofs,
+        },
     }
 
     return character
@@ -237,7 +269,7 @@ local function seed_characters()
     Runtime.set_character(MAGE_ID, mage)
     Runtime.set_character(
         TARGET_ID,
-        starter_character(TARGET_ID, "Fighter")
+        starter_character(TARGET_ID, "Oathguard")
     )
 
     local shield_target =
