@@ -42,6 +42,9 @@ local C4PrimaryStatReference = require(
 local C4AuthenticatedSkillSourcePreview = require(
     Shared:WaitForChild("C4AuthenticatedSkillSourcePreview")
 )
+local C4ResourceMigrationBoundary = require(
+    Shared:WaitForChild("C4ResourceMigrationBoundary")
+)
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
@@ -799,6 +802,31 @@ Args:
 Returns:
     (any?, string?): Strict C4 source catalogue or identity denial.
 ]]
+--[[
+Returns the coordinated C4 resource cutover boundary for the real owner.
+
+This is intentionally fail-closed. It exposes exact source base HP/MP/CP but
+will not authorize a live switch until original equipment, actually owned
+passives, active-effect ordering and CP authority are integrated.
+
+Args:
+    user_id (number): Current server-owned selected character user ID.
+
+Returns:
+    (any?, string?): Authenticated migration boundary or denial reason.
+]]
+function ProgressionRuntimeState.get_c4_resource_migration_boundary(
+    user_id: number
+): (any?, string?)
+    local character = states[user_id]
+
+    if not character then
+        return nil, "OriginalCharacterIdentityNotVerified"
+    end
+
+    return C4ResourceMigrationBoundary.for_character(character)
+end
+
 function ProgressionRuntimeState.get_c4_source_skill_tree(
     user_id: number
 ): (any?, string?)
