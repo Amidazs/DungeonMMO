@@ -1330,7 +1330,7 @@ local DEFINITIONS = table.freeze({
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
-        RankLevels = table.freeze({[1] = 24, [2] = 32}),
+        RankLevels = table.freeze({[1] = 24, [2] = 28}),
         RankThresholds = table.freeze({[2] = 80}),
         Prerequisites = table.freeze({
             table.freeze({
@@ -2219,7 +2219,7 @@ local DEFINITIONS = table.freeze({
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedRaces = table.freeze({"Human"}),
         AllowedFirstTransferClasses = table.freeze({"Oathguard"}),
-        RankLevels = table.freeze({[1] = 24, [2] = 28}),
+        RankLevels = table.freeze({[1] = 24, [2] = 32}),
         RankThresholds = table.freeze({[2] = 0}),
         WeaponTags = table.freeze({}),
     }),
