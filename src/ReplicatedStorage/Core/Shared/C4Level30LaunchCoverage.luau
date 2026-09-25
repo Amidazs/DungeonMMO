@@ -77,7 +77,8 @@ Args:
     source (any): Historical two-branch source bracket inventory.
 
 Returns:
-    ({[number]: number}, number): Bracket counts and total ranks at cap.
+    ({[number]: number}, number, {number}): Counts, total ranks and sorted
+        source training brackets through the launch cap.
 ]]
 local function source_counts(
     source: any
