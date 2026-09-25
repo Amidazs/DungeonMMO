@@ -149,7 +149,7 @@ Args:
     race_id (string): Original Human or Elf race.
     class_id (string): One current original starter or first transfer.
     level (number): Supported historical class level through 30.
-    item_ids (any): Reviewed C4 original Weapon/Body/OffHand item IDs.
+    item_ids (any): Reviewed C4 original six-slot source item IDs.
     source_ranks (any): Claimed original owned passive skill/rank pairs.
 
 Returns:
@@ -190,7 +190,8 @@ function C4UnifiedStatReference.get_with_source_items(
         SourceKinds = resolved.Kinds, SourceCommit = resolved.SourceCommit,
         Naked = naked, EquippedStats = values,
         AppliedSourceModifiers = passive.AppliedModifiers,
-        MultiSlotItemsIntegrated = false,
+        CurrentSixSlotPaperdollIntegrated = true,
+        FullOriginalPaperdollIntegrated = false,
         EnchantmentsIntegrated = false, ActiveBuffsIntegrated = false,
         LiveCombatIntegrated = false,
         ExactFinalC4StatsCertified = false,
