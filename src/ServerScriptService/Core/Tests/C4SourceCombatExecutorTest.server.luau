@@ -87,6 +87,93 @@ function FakeCombat.normal_attack(
 end
 
 --[[
+Returns one disposable source PDAM result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_user_id (number): Expected fixture defender.
+    creative_skill_id (string): Expected fixture skill ID.
+    creative_rank (number): Expected fixture rank.
+    spatial_context (any): Executor-derived spatial context.
+
+Returns:
+    (any?, string?): Fake accepted PDAM result.
+]]
+function FakeCombat.physical_skill(
+    attacker_user_id: number,
+    defender_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number,
+    spatial_context: any
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_user_id == DEFENDER_ID)
+    assert(creative_skill_id == "IronCleave")
+    assert(creative_rank == 1)
+    last_spatial = spatial_context
+
+    return {
+        Kind = "PhysicalDamage",
+        Amount = 12,
+    }, nil
+end
+
+--[[
+Returns one disposable source MDAM result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_user_id (number): Expected fixture defender.
+    creative_skill_id (string): Expected fixture skill ID.
+    creative_rank (number): Expected fixture rank.
+
+Returns:
+    (any?, string?): Fake accepted MDAM result.
+]]
+function FakeCombat.magic_skill(
+    attacker_user_id: number,
+    defender_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_user_id == DEFENDER_ID)
+    assert(creative_skill_id == "WindStrike")
+    assert(creative_rank == 1)
+
+    return {
+        Kind = "MagicDamage",
+        Amount = 8,
+    }, nil
+end
+
+--[[
+Returns one disposable source self-heal result.
+
+Args:
+    caster_user_id (number): Expected fixture caster.
+    creative_skill_id (string): Expected fixture heal ID.
+    creative_rank (number): Expected fixture rank.
+
+Returns:
+    (any?, string?): Fake accepted HEAL result.
+]]
+function FakeCombat.heal_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(caster_user_id == ATTACKER_ID)
+    assert(creative_skill_id == "MageHeal")
+    assert(creative_rank == 1)
+
+    return {
+        Kind = "Heal",
+        Amount = 15,
+    }, nil
+end
+
+--[[
 Reports the disposable source-resource global gate.
 
 Args:
@@ -205,6 +292,10 @@ local function main()
             and capability.DefaultEnabled == false
             and capability.ServerSpatialContext
             and capability.PlayableDamageRoutesThroughCP
+            and capability.NormalAttackLiveApplication
+            and capability.PhysicalSkillLiveApplication
+            and capability.MagicSkillLiveApplication
+            and capability.SelfHealLiveApplication
             and not capability.ClientDamageAuthority,
         "live executor starts disabled with server-only authority"
     )
@@ -289,6 +380,57 @@ local function main()
             and last_spatial.HeightDeltaSourceUnits == 50
             and last_spatial.IsNight,
         "executor derives transforms and explicit elevation scale server-side"
+    )
+
+    local physical = assert(executor:physical_skill(
+        attacker,
+        defender,
+        "IronCleave",
+        1
+    ))
+    check(
+        physical.Kind == "C4LivePhysicalSkill"
+            and physical.RawDamage == 12
+            and physical.CPAbsorbed == 3
+            and physical.HealthDamage == 9
+            and physical.HealthBefore == 93
+            and physical.HealthAfter == 84,
+        "live PDAM routes accepted source damage through CP before HP"
+    )
+
+    local magic = assert(executor:magic_skill(
+        attacker,
+        defender,
+        "WindStrike",
+        1
+    ))
+    check(
+        magic.Kind == "C4LiveMagicSkill"
+            and magic.RawDamage == 8
+            and magic.CPAbsorbed == 3
+            and magic.HealthDamage == 5
+            and magic.HealthBefore == 84
+            and magic.HealthAfter == 79,
+        "live MDAM routes accepted source damage through CP before HP"
+    )
+
+    local attacker_humanoid =
+        attacker.Character:FindFirstChildOfClass("Humanoid")
+    assert(attacker_humanoid)
+    attacker_humanoid.Health = 70
+
+    local heal = assert(executor:heal_skill(
+        attacker,
+        "MageHeal",
+        1
+    ))
+    check(
+        heal.Kind == "C4LiveHealSkill"
+            and heal.RawHeal == 15
+            and heal.EffectiveHeal == 15
+            and heal.HealthBefore == 70
+            and heal.HealthAfter == 85,
+        "live HEAL applies accepted source healing to server Humanoid"
     )
 
     local self_attack, self_reason =
