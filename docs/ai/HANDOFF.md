@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.62 authoritative active source state GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_62_C4_Authoritative_Active_Source_State_20260925.md);
+[evidence](../testing/c4-authoritative-active-source-state-v2-62-20260925.md).
+C4ActiveSourceEffectResolver + server-only C4ActiveSourceEffectState now
+represent real runtime activation rather than learned-skill inference. Scout
+Accuracy/Critical and Ironvow Accuracy/Critical toggle executors register and
+remove reviewed source ranks through this state. Respawn/player removal clear
+it; replicated attributes are irrelevant. Fresh Base 9/9 and Dungeon 10/10
+focused suites PASS at d379e966. Next bridge timed CombatStatusService buffs
+and Endurance Surge, expose the authoritative snapshot to the resource
+boundary, fail closed for unsupported live effects, then close the active
+blocker. CP authority follows. No publish/prod saves/main merge.
+
 ## 25 September 2026 — v2.61 C4 active-effect calculator ordering GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_61_C4_Active_Effect_Calculator_Ordering_20260925.md);
