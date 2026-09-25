@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.67 reversible live resource cutover GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_67_C4_Reversible_Resource_Cutover_20260925.md)
+and [green evidence](
+../testing/c4-reversible-resource-cutover-v2-67-20260925.md).
+The C4 source resource stack can now be applied to real players through a
+server-only gate without making it the production default. Real HP, MP and CP
+switch to authenticated source maxima; fractions survive transitions; source
+HP/MP/CP regeneration runs every three seconds; playable attacks consume CP
+first; NPC damage bypasses CP; respawn reapplies source authority; rollback
+returns to the current custom resource model. Base focused **12/12 PASS**,
+Dungeon **14/14 PASS**, and genuine two-player unpublished Play passed with
+both cutover markers at e2fb63d1. The feature remains OFF by default,
+`CanApplyLive=false` remains a rollout guard, and nothing was published or
+saved to production. Next move to a reversible disabled source physical/
+magic/healing combat provider so custom damage bonuses cannot be double-stacked
+over C4 source formulas.
+
 ## 25 September 2026 — CURRENT v2.66 pre-cutover source parity GREEN
 
 [Latest roadmap](
