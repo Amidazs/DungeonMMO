@@ -187,6 +187,8 @@ local function final_stats(row: any): any
         EARTH_VULN = 1,
         HOLY_VULN = 1,
         DARK_VULN = 1,
+        BLEED_VULN = 1,
+        POISON_VULN = 1,
         BOW_WPN_VULN = 1,
         BLUNT_WPN_VULN = 1,
         DAGGER_WPN_VULN = 1,
@@ -219,7 +221,9 @@ function C4NpcSourceReference.get(
     end
 
     local stats = final_stats(row)
+    local con_bonus = source_bonus("CON", row.CON)
     local dex_bonus = source_bonus("DEX", row.DEX)
+    local men_bonus = source_bonus("MEN", row.MEN)
     local str_bonus = source_bonus("STR", row.STR)
 
     return table.freeze({
@@ -233,7 +237,9 @@ function C4NpcSourceReference.get(
         SourceCombatPrerequisitesReady = true,
         SourceStatCandidateReady = true,
         SourceStatCandidate = stats,
+        SourceConBonus = con_bonus,
         SourceDexBonus = dex_bonus,
+        SourceMenBonus = men_bonus,
         SourceStrBonus = str_bonus,
         SourceAttackRange = row.AttackRange,
         SourceBaseHealthRegen = row.BaseHealthRegen,
