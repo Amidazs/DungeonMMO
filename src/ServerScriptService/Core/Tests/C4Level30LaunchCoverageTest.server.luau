@@ -124,12 +124,12 @@ local function main()
         and wizard.SourceBrackets[3] == 28
         and wizard.SourceBrackets[4] == 30,
         "Human Wizard C4 source ranks must retain exact launch brackets")
-    check(wizard.CurrentCareerId == nil
-        and wizard.TrainerMappedRankEntries == 0
-        and wizard.MissingRankScheduleEntries == 93
+    check(wizard.CurrentCareerId == "Emberweaver"
+        and wizard.TrainerMappedRankEntries == 74
+        and wizard.MissingRankScheduleEntries == 19
         and not wizard.SourceRankScheduleMapped
-        and wizard.Status == "SourceRanksAuditedClassUnimplemented",
-        "Human Wizard source audit cannot imply a playable transfer class")
+        and wizard.Status == "SkillRankParityOutstanding",
+        "Human Wizard maps non-servitor ranks without claiming summons")
 
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
     check(warrior.Status == "RankScheduleMappedEffectsPending"
