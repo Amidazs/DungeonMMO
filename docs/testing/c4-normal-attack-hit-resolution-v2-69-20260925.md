@@ -5,10 +5,9 @@ Branch: `wip/phase-4-test-hud-integration-v1`.
 
 ## Status
 
-**IMPLEMENTED / LOCAL BUILD PASS / STUDIO FOCUSED EXECUTION PENDING**
+**GREEN / FOCUSED BASE + DUNGEON STUDIO ACCEPTED**
 
-Do not describe v2.69 as GREEN until the focused Base and Dungeon Studio runner
-has passed on the current candidate.
+Fresh focused Base and Dungeon Studio runners passed on the current candidate.
 
 ## Candidate
 
@@ -57,20 +56,26 @@ Build outputs:
 - `%TEMP%\DungeonMMO_v269_Base.rbxl`;
 - `%TEMP%\DungeonMMO_v269_Dungeon.rbxl`.
 
-## Studio gate still required
+## Fresh Studio acceptance
 
-Run `scripts/studio/c4_v255_v258_resource_focus.luau` in the fresh Base and
-Dungeon disposable builds.
+Base:
 
-Expected runner label:
+`[C4 v2.55-v2.69 Focus] RESULT environment=Base passed=14 total=14`
 
-`[C4 v2.55-v2.69 Focus]`.
+Dungeon:
 
-The runner now includes `C4CombatFormulaReferenceTest` and
-`C4SourceCombatCalculationServiceTest`.
+`[C4 v2.55-v2.69 Focus] RESULT environment=Dungeon passed=16 total=16`
 
-Do not record assertion totals until the current Studio run actually emits
-them.
+Relevant focused output:
+
+- `[C4 Combat Formula] SOURCE_FORMULA_PASS: 22 assertions, live=false`;
+- `[C4 Source Combat] SOURCE_ONLY_PASS: 11 assertions hit=true pdam=true mdam=true heal=true live=false`;
+- Dungeon Mana Service: 13 assertions PASS;
+- Dungeon C4 Resource Cutover: 7 assertions PASS.
+
+The Base Studio log also contained an unrelated Studio Asset Manager 401 for
+an unauthenticated group lookup. It did not affect the local source tests or
+their results.
 
 ## Safety boundary
 
