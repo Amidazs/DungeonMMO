@@ -8,16 +8,15 @@ assert(
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local core_tests = ServerScriptService.Core.Tests
-local combat_tests = ServerScriptService.Combat.Tests
+local combat = ServerScriptService:FindFirstChild("Combat")
+local combat_tests = if combat
+    then combat:FindFirstChild("Tests")
+    else nil
 
 local fixtures = {
     {
         Parent = core_tests,
         Name = "C4SkillRuntimeRulesTest",
-    },
-    {
-        Parent = combat_tests,
-        Name = "ManaServiceTest",
     },
     {
         Parent = core_tests,
@@ -36,6 +35,13 @@ local fixtures = {
         Name = "C4LaunchCoreGearSourceTest",
     },
 }
+
+if combat_tests then
+    table.insert(fixtures, 2, {
+        Parent = combat_tests,
+        Name = "ManaServiceTest",
+    })
+end
 
 local function run_test(fixture: any): boolean
     local source = assert(
@@ -73,9 +79,12 @@ local function main()
         end
     end
 
+    local environment = if combat_tests then "Dungeon" else "Base"
+
     print((
-        "[C4 v2.55-v2.58 Focus] RESULT passed=%d total=%d"
-    ):format(passed, #fixtures))
+        "[C4 v2.55-v2.58 Focus] RESULT "
+            .. "environment=%s passed=%d total=%d"
+    ):format(environment, passed, #fixtures))
 
     assert(
         passed == #fixtures,
