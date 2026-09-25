@@ -8,13 +8,6 @@ local Services = ServerScriptService.Core.Services
 local DefaultCastContract = require(
     Services.C4SourceCastContractService
 )
-local DefaultResources = require(
-    Services.C4ResourceCutoverService
-)
-local DefaultMana = require(
-    ServerScriptService.Combat.ManaService
-)
-
 local C4SourceCastResourceService = {}
 C4SourceCastResourceService.__index = C4SourceCastResourceService
 
@@ -34,8 +27,17 @@ function C4SourceCastResourceService.new(options: any?): any
     local config = options or {}
     local cast_contract =
         config.CastContract or DefaultCastContract
-    local resources = config.Resources or DefaultResources
-    local mana = config.Mana or DefaultMana
+    local resources = config.Resources
+    local mana = config.Mana
+
+    if not resources then
+        resources = require(Services.C4ResourceCutoverService)
+    end
+    if not mana then
+        mana = require(
+            ServerScriptService.Combat.ManaService
+        )
+    end
 
     assert(
         type(cast_contract.resolve) == "function",
