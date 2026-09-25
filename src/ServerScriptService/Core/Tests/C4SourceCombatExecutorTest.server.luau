@@ -19,6 +19,8 @@ local defender_active = true
 local combat_mode = "Hit"
 local last_spatial = nil
 local npc_events = {}
+local delayed_callbacks = {}
+local status_mode = "Bleed"
 
 local NPC_BOUNDARY = {
     SourceTargetKind = "Npc",
@@ -191,6 +193,73 @@ function FakeCombat.heal_skill(
 end
 
 --[[
+Returns one disposable source periodic-status result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected fixture NPC boundary.
+    creative_skill_id (string): Expected creative status identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source DEBUFF application result.
+]]
+function FakeCombat.status_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_rank == 1)
+
+    if status_mode == "Resisted" then
+        return {
+            Kind = "PeriodicStatus",
+            Landed = false,
+            Rate = 50,
+            Roll = 50,
+            EffectType = "BLEED",
+            SourceSkillId = 96,
+            SourceRank = 1,
+            TickDamage = 13,
+            TickCount = 4,
+            TickSeconds = 5,
+        }, nil
+    end
+
+    if creative_skill_id == "MysticPoisonCurse" then
+        return {
+            Kind = "PeriodicStatus",
+            Landed = true,
+            Rate = 72,
+            Roll = 0,
+            EffectType = "POISON",
+            SourceSkillId = 1168,
+            SourceRank = 1,
+            TickDamage = 8,
+            TickCount = 10,
+            TickSeconds = 3,
+        }, nil
+    end
+
+    assert(creative_skill_id == "WayfinderWound")
+    return {
+        Kind = "PeriodicStatus",
+        Landed = true,
+        Rate = 99,
+        Roll = 0,
+        EffectType = "BLEED",
+        SourceSkillId = 96,
+        SourceRank = 1,
+        TickDamage = 13,
+        TickCount = 4,
+        TickSeconds = 5,
+    }, nil
+end
+
+--[[
 Reports the disposable source-resource global gate.
 
 Args:
@@ -345,6 +414,15 @@ local function main()
                 Lethal = lethal,
             })
         end,
+        DelayProvider = function(
+            seconds: number,
+            callback: () -> ()
+        )
+            table.insert(delayed_callbacks, {
+                Seconds = seconds,
+                Callback = callback,
+            })
+        end,
     })
 
     local capability = executor:capability()
@@ -362,6 +440,9 @@ local function main()
             and capability.NpcNormalAttackLiveApplication
             and capability.NpcPhysicalSkillLiveApplication
             and capability.NpcMagicSkillLiveApplication
+            and capability.NpcPeriodicStatusLiveApplication
+            and capability.NpcPeriodicStatusNonlethal
+            and capability.NpcPeriodicStatusRefreshBySourceSkill
             and capability.NpcDamageBypassesCombatPoints
             and capability.NpcDamageCallbackPreservation
             and not capability.ClientDamageAuthority,
@@ -560,6 +641,106 @@ local function main()
             and not npc_events[3].Lethal,
         "NPC source damage emits existing trusted bookkeeping context"
     )
+
+    local enemy_humanoid =
+        enemy:FindFirstChildOfClass("Humanoid")
+    assert(enemy_humanoid)
+    enemy_humanoid.Health = 20
+    table.clear(delayed_callbacks)
+    table.clear(npc_events)
+
+    status_mode = "Bleed"
+    local bleed = assert(executor:status_skill_npc(
+        attacker,
+        enemy,
+        "WayfinderWound",
+        1,
+        301
+    ))
+    check(
+        bleed.StatusApplied
+            and bleed.Landed
+            and bleed.SourceKind == "StatusPhysical"
+            and bleed.SourceSkillId == 96
+            and bleed.TickDamage == 13
+            and bleed.TickCount == 4
+            and bleed.TickSeconds == 5
+            and #delayed_callbacks == 1
+            and delayed_callbacks[1].Seconds == 5,
+        "source Bleed schedules the exact reviewed periodic plan"
+    )
+
+    for _ = 1, 4 do
+        local queued = table.remove(delayed_callbacks, 1)
+        assert(queued)
+        queued.Callback()
+    end
+    check(
+        enemy_humanoid.Health == 1
+            and #npc_events == 2
+            and npc_events[1].Damage == 13
+            and npc_events[2].Damage == 6
+            and npc_events[1].Context.source_kind
+                == "StatusPhysical"
+            and npc_events[1].Context.C4PeriodicStatus == true
+            and not npc_events[1].Lethal
+            and not npc_events[2].Lethal
+            and #delayed_callbacks == 0,
+        "source Bleed ticks are nonlethal and preserve damage callbacks"
+    )
+
+    enemy_humanoid.Health = 100
+    table.clear(delayed_callbacks)
+    table.clear(npc_events)
+    status_mode = "Poison"
+
+    local poison = assert(executor:status_skill_npc(
+        attacker,
+        enemy,
+        "MysticPoisonCurse",
+        1,
+        302
+    ))
+    check(
+        poison.StatusApplied
+            and poison.SourceKind == "StatusMagic"
+            and poison.SourceSkillId == 1168
+            and poison.TickDamage == 8
+            and poison.TickCount == 10
+            and poison.TickSeconds == 3
+            and #delayed_callbacks == 1,
+        "source Poison schedules the exact reviewed periodic plan"
+    )
+
+    local poison_tick = table.remove(delayed_callbacks, 1)
+    assert(poison_tick)
+    poison_tick.Callback()
+    check(
+        enemy_humanoid.Health == 92
+            and #npc_events == 1
+            and npc_events[1].Context.source_kind == "StatusMagic"
+            and npc_events[1].Context.C4SourceSkillId == 1168
+            and npc_events[1].Context.C4SourceCastSequenceId == 302,
+        "source Poison tick keeps original cast attribution"
+    )
+
+    table.clear(delayed_callbacks)
+    status_mode = "Resisted"
+    local resisted = assert(executor:status_skill_npc(
+        attacker,
+        enemy,
+        "WayfinderWound",
+        1,
+        303
+    ))
+    check(
+        not resisted.StatusApplied
+            and not resisted.Landed
+            and not resisted.Scheduled
+            and #delayed_callbacks == 0,
+        "resisted source DEBUFF schedules no periodic damage"
+    )
+    status_mode = "Bleed"
 
     local self_attack, self_reason =
         executor:normal_attack(attacker, attacker)
