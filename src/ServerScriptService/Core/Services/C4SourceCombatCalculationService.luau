@@ -570,6 +570,8 @@ Args:
     defender_user_id (number): Authenticated source-ready defender.
     creative_skill_id (string): Server-selected creative physical skill ID.
     creative_rank (number): Server-resolved purchased creative rank.
+    facing_eligible (boolean?): Server-owned shield-facing result when the
+        defender has a reviewed source shield.
 
 Returns:
     (any?, string?): Source physical result or strict denial reason.
@@ -578,7 +580,8 @@ function C4SourceCombatCalculationService.physical_skill(
     attacker_user_id: number,
     defender_user_id: number,
     creative_skill_id: string,
-    creative_rank: number
+    creative_rank: number,
+    facing_eligible: boolean?
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -617,10 +620,42 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, variance_reason
     end
 
+    local defender_stats = defender.SourceStatCandidate
+    local shield_equipped =
+        defender_stats.SHIELD_DEFENCE_RATE ~= nil
+        or defender_stats.SHIELD_DEFENCE_POWER ~= nil
+    local shield = {
+        ShieldEquipped = false,
+        Blocked = false,
+        PerfectShield = false,
+        ShieldDefencePower = 0,
+        FacingEligible = facing_eligible,
+    }
+
+    if shield_equipped then
+        if type(facing_eligible) ~= "boolean" then
+            return nil, "ShieldFacingEligibilityRequired"
+        end
+
+        local shield_result, shield_reason =
+            C4SourceCombatCalculationService.shield_resolution(
+                attacker_user_id,
+                defender_user_id,
+                facing_eligible
+            )
+        if not shield_result then
+            return nil, shield_reason
+        end
+        shield = shield_result
+    end
+
     local amount = Formula.physical_damage({
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = effect.Sets.power,
+        Shield = shield.Blocked,
+        PerfectShield = shield.PerfectShield,
+        ShieldDefense = shield.ShieldDefencePower,
         RandomDamageMultiplier = variance.Multiplier,
     })
 
@@ -632,6 +667,13 @@ function C4SourceCombatCalculationService.physical_skill(
         RandomDamageMultiplier = variance.Multiplier,
         SourceWeaponId = variance.SourceWeaponId,
         Unarmed = variance.Unarmed,
+        ShieldEquipped = shield.ShieldEquipped,
+        ShieldBlocked = shield.Blocked,
+        PerfectShield = shield.PerfectShield,
+        ShieldDefencePower = shield.ShieldDefencePower,
+        ShieldFacingEligible = shield.FacingEligible,
+        ShieldBlockRoll = shield.BlockRoll,
+        ShieldPerfectRoll = shield.PerfectRoll,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -805,6 +847,7 @@ function C4SourceCombatCalculationService.capability(): any
         MagicCriticalIntegrated = false,
         ShieldSourceResolutionAvailable = true,
         ShieldRollServerOwned = true,
+        ShieldPhysicalFormulaIntegrated = true,
         ShieldFacingRuntimeIntegrated = false,
         ShieldResolutionIntegrated = false,
         MagicFailureResolutionIntegrated = false,
