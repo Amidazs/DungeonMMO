@@ -202,6 +202,63 @@ local function main()
         "Source critical roll equal to rate does not crit"
     )
 
+    check_close(
+        Formula.shield_block_rate(20, 1.1, false),
+        22,
+        "Source shield rate multiplies by defender DEX bonus"
+    )
+    check_close(
+        Formula.shield_block_rate(20, 1.1, true),
+        28.6,
+        "Bow attacker multiplies source shield rate by 1.3"
+    )
+
+    local shield_block = Formula.resolve_shield_block(
+        20,
+        1,
+        false,
+        true,
+        19
+    )
+    check(
+        shield_block.Blocked
+            and shield_block.EffectiveRate == 20,
+        "Source shield roll below effective rate blocks"
+    )
+
+    local equal_shield_roll = Formula.resolve_shield_block(
+        20,
+        1,
+        false,
+        true,
+        20
+    )
+    check(
+        not equal_shield_roll.Blocked,
+        "Source shield roll equal to effective rate does not block"
+    )
+
+    local wrong_facing = Formula.resolve_shield_block(
+        20,
+        1,
+        false,
+        false,
+        0
+    )
+    check(
+        not wrong_facing.Blocked,
+        "Source shield cannot block outside the facing angle"
+    )
+
+    check(
+        not Formula.resolve_perfect_shield(95).PerfectShield,
+        "Perfect shield strict threshold rejects roll 95"
+    )
+    check(
+        Formula.resolve_perfect_shield(96).PerfectShield,
+        "Perfect shield strict threshold accepts roll 96"
+    )
+
     check(Formula.magic_resist_threshold(30, 30) == 100,
         "Equal magic/target level source resistance threshold")
     check(Formula.magic_resist_threshold(31, 30) == 130,
