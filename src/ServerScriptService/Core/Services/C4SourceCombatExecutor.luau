@@ -8,9 +8,6 @@ local Services = ServerScriptService.Core.Services
 local SourceCombat = require(
     Services.C4SourceCombatCalculationService
 )
-local ResourceCutover = require(
-    Services.C4ResourceCutoverService
-)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -134,7 +131,7 @@ function C4SourceCombatExecutor.new(options: any?): any
     return setmetatable({
         _enabled = false,
         _combat = config.CombatProvider or SourceCombat,
-        _resources = config.ResourceAuthority or ResourceCutover,
+        _resources = config.ResourceAuthority,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -211,6 +208,9 @@ function C4SourceCombatExecutor:set_enabled(
     then
         return false, "C4LiveSpatialRulesUnconfigured"
     end
+    if enabled and type(self._resources) ~= "table" then
+        return false, "C4LiveResourceAuthorityUnavailable"
+    end
 
     self._enabled = enabled
     return true, nil
@@ -251,6 +251,9 @@ function C4SourceCombatExecutor:_validate_participants(
     end
     if not self._combat.is_enabled() then
         return false, "C4SourceCombatCalculationDisabled"
+    end
+    if type(self._resources) ~= "table" then
+        return false, "C4LiveResourceAuthorityUnavailable"
     end
     if not self._resources.is_enabled() then
         return false, "C4ResourceCutoverDisabled"
@@ -418,6 +421,8 @@ function C4SourceCombatExecutor:capability(): any
         ServerNightProviderRequired = true,
         RequiresSourceCalculationGate = true,
         RequiresResourceCutoverGate = true,
+        ResourceAuthorityConfigured =
+            type(self._resources) == "table",
         RequiresPerPlayerResourceCutover = true,
         ServerSpatialContext = true,
         PlayableDamageRoutesThroughCP = true,
