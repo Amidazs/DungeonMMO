@@ -1,3 +1,20 @@
+**v2.55 GitHub-only, STUDIO PENDING:** [current roadmap](
+DungeonMMO_Roadmap_v2_55_C4_Shared_Heal_And_Split_MP_Rules_20260925.md)
+and [pending test scope](
+../testing/c4-shared-skill-runtime-rules-v2-55-20260925.md).
+Shared pinned C4 runtime rules now represent original split-MP casting
+(total affordability, initial cost at cast start, ongoing cost on launch),
+instant Heal power with 1.3x/1.5x Spiritshot multipliers and source magic
+cast-time acceleration. ManaService has a reusable split transaction API,
+but no existing skill was silently switched to it. The nine Scout heal
+contracts now certify those source amount/MP semantics while remaining
+SourceOnly, LiveLearnable=false, LiveCastable=false and 9 of the 22
+explicit missing learning rows. Live C4 MaxHP/MaxMP/CP, regen, shot item
+economy, Heal threat and the Scout trainer/executor remain OPEN. New
+deterministic and ManaService regressions are authored but not executed;
+v2.53's 500-assertion Studio evidence does not validate v2.55.
+No Remote Desktop Commander edits, main merge, publish or production saves.
+
 **v2.54 GitHub-only, STUDIO PENDING:** [current roadmap](
 DungeonMMO_Roadmap_v2_54_Elven_Scout_C4_Heal_Migration_Plan_20260925.md).
 Nine independent Elven Scout source-only self-heal contracts now preserve
