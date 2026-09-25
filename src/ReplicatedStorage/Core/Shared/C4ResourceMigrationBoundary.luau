@@ -15,11 +15,16 @@ local C4CreativeItemSourceMap = require(
 local C4EquipmentExpertiseRules = require(
     Shared:WaitForChild("C4EquipmentExpertiseRules")
 )
+local C4OwnedPassiveSourceResolver = require(
+    Shared:WaitForChild("C4OwnedPassiveSourceResolver")
+)
+local C4UnifiedStatReference = require(
+    Shared:WaitForChild("C4UnifiedStatReference")
+)
 
 local C4ResourceMigrationBoundary = {}
 
 local ACTIVATION_BLOCKERS = table.freeze({
-    "OriginalOwnedPassiveMappingIncomplete",
     "ActiveEffectOrderingIncomplete",
     "LiveCPRuntimeUnavailable",
 })
@@ -30,17 +35,24 @@ Copies the activation blockers so callers cannot mutate shared state.
 Args:
     equipment_ready (boolean): Whether the current equipment migration is
         source-mapped and valid for the character's C4 Expertise level.
+    passives_ready (boolean): Whether actually owned creative passives map
+        cleanly to source ranks and compose into the source stat candidate.
 
 Returns:
     {string}: Independent list of unresolved live-migration requirements.
 ]]
 local function copy_activation_blockers(
-    equipment_ready: boolean
+    equipment_ready: boolean,
+    passives_ready: boolean
 ): {string}
     local result = {}
 
     if not equipment_ready then
         table.insert(result, "OriginalEquipmentMigrationIncomplete")
+    end
+
+    if not passives_ready then
+        table.insert(result, "OriginalOwnedPassiveMappingIncomplete")
     end
 
     for _, blocker in ipairs(ACTIVATION_BLOCKERS) do
@@ -105,6 +117,28 @@ function C4ResourceMigrationBoundary.for_character(
     local inventory_ready = reviewed_loadout ~= nil
         and equipment_expertise ~= nil
 
+    local passive_plan, passive_reason =
+        C4OwnedPassiveSourceResolver.for_character(character)
+    local passive_mapping_ready = passive_plan ~= nil
+        and passive_plan.Ready
+
+    local stat_candidate = nil
+    local stat_reason = passive_reason
+
+    if inventory_ready and passive_mapping_ready then
+        stat_candidate, stat_reason =
+            C4UnifiedStatReference.get_with_source_items(
+                identity.RaceId,
+                identity.ClassId,
+                character.Level,
+                reviewed_loadout.SourceItemIds,
+                passive_plan.SourceRanks
+            )
+    end
+
+    local passives_ready = passive_mapping_ready
+        and stat_candidate ~= nil
+
     return {
         RaceId = identity.RaceId,
         ClassId = identity.ClassId,
@@ -127,14 +161,34 @@ function C4ResourceMigrationBoundary.for_character(
             equipment_expertise ~= nil,
         OriginalEquipmentExpertiseReason = equipment_reason,
         OriginalInventoryIntegrated = inventory_ready,
-        OriginalOwnedPassivesIntegrated = false,
+        OwnedPassiveSourceMappingReady = passive_mapping_ready,
+        OwnedPassiveSourceReason = passive_reason,
+        ReviewedOwnedSourcePassiveRanks = if passive_plan
+            then passive_plan.SourceRanks
+            else nil,
+        UnsupportedOwnedCreativePassives = if passive_plan
+            then passive_plan.UnsupportedOwnedCreativePassives
+            else nil,
+        UnresolvedOwnedPassiveRanks = if passive_plan
+            then passive_plan.UnresolvedOwnedPassiveRanks
+            else nil,
+        SourceStatCandidateReady = stat_candidate ~= nil,
+        SourceStatCandidateReason = stat_reason,
+        SourceStatCandidate = if stat_candidate
+            then stat_candidate.EquippedStats
+            else nil,
+        SourcePassiveModifiersApplied = if stat_candidate
+            then stat_candidate.AppliedSourceModifiers
+            else nil,
+        OriginalOwnedPassivesIntegrated = passives_ready,
         ActiveEffectsIntegrated = false,
         LiveHealthIntegrated = false,
         LiveManaIntegrated = false,
         LiveCPIntegrated = false,
         CanApplyLive = false,
         ActivationBlockers = copy_activation_blockers(
-            inventory_ready
+            inventory_ready,
+            passives_ready
         ),
     }, nil
 end
@@ -149,7 +203,7 @@ Returns:
     {string}: Independent list of current fail-closed blockers.
 ]]
 function C4ResourceMigrationBoundary.blockers(): {string}
-    return copy_activation_blockers(true)
+    return copy_activation_blockers(true, false)
 end
 
 return table.freeze(C4ResourceMigrationBoundary)
