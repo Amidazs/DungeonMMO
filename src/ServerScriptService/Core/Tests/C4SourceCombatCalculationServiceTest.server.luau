@@ -8,6 +8,7 @@ local Shared = ReplicatedStorage.Core.Shared
 
 local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Formula = require(Shared.C4CombatFormulaReference)
+local NpcSource = require(Shared.C4NpcSourceReference)
 local ProfileSchema = require(Shared.ProfileSchema)
 local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
 local Combat = require(
@@ -337,7 +338,6 @@ local function check_default_off()
             and capability.WeaponVulnerabilityIntegrated
             and capability.PvpFormulaModifiersIntegrated
             and capability.PlayerTargetPvpModifiersIntegrated
-            and not capability.NpcRacePhysicalModifiersIntegrated
             and capability.CriticalResolutionIntegrated
             and capability.PhysicalSkillCriticalIntegrated
             and capability.PhysicalSkillCriticalRollServerOwned
@@ -348,6 +348,10 @@ local function check_default_off()
             and not capability.MagicFailuresSourceDefaultEnabled
             and capability.ElementalResolutionIntegrated
             and capability.ElementalPlayerTargetSourceStatsIntegrated
+            and capability.ElementalNpcTargetSourceStatsIntegrated
+            and capability.NpcTargetSourceBoundaryIntegrated
+            and capability.NpcTargetPvpNeutralityIntegrated
+            and capability.NpcRacePhysicalModifiersIntegrated
             and capability.ShotsIntegrated
             and capability.ShotAuthorityInstalled
             and capability.PhysicalSoulshotIntegrated
@@ -881,6 +885,184 @@ local function check_heal()
 end
 
 --[[
+Checks player source formulas against reviewed server NPC boundaries.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms NPC hit, PDAM, MDAM, race and PvP semantics.
+]]
+local function check_npc_targets()
+    local marauder = assert(NpcSource.get("Marauder"))
+    local wolf = assert(NpcSource.get("Wolf"))
+    local fighter = assert(
+        Runtime.get_c4_resource_migration_boundary(FIGHTER_ID)
+    )
+    local mage = assert(
+        Runtime.get_c4_resource_migration_boundary(MAGE_ID)
+    )
+
+    local hit = assert(Combat.normal_attack_hit(
+        FIGHTER_ID,
+        marauder,
+        FRONT_CONTEXT
+    ))
+    local expected_hit = Formula.hit_chance_with_condition(
+        fighter.SourceStatCandidate.ACCURACY_COMBAT,
+        marauder.SourceStatCandidate.EVASION_RATE,
+        1
+    )
+    check(
+        hit.TargetKind == "Npc"
+            and hit.SourceNpcId == 325
+            and hit.SourceNpcRace == "NONE"
+            and hit.SourceEvasion == 38
+            and hit.ChancePerThousand == expected_hit,
+        "normal hit resolution accepts reviewed NPC target stats"
+    )
+
+    shot_state.Soulshot = false
+    local normal = nil
+
+    for _ = 1, 100 do
+        normal = assert(Combat.normal_attack(
+            FIGHTER_ID,
+            marauder,
+            FRONT_CONTEXT
+        ))
+        if normal.Hit then
+            break
+        end
+    end
+
+    check(
+        normal ~= nil
+            and normal.Hit
+            and normal.TargetKind == "Npc"
+            and normal.SourceNpcId == 325
+            and normal.SourceNpcRace == "NONE"
+            and normal.NpcRaceMultiplier == 1
+            and #normal.NpcRaceStats == 0
+            and normal.PvpMultiplier == 1
+            and not normal.PvpApplied,
+        "ordinary player-to-NPC attack uses neutral NONE race and no PvP"
+    )
+
+    local resolved_normal = assert(normal)
+    local expected_normal = Formula.physical_damage({
+        PAtk = fighter.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = marauder.SourceStatCandidate.PHYSICAL_DEFENCE,
+        Soulshot = resolved_normal.Soulshot,
+        Critical = resolved_normal.Critical,
+        CriticalPowerMultiplier =
+            resolved_normal.CriticalPowerMultiplier,
+        CriticalPowerAdd = resolved_normal.CriticalPowerAdd,
+        WeaponVulnerabilityMultiplier =
+            resolved_normal.WeaponVulnerabilityMultiplier,
+        RandomDamageMultiplier =
+            resolved_normal.RandomDamageMultiplier,
+        RaceMultiplier = resolved_normal.NpcRaceMultiplier,
+        PvpMultiplier = 1,
+    })
+    check_close(
+        resolved_normal.Amount,
+        expected_normal,
+        "ordinary player-to-NPC damage equals exact source formula"
+    )
+
+    shot_state.Soulshot = false
+    local physical = assert(Combat.physical_skill(
+        FIGHTER_ID,
+        wolf,
+        "IronCleave",
+        1
+    ))
+    local expected_physical = Formula.physical_damage({
+        PAtk = fighter.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = wolf.SourceStatCandidate.PHYSICAL_DEFENCE,
+        SkillPower = 25,
+        Soulshot = physical.Soulshot,
+        WeaponVulnerabilityMultiplier =
+            physical.WeaponVulnerabilityMultiplier,
+        RandomDamageMultiplier =
+            physical.RandomDamageMultiplier,
+        RaceMultiplier = physical.NpcRaceMultiplier,
+        PvpMultiplier = 1,
+    })
+    if physical.PhysicalSkillCritical then
+        expected_physical *= 2
+    end
+
+    check_close(
+        physical.Amount,
+        expected_physical,
+        "player-to-Wolf PDAM equals exact source formula"
+    )
+    check(
+        physical.TargetKind == "Npc"
+            and physical.SourceNpcId == 525
+            and physical.SourceNpcRace == "ANIMAL"
+            and physical.NpcRaceMultiplier
+                == fighter.SourceStatCandidate.PHYSICAL_ATK_ANIMALS
+            and #physical.NpcRaceStats == 1
+            and physical.NpcRaceStats[1]
+                == "PHYSICAL_ATK_ANIMALS"
+            and physical.PvpMultiplier == 1
+            and not physical.PvpApplied,
+        "Wolf PDAM uses C4 ANIMAL modifier and suppresses PvP multiplier"
+    )
+
+    shot_state.BlessedSpiritshot = false
+    shot_state.Spiritshot = false
+    local magic = assert(Combat.magic_skill(
+        MAGE_ID,
+        wolf,
+        "WindStrike",
+        1
+    ))
+    local expected_magic = Formula.magic_damage({
+        MAtk = mage.SourceStatCandidate.MAGICAL_ATTACK,
+        MDef = wolf.SourceStatCandidate.MAGICAL_DEFENCE,
+        SkillPower = 12,
+        Spiritshot = magic.Spiritshot,
+        BlessedSpiritshot = magic.BlessedSpiritshot,
+        Failure = magic.MagicFailure,
+        MagicCritical = magic.MagicCritical,
+        ElementalMultiplier = magic.ElementalMultiplier,
+        PvpMultiplier = 1,
+    })
+
+    check_close(
+        magic.Amount,
+        expected_magic,
+        "player-to-Wolf MDAM equals exact source formula"
+    )
+    check(
+        magic.TargetKind == "Npc"
+            and magic.SourceNpcId == 525
+            and magic.SourceNpcRace == "ANIMAL"
+            and magic.ElementalMultiplier == 1
+            and magic.PvpMultiplier == 1
+            and not magic.PvpApplied,
+        "NPC MDAM uses source target defence/vulnerability without PvP"
+    )
+
+    local malformed = table.clone(marauder)
+    malformed.SourceCommit = "wrong"
+    local denied, denied_reason = Combat.normal_attack_hit(
+        FIGHTER_ID,
+        malformed,
+        FRONT_CONTEXT
+    )
+    check(
+        denied == nil
+            and denied_reason == "InvalidC4NpcSourceBoundary",
+        "forged NPC boundary provenance fails closed"
+    )
+end
+
+--[[
 Checks wrong skill families and unowned ranks fail closed.
 
 Args:
@@ -937,6 +1119,7 @@ local function main()
     check_physical()
     check_magic()
     check_heal()
+    check_npc_targets()
     check_denials()
     Combat.set_enabled(false)
     Combat.set_shot_authority(nil)
@@ -952,7 +1135,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "pdam=true mdam=true heal=true live=false"
+        .. "pdam=true mdam=true heal=true npc=true live=false"
     ):format(checks))
 end
 
