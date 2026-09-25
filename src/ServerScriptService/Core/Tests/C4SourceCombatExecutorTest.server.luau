@@ -489,6 +489,19 @@ local function main()
     )
     defender_active = true
 
+    local npc_preflight, npc_preflight_reason =
+        executor:can_magic_skill_npc(attacker, enemy)
+    local preflight_humanoid =
+        enemy:FindFirstChildOfClass("Humanoid")
+    check(
+        npc_preflight
+            and npc_preflight_reason == nil
+            and preflight_humanoid ~= nil
+            and preflight_humanoid.Health == 100
+            and #npc_events == 0,
+        "NPC magic preflight validates without HP or callback mutation"
+    )
+
     combat_mode = "Miss"
     local miss = assert(executor:normal_attack(
         attacker,
