@@ -127,7 +127,7 @@ local function check_shot_requirements()
         "Trident uses two D-grade shots"
     )
     check(
-        assert(SourceItems.get(1181)).Grade == "None"
+        assert(SourceItems.get(1181)).Grade == nil
             and assert(SourceItems.get(1181)).SoulShotCount == 7
             and assert(SourceItems.get(1181)).SpiritShotCount == 2
             and assert(SourceItems.get(1182)).SoulShotCount == 2
