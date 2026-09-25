@@ -229,6 +229,8 @@ Returns:
     nil: Prints bounded dispatch acceptance evidence.
 ]]
 local function main()
+    local previous_state = Adapter.capture_test_state()
+
     Adapter.set_enabled(false)
     Adapter.bind_executor(nil)
     Adapter.set_npc_damage_observer(nil)
@@ -476,11 +478,7 @@ local function main()
         "dispatch capability exposes the remaining activation blockers"
     )
 
-    Adapter.set_enabled(false)
-    Adapter.bind_executor(nil)
-    Adapter.set_npc_damage_observer(nil)
-    Adapter.set_skill_rank_provider_for_test(nil)
-    Adapter.set_activation_audit_provider_for_test(nil)
+    Adapter.restore_test_state(previous_state)
     executor_enabled = false
     table.clear(calls)
     target:Destroy()
