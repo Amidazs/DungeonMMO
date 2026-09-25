@@ -18,6 +18,7 @@ local Runtime = require(
 local FIGHTER_ID = 938181
 local MAGE_ID = 938182
 local TARGET_ID = 938183
+local SHIELD_TARGET_ID = 938184
 local checks = 0
 
 --[[
@@ -33,6 +34,7 @@ local function empty_active_snapshot(user_id: number): any?
     if user_id ~= FIGHTER_ID
         and user_id ~= MAGE_ID
         and user_id ~= TARGET_ID
+        and user_id ~= SHIELD_TARGET_ID
     then
         return nil
     end
@@ -167,6 +169,14 @@ local function seed_characters()
         TARGET_ID,
         starter_character(TARGET_ID, "Fighter")
     )
+
+    local shield_target =
+        starter_character(SHIELD_TARGET_ID, "Fighter")
+    shield_target.Equipment.OffHand = "marauder_shield"
+    Runtime.set_character(
+        SHIELD_TARGET_ID,
+        shield_target
+    )
 end
 
 --[[
@@ -193,6 +203,10 @@ local function check_default_off()
             and capability.PhysicalRandomVarianceResolution
             and capability.RandomWeaponVarianceIntegrated
             and capability.UnarmedRandomVarianceIntegrated
+            and capability.ShieldSourceResolutionAvailable
+            and capability.ShieldRollServerOwned
+            and capability.ShieldPhysicalFormulaIntegrated
+            and not capability.ShieldFacingRuntimeIntegrated
             and not capability.PhysicalSkillCriticalIntegrated
             and not capability.MagicCriticalIntegrated
             and not capability.LiveDamageApplied,
@@ -337,6 +351,104 @@ local function check_physical_random_variance()
         result.Multiplier,
         1 + (result.Roll / 100),
         "server-owned random variance roll maps to source multiplier"
+    )
+end
+
+--[[
+Checks source shield rate, facing, perfect roll and PDAM formula wiring.
+
+The shield-facing boolean is supplied only by this server-side test call. The
+future live executor still has to derive it from authoritative world transforms.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms reviewed shield stats and physical formula integration.
+]]
+local function check_shield_resolution()
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(
+            SHIELD_TARGET_ID
+        )
+    )
+
+    local wrong_facing = assert(Combat.shield_resolution(
+        FIGHTER_ID,
+        SHIELD_TARGET_ID,
+        false
+    ))
+    check(
+        wrong_facing.ShieldEquipped
+            and wrong_facing.ShieldDefenceRate == 20
+            and wrong_facing.ShieldDefencePower == 79
+            and wrong_facing.ShieldAngleDegrees == 120
+            and not wrong_facing.Blocked
+            and not wrong_facing.PerfectShield,
+        "reviewed source shield cannot block outside server-owned facing"
+    )
+
+    local facing = assert(Combat.shield_resolution(
+        FIGHTER_ID,
+        SHIELD_TARGET_ID,
+        true
+    ))
+    check(
+        facing.Blocked
+            == (facing.EffectiveRate > facing.BlockRoll),
+        "server-owned shield roll uses exact strict source comparison"
+    )
+    check(
+        if facing.Blocked
+            then facing.PerfectShield
+                == (facing.ShieldPerfectRoll > 95)
+            else facing.ShieldPerfectRoll == nil
+                and not facing.PerfectShield,
+        "perfect shield rolls only after a successful source block"
+    )
+
+    local missing, missing_reason = Combat.physical_skill(
+        FIGHTER_ID,
+        SHIELD_TARGET_ID,
+        "IronCleave",
+        1
+    )
+    check(
+        missing == nil
+            and missing_reason == "ShieldFacingEligibilityRequired",
+        "shielded PDAM refuses to invent facing state"
+    )
+
+    local result = assert(Combat.physical_skill(
+        FIGHTER_ID,
+        SHIELD_TARGET_ID,
+        "IronCleave",
+        1,
+        true
+    ))
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(FIGHTER_ID)
+    )
+    local expected = Formula.physical_damage({
+        PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+        SkillPower = 25,
+        Shield = result.ShieldBlocked,
+        PerfectShield = result.PerfectShield,
+        ShieldDefense = result.ShieldDefencePower,
+        RandomDamageMultiplier = result.RandomDamageMultiplier,
+    })
+
+    check_close(
+        result.Amount,
+        expected,
+        "PDAM consumes the exact source shield result"
+    )
+    check(
+        result.ShieldEquipped
+            and result.ShieldDefencePower == 79
+            and result.ShieldFacingEligible == true,
+        "PDAM exposes reviewed shield evidence without live application"
     )
 end
 
@@ -511,6 +623,7 @@ local function main()
     check_normal_attack_hit()
     check_normal_attack_critical()
     check_physical_random_variance()
+    check_shield_resolution()
     check_physical()
     check_magic()
     check_heal()
@@ -520,11 +633,12 @@ local function main()
     Runtime.clear_character(FIGHTER_ID)
     Runtime.clear_character(MAGE_ID)
     Runtime.clear_character(TARGET_ID)
+    Runtime.clear_character(SHIELD_TARGET_ID)
 
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
-        .. "hit=true critical=true variance=true pdam=true "
-        .. "mdam=true heal=true live=false"
+        .. "hit=true critical=true variance=true shield=true "
+        .. "pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
 
