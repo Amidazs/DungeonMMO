@@ -62,16 +62,16 @@ local fixtures = {
         Parent = core_tests,
         Name = "C4ResourceRegenSourceTest",
     },
-    {
-        Parent = core_tests,
-        Name = "C4ResourceCutoverServiceTest",
-    },
 }
 
 if combat_tests then
     table.insert(fixtures, 2, {
         Parent = combat_tests,
         Name = "ManaServiceTest",
+    })
+    table.insert(fixtures, {
+        Parent = core_tests,
+        Name = "C4ResourceCutoverServiceTest",
     })
 end
 
