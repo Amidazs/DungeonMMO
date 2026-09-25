@@ -80,6 +80,33 @@ local KNIGHT = table.freeze({
     TargetTaunt = "OathguardChallenge",
 })
 
+local HUMAN_WIZARD = table.freeze({
+    EquipmentExpertise = "EmberweaverEquipmentExpertise",
+    CommonItemCreation = "EmberweaverCommonItemCreation",
+    WeaponMastery = "EmberweaverFocusTraining",
+    RobeMastery = "EmberweaverRobeTraining",
+    MagicResistance = "EmberweaverArcaneResistance",
+    ManaRechargeEfficiency = "EmberweaverManaChanneling",
+    ManaCapacity = "EmberweaverManaReservoir",
+    SpellReuse = "EmberweaverQuickWeave",
+    FrostSlowBolt = "EmberweaverFrostLance",
+    HealthDrain = "EmberweaverLifeSiphon",
+    FireBolt = "EmberweaverEmberBolt",
+    CloseMagicBurst = "EmberweaverFlameBurst",
+    AttackWeakness = "EmberweaverWitheringHex",
+    EfficientMagicBolt = "EmberweaverFocusedBolt",
+    FireAreaAttack = "EmberweaverEmberField",
+    PoisonCurse = "EmberweaverVenomHex",
+    CastConcentration = "EmberweaverConcentration",
+    FastSpellCasting = "EmberweaverFastCasting",
+    ManaRecovery = "EmberweaverManaRecovery",
+    Sleep = "EmberweaverSlumberHex",
+    FireVulnerability = "EmberweaverScorchMark",
+    PoisonCloud = "EmberweaverVenomCloud",
+    HealthToMana = "EmberweaverBloodToMana",
+    CorpseHealthDrain = "EmberweaverCorpseSiphon",
+})
+
 local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
@@ -116,6 +143,9 @@ function SkillMap.get(
     end
     if branch_id == "HumanKnight" then
         return KNIGHT[source_category]
+    end
+    if branch_id == "HumanWizard" then
+        return HUMAN_WIZARD[source_category]
     end
     if branch_id == "ElvenKnight" then
         return ELVEN_KNIGHT[source_category]
