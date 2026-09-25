@@ -30,6 +30,13 @@ local CHARACTER_URL =
     .. SOURCE_COMMIT
     .. "/L2jAdmins_Core/src/l2j/gameserver/model/actor/"
     .. "L2Character.java"
+local RND_URL =
+    "https://github.com/Neco-spain/"
+    .. "l2jadmins_C4-Scions-of-Destiny/blob/"
+    .. SOURCE_COMMIT
+    .. "/L2jAdmins_Core/src/l2j/util/Rnd.java"
+
+local PERFECT_SHIELD_CONFIG_RATE = 5
 
 --[[
 Checks one finite positive numeric combat argument.
@@ -324,6 +331,134 @@ function C4CombatFormulaReference.resolve_normal_attack_hit(
 end
 
 --[[
+Returns the exact C4 shield-block rate before the source 0-99 roll.
+
+The source multiplies final SHIELD_DEFENCE_RATE by the defender's DEX bonus.
+A bow attacker then multiplies that result by 1.3. The source does not clamp
+the resulting rate before comparing it with Rnd.get(100).
+
+Args:
+    shield_defence_rate (number): Final source shield-rate stat.
+    dex_bonus (number): Authenticated source DEX bonus.
+    attacker_is_bow (boolean): Whether the reviewed source weapon is a bow.
+
+Returns:
+    number: Exact source shield-block comparison rate.
+]]
+function C4CombatFormulaReference.shield_block_rate(
+    shield_defence_rate: number,
+    dex_bonus: number,
+    attacker_is_bow: boolean
+): number
+    assert(
+        type(shield_defence_rate) == "number"
+            and shield_defence_rate == shield_defence_rate
+            and shield_defence_rate >= 0
+            and shield_defence_rate < math.huge,
+        "Shield defence rate must be finite and nonnegative"
+    )
+    positive(dex_bonus, "DEX bonus")
+    assert(
+        type(attacker_is_bow) == "boolean",
+        "Attacker bow state must be boolean"
+    )
+
+    local rate = shield_defence_rate * dex_bonus
+    if attacker_is_bow then
+        rate *= 1.3
+    end
+    return rate
+end
+
+--[[
+Resolves the C4 shield-block comparison after facing eligibility is known.
+
+The source exits before rolling when the shield rate is zero or the defender
+is outside the source shield-facing angle. Rnd.get(100) yields 0 through 99,
+and a block succeeds only when the effective rate is strictly greater.
+
+Args:
+    shield_defence_rate (number): Final source shield-rate stat.
+    dex_bonus (number): Authenticated source DEX bonus.
+    attacker_is_bow (boolean): Whether the source attacker weapon is a bow.
+    facing_eligible (boolean): Server-resolved source-angle eligibility.
+    roll (number): Server-owned integer roll from 0 through 99.
+
+Returns:
+    any: Detached source block result and comparison evidence.
+]]
+function C4CombatFormulaReference.resolve_shield_block(
+    shield_defence_rate: number,
+    dex_bonus: number,
+    attacker_is_bow: boolean,
+    facing_eligible: boolean,
+    roll: number
+): any
+    assert(
+        type(facing_eligible) == "boolean",
+        "Shield facing eligibility must be boolean"
+    )
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 99,
+        "Shield roll must be an integer from 0 through 99"
+    )
+
+    local rate = C4CombatFormulaReference.shield_block_rate(
+        shield_defence_rate,
+        dex_bonus,
+        attacker_is_bow
+    )
+
+    local blocked = shield_defence_rate > 0
+        and facing_eligible
+        and rate > roll
+
+    return {
+        EffectiveRate = rate,
+        Roll = roll,
+        FacingEligible = facing_eligible,
+        Blocked = blocked,
+    }
+end
+
+--[[
+Resolves the pinned C4 perfect-shield roll used after a normal shield block.
+
+The reviewed source checks:
+(100 - AltPerfectShieldBlockRate) < Rnd.get(100)
+with the default config value 5. Because the comparison is strict, rolls
+96-99 succeed while 95 does not.
+
+Args:
+    roll (number): Server-owned integer roll from 0 through 99.
+
+Returns:
+    any: Exact perfect-shield result and source threshold evidence.
+]]
+function C4CombatFormulaReference.resolve_perfect_shield(
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 99,
+        "Perfect-shield roll must be an integer from 0 through 99"
+    )
+
+    local threshold = 100 - PERFECT_SHIELD_CONFIG_RATE
+    return {
+        ConfigRate = PERFECT_SHIELD_CONFIG_RATE,
+        Threshold = threshold,
+        Roll = roll,
+        PerfectShield = threshold < roll,
+    }
+end
+
+--[[
 Returns the C4 unarmed random-damage percentage range.
 
 The reviewed source uses 5 + (int) sqrt(level) when no active weapon exists.
@@ -484,6 +619,7 @@ function C4CombatFormulaReference.sources(): any
         HealUrl = HEAL_URL,
         ConfigUrl = CONFIG_URL,
         CharacterUrl = CHARACTER_URL,
+        RndUrl = RND_URL,
     }
 end
 
