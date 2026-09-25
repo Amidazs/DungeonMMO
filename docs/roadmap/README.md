@@ -1,3 +1,14 @@
+**v2.79 LIVE C4 EXECUTOR FOUNDATION GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_79_C4_Live_Combat_Executor_20260925.md)
+and [green evidence](
+../testing/c4-live-combat-executor-v2-79-20260925.md).
+A disabled server-only live normal-attack executor now requires explicit
+spatial mapping plus source calculation/resource gates and per-player cutover,
+then routes playable damage through CP before HP. Fresh Studio Base **17/17
+PASS**, Dungeon **19/19 PASS**, executor **10 assertions PASS**. Production
+activation remains impossible until trusted spatial rules are configured.
+Next: extend live execution across PDAM/MDAM/HEAL.
+
 **v2.78 SPATIAL COMBAT INPUTS GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_78_C4_Spatial_Combat_20260925.md)
 and [green evidence](
