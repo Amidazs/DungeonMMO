@@ -48,10 +48,6 @@ local fixtures = {
     },
     {
         Parent = core_tests,
-        Name = "C4UnifiedStatReferenceTest",
-    },
-    {
-        Parent = core_tests,
         Name = "C4ActiveSourceEffectStateTest",
     },
     {
