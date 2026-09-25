@@ -1,6 +1,6 @@
 --!strict
--- Explicit C4 source-to-creative CANDIDATES across all nine original
--- level-30 paths. Entries are not evidence of effect/formula equivalence.
+-- Explicit C4 source-to-creative CANDIDATES across tracked level-30 paths.
+-- Entries are not evidence of effect/formula equivalence.
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
@@ -60,6 +60,57 @@ local MAPS = table.freeze({
         [1206] = table.freeze({SkillId = "ElvenMysticLanguor"}),
         [1216] = table.freeze({SkillId = "MageHeal"}),
         [1320] = table.freeze({SkillId = "C4CommonItemCreation"}),
+    }),
+    HumanWizard = table.freeze({
+        [146] = table.freeze({
+            SkillId = "EmberweaverArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "EmberweaverQuickWeave"}),
+        [213] = table.freeze({SkillId = "EmberweaverManaReservoir"}),
+        [228] = table.freeze({SkillId = "EmberweaverFastCasting"}),
+        [229] = table.freeze({SkillId = "EmberweaverManaRecovery"}),
+        [234] = table.freeze({SkillId = "EmberweaverRobeTraining"}),
+        [239] = table.freeze({
+            SkillId = "EmberweaverEquipmentExpertise",
+        }),
+        [249] = table.freeze({
+            SkillId = "EmberweaverFocusTraining",
+            Offset = 2,
+        }),
+        [285] = table.freeze({SkillId = "EmberweaverManaChanneling"}),
+        [1069] = table.freeze({SkillId = "EmberweaverSlumberHex"}),
+        [1078] = table.freeze({
+            SkillId = "EmberweaverConcentration",
+        }),
+        [1083] = table.freeze({SkillId = "EmberweaverScorchMark"}),
+        [1147] = table.freeze({
+            SkillId = "EmberweaverLifeSiphon",
+            Offset = 2,
+        }),
+        [1151] = table.freeze({SkillId = "EmberweaverCorpseSiphon"}),
+        [1157] = table.freeze({SkillId = "EmberweaverBloodToMana"}),
+        [1164] = table.freeze({
+            SkillId = "EmberweaverWitheringHex",
+            Offset = 1,
+        }),
+        [1167] = table.freeze({SkillId = "EmberweaverVenomCloud"}),
+        [1168] = table.freeze({
+            SkillId = "EmberweaverVenomHex",
+            Offset = 1,
+        }),
+        [1172] = table.freeze({SkillId = "EmberweaverFlameBurst"}),
+        [1181] = table.freeze({SkillId = "EmberweaverEmberField"}),
+        [1184] = table.freeze({
+            SkillId = "EmberweaverFrostLance",
+            Offset = 4,
+        }),
+        [1220] = table.freeze({SkillId = "EmberweaverEmberBolt"}),
+        [1274] = table.freeze({SkillId = "EmberweaverFocusedBolt"}),
+        [1320] = table.freeze({
+            SkillId = "EmberweaverCommonItemCreation",
+            Offset = 1,
+        }),
     }),
     HumanWarrior = table.freeze({
         [78] = table.freeze({SkillId = "IronvowBattleCall"}),
@@ -185,6 +236,12 @@ local GAPS = table.freeze({
 
         [1322] = "Common Craft is not the current recipe-reading passive",
     }),
+    HumanWizard = table.freeze({
+        [1111] = "Mana companion requires server-owned summon authority",
+        [1126] = "Servitor MP recovery requires a real owned companion",
+        [1127] = "Servitor healing requires a real owned companion",
+        [1225] = "Combat companion requires server-owned summon authority",
+    }),
     HumanWarrior = table.freeze({
 
     }),
@@ -206,7 +263,7 @@ local GAPS = table.freeze({
 Resolves an original source learning rank to an existing creative ID.
 
 Args:
-    scope_id (string): One of the nine original level-30 class paths.
+    scope_id (string): One tracked original level-30 class path.
     source_skill_id (number): Original C4 XML and learning-tree ID.
     source_level (number): Original C4 rank, not the character level.
 
