@@ -140,8 +140,10 @@ local function check_nine_paths()
             row[2] .. " exact source values remain fail-closed"
         )
         check(
-            #plan.ActivationBlockers == 3,
-            row[2] .. " keeps remaining coordinated migration blockers"
+            #plan.ActivationBlockers == 2
+                and plan.OriginalOwnedPassiveMappingIntegrated
+                and plan.SourceStatCandidateReady,
+            row[2] .. " leaves only active-effect and CP blockers"
         )
 
         Runtime.clear_character(TEST_OWNER)
@@ -185,8 +187,10 @@ local function check_reviewed_equipment_boundary()
     check(
         reviewed.OriginalEquipmentExpertiseReady
             and reviewed.OriginalInventoryIntegrated
+            and reviewed.OriginalOwnedPassiveMappingIntegrated
+            and reviewed.SourceStatCandidateReady
             and not reviewed.CanApplyLive
-            and #reviewed.ActivationBlockers == 3,
+            and #reviewed.ActivationBlockers == 2,
         "level-30 six-slot inventory migration is source-ready"
     )
 
@@ -204,12 +208,48 @@ local function check_reviewed_equipment_boundary()
             and not blocked.OriginalInventoryIntegrated
             and blocked.OriginalEquipmentExpertiseReason
                 == "OriginalEquipmentGradeExpertiseRequired"
-            and #blocked.ActivationBlockers == 4,
+            and blocked.OriginalOwnedPassiveMappingIntegrated
+            and #blocked.ActivationBlockers == 3,
         "level-19 D-grade equipment keeps migration fail-closed"
     )
 
     Runtime.clear_character(TEST_OWNER)
 end
+--[[
+Checks unsupported actually-owned custom passives keep C4 cutover blocked.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source mapping never silently stacks a custom passive.
+]]
+local function check_owned_passive_boundary()
+    local character = original_character("Human", "Mage", 15)
+    character.Progression.Skills.MysticRobeCasting = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 1,
+        Proficiency = 0,
+    }
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        not plan.OwnedPassiveSourceMappingReady
+            and not plan.OriginalOwnedPassiveMappingIntegrated
+            and not plan.SourceStatCandidateReady
+            and plan.UnsupportedOwnedCreativePassives[1]
+                == "MysticRobeCasting"
+            and #plan.ActivationBlockers == 3,
+        "unmapped owned combat passive adds the passive migration blocker"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
 --[[
 Checks forged advancement and unsupported levels cannot expose a cutover plan.
 
@@ -273,11 +313,12 @@ Returns:
 local function main()
     check_nine_paths()
     check_reviewed_equipment_boundary()
+    check_owned_passive_boundary()
     check_denials()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "nine_paths=9 live=false blockers=3"
+        .. "nine_paths=9 live=false blockers=2"
     ):format(checks))
 end
 
