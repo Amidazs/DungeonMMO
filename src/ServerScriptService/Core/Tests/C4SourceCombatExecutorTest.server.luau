@@ -440,6 +440,8 @@ local function main()
             and capability.NpcNormalAttackLiveApplication
             and capability.NpcPhysicalSkillLiveApplication
             and capability.NpcMagicSkillLiveApplication
+            and capability.NpcMagicSkillReadOnlyPreflight
+            and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcPeriodicStatusLiveApplication
             and capability.NpcPeriodicStatusNonlethal
             and capability.NpcPeriodicStatusRefreshBySourceSkill
@@ -491,15 +493,19 @@ local function main()
 
     local npc_preflight, npc_preflight_reason =
         executor:can_magic_skill_npc(attacker, enemy)
+    local status_preflight, status_preflight_reason =
+        executor:can_status_skill_npc(attacker, enemy)
     local preflight_humanoid =
         enemy:FindFirstChildOfClass("Humanoid")
     check(
         npc_preflight
             and npc_preflight_reason == nil
+            and status_preflight
+            and status_preflight_reason == nil
             and preflight_humanoid ~= nil
             and preflight_humanoid.Health == 100
             and #npc_events == 0,
-        "NPC magic preflight validates without HP or callback mutation"
+        "NPC magic/status preflight validates without world mutation"
     )
 
     combat_mode = "Miss"
