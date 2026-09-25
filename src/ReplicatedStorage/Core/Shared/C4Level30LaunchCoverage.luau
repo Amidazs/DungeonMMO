@@ -15,7 +15,6 @@ local Mapping = require(Shared.C4Level30ClassSkillMap)
 
 local Coverage = {}
 local LAUNCH_CAP = 30
-local BRACKETS = table.freeze({20, 24, 28})
 
 --[[
 Finds the registered source branch without enabling unimplemented races.
@@ -80,9 +79,13 @@ Args:
 Returns:
     ({[number]: number}, number): Bracket counts and total ranks at cap.
 ]]
-local function source_counts(source: any): ({[number]: number}, number)
+local function source_counts(
+    source: any
+): ({[number]: number}, number, {number})
     local by_level = {}
     local total = 0
+    local brackets = {}
+
     for level, categories in pairs(source.Levels) do
         if level <= LAUNCH_CAP then
             local count = 0
@@ -91,9 +94,12 @@ local function source_counts(source: any): ({[number]: number}, number)
             end
             by_level[level] = count
             total += count
+            table.insert(brackets, level)
         end
     end
-    return by_level, total
+
+    table.sort(brackets)
+    return by_level, total, brackets
 end
 
 --[[
@@ -197,8 +203,9 @@ function Coverage.for_branch(branch_id: string): any?
         else WarriorKnight.get(branch_id)
     local levels: {[number]: number} = {}
     local total: number? = nil
+    local brackets = {}
     if source then
-        levels, total = source_counts(source)
+        levels, total, brackets = source_counts(source)
     end
     local authored = authored_skills(branch_id)
     local mapped = 0
@@ -212,8 +219,7 @@ function Coverage.for_branch(branch_id: string): any?
         SourceUrl = if source then source.SourceUrl
             else branch.SourceIndexUrl,
         LevelCap = LAUNCH_CAP,
-        SourceBrackets = if source
-            then BRACKETS else {},
+        SourceBrackets = brackets,
         SourceRankEntriesByLevel = levels,
         SourceRankEntriesThroughCap = total,
         CurrentCareerId = if career then career.Id else nil,
