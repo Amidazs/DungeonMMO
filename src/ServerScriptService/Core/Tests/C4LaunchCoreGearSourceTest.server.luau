@@ -69,6 +69,38 @@ local function check_weapons()
 end
 
 --[[
+Checks exact pinned rnd_dam values for every reviewed source weapon.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms current creative weapon mappings have source variance data.
+]]
+local function check_random_damage()
+    check(
+        assert(SourceItems.get(1)).RandomDamage == 10
+            and assert(SourceItems.get(4)).RandomDamage == 20
+            and assert(SourceItems.get(6)).RandomDamage == 20,
+        "starter sword blunt and wand random damage"
+    )
+    check(
+        assert(SourceItems.get(10)).RandomDamage == 5
+            and assert(SourceItems.get(13)).RandomDamage == 5,
+        "starter dagger and bow random damage"
+    )
+    check(
+        assert(SourceItems.get(291)).RandomDamage == 10,
+        "Trident random damage"
+    )
+    check(
+        assert(SourceItems.get(1181)).RandomDamage == 5
+            and assert(SourceItems.get(1182)).RandomDamage == 5,
+        "Neti bow and dagger random damage"
+    )
+end
+
+--[[
 Checks the additional original D-grade body source records.
 
 Args:
@@ -138,6 +170,7 @@ Returns:
 ]]
 local function main()
     check_weapons()
+    check_random_damage()
     check_body_armour()
     check_loadout_rules()
 
