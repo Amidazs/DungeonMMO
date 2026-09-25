@@ -218,12 +218,14 @@ local function check_reviewed_equipment_boundary()
             and reviewed.ReviewedSourceItemIds.OffHand == 102
             and reviewed.ReviewedSourceItemIds.Head == 43
             and reviewed.ReviewedSourceItemIds.Body == 352
+            and reviewed.ReviewedSourceItemIds.Legs == 2378
             and reviewed.ReviewedSourceItemIds.Gloves == 63
             and reviewed.ReviewedSourceItemIds.Feet == 38,
-        "reviewed current six-slot gear exposes exact source item IDs"
+        "reviewed six-slot gear exposes exact source chest and hidden legs IDs"
     )
     check(
         reviewed.OriginalEquipmentExpertiseReady
+            and reviewed.OriginalBodyLegSemanticsReady
             and reviewed.OriginalInventoryIntegrated
             and reviewed.OriginalOwnedPassiveMappingIntegrated
             and reviewed.SourceStatCandidateReady
@@ -246,6 +248,7 @@ local function check_reviewed_equipment_boundary()
     )
     check(
         blocked.ReviewedSixSlotLoadoutReady
+            and blocked.OriginalBodyLegSemanticsReady
             and not blocked.OriginalEquipmentExpertiseReady
             and not blocked.OriginalInventoryIntegrated
             and blocked.OriginalEquipmentExpertiseReason
