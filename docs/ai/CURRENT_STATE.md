@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.87 live C4 periodic status GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_87_C4_Live_Periodic_Status_20260925.md)
+and [green evidence](
+../testing/c4-live-periodic-status-v2-87-20260925.md).
+Exact C4 Bleed/Poison DEBUFF casts now route through the disabled source
+executor and schedule server-owned nonlethal ticks. Wayfinder Wound is source
+Bleed **13 x 4 @ 5s** and Mystic Poison Curse is source Poison **8 x 10 @ 3s**;
+the creative placeholder direct/tick values are suppressed in source mode.
+Periodic callbacks preserve contribution/quest/threat and progression evidence.
+Fresh Studio Base **21/21 PASS**, Dungeon **24/24 PASS**, executor **22
+assertions PASS**, dispatch **19 assertions PASS**. StatusPhysical/StatusMagic
+are no longer activation blockers; only **RangerArea** remains. All source/live
+gates stay OFF. Next: review and map RangerArea to an exact C4 source contract.
+No main merge, publish, production saves or animation edits.
+
 ## 25 September 2026 — CURRENT v2.86 C4 periodic-status source GREEN
 
 [Latest roadmap](
