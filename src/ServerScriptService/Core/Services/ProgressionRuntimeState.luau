@@ -89,6 +89,7 @@ local ProgressionRuntimeState = {}
 
 local states: {[number]: any} = {}
 local active_effect_snapshot_provider: ((number) -> any?)? = nil
+local c4_resource_override_provider: ((number) -> any?)? = nil
 
 --[[
 Builds a fresh default character used only for neutral runtime fallbacks.
@@ -834,6 +835,62 @@ function ProgressionRuntimeState.set_c4_active_effect_snapshot_provider(
 end
 
 --[[
+Installs the server-only provider for optional live C4 resource overrides.
+
+The provider is registered by the disabled-by-default resource cutover service.
+When no active override exists, all existing custom DungeonMMO resource
+calculations remain unchanged.
+
+Args:
+    callback ((number) -> any?): Returns active source maxima for one user ID,
+        or nil when C4 resource mode is not active.
+
+Returns:
+    nil: Max-health/mana readers can consult the optional source override.
+]]
+function ProgressionRuntimeState.set_c4_resource_override_provider(
+    callback: any
+)
+    assert(
+        type(callback) == "function",
+        "C4 resource override provider is required"
+    )
+    c4_resource_override_provider = callback
+end
+
+--[[
+Returns a validated detached live C4 resource override when one is active.
+
+Args:
+    user_id (number): Server-owned selected character user ID.
+
+Returns:
+    any?: Active source maxima, otherwise nil.
+]]
+local function c4_resource_override(user_id: number): any?
+    if not c4_resource_override_provider then
+        return nil
+    end
+
+    local ok, override = pcall(
+        c4_resource_override_provider,
+        user_id
+    )
+
+    if not ok
+        or type(override) ~= "table"
+        or override.Active ~= true
+        or type(override.MaxHealth) ~= "number"
+        or type(override.MaxMana) ~= "number"
+        or type(override.MaxCP) ~= "number"
+    then
+        return nil
+    end
+
+    return override
+end
+
+--[[
 Returns the coordinated C4 resource cutover boundary for the real owner.
 
 This is intentionally fail-closed. It exposes exact source base HP/MP/CP but
@@ -891,6 +948,12 @@ Returns the authoritative runtime Max Mana derived from Intellect and Spirit.
 function ProgressionRuntimeState.get_max_mana(
     user_id: number
 ): number
+    local override = c4_resource_override(user_id)
+
+    if override then
+        return math.max(0, override.MaxMana)
+    end
+
     return AttributeConfig.max_mana(
         ProgressionRuntimeState.get_attribute(user_id, "Intellect"),
         ProgressionRuntimeState.get_attribute(user_id, "Spirit")
@@ -903,6 +966,11 @@ Returns the authoritative runtime Mana regeneration derived from Spirit.
 function ProgressionRuntimeState.get_mana_regen_per_second(
     user_id: number
 ): number
+    if c4_resource_override(user_id) then
+        -- Source mode regenerates on the original three-second task.
+        return 0
+    end
+
     local base_regen = AttributeConfig.mana_regen_per_second(
         ProgressionRuntimeState.get_attribute(user_id, "Spirit")
     )
@@ -1103,6 +1171,12 @@ Returns:
     number: Authoritative MaxHealth, never lower than one.
 ]]
 function ProgressionRuntimeState.get_max_health(user_id: number): number
+    local override = c4_resource_override(user_id)
+
+    if override then
+        return math.max(1, override.MaxHealth)
+    end
+
     local base_health = CharacterCombatStats.max_health(
         attributes_for(user_id),
         ProgressionRuntimeState.get_race_id(user_id)
