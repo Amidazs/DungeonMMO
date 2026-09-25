@@ -78,6 +78,8 @@ Returns:
     nil: Prints bounded DamageService adapter evidence.
 ]]
 local function main()
+    local previous_adapter =
+        DamageService.get_source_damage_adapter_for_test()
     local target = target_fixture()
     local humanoid = assert(
         target:FindFirstChildOfClass("Humanoid")
@@ -124,7 +126,9 @@ local function main()
         "unhandled adapter result preserves current DamageService path"
     )
 
-    DamageService.set_source_damage_adapter(nil)
+    DamageService.set_source_damage_adapter(
+        previous_adapter
+    )
     target:Destroy()
 
     print((
