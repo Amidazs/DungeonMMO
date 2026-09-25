@@ -263,6 +263,89 @@ local function main()
         "Equal magic/target level source resistance threshold")
     check(Formula.magic_resist_threshold(31, 30) == 130,
         "One level higher target uses x1.3 source threshold")
+    check(
+        not Formula.magic_failures_default_enabled(),
+        "Pinned source MagicFailures configuration defaults off"
+    )
+
+    local equal_magic_roll = Formula.resolve_magic_success(
+        30,
+        30,
+        100
+    )
+    check(
+        not equal_magic_roll.Success,
+        "Magic success roll equal to resistance threshold fails"
+    )
+
+    local above_magic_roll = Formula.resolve_magic_success(
+        30,
+        30,
+        101
+    )
+    check(
+        above_magic_roll.Success,
+        "Magic success roll above resistance threshold succeeds"
+    )
+
+    local half_failure = Formula.resolve_magic_failure(
+        30,
+        30,
+        30,
+        100,
+        101
+    )
+    check(
+        half_failure.Failure == "Half",
+        "Second successful source roll can produce half damage"
+    )
+
+    local resisted_failure = Formula.resolve_magic_failure(
+        30,
+        30,
+        30,
+        100,
+        100
+    )
+    check(
+        resisted_failure.Failure == "Resisted",
+        "Two failed source magic rolls fully resist"
+    )
+
+    local high_level_resist = Formula.resolve_magic_failure(
+        30,
+        40,
+        30,
+        100,
+        9999
+    )
+    check(
+        high_level_resist.Failure == "Resisted",
+        "Target ten levels higher cannot downgrade to half damage"
+    )
+
+    check(
+        Formula.magic_critical_rate_per_thousand(650) == 300,
+        "Source magical critical rate obeys the 30 percent cap"
+    )
+
+    local magic_critical = Formula.resolve_magic_critical(
+        8,
+        7
+    )
+    check(
+        magic_critical.Critical,
+        "Source magical critical roll below rate succeeds"
+    )
+
+    local equal_magic_critical = Formula.resolve_magic_critical(
+        8,
+        8
+    )
+    check(
+        not equal_magic_critical.Critical,
+        "Source magical critical roll equal to rate does not crit"
+    )
 
     print(("[C4 Combat Formula] SOURCE_FORMULA_PASS: %d assertions, "
         .. "live=false"):format(checks))
