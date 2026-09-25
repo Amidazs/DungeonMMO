@@ -35,6 +35,7 @@ local executor_state = {
     TargetReason = nil,
     Landed = true,
     LastSequence = nil,
+    LastRange = nil,
 }
 
 local FakeScheduler = {}
@@ -75,6 +76,8 @@ function FakeScheduler:begin_cast(
         SourceSkillId =
             scheduler_state.SourceSkillOverride or 1168,
         SourceRank = 3,
+        SourceCastRange = 600,
+        SourceEffectRange = 1100,
         StartedAt = now,
         InterruptAt = now + 2,
         LaunchAt = now + 4,
@@ -144,6 +147,8 @@ function FakeScheduler:launch_if_ready(
             scheduler_state.LaunchRankOverride or 2,
         SourceSkillId = 1168,
         SourceRank = 3,
+        SourceCastRange = 600,
+        SourceEffectRange = 1100,
         ReadyForSourceEffectExecution = true,
         InitialMpSpent = 6,
         LaunchMpSpent = 21,
@@ -179,9 +184,11 @@ Returns:
 ]]
 function FakeExecutor:can_status_skill_npc(
     subject: any,
-    target: any
+    target: any,
+    source_range: number?
 ): (boolean, string?)
     executor_state.PreflightCalls += 1
+    executor_state.LastRange = source_range
 
     if subject ~= player or target ~= enemy then
         return false, "InvalidC4LiveNpcTarget"
@@ -277,6 +284,7 @@ local function reset_fakes()
     executor_state.TargetReason = nil
     executor_state.Landed = true
     executor_state.LastSequence = nil
+    executor_state.LastRange = nil
 end
 
 --[[
@@ -359,6 +367,7 @@ local function check_start_identity()
             and started.SourceRank == 3
             and started.TargetBoundServerSide
             and executor_state.PreflightCalls == 1
+            and executor_state.LastRange == 600
             and scheduler_state.BeginCalls == 1,
         "Venom Hex binds exact source Poison rank before launch"
     )
@@ -414,6 +423,7 @@ local function check_landed_launch()
             and resolved.ShotConsumedBySourceCalculation
             and executor_state.StatusCalls == 1
             and executor_state.LastSequence == 951
+            and executor_state.LastRange == 1100
             and not bridge:snapshot(player).Pending,
         "ready Venom Hex resolves one source poison application"
     )
@@ -614,6 +624,8 @@ local function main()
             and capability.ReviewedSkill == "EmberweaverVenomHex"
             and capability.ReviewedSourceSkillId == 1168
             and capability.TargetBoundAtCastStart
+            and capability.SourceCastRangeAtStart
+            and capability.SourceEffectRangeAtLaunch
             and capability.TargetRevalidatedBeforeLaunchMp
             and capability.LaunchMpCommittedBeforeStatusResolution
             and capability.ShotConsumptionDelegatedToSourceCalculation
