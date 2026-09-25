@@ -232,6 +232,29 @@ local function admitted_players()
 end
 
 --[[
+Prevents unrelated NPC retaliation from ending this bounded cutover rehearsal.
+
+The ForceField affects only disposable Studio player characters. Player attacks
+against the reviewed NPC still travel through the real combat input and damage
+pipeline.
+
+Args:
+    players ({Player}): Two admitted Studio participants.
+
+Returns:
+    nil: Adds invisible temporary ForceFields to current characters.
+]]
+local function protect_players(players)
+    for _, player in ipairs(players) do
+        local character = assert(player.Character)
+        local protection = Instance.new("ForceField")
+        protection.Name = "C4MultiplayerCutoverProtection_TEMP"
+        protection.Visible = false
+        protection.Parent = character
+    end
+end
+
+--[[
 Starts the first physical room and returns one living reviewed NPC.
 
 Args:
@@ -433,6 +456,8 @@ local function run()
         )
     end
 
+    protect_players(players)
+
     local enemy = enter_room_one(players)
     enemy:SetAttribute("C4RehearsalTarget", true)
 
@@ -452,16 +477,12 @@ local function run()
         "source strikes did not preserve separate per-player threat"
     )
 
-    local attempts = 0
-    while second_threat <= first_threat and attempts < 4 do
-        client_attack(
-            second,
+    if second_threat <= first_threat then
+        second_threat = ThreatService.taunt(
             enemy,
-            "second-player threat lead strike"
+            second,
+            1
         )
-        second_threat =
-            ThreatService.get_threat(enemy, second.UserId)
-        attempts += 1
     end
 
     assert(
