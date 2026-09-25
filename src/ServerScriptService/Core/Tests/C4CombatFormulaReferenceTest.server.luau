@@ -202,6 +202,29 @@ local function main()
         "Source critical roll equal to rate does not crit"
     )
 
+    local skill_critical =
+        Formula.resolve_physical_skill_critical(
+            5,
+            1.2,
+            59
+        )
+    check(
+        skill_critical.Critical
+            and skill_critical.ChancePerThousand == 60,
+        "PDAM critical uses base rate x10 x STR bonus without normal cap"
+    )
+
+    local equal_skill_critical =
+        Formula.resolve_physical_skill_critical(
+            5,
+            1.2,
+            60
+        )
+    check(
+        not equal_skill_critical.Critical,
+        "PDAM critical roll equal to calculated rate does not crit"
+    )
+
     check_close(
         Formula.shield_block_rate(20, 1.1, false),
         22,
