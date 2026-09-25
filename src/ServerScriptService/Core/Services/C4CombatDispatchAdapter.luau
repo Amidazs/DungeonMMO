@@ -2,10 +2,14 @@
 -- Disabled source-combat dispatch bridge for existing server damage contexts.
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Runtime = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
+)
+local DamageFamilies = require(
+    ReplicatedStorage.Core.Shared.C4CombatDamageFamilyReference
 )
 
 local C4CombatDispatchAdapter = {}
@@ -18,6 +22,10 @@ local skill_rank_provider: any = function(
     skill_id: string
 ): number
     return Runtime.get_skill_rank(user_id, skill_id)
+end
+
+local activation_audit_provider: any = function(): boolean
+    return DamageFamilies.activation_ready()
 end
 
 --[[
@@ -181,6 +189,31 @@ function C4CombatDispatchAdapter.set_skill_rank_provider_for_test(
 end
 
 --[[
+Overrides activation-audit readiness for isolated adapter tests.
+
+Production uses the immutable damage-family audit. This hook exists only so
+route behaviour can be exercised while known activation blockers remain.
+
+Args:
+    provider (any?): Zero-argument boolean provider, or nil for production.
+
+Returns:
+    nil: Changes only the server-local test readiness provider.
+]]
+function C4CombatDispatchAdapter.set_activation_audit_provider_for_test(
+    provider: any?
+)
+    assert(
+        provider == nil or type(provider) == "function",
+        "C4 dispatch audit provider must be a function or nil"
+    )
+
+    activation_audit_provider = provider or function(): boolean
+        return DamageFamilies.activation_ready()
+    end
+end
+
+--[[
 Reports whether existing damage contexts may route through source combat.
 
 Args:
@@ -221,6 +254,9 @@ function C4CombatDispatchAdapter.set_enabled(
     end
     if not bound_executor:is_enabled() then
         return false, "C4LiveCombatExecutorDisabled"
+    end
+    if activation_audit_provider() ~= true then
+        return false, "C4CombatDispatchAuditBlockingFamilies"
     end
 
     feature_enabled = true
@@ -324,7 +360,21 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         return denied("InvalidC4CombatDamageContext")
     end
 
-    if source_kind == "Melee" then
+    local family = DamageFamilies.get(source_kind)
+    if not family then
+        return denied("C4SourceDamageFamilyUnaudited")
+    end
+    if family.PlayerToNpc ~= true then
+        return denied("C4SourceDamageFamilyNotPlayerToNpc")
+    end
+    if family.ActivationBlocker == true then
+        return denied(
+            family.Reason
+                or "C4SourceDamageFamilyActivationBlocked"
+        )
+    end
+
+    if family.Route == "SourceNormal" then
         local result, reason =
             bound_executor:normal_attack_npc(
                 attacker,
@@ -334,7 +384,7 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         return handled_result(result, reason)
     end
 
-    if source_kind == "RangedPhysical" then
+    if family.Route == "SourcePhysicalByRank" then
         local rank = skill_rank(user_id, source_id)
         if not rank then
             local result, reason =
@@ -357,7 +407,7 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         return handled_result(result, reason)
     end
 
-    if source_kind == "Skill" then
+    if family.Route == "SourcePDAM" then
         local rank = skill_rank(user_id, source_id)
         if not rank then
             return denied("C4SourceSkillRankUnavailable")
@@ -374,7 +424,7 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         return handled_result(result, reason)
     end
 
-    if source_kind == "MagicSkill" then
+    if family.Route == "SourceMDAM" then
         local rank = skill_rank(user_id, source_id)
         if not rank then
             return denied("C4SourceSkillRankUnavailable")
@@ -391,7 +441,7 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         return handled_result(result, reason)
     end
 
-    return denied("C4SourceDamageKindUnsupported")
+    return denied("C4SourceDamageFamilyRouteUnavailable")
 end
 
 --[[
@@ -412,10 +462,17 @@ function C4CombatDispatchAdapter.capability(): any
         ExistingDamageContextInput = true,
         DisabledFallsBackToCurrentCombat = true,
         EnabledSourceFailureFallsClosed = true,
+        ActivationAuditReady =
+            DamageFamilies.activation_ready(),
+        ActivationBlockers =
+            DamageFamilies.activation_blockers(),
         NormalMeleeSupported = true,
         RangedPhysicalSupported = true,
         PhysicalSkillSupported = true,
         MagicSkillSupported = true,
+        RangerAreaActivationBlocked = true,
+        MagicBasicActivationBlocked = true,
+        PeriodicStatusActivationBlocked = true,
         NpcOnly = true,
         ClientDamageAuthority = false,
     }
