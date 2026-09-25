@@ -66,6 +66,52 @@ check(
 )
 
 ManaService.reset_player(subject)
+check(
+    ManaService.try_spend(subject, 48)
+        and ManaService.get(subject) == 52,
+    "split-MP affordability fixture must reach 52 Mana"
+)
+check(
+    ManaService.try_begin_split_spend(
+        subject,
+        11,
+        42
+    ) == false
+        and ManaService.get(subject) == 52,
+    "C4 split cast must require initial plus completion MP"
+)
+
+ManaService.reset_player(subject)
+check(
+    ManaService.try_begin_split_spend(
+        subject,
+        11,
+        42
+    ) == true
+        and ManaService.get(subject) == 89,
+    "C4 split cast must spend only initial MP at cast start"
+)
+check(
+    ManaService.finish_split_spend(
+        subject,
+        42
+    ) == 42
+        and ManaService.get(subject) == 47,
+    "C4 split cast must spend ongoing MP only at launch"
+)
+
+ManaService.reset_player(subject)
+check(
+    ManaService.try_begin_split_spend(
+        subject,
+        11,
+        42
+    ) == true
+        and ManaService.get(subject) == 89,
+    "interrupted C4 cast fixture must spend its initial MP"
+)
+
+ManaService.reset_player(subject)
 
 check(
     ManaService.get(subject) == 100,
