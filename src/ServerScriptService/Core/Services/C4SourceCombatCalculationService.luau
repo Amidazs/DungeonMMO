@@ -408,6 +408,114 @@ function C4SourceCombatCalculationService.normal_attack_critical(
 end
 
 --[[
+Resolves C4 shield block and perfect-shield rolls from source-ready players.
+
+Facing eligibility is a semantic world-state input, not a source stat. This
+module lives in ServerScriptService, so only trusted server code may provide
+it. The later live combat executor must derive this boolean from authoritative
+attacker/defender world transforms; clients must never send it.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_user_id (number): Authenticated source-ready defender.
+    facing_eligible (boolean): Server-owned source shield-angle result.
+
+Returns:
+    (any?, string?): Source shield result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.shield_resolution(
+    attacker_user_id: number,
+    defender_user_id: number,
+    facing_eligible: boolean
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    if type(facing_eligible) ~= "boolean" then
+        return nil, "InvalidShieldFacingEligibility"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, defender_reason =
+        source_boundary(defender_user_id)
+    if not defender then
+        return nil, defender_reason
+    end
+
+    local stats = defender.SourceStatCandidate
+    local shield_rate = stats.SHIELD_DEFENCE_RATE
+    local shield_power = stats.SHIELD_DEFENCE_POWER
+
+    if shield_rate == nil and shield_power == nil then
+        return {
+            Kind = "ShieldResolution",
+            ShieldEquipped = false,
+            Blocked = false,
+            PerfectShield = false,
+            FacingEligible = facing_eligible,
+            SourceOnly = true,
+            LiveApplied = false,
+        }, nil
+    end
+
+    if type(shield_rate) ~= "number"
+        or shield_rate < 0
+        or type(shield_power) ~= "number"
+        or shield_power < 0
+        or type(defender.SourceDexBonus) ~= "number"
+        or defender.SourceDexBonus <= 0
+    then
+        return nil, "OriginalShieldSourceStatsUnavailable"
+    end
+
+    local attacker_is_bow =
+        type(attacker.ReviewedSourceKinds) == "table"
+        and attacker.ReviewedSourceKinds.Weapon == "Bow"
+    local block_roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local block = Formula.resolve_shield_block(
+        shield_rate,
+        defender.SourceDexBonus,
+        attacker_is_bow,
+        facing_eligible,
+        block_roll
+    )
+
+    local perfect = nil
+    if block.Blocked then
+        perfect = Formula.resolve_perfect_shield(
+            COMBAT_RANDOM:NextInteger(0, 99)
+        )
+    end
+
+    return {
+        Kind = "ShieldResolution",
+        ShieldEquipped = true,
+        ShieldDefenceRate = shield_rate,
+        ShieldDefencePower = shield_power,
+        SourceDexBonus = defender.SourceDexBonus,
+        AttackerIsBow = attacker_is_bow,
+        BowRateMultiplierApplied = attacker_is_bow,
+        ShieldAngleDegrees = 120,
+        FacingEligible = facing_eligible,
+        EffectiveRate = block.EffectiveRate,
+        BlockRoll = block.Roll,
+        Blocked = block.Blocked,
+        PerfectRoll = if perfect then perfect.Roll else nil,
+        PerfectShield = if perfect
+            then perfect.PerfectShield
+            else false,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one source C4 physical random-damage variance roll.
 
 This reusable source-only path supports both reviewed weapons and the original
@@ -695,6 +803,9 @@ function C4SourceCombatCalculationService.capability(): any
         CriticalResolutionIntegrated = false,
         PhysicalSkillCriticalIntegrated = false,
         MagicCriticalIntegrated = false,
+        ShieldSourceResolutionAvailable = true,
+        ShieldRollServerOwned = true,
+        ShieldFacingRuntimeIntegrated = false,
         ShieldResolutionIntegrated = false,
         MagicFailureResolutionIntegrated = false,
         ElementalResolutionIntegrated = false,
