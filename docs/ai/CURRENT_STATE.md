@@ -1,3 +1,18 @@
+## 25 September 2026 — CURRENT v2.86 C4 periodic-status source GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_86_C4_Periodic_Status_Source_20260925.md)
+and [green evidence](
+../testing/c4-periodic-status-source-v2-86-20260925.md).
+Exact C4 Bleed and Poison periodic plans, effect-success arithmetic and
+nonlethal tick semantics are now pinned. Player and NPC source boundaries carry
+CON/MEN save bonuses plus Bleed/Poison vulnerability bases. Fresh Studio Base
+**21/21 PASS**, Dungeon **24/24 PASS**, status source **14 assertions PASS**.
+StatusPhysical and StatusMagic remain activation blockers until the DEBUFF cast
+and live NPC scheduler consume these rules. Next: source DEBUFF execution and
+server-owned nonlethal status scheduling. No main merge, publish, production
+save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.85 MagicBasic source-normal routing GREEN
 
 [Latest roadmap](
