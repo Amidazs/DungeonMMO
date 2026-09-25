@@ -216,7 +216,7 @@ local function valid_loadout(loadout: any): boolean
     end
 
     local slot_kinds = {
-        Body = {Heavy = true, Light = true, Robe = true},
+        Body = {Heavy = true, Light = true, Magic = true},
         OffHand = {Shield = true},
         Head = {Helmet = true},
         Gloves = {Gloves = true},
@@ -231,7 +231,7 @@ local function valid_loadout(loadout: any): boolean
         if slot == "Weapon" then
             if kind == "Heavy"
                 or kind == "Light"
-                or kind == "Robe"
+                or kind == "Magic"
                 or kind == "Shield"
                 or kind == "Helmet"
                 or kind == "Gloves"
