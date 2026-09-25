@@ -45,6 +45,9 @@ local C4AuthenticatedSkillSourcePreview = require(
 local C4ResourceMigrationBoundary = require(
     Shared:WaitForChild("C4ResourceMigrationBoundary")
 )
+local C4ActiveSourceEffectResolver = require(
+    Shared:WaitForChild("C4ActiveSourceEffectResolver")
+)
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
@@ -1086,6 +1089,39 @@ function ProgressionRuntimeState.get_health_recovery_per_second(
 ): number
     return PassiveSkillEffects.ironvow_health_recovery(
         state_for(user_id)
+    )
+end
+
+--[[
+Resolves one server-owned active creative rank to its reviewed C4 source rank.
+
+This deliberately keeps the private character snapshot private. Combat
+services can ask for a source effect only after their normal server activation
+checks have selected a creative skill and rank.
+
+Args:
+    user_id (number): Authoritative runtime character owner.
+    creative_skill_id (string): Server-selected creative skill ID.
+    creative_rank (number): Server-selected creative purchased rank.
+
+Returns:
+    (any?, string?): Reviewed ACTIVE/TOGGLE source rank or denial reason.
+]]
+function ProgressionRuntimeState.resolve_c4_active_source_effect(
+    user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local character = states[user_id]
+
+    if not character then
+        return nil, "OriginalCharacterIdentityNotVerified"
+    end
+
+    return C4ActiveSourceEffectResolver.resolve(
+        character,
+        creative_skill_id,
+        creative_rank
     )
 end
 
