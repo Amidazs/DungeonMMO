@@ -200,9 +200,7 @@ local function check_unified_effect_snapshot()
             Body = 352,
             Gloves = 63,
         },
-        {
-            {SkillId = 216, Rank = 5},
-        },
+        {},
         {
             {SkillId = 121, Rank = 1},
             {SkillId = 256, Rank = 1},
