@@ -5,6 +5,9 @@ local Shared = script.Parent
 local Primary = require(Shared.C4PrimaryStatReference)
 local Derived = require(Shared.C4DerivedStatReference)
 local Passives = require(Shared.C4PassiveStatReference)
+local CombinedEffects = require(
+    Shared.C4CombinedStatEffectReference
+)
 local Tree = require(Shared.C4Level30SkillTreeSource)
 local Items = require(Shared.C4SourceItemReference)
 local Gear = require(Shared.C4EquippedStatReference)
@@ -193,6 +196,104 @@ function C4UnifiedStatReference.get_with_source_items(
         CurrentSixSlotPaperdollIntegrated = true,
         FullOriginalPaperdollIntegrated = false,
         EnchantmentsIntegrated = false, ActiveBuffsIntegrated = false,
+        LiveCombatIntegrated = false,
+        ExactFinalC4StatsCertified = false,
+    }, nil
+end
+
+--[[
+Builds a source stat snapshot with owned passives and active effects merged.
+
+Passive and active/toggle modifiers share one C4 calculator queue, so every
+0x30 function executes before every 0x40 function regardless of origin.
+The active-rank list must describe effects that are actually active; this
+function does not infer active state from learned skills.
+
+Args:
+    race_id (string): Original Human or Elf race.
+    class_id (string): Current original starter or first-transfer class.
+    level (number): Supported historical class level through 30.
+    item_ids (any): Reviewed six-slot source item IDs.
+    passive_ranks (any): Actually owned historical passive ranks.
+    active_ranks (any): Actually active historical ACTIVE/TOGGLE ranks.
+
+Returns:
+    (any?, string?): Ordered source stat snapshot or strict rejection reason.
+]]
+function C4UnifiedStatReference.get_with_source_effects(
+    race_id: string,
+    class_id: string,
+    level: number,
+    item_ids: any,
+    passive_ranks: any,
+    active_ranks: any
+): (any?, string?)
+    if type(passive_ranks) ~= "table"
+        or type(active_ranks) ~= "table"
+    then
+        return nil, "UnreviewedClassOrSourceRanks"
+    end
+
+    local resolved, item_reason = Items.resolve(item_ids)
+    if not resolved then
+        return nil, item_reason
+    end
+
+    local reference = Primary.get(race_id, class_id)
+    if not reference then
+        return nil, "UnreviewedClassOrSourceRanks"
+    end
+
+    local naked, naked_reason = Derived.get_naked_combat(
+        race_id,
+        class_id,
+        level,
+        resolved.Items.Weapon ~= nil
+    )
+    if not naked then
+        return nil, naked_reason
+    end
+
+    for _, rank_id in ipairs(passive_ranks) do
+        if not is_learnable(reference.ScopeId, rank_id, level) then
+            return nil, "OriginalPassiveNotLearnableByClassOrLevel"
+        end
+    end
+
+    local staged = Gear.stage(
+        source_stats(naked),
+        naked,
+        resolved,
+        class_id == "Mage"
+    )
+    local combined, combined_reason = CombinedEffects.apply(
+        staged.Stats,
+        resolved.Kinds,
+        passive_ranks,
+        active_ranks
+    )
+    if not combined then
+        return nil, combined_reason
+    end
+
+    local values = table.clone(combined.Stats)
+    values.MAX_MP += staged.DeferredMaxMp
+
+    return {
+        ScopeId = reference.ScopeId,
+        Level = level,
+        SourceItemIds = table.clone(item_ids),
+        SourceKinds = resolved.Kinds,
+        SourceCommit = resolved.SourceCommit,
+        Naked = naked,
+        EquippedStats = values,
+        AppliedSourceModifiers = combined.AppliedModifiers,
+        SelectedActiveEffects = combined.SelectedActiveEffects,
+        CurrentSixSlotPaperdollIntegrated = true,
+        ActiveEffectOrderingIntegrated = true,
+        ActiveEffectStateAuthoritative = false,
+        FullOriginalPaperdollIntegrated = false,
+        EnchantmentsIntegrated = false,
         LiveCombatIntegrated = false,
         ExactFinalC4StatsCertified = false,
     }, nil
