@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.89 atomic C4 combat cutover GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_89_C4_Atomic_Combat_Cutover_20260925.md)
+and [green evidence](
+../testing/c4-atomic-combat-cutover-v2-89-20260925.md).
+A server-only transactional cutover coordinator now sequences resource
+authority, explicit player opt-in, source calculation, live executor and
+DamageService dispatch as one reversible operation. Any participant or later
+gate failure rolls all earlier changes back. Fresh Studio Base **22/22 PASS**,
+Dungeon **25/25 PASS**, cutover coordinator **7 assertions PASS**. Normal
+bootstrap still leaves every source/live gate OFF. Next: a genuine unpublished
+Dungeon rehearsal using the real runtime coordinator and real Studio players,
+followed by rollback verification. No main merge, publish, production saves or
+animation edits.
+
 ## 25 September 2026 — CURRENT v2.88 level-30 source dispatch audit GREEN
 
 [Latest roadmap](
