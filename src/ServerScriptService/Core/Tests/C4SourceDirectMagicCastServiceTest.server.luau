@@ -617,35 +617,6 @@ local function check_owner_cleanup()
 end
 
 --[[
-Runs the direct Human Wizard MDAM bridge acceptance.
-
-Args:
-    None.
-
-Returns:
-    nil: Prints bounded test evidence for later Studio validation.
-]]
-local function main()
-    local bridge = service()
-    local capability = bridge:capability()
-
-    check(
-        capability.Available
-            and capability.DefaultEnabled == false
-            and not capability.CurrentlyEnabled
-            and capability.ReviewedDirectMdamOnly
-            and capability.ReviewedSkillCount == 3
-            and #capability.ReviewedSkills == 3
-            and capability.TargetBoundAtCastStart
-            and capability.TargetRevalidatedBeforeLaunchMp
-            and capability.LaunchMpCommittedBeforeEffectExecution
-            and capability.ShotConsumptionDelegatedToSourceCalculation
-            and not capability.ClientTargetAuthority
-            and not capability.ClientDamageAuthority,
-        "capability keeps first direct-MDAM bridge narrow and server-only"
-    )
-
---[[
 Checks all pure single-target Human Wizard MDAM families enter the bridge.
 
 Args:
@@ -716,6 +687,35 @@ local function check_reviewed_source_mismatch()
         "reviewed creative skill cannot drift to another source skill"
     )
 end
+
+--[[
+Runs the direct Human Wizard MDAM bridge acceptance.
+
+Args:
+    None.
+
+Returns:
+    nil: Prints bounded test evidence for later Studio validation.
+]]
+local function main()
+    local bridge = service()
+    local capability = bridge:capability()
+
+    check(
+        capability.Available
+            and capability.DefaultEnabled == false
+            and not capability.CurrentlyEnabled
+            and capability.ReviewedDirectMdamOnly
+            and capability.ReviewedSkillCount == 3
+            and #capability.ReviewedSkills == 3
+            and capability.TargetBoundAtCastStart
+            and capability.TargetRevalidatedBeforeLaunchMp
+            and capability.LaunchMpCommittedBeforeEffectExecution
+            and capability.ShotConsumptionDelegatedToSourceCalculation
+            and not capability.ClientTargetAuthority
+            and not capability.ClientDamageAuthority,
+        "capability keeps reviewed direct-MDAM bridge server-only"
+    )
 
     check_gate_and_allowlist()
     check_reviewed_direct_families()
