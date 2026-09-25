@@ -758,6 +758,66 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    kinetic_charge = table.freeze({
+        Id = "kinetic_charge",
+        Name = "Kinetic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Basic",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
+    mystic_charge = table.freeze({
+        Id = "mystic_charge",
+        Name = "Mystic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Basic",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
+    blessed_mystic_charge = table.freeze({
+        Id = "blessed_mystic_charge",
+        Name = "Blessed Mystic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Uncommon",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
+    d_grade_kinetic_charge = table.freeze({
+        Id = "d_grade_kinetic_charge",
+        Name = "D-Grade Kinetic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Basic",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
+    d_grade_mystic_charge = table.freeze({
+        Id = "d_grade_mystic_charge",
+        Name = "D-Grade Mystic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Basic",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
+    d_grade_blessed_mystic_charge = table.freeze({
+        Id = "d_grade_blessed_mystic_charge",
+        Name = "D-Grade Blessed Mystic Charge",
+        Kind = "Consumable",
+        InventoryCategory = "Consumables",
+        Rarity = "Uncommon",
+        Stackable = true,
+        Tradeable = true,
+    }),
+
     skill_book_test = table.freeze({
         Id = "skill_book_test",
         Name = "Unidentified Skill Book",
