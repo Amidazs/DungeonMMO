@@ -659,6 +659,8 @@ local function check_reviewed_direct_families()
                 and started.CreativeRank == plan.CreativeRank
                 and started.SourceSkillId == plan.SourceSkillId
                 and started.SourceRank == plan.SourceRank
+                and started.SourceCastRange == plan.CastRange
+                and started.SourceEffectRange == plan.EffectRange
                 and executor_state.LastRange == plan.CastRange,
             skill_id .. " enters the reviewed direct-MDAM bridge"
         )
