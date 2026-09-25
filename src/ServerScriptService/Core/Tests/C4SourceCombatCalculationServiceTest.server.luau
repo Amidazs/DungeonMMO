@@ -21,6 +21,57 @@ local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local checks = 0
 
+local shot_state = {
+    Soulshot = false,
+    Spiritshot = false,
+    BlessedSpiritshot = false,
+}
+
+local ShotAuthority = {}
+
+--[[
+Consumes the disposable physical shot state for provider integration tests.
+
+Args:
+    user_id (number): Ignored authenticated fixture owner.
+
+Returns:
+    any: One-use Soulshot state.
+]]
+function ShotAuthority:consume_physical(user_id: number): any
+    local charged = shot_state.Soulshot
+    shot_state.Soulshot = false
+    return {
+        Soulshot = charged,
+    }
+end
+
+--[[
+Consumes the disposable magical shot state with Blessed priority.
+
+Args:
+    user_id (number): Ignored authenticated fixture owner.
+
+Returns:
+    any: One-use Spiritshot/Blessed Spiritshot state.
+]]
+function ShotAuthority:consume_magic(user_id: number): any
+    if shot_state.BlessedSpiritshot then
+        shot_state.BlessedSpiritshot = false
+        return {
+            Spiritshot = false,
+            BlessedSpiritshot = true,
+        }
+    end
+
+    local charged = shot_state.Spiritshot
+    shot_state.Spiritshot = false
+    return {
+        Spiritshot = charged,
+        BlessedSpiritshot = false,
+    }
+end
+
 --[[
 Returns an empty authoritative active-effect snapshot for test owners.
 
@@ -52,6 +103,7 @@ end
 Runtime.set_c4_active_effect_snapshot_provider(
     empty_active_snapshot
 )
+Combat.set_shot_authority(ShotAuthority)
 
 --[[
 Counts one source-combat provider assertion.
@@ -215,6 +267,11 @@ local function check_default_off()
             and not capability.MagicFailuresSourceDefaultEnabled
             and capability.ElementalResolutionIntegrated
             and capability.ElementalPlayerTargetSourceStatsIntegrated
+            and capability.ShotsIntegrated
+            and capability.ShotAuthorityInstalled
+            and capability.PhysicalSoulshotIntegrated
+            and capability.MagicSpiritshotIntegrated
+            and capability.HealSpiritshotIntegrated
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -475,6 +532,7 @@ local function check_physical()
         Runtime.get_c4_resource_migration_boundary(TARGET_ID)
     )
 
+    shot_state.Soulshot = true
     local result = assert(Combat.physical_skill(
         FIGHTER_ID,
         TARGET_ID,
@@ -485,6 +543,7 @@ local function check_physical()
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = 25,
+        Soulshot = result.Soulshot,
         RandomDamageMultiplier = result.RandomDamageMultiplier,
     })
 
@@ -498,6 +557,7 @@ local function check_physical()
             and result.SourceRank == 1
             and result.SourceSkillPower == 25
             and result.Kind == "PhysicalDamage"
+            and result.Soulshot
             and result.RandomDamage == 10
             and result.RandomDamageRoll >= -10
             and result.RandomDamageRoll <= 10
@@ -525,6 +585,7 @@ local function check_magic()
         Runtime.get_c4_resource_migration_boundary(TARGET_ID)
     )
 
+    shot_state.BlessedSpiritshot = true
     local result = assert(Combat.magic_skill(
         MAGE_ID,
         TARGET_ID,
@@ -535,6 +596,8 @@ local function check_magic()
         MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
         MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
         SkillPower = 12,
+        Spiritshot = result.Spiritshot,
+        BlessedSpiritshot = result.BlessedSpiritshot,
         Failure = result.MagicFailure,
         MagicCritical = result.MagicCritical,
         ElementalMultiplier = result.ElementalMultiplier,
@@ -570,7 +633,9 @@ local function check_magic()
     check(
         defender.SourceStatCandidate.WIND_VULN == 1
             and result.SourceElement == "WIND"
-            and result.ElementalMultiplier == 1,
+            and result.ElementalMultiplier == 1
+            and result.BlessedSpiritshot
+            and not result.Spiritshot,
         "Wind Strike uses authenticated target WIND vulnerability"
     )
     check(
@@ -593,19 +658,26 @@ Returns:
     nil: Confirms Self Heal rank-one source amount.
 ]]
 local function check_heal()
+    shot_state.Spiritshot = true
     local result = assert(Combat.heal_skill(
         MAGE_ID,
         "MageHeal",
         1
     ))
 
+    check_close(
+        result.Amount,
+        42 * 1.3,
+        "source Self Heal applies ordinary Spiritshot x1.3"
+    )
     check(
-        result.Amount == 42
+        result.Spiritshot
+            and not result.BlessedSpiritshot
             and result.SourceSkillId == 1216
             and result.SourceRank == 1
             and result.SourceHealPower == 42
             and result.Kind == "Heal",
-        "source Self Heal applies direct reviewed power 42"
+        "source heal consumes authenticated one-use magical charge"
     )
 end
 
@@ -667,6 +739,7 @@ local function main()
     check_heal()
     check_denials()
     Combat.set_enabled(false)
+    Combat.set_shot_authority(nil)
 
     Runtime.clear_character(FIGHTER_ID)
     Runtime.clear_character(MAGE_ID)
@@ -676,7 +749,7 @@ local function main()
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
         .. "hit=true critical=true variance=true shield=true "
-        .. "magiccrit=true magicfailure=true element=true "
+        .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
