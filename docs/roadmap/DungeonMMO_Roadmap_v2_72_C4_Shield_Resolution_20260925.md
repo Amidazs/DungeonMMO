@@ -118,8 +118,17 @@ Disposable artifacts:
 - `%TEMP%\DungeonMMO_v272_Base.rbxl`;
 - `%TEMP%\DungeonMMO_v272_Dungeon.rbxl`.
 
-Focused Studio execution on the final v2.72 candidate is still required before
-this milestone is called GREEN.
+Fresh focused Studio acceptance is GREEN on the source/test candidate:
+
+- Base: **14/14 PASS**;
+- Dungeon: **16/16 PASS**;
+- formula: **37 assertions PASS**;
+- source combat: **21 assertions PASS**;
+- Dungeon resource cutover: **7 assertions PASS**.
+
+Source-combat marker:
+
+`hit=true critical=true variance=true shield=true pdam=true mdam=true heal=true live=false`.
 
 ## Next backend implementation
 
