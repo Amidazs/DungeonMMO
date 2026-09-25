@@ -23,6 +23,14 @@ local C4SourceCombatCalculationService = {}
 
 local COMBAT_RANDOM = Random.new()
 
+local WEAPON_VULNERABILITY_STATS = table.freeze({
+    Bow = "BOW_WPN_VULN",
+    Blunt = "BLUNT_WPN_VULN",
+    Dagger = "DAGGER_WPN_VULN",
+    Polearm = "POLE_WPN_VULN",
+    Sword = "SWORD_WPN_VULN",
+})
+
 local feature_enabled = false
 local shot_authority = nil
 
@@ -152,6 +160,120 @@ local function critical_power_inputs(
     return multiplier, additive, nil
 end
 
+
+--[[
+Reads one finite nonnegative source multiplier from a certified boundary.
+
+Args:
+    boundary (any): Authenticated source-ready migration boundary.
+    stat_name (string): Exact C4 stat key.
+    missing_reason (string): Stable denial reason when unavailable.
+
+Returns:
+    (number?, string?): Source multiplier or strict denial reason.
+]]
+local function source_multiplier(
+    boundary: any,
+    stat_name: string,
+    missing_reason: string
+): (number?, string?)
+    local value = boundary.SourceStatCandidate[stat_name]
+
+    if type(value) ~= "number"
+        or value ~= value
+        or value < 0
+        or value >= math.huge
+    then
+        return nil, missing_reason
+    end
+
+    return value, nil
+end
+
+--[[
+Resolves C4 weapon vulnerability against one source-ready player target.
+
+The source selects a vulnerability stat from the attacker's active weapon
+type. Unarmed attacks have no weapon-specific vulnerability multiplier.
+
+Args:
+    attacker (any): Authenticated source-ready attacker boundary.
+    defender (any): Authenticated source-ready defender boundary.
+
+Returns:
+    (any?, string?): Weapon vulnerability evidence or strict denial reason.
+]]
+local function source_weapon_vulnerability(
+    attacker: any,
+    defender: any
+): (any?, string?)
+    local source_ids = attacker.ReviewedSourceItemIds
+    if type(source_ids) ~= "table" then
+        return nil, "OriginalSourceLoadoutUnavailable"
+    end
+
+    local weapon_id = source_ids.Weapon
+    if weapon_id == nil then
+        return {
+            SourceWeaponId = nil,
+            WeaponKind = nil,
+            VulnerabilityStat = nil,
+            Multiplier = 1,
+            Unarmed = true,
+        }, nil
+    end
+
+    local weapon = SourceItems.get(weapon_id)
+    if not weapon or weapon.Slot ~= "Weapon" then
+        return nil, "OriginalWeaponVulnerabilityUnavailable"
+    end
+
+    local stat_name = WEAPON_VULNERABILITY_STATS[weapon.Kind]
+    if not stat_name then
+        return nil, "OriginalWeaponVulnerabilityUnavailable"
+    end
+
+    local multiplier, reason = source_multiplier(
+        defender,
+        stat_name,
+        "OriginalTargetWeaponVulnerabilityUnavailable"
+    )
+    if multiplier == nil then
+        return nil, reason
+    end
+
+    return {
+        SourceWeaponId = weapon_id,
+        WeaponKind = weapon.Kind,
+        VulnerabilityStat = stat_name,
+        Multiplier = multiplier,
+        Unarmed = false,
+    }, nil
+end
+
+--[[
+Resolves one player-versus-player C4 damage multiplier from source stats.
+
+All current source-combat provider targets are authenticated player characters,
+so the reviewed L2Playable-versus-L2Playable branch applies.
+
+Args:
+    attacker (any): Authenticated source-ready attacker boundary.
+    stat_name (string): Exact C4 PvP damage stat.
+
+Returns:
+    (number?, string?): Source PvP multiplier or strict denial reason.
+]]
+local function source_pvp_multiplier(
+    attacker: any,
+    stat_name: string
+): (number?, string?)
+    return source_multiplier(
+        attacker,
+        stat_name,
+        "OriginalPvpDamageMultiplierUnavailable"
+    )
+end
 
 --[[
 Resolves the exact C4 physical random-damage range from source equipment.
@@ -730,11 +852,190 @@ function C4SourceCombatCalculationService.physical_random_variance(
 end
 
 --[[
+Resolves one complete C4 single-target ordinary physical attack.
+
+The source sequence is hit first, then shield, critical and damage. A charged
+Soulshot is consumed only after a successful hit, matching the reviewed attack
+flow. This calculation represents one target/one strike; attack animation,
+arrow inventory and pole/dual scheduling remain outside this provider.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_user_id (number): Authenticated source-ready defender.
+    facing_eligible (boolean?): Server-owned shield-facing result when needed.
+
+Returns:
+    (any?, string?): Complete source attack result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.normal_attack(
+    attacker_user_id: number,
+    defender_user_id: number,
+    facing_eligible: boolean?
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, defender_reason =
+        source_boundary(defender_user_id)
+    if not defender then
+        return nil, defender_reason
+    end
+
+    local hit = Formula.resolve_normal_attack_hit(
+        attacker.SourceStatCandidate.ACCURACY_COMBAT,
+        defender.SourceStatCandidate.EVASION_RATE,
+        1,
+        COMBAT_RANDOM:NextInteger(0, 999)
+    )
+
+    if hit.Miss then
+        return {
+            Kind = "NormalAttack",
+            Hit = false,
+            Miss = true,
+            Amount = 0,
+            HitChancePerThousand = hit.ChancePerThousand,
+            HitRoll = hit.Roll,
+            Soulshot = false,
+            SoulshotConsumed = false,
+            SourceConditionMultiplier = 1,
+            SourceConditionIntegrated = false,
+            SourceOnly = true,
+            LiveApplied = false,
+        }, nil
+    end
+
+    local defender_stats = defender.SourceStatCandidate
+    local shield_equipped =
+        defender_stats.SHIELD_DEFENCE_RATE ~= nil
+        or defender_stats.SHIELD_DEFENCE_POWER ~= nil
+    local shield = {
+        ShieldEquipped = false,
+        Blocked = false,
+        PerfectShield = false,
+        ShieldDefencePower = 0,
+        FacingEligible = facing_eligible,
+    }
+
+    if shield_equipped then
+        if type(facing_eligible) ~= "boolean" then
+            return nil, "ShieldFacingEligibilityRequired"
+        end
+
+        local shield_result, shield_reason =
+            C4SourceCombatCalculationService.shield_resolution(
+                attacker_user_id,
+                defender_user_id,
+                facing_eligible
+            )
+        if not shield_result then
+            return nil, shield_reason
+        end
+        shield = shield_result
+    end
+
+    local multiplier, additive, power_reason =
+        critical_power_inputs(attacker)
+    if multiplier == nil or additive == nil then
+        return nil, power_reason
+    end
+
+    local critical = Formula.resolve_physical_critical(
+        attacker.SourceStatCandidate.CRITICAL_RATE,
+        COMBAT_RANDOM:NextInteger(0, 999)
+    )
+
+    local variance, variance_reason =
+        source_random_variance(attacker)
+    if not variance then
+        return nil, variance_reason
+    end
+
+    local vulnerability, vulnerability_reason =
+        source_weapon_vulnerability(attacker, defender)
+    if not vulnerability then
+        return nil, vulnerability_reason
+    end
+
+    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
+        attacker,
+        "PVP_PHYSICAL_DMG"
+    )
+    if pvp_multiplier == nil then
+        return nil, pvp_reason
+    end
+
+    local shot, shot_reason =
+        consume_physical_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local amount = Formula.physical_damage({
+        PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+        Soulshot = shot.Soulshot,
+        Shield = shield.Blocked,
+        PerfectShield = shield.PerfectShield,
+        ShieldDefense = shield.ShieldDefencePower,
+        Critical = critical.Critical,
+        CriticalPowerMultiplier = multiplier,
+        CriticalPowerAdd = additive,
+        WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
+        RandomDamageMultiplier = variance.Multiplier,
+        PvpMultiplier = pvp_multiplier,
+    })
+
+    return {
+        Kind = "NormalAttack",
+        Hit = true,
+        Miss = false,
+        Amount = amount,
+        HitChancePerThousand = hit.ChancePerThousand,
+        HitRoll = hit.Roll,
+        Critical = critical.Critical,
+        CriticalChancePerThousand = critical.ChancePerThousand,
+        CriticalRoll = critical.Roll,
+        CriticalPowerMultiplier = multiplier,
+        CriticalPowerAdd = additive,
+        Soulshot = shot.Soulshot,
+        SoulshotConsumed = shot.Soulshot,
+        RandomDamage = variance.RandomDamage,
+        RandomDamageRoll = variance.Roll,
+        RandomDamageMultiplier = variance.Multiplier,
+        SourceWeaponId = vulnerability.SourceWeaponId,
+        WeaponKind = vulnerability.WeaponKind,
+        WeaponVulnerabilityStat = vulnerability.VulnerabilityStat,
+        WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
+        PvpStat = "PVP_PHYSICAL_DMG",
+        PvpMultiplier = pvp_multiplier,
+        ShieldEquipped = shield.ShieldEquipped,
+        ShieldBlocked = shield.Blocked,
+        PerfectShield = shield.PerfectShield,
+        ShieldDefencePower = shield.ShieldDefencePower,
+        ShieldFacingEligible = shield.FacingEligible,
+        ShieldBlockRoll = shield.BlockRoll,
+        ShieldPerfectRoll = shield.PerfectRoll,
+        SourceConditionMultiplier = 1,
+        SourceConditionIntegrated = false,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Calculates C4 PDAM skill damage between source-ready players.
 
-Weapon or unarmed random-damage variance is now server-owned and exact.
-Shots, PDAM skill criticals, race vulnerability and PvP bonuses remain neutral
-until their authoritative runtime inputs are integrated.
+Weapon/unarmed variance, source weapon vulnerability, shots and the player
+PvP physical-skill multiplier are server-authoritative. PDAM skill criticals
+and NPC race-specific modifiers remain outside this player-only provider.
 
 Args:
     attacker_user_id (number): Authenticated source-ready attacker.
@@ -791,6 +1092,20 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, variance_reason
     end
 
+    local vulnerability, vulnerability_reason =
+        source_weapon_vulnerability(attacker, defender)
+    if not vulnerability then
+        return nil, vulnerability_reason
+    end
+
+    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
+        attacker,
+        "PVP_PHYS_SKILL_DMG"
+    )
+    if pvp_multiplier == nil then
+        return nil, pvp_reason
+    end
+
     local defender_stats = defender.SourceStatCandidate
     local shield_equipped =
         defender_stats.SHIELD_DEFENCE_RATE ~= nil
@@ -834,7 +1149,9 @@ function C4SourceCombatCalculationService.physical_skill(
         Shield = shield.Blocked,
         PerfectShield = shield.PerfectShield,
         ShieldDefense = shield.ShieldDefencePower,
+        WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
         RandomDamageMultiplier = variance.Multiplier,
+        PvpMultiplier = pvp_multiplier,
     })
 
     return {
@@ -846,6 +1163,11 @@ function C4SourceCombatCalculationService.physical_skill(
         RandomDamageMultiplier = variance.Multiplier,
         SourceWeaponId = variance.SourceWeaponId,
         Unarmed = variance.Unarmed,
+        WeaponKind = vulnerability.WeaponKind,
+        WeaponVulnerabilityStat = vulnerability.VulnerabilityStat,
+        WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
+        PvpStat = "PVP_PHYS_SKILL_DMG",
+        PvpMultiplier = pvp_multiplier,
         ShieldEquipped = shield.ShieldEquipped,
         ShieldBlocked = shield.Blocked,
         PerfectShield = shield.PerfectShield,
@@ -868,8 +1190,8 @@ The final source magical critical rate is resolved with a private server roll.
 The optional C4 magic-failure algorithm is represented exactly, while the
 pinned source default keeps MagicFailures disabled. The reviewed source skill
 element resolves against the defender's authenticated elemental vulnerability.
-Spiritshots and PvP multipliers remain neutral until their authoritative
-runtime sources are integrated.
+Spiritshots, elemental vulnerability and the player PvP magical multiplier
+are now source-authoritative for this player-only provider.
 
 Args:
     attacker_user_id (number): Authenticated source-ready caster.
@@ -953,6 +1275,14 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, elemental_reason
     end
 
+    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
+        attacker,
+        "PVP_MAGICAL_DMG"
+    )
+    if pvp_multiplier == nil then
+        return nil, pvp_reason
+    end
+
     local shot, shot_reason =
         consume_magic_shot(attacker_user_id)
     if not shot then
@@ -968,6 +1298,7 @@ function C4SourceCombatCalculationService.magic_skill(
         Failure = failure.Failure,
         MagicCritical = critical.Critical,
         ElementalMultiplier = elemental_multiplier,
+        PvpMultiplier = pvp_multiplier,
     })
 
     return {
@@ -990,6 +1321,8 @@ function C4SourceCombatCalculationService.magic_skill(
         SourceMagicalCriticalRate = critical_rate,
         SourceElement = element,
         ElementalMultiplier = elemental_multiplier,
+        PvpStat = "PVP_MAGICAL_DMG",
+        PvpMultiplier = pvp_multiplier,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -1090,6 +1423,8 @@ function C4SourceCombatCalculationService.capability(): any
         NormalAttackPhysicalCriticalRollServerOwned = true,
         NormalAttackCriticalPowerIntegrated = true,
         NormalAttackTargetSpecificCriticalModifiersIntegrated = false,
+        NormalAttackDamageComposition = true,
+        WeaponVulnerabilityIntegrated = true,
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
@@ -1116,7 +1451,9 @@ function C4SourceCombatCalculationService.capability(): any
             Formula.magic_failures_default_enabled(),
         ElementalResolutionIntegrated = true,
         ElementalPlayerTargetSourceStatsIntegrated = true,
-        PvpFormulaModifiersIntegrated = false,
+        PvpFormulaModifiersIntegrated = true,
+        PlayerTargetPvpModifiersIntegrated = true,
+        NpcRacePhysicalModifiersIntegrated = false,
         LiveDamageApplied = false,
     }
 end
