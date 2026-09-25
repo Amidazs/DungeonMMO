@@ -1,3 +1,14 @@
+**v2.84 C4 DAMAGE-FAMILY AUDIT GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_84_C4_Damage_Family_Audit_20260925.md)
+and [green evidence](
+../testing/c4-damage-family-audit-v2-84-20260925.md).
+Melee, RangedPhysical, Skill and MagicSkill are source-routable; MagicBasic,
+RangerArea, StatusPhysical and StatusMagic are explicit activation blockers.
+Periodic bleed/poison ticks now have distinct source identities, and production
+dispatch refuses enable while any blocker remains. Fresh Studio Base **20/20
+PASS**, Dungeon **23/23 PASS**, family audit **24 assertions PASS**, dispatch
+**17 assertions PASS**. Next: source Bleed/Poison periodic execution.
+
 **v2.81 C4 NPC SOURCE BOUNDARY GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_81_C4_NPC_Source_Boundary_20260925.md)
 and [green evidence](
