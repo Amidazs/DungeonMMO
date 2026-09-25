@@ -363,9 +363,17 @@ function C4ResourceMigrationBoundary.for_character(
             and best_candidate.Naked
             then best_candidate.Naked.STRBonus
             else nil,
+        SourceConBonus = if best_candidate
+            and best_candidate.Naked
+            then best_candidate.Naked.CONBonus
+            else nil,
         SourceDexBonus = if best_candidate
             and best_candidate.Naked
             then best_candidate.Naked.DEXBonus
+            else nil,
+        SourceMenBonus = if best_candidate
+            and best_candidate.Naked
+            then best_candidate.Naked.MENBonus
             else nil,
         SourceModifiersApplied = if best_candidate
             then best_candidate.AppliedSourceModifiers
