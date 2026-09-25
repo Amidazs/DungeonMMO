@@ -296,6 +296,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverEmberBolt", 6)
     own_skill(wizard, "EmberweaverFlameBurst", 6)
     own_skill(wizard, "EmberweaverFocusedBolt", 3)
+    own_skill(wizard, "EmberweaverVenomHex", 2)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -1237,6 +1238,34 @@ local function check_npc_targets()
             and not poison.BlessedSpiritshot
             and not poison.LiveApplied,
         "poison effect-success roll is private server source state"
+    )
+
+    shot_state.Spiritshot = true
+    local wizard_poison = assert(Combat.status_skill(
+        WIZARD_ID,
+        marauder,
+        "EmberweaverVenomHex",
+        2
+    ))
+    check(
+        wizard_poison.Kind == "PeriodicStatus"
+            and wizard_poison.SourceSkillId == 1168
+            and wizard_poison.SourceRank == 3
+            and wizard_poison.EffectType == "POISON"
+            and wizard_poison.TickDamage == 8
+            and wizard_poison.TickCount == 10
+            and wizard_poison.TickSeconds == 3
+            and wizard_poison.Spiritshot
+            and not wizard_poison.BlessedSpiritshot,
+        "Emberweaver Venom Hex resolves exact source Poison rank three"
+    )
+    check(
+        not shot_state.Spiritshot
+            and wizard_poison.Roll >= 0
+            and wizard_poison.Roll <= 99
+            and wizard_poison.Landed
+                == (wizard_poison.Roll < wizard_poison.Rate),
+        "Venom Hex consumes one source Spiritshot and owns its land roll"
     )
 
     local malformed = table.clone(marauder)
