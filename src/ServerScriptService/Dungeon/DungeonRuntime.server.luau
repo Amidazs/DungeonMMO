@@ -31,6 +31,9 @@ local CharacterIdentityRules = require(
 )
 local CombatConfig = require(SharedCombat:WaitForChild("CombatConfig"))
 local RuntimeServices = require(Services:WaitForChild("RuntimeServices"))
+local C4CombatCutoverRegistry = require(
+    Services:WaitForChild("C4CombatCutoverRegistry")
+)
 local DungeonDifficultyTuning = require(
     Services:WaitForChild("DungeonDifficultyTuning")
 )
@@ -145,6 +148,13 @@ local loadout_request = remotes:WaitForChild("LoadoutRequest") :: RemoteEvent
 local return_request = remotes:WaitForChild("ReturnRequest") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Dungeon")
+assert(
+    runtime.C4CombatCutoverCoordinator ~= nil,
+    "Dungeon runtime requires C4 cutover coordinator"
+)
+C4CombatCutoverRegistry.bind(
+    runtime.C4CombatCutoverCoordinator
+)
 ProgressionService.bind_default(runtime.ProgressionService)
 ProficiencyService.bind_default(runtime.ProficiencyService)
 DungeonContributionBridge.bind_service(
