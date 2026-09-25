@@ -44,6 +44,7 @@ local function valid_executor(executor: any): boolean
         and type(executor.normal_attack_npc) == "function"
         and type(executor.physical_skill_npc) == "function"
         and type(executor.magic_skill_npc) == "function"
+        and type(executor.status_skill_npc) == "function"
 end
 
 --[[
@@ -374,6 +375,41 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         )
     end
 
+    if DamageFamilies.is_periodic_status_skill(source_id) then
+        local rank = skill_rank(user_id, source_id)
+        if not rank then
+            return denied("C4SourceSkillRankUnavailable")
+        end
+
+        local result, reason =
+            bound_executor:status_skill_npc(
+                attacker,
+                target,
+                source_id,
+                rank,
+                context.sequence_id
+            )
+        if not result then
+            return denied(reason or "C4SourceStatusDispatchFailed")
+        end
+
+        return {
+            Handled = true,
+            AppliedDamage = 0,
+            Applied = result.StatusApplied == true,
+            StatusApplied = result.StatusApplied == true,
+            Miss = result.Landed == false,
+            Reason = nil,
+            SourceResult = result,
+        }
+    end
+
+    if family.Route == "LegacyPeriodicTickSuppressed" then
+        return denied(
+            family.Reason or "C4LegacyPeriodicTickSuppressed"
+        )
+    end
+
     if family.Route == "SourceNormal" then
         local result, reason =
             bound_executor:normal_attack_npc(
@@ -472,7 +508,9 @@ function C4CombatDispatchAdapter.capability(): any
         MagicSkillSupported = true,
         RangerAreaActivationBlocked = true,
         MagicBasicUsesSourceNormalAttack = true,
-        PeriodicStatusActivationBlocked = true,
+        PeriodicStatusSupported = true,
+        PeriodicStatusActivationBlocked = false,
+        LegacyPeriodicTicksSuppressed = true,
         NpcOnly = true,
         ClientDamageAuthority = false,
     }
