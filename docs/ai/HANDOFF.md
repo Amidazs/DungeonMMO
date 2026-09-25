@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.87 live C4 periodic status GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_87_C4_Live_Periodic_Status_20260925.md);
+[green evidence](../testing/c4-live-periodic-status-v2-87-20260925.md).
+Source DEBUFF execution is now live-executor capable but disabled by default.
+Wayfinder Wound routes to reviewed Bleed 13 x 4 @ 5s; Mystic Poison Curse
+routes to Poison 8 x 10 @ 3s. Periodic damage cannot kill, resisted casts
+schedule nothing, same-source reapplication invalidates stale callbacks, and
+legacy creative StatusPhysical/StatusMagic ticks are suppressed after source
+cutover. Fresh focused Base 21/21 and Dungeon 24/24 passed. Only RangerArea
+remains in the dispatch activation blocker list. Next review its exact pinned
+C4 source equivalent before implementation. Permanent edits remain GitHub-only;
+no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.86 C4 periodic-status source GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_86_C4_Periodic_Status_Source_20260925.md);
