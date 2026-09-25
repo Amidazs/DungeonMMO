@@ -401,8 +401,8 @@ local function check_shield_resolution()
     check(
         if facing.Blocked
             then facing.PerfectShield
-                == (facing.ShieldPerfectRoll > 95)
-            else facing.ShieldPerfectRoll == nil
+                == (facing.PerfectRoll > 95)
+            else facing.PerfectRoll == nil
                 and not facing.PerfectShield,
         "perfect shield rolls only after a successful source block"
     )
