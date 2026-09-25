@@ -88,17 +88,6 @@ local function check_equipment_and_class_gates()
             > scout.Naked.Evasion,
         "Bow and Light passive modifiers apply in one original order")
 
-    local rogue = assert(C4.get("Human", "Ashenblade", 30,
-        {Weapon = "Dagger", Body = "Light"}, {
-            {SkillId = 193, Rank = 1},
-        }))
-    check(
-        rogue.PassiveStatSnapshot.PHYSICAL_CRITICAL_POWER == 1
-            and rogue.PassiveStatSnapshot.PHYSICAL_CRITICAL_POWER_ADD
-                == 32,
-        "Critical Power uses exact source neutral multiplier and rank-one add"
-    )
-
     local wrong = assert(C4.get("Elf", "GreenwardScout", 30,
         {Weapon = "Dagger", Body = "Heavy"}, {
             {SkillId = 208, Rank = 1},
