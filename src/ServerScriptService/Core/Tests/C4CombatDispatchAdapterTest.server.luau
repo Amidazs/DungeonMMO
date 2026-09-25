@@ -195,6 +195,7 @@ local function main()
     Adapter.set_enabled(false)
     Adapter.bind_executor(nil)
     Adapter.set_npc_damage_observer(nil)
+    Adapter.set_activation_audit_provider_for_test(nil)
     Adapter.set_skill_rank_provider_for_test(function(
         _user_id: number,
         skill_id: string
@@ -249,8 +250,25 @@ local function main()
     )
 
     executor_enabled = true
+    local audit_blocked, audit_blocked_reason =
+        Adapter.set_enabled(true)
+    check(
+        not audit_blocked
+            and audit_blocked_reason
+                == "C4CombatDispatchAuditBlockingFamilies",
+        "production dispatch cannot enable while audited blockers remain"
+    )
+
+    Adapter.set_activation_audit_provider_for_test(
+        function(): boolean
+            return true
+        end
+    )
     local enabled = Adapter.set_enabled(true)
-    check(enabled and Adapter.is_enabled(), "explicit dispatch gate enables")
+    check(
+        enabled and Adapter.is_enabled(),
+        "test-ready dispatch gate enables only after audit readiness"
+    )
 
     local normal = Adapter.try_damage(
         damage_context(target, "Melee", "PrototypeWeapon", 11)
@@ -312,15 +330,69 @@ local function main()
         "ranked ranged physical context uses source PDAM"
     )
 
-    local unsupported = Adapter.try_damage(
-        damage_context(target, "Bleed", "BleedTick", 16)
+    local ranger_area = Adapter.try_damage(
+        damage_context(target, "RangerArea", "Volley", 16)
     )
     check(
-        unsupported.Handled
-            and unsupported.AppliedDamage == 0
-            and unsupported.Reason
-                == "C4SourceDamageKindUnsupported",
-        "enabled source mode fails closed for unsupported player damage"
+        ranger_area.Handled
+            and ranger_area.AppliedDamage == 0
+            and ranger_area.Reason
+                == "C4RangerAreaSourceMappingPending",
+        "reviewed Ranger area damage fails closed while source mapping waits"
+    )
+
+    local magic_basic = Adapter.try_damage(
+        damage_context(target, "MagicBasic", "SpiritOrb", 17)
+    )
+    check(
+        magic_basic.Handled
+            and magic_basic.AppliedDamage == 0
+            and magic_basic.Reason
+                == "C4MagicBasicSourceMappingPending",
+        "reviewed magical basic damage fails closed while mapping waits"
+    )
+
+    local physical_status = Adapter.try_damage(
+        damage_context(
+            target,
+            "StatusPhysical",
+            "WayfinderWound",
+            18
+        )
+    )
+    check(
+        physical_status.Handled
+            and physical_status.AppliedDamage == 0
+            and physical_status.Reason
+                == "C4PhysicalPeriodicStatusPending",
+        "reviewed physical status ticks fail closed in source mode"
+    )
+
+    local magic_status = Adapter.try_damage(
+        damage_context(
+            target,
+            "StatusMagic",
+            "MysticPoisonCurse",
+            19
+        )
+    )
+    check(
+        magic_status.Handled
+            and magic_status.AppliedDamage == 0
+            and magic_status.Reason
+                == "C4MagicPeriodicStatusPending",
+        "reviewed magical status ticks fail closed in source mode"
+    )
+
+    local unaudited = Adapter.try_damage(
+        damage_context(target, "UnknownFamily", "Unknown", 20)
+    )
+    check(
+        unaudited.Handled
+            and unaudited.AppliedDamage == 0
+            and unaudited.Reason
+                == "C4SourceDamageFamilyUnaudited",
+        "unreviewed player damage can never fall back while source is enabled"
     )
 
     local capability = Adapter.capability()
@@ -329,14 +401,20 @@ local function main()
             and capability.ExecutorBound
             and capability.DisabledFallsBackToCurrentCombat
             and capability.EnabledSourceFailureFallsClosed
+            and not capability.ActivationAuditReady
+            and #capability.ActivationBlockers == 4
+            and capability.RangerAreaActivationBlocked
+            and capability.MagicBasicActivationBlocked
+            and capability.PeriodicStatusActivationBlocked
             and not capability.ClientDamageAuthority,
-        "dispatch capability preserves disabled fallback and source authority"
+        "dispatch capability exposes the remaining activation blockers"
     )
 
     Adapter.set_enabled(false)
     Adapter.bind_executor(nil)
     Adapter.set_npc_damage_observer(nil)
     Adapter.set_skill_rank_provider_for_test(nil)
+    Adapter.set_activation_audit_provider_for_test(nil)
     executor_enabled = false
     table.clear(calls)
     target:Destroy()
