@@ -24,9 +24,8 @@ local C4UnifiedStatReference = require(
 
 local C4ResourceMigrationBoundary = {}
 
-local FIXED_ACTIVATION_BLOCKERS = table.freeze({
-    "LiveCPRuntimeUnavailable",
-})
+local SOURCE_COMMIT =
+    "07f8536384e799f128d44198dd7ab23519660eea"
 
 --[[
 Validates a server-owned active-source snapshot before source composition.
@@ -83,6 +82,39 @@ local function validate_active_snapshot(
 end
 
 --[[
+Validates the server-only C4 Combat Point runtime capability.
+
+The migration boundary checks code-path guarantees, not a configured live
+player. CP must remain disabled by default until the coordinated cutover.
+
+Args:
+    capability (any): Detached C4CombatPointRuntime capability snapshot.
+
+Returns:
+    (boolean, string?): Readiness and stable denial reason.
+]]
+local function validate_cp_capability(
+    capability: any
+): (boolean, string?)
+    if type(capability) ~= "table"
+        or capability.Authoritative ~= true
+        or capability.RuntimeAvailable ~= true
+        or capability.CharacterBound ~= true
+        or capability.SourceMaxCPConfigurable ~= true
+        or capability.PlayableAttackerOnly ~= true
+        or capability.NpcDamageBypassesCP ~= true
+        or capability.RegenPeriodSeconds ~= 3
+        or capability.LifecycleClearSupported ~= true
+        or capability.LiveConfiguredByDefault ~= false
+        or capability.SourceCommit ~= SOURCE_COMMIT
+    then
+        return false, "LiveCPRuntimeUnavailable"
+    end
+
+    return true, nil
+end
+
+--[[
 Copies activation blockers so callers cannot mutate shared state.
 
 Equipment, owned-passive and active-effect readiness are character-specific.
@@ -92,6 +124,7 @@ Args:
     equipment_ready (boolean): Reviewed equipment and Expertise are ready.
     passives_ready (boolean): Actually owned source passives are ready.
     active_effects_ready (boolean): Authoritative active source state is ready.
+    cp_ready (boolean): Server C4 CP runtime capability is source-safe.
 
 Returns:
     {string}: Independent list of unresolved live-migration requirements.
@@ -99,7 +132,8 @@ Returns:
 local function copy_activation_blockers(
     equipment_ready: boolean,
     passives_ready: boolean,
-    active_effects_ready: boolean
+    active_effects_ready: boolean,
+    cp_ready: boolean
 ): {string}
     local result = {}
 
@@ -115,8 +149,8 @@ local function copy_activation_blockers(
         table.insert(result, "ActiveEffectOrderingIncomplete")
     end
 
-    for _, blocker in ipairs(FIXED_ACTIVATION_BLOCKERS) do
-        table.insert(result, blocker)
+    if not cp_ready then
+        table.insert(result, "LiveCPRuntimeUnavailable")
     end
 
     return result
@@ -132,13 +166,15 @@ optional so callers without the private server registry remain fail-closed.
 Args:
     character (any): Server-owned selected character snapshot.
     active_snapshot (any?): Private authoritative active-effect snapshot.
+    cp_capability (any?): Server-only Combat Point runtime capability.
 
 Returns:
     (any?, string?): Exact source-resource plan or strict denial reason.
 ]]
 function C4ResourceMigrationBoundary.for_character(
     character: any,
-    active_snapshot: any?
+    active_snapshot: any?,
+    cp_capability: any?
 ): (any?, string?)
     if not CharacterIdentityRules.is_complete(character) then
         return nil, "OriginalCharacterIdentityNotVerified"
@@ -237,6 +273,13 @@ function C4ResourceMigrationBoundary.for_character(
 
     local best_candidate = combined_candidate
         or passive_candidate
+    local cp_ready, cp_reason = validate_cp_capability(
+        cp_capability
+    )
+    local prerequisites_ready = inventory_ready
+        and passives_ready
+        and active_effects_ready
+        and cp_ready
 
     return {
         RaceId = identity.RaceId,
@@ -316,6 +359,16 @@ function C4ResourceMigrationBoundary.for_character(
             then best_candidate.AppliedSourceModifiers
             else nil,
 
+        CombatPointRuntimeAuthoritative =
+            type(cp_capability) == "table"
+            and cp_capability.Authoritative == true,
+        CombatPointRuntimeReady = cp_ready,
+        CombatPointRuntimeReason = cp_reason,
+        CombatPointRuntimeCapability = if type(cp_capability) == "table"
+            then table.clone(cp_capability)
+            else nil,
+        CutoverPrerequisitesReady = prerequisites_ready,
+
         LiveHealthIntegrated = false,
         LiveManaIntegrated = false,
         LiveCPIntegrated = false,
@@ -323,22 +376,32 @@ function C4ResourceMigrationBoundary.for_character(
         ActivationBlockers = copy_activation_blockers(
             inventory_ready,
             passives_ready,
-            active_effects_ready
+            active_effects_ready,
+            cp_ready
         ),
     }, nil
 end
 
 --[[
-Reports fixed migration blockers after per-character source readiness.
+Reports coordinated blockers after per-character source readiness.
 
 Args:
-    None.
+    cp_capability (any?): Server-only Combat Point runtime capability.
 
 Returns:
-    {string}: Independent list of fixed coordinated cutover blockers.
+    {string}: Independent list of remaining coordinated cutover blockers.
 ]]
-function C4ResourceMigrationBoundary.blockers(): {string}
-    return copy_activation_blockers(true, true, true)
+function C4ResourceMigrationBoundary.blockers(
+    cp_capability: any?
+): {string}
+    local cp_ready = validate_cp_capability(cp_capability)
+
+    return copy_activation_blockers(
+        true,
+        true,
+        true,
+        cp_ready
+    )
 end
 
 return table.freeze(C4ResourceMigrationBoundary)
