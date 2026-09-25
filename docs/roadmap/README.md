@@ -1,3 +1,14 @@
+**v2.87 LIVE C4 PERIODIC STATUS GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_87_C4_Live_Periodic_Status_20260925.md)
+and [green evidence](
+../testing/c4-live-periodic-status-v2-87-20260925.md).
+Exact source Bleed/Poison DEBUFF execution now schedules server-owned nonlethal
+ticks, suppresses the old creative periodic values in source mode and preserves
+combat bookkeeping. Fresh Studio Base **21/21 PASS**, Dungeon **24/24 PASS**,
+executor **22 assertions PASS**, dispatch **19 assertions PASS**. Only
+**RangerArea** remains a player-to-NPC source activation blocker. Next: exact
+C4 Ranger area mapping.
+
 **v2.86 C4 PERIODIC-STATUS SOURCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_86_C4_Periodic_Status_Source_20260925.md)
 and [green evidence](
