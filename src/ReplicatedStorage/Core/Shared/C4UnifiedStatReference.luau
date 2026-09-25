@@ -104,6 +104,8 @@ local function source_stats(
         EARTH_VULN = 1,
         HOLY_VULN = 1,
         DARK_VULN = 1,
+        BLEED_VULN = 1,
+        POISON_VULN = 1,
         BOW_WPN_VULN = 1,
         BLUNT_WPN_VULN = 1,
         DAGGER_WPN_VULN = 1,
