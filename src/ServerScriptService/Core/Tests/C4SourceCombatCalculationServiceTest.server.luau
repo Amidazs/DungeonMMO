@@ -19,6 +19,7 @@ local FIGHTER_ID = 938181
 local MAGE_ID = 938182
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
+local BOW_ATTACKER_ID = 938185
 local checks = 0
 
 local shot_state = {
@@ -86,8 +87,25 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= MAGE_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
+        and user_id ~= BOW_ATTACKER_ID
     then
         return nil
+    end
+
+    if user_id == TARGET_ID then
+        return {
+            SourceRanks = {
+                {
+                    SkillId = 112,
+                    Rank = 1,
+                },
+            },
+            UnresolvedEffects = {},
+            ActiveCount = 1,
+            ResolvedCount = 1,
+            Ready = true,
+            Authoritative = true,
+        }
     end
 
     return {
@@ -229,6 +247,14 @@ local function seed_characters()
         SHIELD_TARGET_ID,
         shield_target
     )
+
+    local bow_attacker =
+        starter_character(BOW_ATTACKER_ID, "Fighter")
+    bow_attacker.Equipment.Weapon = "apprentice_longbow"
+    Runtime.set_character(
+        BOW_ATTACKER_ID,
+        bow_attacker
+    )
 end
 
 --[[
@@ -259,6 +285,11 @@ local function check_default_off()
             and capability.ShieldRollServerOwned
             and capability.ShieldPhysicalFormulaIntegrated
             and not capability.ShieldFacingRuntimeIntegrated
+            and capability.NormalAttackDamageComposition
+            and capability.WeaponVulnerabilityIntegrated
+            and capability.PvpFormulaModifiersIntegrated
+            and capability.PlayerTargetPvpModifiersIntegrated
+            and not capability.NpcRacePhysicalModifiersIntegrated
             and not capability.PhysicalSkillCriticalIntegrated
             and capability.MagicCriticalIntegrated
             and capability.MagicCriticalRollServerOwned
@@ -418,6 +449,98 @@ local function check_physical_random_variance()
 end
 
 --[[
+Checks one complete ordinary C4 attack against a source bow vulnerability.
+
+Misses preserve the charged physical shot exactly like the reviewed source.
+The bounded retry avoids assuming a private random roll while still verifying
+the successful composition path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms hit/crit/variance/vulnerability/PvP/shot composition.
+]]
+local function check_normal_attack_composition()
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(BOW_ATTACKER_ID)
+    )
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+
+    check_close(
+        defender.SourceStatCandidate.BOW_WPN_VULN,
+        0.84,
+        "authoritative Deflect Arrow exposes source bow vulnerability"
+    )
+
+    shot_state.Soulshot = true
+    local result = nil
+    local miss_preserved_charge = true
+
+    for _ = 1, 100 do
+        result = assert(Combat.normal_attack(
+            BOW_ATTACKER_ID,
+            TARGET_ID
+        ))
+
+        if result.Hit then
+            break
+        end
+
+        miss_preserved_charge =
+            miss_preserved_charge and shot_state.Soulshot
+    end
+
+    check(
+        result ~= nil and result.Hit,
+        "bounded source normal attack eventually produced a hit"
+    )
+    check(
+        miss_preserved_charge and not shot_state.Soulshot,
+        "misses preserve Soulshot and successful hit consumes it once"
+    )
+
+    local resolved = assert(result)
+    local expected = Formula.physical_damage({
+        PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+        Soulshot = resolved.Soulshot,
+        Critical = resolved.Critical,
+        CriticalPowerMultiplier =
+            resolved.CriticalPowerMultiplier,
+        CriticalPowerAdd = resolved.CriticalPowerAdd,
+        WeaponVulnerabilityMultiplier =
+            resolved.WeaponVulnerabilityMultiplier,
+        RandomDamageMultiplier =
+            resolved.RandomDamageMultiplier,
+        PvpMultiplier = resolved.PvpMultiplier,
+    })
+
+    check_close(
+        resolved.Amount,
+        expected,
+        "normal attack composes exact source physical formula inputs"
+    )
+    check(
+        resolved.SourceWeaponId == 13
+            and resolved.WeaponKind == "Bow"
+            and resolved.WeaponVulnerabilityStat
+                == "BOW_WPN_VULN"
+            and math.abs(
+                resolved.WeaponVulnerabilityMultiplier - 0.84
+            ) <= 0.00001
+            and resolved.PvpStat == "PVP_PHYSICAL_DMG"
+            and resolved.PvpMultiplier == 1
+            and resolved.Soulshot
+            and resolved.SoulshotConsumed
+            and not resolved.LiveApplied,
+        "normal attack exposes source vulnerability/PvP/shot evidence"
+    )
+end
+
+--[[
 Checks source shield rate, facing, perfect roll and PDAM formula wiring.
 
 The shield-facing boolean is supplied only by this server-side test call. The
@@ -499,7 +622,10 @@ local function check_shield_resolution()
         Shield = result.ShieldBlocked,
         PerfectShield = result.PerfectShield,
         ShieldDefense = result.ShieldDefencePower,
+        WeaponVulnerabilityMultiplier =
+            result.WeaponVulnerabilityMultiplier,
         RandomDamageMultiplier = result.RandomDamageMultiplier,
+        PvpMultiplier = result.PvpMultiplier,
     })
 
     check_close(
@@ -563,6 +689,9 @@ local function check_physical()
             and result.RandomDamageRoll <= 10
             and result.Unarmed
             and result.SourceWeaponId == nil
+            and result.WeaponVulnerabilityMultiplier == 1
+            and result.PvpStat == "PVP_PHYS_SKILL_DMG"
+            and result.PvpMultiplier == 1
             and not result.LiveApplied,
         "physical provider retains exact source identity without applying HP"
     )
@@ -601,6 +730,7 @@ local function check_magic()
         Failure = result.MagicFailure,
         MagicCritical = result.MagicCritical,
         ElementalMultiplier = result.ElementalMultiplier,
+        PvpMultiplier = result.PvpMultiplier,
     })
 
     check_close(
@@ -635,7 +765,9 @@ local function check_magic()
             and result.SourceElement == "WIND"
             and result.ElementalMultiplier == 1
             and result.BlessedSpiritshot
-            and not result.Spiritshot,
+            and not result.Spiritshot
+            and result.PvpStat == "PVP_MAGICAL_DMG"
+            and result.PvpMultiplier == 1,
         "Wind Strike uses authenticated target WIND vulnerability"
     )
     check(
@@ -733,6 +865,7 @@ local function main()
     check_normal_attack_hit()
     check_normal_attack_critical()
     check_physical_random_variance()
+    check_normal_attack_composition()
     check_shield_resolution()
     check_physical()
     check_magic()
@@ -745,11 +878,13 @@ local function main()
     Runtime.clear_character(MAGE_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
+    Runtime.clear_character(BOW_ATTACKER_ID)
 
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
         .. "hit=true critical=true variance=true shield=true "
-        .. "magiccrit=true magicfailure=true element=true shots=true "
+        .. "normal=true vuln=true pvp=true magiccrit=true "
+        .. "magicfailure=true element=true shots=true "
         .. "pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
