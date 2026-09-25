@@ -140,9 +140,6 @@ function RuntimeServices.new(place_kind: string): any
 
     local c4_combat_cutover_coordinator = nil
     if place_kind == "Dungeon" then
-        C4CombatDispatchAdapter.bind_executor(
-            c4_source_combat_executor
-        )
         c4_combat_cutover_coordinator =
             C4CombatCutoverCoordinator.new({
                 ResourceAuthority = c4_resource_cutover,
