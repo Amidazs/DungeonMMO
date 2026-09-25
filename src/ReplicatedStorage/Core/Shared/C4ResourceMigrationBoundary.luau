@@ -33,8 +33,14 @@ Args:
 Returns:
     {string}: Independent list of unresolved live-migration requirements.
 ]]
-local function copy_activation_blockers(): {string}
+local function copy_activation_blockers(
+    equipment_ready: boolean
+): {string}
     local result = {}
+
+    if not equipment_ready then
+        table.insert(result, "OriginalEquipmentMigrationIncomplete")
+    end
 
     for _, blocker in ipairs(ACTIVATION_BLOCKERS) do
         table.insert(result, blocker)
@@ -126,7 +132,9 @@ function C4ResourceMigrationBoundary.for_character(
         LiveManaIntegrated = false,
         LiveCPIntegrated = false,
         CanApplyLive = false,
-        ActivationBlockers = copy_activation_blockers(),
+        ActivationBlockers = copy_activation_blockers(
+            inventory_ready
+        ),
     }, nil
 end
 
@@ -140,7 +148,7 @@ Returns:
     {string}: Independent list of current fail-closed blockers.
 ]]
 function C4ResourceMigrationBoundary.blockers(): {string}
-    return copy_activation_blockers()
+    return copy_activation_blockers(true)
 end
 
 return table.freeze(C4ResourceMigrationBoundary)
