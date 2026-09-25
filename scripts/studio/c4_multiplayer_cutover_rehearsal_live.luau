@@ -270,6 +270,7 @@ local function enter_room_one(players)
         local root = player.Character.HumanoidRootPart
         root.CFrame = trigger.CFrame
             * CFrame.new((index - 1.5) * 3, 0, 8)
+        task.wait(0.15)
         player.Character:FindFirstChildOfClass("Humanoid"):MoveTo(
             trigger.Position + Vector3.new(0, 0, -2)
         )
@@ -456,9 +457,8 @@ local function run()
         )
     end
 
-    protect_players(players)
-
     local enemy = enter_room_one(players)
+    protect_players(players)
     enemy:SetAttribute("C4RehearsalTarget", true)
 
     local first_damage =
