@@ -157,6 +157,55 @@ Args:
 Returns:
     nil: Confirms server-owned identity remains mandatory.
 ]]
+--[[
+Checks reviewed core gear is surfaced while extra paperdoll slots stay blocked.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source gear can be previewed without enabling live cutover.
+]]
+local function check_reviewed_equipment_boundary()
+    local character = original_character("Human", "Oathguard", 30)
+    character.Equipment = {
+        Weapon = "marauder_sword",
+        Body = "stonewatch_d_grade_armor",
+        OffHand = "marauder_shield",
+    }
+    Runtime.set_character(TEST_OWNER, character)
+
+    local reviewed = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        reviewed.ReviewedCoreLoadoutReady
+            and reviewed.ReviewedSourceItemIds.Weapon == 1
+            and reviewed.ReviewedSourceItemIds.Body == 352
+            and reviewed.ReviewedSourceItemIds.OffHand == 102,
+        "reviewed current core gear exposes exact source item IDs"
+    )
+    check(
+        not reviewed.OriginalInventoryIntegrated
+            and not reviewed.CanApplyLive,
+        "reviewed core gear does not prematurely close inventory migration"
+    )
+
+    character.Equipment.Helmet = "marauder_helmet"
+    Runtime.set_character(TEST_OWNER, character)
+    local blocked = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        not blocked.ReviewedCoreLoadoutReady
+            and blocked.ReviewedCoreLoadoutReason
+                == "AdditionalCreativeEquipmentSlotsNotIntegrated",
+        "unintegrated helmet prevents a complete source loadout claim"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
 local function check_denials()
     local missing, missing_reason =
         Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
@@ -210,6 +259,7 @@ Returns:
 ]]
 local function main()
     check_nine_paths()
+    check_reviewed_equipment_boundary()
     check_denials()
 
     print((
