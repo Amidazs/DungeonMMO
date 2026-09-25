@@ -149,13 +149,13 @@ local function check_nine_paths()
 end
 
 --[[
-Checks reviewed core gear is surfaced while extra paperdoll slots stay blocked.
+Checks the complete current six-slot paperdoll and C4 Expertise boundary.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms source gear can be previewed without enabling live cutover.
+    nil: Confirms source-ready gear remains separate from live cutover.
 ]]
 local function check_reviewed_equipment_boundary()
     local character = original_character("Human", "Oathguard", 30)
