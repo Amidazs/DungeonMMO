@@ -71,7 +71,7 @@ Returns:
 ]]
 local function check_equipment_and_class_gates()
     local knight = assert(C4.get("Human", "Oathguard", 30,
-        {Weapon = "Sword", Body = "Heavy"}, {
+        {Weapon = "Sword", Body = "Heavy", Legs = "Heavy"}, {
             {SkillId = 232, Rank = 1},
         }))
     local heavy_expected = knight.Naked.NakedPDef + 17.7
@@ -84,7 +84,7 @@ local function check_equipment_and_class_gates()
         ):format(heavy_expected, heavy_actual)
     )
     local scout = assert(C4.get("Elf", "GreenwardScout", 30,
-        {Weapon = "Bow", Body = "Light"}, {
+        {Weapon = "Bow", Body = "Light", Legs = "Light"}, {
             {SkillId = 208, Rank = 1},
             {SkillId = 233, Rank = 1},
         }))
