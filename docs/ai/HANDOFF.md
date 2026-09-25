@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.70 physical critical resolution GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md);
+[green evidence](../testing/c4-physical-critical-resolution-v2-70-20260925.md).
+Ordinary physical critical resolution now uses authenticated final source
+critical rate, the C4 500/1000 cap and a private server 0-999 roll with exact
+strict-greater-than semantics. Source stat candidates carry critical-power
+multiplier 1/additive 0 before reviewed passive/active modifiers. Fresh Studio
+focus: Base **14/14**, Dungeon **16/16**, formula **26 assertions**, source
+combat **13 assertions**. An initial broad runner hit one unrelated stale
+heavy-armour expected-value test; the targeted v2.70 paths were green and no
+production behaviour was altered to mask it. Physical-skill/magic criticals
+remain open. Next implement source weapon random variance. No main
+merge/publish/prod saves.
+
 ## 25 September 2026 — v2.69 normal-attack hit resolution GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_69_C4_Normal_Attack_Hit_Resolution_20260925.md);
