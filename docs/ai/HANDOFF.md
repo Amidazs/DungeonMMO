@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.58 focused local acceptance complete
+
+Fresh local unpublished Base/Dungeon builds and focused Studio RunScript
+acceptance are GREEN at
+`e61eeb803bd0725aa89581a352583017d32f9fc5`. Base v2.55-v2.58 focus 5/5
+PASS; Dungeon 6/6 PASS including ManaService. Assertion counts: runtime rules
+13, ManaService 13, authenticated nine-class skills 554, resource boundary 42,
+creative item mapping 43, launch core gear 8. Initial reruns found and fixed
+two test-only harness defects (Base Combat.Tests assumption and an invalid
+Runtime.get_character call). Production code did not need a regression repair.
+Continue with the remaining C4 inventory paperdoll slots or the owned-passive
+translation blocker; do not activate live C4 HP/MP/CP until inventory,
+passives, active effects and CP authority are coherent. No main merge/publish/
+production DataStore action.
+
 ## 25 September 2026 — v2.58 complete reviewed core-slot item mapping
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_58_C4_Launch_Core_Gear_Source_Expansion_20260925.md);
