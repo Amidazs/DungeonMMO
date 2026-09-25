@@ -17,6 +17,8 @@ local Gear = require(Shared.C4EquippedStatReference)
 
 local C4UnifiedStatReference = {}
 
+local BASE_MAGICAL_CRITICAL_RATE = 8
+
 --[[
 Finds a learned source rank in its original class or inherited starter.
 
@@ -93,6 +95,7 @@ local function source_stats(
         ACCURACY_COMBAT = naked.Accuracy,
         EVASION_RATE = naked.Evasion,
         CRITICAL_RATE = naked.PhysicalCriticalRate,
+        MAGICAL_CRITICAL_RATE = BASE_MAGICAL_CRITICAL_RATE,
         PHYSICAL_CRITICAL_POWER = 1,
         PHYSICAL_CRITICAL_POWER_ADD = 0,
         MAX_HP = naked.MaxHP,
