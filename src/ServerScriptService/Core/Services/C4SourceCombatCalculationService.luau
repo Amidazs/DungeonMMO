@@ -12,6 +12,9 @@ local Formula = require(
 local SkillEffects = require(
     Shared.C4SkillEffectSource
 )
+local SourceItems = require(
+    Shared.C4SourceItemReference
+)
 local Runtime = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
@@ -146,6 +149,92 @@ local function critical_power_inputs(
     end
 
     return multiplier, additive, nil
+end
+
+
+--[[
+Resolves the exact C4 physical random-damage range from source equipment.
+
+Reviewed weapon rnd_dam comes from the pinned C4 weapon table. An unarmed
+source-ready character uses 5 + floor(sqrt(level)), matching L2Character.
+
+Args:
+    boundary (any): Authenticated source-ready migration boundary.
+
+Returns:
+    (any?, string?): Source random-damage profile or strict denial reason.
+]]
+local function random_damage_profile(
+    boundary: any
+): (any?, string?)
+    local source_ids = boundary.ReviewedSourceItemIds
+
+    if type(source_ids) ~= "table" then
+        return nil, "OriginalSourceLoadoutUnavailable"
+    end
+
+    local weapon_id = source_ids.Weapon
+    if weapon_id == nil then
+        return {
+            RandomDamage = Formula.unarmed_random_damage_range(
+                boundary.Level
+            ),
+            SourceWeaponId = nil,
+            Unarmed = true,
+        }, nil
+    end
+
+    local weapon = SourceItems.get(weapon_id)
+    if not weapon
+        or weapon.Slot ~= "Weapon"
+        or type(weapon.RandomDamage) ~= "number"
+        or weapon.RandomDamage % 1 ~= 0
+        or weapon.RandomDamage < 0
+    then
+        return nil, "OriginalWeaponRandomDamageUnavailable"
+    end
+
+    return {
+        RandomDamage = weapon.RandomDamage,
+        SourceWeaponId = weapon_id,
+        Unarmed = false,
+    }, nil
+end
+
+--[[
+Rolls one server-owned C4 physical random-damage multiplier.
+
+Args:
+    boundary (any): Authenticated source-ready attacker boundary.
+
+Returns:
+    (any?, string?): Range, roll and multiplier or strict denial reason.
+]]
+local function source_random_variance(
+    boundary: any
+): (any?, string?)
+    local profile, reason = random_damage_profile(boundary)
+    if not profile then
+        return nil, reason
+    end
+
+    local random_damage = profile.RandomDamage
+    local roll = COMBAT_RANDOM:NextInteger(
+        -random_damage,
+        random_damage
+    )
+
+    return {
+        RandomDamage = random_damage,
+        Roll = roll,
+        Multiplier =
+            Formula.physical_random_damage_multiplier(
+                random_damage,
+                roll
+            ),
+        SourceWeaponId = profile.SourceWeaponId,
+        Unarmed = profile.Unarmed,
+    }, nil
 end
 
 --[[
@@ -319,6 +408,49 @@ function C4SourceCombatCalculationService.normal_attack_critical(
 end
 
 --[[
+Resolves one source C4 physical random-damage variance roll.
+
+This reusable source-only path supports both reviewed weapons and the original
+unarmed fallback. The roll is private server state.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+
+Returns:
+    (any?, string?): Source variance result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.physical_random_variance(
+    attacker_user_id: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local variance, variance_reason =
+        source_random_variance(attacker)
+    if not variance then
+        return nil, variance_reason
+    end
+
+    return {
+        Kind = "PhysicalRandomVariance",
+        RandomDamage = variance.RandomDamage,
+        Roll = variance.Roll,
+        Multiplier = variance.Multiplier,
+        SourceWeaponId = variance.SourceWeaponId,
+        Unarmed = variance.Unarmed,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Calculates deterministic C4 PDAM skill damage between source-ready players.
 
 Shots, random weapon variance, criticals, race vulnerability and PvP bonuses
@@ -371,15 +503,27 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, "UnsupportedOriginalPhysicalSkillType"
     end
 
+    local variance, variance_reason =
+        source_random_variance(attacker)
+    if not variance then
+        return nil, variance_reason
+    end
+
     local amount = Formula.physical_damage({
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
         SkillPower = effect.Sets.power,
+        RandomDamageMultiplier = variance.Multiplier,
     })
 
     return {
         Kind = "PhysicalDamage",
         Amount = amount,
+        RandomDamage = variance.RandomDamage,
+        RandomDamageRoll = variance.Roll,
+        RandomDamageMultiplier = variance.Multiplier,
+        SourceWeaponId = variance.SourceWeaponId,
+        Unarmed = variance.Unarmed,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -545,7 +689,9 @@ function C4SourceCombatCalculationService.capability(): any
         MagicalMDAM = true,
         InstantHeal = true,
         ShotsIntegrated = false,
-        RandomWeaponVarianceIntegrated = false,
+        PhysicalRandomVarianceResolution = true,
+        RandomWeaponVarianceIntegrated = true,
+        UnarmedRandomVarianceIntegrated = true,
         CriticalResolutionIntegrated = false,
         PhysicalSkillCriticalIntegrated = false,
         MagicCriticalIntegrated = false,
