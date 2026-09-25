@@ -33,27 +33,53 @@ local function apply_weapon(stats: any, naked: any, weapon: any)
 end
 
 --[[
-Applies original chest P.Def and class-specific paperdoll deduction.
+Applies original C4 armour P.Def and paperdoll deductions in source order.
+
+Every armour item's 0x10 P.Def add is summed before FuncPDefMod's 0x20
+slot deductions and level multiplier. DungeonMMO has no separate Legs slot,
+so only its current Head, Body, Gloves and Boots/Feet paperdoll is staged.
 
 Args:
     stats (any): Fresh original naked-stat dictionary.
     naked (any): Source naked level and class multiplier data.
-    body (any): Verified original chest armour XML record.
+    items (any): Verified original source item records by paperdoll slot.
     is_mystic (boolean): Actual starter Mystic class identity.
 
 Returns:
-    nil: Replaces only the P.Def derived from the equipped chest.
+    nil: Replaces P.Def with the reviewed six-slot source calculation.
 ]]
-local function apply_chest(
-    stats: any, naked: any, body: any, is_mystic: boolean
+local function apply_armour(
+    stats: any,
+    naked: any,
+    items: any,
+    is_mystic: boolean
 )
-    -- The 0x10 item add comes before the 0x20 class formula.
-    -- Never add gear to the already-rounded naked P.Def.
     local base = if is_mystic then 54 else 80
-    local paperdoll_deduction = if is_mystic then 15 else 31
+    local additive = 0
+    local deduction = 0
+
+    if items.Head then
+        additive += items.Head.PhysicalDefence
+        deduction += 12
+    end
+
+    if items.Body then
+        additive += items.Body.PhysicalDefence
+        deduction += if is_mystic then 15 else 31
+    end
+
+    if items.Gloves then
+        additive += items.Gloves.PhysicalDefence
+        deduction += 8
+    end
+
+    if items.Feet then
+        additive += items.Feet.PhysicalDefence
+        deduction += 7
+    end
+
     stats.PHYSICAL_DEFENCE = math.floor(
-        (base + body.PhysicalDefence - paperdoll_deduction)
-            * naked.LevelModifier
+        (base + additive - deduction) * naked.LevelModifier
     )
 end
 
@@ -80,7 +106,13 @@ function C4EquippedStatReference.stage(
     local body = resolved.Items.Body
     local offhand = resolved.Items.OffHand
     if weapon then apply_weapon(values, naked, weapon) end
-    if body then apply_chest(values, naked, body, is_mystic) end
+    if resolved.Items.Head
+        or body
+        or resolved.Items.Gloves
+        or resolved.Items.Feet
+    then
+        apply_armour(values, naked, resolved.Items, is_mystic)
+    end
     if offhand then
         values.EVASION_RATE -= offhand.EvasionPenalty
         values.SHIELD_DEFENCE_POWER = offhand.ShieldDefencePower
