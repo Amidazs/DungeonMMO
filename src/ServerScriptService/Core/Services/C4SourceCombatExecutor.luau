@@ -1304,7 +1304,8 @@ end
 --[[
 Executes one complete live player-vs-player C4 ordinary attack.
 
-All transforms, elevation mapping, night state, calculation rolls, shield state,
+All transforms, elevation mapping, night state, calculation rolls,
+shield state,
 critical state, shot state and resource mutation remain server-owned.
 
 Args:
