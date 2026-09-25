@@ -350,8 +350,8 @@ local function check_active_effect_boundary()
     check(
         not unresolved.ActiveEffectsIntegrated
             and not unresolved.CombinedSourceStatCandidateReady
-            and unresolved.UnresolvedActiveSourceEffects[1]
-                .CreativeSkillId == "UnmappedTimedBuff"
+            and unresolved.UnresolvedActiveSourceEffects[1].CreativeSkillId
+                == "UnmappedTimedBuff"
             and #unresolved.ActivationBlockers == 2,
         "unresolved live active effect keeps active migration fail-closed"
     )
