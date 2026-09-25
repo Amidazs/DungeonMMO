@@ -215,6 +215,65 @@ function C4CombatDispatchAdapter.set_activation_audit_provider_for_test(
 end
 
 --[[
+Captures mutable adapter wiring for isolated server tests.
+
+This exists only to stop Studio test scripts from destroying the real runtime
+executor/observer binding when they exercise singleton adapter state.
+
+Args:
+    None.
+
+Returns:
+    any: Opaque server-local state that can be restored after a test.
+]]
+function C4CombatDispatchAdapter.capture_test_state(): any
+    return {
+        FeatureEnabled = feature_enabled,
+        BoundExecutor = bound_executor,
+        NpcDamageObserver = npc_damage_observer,
+        SkillRankProvider = skill_rank_provider,
+        ActivationAuditProvider = activation_audit_provider,
+    }
+end
+
+--[[
+Restores mutable adapter wiring captured by capture_test_state().
+
+Args:
+    state (any): Opaque state returned by capture_test_state().
+
+Returns:
+    nil: Restores the prior server-local adapter wiring.
+]]
+function C4CombatDispatchAdapter.restore_test_state(state: any)
+    assert(
+        type(state) == "table",
+        "C4 dispatch test state must be a table"
+    )
+
+    feature_enabled = state.FeatureEnabled == true
+    bound_executor = state.BoundExecutor
+    npc_damage_observer = state.NpcDamageObserver
+    skill_rank_provider = state.SkillRankProvider
+    activation_audit_provider = state.ActivationAuditProvider
+
+    assert(
+        type(skill_rank_provider) == "function",
+        "C4 dispatch skill-rank provider must be restorable"
+    )
+    assert(
+        type(activation_audit_provider) == "function",
+        "C4 dispatch audit provider must be restorable"
+    )
+
+    if bound_executor then
+        bound_executor:set_npc_damage_observer(
+            npc_damage_observer
+        )
+    end
+end
+
+--[[
 Reports whether existing damage contexts may route through source combat.
 
 Args:
