@@ -140,8 +140,8 @@ local function check_nine_paths()
             row[2] .. " exact source values remain fail-closed"
         )
         check(
-            #plan.ActivationBlockers == 4,
-            row[2] .. " keeps all coordinated migration blockers"
+            #plan.ActivationBlockers == 3,
+            row[2] .. " keeps remaining coordinated migration blockers"
         )
 
         Runtime.clear_character(TEST_OWNER)
@@ -161,8 +161,11 @@ local function check_reviewed_equipment_boundary()
     local character = original_character("Human", "Oathguard", 30)
     character.Equipment = {
         Weapon = "marauder_sword",
-        Body = "stonewatch_d_grade_armor",
         OffHand = "marauder_shield",
+        Helmet = "marauder_helmet",
+        Body = "stonewatch_d_grade_armor",
+        Gloves = "tempered_ironbound_gloves",
+        Boots = "marauder_boots",
     }
     Runtime.set_character(TEST_OWNER, character)
 
@@ -170,33 +173,43 @@ local function check_reviewed_equipment_boundary()
         Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
     )
     check(
-        reviewed.ReviewedCoreLoadoutReady
+        reviewed.ReviewedSixSlotLoadoutReady
             and reviewed.ReviewedSourceItemIds.Weapon == 1
+            and reviewed.ReviewedSourceItemIds.OffHand == 102
+            and reviewed.ReviewedSourceItemIds.Head == 43
             and reviewed.ReviewedSourceItemIds.Body == 352
-            and reviewed.ReviewedSourceItemIds.OffHand == 102,
-        "reviewed current core gear exposes exact source item IDs"
+            and reviewed.ReviewedSourceItemIds.Gloves == 63
+            and reviewed.ReviewedSourceItemIds.Feet == 38,
+        "reviewed current six-slot gear exposes exact source item IDs"
     )
     check(
-        not reviewed.OriginalInventoryIntegrated
-            and not reviewed.CanApplyLive,
-        "reviewed core gear does not prematurely close inventory migration"
+        reviewed.OriginalEquipmentExpertiseReady
+            and reviewed.OriginalInventoryIntegrated
+            and not reviewed.CanApplyLive
+            and #reviewed.ActivationBlockers == 3,
+        "level-30 six-slot inventory migration is source-ready"
     )
 
-    character.Equipment.Helmet = "marauder_helmet"
-    Runtime.set_character(TEST_OWNER, character)
+    local early = original_character("Human", "Fighter", 19)
+    early.Equipment = {
+        Body = "stonewatch_d_grade_armor",
+    }
+    Runtime.set_character(TEST_OWNER, early)
     local blocked = assert(
         Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
     )
     check(
-        not blocked.ReviewedCoreLoadoutReady
-            and blocked.ReviewedCoreLoadoutReason
-                == "AdditionalCreativeEquipmentSlotsNotIntegrated",
-        "unintegrated helmet prevents a complete source loadout claim"
+        blocked.ReviewedSixSlotLoadoutReady
+            and not blocked.OriginalEquipmentExpertiseReady
+            and not blocked.OriginalInventoryIntegrated
+            and blocked.OriginalEquipmentExpertiseReason
+                == "OriginalEquipmentGradeExpertiseRequired"
+            and #blocked.ActivationBlockers == 4,
+        "level-19 D-grade equipment keeps migration fail-closed"
     )
 
     Runtime.clear_character(TEST_OWNER)
 end
-
 --[[
 Checks forged advancement and unsupported levels cannot expose a cutover plan.
 
@@ -264,7 +277,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "nine_paths=9 live=false blockers=4"
+        .. "nine_paths=9 live=false blockers=3"
     ):format(checks))
 end
 
