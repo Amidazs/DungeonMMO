@@ -1,3 +1,19 @@
+## 25 September 2026 — v2.57 reviewed creative-to-C4 item links
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_57_C4_Creative_Item_Source_Map_20260925.md);
+[pending test scope](../testing/c4-creative-item-source-map-v2-57-20260925.md).
+Added C4CreativeItemSourceMap. Nine reviewed current items now resolve to the
+nine pinned C4 source item IDs; current CombatModifiers are explicitly ignored
+for source math. Loadout conversion requires every equipped Weapon/Body/OffHand
+item to have a reviewed link and rejects current polearm/D-grade gear instead
+of guessing. Naked loadout is allowed. v2.56's
+OriginalInventoryMappingIncomplete blocker remains because the launch item
+catalogue is not complete. Tests authored, not executed. Next extend the C4
+source item catalogue for actual launch gear, then feed reviewed server-owned
+loadouts into the authenticated resource boundary before owned-passive and
+active-effect/CP work. GitHub-only permanent edits; no merge/publish/prod save
+or animation changes.
+
 ## 25 September 2026 — v2.56 fail-closed C4 resource migration boundary
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_56_C4_Resource_Migration_Boundary_20260925.md);
