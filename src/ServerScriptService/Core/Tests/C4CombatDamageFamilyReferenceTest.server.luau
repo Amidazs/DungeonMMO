@@ -74,13 +74,13 @@ local function main()
     check_family("RangerArea", "Unsupported", true)
     check_family(
         "StatusPhysical",
-        "PeriodicStatusPending",
-        true
+        "LegacyPeriodicTickSuppressed",
+        false
     )
     check_family(
         "StatusMagic",
-        "PeriodicStatusPending",
-        true
+        "LegacyPeriodicTickSuppressed",
+        false
     )
 
     for _, source_kind in ipairs({
@@ -99,15 +99,22 @@ local function main()
         )
     end
 
+    check(
+        Families.is_periodic_status_skill("WayfinderWound")
+            and Families.is_periodic_status_skill(
+                "MysticPoisonCurse"
+            )
+            and not Families.is_periodic_status_skill("IronCleave"),
+        "reviewed DEBUFF casts are intercepted before generic damage"
+    )
+
     local blockers = Families.activation_blockers()
     check(
-        #blockers == 3,
-        "exactly three current player-to-NPC families block activation"
+        #blockers == 1,
+        "only RangerArea still blocks player-to-NPC activation"
     )
     check(
-        blockers[1] == "RangerArea"
-            and blockers[2] == "StatusMagic"
-            and blockers[3] == "StatusPhysical",
+        blockers[1] == "RangerArea",
         "activation blocker list remains deterministic"
     )
     check(
@@ -121,7 +128,7 @@ local function main()
 
     print((
         "[C4 Damage Family Audit] FAMILY_AUDIT_PASS: "
-            .. "%d assertions blockers=3 activation_ready=false"
+            .. "%d assertions blockers=1 activation_ready=false"
     ):format(checks))
 end
 
