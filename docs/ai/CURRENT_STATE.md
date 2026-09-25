@@ -1,3 +1,21 @@
+## 25 September 2026 — CURRENT v2.61 source active-effect ordering GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_61_C4_Active_Effect_Calculator_Ordering_20260925.md)
+and [green evidence](
+../testing/c4-active-effect-calculator-ordering-v2-61-20260925.md).
+The source calculator now shares C4 operation ordering across reviewed
+equipment, actually-owned passives and supplied active/toggle effects. Named
+stack groups choose their strongest source stackOrder, and independent effects
+remain independent. Fresh Base **8/8 PASS** and Dungeon **9/9 PASS** at
+08015086. This is not yet live active-state authority:
+`ActiveEffectStateAuthoritative=false` remains explicit, so the
+ActiveEffectOrderingIncomplete cutover blocker stays in place. Next wire real
+server-owned live toggles and timed buffs to an authoritative source-effect
+state registry; learned skills alone must never count as active. CP runtime is
+the remaining fixed blocker after that. Permanent code/docs stay GitHub-only;
+no main merge, publish, production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.60 owned passive migration source-ready
 
 [Latest roadmap](
