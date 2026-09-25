@@ -125,8 +125,13 @@ local function main()
         and wizard.SourceRankEntriesByLevel[20] == 29
         and wizard.SourceRankEntriesByLevel[25] == 32
         and wizard.SourceRankEntriesByLevel[28] == 1
-        and wizard.SourceRankEntriesByLevel[30] == 31,
-        "Human Wizard C4 source ranks must be inventoried through level 30")
+        and wizard.SourceRankEntriesByLevel[30] == 31
+        and #wizard.SourceBrackets == 4
+        and wizard.SourceBrackets[1] == 20
+        and wizard.SourceBrackets[2] == 25
+        and wizard.SourceBrackets[3] == 28
+        and wizard.SourceBrackets[4] == 30,
+        "Human Wizard C4 source ranks must retain exact launch brackets")
     check(wizard.CurrentCareerId == nil
         and wizard.TrainerMappedRankEntries == 0
         and wizard.MissingRankScheduleEntries == 93
