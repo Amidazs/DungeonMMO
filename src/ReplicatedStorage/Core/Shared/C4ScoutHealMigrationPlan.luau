@@ -1,12 +1,13 @@
 --!strict
 -- Original C4 Scout self-heal migration contract, not a live skill.
--- No source power is converted into Roblox HP and no SP/MP is spent.
+-- Source heal/MP semantics are certified here; no live HP/SP/MP is changed.
 local Shared = script.Parent
 
 local Identity = require(Shared.CharacterIdentityRules)
 local Primary = require(Shared.C4PrimaryStatReference)
 local Tree = require(Shared.C4Level30SkillTreeSource)
 local Effects = require(Shared.C4SkillEffectSource)
+local RuntimeRules = require(Shared.C4SkillRuntimeRules)
 
 local C4ScoutHealMigrationPlan = {}
 
@@ -57,6 +58,10 @@ local function build_contracts(): {[number]: any}
             and type(sets.hitTime) == "number"
             and type(sets.reuseDelay) == "number",
             "Scout heal requires pinned MP and cast/reuse times")
+        local mana = RuntimeRules.split_mana_cost(
+            sets.mpInitialConsume,
+            sets.mpConsume
+        )
         contracts[source_rank] = table.freeze({
             PlannedCreativeId = PLANNED_CREATIVE_ID,
             PlannedCreativeRank = rank,
@@ -65,10 +70,24 @@ local function build_contracts(): {[number]: any}
             SourceLearnLevel = row.MinLevel,
             SourceSP = row.SP,
             SourcePower = heal.power,
-            SourceInitialMP = sets.mpInitialConsume,
-            SourceOngoingMP = sets.mpConsume,
-            SourceTotalMP =
-                sets.mpInitialConsume + sets.mpConsume,
+            SourceHealUncharged = RuntimeRules.instant_heal(
+                heal.power,
+                false,
+                false
+            ),
+            SourceHealSpiritshot = RuntimeRules.instant_heal(
+                heal.power,
+                true,
+                false
+            ),
+            SourceHealBlessedSpiritshot = RuntimeRules.instant_heal(
+                heal.power,
+                false,
+                true
+            ),
+            SourceInitialMP = mana.InitialMP,
+            SourceOngoingMP = mana.OngoingMP,
+            SourceTotalMP = mana.TotalMP,
             SourceTarget = sets.target,
             SourceCastMs = sets.hitTime,
             SourceReuseMs = sets.reuseDelay,
@@ -76,7 +95,8 @@ local function build_contracts(): {[number]: any}
             SourceOnly = true,
             LiveLearnable = false,
             LiveCastable = false,
-            ExactC4HealFormulaCertified = false,
+            ExactC4HealFormulaCertified = true,
+            SplitMPTransactionCertified = true,
         })
     end
     for source_rank = FIRST_SOURCE_RANK, LAST_SOURCE_RANK do
@@ -148,7 +168,8 @@ function C4ScoutHealMigrationPlan.for_character(
         SourceOnly = true,
         LiveLearnable = false,
         LiveCastable = false,
-        ExactC4HealFormulaCertified = false,
+        ExactC4HealFormulaCertified = true,
+        SplitMPTransactionCertified = true,
     }, nil
 end
 
