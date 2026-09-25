@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.71 physical random variance GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_71_C4_Physical_Random_Variance_20260925.md)
+and [green evidence](
+../testing/c4-physical-random-variance-v2-71-20260925.md).
+Exact C4 physical random variance is now source-authoritative behind the
+disabled combat gate. All eight reviewed source weapons carry pinned rnd_dam;
+unarmed attackers use 5 + floor(sqrt(level)); the server owns the inclusive
+negative-to-positive roll and PDAM calculations now consume the resulting
+source multiplier. Fresh Base **14/14 PASS**, Dungeon **16/16 PASS**, launch
+gear **12 assertions PASS**, formula **30 assertions PASS**, source combat
+**15 assertions PASS**. No live source damage is applied. Next: shield defence
+success/power/perfect-shield handling. No main merge, publish, production save
+mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.70 physical critical resolution GREEN
 
 [Latest roadmap](
