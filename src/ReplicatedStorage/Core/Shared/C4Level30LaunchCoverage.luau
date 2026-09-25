@@ -136,7 +136,9 @@ local function category_matches(
     local valid_family = false
     local valid_transfer = false
     for _, class_id in ipairs(skill.AllowedBaseClasses or {}) do
-        if class_id == "Fighter" then valid_family = true end
+        if class_id == career.BaseClassId then
+            valid_family = true
+        end
     end
     for _, class_id in ipairs(
         skill.AllowedFirstTransferClasses or {}
