@@ -55,6 +55,7 @@ local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local Mana = require(SSS.Combat.ManaService)
 local Damage = require(SSS.Combat.DamageService)
 local Critical = require(SSS.Combat.IronvowCriticalToggleService)
+local ActiveSource = require(SSS.Core.Services.C4ActiveSourceEffectState)
 local channel = RS.TEMP_WarriorCriticalInput
 local SKILL_ID = "IronvowCriticalStance"
 local receipts = {}
@@ -227,6 +228,11 @@ local function verify_cast(player, npc)
     until os.clock() > deadline
     assert(math.abs(Critical.get_bonus(player) - 0.064) < 0.0001,
         "Paid source rank-three bonus was not activated by client")
+    local source_active = ActiveSource.snapshot(player)
+    assert(source_active.ActiveCount == 1
+        and source_active.SourceRanks[1].SkillId == 312
+        and source_active.SourceRanks[1].Rank == 3,
+        "Live critical toggle did not register C4 source 312 rank 3")
     local active_mana = Mana.get(player)
     assert(starting_mana - active_mana >= 4.9,
         "Rank-three stance activation did not spend five actual MP")
@@ -244,6 +250,8 @@ local function verify_cast(player, npc)
     task.wait(0.13)
     assert(Critical.get_bonus(player) == 0,
         "Critical stance did not turn off on second client request")
+    assert(ActiveSource.snapshot(player).ActiveCount == 0,
+        "Deactivated critical stance remained in C4 source state")
     local after_off = critical_hit(player, npc)
     assert(math.abs(after_off - unbuffed) < 0.05,
         "Deactivated stance still deals extra real NPC critical damage")
@@ -260,6 +268,8 @@ local function verify_cast(player, npc)
     Runtime.set_character(player.UserId, owner)
     assert(Critical.get_bonus(player) == 0,
         "Revoking actual paid rank leaves critical bonus active")
+    assert(ActiveSource.snapshot(player).ActiveCount == 0,
+        "Revoked critical ownership left stale C4 source state")
     owner.Progression.Skills[SKILL_ID].PurchasedRank = 3
     owner.Identity.ClassId = "Fighter"
     Runtime.set_character(player.UserId, owner)
