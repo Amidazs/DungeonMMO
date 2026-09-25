@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.62 live toggle source state GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_62_C4_Authoritative_Active_Source_State_20260925.md)
+and [green evidence](
+../testing/c4-authoritative-active-source-state-v2-62-20260925.md).
+The four existing server-owned toggle executors now maintain a private
+authoritative C4 source-effect registry. Source IDs never come from clients;
+the registry re-resolves real owned creative rank against the authenticated
+runtime character and invalidates on deactivation/upkeep failure/respawn/
+player removal. Base 9/9 and Dungeon 10/10 focused suites are green at
+d379e966. Timed CombatStatusService effects and Ironvow Endurance Surge are
+still outside the registry, so ActiveEffectOrderingIncomplete remains. Next
+bridge those timed paths and feed the authoritative snapshot into the resource
+boundary. Permanent edits remain GitHub-only; no main merge/publish/prod save.
+
 ## 25 September 2026 — CURRENT v2.61 source active-effect ordering GREEN
 
 [Latest roadmap](
