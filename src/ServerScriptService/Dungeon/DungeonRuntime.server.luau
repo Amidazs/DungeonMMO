@@ -2407,6 +2407,7 @@ for _, player in ipairs(Players:GetPlayers()) do task.spawn(admit_player, player
 
 Players.PlayerRemoving:Connect(function(player)
     scout_environment:remove(player)
+    runtime.C4CombatCutoverCoordinator:remove_player(player)
     local user_id = player.UserId
     if not loaded_users[user_id] then return end
     loaded_users[user_id] = nil
