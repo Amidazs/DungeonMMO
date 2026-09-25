@@ -1,13 +1,12 @@
-**v2.72 SOURCE SHIELD RESOLUTION BUILT:** [current roadmap](
+**v2.72 SOURCE SHIELD RESOLUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_72_C4_Shield_Resolution_20260925.md)
 and [acceptance record](
 ../testing/c4-shield-resolution-v2-72-20260925.md).
 Reviewed C4 shield rate/power now feeds exact DEX-scaled, bow-aware,
 server-owned block/perfect rolls and PDAM formula application. Shielded PDAM
 refuses to invent facing state; authoritative transform-derived facing remains
-a requirement for the later live executor. Fresh unpublished Base/Dungeon
-Rojo builds PASS and the focused runner is extended through v2.72; final
-focused Studio execution is still pending before GREEN acceptance. No main
+a requirement for the later live executor. Fresh focused Studio Base **14/14 PASS** and Dungeon **16/16 PASS**;
+formula **37 assertions PASS** and source combat **21 assertions PASS**. No main
 merge, publish or production saves.
 
 **v2.71 PHYSICAL RANDOM VARIANCE GREEN:** [current roadmap](
