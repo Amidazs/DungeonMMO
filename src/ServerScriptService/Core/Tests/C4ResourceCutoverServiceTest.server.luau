@@ -1,4 +1,13 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_SINGLETON_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[C4 Resource Cutover] SKIP: singleton regression runs in focused Edit mode"
+    )
+    return
+end
 -- Disabled-by-default C4 resource cutover surface regression.
 
 local ServerScriptService = game:GetService("ServerScriptService")
