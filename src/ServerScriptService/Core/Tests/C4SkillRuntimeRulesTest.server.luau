@@ -83,6 +83,42 @@ local function check_magic_cast_vectors()
 end
 
 --[[
+Checks source magic cool-time and reuse-delay scaling.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms cool-time has no hit-time floor and reuse order is exact.
+]]
+local function check_cool_time_and_reuse_vectors()
+    check(
+        Rules.magic_cool_time(200, 333, false, false) == 200,
+        "333 M.Atk.Spd must preserve authored 200 ms cool time"
+    )
+    check(
+        Rules.magic_cool_time(200, 333, true, false) == 140,
+        "Spiritshot cool time must accelerate without a 500 ms floor"
+    )
+    check(
+        Rules.magic_cool_time(200, 333, false, true) == 140,
+        "Blessed Spiritshot uses the same cool-time acceleration"
+    )
+    check(
+        Rules.skill_reuse_delay(6000, 333, 1) == 6000,
+        "neutral source reuse multiplier preserves authored reuse at 333"
+    )
+    check(
+        Rules.skill_reuse_delay(6000, 666, 1) == 3000,
+        "double attack speed halves source reuse delay"
+    )
+    check(
+        Rules.skill_reuse_delay(6000, 333, 0.5) == 3000,
+        "source reuse-rate multiplier is applied before attack-speed scaling"
+    )
+end
+
+--[[
 Runs all deterministic C4 skill-runtime rule checks.
 
 Args:
@@ -94,6 +130,7 @@ Returns:
 local function main()
     check_elemental_heal_vectors()
     check_magic_cast_vectors()
+    check_cool_time_and_reuse_vectors()
 
     print(("[C4 Skill Runtime Rules] SOURCE_ONLY_PASS: %d assertions")
         :format(checks))
