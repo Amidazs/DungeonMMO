@@ -51,7 +51,6 @@ function C4CombatCutoverCoordinator.new(options: any): any
     require_method(resources, "set_enabled", "Resource authority")
     require_method(resources, "enable_player", "Resource authority")
     require_method(resources, "disable_player", "Resource authority")
-    require_method(resources, "remove_player", "Resource authority")
     require_method(resources, "is_active", "Resource authority")
     require_method(combat, "is_enabled", "Combat provider")
     require_method(combat, "set_enabled", "Combat provider")
@@ -217,8 +216,10 @@ end
 --[[
 Removes one opted-in participant without widening or stranding source mode.
 
-A departing participant is cleared through the resource authority without
-trying to restore a character that is leaving the server. If the last active
+The participant is fully rolled back to the current resource model before
+leaving the coordinator's active set. This is required for both live staged
+withdrawal and disconnect cleanup because a still-connected player must never
+retain source HP/MP/CP state after losing source dispatch. If the last active
 participant is removed, every global source gate is disabled immediately.
 
 Args:
@@ -243,7 +244,7 @@ function C4CombatCutoverCoordinator:remove_player(
         return false, "C4CutoverPlayerNotActive"
     end
 
-    self._resources.remove_player(player)
+    self._resources.disable_player(player)
 
     if #self._active_players == 0 and self._enabled then
         self:_rollback()
