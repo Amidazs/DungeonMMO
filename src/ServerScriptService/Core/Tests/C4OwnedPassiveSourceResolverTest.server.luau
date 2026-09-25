@@ -207,6 +207,35 @@ local function check_first_transfer_inheritance()
 end
 
 --[[
+Checks Human Wizard reuse passives migrate only from actually owned ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms Quick Recovery rank two resolves from Emberweaver ownership.
+]]
+local function check_human_wizard_reuse_passive()
+    local character = original_character(
+        "Human",
+        "Emberweaver",
+        30
+    )
+    own_passive(character, "EmberweaverQuickWeave", 2)
+
+    local result = assert(Resolver.for_character(character))
+    local recovery = assert(find_source_rank(result, 164))
+
+    check(
+        result.Ready
+            and recovery.Rank == 2
+            and recovery.CreativeSkillId == "EmberweaverQuickWeave"
+            and recovery.CreativeRank == 2,
+        "owned Emberweaver Quick Weave resolves Quick Recovery rank two"
+    )
+end
+
+--[[
 Checks unsupported or corrupted owned passive state remains fail-closed.
 
 Args:
@@ -254,6 +283,7 @@ Returns:
 local function main()
     check_starter_owned_ranks()
     check_first_transfer_inheritance()
+    check_human_wizard_reuse_passive()
     check_fail_closed_owned_state()
 
     print((
