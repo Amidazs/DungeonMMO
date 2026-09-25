@@ -753,6 +753,44 @@ local function consume_physical_shot(
 end
 
 --[[
+Resolves elemental vulnerability for one source magic skill.
+
+The pinned C4 formula starts at multiplier 1 and only applies an elemental
+vulnerability when the source skill actually defines an element. Missing
+element metadata therefore means neutral magic, not invalid source data.
+
+Args:
+    effect (any): Exact source skill effect rank.
+    defender (any): Authenticated source target boundary.
+
+Returns:
+    (number?, string?, string?): Multiplier, source element, or denial reason.
+]]
+local function source_magic_element(
+    effect: any,
+    defender: any
+): (number?, string?, string?)
+    local element = effect.Sets.element
+    if element == nil then
+        return 1, nil, nil
+    end
+    if type(element) ~= "string" or element == "" then
+        return nil, nil, "InvalidOriginalMagicElement"
+    end
+
+    local multiplier, reason =
+        Formula.elemental_vulnerability(
+            element,
+            defender.SourceStatCandidate
+        )
+    if multiplier == nil then
+        return nil, nil, reason
+    end
+
+    return multiplier, element, nil
+end
+
+--[[
 Consumes the private one-use magical shot state.
 
 Args:
@@ -1666,16 +1704,8 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, failure_reason
     end
 
-    local element = effect.Sets.element
-    if type(element) ~= "string" or element == "" then
-        return nil, "OriginalMagicElementUnavailable"
-    end
-
-    local elemental_multiplier, elemental_reason =
-        Formula.elemental_vulnerability(
-            element,
-            defender.SourceStatCandidate
-        )
+    local elemental_multiplier, element, elemental_reason =
+        source_magic_element(effect, defender)
     if elemental_multiplier == nil then
         return nil, elemental_reason
     end
@@ -1727,6 +1757,7 @@ function C4SourceCombatCalculationService.magic_skill(
         MagicCriticalRoll = critical.Roll,
         SourceMagicalCriticalRate = critical_rate,
         SourceElement = element,
+        SourceElemental = element ~= nil,
         ElementalMultiplier = elemental_multiplier,
         PvpStat = "PVP_MAGICAL_DMG",
         PvpMultiplier = pvp_multiplier,
