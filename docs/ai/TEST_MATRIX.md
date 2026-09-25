@@ -1,3 +1,27 @@
+## 26 September 2026 — CURRENT v3.01 big Wizard validation pending
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_01_Human_Wizard_Targeted_Cast_Batch_20260926.md);
+[pending validation](
+../testing/c4-human-wizard-targeted-cast-batch-v3-01-pending-20260926.md).
+Human Wizard v3.01 is now a larger **validation-pending**
+backend batch. The staged server runtime covers three pure targeted direct
+spells (Ember Bolt, Flame Burst and Focused Bolt) plus targeted Venom Hex
+poison. Non-elemental C4 MDAM now resolves neutrally, exact cast/effect ranges
+flow through contract -> timing -> scheduler -> bridge, and hit-time range
+revalidation happens before launch MP/shot/effect execution. A real
+cross-service staged integration test and source-cast runtime composition test
+were added. Tomorrow's prepared runners are **14 cast-focused suites** and a
+**32-suite big backend pass** spanning progression, source data, stats,
+resources, scheduler, damage dispatch, ManaService and contribution/quest
+bookkeeping. No local/Studio tests were run tonight; v2.99 remains the last
+fully green baseline.
+
+Primary tomorrow runner:
+`scripts/studio/c4_human_wizard_big_backend_focus.luau` (**32 suites**).
+Secondary cast runner:
+`scripts/studio/c4_human_wizard_source_cast_focus.luau` (**14 suites**).
+
 ## 26 September 2026 — CURRENT v3.00 direct MDAM bridge pending validation
 
 [Roadmap](
