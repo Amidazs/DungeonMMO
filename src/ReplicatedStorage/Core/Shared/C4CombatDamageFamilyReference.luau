@@ -25,10 +25,10 @@ local FAMILIES = table.freeze({
         ActivationBlocker = false,
     }),
     RangerArea = table.freeze({
-        Route = "Unsupported",
+        Route = "LegacyC4ScopeExcluded",
         PlayerToNpc = true,
-        ActivationBlocker = true,
-        Reason = "C4RangerAreaSourceMappingPending",
+        ActivationBlocker = false,
+        Reason = "C4LegacyRangerAreaOutsideLevel30Scope",
     }),
     MagicBasic = table.freeze({
         Route = "SourceNormal",
@@ -74,9 +74,7 @@ local FAMILIES = table.freeze({
     }),
 })
 
-local BLOCKING_PLAYER_TO_NPC_FAMILIES = table.freeze({
-    "RangerArea",
-})
+local BLOCKING_PLAYER_TO_NPC_FAMILIES = table.freeze({})
 
 local PERIODIC_STATUS_SKILLS = table.freeze({
     WayfinderWound = true,
