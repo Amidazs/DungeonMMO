@@ -1,3 +1,15 @@
+## 25 September 2026 — v2.74 C4 elemental resolution GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_74_C4_Elemental_Resolution_20260925.md);
+[green evidence](../testing/c4-elemental-resolution-v2-74-20260925.md).
+The disabled source-combat provider now resolves the reviewed six C4 skill
+elements against authenticated final player-target elemental vulnerability
+stats. Fresh Studio Base 14/14 and Dungeon 16/16 passed; formula 49 and source
+combat 24 assertions passed. NPC template vulnerabilities remain a later
+NPC/live boundary rather than guessed data. Next add source shot authority,
+then PvP/source-target modifiers and the live executor. Permanent edits remain
+GitHub-only; no main merge/publish/prod saves.
+
 ## 25 September 2026 — v2.73 C4 magic failure/critical GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_73_C4_Magic_Failure_Critical_20260925.md);
