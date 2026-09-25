@@ -74,12 +74,14 @@ local function check_equipment_and_class_gates()
         {Weapon = "Sword", Body = "Heavy"}, {
             {SkillId = 232, Rank = 1},
         }))
+    local heavy_expected = knight.Naked.NakedPDef + 17.7
+    local heavy_actual =
+        knight.PassiveStatSnapshot.PHYSICAL_DEFENCE
     check(
-        math.abs(
-            knight.PassiveStatSnapshot.PHYSICAL_DEFENCE
-                - (knight.Naked.NakedPDef + 17.7)
-        ) < 0.000001,
-        "Heavy mastery adds source P.Def on correctly equipped Knight"
+        math.abs(heavy_actual - heavy_expected) < 0.000001,
+        (
+            "Heavy mastery source P.Def expected %.6f, got %.6f"
+        ):format(heavy_expected, heavy_actual)
     )
     local scout = assert(C4.get("Elf", "GreenwardScout", 30,
         {Weapon = "Bow", Body = "Light"}, {
