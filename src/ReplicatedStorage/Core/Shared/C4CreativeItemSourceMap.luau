@@ -17,11 +17,20 @@ local C4CreativeItemSourceMap = {}
 local LINKS = table.freeze({
     marauder_sword = 1,
     greenward_training_mace = 4,
+    stonewatch_training_mace = 4,
     apprentice_arcane_wand = 6,
     scout_dagger = 10,
     apprentice_longbow = 13,
+    neti_trial_dagger = 1182,
+    neti_trial_bow = 1181,
+    ironroot_training_halberd = 291,
     scout_leather_vest = 22,
+    ironroot_light_vest = 22,
     marauder_armor = 25,
+    stonewatch_d_grade_armor = 352,
+    greenward_d_grade_armor = 352,
+    ironroot_d_grade_armor = 352,
+    scout_expert_leather_vest = 395,
     apprentice_mystic_robe = 425,
     marauder_shield = 102,
 })
@@ -30,6 +39,18 @@ local SLOT_MAP = table.freeze({
     Weapon = "Weapon",
     Body = "Body",
     OffHand = "OffHand",
+})
+
+local CORE_SLOTS = table.freeze({
+    "Weapon",
+    "Body",
+    "OffHand",
+})
+
+local UNINTEGRATED_SLOTS = table.freeze({
+    "Helmet",
+    "Gloves",
+    "Boots",
 })
 
 --[[
@@ -104,9 +125,15 @@ function C4CreativeItemSourceMap.resolve_loadout(
         return nil, "InvalidCreativeEquipmentLoadout"
     end
 
+    for _, slot in ipairs(UNINTEGRATED_SLOTS) do
+        if equipment[slot] ~= nil then
+            return nil, "AdditionalCreativeEquipmentSlotsNotIntegrated"
+        end
+    end
+
     local result = {}
 
-    for _, slot in ipairs({"Weapon", "Body", "OffHand"}) do
+    for _, slot in ipairs(CORE_SLOTS) do
         local creative_item_id = equipment[slot]
 
         if creative_item_id ~= nil then
@@ -141,7 +168,7 @@ function C4CreativeItemSourceMap.resolve_loadout(
 end
 
 --[[
-Lists the nine reviewed creative-to-source item links.
+Lists all reviewed creative-to-source core equipment links.
 
 Args:
     None.
