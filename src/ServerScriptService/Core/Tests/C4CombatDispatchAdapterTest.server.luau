@@ -346,10 +346,10 @@ local function main()
     )
     check(
         magic_basic.Handled
-            and magic_basic.AppliedDamage == 0
-            and magic_basic.Reason
-                == "C4MagicBasicSourceMappingPending",
-        "reviewed magical basic damage fails closed while mapping waits"
+            and magic_basic.AppliedDamage == 10
+            and calls[#calls].Kind == "Normal"
+            and calls[#calls].SequenceId == 17,
+        "creative Spirit Orb contact uses source normal attack damage"
     )
 
     local physical_status = Adapter.try_damage(
@@ -402,9 +402,9 @@ local function main()
             and capability.DisabledFallsBackToCurrentCombat
             and capability.EnabledSourceFailureFallsClosed
             and not capability.ActivationAuditReady
-            and #capability.ActivationBlockers == 4
+            and #capability.ActivationBlockers == 3
             and capability.RangerAreaActivationBlocked
-            and capability.MagicBasicActivationBlocked
+            and capability.MagicBasicUsesSourceNormalAttack
             and capability.PeriodicStatusActivationBlocked
             and not capability.ClientDamageAuthority,
         "dispatch capability exposes the remaining activation blockers"
