@@ -1,3 +1,16 @@
+**v2.68 SOURCE COMBAT PROVIDER GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_68_C4_Source_Combat_Calculation_Provider_20260925.md)
+and [acceptance evidence](
+../testing/c4-source-combat-calculation-provider-v2-68-20260925.md).
+Added a disabled server-only C4 combat calculation provider for authenticated
+PDAM, MDAM and instant HEAL source ranks. It derives final attacker/defender
+stats from the zero-blocker source boundary and resolves skill ID/rank/power
+from actually owned creative skills; callers cannot inject C4 source stats or
+power. Results remain source-only and do not alter HP/MP. Fresh Base **13/13
+PASS** and Dungeon **15/15 PASS** at 0e859222. Next integrate authoritative
+hit/crit/random/shield/magic-failure/element/shot/PvP inputs before any live
+source damage executor. No main merge, publish or production saves.
+
 **v2.67 REVERSIBLE RESOURCE CUTOVER GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_67_C4_Reversible_Resource_Cutover_20260925.md)
 and [acceptance evidence](
