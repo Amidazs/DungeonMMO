@@ -98,6 +98,8 @@ local function begin_evidence(record: any): any
         FinalHitTimeMs = record.FinalHitTimeMs,
         FinalCoolTimeMs = record.FinalCoolTimeMs,
         FinalReuseDelayMs = record.FinalReuseDelayMs,
+        SourceCastRange = record.SourceCastRange,
+        SourceEffectRange = record.SourceEffectRange,
         SourceOnly = true,
         LiveDamageIntegrated = false,
         ShotStateConsumed = false,
@@ -225,6 +227,8 @@ local function pending_record(
         FinalHitTimeMs = timing.FinalHitTimeMs,
         FinalCoolTimeMs = timing.FinalCoolTimeMs,
         FinalReuseDelayMs = reuse_ms,
+        SourceCastRange = timing.SourceCastRange,
+        SourceEffectRange = timing.SourceEffectRange,
     }
 end
 
@@ -433,6 +437,8 @@ function C4SourceCastSchedulerService:launch_if_ready(
         FinalizerAt = record.FinalizerAt,
         ReuseReadyAt = record.ReuseReadyAt,
         LaunchCommittedAt = now,
+        SourceCastRange = record.SourceCastRange,
+        SourceEffectRange = record.SourceEffectRange,
         InitialMpSpent = committed.InitialMpSpent,
         LaunchMpSpent = committed.LaunchMpSpent,
         SourceOnly = true,
@@ -523,6 +529,7 @@ function C4SourceCastSchedulerService.capability(): any
         ReplayRejected = true,
         SplitManaCommitAtLaunch = true,
         ReadyForSourceEffectExecution = true,
+        SourceRangeMetadataPreserved = true,
         ShotConsumptionIntegrated = false,
         LiveDamageIntegrated = false,
         ClientAuthority = false,
