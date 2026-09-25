@@ -11,35 +11,35 @@ local SOURCE_DATA = SOURCE_ROOT .. "/L2jAdmins_Data/"
 local ITEM_REFERENCES = table.freeze({
     -- SQL bodypart/weaponType and XML stat operations are both pinned.
     [1] = table.freeze({
-        Id = 1, Slot = "Weapon", Kind = "Sword", Grade = "None",
+        Id = 1, Slot = "Weapon", Kind = "Sword",
         SoulShotCount = 1, SpiritShotCount = 1,
         PhysicalAttack = 8, MagicalAttack = 6,
         RandomDamage = 10,
         PhysicalCriticalRate = 8, Accuracy = 0, AttackSpeed = 379,
     }),
     [4] = table.freeze({
-        Id = 4, Slot = "Weapon", Kind = "Blunt", Grade = "None",
+        Id = 4, Slot = "Weapon", Kind = "Blunt",
         SoulShotCount = 1, SpiritShotCount = 1,
         PhysicalAttack = 8, MagicalAttack = 6,
         RandomDamage = 20,
         PhysicalCriticalRate = 4, Accuracy = 4, AttackSpeed = 379,
     }),
     [6] = table.freeze({
-        Id = 6, Slot = "Weapon", Kind = "Blunt", Grade = "None",
+        Id = 6, Slot = "Weapon", Kind = "Blunt",
         SoulShotCount = 1, SpiritShotCount = 1,
         PhysicalAttack = 5, MagicalAttack = 7,
         RandomDamage = 20,
         PhysicalCriticalRate = 4, Accuracy = 4, AttackSpeed = 379,
     }),
     [10] = table.freeze({
-        Id = 10, Slot = "Weapon", Kind = "Dagger", Grade = "None",
+        Id = 10, Slot = "Weapon", Kind = "Dagger",
         SoulShotCount = 1, SpiritShotCount = 1,
         PhysicalAttack = 5, MagicalAttack = 5,
         RandomDamage = 5,
         PhysicalCriticalRate = 12, Accuracy = -3, AttackSpeed = 433,
     }),
     [13] = table.freeze({
-        Id = 13, Slot = "Weapon", Kind = "Bow", Grade = "None",
+        Id = 13, Slot = "Weapon", Kind = "Bow",
         SoulShotCount = 1, SpiritShotCount = 1,
         PhysicalAttack = 16, MagicalAttack = 6,
         RandomDamage = 5,
@@ -55,7 +55,7 @@ local ITEM_REFERENCES = table.freeze({
         AttackSpeed = 325, TwoHanded = true,
     }),
     [1181] = table.freeze({
-        Id = 1181, Slot = "Weapon", Kind = "Bow", Grade = "None",
+        Id = 1181, Slot = "Weapon", Kind = "Bow",
         SoulShotCount = 7, SpiritShotCount = 2,
         PhysicalAttack = 45, MagicalAttack = 5,
         RandomDamage = 5,
@@ -63,7 +63,7 @@ local ITEM_REFERENCES = table.freeze({
         AttackSpeed = 293, TwoHanded = true,
     }),
     [1182] = table.freeze({
-        Id = 1182, Slot = "Weapon", Kind = "Dagger", Grade = "None",
+        Id = 1182, Slot = "Weapon", Kind = "Dagger",
         SoulShotCount = 2, SpiritShotCount = 2,
         PhysicalAttack = 19, MagicalAttack = 5,
         RandomDamage = 5,
