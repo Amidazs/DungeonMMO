@@ -14,7 +14,7 @@ end
 local original_progression = ProgressionService.get_default()
 local original_proficiency = ProficiencyService.get_default()
 
-RuntimeServices.new("Base")
+local base_runtime = RuntimeServices.new("Base")
 
 expect(
     ProgressionService.get_default() == original_progression,
@@ -24,6 +24,10 @@ expect(
     ProficiencyService.get_default() == original_proficiency,
     "auxiliary RuntimeServices.new must not replace the Place-owned ProficiencyService"
 )
+expect(
+    base_runtime.C4SourceCastRuntime == nil,
+    "Base RuntimeServices must not compose Dungeon-only C4 cast runtime"
+)
 
 ProgressionService.bind_default(original_progression)
 ProficiencyService.bind_default(original_proficiency)
@@ -32,4 +36,4 @@ if #failures > 0 then
     error("[Runtime Default Binding Tests] FAIL: " .. table.concat(failures, "; "))
 end
 
-print("[Runtime Default Binding Tests] PASS: 2 assertions.")
+print("[Runtime Default Binding Tests] PASS: 3 assertions.")
