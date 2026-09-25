@@ -1,7 +1,7 @@
 # DungeonMMO Roadmap v2.71 — C4 Physical Random Variance
 
-Date: 25 September 2026.  
-Branch: `wip/phase-4-test-hud-integration-v1`.  
+Date: 25 September 2026.
+Branch: `wip/phase-4-test-hud-integration-v1`.
 Previous: [v2.70](
 DungeonMMO_Roadmap_v2_70_C4_Physical_Critical_Resolution_20260925.md).
 
