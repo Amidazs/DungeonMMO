@@ -159,6 +159,54 @@ function C4CombatPointRuntime.configure_from_boundary(
 end
 
 --[[
+Reconfigures CP from a certified boundary while preserving resource fraction.
+
+This is used when live source maxima change because of an authenticated source
+effect. The fraction is measured from prior authoritative server state; it is
+never supplied by a client request.
+
+Args:
+    owner (any): Player or disposable server-owned test owner.
+    boundary (any): Authenticated source-ready C4 migration boundary.
+    fraction (number): Server-measured current/max CP ratio from zero to one.
+
+Returns:
+    (boolean, string?): Success or strict validation reason.
+]]
+function C4CombatPointRuntime.configure_fraction_from_boundary(
+    owner: any,
+    boundary: any,
+    fraction: number
+): (boolean, string?)
+    if not has_owner_identity(owner) then
+        return false, "InvalidCombatPointOwner"
+    end
+
+    if type(fraction) ~= "number"
+        or fraction ~= fraction
+        or fraction < 0
+        or fraction > 1
+        or math.abs(fraction) >= math.huge
+    then
+        return false, "InvalidCombatPointFraction"
+    end
+
+    local max_cp, source_reason = source_max_cp(boundary)
+
+    if not max_cp then
+        return false, source_reason
+    end
+
+    state_by_owner[owner] = {
+        Character = owner.Character,
+        CurrentCP = max_cp * fraction,
+        MaxCP = max_cp,
+    }
+
+    return true, nil
+end
+
+--[[
 Clears all CP state for one owner.
 
 Args:
