@@ -957,9 +957,9 @@ function C4SourceCombatCalculationService.normal_attack_critical(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -1034,9 +1034,9 @@ function C4SourceCombatCalculationService.shield_resolution(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -1051,6 +1051,9 @@ function C4SourceCombatCalculationService.shield_resolution(
             Blocked = false,
             PerfectShield = false,
             FacingEligible = facing_eligible,
+            TargetKind = target_kind,
+            SourceNpcId = defender.SourceNpcId,
+            SourceNpcRace = defender.SourceNpcRace,
             SourceOnly = true,
             LiveApplied = false,
         }, nil
@@ -1102,6 +1105,9 @@ function C4SourceCombatCalculationService.shield_resolution(
         PerfectShield = if perfect
             then perfect.PerfectShield
             else false,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -1181,9 +1187,9 @@ function C4SourceCombatCalculationService.normal_attack(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -1216,6 +1222,9 @@ function C4SourceCombatCalculationService.normal_attack(
             SourcePositionRelation = condition.PositionRelation,
             SourceElevationRelation = condition.ElevationRelation,
             SourceNight = condition.IsNight,
+            TargetKind = target_kind,
+            SourceNpcId = defender.SourceNpcId,
+            SourceNpcRace = defender.SourceNpcRace,
             SourceOnly = true,
             LiveApplied = false,
         }, nil
@@ -1237,7 +1246,7 @@ function C4SourceCombatCalculationService.normal_attack(
         local shield_result, shield_reason =
             C4SourceCombatCalculationService.shield_resolution(
                 attacker_user_id,
-                defender_user_id,
+                defender_target,
                 spatial_context
             )
         if not shield_result then
@@ -1269,10 +1278,21 @@ function C4SourceCombatCalculationService.normal_attack(
         return nil, vulnerability_reason
     end
 
-    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
+    local race, race_reason = source_npc_race_multiplier(
         attacker,
-        "PVP_PHYSICAL_DMG"
+        defender,
+        target_kind
     )
+    if not race then
+        return nil, race_reason
+    end
+
+    local pvp_multiplier, pvp_reason =
+        source_target_pvp_multiplier(
+            attacker,
+            target_kind,
+            "PVP_PHYSICAL_DMG"
+        )
     if pvp_multiplier == nil then
         return nil, pvp_reason
     end
@@ -1295,6 +1315,7 @@ function C4SourceCombatCalculationService.normal_attack(
         CriticalPowerAdd = additive,
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
         RandomDamageMultiplier = variance.Multiplier,
+        RaceMultiplier = race.Multiplier,
         PvpMultiplier = pvp_multiplier,
     })
 
@@ -1319,8 +1340,14 @@ function C4SourceCombatCalculationService.normal_attack(
         WeaponKind = vulnerability.WeaponKind,
         WeaponVulnerabilityStat = vulnerability.VulnerabilityStat,
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
+        NpcRaceMultiplier = race.Multiplier,
+        NpcRaceStats = race.AppliedStats,
         PvpStat = "PVP_PHYSICAL_DMG",
         PvpMultiplier = pvp_multiplier,
+        PvpApplied = target_kind == "Player",
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         ShieldEquipped = shield.ShieldEquipped,
         ShieldBlocked = shield.Blocked,
         PerfectShield = shield.PerfectShield,
@@ -1378,9 +1405,9 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -1443,10 +1470,21 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, vulnerability_reason
     end
 
-    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
+    local race, race_reason = source_npc_race_multiplier(
         attacker,
-        "PVP_PHYS_SKILL_DMG"
+        defender,
+        target_kind
     )
+    if not race then
+        return nil, race_reason
+    end
+
+    local pvp_multiplier, pvp_reason =
+        source_target_pvp_multiplier(
+            attacker,
+            target_kind,
+            "PVP_PHYS_SKILL_DMG"
+        )
     if pvp_multiplier == nil then
         return nil, pvp_reason
     end
@@ -1471,7 +1509,7 @@ function C4SourceCombatCalculationService.physical_skill(
         local shield_result, shield_reason =
             C4SourceCombatCalculationService.shield_resolution(
                 attacker_user_id,
-                defender_user_id,
+                defender_target,
                 spatial_context
             )
         if not shield_result then
@@ -1496,6 +1534,7 @@ function C4SourceCombatCalculationService.physical_skill(
         ShieldDefense = shield.ShieldDefencePower,
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
         RandomDamageMultiplier = variance.Multiplier,
+        RaceMultiplier = race.Multiplier,
         PvpMultiplier = pvp_multiplier,
     })
 
@@ -1515,8 +1554,14 @@ function C4SourceCombatCalculationService.physical_skill(
         WeaponKind = vulnerability.WeaponKind,
         WeaponVulnerabilityStat = vulnerability.VulnerabilityStat,
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
+        NpcRaceMultiplier = race.Multiplier,
+        NpcRaceStats = race.AppliedStats,
         PvpStat = "PVP_PHYS_SKILL_DMG",
         PvpMultiplier = pvp_multiplier,
+        PvpApplied = target_kind == "Player",
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         PhysicalSkillCritical = skill_critical.Critical,
         PhysicalSkillCriticalChancePerThousand =
             skill_critical.ChancePerThousand,
@@ -1573,9 +1618,9 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, attacker_reason
     end
 
-    local defender, defender_reason =
-        source_boundary(defender_user_id)
-    if not defender then
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
         return nil, defender_reason
     end
 
@@ -1630,10 +1675,12 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, elemental_reason
     end
 
-    local pvp_multiplier, pvp_reason = source_pvp_multiplier(
-        attacker,
-        "PVP_MAGICAL_DMG"
-    )
+    local pvp_multiplier, pvp_reason =
+        source_target_pvp_multiplier(
+            attacker,
+            target_kind,
+            "PVP_MAGICAL_DMG"
+        )
     if pvp_multiplier == nil then
         return nil, pvp_reason
     end
@@ -1678,6 +1725,10 @@ function C4SourceCombatCalculationService.magic_skill(
         ElementalMultiplier = elemental_multiplier,
         PvpStat = "PVP_MAGICAL_DMG",
         PvpMultiplier = pvp_multiplier,
+        PvpApplied = target_kind == "Player",
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceNpcRace = defender.SourceNpcRace,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -1808,9 +1859,12 @@ function C4SourceCombatCalculationService.capability(): any
             Formula.magic_failures_default_enabled(),
         ElementalResolutionIntegrated = true,
         ElementalPlayerTargetSourceStatsIntegrated = true,
+        ElementalNpcTargetSourceStatsIntegrated = true,
+        NpcTargetSourceBoundaryIntegrated = true,
         PvpFormulaModifiersIntegrated = true,
         PlayerTargetPvpModifiersIntegrated = true,
-        NpcRacePhysicalModifiersIntegrated = false,
+        NpcTargetPvpNeutralityIntegrated = true,
+        NpcRacePhysicalModifiersIntegrated = true,
         LiveDamageApplied = false,
     }
 end
