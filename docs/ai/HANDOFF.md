@@ -1,14 +1,14 @@
-## 25 September 2026 — v2.72 source shield resolution BUILT
+## 25 September 2026 — v2.72 source shield resolution GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_72_C4_Shield_Resolution_20260925.md);
-[acceptance record](../testing/c4-shield-resolution-v2-72-20260925.md).
+[green evidence](../testing/c4-shield-resolution-v2-72-20260925.md).
 The disabled source-combat provider now resolves reviewed shield rate/power,
 DEX scaling, bow x1.3 rate, strict block/perfect rolls and applies the result
 to PDAM. A shielded target requires trusted server facing state; missing facing
-fails closed and no client-facing authority was added. Formula/provider tests
-and the v2.72 focused runner are authored. Fresh unpublished Base/Dungeon Rojo
-builds PASS, but final focused Studio execution is pending, so do not call this
-GREEN yet. Permanent edits remain GitHub-only; no main merge/publish/prod
+fails closed and no client-facing authority was added. Fresh focused Studio
+Base 14/14 and Dungeon 16/16 passed; formula 37 and source combat 21 assertions
+passed. Next move directly to magic failure/resistance and magic critical
+resolution. Permanent edits remain GitHub-only; no main merge/publish/prod
 saves.
 
 ## 25 September 2026 — v2.71 physical random variance GREEN
