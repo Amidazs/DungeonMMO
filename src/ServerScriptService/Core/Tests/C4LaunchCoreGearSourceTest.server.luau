@@ -111,7 +111,7 @@ Returns:
 ]]
 local function check_shot_requirements()
     check(
-        assert(SourceItems.get(1)).Grade == "None"
+        assert(SourceItems.get(1)).Grade == nil
             and assert(SourceItems.get(1)).SoulShotCount == 1
             and assert(SourceItems.get(1)).SpiritShotCount == 1
             and assert(SourceItems.get(4)).SoulShotCount == 1
