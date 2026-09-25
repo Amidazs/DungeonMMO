@@ -442,6 +442,7 @@ local function main()
             and capability.NpcMagicSkillLiveApplication
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
+            and capability.NpcSourceRangePreflight
             and capability.NpcPeriodicStatusLiveApplication
             and capability.NpcPeriodicStatusNonlethal
             and capability.NpcPeriodicStatusRefreshBySourceSkill
@@ -492,9 +493,23 @@ local function main()
     defender_active = true
 
     local npc_preflight, npc_preflight_reason =
-        executor:can_magic_skill_npc(attacker, enemy)
+        executor:can_magic_skill_npc(
+            attacker,
+            enemy,
+            750
+        )
     local status_preflight, status_preflight_reason =
-        executor:can_status_skill_npc(attacker, enemy)
+        executor:can_status_skill_npc(
+            attacker,
+            enemy,
+            600
+        )
+    local out_of_range, out_of_range_reason =
+        executor:can_magic_skill_npc(
+            attacker,
+            enemy,
+            200
+        )
     local preflight_humanoid =
         enemy:FindFirstChildOfClass("Humanoid")
     check(
@@ -502,10 +517,13 @@ local function main()
             and npc_preflight_reason == nil
             and status_preflight
             and status_preflight_reason == nil
+            and not out_of_range
+            and out_of_range_reason
+                == "C4SourceCastTargetOutOfRange"
             and preflight_humanoid ~= nil
             and preflight_humanoid.Health == 100
             and #npc_events == 0,
-        "NPC magic/status preflight validates without world mutation"
+        "NPC source range preflight validates without world mutation"
     )
 
     combat_mode = "Miss"
