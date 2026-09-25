@@ -131,6 +131,11 @@ function RuntimeServices.new(place_kind: string): any
         c4_resource_cutover = require(
             Services:WaitForChild("C4ResourceCutoverService")
         )
+        C4CombatDispatchAdapter.bind_participant_provider(
+            function(attacker: any): boolean
+                return c4_resource_cutover.is_active(attacker)
+            end
+        )
     end
 
     local c4_source_combat_executor =
