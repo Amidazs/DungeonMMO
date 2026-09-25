@@ -44,6 +44,21 @@ local LINKS = table.freeze({
     marauder_boots = 38,
 })
 
+-- DungeonMMO has one visible Body slot. These reviewed source legs complete
+-- the matching C4 armor set so armor conditions and FuncPDefMod can reproduce
+-- the original chest+legs semantics without adding a second player-facing
+-- inventory slot.
+local BODY_LEGS = table.freeze({
+    scout_leather_vest = 29,
+    ironroot_light_vest = 29,
+    marauder_armor = 32,
+    stonewatch_d_grade_armor = 2378,
+    greenward_d_grade_armor = 2378,
+    ironroot_d_grade_armor = 2378,
+    scout_expert_leather_vest = 417,
+    apprentice_mystic_robe = 461,
+})
+
 local SLOT_MAP = table.freeze({
     Weapon = "Weapon",
     Body = "Body",
@@ -101,6 +116,26 @@ function C4CreativeItemSourceMap.resolve(
         return nil, "CreativeAndOriginalSlotMismatch"
     end
 
+    local source_legs_item_id = BODY_LEGS[creative_item_id]
+    local source_legs = nil
+
+    if current.Slot == "Body" then
+        if not source_legs_item_id then
+            return nil, "CreativeBodySourceLegsMissing"
+        end
+
+        source_legs = C4SourceItemReference.get(source_legs_item_id)
+        if not source_legs
+            or source_legs.Slot ~= "Legs"
+            or source_legs.Kind ~= source.Kind
+            or source_legs.Grade ~= source.Grade
+        then
+            return nil, "CreativeBodySourceSetMismatch"
+        end
+    elseif source_legs_item_id then
+        return nil, "CreativeBodySourceSetMismatch"
+    end
+
     return {
         CreativeItemId = creative_item_id,
         CreativeSlot = current.Slot,
@@ -108,6 +143,12 @@ function C4CreativeItemSourceMap.resolve(
         SourceItemId = source_item_id,
         SourceSlot = source.Slot,
         SourceKind = source.Kind,
+        SourceLegsItemId = source_legs_item_id,
+        SourceLegsKind = if source_legs
+            then source_legs.Kind
+            else nil,
+        CompleteSourceArmorSet = current.Slot ~= "Body"
+            or source_legs ~= nil,
         SourceOnly = true,
         CurrentCombatModifiersIgnored = true,
         LiveIntegrated = false,
@@ -115,7 +156,7 @@ function C4CreativeItemSourceMap.resolve(
 end
 
 --[[
-Converts a fully reviewed current six-slot equipment loadout.
+Converts a reviewed six-slot loadout to its full C4 source paperdoll.
 
 Empty slots are allowed. Any equipped current item without an explicit reviewed
 link fails the whole conversion so mixed custom/source equipment cannot leak
@@ -152,6 +193,10 @@ function C4CreativeItemSourceMap.resolve_loadout(
             end
 
             result[link.SourceSlot] = link.SourceItemId
+
+            if link.SourceLegsItemId then
+                result.Legs = link.SourceLegsItemId
+            end
         end
     end
 
@@ -166,6 +211,7 @@ function C4CreativeItemSourceMap.resolve_loadout(
         SourceCommit = resolved.SourceCommit,
         SourceOnly = true,
         CompleteReviewedLoadout = true,
+        OriginalBodyLegSemanticsIntegrated = true,
         LiveIntegrated = false,
     }, nil
 end
@@ -186,6 +232,7 @@ function C4CreativeItemSourceMap.all(): any
         table.insert(result, {
             CreativeItemId = creative_item_id,
             SourceItemId = source_item_id,
+            SourceLegsItemId = BODY_LEGS[creative_item_id],
         })
     end
 
