@@ -71,7 +71,11 @@ local function main()
     check_family("MagicSkill", "SourceMDAM", false)
 
     check_family("MagicBasic", "SourceNormal", false)
-    check_family("RangerArea", "Unsupported", true)
+    check_family(
+        "RangerArea",
+        "LegacyC4ScopeExcluded",
+        false
+    )
     check_family(
         "StatusPhysical",
         "LegacyPeriodicTickSuppressed",
@@ -110,16 +114,12 @@ local function main()
 
     local blockers = Families.activation_blockers()
     check(
-        #blockers == 1,
-        "only RangerArea still blocks player-to-NPC activation"
+        #blockers == 0,
+        "reviewed level-30 player-to-NPC source scope has no blockers"
     )
     check(
-        blockers[1] == "RangerArea",
-        "activation blocker list remains deterministic"
-    )
-    check(
-        not Families.activation_ready(),
-        "production dispatch audit remains not ready"
+        Families.activation_ready(),
+        "reviewed level-30 source dispatch audit is activation-ready"
     )
     check(
         Families.get("UnknownDamageFamily") == nil,
@@ -128,7 +128,7 @@ local function main()
 
     print((
         "[C4 Damage Family Audit] FAMILY_AUDIT_PASS: "
-            .. "%d assertions blockers=1 activation_ready=false"
+            .. "%d assertions blockers=0 activation_ready=true"
     ):format(checks))
 end
 
