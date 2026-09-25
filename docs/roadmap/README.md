@@ -1,3 +1,13 @@
+**v2.85 MAGICBASIC SOURCE-NORMAL ROUTING GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_85_C4_Magic_Basic_Normal_Routing_20260925.md)
+and [green evidence](
+../testing/c4-magic-basic-normal-routing-v2-85-20260925.md).
+Spirit Orb source-mode contact now uses the accepted C4 ordinary attack damage
+route without inventing a magic-basic formula. Remaining activation blockers:
+RangerArea, StatusPhysical and StatusMagic. Fresh Studio Base **20/20 PASS**,
+Dungeon **23/23 PASS**, family audit **24 assertions PASS**, dispatch **17
+assertions PASS**. Next: exact source Bleed/Poison status execution.
+
 **v2.84 C4 DAMAGE-FAMILY AUDIT GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_84_C4_Damage_Family_Audit_20260925.md)
 and [green evidence](
