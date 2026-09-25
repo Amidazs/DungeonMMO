@@ -128,6 +128,11 @@ local CombatValidationService = require(
 local ProgressionRuntimeState = require(
     ServerScriptService:WaitForChild("Core"):WaitForChild("Services"):WaitForChild("ProgressionRuntimeState")
 )
+local C4ResourceCutoverService = require(
+    ServerScriptService:WaitForChild("Core")
+        :WaitForChild("Services")
+        :WaitForChild("C4ResourceCutoverService")
+)
 local C4ActiveSourceEffectState = require(
     ServerScriptService:WaitForChild("Core")
         :WaitForChild("Services")
@@ -139,6 +144,18 @@ local DungeonProgressionBridge = require(
 local DungeonContributionBridge = require(
     ServerScriptService:WaitForChild("Dungeon"):WaitForChild("DungeonContributionBridge")
 )
+
+DamageService.set_player_resource_damage_resolver(function(
+    defender: Player,
+    damage: number,
+    attacker_is_playable: boolean
+): (number, number)
+    return C4ResourceCutoverService.resolve_player_damage(
+        defender,
+        damage,
+        attacker_is_playable
+    )
+end)
 
 DamageService.set_damage_callback(function(
     context: any,
@@ -3754,6 +3771,7 @@ local function on_character_added(
     StaminaService.reset_player(player)
     ManaService.reset_player(player)
     ProgressionRuntimeState.apply_max_health(player)
+    C4ResourceCutoverService.on_character_added(player)
     SkillCooldownService.remove_owner(player)
     DefenseService.clear(player)
     set_state(player, record, State.LOCOMOTION)
@@ -4029,6 +4047,7 @@ Players.PlayerRemoving:Connect(function(player)
     IronvowEnduranceSurgeService.stop(player)
     C4ActiveSourceEffectState.clear(player)
     StaminaService.remove_player(player)
+    C4ResourceCutoverService.remove_player(player)
     ManaService.remove_player(player)
     SkillCooldownService.remove_owner(player)
     player_states[player] = nil
