@@ -12,6 +12,8 @@ local C4PrimaryStatReference = require(
 
 local C4CombatPointSourceRules = {}
 
+local SOURCE_COMMIT =
+    "07f8536384e799f128d44198dd7ab23519660eea"
 local REGEN_PERIOD_SECONDS = 3
 local CP_REGEN_MULTIPLIER = 1
 
@@ -156,6 +158,7 @@ function C4CombatPointSourceRules.metadata(): any
         CpRegenMultiplier = CP_REGEN_MULTIPLIER,
         PlayableAttackerOnly = true,
         NpcDamageBypassesCP = true,
+        SourceCommit = SOURCE_COMMIT,
         SourceOnly = true,
     }
 end
