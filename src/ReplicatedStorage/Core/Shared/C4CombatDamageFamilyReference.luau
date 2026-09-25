@@ -31,10 +31,9 @@ local FAMILIES = table.freeze({
         Reason = "C4RangerAreaSourceMappingPending",
     }),
     MagicBasic = table.freeze({
-        Route = "Unsupported",
+        Route = "SourceNormal",
         PlayerToNpc = true,
-        ActivationBlocker = true,
-        Reason = "C4MagicBasicSourceMappingPending",
+        ActivationBlocker = false,
     }),
     StatusPhysical = table.freeze({
         Route = "PeriodicStatusPending",
@@ -76,7 +75,6 @@ local FAMILIES = table.freeze({
 })
 
 local BLOCKING_PLAYER_TO_NPC_FAMILIES = table.freeze({
-    "MagicBasic",
     "RangerArea",
     "StatusMagic",
     "StatusPhysical",
