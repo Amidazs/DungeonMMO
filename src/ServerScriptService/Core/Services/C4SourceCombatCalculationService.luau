@@ -451,11 +451,11 @@ function C4SourceCombatCalculationService.physical_random_variance(
 end
 
 --[[
-Calculates deterministic C4 PDAM skill damage between source-ready players.
+Calculates C4 PDAM skill damage between source-ready players.
 
-Shots, random weapon variance, criticals, race vulnerability and PvP bonuses
-remain neutral here. Those require separate authoritative runtime inputs before
-live integration.
+Weapon or unarmed random-damage variance is now server-owned and exact.
+Shots, PDAM skill criticals, race vulnerability and PvP bonuses remain neutral
+until their authoritative runtime inputs are integrated.
 
 Args:
     attacker_user_id (number): Authenticated source-ready attacker.
