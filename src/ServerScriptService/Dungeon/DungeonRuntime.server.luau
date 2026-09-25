@@ -165,7 +165,12 @@ C4CombatCutoverRegistry.bind(
     runtime.C4CombatCutoverCoordinator
 )
 C4CombatCutoverStudioBridge.bind(
-    runtime.C4CombatCutoverCoordinator
+    runtime.C4CombatCutoverCoordinator,
+    nil,
+    function(user_id: number): (any?, string?)
+        return ProgressionRuntimeState
+            .get_c4_resource_migration_boundary(user_id)
+    end
 )
 ProgressionService.bind_default(runtime.ProgressionService)
 ProficiencyService.bind_default(runtime.ProficiencyService)
