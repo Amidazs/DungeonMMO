@@ -1,3 +1,24 @@
+## 25 September 2026 — v2.92 multiplayer cutover GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_92_C4_Multiplayer_Cutover_Hardening_20260925.md);
+[green evidence](../testing/c4-multiplayer-cutover-v2-92-20260925.md).
+The final bounded cutover-hardening gate is complete. Two real unpublished
+Dungeon clients both used existing combat input to damage the same reviewed NPC
+through C4 source dispatch, with separate contribution/threat and correct
+highest-threat targeting. The first rehearsal exposed a lifecycle bug:
+coordinator participant withdrawal was using lightweight departure cleanup,
+which left connected source resource state stale. It now performs full
+fraction-preserving resource rollback. Live acceptance then proved one selected
+participant can leave source mode while the other remains source-active; the
+removed player's real client strike used 10.0 existing-model damage while the
+remaining participant still landed C4-source damage. Final-participant removal
+shut all source gates down, and a subsequent two-player enable/full rollback
+passed. Fresh focused Base 24/24, Dungeon 27/27, dispatch 20 assertions and
+coordinator 11 assertions passed. Resume progression/quests/content and the
+broader professions/economy, guild/raid and PvP/castle roadmap rather than
+repeating cutover rehearsals. Permanent edits remain GitHub-only; no main
+merge/publish/prod saves.
+
 ## 25 September 2026 — v2.91 live player-to-NPC rehearsal GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_91_C4_Live_Player_NPC_Rehearsal_20260925.md);
