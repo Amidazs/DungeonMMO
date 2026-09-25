@@ -88,6 +88,10 @@ local FIXTURES = table.freeze({
         Name = "ContributionDamageBridgeTest",
     },
     {Folder = core_tests, Name = "RuntimeDefaultBindingTest"},
+    {
+        Folder = core_tests,
+        Name = "C4DungeonSourceCastRuntimeTest",
+    },
 })
 
 --[[
