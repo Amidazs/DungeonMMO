@@ -1,3 +1,17 @@
+## 25 September 2026 — v2.61 C4 active-effect calculator ordering GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_61_C4_Active_Effect_Calculator_Ordering_20260925.md);
+[evidence](../testing/c4-active-effect-calculator-ordering-v2-61-20260925.md).
+C4CombinedStatEffectReference now merges owned passive and supplied
+ACTIVE/TOGGLE source functions into one calculator queue, including named
+stack-group priority and shared 0x30/0x40 ordering. Unified source stats can
+compose gear + owned passives + active effects, but deliberately report
+ActiveEffectStateAuthoritative=false. Base 8/8 and Dungeon 9/9 focused Studio
+suites are green at 08015086. Next create a server-only active source-effect
+registry and connect real live toggle/buff services; do not remove the
+active-effect blocker until learned-but-inactive skills cannot enter the
+snapshot. CP remains after that. No publish/prod saves/main merge.
+
 ## 25 September 2026 — v2.60 actually-owned C4 passive resolution GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_60_C4_Owned_Passive_Source_Resolution_20260925.md);
