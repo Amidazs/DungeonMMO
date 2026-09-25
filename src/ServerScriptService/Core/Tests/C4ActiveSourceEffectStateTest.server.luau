@@ -267,6 +267,107 @@ local function check_inherited_active_source()
 end
 
 --[[
+Checks timed source observations expire from server-owned monotonic time.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms resolved timed buffs exist only during their live duration.
+]]
+local function check_timed_source_state()
+    local character = original_character(
+        "Elf",
+        "GreenwardWarden",
+        30
+    )
+    own_skill(character, "GreenwardWardenAttackAura", 1)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local owner = owner_fixture(TEST_OWNER)
+    local observed, reason = ActiveState.observe_timed(
+        owner,
+        "GreenwardWardenAttackAura",
+        1,
+        0.05
+    )
+    check(
+        observed and reason == nil,
+        "server timed Warden aura resolves to a source effect"
+    )
+
+    local live = ActiveState.snapshot(owner)
+    check(
+        live.Ready
+            and live.ActiveCount == 1
+            and live.ResolvedCount == 1
+            and live.SourceRanks[1].SkillId == 77
+            and live.SourceRanks[1].Rank == 2,
+        "timed Warden aura records source Attack Aura rank 2"
+    )
+
+    task.wait(0.08)
+
+    local expired = ActiveState.snapshot(owner)
+    check(
+        expired.ActiveCount == 0
+            and expired.ResolvedCount == 0
+            and expired.Ready,
+        "timed source observation disappears after server expiry"
+    )
+
+    ActiveState.clear(owner)
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
+Checks a live timed custom effect stays visible when no C4 mapping exists.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source migration fails closed instead of dropping the effect.
+]]
+local function check_unresolved_timed_state()
+    local character = original_character(
+        "Elf",
+        "GreenwardScout",
+        30
+    )
+    own_skill(character, "ElvenScoutWindRun", 1)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local owner = owner_fixture(TEST_OWNER)
+    local observed, reason = ActiveState.observe_timed(
+        owner,
+        "ElvenScoutWindRun",
+        1,
+        5
+    )
+    check(
+        observed
+            and reason == "CreativeSkillNotActiveSourceCandidate",
+        "unmapped live timed buff is still observed"
+    )
+
+    local snapshot = ActiveState.snapshot(owner)
+    check(
+        not snapshot.Ready
+            and snapshot.ActiveCount == 1
+            and snapshot.ResolvedCount == 0
+            and #snapshot.SourceRanks == 0
+            and #snapshot.UnresolvedEffects == 1
+            and snapshot.UnresolvedEffects[1].CreativeSkillId
+                == "ElvenScoutWindRun",
+        "unmapped live timed buff remains an explicit migration blocker"
+    )
+
+    ActiveState.clear(owner)
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
 Checks non-active source candidates and missing ownership fail closed.
 
 Args:
@@ -320,11 +421,13 @@ Returns:
 local function main()
     check_activation_authority()
     check_inherited_active_source()
+    check_timed_source_state()
+    check_unresolved_timed_state()
     check_denials()
 
     print((
         "[C4 Active Source State] SOURCE_ONLY_PASS: %d assertions "
-        .. "authoritative=true attributes_ignored=true live_registry=true"
+        .. "authoritative=true timed=true unresolved_fail_closed=true"
     ):format(checks))
 end
 
