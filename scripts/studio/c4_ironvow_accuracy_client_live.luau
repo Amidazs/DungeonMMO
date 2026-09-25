@@ -55,6 +55,7 @@ local Runtime = require(SSS.Core.Services.ProgressionRuntimeState)
 local Mana = require(SSS.Combat.ManaService)
 local Damage = require(SSS.Combat.DamageService)
 local Accuracy = require(SSS.Combat.IronvowAccuracyToggleService)
+local ActiveSource = require(SSS.Core.Services.C4ActiveSourceEffectState)
 local channel = RS.TEMP_WarriorAccuracyInput
 local SKILL_ID = "IronvowAccuracyStance"
 local receipts = {}
@@ -227,6 +228,11 @@ local function verify_cast(player, npc)
     until os.clock() >= deadline
     assert(math.abs(Accuracy.get_bonus(player) - 0.03) < 0.0001,
         "Source +3 Accuracy does not apply true server-owned hit chance")
+    local source_active = ActiveSource.snapshot(player)
+    assert(source_active.ActiveCount == 1
+        and source_active.SourceRanks[1].SkillId == 256
+        and source_active.SourceRanks[1].Rank == 1,
+        "Live Accuracy did not register C4 source 256 rank 1")
     local active_mp = Mana.get(player)
     assert(before_mp - active_mp >= 0.9,
         "Source one-MP accuracy activation did not spend real mana")
@@ -243,6 +249,8 @@ local function verify_cast(player, npc)
     assert(Accuracy.get_bonus(player) == 0
         and test_hit(player, npc) == 0,
         "Disabled stance grants unpaid NPC hit chance")
+    assert(ActiveSource.snapshot(player).ActiveCount == 0,
+        "Disabled Accuracy remained in C4 source state")
     receipts[player.UserId] = nil
     channel:FireClient(player, "CAST")
     assert(await_receipt(player, "CAST").accepted,
@@ -254,6 +262,8 @@ local function verify_cast(player, npc)
     Runtime.set_character(player.UserId, owner)
     assert(Accuracy.get_bonus(player) == 0,
         "Revoked paid rank leaves live Accuracy effect active")
+    assert(ActiveSource.snapshot(player).ActiveCount == 0,
+        "Revoked Accuracy ownership left stale C4 source state")
     owner.Progression.Skills[SKILL_ID].PurchasedRank = 1
     owner.Identity.ClassId = "Fighter"
     Runtime.set_character(player.UserId, owner)
