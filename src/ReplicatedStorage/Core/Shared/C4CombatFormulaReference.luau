@@ -795,6 +795,53 @@ function C4CombatFormulaReference.resolve_magic_critical(
 end
 
 --[[
+Returns the exact C4 elemental vulnerability multiplier for a source skill.
+
+The reviewed player-character template defaults all six elemental
+vulnerabilities to 1.0. Source calculator effects may modify the matching
+stat before this function is called.
+
+Args:
+    element (string): FIRE, WIND, WATER, EARTH, HOLY or DARK.
+    source_stats (any): Authenticated final source stat dictionary.
+
+Returns:
+    (number?, string?): Elemental multiplier or strict source-data reason.
+]]
+function C4CombatFormulaReference.elemental_vulnerability(
+    element: string,
+    source_stats: any
+): (number?, string?)
+    local stat_by_element = {
+        FIRE = "FIRE_VULN",
+        WIND = "WIND_VULN",
+        WATER = "WATER_VULN",
+        EARTH = "EARTH_VULN",
+        HOLY = "HOLY_VULN",
+        DARK = "DARK_VULN",
+    }
+    local stat_name = stat_by_element[element]
+    if not stat_name then
+        return nil, "UnsupportedOriginalSkillElement"
+    end
+
+    if type(source_stats) ~= "table" then
+        return nil, "OriginalElementalSourceStatsUnavailable"
+    end
+
+    local multiplier = source_stats[stat_name]
+    if type(multiplier) ~= "number"
+        or multiplier ~= multiplier
+        or multiplier < 0
+        or multiplier >= math.huge
+    then
+        return nil, "OriginalElementalVulnerabilityUnavailable"
+    end
+
+    return multiplier, nil
+end
+
+--[[
 Reports the pinned default source setting for alternative magic failures.
 
 Args:
