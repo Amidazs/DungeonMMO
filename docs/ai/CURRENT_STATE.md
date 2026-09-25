@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.76 normal attack/PvP composition GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_76_C4_Normal_Attack_PvP_Composition_20260925.md)
+and [green evidence](
+../testing/c4-normal-attack-pvp-composition-v2-76-20260925.md).
+The disabled source-combat provider now composes one complete ordinary
+single-target attack from hit, shield, physical critical/power, random
+variance, authenticated target weapon vulnerability, player PvP modifier and
+one-use Soulshot. PDAM uses PVP_PHYS_SKILL_DMG plus weapon vulnerability; MDAM
+uses PVP_MAGICAL_DMG. A real Oathguard Deflect Arrow source effect proves Bow
+vulnerability 0.84 rather than only neutral multipliers. Fresh Studio Base
+**15/15 PASS**, Dungeon **17/17 PASS**, formula **49 assertions PASS**, source
+combat **30 assertions PASS**. Next close server-owned spatial hit/shield
+inputs before the live source-combat executor. No main merge, publish,
+production save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.75 source shot authority GREEN
 
 [Latest roadmap](
