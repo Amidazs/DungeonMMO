@@ -9,6 +9,9 @@ local CharacterIdentityRules = require(
 local C4PrimaryStatReference = require(
     Shared:WaitForChild("C4PrimaryStatReference")
 )
+local C4CreativeItemSourceMap = require(
+    Shared:WaitForChild("C4CreativeItemSourceMap")
+)
 
 local C4ResourceMigrationBoundary = {}
 
@@ -75,6 +78,11 @@ function C4ResourceMigrationBoundary.for_character(
         return nil, reason
     end
 
+    local reviewed_loadout, loadout_reason =
+        C4CreativeItemSourceMap.resolve_loadout(
+            character.Equipment or {}
+        )
+
     return {
         RaceId = identity.RaceId,
         ClassId = identity.ClassId,
@@ -85,6 +93,14 @@ function C4ResourceMigrationBoundary.for_character(
         SourceBaseMaxMana = vitals.MaxMP,
         SourceBaseMaxCP = vitals.MaxCP,
         ExactBaseVitalsCertified = true,
+        ReviewedCoreLoadoutReady = reviewed_loadout ~= nil,
+        ReviewedCoreLoadoutReason = loadout_reason,
+        ReviewedSourceItemIds = if reviewed_loadout
+            then reviewed_loadout.SourceItemIds
+            else nil,
+        ReviewedSourceKinds = if reviewed_loadout
+            then reviewed_loadout.SourceKinds
+            else nil,
         OriginalInventoryIntegrated = false,
         OriginalOwnedPassivesIntegrated = false,
         ActiveEffectsIntegrated = false,
