@@ -184,6 +184,9 @@ local function check_default_off()
         not Combat.is_enabled()
             and capability.Available
             and capability.DefaultEnabled == false
+            and capability.NormalAttackHitResolution
+            and capability.NormalAttackHitRollServerOwned
+            and not capability.NormalAttackHitConditionIntegrated
             and not capability.LiveDamageApplied,
         "source combat provider starts disabled and non-live"
     )
@@ -198,6 +201,56 @@ local function check_default_off()
         result == nil
             and reason == "C4SourceCombatCalculationDisabled",
         "disabled provider cannot calculate a source hit"
+    )
+end
+
+--[[
+Checks normal attack hit/miss uses final source Accuracy/Evasion.
+
+The service owns the random roll. The test verifies the returned roll against
+the exact source comparison instead of injecting or predicting randomness.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms the source chance and server-owned roll relationship.
+]]
+local function check_normal_attack_hit()
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(FIGHTER_ID)
+    )
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+
+    local result = assert(Combat.normal_attack_hit(
+        FIGHTER_ID,
+        TARGET_ID
+    ))
+    local expected_chance =
+        Formula.hit_chance_with_condition(
+            attacker.SourceStatCandidate.ACCURACY_COMBAT,
+            defender.SourceStatCandidate.EVASION_RATE,
+            1
+        )
+
+    check_close(
+        result.ChancePerThousand,
+        expected_chance,
+        "normal attack hit chance uses final source Accuracy/Evasion"
+    )
+    check(
+        result.Roll >= 0
+            and result.Roll <= 999
+            and result.Roll % 1 == 0
+            and result.Hit
+                == (result.ChancePerThousand >= result.Roll)
+            and result.Miss ~= result.Hit
+            and result.SourceConditionMultiplier == 1
+            and not result.SourceConditionIntegrated
+            and not result.LiveApplied,
+        "normal attack roll is server-owned and source comparison is exact"
     )
 end
 
@@ -363,6 +416,7 @@ local function main()
     check_default_off()
 
     Combat.set_enabled(true)
+    check_normal_attack_hit()
     check_physical()
     check_magic()
     check_heal()
@@ -375,7 +429,7 @@ local function main()
 
     print((
         "[C4 Source Combat] SOURCE_ONLY_PASS: %d assertions "
-        .. "pdam=true mdam=true heal=true live=false"
+        .. "hit=true pdam=true mdam=true heal=true live=false"
     ):format(checks))
 end
 
