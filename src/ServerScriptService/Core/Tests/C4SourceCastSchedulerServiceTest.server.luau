@@ -23,6 +23,8 @@ local timing_plan = {
     FinalCoolTimeMs = 140,
     FinalReuseDelayMs = 4500,
     FinalReuseDelayReady = true,
+    SourceCastRange = 750,
+    SourceEffectRange = 1250,
     ReuseBlocker = nil,
 }
 local timing_reason: string? = nil
@@ -218,6 +220,8 @@ local function reset_fakes()
         FinalCoolTimeMs = 140,
         FinalReuseDelayMs = 4500,
         FinalReuseDelayReady = true,
+        SourceCastRange = 750,
+        SourceEffectRange = 1250,
         ReuseBlocker = nil,
     }
     timing_reason = nil
@@ -271,7 +275,9 @@ local function check_normal_deadlines()
             and started.InterruptAt == 102
             and started.LaunchAt == 104
             and math.abs(started.FinalizerAt - 104.14) < 0.000001
-            and started.ReuseReadyAt == 104.5,
+            and started.ReuseReadyAt == 104.5
+            and started.SourceCastRange == 750
+            and started.SourceEffectRange == 1250,
         "source timing plan creates exact private deadlines"
     )
 end
@@ -310,6 +316,8 @@ local function check_normal_launch()
         launched ~= nil
             and launch_reason == nil
             and launched.LaunchMpSpent == 21
+            and launched.SourceCastRange == 750
+            and launched.SourceEffectRange == 1250
             and launched.ReadyForSourceEffectExecution
             and not launched.LiveDamageIntegrated
             and resource_state.CommitCalls == 1
@@ -565,6 +573,7 @@ local function main()
             and capability.ReplayRejected
             and capability.SplitManaCommitAtLaunch
             and capability.ReadyForSourceEffectExecution
+            and capability.SourceRangeMetadataPreserved
             and not capability.ShotConsumptionIntegrated
             and not capability.LiveDamageIntegrated
             and not capability.ClientAuthority,
