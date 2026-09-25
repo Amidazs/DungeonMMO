@@ -200,19 +200,24 @@ local function check_scout_heal_migration_plan()
     for _, row in ipairs(original_rows) do
         local planned = assert(ScoutHeal.get_rank(row.SkillLevel))
         local effect = assert(Source.get_rank(58, row.SkillLevel))
+        local power = effect.Effects[1].power
         check(planned.SourceLearnLevel == row.MinLevel
             and planned.SourceSP == row.SP
             and planned.PlannedCreativeRank == row.SkillLevel - 3
-            and planned.SourcePower == effect.Effects[1].power
+            and planned.SourcePower == power
+            and planned.SourceHealUncharged == power
+            and planned.SourceHealSpiritshot == power * 1.3
+            and planned.SourceHealBlessedSpiritshot == power * 1.5
             and planned.SourceTotalMP
                 == effect.Sets.mpInitialConsume
                     + effect.Sets.mpConsume
             and planned.SourceTarget == "TARGET_SELF",
-            "Scout rank preserves real C4 SP, MP, power and targeting")
+            "Scout rank preserves C4 SP, MP, heal output and targeting")
         check(planned.SourceOnly and not planned.LiveLearnable
             and not planned.LiveCastable
-            and not planned.ExactC4HealFormulaCertified,
-            "A source contract must not grant free live healing")
+            and planned.ExactC4HealFormulaCertified
+            and planned.SplitMPTransactionCertified,
+            "Certified source semantics must not grant free live healing")
     end
     check(ScoutHeal.get_rank(3) == nil
         and ScoutHeal.get_rank(13) == nil,
@@ -225,8 +230,10 @@ local function check_scout_heal_migration_plan()
         local plan, reason = ScoutHeal.for_character(character)
         check(plan ~= nil and reason == nil
             and #plan.Rows == bracket[2]
+            and plan.ExactC4HealFormulaCertified
+            and plan.SplitMPTransactionCertified
             and not plan.LiveCastable,
-            "Earned Scout sees only its current C4 source heal ranks")
+            "Scout sees certified source heal ranks without a live grant")
         local preview = assert(Runtime.get_c4_source_skill_tree(OWNER_ID))
         for _, original in ipairs(plan.Rows) do
             local row = assert(find_row(
