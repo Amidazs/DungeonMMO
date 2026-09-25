@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.75 source shot authority GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_75_C4_Source_Shot_Authority_20260925.md)
+and [green evidence](
+../testing/c4-source-shot-authority-v2-75-20260925.md).
+Server-authoritative C4-equivalent combat charges now consume exact reviewed
+weapon grade/count through InventoryService, keep private one-use charged state
+and feed Soulshot/Spiritshot/Blessed Spiritshot effects into source PDAM, MDAM
+and HEAL. Player-facing items use original DungeonMMO names. Fresh Studio Base
+**15/15 PASS**, Dungeon **17/17 PASS**, launch gear **15**, shot service **11**
+and source combat **25 assertions PASS**. Next audit remaining PvP/source-target
+formula modifiers and close normal-attack source damage composition before the
+live executor. No main merge, publish, production save mutation or animation
+edits.
+
 ## 25 September 2026 — CURRENT v2.74 elemental resolution GREEN
 
 [Latest roadmap](
