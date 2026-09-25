@@ -1,3 +1,22 @@
+## 25 September 2026 — CURRENT v2.57 reviewed C4 item mapping
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_57_C4_Creative_Item_Source_Map_20260925.md)
+and [pending test scope](
+../testing/c4-creative-item-source-map-v2-57-20260925.md).
+C4CreativeItemSourceMap now explicitly links nine current creative equipment
+items to the nine pinned C4 source item records and rejects mixed/unreviewed
+Weapon/Body/OffHand loadouts. Current custom CombatModifiers are never treated
+as C4 stats. This narrows but does not close v2.56's inventory migration
+blocker; polearm, D-grade/expert armour and remaining equipment still need
+verified original references or compatibility-only classification. New v2.57
+tests are authored but no Rojo/Studio execution is claimed; v2.56 and v2.55
+new tests remain pending too. Next expand reviewed launch item coverage and
+connect only fully reviewed server-owned loadouts into the resource migration
+boundary, then resolve actually owned source passives and active-effect/CP
+ordering. Permanent code/docs GitHub-only; no main merge, publish, production
+save mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.56 C4 resource migration boundary
 
 [Latest roadmap](
