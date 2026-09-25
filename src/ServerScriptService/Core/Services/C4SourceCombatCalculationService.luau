@@ -15,6 +15,9 @@ local Spatial = require(
 local SkillEffects = require(
     Shared.C4SkillEffectSource
 )
+local StatusEffects = require(
+    Shared.C4StatusEffectReference
+)
 local SourceItems = require(
     Shared.C4SourceItemReference
 )
@@ -205,6 +208,8 @@ local function npc_source_boundary(
         "EARTH_VULN",
         "HOLY_VULN",
         "DARK_VULN",
+        "BLEED_VULN",
+        "POISON_VULN",
         "BOW_WPN_VULN",
         "BLUNT_WPN_VULN",
         "DAGGER_WPN_VULN",
@@ -1738,6 +1743,140 @@ function C4SourceCombatCalculationService.magic_skill(
 end
 
 --[[
+Resolves one reviewed C4 hostile periodic-status cast.
+
+This path handles DEBUFF application only. It does not apply or schedule ticks.
+The live executor owns periodic world mutation after a successful source roll.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative status skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source DEBUFF result and periodic plan or denial reason.
+]]
+function C4SourceCombatCalculationService.status_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason = StatusEffects.periodic_plan(
+        source.SkillId,
+        source.Rank
+    )
+    if not plan then
+        return nil, plan_reason
+    end
+
+    local target_stat_bonus
+    if plan.SaveVs == "CON" then
+        target_stat_bonus = defender.SourceConBonus
+    elseif plan.SaveVs == "MEN" then
+        target_stat_bonus = defender.SourceMenBonus
+    else
+        return nil, "UnsupportedOriginalPeriodicStatusSaveStat"
+    end
+
+    if type(target_stat_bonus) ~= "number"
+        or target_stat_bonus <= 0
+    then
+        return nil, "OriginalPeriodicStatusSaveBonusUnavailable"
+    end
+
+    local vulnerability =
+        defender.SourceStatCandidate[plan.VulnerabilityStat]
+    if type(vulnerability) ~= "number"
+        or vulnerability < 0
+    then
+        return nil, "OriginalPeriodicStatusVulnerabilityUnavailable"
+    end
+
+    local shot = {
+        Spiritshot = false,
+        BlessedSpiritshot = false,
+    }
+    if plan.IsMagic then
+        local consumed, shot_reason =
+            consume_magic_shot(attacker_user_id)
+        if not consumed then
+            return nil, shot_reason
+        end
+        shot = consumed
+    end
+
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = plan.EffectPower,
+            TargetStatBonus = target_stat_bonus,
+            TargetVulnerability = vulnerability,
+            IsMagic = plan.IsMagic,
+            AttackerMAtk =
+                attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            TargetMDef =
+                defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            Spiritshot = shot.Spiritshot,
+            BlessedSpiritshot = shot.BlessedSpiritshot,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = plan.MagicLevel,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "PeriodicStatus",
+        Landed = resolved.Landed,
+        Rate = resolved.Rate,
+        Roll = resolved.Roll,
+        EffectType = plan.EffectType,
+        SaveVs = plan.SaveVs,
+        VulnerabilityStat = plan.VulnerabilityStat,
+        TickDamage = plan.TickDamage,
+        TickCount = plan.TickCount,
+        TickSeconds = plan.TickSeconds,
+        Nonlethal = plan.Nonlethal,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Calculates one deterministic C4 instant HEAL amount from an owned source rank.
 
 Spiritshot modifiers remain neutral until source shot ownership/consumption is
@@ -1835,6 +1974,9 @@ function C4SourceCombatCalculationService.capability(): any
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
+        PeriodicStatusCalculation = true,
+        PeriodicStatusEffectSuccessIntegrated = true,
+        PeriodicStatusNonlethalSemanticsIntegrated = true,
         ShotsIntegrated = true,
         ShotAuthorityInstalled = shot_authority ~= nil,
         PhysicalSoulshotIntegrated = true,
