@@ -93,6 +93,36 @@ local QUESTS = table.freeze({
         }),
         WorldBindingStatus = "NotImplemented",
     }),
+    HumanWizard = table.freeze({
+        Id = "EmberglassTrial",
+        BranchId = "HumanWizard",
+        SourceTitle = "The Emberglass Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "MagisterOrwyn",
+        Recommendation = "EmberglassAccord",
+        Steps = table.freeze({
+            talk("MagisterOrwyn", "Answer the Emberglass summons."),
+            talk("ArchivistNeris", "Learn how the broken wards are traced."),
+            defeat(
+                "AshveilAcolyte",
+                3,
+                "Recover three personally earned aetherglass shards."
+            ),
+            talk("ArchivistNeris", "Return the three aetherglass shards."),
+            defeat(
+                "CinderboundConjurer",
+                1,
+                "Recover the conjurer's personal ember sigil."
+            ),
+            talk("MagisterOrwyn", "Present the sigil and seal the accord."),
+        }),
+        RequiredProofIds = table.freeze({
+            "AetherglassShards3",
+            "CinderboundEmberSigil",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanRogue = table.freeze({
         Id = "C4PathToRogue", BranchId = "HumanRogue",
         SourceQuestId = 403, SourceTitle = "The Ashen Blade Trial",
@@ -169,8 +199,8 @@ Returns:
 function SourceQuests.inventoried(): {any}
     return table.freeze({
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
-        QUESTS.HumanRogue, QUESTS.ElvenScout,
-        QUESTS.ElvenKnight,
+        QUESTS.HumanRogue, QUESTS.HumanWizard,
+        QUESTS.ElvenScout, QUESTS.ElvenKnight,
     })
 end
 
