@@ -1,3 +1,18 @@
+## 25 September 2026 — v2.66 resource regen + armor sets GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_66_C4_Resource_Regen_Armor_Sets_20260925.md);
+[evidence](../testing/c4-resource-regen-armor-sets-v2-66-20260925.md).
+Before live cutover, source audit found two real gaps and fixed them:
+C4 REG_HP/MP/CP stats now exist in unified candidates, and current one-slot
+Body equipment now expands to reviewed source Chest+Legs sets. Exact
+ConditionUsingItemType semantics require matching Heavy/Light/Magic chest plus
+legs (or FullArmor), and FuncPDefMod now includes source Legs deductions.
+Apprentice Tunic is correctly Magic, with Stockings 461; both deferred MP
+adds are staged. Base retry 12/12 and Dungeon 13/13 are green at b610d05c.
+Clean migration prerequisites remain blocker-free, but live resources remain
+off. Next implement reversible disabled-by-default HP/MP/CP cutover and source
+three-second regen. No publish/prod saves/main merge.
+
 ## 25 September 2026 — v2.65 C4 Combat Point runtime GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_65_C4_Combat_Point_Runtime_20260925.md);
