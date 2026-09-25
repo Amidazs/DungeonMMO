@@ -1,5 +1,5 @@
 --!strict
--- Whole nine-path C4 learning-tree source regression through level 30.
+-- Whole tracked C4 learning-tree source regression through level 30.
 local RS = game:GetService("ReplicatedStorage")
 local Source = require(
     RS.Core.Shared.C4Level30SkillTreeSource
@@ -59,11 +59,12 @@ Args:
     None.
 
 Returns:
-    nil: Prints exact nine-path source totals, not live trainer parity.
+    nil: Prints exact tracked-path source totals, not live trainer parity.
 ]]
 local function main()
     check_scope("HumanFighter", 39)
     check_scope("HumanMystic", 44)
+    check_scope("HumanWizard", 93)
     check_scope("ElvenFighter", 43)
     check_scope("ElvenMystic", 42)
     check_scope("HumanWarrior", 62)
@@ -73,12 +74,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 9
-        and coverage.RowCount == 476
-        and coverage.UniqueSourceSkillIds == 75
+    check(coverage.PathCount == 10
+        and coverage.RowCount == 569
+        and coverage.UniqueSourceSkillIds == 95
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All nine original paths have exact source learning rows")
+        "All ten tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -88,6 +89,22 @@ local function main()
         and power_strike[9].SkillLevel == 9
         and power_strike[9].MinLevel == 15,
         "Human Fighter Power Strike source ranks 1-9")
+
+    local wizard_blaze = Source.find_skill("HumanWizard", 1220)
+    check(#wizard_blaze == 6
+        and wizard_blaze[1].SkillLevel == 1
+        and wizard_blaze[1].SP == 1400
+        and wizard_blaze[1].MinLevel == 20
+        and wizard_blaze[6].SkillLevel == 6
+        and wizard_blaze[6].SP == 5300
+        and wizard_blaze[6].MinLevel == 30,
+        "Human Wizard Blaze ranks 1-6 preserve source SP/levels")
+
+    local wizard_servitor = Source.find_skill("HumanWizard", 1127)
+    check(#wizard_servitor == 9
+        and wizard_servitor[1].SP == 960
+        and wizard_servitor[9].SP == 3500,
+        "Human Wizard Servitor Heal ranks stay source-only metadata")
 
     local common = Source.find_skill("ElvenKnight", 1320)
     check(#common == 2
@@ -110,7 +127,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=9 rows=476 uniqueSkillIds=75 live=false")
+        .. "paths=10 rows=569 uniqueSkillIds=95 live=false")
         :format(checks))
 end
 
