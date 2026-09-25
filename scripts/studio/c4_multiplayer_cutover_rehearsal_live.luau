@@ -323,7 +323,66 @@ local function face_enemy(player, enemy)
 end
 
 --[[
-Sends one real existing client basic attack and waits for NPC HP to fall.
+Sends one real existing client attack request and captures its response.
+
+Args:
+    player (Player): Client issuing CombatInputActions.begin_attack().
+    label (string): Diagnostic label for this request.
+
+Returns:
+    boolean: True only when the existing client input accepted the request.
+]]
+local function request_client_attack(player, label)
+    local key = tostring(player.UserId) .. ":ATTACK_RESULT"
+    responses[key] = nil
+    channel:FireClient(player, "ATTACK")
+
+    local response = wait_for(function()
+        local value = responses[key]
+        if value == nil then
+            return nil
+        end
+        return {
+            Value = value,
+        }
+    end, label .. " client request", 12)
+
+    return response.Value == true
+end
+
+--[[
+Waits briefly for one attack attempt to reduce the NPC's health.
+
+Args:
+    humanoid (Humanoid): Authoritative NPC health owner.
+    before (number): Health immediately before the request.
+    seconds (number): Bounded wait for projectile/contact resolution.
+
+Returns:
+    number: Positive applied damage, otherwise zero for a miss/no-hit attempt.
+]]
+local function wait_for_attack_damage(
+    humanoid,
+    before,
+    seconds
+)
+    local deadline = os.clock() + seconds
+
+    repeat
+        if humanoid.Health < before then
+            return before - humanoid.Health
+        end
+        task.wait(0.05)
+    until os.clock() >= deadline
+
+    return 0
+end
+
+--[[
+Sends real existing client attacks until one legitimate source/current hit lands.
+
+C4 normal attacks can legitimately miss. A miss must therefore cause a bounded
+retry rather than being treated as a cutover failure.
 
 Args:
     player (Player): Client that must issue CombatInputActions.begin_attack().
@@ -331,38 +390,37 @@ Args:
     label (string): Diagnostic label for this strike.
 
 Returns:
-    number: Positive real NPC health damage from the strike.
+    number: Positive real NPC health damage from the first landed attempt.
 ]]
 local function client_attack(player, enemy, label)
-    face_enemy(player, enemy)
-
     local humanoid = enemy:FindFirstChildOfClass("Humanoid")
-    local before = humanoid.Health
-    local key = tostring(player.UserId) .. ":ATTACK_RESULT"
-    responses[key] = nil
+    assert(humanoid, label .. " target has no Humanoid")
 
-    channel:FireClient(player, "ATTACK")
+    for attempt = 1, 6 do
+        face_enemy(player, enemy)
+        local before = humanoid.Health
 
-    local accepted = wait_for(function()
-        return responses[key]
-    end, label .. " client request", 12)
-    assert(
-        accepted == true,
-        label .. " was rejected by existing client combat input"
-    )
+        local accepted = request_client_attack(
+            player,
+            label .. " attempt " .. tostring(attempt)
+        )
 
-    wait_for(function()
-        return humanoid.Health < before
-    end, label .. " NPC damage", 15)
+        if accepted then
+            local applied = wait_for_attack_damage(
+                humanoid,
+                before,
+                2.5
+            )
+            if applied > 0 then
+                task.wait(0.8)
+                return applied
+            end
+        end
 
-    local applied = before - humanoid.Health
-    assert(
-        applied > 0,
-        label .. " did not apply positive authoritative damage"
-    )
+        task.wait(1.0)
+    end
 
-    task.wait(1.2)
-    return applied
+    error(label .. " did not land after six accepted/missed attempts")
 end
 
 --[[
