@@ -175,6 +175,9 @@ function C4DerivedStatReference.get_naked_combat(
     local int_bonus = assert(C4DerivedStatReference.stat_bonus(
         "INT", template.INT
     ))
+    local con_bonus = assert(C4DerivedStatReference.stat_bonus(
+        "CON", template.CON
+    ))
     local dex_bonus = assert(C4DerivedStatReference.stat_bonus(
         "DEX", template.DEX
     ))
@@ -199,6 +202,7 @@ function C4DerivedStatReference.get_naked_combat(
         LevelModifier = level_mod,
         STRBonus = str_bonus,
         INTBonus = int_bonus,
+        CONBonus = con_bonus,
         DEXBonus = dex_bonus,
         WITBonus = wit_bonus,
         MENBonus = men_bonus,
