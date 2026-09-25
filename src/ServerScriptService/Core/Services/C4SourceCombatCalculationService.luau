@@ -238,6 +238,91 @@ local function source_random_variance(
 end
 
 --[[
+Resolves the configured C4 magic-failure branch for one source skill.
+
+The pinned source defaults MagicFailures to false. The exact two-roll
+algorithm is still represented here so the provider can preserve source
+behaviour if that source configuration is deliberately changed later.
+
+Args:
+    attacker (any): Authenticated source-ready caster boundary.
+    defender (any): Authenticated source-ready defender boundary.
+    effect (any): Reviewed source MDAM rank.
+
+Returns:
+    (any?, string?): Failure classification and source evidence.
+]]
+local function source_magic_failure(
+    attacker: any,
+    defender: any,
+    effect: any
+): (any?, string?)
+    local magic_level = effect.Sets.magicLvl
+    if type(magic_level) ~= "number"
+        or magic_level % 1 ~= 0
+    then
+        return nil, "OriginalMagicLevelUnavailable"
+    end
+
+    if magic_level <= 0 then
+        magic_level = attacker.Level
+    end
+
+    local threshold = Formula.magic_resist_threshold(
+        defender.Level,
+        magic_level
+    )
+    local enabled = Formula.magic_failures_default_enabled()
+
+    if not enabled then
+        return {
+            Enabled = false,
+            Failure = "None",
+            MagicLevel = magic_level,
+            Threshold = threshold,
+            FirstRoll = nil,
+            SecondRoll = nil,
+        }, nil
+    end
+
+    local first_roll = COMBAT_RANDOM:NextInteger(0, 9999)
+    local first = Formula.resolve_magic_success(
+        defender.Level,
+        magic_level,
+        first_roll
+    )
+
+    if first.Success then
+        return {
+            Enabled = true,
+            Failure = "None",
+            MagicLevel = magic_level,
+            Threshold = first.Threshold,
+            FirstRoll = first.Roll,
+            SecondRoll = nil,
+        }, nil
+    end
+
+    local second_roll = COMBAT_RANDOM:NextInteger(0, 9999)
+    local resolved = Formula.resolve_magic_failure(
+        attacker.Level,
+        defender.Level,
+        magic_level,
+        first_roll,
+        second_roll
+    )
+
+    return {
+        Enabled = true,
+        Failure = resolved.Failure,
+        MagicLevel = magic_level,
+        Threshold = resolved.Threshold,
+        FirstRoll = resolved.FirstRoll,
+        SecondRoll = resolved.SecondRoll,
+    }, nil
+end
+
+--[[
 Changes the calculation-provider gate.
 
 This gate controls only source calculation previews. It does not alter
@@ -683,10 +768,13 @@ function C4SourceCombatCalculationService.physical_skill(
 end
 
 --[[
-Calculates deterministic C4 MDAM skill damage between source-ready players.
+Calculates C4 MDAM skill damage between source-ready players.
 
-Failure, magic critical, Spiritshot, elemental and PvP multipliers stay neutral
-until their authoritative runtime sources are integrated.
+The final source magical critical rate is resolved with a private server roll.
+The optional C4 magic-failure algorithm is represented exactly, while the
+pinned source default keeps MagicFailures disabled. Spiritshots, elemental and
+PvP multipliers remain neutral until their authoritative runtime sources are
+integrated.
 
 Args:
     attacker_user_id (number): Authenticated source-ready caster.
@@ -734,15 +822,52 @@ function C4SourceCombatCalculationService.magic_skill(
         return nil, "UnsupportedOriginalMagicSkillType"
     end
 
+    local critical_rate =
+        attacker.SourceStatCandidate.MAGICAL_CRITICAL_RATE
+    if type(critical_rate) ~= "number"
+        or critical_rate ~= critical_rate
+        or math.abs(critical_rate) >= math.huge
+    then
+        return nil, "OriginalMagicalCriticalRateUnavailable"
+    end
+
+    local critical = Formula.resolve_magic_critical(
+        critical_rate,
+        COMBAT_RANDOM:NextInteger(0, 999)
+    )
+    local failure, failure_reason = source_magic_failure(
+        attacker,
+        defender,
+        effect
+    )
+    if not failure then
+        return nil, failure_reason
+    end
+
     local amount = Formula.magic_damage({
         MAtk = attacker.SourceStatCandidate.MAGICAL_ATTACK,
         MDef = defender.SourceStatCandidate.MAGICAL_DEFENCE,
         SkillPower = effect.Sets.power,
+        Failure = failure.Failure,
+        MagicCritical = critical.Critical,
     })
 
     return {
         Kind = "MagicDamage",
         Amount = amount,
+        MagicLevel = failure.MagicLevel,
+        MagicFailureEnabled = failure.Enabled,
+        MagicFailure = failure.Failure,
+        MagicFailureThreshold = failure.Threshold,
+        MagicFailureFirstRoll = failure.FirstRoll,
+        MagicFailureSecondRoll = failure.SecondRoll,
+        MagicCritical = critical.Critical,
+        MagicCriticalEffective =
+            critical.Critical and failure.Failure == "None",
+        MagicCriticalChancePerThousand =
+            critical.ChancePerThousand,
+        MagicCriticalRoll = critical.Roll,
+        SourceMagicalCriticalRate = critical_rate,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
@@ -844,13 +969,17 @@ function C4SourceCombatCalculationService.capability(): any
         UnarmedRandomVarianceIntegrated = true,
         CriticalResolutionIntegrated = false,
         PhysicalSkillCriticalIntegrated = false,
-        MagicCriticalIntegrated = false,
+        MagicCriticalIntegrated = true,
+        MagicCriticalRollServerOwned = true,
         ShieldSourceResolutionAvailable = true,
         ShieldRollServerOwned = true,
         ShieldPhysicalFormulaIntegrated = true,
         ShieldFacingRuntimeIntegrated = false,
         ShieldResolutionIntegrated = false,
-        MagicFailureResolutionIntegrated = false,
+        MagicFailureFormulaAvailable = true,
+        MagicFailureResolutionIntegrated = true,
+        MagicFailuresSourceDefaultEnabled =
+            Formula.magic_failures_default_enabled(),
         ElementalResolutionIntegrated = false,
         PvpFormulaModifiersIntegrated = false,
         LiveDamageApplied = false,
