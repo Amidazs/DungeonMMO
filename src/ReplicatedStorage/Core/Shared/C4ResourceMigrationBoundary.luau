@@ -211,8 +211,11 @@ function C4ResourceMigrationBoundary.for_character(
             )
     end
 
+    local body_leg_semantics_ready = reviewed_loadout ~= nil
+        and reviewed_loadout.OriginalBodyLegSemanticsIntegrated == true
     local inventory_ready = reviewed_loadout ~= nil
         and equipment_expertise ~= nil
+        and body_leg_semantics_ready
 
     local passive_plan, passive_reason =
         C4OwnedPassiveSourceResolver.for_character(character)
@@ -303,6 +306,7 @@ function C4ResourceMigrationBoundary.for_character(
         OriginalEquipmentExpertiseReady =
             equipment_expertise ~= nil,
         OriginalEquipmentExpertiseReason = equipment_reason,
+        OriginalBodyLegSemanticsReady = body_leg_semantics_ready,
         OriginalInventoryIntegrated = inventory_ready,
 
         OwnedPassiveSourceMappingReady = passive_mapping_ready,
