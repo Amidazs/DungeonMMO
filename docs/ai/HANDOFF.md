@@ -1,3 +1,28 @@
+## 25 September 2026 — v2.55 shared C4 heal/split-MP runtime rules
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_55_C4_Shared_Heal_And_Split_MP_Rules_20260925.md);
+[pending test scope](../testing/c4-shared-skill-runtime-rules-v2-55-20260925.md).
+Added pure C4SkillRuntimeRules from pinned source for combined pre-cast
+MP affordability, initial MP at cast start, launch MP reduction/clamp,
+instant Heal power with Spiritshot 1.3x/Blessed 1.5x and magic cast-time
+shot acceleration/500ms floor. ManaService now exposes reusable
+try_begin_split_spend + finish_split_spend without changing current
+try_spend callers. Scout skill58 rank4-12 source contracts now record
+certified exact instant-heal amounts and split-MP lifecycle but remain
+SourceOnly, LiveLearnable=false, LiveCastable=false and CreativeLink
+Missing; existing ElvenRenewal is still not the C4 heal. Heal amount
+certification does NOT cover threat/hate, Spiritshot item economy,
+live source MaxHP/MaxMP/CP or regen. Added C4SkillRuntimeRulesTest,
+extended ManaServiceTest and nine-class authenticated preview checks.
+**No v2.55 Studio/Rojo execution claimed.** All permanent edits were
+made directly in GitHub, no Remote Desktop Commander. Source inventory
+stays 476 rows /454 candidates /22 missing; nine Scout heal rows stay
+missing until real trainer/resource/executor integration. Next migrate
+the live all-nine resource boundary coherently with source gear/passive/
+active-buff ordering before enabling one class's C4 skill; then continue
+all-class effect families and the remaining 13 explicit source gaps.
+No main merge/publish/production saves/animation edits.
+
 ## 25 September 2026 — v2.54 independent C4 Scout heal source migration
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_54_Elven_Scout_C4_Heal_Migration_Plan_20260925.md).
