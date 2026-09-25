@@ -925,7 +925,7 @@ local function check_human_wizard_magic()
     )
     check(
         attacker.ScopeId == "HumanWizard"
-            and attacker.SourceClassId == 11
+            and attacker.SourceBaseMaxMana == 492
             and attacker.SourceStatCandidate.MAGICAL_ATTACK > 0
             and attacker.SourceStatCandidate.MAGICAL_CRITICAL_RATE >= 0,
         "Human Wizard direct spell uses its own source class candidate"
