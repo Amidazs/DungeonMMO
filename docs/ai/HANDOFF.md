@@ -1,3 +1,16 @@
+## 25 September 2026 — v2.85 MagicBasic source-normal routing GREEN
+
+[Roadmap](../roadmap/DungeonMMO_Roadmap_v2_85_C4_Magic_Basic_Normal_Routing_20260925.md);
+[green evidence](../testing/c4-magic-basic-normal-routing-v2-85-20260925.md).
+Spirit Orb keeps its original visual/contact presentation, while disabled
+source-mode damage now routes through the accepted C4 ordinary attack
+calculation. Remaining dispatch blockers are RangerArea, StatusPhysical and
+StatusMagic, so production activation is still impossible. Fresh focused
+Studio Base 20/20 and Dungeon 23/23 passed; family audit 24 and dispatch 17
+assertions passed. Next migrate C4 Bleed/Poison as true DEBUFF/status paths,
+not PDAM/MDAM. Permanent edits remain GitHub-only; no main merge/publish/prod
+saves.
+
 ## 25 September 2026 — v2.84 C4 damage-family audit GREEN
 
 [Roadmap](../roadmap/DungeonMMO_Roadmap_v2_84_C4_Damage_Family_Audit_20260925.md);
