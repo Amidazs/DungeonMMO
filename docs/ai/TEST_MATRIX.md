@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.94 Human Wizard foundation
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_94_Human_Wizard_Foundation_20260925.md);
+[evidence](
+../testing/c4-human-wizard-foundation-v2-94-20260925.md).
+Fresh unpublished Base focus passes **3/3**:
+`C4HumanWizardFoundationTest` **166 assertions**,
+`C4HumanWizardQuestTransactionTest` **22 assertions**, and
+`C4Level30LaunchCoverageTest` **37 assertions**. Base and Dungeon Rojo
+builds also pass. The accepted contract is creative Emberweaver
+selection/quest/level-20 mentor award/trainer plus **74/93** exact training
+schedule rows. The remaining **19** companion-dependent rows are intentionally
+unmapped and are not counted as implemented effects. No release parity is
+claimed.
+
 ## 25 September 2026 — CURRENT v2.93 Human Wizard source audit
 
 [Roadmap](
