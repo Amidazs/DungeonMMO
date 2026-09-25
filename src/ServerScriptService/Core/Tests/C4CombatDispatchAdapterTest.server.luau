@@ -289,15 +289,6 @@ local function main()
     )
 
     executor_enabled = true
-    local audit_blocked, audit_blocked_reason =
-        Adapter.set_enabled(true)
-    check(
-        not audit_blocked
-            and audit_blocked_reason
-                == "C4CombatDispatchAuditBlockingFamilies",
-        "production dispatch cannot enable while audited blockers remain"
-    )
-
     Adapter.set_activation_audit_provider_for_test(
         function(): boolean
             return true
@@ -376,8 +367,8 @@ local function main()
         ranger_area.Handled
             and ranger_area.AppliedDamage == 0
             and ranger_area.Reason
-                == "C4RangerAreaSourceMappingPending",
-        "reviewed Ranger area damage fails closed while source mapping waits"
+                == "C4LegacyRangerAreaOutsideLevel30Scope",
+        "legacy Ranger area damage fails closed outside C4 level-30 scope"
     )
 
     local magic_basic = Adapter.try_damage(
@@ -473,10 +464,10 @@ local function main()
             and capability.ExecutorBound
             and capability.DisabledFallsBackToCurrentCombat
             and capability.EnabledSourceFailureFallsClosed
-            and not capability.ActivationAuditReady
-            and #capability.ActivationBlockers == 1
-            and capability.ActivationBlockers[1] == "RangerArea"
-            and capability.RangerAreaActivationBlocked
+            and capability.ActivationAuditReady
+            and #capability.ActivationBlockers == 0
+            and not capability.RangerAreaActivationBlocked
+            and capability.RangerAreaSourceScopeExcluded
             and capability.MagicBasicUsesSourceNormalAttack
             and capability.PeriodicStatusSupported
             and not capability.PeriodicStatusActivationBlocked
