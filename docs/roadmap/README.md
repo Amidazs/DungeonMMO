@@ -1,3 +1,14 @@
+**v2.81 C4 NPC SOURCE BOUNDARY GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_81_C4_NPC_Source_Boundary_20260925.md)
+and [green evidence](
+../testing/c4-npc-source-boundary-v2-81-20260925.md).
+Creative Marauder and Wolf enemies now resolve pinned internal C4 NPC stats
+through server-owned archetype identity. Source normal/PDAM/MDAM calculations
+accept NPC targets, suppress PvP modifiers and apply reviewed NPC race
+semantics. Fresh Studio Base **18/18 PASS**, Dungeon **20/20 PASS**, NPC
+boundary **13 assertions PASS**, source combat **38 assertions PASS**.
+Next: disabled live player-to-NPC executor with callback preservation.
+
 **v2.80 LIVE C4 SKILL EXECUTION GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_80_C4_Live_Skill_Execution_20260925.md)
 and [green evidence](
