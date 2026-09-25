@@ -79,6 +79,21 @@ function FakeCoordinator:disable(): boolean
 end
 
 --[[
+Rejects fixture removal because this edit-mode test has no connected players.
+
+Args:
+    _player (any): Unused disposable player.
+
+Returns:
+    (boolean, string?): Stable inactive fixture response.
+]]
+function FakeCoordinator:remove_player(
+    _player: any
+): (boolean, string?)
+    return false, "C4CutoverPlayerNotActive"
+end
+
+--[[
 Runs isolated ServerStorage bridge checks.
 
 Args:
@@ -113,6 +128,16 @@ local function main()
         not unknown.ok
             and unknown.reason == "UnknownC4RehearsalAction",
         "unknown rehearsal action fails closed"
+    )
+
+    local invalid_remove = bridge:Invoke("remove", {
+        UserIds = {},
+    })
+    check(
+        not invalid_remove.ok
+            and invalid_remove.reason
+                == "InvalidC4RehearsalPlayers",
+        "participant removal requires one connected server player"
     )
 
     enabled = true
