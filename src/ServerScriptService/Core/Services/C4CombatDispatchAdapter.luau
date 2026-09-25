@@ -375,7 +375,9 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         )
     end
 
-    if DamageFamilies.is_periodic_status_skill(source_id) then
+    if (source_kind == "Skill" or source_kind == "MagicSkill")
+        and DamageFamilies.is_periodic_status_skill(source_id)
+    then
         local rank = skill_rank(user_id, source_id)
         if not rank then
             return denied("C4SourceSkillRankUnavailable")
