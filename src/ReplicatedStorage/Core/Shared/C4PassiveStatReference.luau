@@ -10,7 +10,7 @@ Checks a source equipment condition without guessing Roblox item tags.
 
 Args:
     allowed (string?): Source comma-separated weapon or armour kinds.
-    equipment (any): Historical kind or explicit Weapon/Body/OffHand.
+    equipment (any): Historical kind or reviewed source paperdoll.
 
 Returns:
     boolean: Whether an equipped original item meets this exact kind.
@@ -22,7 +22,9 @@ local function uses_kind(allowed: string?, equipment: any): boolean
         local trimmed = kind:match("^%s*(.-)%s*$")
         if type(equipment) == "table" then
             for _, slot in ipairs({"Weapon", "Body", "OffHand"}) do
-                if trimmed == equipment[slot] then return true end
+                if trimmed == equipment[slot] then
+                    return true
+                end
             end
         elseif trimmed == equipment then
             return true
@@ -203,30 +205,48 @@ end
 Validates a complete original equipment-kind loadout.
 
 Args:
-    loadout (any): Weapon, Body and OffHand C4 kind names only.
+    loadout (any): Reviewed current six-slot C4 kind names.
 
 Returns:
     boolean: True only for explicitly named source equipment slots.
 ]]
 local function valid_loadout(loadout: any): boolean
-    if type(loadout) ~= "table" then return false end
-    local slots = {Weapon = true, Body = true, OffHand = true}
+    if type(loadout) ~= "table" then
+        return false
+    end
+
+    local slot_kinds = {
+        Body = {Heavy = true, Light = true, Robe = true},
+        OffHand = {Shield = true},
+        Head = {Helmet = true},
+        Gloves = {Gloves = true},
+        Feet = {Boots = true},
+    }
+
     for slot, kind in pairs(loadout) do
-        if not slots[slot] or type(kind) ~= "string"
-            or kind == ""
-        then return false end
-        if slot == "Body"
-            and kind ~= "Heavy" and kind ~= "Light"
-            and kind ~= "Robe"
-        then return false end
-        if slot == "OffHand" and kind ~= "Shield" then
+        if type(kind) ~= "string" or kind == "" then
             return false
         end
-        if slot == "Weapon"
-            and (kind == "Heavy" or kind == "Light"
-                or kind == "Robe" or kind == "Shield")
-        then return false end
+
+        if slot == "Weapon" then
+            if kind == "Heavy"
+                or kind == "Light"
+                or kind == "Robe"
+                or kind == "Shield"
+                or kind == "Helmet"
+                or kind == "Gloves"
+                or kind == "Boots"
+            then
+                return false
+            end
+        else
+            local allowed = slot_kinds[slot]
+            if not allowed or allowed[kind] ~= true then
+                return false
+            end
+        end
     end
+
     return true
 end
 
@@ -238,7 +258,7 @@ equipment, already-computed source item stats and owned source ranks.
 
 Args:
     source_stats (any): C4 stat-name to already-composed base values.
-    loadout (any): C4 Weapon, Body and OffHand kinds, or empty table.
+    loadout (any): Reviewed current six-slot C4 kinds, or empty table.
     source_ranks (any): One owned original rank per distinct passive.
 
 Returns:
