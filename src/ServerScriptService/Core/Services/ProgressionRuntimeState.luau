@@ -48,6 +48,9 @@ local C4ResourceMigrationBoundary = require(
 local C4ActiveSourceEffectResolver = require(
     Shared:WaitForChild("C4ActiveSourceEffectResolver")
 )
+local C4CombatPointRuntime = require(
+    ServerScriptService.Core.Services.C4CombatPointRuntime
+)
 local CharacterIdentityRules = require(
     Shared:WaitForChild("CharacterIdentityRules")
 )
@@ -867,7 +870,8 @@ function ProgressionRuntimeState.get_c4_resource_migration_boundary(
 
     return C4ResourceMigrationBoundary.for_character(
         character,
-        active_snapshot
+        active_snapshot,
+        C4CombatPointRuntime.capability()
     )
 end
 
