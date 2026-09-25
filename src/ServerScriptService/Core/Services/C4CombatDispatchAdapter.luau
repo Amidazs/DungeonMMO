@@ -412,6 +412,13 @@ function C4CombatDispatchAdapter.try_damage(context: any): any
         )
     end
 
+    if family.Route == "LegacyC4ScopeExcluded" then
+        return denied(
+            family.Reason
+                or "C4LegacyDamageFamilyOutsideSourceScope"
+        )
+    end
+
     if family.Route == "SourceNormal" then
         local result, reason =
             bound_executor:normal_attack_npc(
@@ -508,7 +515,8 @@ function C4CombatDispatchAdapter.capability(): any
         RangedPhysicalSupported = true,
         PhysicalSkillSupported = true,
         MagicSkillSupported = true,
-        RangerAreaActivationBlocked = true,
+        RangerAreaActivationBlocked = false,
+        RangerAreaSourceScopeExcluded = true,
         MagicBasicUsesSourceNormalAttack = true,
         PeriodicStatusSupported = true,
         PeriodicStatusActivationBlocked = false,
