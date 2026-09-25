@@ -1,3 +1,13 @@
+**v2.58 LOCAL ACCEPTANCE GREEN:** Both disposable Base and Dungeon
+Rojo builds passed at
+`e61eeb803bd0725aa89581a352583017d32f9fc5`. Focused Base v2.55-v2.58
+resource/source tests passed 5/5 and Dungeon passed 6/6, including the split-MP
+ManaService regression. Nine-class authenticated source preview now passes 554
+assertions; resource boundary 42; creative item map 43; launch core gear 8;
+runtime rules 13; ManaService 13. No place publish or production save action.
+Next blockers remain Helmet/Gloves/Boots source paperdoll integration,
+actually-owned passive translation, active-effect ordering and CP runtime.
+
 **v2.58 GitHub-only, PLAYTEST NEXT:** [current roadmap](
 DungeonMMO_Roadmap_v2_58_C4_Launch_Core_Gear_Source_Expansion_20260925.md)
 and [test scope](
