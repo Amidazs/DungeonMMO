@@ -1,3 +1,22 @@
+## 25 September 2026 — v2.94 Human Wizard foundation GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_94_Human_Wizard_Foundation_20260925.md);
+[evidence](
+../testing/c4-human-wizard-foundation-v2-94-20260925.md).
+Human Wizard now has the original DungeonMMO **Emberweaver** first-transfer
+foundation. Human Mystic selects the branch, completes the creative Emberglass
+level-18 quest through server-owned proof/items, reaches level 20 and receives
+the class only from a one-use mentor receipt. A real Emberweaver trainer now
+owns the mapped catalogue. First-transfer skill authorization was generalized
+so Mage-family transfer skills cannot bypass the mentor receipt gate. The
+source schedule is **74/93 mapped** across 24 non-servitor families; the
+remaining **19** Servitor Heal/Recharge and two summon lines stay fail-closed
+until companion authority exists. Fresh Base/Dungeon builds pass; focused
+foundation **166**, quest transaction **22**, launch audit **37** assertions
+all pass, runner **3/3**. Continue exact source/effect work and companions.
+Permanent edits remain GitHub-only; no main merge, publish or production saves.
+
 ## 25 September 2026 — v2.93 Human Wizard source audit GREEN
 
 [Roadmap](
