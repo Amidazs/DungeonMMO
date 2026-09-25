@@ -334,15 +334,15 @@ local function check_gate_and_allowlist()
 end
 
 --[[
-Checks target binding, early launch and one successful executor handoff.
+Creates one enabled target-bound direct-MDAM cast fixture.
 
 Args:
-    None.
+    start_time (number): Deterministic scheduler start timestamp.
 
 Returns:
-    nil: Confirms exact target/rank/sequence reaches the executor once.
+    (any, any): Enabled bridge and its successful start evidence.
 ]]
-local function check_successful_handoff()
+local function started_bridge(start_time: number): (any, any)
     reset_fakes()
     local bridge = service()
     bridge:set_enabled(true)
@@ -351,8 +351,24 @@ local function check_successful_handoff()
         player,
         enemy,
         "EmberweaverEmberBolt",
-        200
+        start_time
     ))
+
+    return bridge, started
+end
+
+--[[
+Checks target validation and private target binding at cast start.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms scheduler starts only after reviewed NPC validation.
+]]
+local function check_target_bound_start()
+    local _, started = started_bridge(200)
+
     check(
         started.TargetBoundServerSide
             and started.CastId == 71
@@ -361,6 +377,19 @@ local function check_successful_handoff()
             and scheduler_state.BeginCalls == 1,
         "cast start validates then privately binds the reviewed NPC"
     )
+end
+
+--[[
+Checks early launch rejection and one successful executor handoff.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact target/rank/sequence reaches the executor once.
+]]
+local function check_successful_launch()
+    local bridge, started = started_bridge(200)
 
     scheduler_state.LaunchReason = "C4SourceCastNotReady"
     local early, early_reason = bridge:launch_if_ready(
@@ -581,7 +610,8 @@ local function main()
     )
 
     check_gate_and_allowlist()
-    check_successful_handoff()
+    check_target_bound_start()
+    check_successful_launch()
     check_target_revalidation()
     check_cancel_and_replay()
     check_launch_plan_change()
