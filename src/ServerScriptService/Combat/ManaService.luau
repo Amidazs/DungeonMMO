@@ -102,6 +102,88 @@ function ManaService.remove_player(subject: Instance)
     records[subject] = nil
 end
 
+--[[
+Refreshes authoritative maximum/regen while optionally preserving MP fraction.
+
+This is used by the disabled C4 resource cutover when authority moves between
+the existing DungeonMMO resource formulas and an authenticated source maximum.
+
+Args:
+    subject (Instance): Existing authoritative mana owner.
+    preserve_fraction (boolean): Preserve current/max ratio across the change.
+
+Returns:
+    boolean: True when an existing mana record was refreshed.
+]]
+function ManaService.refresh_player(
+    subject: Instance,
+    preserve_fraction: boolean
+): boolean
+    local record = records[subject]
+
+    if not record then
+        return false
+    end
+
+    local previous_current = record.current
+    local previous_maximum = record.maximum
+    local maximum, regen = resolve_limits(subject)
+
+    record.maximum = maximum
+    record.regen_per_second = regen
+
+    if preserve_fraction and previous_maximum > 0 then
+        local fraction = math.clamp(
+            previous_current / previous_maximum,
+            0,
+            1
+        )
+        record.current = maximum * fraction
+    elseif previous_current >= previous_maximum - 0.001 then
+        record.current = maximum
+    else
+        record.current = math.min(previous_current, maximum)
+    end
+
+    replicate(subject, record)
+    return true
+end
+
+--[[
+Restores authoritative mana without changing spend-delay history.
+
+Source-mode regeneration calls this only from its server-owned three-second
+task. Existing non-source mode continues to use the ordinary Heartbeat logic.
+
+Args:
+    subject (Instance): Existing authoritative mana owner.
+    amount (number): Non-negative mana amount requested for restoration.
+
+Returns:
+    number: Actual mana restored after clamping to current maximum.
+]]
+function ManaService.restore(
+    subject: Instance,
+    amount: number
+): number
+    local record = records[subject]
+
+    if not record then
+        return 0
+    end
+
+    refresh_limits(subject, record)
+
+    local before = record.current
+    record.current = math.min(
+        record.maximum,
+        record.current + math.max(0, amount)
+    )
+
+    replicate(subject, record)
+    return record.current - before
+end
+
 function ManaService.get(subject: Instance): number
     local record = records[subject]
     return if record then record.current else 0
