@@ -1,3 +1,17 @@
+**v2.69 NORMAL-ATTACK HIT RESOLUTION BUILT:** [current roadmap](
+DungeonMMO_Roadmap_v2_69_C4_Normal_Attack_Hit_Resolution_20260925.md)
+and [acceptance record](
+../testing/c4-normal-attack-hit-resolution-v2-69-20260925.md).
+Exact C4 ordinary-attack hit chance/roll arithmetic now exists in the pure
+formula layer and the disabled server-only source combat provider. Authenticated
+final source Accuracy/Evasion drive the original delta table and the provider
+owns its 0-999 roll. Source condition multipliers and caps are implemented,
+but runtime position/elevation/night mapping stays neutral and explicit.
+Reviewed C4 PDAM skills remain separate from calcHitMiss. Fresh unpublished
+Base and Dungeon Rojo builds PASS at candidate 6c45baec; focused Studio
+Base/Dungeon execution is pending before GREEN acceptance. No main merge,
+publish or production saves.
+
 **v2.68 SOURCE COMBAT PROVIDER GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_68_C4_Source_Combat_Calculation_Provider_20260925.md)
 and [acceptance evidence](
