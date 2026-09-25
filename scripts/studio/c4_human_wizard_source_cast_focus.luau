@@ -9,8 +9,10 @@ assert(
 local tests = game:GetService("ServerScriptService").Core.Tests
 
 local FIXTURES = table.freeze({
+    "C4SkillRuntimeRulesTest",
     "C4SourceCastContractServiceTest",
     "C4SourceCastResourceServiceTest",
+    "C4SourceCastTimingServiceTest",
     "C4SourceCombatCalculationServiceTest",
 })
 
