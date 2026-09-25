@@ -1,5 +1,5 @@
 --!strict
--- Source-only final cast-time planner for authenticated magic skills.
+-- Source-only final cast-time/reuse planner for authenticated magic skills.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -17,7 +17,7 @@ local Runtime = require(
 local C4SourceCastTimingService = {}
 C4SourceCastTimingService.__index = C4SourceCastTimingService
 
-local REUSE_BLOCKER = "OriginalSkillReuseRateNotIntegrated"
+local MASTERY_BLOCKER = "OriginalSkillMasteryRollNotIntegrated"
 
 --[[
 Returns the default authenticated source stat boundary.
@@ -35,32 +35,82 @@ local function default_boundary_provider(
 end
 
 --[[
-Validates the final source magic attack speed required by timing formulas.
+Reads one finite source stat from a ready migration candidate.
 
 Args:
     boundary (any): Authenticated source migration boundary.
+    stat_id (string): Exact source stat key.
+    allow_zero (boolean): Whether zero is a valid value.
 
 Returns:
-    (number?, string?): Positive M.Atk.Spd or strict denial reason.
+    (number?, string?): Valid value or a field-specific strict denial.
 ]]
-local function magic_attack_speed(
-    boundary: any
+local function source_stat(
+    boundary: any,
+    stat_id: string,
+    allow_zero: boolean
 ): (number?, string?)
     local stats = boundary and boundary.SourceStatCandidate
     local value = type(stats) == "table"
-        and stats.MAGICAL_ATTACK_SPEED or nil
+        and stats[stat_id] or nil
+    local minimum_ok = if allow_zero
+        then type(value) == "number" and value >= 0
+        else type(value) == "number" and value > 0
 
     if boundary == nil
         or boundary.SourceStatCandidateReady ~= true
-        or type(value) ~= "number"
+        or not minimum_ok
         or value ~= value
-        or value <= 0
         or value >= math.huge
     then
-        return nil, "OriginalMagicAttackSpeedUnavailable"
+        return nil, "OriginalSourceStatUnavailable:" .. stat_id
     end
 
     return value, nil
+end
+
+--[[
+Resolves all authenticated source stats required for magic timing/reuse.
+
+Args:
+    boundary (any): Current source migration boundary.
+
+Returns:
+    (any?, string?): Attack speed, reuse multiplier and mastery stat.
+]]
+local function timing_stats(boundary: any): (any?, string?)
+    local attack_speed, speed_reason = source_stat(
+        boundary,
+        "MAGICAL_ATTACK_SPEED",
+        false
+    )
+    if attack_speed == nil then
+        return nil, speed_reason
+    end
+
+    local reuse_multiplier, reuse_reason = source_stat(
+        boundary,
+        "MAGICAL_SKILL_REUSE",
+        true
+    )
+    if reuse_multiplier == nil then
+        return nil, reuse_reason
+    end
+
+    local mastery, mastery_reason = source_stat(
+        boundary,
+        "SKILL_MASTERY",
+        true
+    )
+    if mastery == nil then
+        return nil, mastery_reason
+    end
+
+    return {
+        MagicAttackSpeed = attack_speed,
+        MagicReuseMultiplier = reuse_multiplier,
+        SkillMastery = mastery,
+    }, nil
 end
 
 --[[
@@ -81,6 +131,76 @@ local function peek_magic_shots(
 
     return snapshot.Spiritshot == true,
         snapshot.BlessedSpiritshot == true
+end
+
+--[[
+Calculates final hit/cool timing from source stats and read-only shot state.
+
+Args:
+    contract (any): Exact authenticated source cast contract.
+    stats (any): Authenticated source timing stats.
+    spiritshot (boolean): Current ordinary Spiritshot charge.
+    blessed_spiritshot (boolean): Current blessed charge.
+
+Returns:
+    any: Final hit/cool/interrupt timing.
+]]
+local function cast_times(
+    contract: any,
+    stats: any,
+    spiritshot: boolean,
+    blessed_spiritshot: boolean
+): any
+    local hit_time = Rules.magic_cast_time(
+        contract.SourceHitTimeMs,
+        stats.MagicAttackSpeed,
+        spiritshot,
+        blessed_spiritshot
+    )
+    local cool_time = nil
+
+    if contract.SourceCoolTimeMs ~= nil then
+        cool_time = Rules.magic_cool_time(
+            contract.SourceCoolTimeMs,
+            stats.MagicAttackSpeed,
+            spiritshot,
+            blessed_spiritshot
+        )
+    end
+
+    return {
+        HitTimeMs = hit_time,
+        CoolTimeMs = cool_time,
+        InterruptTimeMs = math.floor(hit_time / 2),
+    }
+end
+
+--[[
+Calculates source reuse and blocks only when a mastery roll can still alter it.
+
+Args:
+    contract (any): Exact authenticated source cast contract.
+    stats (any): Authenticated source reuse/mastery stats.
+
+Returns:
+    any: Pre-mastery reuse plus conditional exact final reuse state.
+]]
+local function reuse_plan(contract: any, stats: any): any
+    local delay = Rules.skill_reuse_delay(
+        contract.SourceReuseDelayMs,
+        stats.MagicAttackSpeed,
+        stats.MagicReuseMultiplier
+    )
+    local mastery_possible = stats.SkillMastery > 0
+
+    return {
+        PreMasteryReuseDelayMs = delay,
+        FinalReuseDelayMs = if mastery_possible
+            then nil else delay,
+        FinalReuseDelayReady = not mastery_possible,
+        ReuseBlocker = if mastery_possible
+            then MASTERY_BLOCKER else nil,
+    }
 end
 
 --[[
@@ -126,11 +246,11 @@ function C4SourceCastTimingService.new(
 end
 
 --[[
-Resolves exact final cast timing while leaving final reuse fail-closed.
+Resolves exact source magic timing and conditional final reuse.
 
-Shot state is observed but never consumed. Authored reuse is scaled with the
-neutral multiplier only as diagnostic evidence; final reuse cannot be
-authorized until MAGICAL_SKILL_REUSE is present in the source stat candidate.
+Shot state is observed but never consumed. Reuse uses the authenticated
+MAGICAL_SKILL_REUSE value. A nonzero SKILL_MASTERY value keeps final reuse
+blocked until the source mastery roll is integrated.
 
 Args:
     user_id (number): Authenticated source-ready cast owner.
@@ -143,11 +263,10 @@ function C4SourceCastTimingService:resolve(
     user_id: number,
     creative_skill_id: string
 ): (any?, string?)
-    local contract, contract_reason =
-        self._cast_contract.resolve(
-            user_id,
-            creative_skill_id
-        )
+    local contract, contract_reason = self._cast_contract.resolve(
+        user_id,
+        creative_skill_id
+    )
     if not contract then
         return nil, contract_reason
     end
@@ -164,34 +283,22 @@ function C4SourceCastTimingService:resolve(
         return nil, "OriginalCastSourceScopeMismatch"
     end
 
-    local attack_speed, speed_reason =
-        magic_attack_speed(boundary)
-    if not attack_speed then
-        return nil, speed_reason
+    local stats, stats_reason = timing_stats(boundary)
+    if not stats then
+        return nil, stats_reason
     end
 
-    local spiritshot, blessed_spiritshot =
-        peek_magic_shots(self._shots, user_id)
-    local hit_time = Rules.magic_cast_time(
-        contract.SourceHitTimeMs,
-        attack_speed,
+    local spiritshot, blessed = peek_magic_shots(
+        self._shots,
+        user_id
+    )
+    local times = cast_times(
+        contract,
+        stats,
         spiritshot,
-        blessed_spiritshot
+        blessed
     )
-    local cool_time = nil
-    if contract.SourceCoolTimeMs ~= nil then
-        cool_time = Rules.magic_cool_time(
-            contract.SourceCoolTimeMs,
-            attack_speed,
-            spiritshot,
-            blessed_spiritshot
-        )
-    end
-    local unmodified_reuse = Rules.skill_reuse_delay(
-        contract.SourceReuseDelayMs,
-        attack_speed,
-        1
-    )
+    local reuse = reuse_plan(contract, stats)
 
     return table.freeze({
         CreativeSkillId = creative_skill_id,
@@ -199,19 +306,21 @@ function C4SourceCastTimingService:resolve(
         SourceScopeId = contract.SourceScopeId,
         SourceSkillId = contract.SourceSkillId,
         SourceRank = contract.SourceRank,
-        SourceMagicAttackSpeed = attack_speed,
+        SourceMagicAttackSpeed = stats.MagicAttackSpeed,
+        SourceMagicReuseMultiplier = stats.MagicReuseMultiplier,
+        SourceSkillMastery = stats.SkillMastery,
         SpiritshotCharged = spiritshot,
-        BlessedSpiritshotCharged = blessed_spiritshot,
+        BlessedSpiritshotCharged = blessed,
         SourceAuthoredHitTimeMs = contract.SourceHitTimeMs,
-        FinalHitTimeMs = hit_time,
-        CastInterruptTimeMs = math.floor(hit_time / 2),
+        FinalHitTimeMs = times.HitTimeMs,
+        CastInterruptTimeMs = times.InterruptTimeMs,
         SourceAuthoredCoolTimeMs = contract.SourceCoolTimeMs,
-        FinalCoolTimeMs = cool_time,
-        SourceAuthoredReuseDelayMs =
-            contract.SourceReuseDelayMs,
-        UnmodifiedReuseDelayMs = unmodified_reuse,
-        FinalReuseDelayReady = false,
-        ReuseBlocker = REUSE_BLOCKER,
+        FinalCoolTimeMs = times.CoolTimeMs,
+        SourceAuthoredReuseDelayMs = contract.SourceReuseDelayMs,
+        PreMasteryReuseDelayMs = reuse.PreMasteryReuseDelayMs,
+        FinalReuseDelayMs = reuse.FinalReuseDelayMs,
+        FinalReuseDelayReady = reuse.FinalReuseDelayReady,
+        ReuseBlocker = reuse.ReuseBlocker,
         ShotStateConsumed = false,
         SourceOnly = true,
         LiveSchedulingIntegrated = false,
@@ -235,9 +344,10 @@ function C4SourceCastTimingService.capability(): any
         FinalMagicCoolTimeIntegrated = true,
         ReadOnlyShotAccelerationIntegrated = true,
         CastInterruptWindowIntegrated = true,
-        UnmodifiedReuseDiagnosticIntegrated = true,
-        FinalReuseDelayIntegrated = false,
-        ReuseBlocker = REUSE_BLOCKER,
+        MagicReuseMultiplierIntegrated = true,
+        ZeroMasteryFinalReuseIntegrated = true,
+        SkillMasteryRollIntegrated = false,
+        MasteryReuseBlocker = MASTERY_BLOCKER,
         LiveSchedulingIntegrated = false,
         ClientAuthority = false,
     }
