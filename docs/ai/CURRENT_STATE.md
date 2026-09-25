@@ -1,3 +1,19 @@
+## 25 September 2026 — CURRENT v2.64 active source boundary complete
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_64_C4_Active_Effect_Boundary_20260925.md)
+and [green evidence](
+../testing/c4-active-effect-boundary-v2-64-20260925.md).
+Equipment, actually-owned passives and authoritative current active/toggle
+effects now compose into one C4 source stat candidate. Timed statuses expire
+from private server state; unresolved effects remain blockers. Persistent
+launch coverage is **21 skills / 25 ranks, 25/25 mapped**. Fresh Base 10/10
+and Dungeon 11/11 focused suites are green at 1e01640f. The only remaining
+fixed coordinated migration blocker is `LiveCPRuntimeUnavailable`. Next
+implement CP as a server-authoritative PvP resource without making dungeon
+monster damage consume CP. Live C4 resources remain disabled. Permanent edits
+stay GitHub-only; no main merge/publish/prod save/animation changes.
+
 ## 25 September 2026 — CURRENT v2.62 live toggle source state GREEN
 
 [Latest roadmap](
