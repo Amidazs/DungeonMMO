@@ -231,11 +231,13 @@ local function main()
 
     check(
         #mapping_issues == 0,
-        "persistent source mappings are unambiguous and review-free"
+        "persistent source mappings are unambiguous and review-free: "
+            .. table.concat(mapping_issues, ", ")
     )
     check(
         #missing == 0,
-        "every reachable persistent active rank has a C4 source rank"
+        "every reachable persistent active rank has a C4 source rank: "
+            .. table.concat(missing, ", ")
     )
     check(
         skill_count == 21,
