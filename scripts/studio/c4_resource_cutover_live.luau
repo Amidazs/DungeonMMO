@@ -8,6 +8,66 @@ assert(
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local StudioTestService = game:GetService("StudioTestService")
+local Workspace = game:GetService("Workspace")
+
+local runtime_source = ServerScriptService.Dungeon.DungeonRuntime
+
+--[[
+Replaces one audited source span only inside the disposable test place.
+
+Args:
+    original (string): Exact DungeonRuntime source text to replace.
+    replacement (string): Test-only replacement used before Play starts.
+
+Returns:
+    nil: Raises when the anchor is missing or ambiguous.
+]]
+local function replace_once(
+    original: string,
+    replacement: string
+)
+    local source = runtime_source.Source
+    local first = assert(
+        string.find(source, original, 1, true),
+        "C4 resource cutover Dungeon source anchor missing"
+    )
+
+    assert(
+        not string.find(
+            source,
+            original,
+            first + #original,
+            true
+        ),
+        "C4 resource cutover Dungeon source anchor ambiguous"
+    )
+
+    runtime_source.Source = source:sub(1, first - 1)
+        .. replacement
+        .. source:sub(first + #original)
+end
+
+replace_once(
+    '    if RunService:IsStudio() then\n'
+        .. '        local studio = StudioSessionFactory.create_for_players(\n'
+        .. '            {player},',
+    '    if RunService:IsStudio() then\n'
+        .. '        while #Players:GetPlayers() < 2 do task.wait(0.1) end\n'
+        .. '        local studio = StudioSessionFactory.create_for_players(\n'
+        .. '            Players:GetPlayers(),'
+)
+
+Workspace:SetAttribute("DungeonMMOStudioDungeonId", "TestDungeon")
+Workspace:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
+Workspace:SetAttribute("DungeonMMOStudioBaseClass", "Fighter")
+Workspace:SetAttribute(
+    "DungeonMMOPlaceholderPhysicalContentEnabled",
+    true
+)
+Workspace:SetAttribute(
+    "DungeonMMOPlaceholderPlayableEnabled",
+    true
+)
 
 local driver = Instance.new("Script")
 driver.Name = "TEMP_C4ResourceCutoverDriver"
@@ -439,7 +499,12 @@ local function main()
     end, "two real Studio players", 45)
 
     for _, player in ipairs(players) do
-        living_humanoid(player)
+        wait_for(function()
+            return player:GetAttribute("DungeonCombatAllowed") == true
+                and player.Character
+                and player.Character:FindFirstChild("HumanoidRootPart")
+                and player.Character:FindFirstChildOfClass("Humanoid")
+        end, "two admitted Dungeon players", 75)
     end
 
     verify_cutover(players[1], players[2])
