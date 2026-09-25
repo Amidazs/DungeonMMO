@@ -234,33 +234,59 @@ local function reset_fakes()
 end
 
 --[[
-Checks exact deadlines, early rejection and successful source launch commit.
+Builds the standard exact-deadline scheduler fixture.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms source hit/cool/reuse times become private deadlines.
+    (any, any): Fresh scheduler and successful cast-start evidence.
 ]]
-local function check_normal_schedule()
+local function normal_schedule_fixture(): (any, any)
     reset_fakes()
     local scheduler = Scheduler.new(FakeResources, FakeTiming)
-
-    local started, reason = scheduler:begin_cast(
+    local started = assert(scheduler:begin_cast(
         player,
         "EmberweaverEmberBolt",
         100
-    )
+    ))
+
+    return scheduler, started
+end
+
+--[[
+Checks exact hit, interrupt, finalizer and reuse deadlines.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source timing values become private deadlines.
+]]
+local function check_normal_deadlines()
+    local _, started = normal_schedule_fixture()
+
     check(
-        started ~= nil
-            and reason == nil
-            and started.StartedAt == 100
+        started.StartedAt == 100
             and started.InterruptAt == 102
             and started.LaunchAt == 104
             and math.abs(started.FinalizerAt - 104.14) < 0.000001
             and started.ReuseReadyAt == 104.5,
         "source timing plan creates exact private deadlines"
     )
+end
+
+--[[
+Checks early rejection, one successful launch and replay protection.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms launch-time MP commits only at/after the hit deadline.
+]]
+local function check_normal_launch()
+    local scheduler, started = normal_schedule_fixture()
 
     local early, early_reason = scheduler:launch_if_ready(
         player,
@@ -545,7 +571,8 @@ local function main()
         "capability keeps scheduler private and source-effect-only"
     )
 
-    check_normal_schedule()
+    check_normal_deadlines()
+    check_normal_launch()
     check_cancel_and_reuse()
     check_unresolved_reuse()
     check_plan_change()
