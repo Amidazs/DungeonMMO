@@ -1,3 +1,17 @@
+**v2.65 LOCAL ACCEPTANCE GREEN:** [current roadmap](
+DungeonMMO_Roadmap_v2_65_C4_Combat_Point_Runtime_20260925.md)
+and [test evidence](
+../testing/c4-combat-point-runtime-v2-65-20260925.md).
+Pinned C4 CP regeneration and PcStatus damage semantics are now represented in
+a server-authoritative, disabled-by-default CP runtime. Max CP can only be
+configured from a certified source migration boundary; playable damage uses CP
+first while NPC damage bypasses it. The final `LiveCPRuntimeUnavailable`
+prerequisite blocker is closed for clean characters. Base focused **11/11
+PASS** and Dungeon **12/12 PASS** at `2aae5124`. All coordinated source
+prerequisites are ready, but the live HP/MP/CP cutover remains explicitly
+disabled. Next build the reversible, disabled-by-default coordinated resource
+cutover service. No main merge, publish or production saves.
+
 **v2.64 LOCAL ACCEPTANCE GREEN:** [current roadmap](
 DungeonMMO_Roadmap_v2_64_C4_Active_Effect_Boundary_20260925.md)
 and [test evidence](
