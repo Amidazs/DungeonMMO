@@ -1,3 +1,20 @@
+## 25 September 2026 — CURRENT v2.84 C4 damage-family audit GREEN
+
+[Latest roadmap](
+../roadmap/DungeonMMO_Roadmap_v2_84_C4_Damage_Family_Audit_20260925.md)
+and [green evidence](
+../testing/c4-damage-family-audit-v2-84-20260925.md).
+Every current DamageService source family is now classified before staging
+activation. Melee, RangedPhysical, Skill and MagicSkill have source routes;
+MagicBasic, RangerArea, StatusPhysical and StatusMagic are explicit blockers.
+Rogue bleed/player poison ticks now use distinct periodic-status source kinds,
+so they cannot be mistaken for fresh PDAM/MDAM casts. Production dispatch now
+refuses enable while any blocker remains. Fresh Studio Base **20/20 PASS**,
+Dungeon **23/23 PASS**, family audit **24 assertions PASS**, dispatch **17
+assertions PASS**. Next: exact source Bleed/Poison periodic execution, then
+resolve Spirit Orb and Volley. No main merge, publish, production save
+mutation or animation edits.
+
 ## 25 September 2026 — CURRENT v2.81 C4 NPC source boundary GREEN
 
 [Latest roadmap](
