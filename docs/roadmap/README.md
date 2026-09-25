@@ -1,3 +1,19 @@
+**v2.94 HUMAN WIZARD FOUNDATION GREEN:** [roadmap](
+DungeonMMO_Roadmap_v2_94_Human_Wizard_Foundation_20260925.md)
+and [green evidence](
+../testing/c4-human-wizard-foundation-v2-94-20260925.md).
+The Human Wizard source branch now has the creative DungeonMMO
+**Emberweaver** first-transfer identity, a server-authenticated level-18
+Emberglass quest, level-20 mentor award and class-bound trainer. The same
+first-transfer receipt boundary now protects Mage-family skills as well as
+Fighter-family skills. **74/93** level-30 source rows map to 24 independently
+named non-servitor skill families; **19/93** companion-dependent rows remain
+deliberately unmapped until a real server-owned companion system exists.
+Fresh Base/Dungeon Rojo PASS; Wizard foundation **166 assertions PASS**,
+quest/transfer **22 PASS**, launch audit **37 PASS**, focused runner **3/3**.
+Next: source-resolved Wizard effects and companion authority, not more cutover
+rehearsals.
+
 **v2.93 HUMAN WIZARD SOURCE AUDIT GREEN:** [roadmap](
 DungeonMMO_Roadmap_v2_93_Human_Wizard_Source_Audit_20260925.md)
 and [green evidence](
