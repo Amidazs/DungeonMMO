@@ -91,13 +91,16 @@ Trusted Studio/server tooling can use it across Luau VM boundaries.
 Args:
     coordinator (any): Actual runtime cutover coordinator.
     bridge_name (string?): Optional isolated test name.
+    diagnostic_provider (((number) -> (any?, string?))?): Optional
+        server-runtime source-boundary provider for unpublished diagnostics.
 
 Returns:
     BindableFunction?: Created bridge, otherwise nil outside local Studio.
 ]]
 function C4CombatCutoverStudioBridge.bind(
     coordinator: any,
-    bridge_name: string?
+    bridge_name: string?,
+    diagnostic_provider: ((number) -> (any?, string?))?
 ): BindableFunction?
     assert(
         valid_coordinator(coordinator),
@@ -138,6 +141,74 @@ function C4CombatCutoverStudioBridge.bind(
             coordinator:disable()
             return {
                 ok = true,
+                snapshot = coordinator:snapshot(),
+            }
+        end
+
+        if action == "diagnose" then
+            if type(diagnostic_provider) ~= "function" then
+                return {
+                    ok = false,
+                    reason = "C4RehearsalDiagnosticsUnavailable",
+                    snapshot = coordinator:snapshot(),
+                }
+            end
+
+            local players, player_reason =
+                resolve_players(payload and payload.UserIds)
+            if not players then
+                return {
+                    ok = false,
+                    reason = player_reason,
+                    snapshot = coordinator:snapshot(),
+                }
+            end
+
+            local diagnostics = {}
+            for _, player in ipairs(players) do
+                local boundary, boundary_reason =
+                    diagnostic_provider(player.UserId)
+                local summary = {
+                    UserId = player.UserId,
+                    Reason = boundary_reason,
+                }
+
+                if type(boundary) == "table" then
+                    summary.RaceId = boundary.RaceId
+                    summary.ClassId = boundary.ClassId
+                    summary.Level = boundary.Level
+                    summary.ReviewedSixSlotLoadoutReady =
+                        boundary.ReviewedSixSlotLoadoutReady
+                    summary.ReviewedSixSlotLoadoutReason =
+                        boundary.ReviewedSixSlotLoadoutReason
+                    summary.OriginalOwnedPassivesIntegrated =
+                        boundary.OriginalOwnedPassivesIntegrated
+                    summary.OwnedPassiveSourceReason =
+                        boundary.OwnedPassiveSourceReason
+                    summary.ActiveEffectSourceStateReady =
+                        boundary.ActiveEffectSourceStateReady
+                    summary.ActiveEffectSourceStateReason =
+                        boundary.ActiveEffectSourceStateReason
+                    summary.CombatPointRuntimeReady =
+                        boundary.CombatPointRuntimeReady
+                    summary.CombatPointRuntimeReason =
+                        boundary.CombatPointRuntimeReason
+                    summary.SourceStatCandidateReady =
+                        boundary.SourceStatCandidateReady
+                    summary.SourceStatCandidateReason =
+                        boundary.SourceStatCandidateReason
+                    summary.CutoverPrerequisitesReady =
+                        boundary.CutoverPrerequisitesReady
+                    summary.ActivationBlockers =
+                        boundary.ActivationBlockers
+                end
+
+                table.insert(diagnostics, summary)
+            end
+
+            return {
+                ok = true,
+                players = diagnostics,
                 snapshot = coordinator:snapshot(),
             }
         end
