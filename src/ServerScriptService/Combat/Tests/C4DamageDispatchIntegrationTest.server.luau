@@ -1,4 +1,13 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_SINGLETON_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[C4 Damage Dispatch Integration] SKIP: singleton regression runs in focused Edit mode"
+    )
+    return
+end
 -- DamageService hook regression for disabled/handled C4 source dispatch.
 
 local ServerScriptService = game:GetService("ServerScriptService")
