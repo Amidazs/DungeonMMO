@@ -946,6 +946,39 @@ end)
 ]==]
 
 driver.Parent = ServerScriptService
+
+--[[
+Disables two edit-only physical regression scripts for this live rehearsal.
+
+These scripts independently author temporary placeholder anchors as soon as
+Play starts. The Moonweaver rehearsal also enables synthetic placeholder
+content, so letting both regression scripts auto-run creates duplicate anchor
+errors unrelated to the class/runtime behavior under test.
+
+Args:
+    None.
+
+Returns:
+    nil: Disables only the disposable unpublished Studio copies.
+]]
+local function disable_conflicting_physical_regressions()
+    local tests = ServerScriptService.Dungeon:FindFirstChild("Tests")
+    assert(tests, "Moonweaver live Dungeon tests folder missing")
+
+    for _, name in ipairs({
+        "DungeonOptionalDepthPhysicalLayoutTest",
+        "DungeonLateEventPhysicalLayoutTest",
+    }) do
+        local script_instance = tests:FindFirstChild(name)
+        assert(
+            script_instance and script_instance:IsA("Script"),
+            "Moonweaver live regression script missing: " .. name
+        )
+        script_instance.Disabled = true
+    end
+end
+
+disable_conflicting_physical_regressions()
 print("[Moonweaver Live] EDIT_DRIVER_READY")
 
 local ok, result = pcall(function()
