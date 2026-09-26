@@ -430,6 +430,9 @@ local GAPS = table.freeze({
     ElvenOracle = table.freeze({
 
     }),
+    PalusKnight = table.freeze({
+
+    }),
     HumanWarrior = table.freeze({
 
     }),
