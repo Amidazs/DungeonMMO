@@ -125,9 +125,6 @@ function RuntimeServices.new(place_kind: string): any
     local progression = ProgressionService.new(profiles)
     local inventory = InventoryService.new(profiles)
     local c4_source_shots = C4SourceShotService.new(inventory)
-    C4SourceCombatCalculationService.set_shot_authority(
-        c4_source_shots
-    )
 
     local c4_resource_cutover = nil
     if place_kind == "Dungeon" then
