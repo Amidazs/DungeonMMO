@@ -291,6 +291,7 @@ local function attach(model: Instance)
         ThreatService.clear(model)
         C4NpcSleepService.clear(model)
         C4NpcElementalVulnerabilityService.clear_all(model)
+        EnemyWeakeningService.clear(model)
         runtime.attackSequence += 1
         runtime.attacking = false
         model:SetAttribute("AttackTelegraph", false)
