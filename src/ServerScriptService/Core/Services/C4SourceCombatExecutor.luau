@@ -3,6 +3,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Workspace = game:GetService("Workspace")
 
 local Services = ServerScriptService.Core.Services
 local StatusEffects = require(
@@ -459,6 +460,120 @@ function C4SourceCombatExecutor:_validate_npc_source_range(
     end
 
     return true, nil
+end
+
+--[[
+Returns the nearest ancestor Model containing a Humanoid.
+
+Args:
+    instance (Instance): Descendant returned by the server overlap query.
+
+Returns:
+    Model?: Combat model owning the part, otherwise nil.
+]]
+local function combat_model_from_descendant(
+    instance: Instance
+): Model?
+    local current: Instance? = instance
+
+    while current and current ~= Workspace do
+        if current:IsA("Model")
+            and current:FindFirstChildOfClass("Humanoid")
+        then
+            return current
+        end
+        current = current.Parent
+    end
+
+    return nil
+end
+
+--[[
+Collects reviewed NPC targets for a source TARGET_AREA magic cast.
+
+The pinned C4 TargetArea handler always keeps the selected primary target, then
+checks other offensive targets against skillRadius from the caster. DungeonMMO
+also requires secondary targets to share the primary target's encounter so an
+instance cannot damage NPCs from another room/run.
+
+Args:
+    attacker (any): Server-owned casting player.
+    primary (Model): Reviewed selected NPC target.
+    primary_boundary (any): Already-validated primary source boundary.
+    source_radius (number): C4 skillRadius in source units.
+
+Returns:
+    ({Model}?, {any}?, string?): Ordered models/boundaries or denial reason.
+]]
+function C4SourceCombatExecutor:_collect_npc_area_targets(
+    attacker: any,
+    primary: Model,
+    primary_boundary: any,
+    source_radius: number
+): ({Model}?, {any}?, string?)
+    if type(source_radius) ~= "number"
+        or source_radius ~= source_radius
+        or source_radius <= 0
+        or source_radius >= math.huge
+    then
+        return nil, nil, "InvalidC4SourceAreaRadius"
+    end
+    if type(self._source_units_per_stud) ~= "number" then
+        return nil, nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local attacker_model = combat_model(attacker)
+    if not attacker_model then
+        return nil, nil, "C4LiveCombatCharacterUnavailable"
+    end
+
+    local attacker_root =
+        attacker_model:FindFirstChild("HumanoidRootPart")
+    if not attacker_root or not attacker_root:IsA("BasePart") then
+        return nil, nil, "C4LiveCombatRootUnavailable"
+    end
+
+    local radius_studs =
+        source_radius / self._source_units_per_stud
+    local params = OverlapParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {attacker_model}
+    params.RespectCanCollide = false
+
+    local primary_encounter =
+        primary:GetAttribute("DungeonEncounterId")
+    local models: {Model} = {primary}
+    local boundaries = {primary_boundary}
+    local seen: {[Model]: boolean} = {
+        [primary] = true,
+    }
+
+    for _, part in Workspace:GetPartBoundsInRadius(
+        attacker_root.Position,
+        radius_studs,
+        params
+    ) do
+        local candidate = combat_model_from_descendant(part)
+        if not candidate or seen[candidate] then
+            continue
+        end
+        seen[candidate] = true
+
+        if candidate:GetAttribute("DungeonEncounterId")
+            ~= primary_encounter
+        then
+            continue
+        end
+
+        local boundary =
+            self:_validate_npc_target(attacker, candidate)
+        if boundary then
+            table.insert(models, candidate)
+            table.insert(boundaries, boundary)
+        end
+    end
+
+    return models, boundaries, nil
 end
 
 --[[
@@ -1126,6 +1241,113 @@ function C4SourceCombatExecutor:magic_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC C4 TARGET_AREA MDAM cast.
+
+The selected NPC is always included after normal cast/effect range validation.
+Additional reviewed NPCs are collected within the source skillRadius around the
+caster, matching the pinned C4 TargetArea semantics. One magical shot snapshot
+is shared across every target calculation and consumed once for the cast.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed selected NPC.
+    creative_skill_id (string): Server-selected creative area spell.
+    creative_rank (number): Server-resolved purchased rank.
+    source_radius (number): Reviewed C4 skillRadius in source units.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live area application evidence or denial reason.
+]]
+function C4SourceCombatExecutor:magic_area_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    local primary_boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not primary_boundary then
+        return nil, boundary_reason
+    end
+
+    local targets, boundaries, area_reason =
+        self:_collect_npc_area_targets(
+            attacker,
+            enemy,
+            primary_boundary,
+            source_radius
+        )
+    if not targets or not boundaries then
+        return nil, area_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.magic_area_skill(
+            attacker.UserId,
+            boundaries,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.SourceSkillRadius ~= source_radius
+        or #calculated.Results ~= #targets
+    then
+        return nil, "C4MagicAreaCalculationContractMismatch"
+    end
+
+    local applications = {}
+    local total_damage = 0
+
+    for index, target in ipairs(targets) do
+        local humanoid = target:FindFirstChildOfClass("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then
+            continue
+        end
+
+        local result = calculated.Results[index]
+        local applied, apply_reason = self:_apply_npc_damage(
+            attacker,
+            target,
+            result.Amount,
+            "MagicArea",
+            creative_skill_id,
+            sequence_id
+        )
+        if not applied then
+            return nil, apply_reason
+        end
+
+        total_damage += applied.HealthDamage
+        table.insert(applications, {
+            Target = target,
+            Calculation = result,
+            HealthDamage = applied.HealthDamage,
+            RawDamage = applied.RawDamage,
+            HealthBefore = applied.HealthBefore,
+            HealthAfter = applied.HealthAfter,
+            Lethal = applied.Lethal,
+        })
+    end
+
+    return {
+        Kind = "C4LiveNpcMagicArea",
+        Calculation = calculated,
+        Applications = applications,
+        Applied = #applications > 0,
+        TargetCount = #applications,
+        TotalHealthDamage = total_damage,
+        SourceSkillRadius = source_radius,
+        Spiritshot = calculated.Spiritshot,
+        BlessedSpiritshot = calculated.BlessedSpiritshot,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -1592,6 +1814,9 @@ function C4SourceCombatExecutor:capability(): any
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
+        NpcMagicAreaLiveApplication = true,
+        NpcMagicAreaCasterRadiusSourceSemantics = true,
+        NpcMagicAreaSingleShotSnapshot = true,
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
