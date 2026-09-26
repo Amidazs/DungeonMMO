@@ -16,6 +16,9 @@ local FIXTURE_TIMEOUT_SECONDS = 12
 local FIXTURES = table.freeze({
     {Folder = core_tests, Name = "C4ElvenOracleSourceAuditTest"},
     {Folder = core_tests, Name = "C4ElvenOracleFoundationTest"},
+    {Folder = core_tests, Name = "C4ElvenOracleSourceEffectsTest"},
+    {Folder = core_tests, Name = "C4ElvenOracleDirectMagicBridgeTest"},
+    {Folder = core_tests, Name = "C4ElvenOracleSupportMagicBridgeTest"},
     {Folder = core_tests, Name = "C4Level30LaunchCoverageTest"},
     {Folder = core_tests, Name = "C4CreativeSkillLinkAuditTest"},
     {Folder = core_tests, Name = "C4Level30SkillTreeSourceTest"},
