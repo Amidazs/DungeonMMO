@@ -270,6 +270,44 @@ local function check_human_cleric_owned_passives()
 end
 
 --[[
+Checks Moonweaver owned passives resolve exact Elven Wizard source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms level-30 Elven Wizard passive source ownership.
+]]
+local function check_elven_wizard_owned_passives()
+    local character = original_character(
+        "Elf",
+        "Moonweaver",
+        30
+    )
+    own_passive(character, "MoonweaverQuickWeave", 2)
+    own_passive(character, "MoonweaverRobeTraining", 6)
+    own_passive(character, "MoonweaverManaChanneling", 6)
+
+    local result = assert(Resolver.for_character(character))
+    local reuse = assert(find_source_rank(result, 164))
+    local robe = assert(find_source_rank(result, 234))
+    local mana_gain = assert(find_source_rank(result, 285))
+
+    check(
+        result.Ready
+            and result.ScopeId == "ElvenWizard"
+            and reuse.Rank == 2
+            and reuse.CreativeSkillId == "MoonweaverQuickWeave"
+            and robe.Rank == 6
+            and robe.CreativeSkillId == "MoonweaverRobeTraining"
+            and mana_gain.Rank == 6
+            and mana_gain.CreativeSkillId
+                == "MoonweaverManaChanneling",
+        "owned Moonweaver passives resolve exact Elven Wizard ranks"
+    )
+end
+
+--[[
 Checks unsupported or corrupted owned passive state remains fail-closed.
 
 Args:
@@ -319,6 +357,7 @@ local function main()
     check_first_transfer_inheritance()
     check_human_wizard_reuse_passive()
     check_human_cleric_owned_passives()
+    check_elven_wizard_owned_passives()
     check_fail_closed_owned_state()
 
     print((
