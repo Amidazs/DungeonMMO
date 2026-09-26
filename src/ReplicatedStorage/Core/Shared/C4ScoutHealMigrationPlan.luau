@@ -1,6 +1,6 @@
 --!strict
--- Original C4 Scout self-heal migration contract, not a live skill.
--- Source heal/MP semantics are certified here; no live HP/SP/MP is changed.
+-- Original C4 Scout self-heal source contract.
+-- Exact source semantics now back the live Greenward Scout skill family.
 local Shared = script.Parent
 
 local Identity = require(Shared.CharacterIdentityRules)
@@ -93,8 +93,8 @@ local function build_contracts(): {[number]: any}
             SourceReuseMs = sets.reuseDelay,
             SourceSkillType = sets.skillType,
             SourceOnly = true,
-            LiveLearnable = false,
-            LiveCastable = false,
+            LiveLearnable = true,
+            LiveCastable = true,
             ExactC4HealFormulaCertified = true,
             SplitMPTransactionCertified = true,
         })
@@ -109,7 +109,7 @@ end
 local CONTRACTS = build_contracts()
 
 --[[
-Returns a source-only Scout rank without granting a usable skill.
+Returns one exact Scout source rank backing the live creative family.
 
 Args:
     source_rank (number): Original Elemental Heal skill level 4-12.
@@ -126,8 +126,8 @@ end
 --[[
 Lists the Scout-only historical self-heal ranks at an owner's level.
 
-The original class and mentor receipt must be valid. This represents
-source availability, NOT an owned or purchased character skill.
+The original class and mentor receipt must be valid. This describes
+the exact source ranks now used by the separately purchased live skill.
 
 Args:
     character (any): Authoritative complete Elf Scout character.
@@ -166,8 +166,8 @@ function C4ScoutHealMigrationPlan.for_character(
         SourceRankOffset = SOURCE_RANK_OFFSET,
         Rows = rows,
         SourceOnly = true,
-        LiveLearnable = false,
-        LiveCastable = false,
+        LiveLearnable = true,
+        LiveCastable = true,
         ExactC4HealFormulaCertified = true,
         SplitMPTransactionCertified = true,
     }, nil
