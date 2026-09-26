@@ -548,7 +548,8 @@ local function cast_wind_shackle(bridge, player, enemy)
     assert(
         application.Applied
             and application.Landed
-            and application.SourceSkillId == nil
+            and application.Calculation.SourceSkillId == 1206
+            and application.Calculation.SourceRank == 4
             and application.PhysicalAttackSpeedMultiplier == 0.8
             and application.RateReductionFraction == 0.2
             and application.DurationSeconds == 15
