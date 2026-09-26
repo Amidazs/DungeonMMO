@@ -28,11 +28,13 @@ local HUMAN = table.freeze({
     Sprint = "HumanScoutSprint",
     CriticalDamagePassive = "HumanScoutCriticalPower",
     SittingRecovery = "HumanScoutRestingRecovery",
+    VitalForce = "AshenbladeVitalForce",
     CriticalRatePassive = "HumanScoutPrecision",
 })
 
 local ELF = table.freeze({
     HPRegeneration = "ElvenRenewal",
+    ElementalHeal = "GreenwardScoutElementalHeal",
     ThreatCharm = "GreenwardCalmingArrow",
     DefenseBuff = "ElvenScoutGuard",
     CureWounds = "ElvenScoutCureWounds",
