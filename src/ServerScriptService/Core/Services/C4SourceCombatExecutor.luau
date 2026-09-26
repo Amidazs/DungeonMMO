@@ -2611,6 +2611,61 @@ function C4SourceCombatExecutor:support_buff_skill_target(
 end
 
 --[[
+Checks whether a reviewed C4 party heal currently has an eligible target.
+
+The server-owned party roster, life state, range and line-of-sight remain in
+the existing PartyHealService. This preflight does not spend MP or consume a
+magical shot.
+
+Args:
+    caster (any): Server-owned healing player.
+    source_radius (number): Reviewed C4 party radius in source units.
+
+Returns:
+    (boolean, string?): Readiness or strict denial reason.
+]]
+function C4SourceCombatExecutor:can_party_heal_skill(
+    caster: any,
+    source_radius: number
+): (boolean, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return false, ready_reason
+    end
+
+    if type(source_radius) ~= "number"
+        or source_radius ~= source_radius
+        or source_radius <= 0
+        or source_radius >= math.huge
+    then
+        return false, "InvalidC4SourcePartyHealRadius"
+    end
+    if type(self._source_units_per_stud) ~= "number"
+        or self._source_units_per_stud <= 0
+    then
+        return false, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local provider = self._party_heal
+    if not provider
+        or type(provider.has_injured_member) ~= "function"
+    then
+        return false, "C4LivePartyHealAuthorityUnavailable"
+    end
+
+    local radius_studs =
+        source_radius / self._source_units_per_stud
+    if not provider.has_injured_member(
+        caster,
+        radius_studs
+    ) then
+        return false, "C4LivePartyHealNoEligibleTargets"
+    end
+
+    return true, nil
+end
+
+--[[
 Executes one live source TARGET_PARTY heal.
 
 The source calculator consumes the caster's one magical shot and returns the
