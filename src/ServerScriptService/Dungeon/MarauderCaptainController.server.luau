@@ -22,6 +22,9 @@ local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     Combat:WaitForChild("C4NpcSleepService")
 )
+local C4NpcRootService = require(
+    Combat:WaitForChild("C4NpcRootService")
+)
 local C4NpcElementalVulnerabilityService = require(
     Combat:WaitForChild(
         "C4NpcElementalVulnerabilityService"
@@ -290,6 +293,7 @@ local function attach(model: Instance)
     humanoid.Died:Connect(function()
         ThreatService.clear(model)
         C4NpcSleepService.clear(model)
+        C4NpcRootService.clear(model)
         C4NpcElementalVulnerabilityService.clear_all(model)
         EnemyWeakeningService.clear(model)
         runtime.attackSequence += 1
@@ -342,10 +346,20 @@ RunService.Heartbeat:Connect(function(dt)
             elseif distance > STOP_RANGE then
                 model:SetAttribute("MarauderAIState", "Chasing")
                 local offset = Vector3.new(target_root.Position.X - runtime.root.Position.X, 0, target_root.Position.Z - runtime.root.Position.Z)
+                local movement_multiplier =
+                    RangerSlowService.get_multiplier(model)
+                if C4NpcRootService.is_rooted(model) then
+                    movement_multiplier = 0
+                    model:SetAttribute(
+                        "MarauderAIState",
+                        "Rooted"
+                    )
+                end
+
                 local move = math.min(
                     math.max(0, distance - STOP_RANGE),
                     CHASE_SPEED
-                        * RangerSlowService.get_multiplier(model)
+                        * movement_multiplier
                         * step
                 )
                 if offset.Magnitude > 0.01 and move > 0 then
