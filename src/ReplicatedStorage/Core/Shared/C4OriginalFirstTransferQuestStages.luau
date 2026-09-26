@@ -123,6 +123,39 @@ local QUESTS = table.freeze({
         }),
         WorldBindingStatus = "NotImplemented",
     }),
+    HumanCleric = table.freeze({
+        Id = "DawnkeeperVigil",
+        BranchId = "HumanCleric",
+        SourceTitle = "The Dawnkeeper Vigil",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "PriestessElara",
+        Recommendation = "DawnkeeperVow",
+        Steps = table.freeze({
+            talk("PriestessElara", "Accept the Dawnkeeper vigil."),
+            talk("BrotherTavian", "Learn where the blighted relics lie."),
+            defeat(
+                "GloamCultist",
+                3,
+                "Recover three personally earned dawn relic fragments."
+            ),
+            talk("BrotherTavian", "Return the three relic fragments."),
+            defeat(
+                "HollowAcolyte",
+                1,
+                "Recover the acolyte's personal shadow seal."
+            ),
+            talk(
+                "PriestessElara",
+                "Present the shadow seal and complete the vigil."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "DawnRelicFragments3",
+            "HollowAcolyteSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanRogue = table.freeze({
         Id = "C4PathToRogue", BranchId = "HumanRogue",
         SourceQuestId = 403, SourceTitle = "The Ashen Blade Trial",
@@ -200,7 +233,8 @@ function SourceQuests.inventoried(): {any}
     return table.freeze({
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.HumanWizard,
-        QUESTS.ElvenScout, QUESTS.ElvenKnight,
+        QUESTS.HumanCleric, QUESTS.ElvenScout,
+        QUESTS.ElvenKnight,
     })
 end
 
