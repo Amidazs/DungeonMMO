@@ -73,6 +73,13 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 750,
         EffectRange = 1250,
     }),
+    EmberweaverWitheringHex = table.freeze({
+        CreativeRank = 3,
+        SourceSkillId = 1164,
+        SourceRank = 4,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
 })
 
 
@@ -97,6 +104,7 @@ local executor_state = {
     DrainMagicCalls = 0,
     SleepCalls = 0,
     VulnerabilityCalls = 0,
+    WeakeningCalls = 0,
     LastAreaRadius = nil,
     TargetReady = true,
     TargetReason = nil,
@@ -519,6 +527,46 @@ function FakeExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Applies one disposable source physical-attack weakening result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed Withering Hex identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake physical-attack weakening result.
+]]
+function FakeExecutor:physical_attack_weakening_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.WeakeningCalls += 1
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverWitheringHex")
+
+    return {
+        Kind = "C4LiveNpcPhysicalAttackWeakening",
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackMultiplier = 0.8,
+        PowerReductionFraction = 0.2,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -561,6 +609,7 @@ local function reset_fakes()
     executor_state.DrainMagicCalls = 0
     executor_state.SleepCalls = 0
     executor_state.VulnerabilityCalls = 0
+    executor_state.WeakeningCalls = 0
     executor_state.LastAreaRadius = nil
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
@@ -614,14 +663,14 @@ local function check_gate_and_allowlist()
     local blocked, blocked_reason = bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverScorchMark",
+        "EmberweaverCorpseSiphon",
         100
     )
     check(
         blocked == nil
             and blocked_reason == "C4DirectMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "bridge rejects spell families with unimplemented vulnerability semantics"
+        "bridge rejects spell families without reviewed live semantics"
     )
 end
 
@@ -1034,6 +1083,44 @@ local function check_scorch_mark_launch()
 end
 
 --[[
+Checks Withering Hex selects the physical-attack weakening path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact rank and sequence reach weakening execution.
+]]
+local function check_withering_hex_launch()
+    local bridge, started = started_bridge(
+        630,
+        "EmberweaverWitheringHex"
+    )
+
+    local applied = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        631.5,
+        910
+    ))
+
+    check(
+        applied.Applied
+            and applied.Application.Kind
+                == "C4LiveNpcPhysicalAttackWeakening"
+            and applied.Application.WeakeningApplied
+            and applied.Application.PhysicalAttackMultiplier == 0.8
+            and applied.Application.PowerReductionFraction == 0.2
+            and applied.Application.DurationSeconds == 15
+            and executor_state.WeakeningCalls == 1
+            and executor_state.LastRank == 3
+            and executor_state.LastSequence == 910
+            and executor_state.LastRange == 1100,
+        "Withering Hex reaches source attack-weakening executor once"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -1081,6 +1168,7 @@ local function check_reviewed_direct_families()
         "EmberweaverLifeSiphon",
         "EmberweaverSlumberHex",
         "EmberweaverScorchMark",
+        "EmberweaverWitheringHex",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -1170,8 +1258,10 @@ local function main()
             and capability.ReviewedSleepBreaksOnDamage
             and capability.ReviewedElementalVulnerability
             and capability.ReviewedElementalVulnerabilityFeedsMagicDamage
-            and capability.ReviewedSkillCount == 8
-            and #capability.ReviewedSkills == 8
+            and capability.ReviewedPhysicalAttackWeakening
+            and capability.ReviewedPhysicalAttackWeakeningFeedsNpcDamage
+            and capability.ReviewedSkillCount == 9
+            and #capability.ReviewedSkills == 9
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
@@ -1196,6 +1286,7 @@ local function main()
     check_life_siphon_launch()
     check_slumber_hex_launch()
     check_scorch_mark_launch()
+    check_withering_hex_launch()
     check_owner_cleanup()
 
     print((
