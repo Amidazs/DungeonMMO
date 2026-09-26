@@ -7,17 +7,18 @@ DungeonMMO_Roadmap_v3_00_Human_Wizard_Direct_MDAM_Bridge_20260926.md).
 
 ## Status
 
-**IMPLEMENTED IN GITHUB — LARGE LOCAL/STUDIO VALIDATION PENDING.**
+**GREEN — large backend, cast-focused and live Dungeon rehearsal accepted.**
 
-Remote Desktop Commander remains intentionally unavailable tonight. No local
-checkout, Rojo build, Roblox Studio run or live rehearsal was performed.
+Acceptance evidence:
+[Human Wizard targeted cast batch v3.01](
+../testing/c4-human-wizard-targeted-cast-batch-v3-01-20260926.md).
 
-Latest code candidate before this documentation:
+Validated code candidate:
 
-`a8d66d1dda51816a52f64a7eacc33aa44aa5f598`.
+`4f22314542ba6a1e2f18b5cf0c82e711bdb03d26`.
 
-v2.99 remains the latest fully validated point until tomorrow's large test is
-green.
+Fresh Base/Dungeon builds, the 15-suite cast runner, the 35-suite big backend
+runner and a real unpublished Dungeon Play rehearsal are all green.
 
 ## Targeted Human Wizard cast batch
 
@@ -113,12 +114,12 @@ cleanup removes private source-shot state.
 
 Base runtime still does not compose the Dungeon-only cast runtime.
 
-## Tomorrow's large validation
+## Completed large validation
 
-Two prepared runners are now available:
+The accepted runners are:
 
-- `c4_human_wizard_source_cast_focus.luau`: **14 suites**;
-- `c4_human_wizard_big_backend_focus.luau`: **32 suites**.
+- `c4_human_wizard_source_cast_focus.luau`: **15/15 PASS**;
+- `c4_human_wizard_big_backend_focus.luau`: **35/35 PASS**.
 
 The 32-suite runner now reaches beyond skill data into:
 
@@ -140,22 +141,21 @@ The 32-suite runner now reaches beyond skill data into:
 Tests copied by the big runner stay beside their original Core or Combat test
 folder so relative `script.Parent` dependencies remain valid.
 
-## Validation order tomorrow
+## Validation result
 
-When Remote Desktop Commander returns:
+Fresh acceptance completed:
 
-1. fast-forward the local worktree to this branch;
-2. run `git diff --check`;
-3. build Base with Rojo;
-4. run the **32-suite big backend runner** in unpublished Edit mode;
-5. run the **14-suite cast-focused runner** for a concise second pass;
-6. build Dungeon with Rojo;
-7. inspect Dungeon startup/runtime logs;
-8. verify the combat damage observer is installed through the existing
-   CombatService -> C4 dispatch binding;
-9. if all static/focused checks are green, run one unpublished live
-   Emberweaver-to-reviewed-NPC rehearsal;
-10. only then mark v3.00/v3.01 implementation green.
+1. fast-forward and `git diff --check`: PASS;
+2. Base Rojo build: PASS;
+3. Dungeon Rojo build: PASS;
+4. 15-suite cast-focused runner: PASS;
+5. 35-suite big backend runner: PASS;
+6. unpublished real-player Wizard rehearsal: PASS;
+7. final rehearsal log project `CreatorError` count: 0.
+
+The live rehearsal applied all three direct spell families plus exact Venom Hex
+Poison through the staged source runtime and rolled the test gates back after
+completion.
 
 ## Live rehearsal target
 
