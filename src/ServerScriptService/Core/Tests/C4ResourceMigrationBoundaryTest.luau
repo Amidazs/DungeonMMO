@@ -132,7 +132,7 @@ Args:
 Returns:
     nil: Confirms exact source vitals while live cutover stays blocked.
 ]]
-local function check_nine_paths()
+local function check_reviewed_paths()
     local vectors = {
         {"Human", "Fighter", 922, 319, 418},
         {"Human", "Mage", 699, 466, 366},
@@ -143,6 +143,7 @@ local function check_nine_paths()
         {"Human", "Ashenblade", 983, 320, 399},
         {"Human", "Emberweaver", 705, 492, 355},
         {"Human", "Dawnkeeper", 770, 492, 387},
+        {"Elf", "Moonweaver", 682, 495, 343},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
     }
@@ -531,7 +532,7 @@ Returns:
     nil: Prints a source-only pass marker after all assertions succeed.
 ]]
 local function main()
-    check_nine_paths()
+    check_reviewed_paths()
     check_reviewed_equipment_boundary()
     check_human_wizard_reuse_boundary()
     check_owned_passive_boundary()
@@ -540,7 +541,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=11 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=12 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
