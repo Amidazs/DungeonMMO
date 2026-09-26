@@ -16,6 +16,9 @@ local CastScheduler = require(
 local DirectMagic = require(
     Services.C4SourceDirectMagicCastService
 )
+local SupportMagic = require(
+    Services.C4SourceSupportMagicCastService
+)
 local PeriodicMagic = require(
     Services.C4SourcePeriodicMagicCastService
 )
@@ -85,6 +88,10 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local support_magic = SupportMagic.new(
+        scheduler,
+        source_executor
+    )
     local periodic_magic = PeriodicMagic.new(
         scheduler,
         source_executor
@@ -112,6 +119,7 @@ function C4SourceCastRuntimeComposition.new(
         Timing = timing,
         Scheduler = scheduler,
         DirectMagic = direct_magic,
+        SupportMagic = support_magic,
         PeriodicMagic = periodic_magic,
         SelfMagic = self_magic,
         CorpseMagic = corpse_magic,
@@ -133,6 +141,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     player: any
 )
     self.DirectMagic:clear_owner(player)
+    self.SupportMagic:clear_owner(player)
     self.PeriodicMagic:clear_owner(player)
     self.SelfMagic:clear_owner(player)
     self.CorpseMagic:clear_owner(player)
@@ -155,6 +164,7 @@ Returns:
 ]]
 function C4SourceCastRuntimeComposition:capability(): any
     local direct = self.DirectMagic:capability()
+    local support = self.SupportMagic:capability()
     local periodic = self.PeriodicMagic:capability()
     local self_magic = self.SelfMagic:capability()
     local corpse_magic = self.CorpseMagic:capability()
@@ -171,6 +181,11 @@ function C4SourceCastRuntimeComposition:capability(): any
             direct.DefaultEnabled == true,
         DirectMagicCurrentlyEnabled =
             direct.CurrentlyEnabled == true,
+        SupportMagicBridge = true,
+        SupportMagicDefaultEnabled =
+            support.DefaultEnabled == true,
+        SupportMagicCurrentlyEnabled =
+            support.CurrentlyEnabled == true,
         PeriodicMagicBridge = true,
         PeriodicMagicDefaultEnabled =
             periodic.DefaultEnabled == true,
