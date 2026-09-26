@@ -300,6 +300,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverVenomHex", 2)
     own_skill(wizard, "EmberweaverFrostLance", 2)
     own_skill(wizard, "EmberweaverEmberField", 3)
+    own_skill(wizard, "EmberweaverLifeSiphon", 4)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -384,6 +385,8 @@ local function check_default_off()
             and capability.MagicMovementSlowCalculation
             and capability.MagicAreaDamageCalculation
             and capability.MagicAreaSingleShotSnapshot
+            and capability.MagicDrainCalculation
+            and capability.MagicDrainSourceAbsorptionIntegrated
             and capability.MovementSlowEffectSuccessIntegrated
             and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
@@ -1130,6 +1133,48 @@ local function check_human_wizard_ember_field()
 end
 
 --[[
+Checks Life Siphon preserves source DRAIN damage and absorption metadata.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact rank, DARK damage, one shot and 40 percent drain.
+]]
+local function check_human_wizard_life_siphon()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.drain_skill(
+        WIZARD_ID,
+        marauder,
+        "EmberweaverLifeSiphon",
+        4
+    ))
+
+    check(
+        result.Kind == "MagicDrain"
+            and result.SourceSkillId == 1147
+            and result.SourceRank == 6
+            and result.AbsorbPart == 0.4
+            and result.AbsorbAbs == 0
+            and result.Amount > 0,
+        "Life Siphon rank four preserves Vampiric Touch rank six drain contract"
+    )
+    check(
+        result.Damage.SourceSkillPower == 32
+            and result.Damage.SourceElement == "DARK"
+            and result.Damage.TargetKind == "Npc"
+            and result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot,
+        "Life Siphon uses exact DARK MDAM and consumes one Spiritshot"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1461,6 +1506,7 @@ local function main()
     check_human_wizard_neutral_magic()
     check_human_wizard_frost_lance()
     check_human_wizard_ember_field()
+    check_human_wizard_life_siphon()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1479,7 +1525,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true frost=true area=true "
+        .. "status=true pdam=true mdam=true wizard=true frost=true area=true drain=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
