@@ -1,0 +1,318 @@
+--!strict
+-- Exact C4 effects newly required by Palus Knight through level 30.
+-- Source commit: 07f8536384e799f128d44198dd7ab23519660eea
+
+local DATA = table.freeze({
+    [2] = table.freeze({
+        Id = 2,
+        Name = "Confusion",
+        Ranks = table.freeze({
+            [1] = table.freeze({
+                Conditions = table.freeze({}),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Confusion",
+                        count = 5,
+                        time = 6,
+                        val = 0,
+                        abnormal = "CONFUSED",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpInitialConsume = 5,
+                    mpConsume = 17,
+                    magicLvl = 24,
+                    target = "TARGET_MOB",
+                    hitTime = 1500,
+                    reuseDelay = 20000,
+                    skillType = "DEBUFF",
+                    isMagic = true,
+                    operateType = "ACTIVE",
+                    castRange = 600,
+                    effectRange = 1100,
+                    effectPower = 80,
+                    effectType = "CONFUSION",
+                }),
+            }),
+            [2] = table.freeze({
+                Conditions = table.freeze({}),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Confusion",
+                        count = 5,
+                        time = 6,
+                        val = 0,
+                        abnormal = "CONFUSED",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpInitialConsume = 5,
+                    mpConsume = 20,
+                    magicLvl = 28,
+                    target = "TARGET_MOB",
+                    hitTime = 1500,
+                    reuseDelay = 20000,
+                    skillType = "DEBUFF",
+                    isMagic = true,
+                    operateType = "ACTIVE",
+                    castRange = 600,
+                    effectRange = 1100,
+                    effectPower = 80,
+                    effectType = "CONFUSION",
+                }),
+            }),
+        }),
+        SourceFile =
+            "L2jAdmins_Data/data/xml/stats/skills/0000-0099.xml",
+        XmlLevels = 19,
+    }),
+    [129] = table.freeze({
+        Id = 129,
+        Name = "Poison",
+        Ranks = table.freeze({
+            [1] = table.freeze({
+                Conditions = table.freeze({}),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Poison",
+                        count = 10,
+                        time = 3,
+                        val = 18,
+                        abnormal = "POISON",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpInitialConsume = 2,
+                    mpConsume = 8,
+                    magicLvl = 20,
+                    target = "TARGET_ONE",
+                    reuseDelay = 9000,
+                    hitTime = 3000,
+                    skillType = "DEBUFF",
+                    isMagic = true,
+                    operateType = "ACTIVE",
+                    castRange = 600,
+                    effectType = "POISON",
+                    effectPower = 70,
+                    effectRange = 1100,
+                    saveVs = "MEN",
+                }),
+            }),
+        }),
+        SourceFile =
+            "L2jAdmins_Data/data/xml/stats/skills/0100-0199.xml",
+        XmlLevels = 5,
+    }),
+    [223] = table.freeze({
+        Id = 223,
+        Name = "Sting",
+        Ranks = table.freeze({
+            [1] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 23,
+                    magicLvl = 22,
+                    power = 41,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+            [2] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 24,
+                    magicLvl = 23,
+                    power = 44,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+            [3] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 25,
+                    magicLvl = 24,
+                    power = 48,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+            [4] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 27,
+                    magicLvl = 26,
+                    power = 55,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+            [5] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 29,
+                    magicLvl = 27,
+                    power = 59,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+            [6] = table.freeze({
+                Conditions = table.freeze({
+                    table.freeze({
+                        UsingKind = "Sword, Dagger, Dual Sword",
+                    }),
+                }),
+                Effects = table.freeze({
+                    table.freeze({
+                        name = "Bleed",
+                        count = 7,
+                        time = 20,
+                        val = 13,
+                        abnormal = "BLEEDING",
+                    }),
+                }),
+                Modifiers = table.freeze({}),
+                Sets = table.freeze({
+                    mpConsume = 30,
+                    magicLvl = 28,
+                    power = 64,
+                    target = "TARGET_ONE",
+                    hitTime = 1080,
+                    coolTime = 720,
+                    overHit = true,
+                    reuseDelay = 11000,
+                    skillType = "PDAM",
+                    operateType = "ACTIVE",
+                    castRange = 40,
+                    effectRange = 400,
+                    effectType = "BLEED",
+                    effectPower = 50,
+                }),
+            }),
+        }),
+        SourceFile =
+            "L2jAdmins_Data/data/xml/stats/skills/0200-0299.xml",
+        XmlLevels = 49,
+    }),
+})
+
+return DATA
