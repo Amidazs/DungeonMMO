@@ -96,6 +96,14 @@ function FakeExecutor:can_party_heal_skill(
     return true, nil
 end
 
+function FakeExecutor:can_resurrection_skill_player(
+    _caster: any,
+    _target: any,
+    _source_range: number
+): (boolean, string?)
+    return true, nil
+end
+
 function FakeExecutor:heal_skill_target(
     _caster: any,
     _target: any,
@@ -129,6 +137,19 @@ function FakeExecutor:party_heal_skill(
         Applied = true,
         AffectedPlayers = 2,
         EffectiveHeal = 50,
+    }, nil
+end
+
+function FakeExecutor:resurrection_skill_player(
+    _caster: any,
+    _target: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        OfferCreated = true,
+        RequiresTargetAcceptance = true,
     }, nil
 end
 
