@@ -121,6 +121,22 @@ local DEFINITIONS = table.freeze({
                 SkillId = "EmberweaverCorpseSiphon",
                 Mode = "LearnOrRank",
             }),
+            table.freeze({
+                SkillId = "EmberweaverManaCompanion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverServitorRecharge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverServitorHeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "EmberweaverCombatCompanion",
+                Mode = "LearnOrRank",
+            }),
         }),
     }),
     -- The physical Knight trainer requires an authentic personal quest
