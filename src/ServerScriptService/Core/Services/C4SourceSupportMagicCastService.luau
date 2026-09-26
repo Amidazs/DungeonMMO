@@ -95,6 +95,83 @@ local REVIEWED = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    LifebinderHealingLight = table.freeze({
+        SourceSkillId = 1011,
+        Kind = "TargetHeal",
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    LifebinderManaRecharge = table.freeze({
+        SourceSkillId = 1013,
+        Kind = "TargetRecharge",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderBattleMend = table.freeze({
+        SourceSkillId = 1015,
+        Kind = "TargetHeal",
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    LifebinderGroupMend = table.freeze({
+        SourceSkillId = 1027,
+        Kind = "PartyHeal",
+        SourceRadius = 1000,
+    }),
+    LifebinderRevive = table.freeze({
+        SourceSkillId = 1016,
+        Kind = "Resurrection",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderMindWard = table.freeze({
+        SourceSkillId = 1035,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderStoneWard = table.freeze({
+        SourceSkillId = 1040,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderSacredEdge = table.freeze({
+        SourceSkillId = 1043,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderMight = table.freeze({
+        SourceSkillId = 1068,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderBreathBlessing = table.freeze({
+        SourceSkillId = 1073,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderConcentration = table.freeze({
+        SourceSkillId = 1078,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderAgility = table.freeze({
+        SourceSkillId = 1087,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    LifebinderWindstep = table.freeze({
+        SourceSkillId = 1204,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
 })
 
 --[[
@@ -149,6 +226,9 @@ function C4SourceSupportMagicCastService.new(
                 executor.can_resurrection_skill_player
             ) == "function"
             and type(executor.heal_skill_target) == "function"
+            and type(
+                executor.mana_recharge_skill_target
+            ) == "function"
             and type(
                 executor.support_buff_skill_target
             ) == "function"
@@ -431,6 +511,14 @@ local function execute(
             record.CreativeRank
         )
     end
+    if record.Kind == "TargetRecharge" then
+        return self._executor:mana_recharge_skill_target(
+            caster,
+            record.Target,
+            record.CreativeSkillId,
+            record.CreativeRank
+        )
+    end
     if record.Kind == "PartyHeal" then
         return self._executor:party_heal_skill(
             caster,
@@ -563,6 +651,7 @@ function C4SourceSupportMagicCastService:capability(): any
         CurrentlyEnabled = self._enabled,
         ReviewedSkillCount = count,
         TargetHeal = true,
+        TargetRecharge = true,
         TargetBuff = true,
         PartyHeal = true,
         ResurrectionOffer = true,
