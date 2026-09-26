@@ -2152,6 +2152,117 @@ function C4SourceCombatCalculationService.magic_slow_skill(
 end
 
 --[[
+Resolves one reviewed C4 Sleep cast against a source target.
+
+The source SkillDebuff path snapshots and consumes one magical shot for the
+cast, then uses that shot state in the exact hostile-effect success formula.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative Sleep skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source Sleep land result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.sleep_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, _, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason = StatusEffects.sleep_plan(
+        source.SkillId,
+        source.Rank
+    )
+    if not plan then
+        return nil, plan_reason
+    end
+
+    local target_wit_bonus = defender.SourceWitBonus
+    if type(target_wit_bonus) ~= "number"
+        or target_wit_bonus <= 0
+    then
+        return nil, "OriginalSleepWitBonusUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = plan.EffectPower,
+            TargetStatBonus = target_wit_bonus,
+            TargetVulnerability = 1,
+            IsMagic = plan.IsMagic,
+            AttackerMAtk =
+                attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            TargetMDef =
+                defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            Spiritshot = shot.Spiritshot,
+            BlessedSpiritshot = shot.BlessedSpiritshot,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = plan.MagicLevel,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "SleepControl",
+        Landed = resolved.Landed,
+        Rate = resolved.Rate,
+        Roll = resolved.Roll,
+        DurationSeconds = plan.DurationSeconds,
+        BreaksOnDamage = plan.BreaksOnDamage,
+        StopsMovement = plan.StopsMovement,
+        StopsAttacks = plan.StopsAttacks,
+        StopsCasting = plan.StopsCasting,
+        SaveVs = plan.SaveVs,
+        EffectPower = plan.EffectPower,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 hostile periodic-status cast.
 
 This path handles DEBUFF application only. It does not apply or schedule ticks.
@@ -2389,6 +2500,9 @@ function C4SourceCombatCalculationService.capability(): any
         MagicAreaSingleShotSnapshot = true,
         MagicDrainCalculation = true,
         MagicDrainSourceAbsorptionIntegrated = true,
+        SleepControlCalculation = true,
+        SleepControlEffectSuccessIntegrated = true,
+        SleepControlConsumesOneMagicShot = true,
         MovementSlowEffectSuccessIntegrated = true,
         MovementSlowUsesSingleMagicShot = true,
         PeriodicStatusEffectSuccessIntegrated = true,
