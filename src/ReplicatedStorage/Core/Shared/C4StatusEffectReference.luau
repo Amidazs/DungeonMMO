@@ -433,6 +433,110 @@ function C4StatusEffectReference.elemental_vulnerability_plan(
 end
 
 --[[
+Builds the reviewed C4 physical-attack weakening debuff plan.
+
+Curse: Weakness is a magical WIT-resisted DEBUFF that temporarily multiplies
+the target's physical attack. It does not change attack rate or deal damage.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen weakening plan or strict source-data reason.
+]]
+function C4StatusEffectReference.physical_attack_weakening_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1164 then
+        return nil, "UnsupportedOriginalPhysicalAttackWeakeningSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalPhysicalAttackWeakeningSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "CONFUSION"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or sets.target ~= "TARGET_ONE"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "OriginalPhysicalAttackWeakeningContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Debuff" then
+            local multiplier = nil
+
+            for _, modifier in ipairs(effect.Modifiers or {}) do
+                if modifier.Operation == "mul"
+                    and modifier.stat == "PHYSICAL_ATTACK"
+                then
+                    multiplier = modifier.val
+                end
+            end
+
+            if multiplier then
+                if matched ~= nil then
+                    return nil,
+                        "DuplicateOriginalPhysicalAttackWeakeningEffect"
+                end
+                matched = {
+                    Multiplier = multiplier,
+                    Count = effect.count,
+                    DurationSeconds = effect.time,
+                    StackType = effect.stackType,
+                    StackOrder = effect.stackOrder,
+                }
+            end
+        end
+    end
+
+    if not matched
+        or matched.Count ~= 1
+        or type(matched.Multiplier) ~= "number"
+        or matched.Multiplier <= 0
+        or matched.Multiplier > 1
+        or type(matched.DurationSeconds) ~= "number"
+        or matched.DurationSeconds <= 0
+        or matched.StackType ~= "pAtkDown"
+        or matched.StackOrder ~= matched.Multiplier
+    then
+        return nil, "OriginalPhysicalAttackWeakeningEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalPhysicalAttackWeakeningMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = sets.effectType,
+        SaveVs = "WIT",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        PhysicalAttackMultiplier = matched.Multiplier,
+        PowerReductionFraction = 1 - matched.Multiplier,
+        DurationSeconds = matched.DurationSeconds,
+        StackType = matched.StackType,
+        StackOrder = matched.StackOrder,
+    }), nil
+end
+
+--[[
 Calculates exact C4 hostile-effect land rate before the final random roll.
 
 This reproduces Formulas.calcEffectSuccess for the reviewed Bleed/Poison scope:
