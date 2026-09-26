@@ -19,6 +19,9 @@ local NpcBoundaries = require(
 local MovementSlow = require(
     ServerScriptService.Combat.RangerSlowService
 )
+local NpcSleep = require(
+    ServerScriptService.Combat.C4NpcSleepService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -175,6 +178,7 @@ function C4SourceCombatExecutor.new(options: any?): any
             or NpcBoundaries.for_model,
         _npc_damage_observer = config.NpcDamageObserver,
         _movement_slow = config.MovementSlowProvider or MovementSlow,
+        _npc_sleep = config.SleepProvider or NpcSleep,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -726,6 +730,12 @@ function C4SourceCombatExecutor:_apply_npc_damage(
     end
 
     local health_before = humanoid.Health
+    if amount > 0
+        and self._npc_sleep
+        and type(self._npc_sleep.wake_on_damage) == "function"
+    then
+        self._npc_sleep.wake_on_damage(enemy)
+    end
     humanoid:TakeDamage(amount)
     local health_after = humanoid.Health
     local applied_damage = math.max(
@@ -1432,6 +1442,87 @@ function C4SourceCombatExecutor:magic_drain_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC C4 Sleep control skill.
+
+A resisted cast applies no control state. A landed cast delegates to the
+server-owned NPC sleep authority, which suppresses movement/actions and is
+cleared by normal direct damage in the same ordering as the pinned source.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative Sleep skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live Sleep evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:sleep_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.sleep_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcSleep",
+            Calculation = calculated,
+            Applied = false,
+            SleepApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    if not self._npc_sleep
+        or type(self._npc_sleep.apply) ~= "function"
+    then
+        return nil, "C4NpcSleepAuthorityUnavailable"
+    end
+
+    local applied = self._npc_sleep.apply(
+        enemy,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcSleepApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcSleep",
+        Calculation = calculated,
+        Applied = true,
+        SleepApplied = true,
+        Landed = true,
+        DurationSeconds = calculated.DurationSeconds,
+        BreaksOnDamage = calculated.BreaksOnDamage,
+        StopsMovement = calculated.StopsMovement,
+        StopsAttacks = calculated.StopsAttacks,
+        StopsCasting = calculated.StopsCasting,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -1903,6 +1994,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcMagicAreaSingleShotSnapshot = true,
         NpcMagicDrainLiveApplication = true,
         NpcMagicDrainUsesAppliedHealthDamage = true,
+        NpcSleepLiveApplication = true,
+        NpcSleepBreaksOnDirectDamage = true,
+        NpcSleepAuthorityConfigured =
+            type(self._npc_sleep) == "table",
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
