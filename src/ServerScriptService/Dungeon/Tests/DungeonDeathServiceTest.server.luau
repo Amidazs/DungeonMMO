@@ -240,6 +240,125 @@ check(
     "A paid callback must reject a player absent from the run roster."
 )
 
+-- C4 skill resurrection is a target-confirmed proposal, not an
+-- immediate forced respawn. Acceptance returns the target to its death point.
+session = {
+    SessionId = "session-skill-resurrection",
+    State = "Active",
+    Members = {
+        ["101"] = {
+            UserId = 101,
+            Connected = true,
+            Mode = "Active",
+            FreeReviveUsed = true,
+            PaidReviveCount = 0,
+        },
+        ["102"] = {
+            UserId = 102,
+            Connected = true,
+            Mode = "Active",
+            FreeReviveUsed = false,
+            PaidReviveCount = 0,
+        },
+    },
+}
+local resurrection_states = {}
+local resurrection_deaths = DungeonDeathService.new(
+    fake_sessions,
+    fake_checkpoint,
+    "session-skill-resurrection",
+    {
+        clock = function(): number
+            return now
+        end,
+        schedule = schedule,
+        spawn_player = spawn_player,
+        emit_state = function(user_id: number, payload: any)
+            resurrection_states[user_id] = payload
+        end,
+    }
+)
+local cleric = {UserId = 102, Name = "Cleric"}
+local death_position = CFrame.new(44, 3, -55)
+check(
+    resurrection_deaths:on_player_died(
+        player,
+        death_position
+    ).ok
+        and session.Members["101"].Mode == "Spectating",
+    "Skill-resurrection target first becomes a genuine dead party member."
+)
+local spawn_count_before_offer = #spawns
+local offered = resurrection_deaths:request_skill_resurrection(
+    cleric,
+    player,
+    20
+)
+check(
+    offered.ok
+        and #spawns == spawn_count_before_offer
+        and resurrection_states[101].skill_resurrection_offer
+            .caster_user_id == 102
+        and resurrection_states[101].skill_resurrection_offer
+            .restore_experience_power == 20,
+    "Resurrection cast creates a target-confirmed offer without spawning."
+)
+local duplicate_offer =
+    resurrection_deaths:request_skill_resurrection(
+        cleric,
+        player,
+        20
+    )
+check(
+    duplicate_offer.ok == false
+        and duplicate_offer.reason
+            == "SkillResurrectionAlreadyOffered",
+    "A dead player cannot receive duplicate resurrection proposals."
+)
+local accepted =
+    resurrection_deaths:accept_skill_resurrection(player)
+check(
+    accepted.ok
+        and accepted.restore_experience_power == 20
+        and accepted.caster_user_id == 102
+        and session.Members["101"].Mode == "Active"
+        and #spawns == spawn_count_before_offer + 1
+        and spawns[#spawns].cframe.Position
+            == death_position.Position,
+    "Accepting Resurrection restores the member at their death position."
+)
+local stale_accept =
+    resurrection_deaths:accept_skill_resurrection(player)
+check(
+    stale_accept.ok == false
+        and stale_accept.reason
+            == "SkillResurrectionOfferMissing",
+    "A consumed resurrection proposal cannot revive the member twice."
+)
+
+check(
+    resurrection_deaths:on_player_died(
+        player,
+        CFrame.new(48, 3, -60)
+    ).ok,
+    "Resurrected player can die again for decline coverage."
+)
+check(
+    resurrection_deaths:request_skill_resurrection(
+        cleric,
+        player,
+        20
+    ).ok,
+    "A later death can receive a fresh resurrection proposal."
+)
+check(
+    resurrection_deaths:decline_skill_resurrection(player).ok
+        and session.Members["101"].Mode == "Spectating"
+        and resurrection_states[101].skill_resurrection_offer
+            == nil,
+    "Declining Resurrection clears the offer without spawning."
+)
+
 -- A recoverable full wipe resets the active room only once while
 -- the first free revive is pending. A surviving party member
 -- would suppress this callback until that member is defeated.
