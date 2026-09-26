@@ -1645,6 +1645,24 @@ Args:
 Returns:
     (any?, string?): Source magical result or strict denial reason.
 ]]
+--[[
+Calculates one MDAM target using an already captured magical-shot state.
+
+Keeping shot capture outside this helper lets TARGET_AREA reuse the same
+Spiritshot/Blessed Spiritshot state across every target while retaining
+target-specific critical, failure, elemental and PvP rolls.
+
+Args:
+    attacker (any): Authenticated source attacker boundary.
+    defender (any): Reviewed source defender boundary.
+    target_kind (string): Player or NPC target kind.
+    source (any): Resolved source skill identity.
+    effect (any): Resolved source effect rank.
+    shot (any): One captured magical-shot state.
+
+Returns:
+    (any?, string?): Per-target source magic result or denial reason.
+]]
 local function calculate_magic_target(
     attacker: any,
     defender: any,
@@ -1862,6 +1880,19 @@ function C4SourceCombatCalculationService.magic_area_skill(
         return nil, "UnsupportedOriginalMagicAreaSkill"
     end
 
+    local resolved_targets = {}
+    for index, defender_target in ipairs(defender_targets) do
+        local defender, target_kind, defender_reason =
+            source_target_boundary(defender_target)
+        if not defender or not target_kind then
+            return nil, defender_reason
+        end
+        resolved_targets[index] = {
+            Defender = defender,
+            TargetKind = target_kind,
+        }
+    end
+
     local shot, shot_reason =
         consume_magic_shot(attacker_user_id)
     if not shot then
@@ -1869,17 +1900,11 @@ function C4SourceCombatCalculationService.magic_area_skill(
     end
 
     local results = {}
-    for index, defender_target in ipairs(defender_targets) do
-        local defender, target_kind, defender_reason =
-            source_target_boundary(defender_target)
-        if not defender or not target_kind then
-            return nil, defender_reason
-        end
-
+    for index, resolved in ipairs(resolved_targets) do
         local result, result_reason = calculate_magic_target(
             attacker,
-            defender,
-            target_kind,
+            resolved.Defender,
+            resolved.TargetKind,
             source,
             effect,
             shot
