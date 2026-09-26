@@ -1,5 +1,5 @@
 --!strict
--- Source-only final cast-time/reuse planner for authenticated magic skills.
+-- Source-only final cast-time/reuse planner for authenticated active skills.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -70,18 +70,29 @@ local function source_stat(
 end
 
 --[[
-Resolves all authenticated source stats required for magic timing/reuse.
+Resolves authenticated source stats for one magic or physical active skill.
 
 Args:
     boundary (any): Current source migration boundary.
+    is_magic (boolean): Whether the source skill uses magical timing.
 
 Returns:
     (any?, string?): Attack speed, reuse multiplier and mastery stat.
 ]]
-local function timing_stats(boundary: any): (any?, string?)
+local function timing_stats(
+    boundary: any,
+    is_magic: boolean
+): (any?, string?)
+    local speed_stat = if is_magic
+        then "MAGICAL_ATTACK_SPEED"
+        else "PHYSICAL_ATTACK_SPEED"
+    local reuse_stat = if is_magic
+        then "MAGICAL_SKILL_REUSE"
+        else "PHYSICAL_SKILL_REUSE"
+
     local attack_speed, speed_reason = source_stat(
         boundary,
-        "MAGICAL_ATTACK_SPEED",
+        speed_stat,
         false
     )
     if attack_speed == nil then
@@ -90,7 +101,7 @@ local function timing_stats(boundary: any): (any?, string?)
 
     local reuse_multiplier, reuse_reason = source_stat(
         boundary,
-        "MAGICAL_SKILL_REUSE",
+        reuse_stat,
         true
     )
     if reuse_multiplier == nil then
@@ -107,8 +118,8 @@ local function timing_stats(boundary: any): (any?, string?)
     end
 
     return {
-        MagicAttackSpeed = attack_speed,
-        MagicReuseMultiplier = reuse_multiplier,
+        AttackSpeed = attack_speed,
+        ReuseMultiplier = reuse_multiplier,
         SkillMastery = mastery,
     }, nil
 end
@@ -151,21 +162,35 @@ local function cast_times(
     spiritshot: boolean,
     blessed_spiritshot: boolean
 ): any
-    local hit_time = Rules.magic_cast_time(
-        contract.SourceHitTimeMs,
-        stats.MagicAttackSpeed,
-        spiritshot,
-        blessed_spiritshot
-    )
+    local hit_time
     local cool_time = nil
 
-    if contract.SourceCoolTimeMs ~= nil then
-        cool_time = Rules.magic_cool_time(
-            contract.SourceCoolTimeMs,
-            stats.MagicAttackSpeed,
+    if contract.SourceIsMagic then
+        hit_time = Rules.magic_cast_time(
+            contract.SourceHitTimeMs,
+            stats.AttackSpeed,
             spiritshot,
             blessed_spiritshot
         )
+        if contract.SourceCoolTimeMs ~= nil then
+            cool_time = Rules.magic_cool_time(
+                contract.SourceCoolTimeMs,
+                stats.AttackSpeed,
+                spiritshot,
+                blessed_spiritshot
+            )
+        end
+    else
+        hit_time = Rules.physical_cast_time(
+            contract.SourceHitTimeMs,
+            stats.AttackSpeed
+        )
+        if contract.SourceCoolTimeMs ~= nil then
+            cool_time = Rules.physical_cool_time(
+                contract.SourceCoolTimeMs,
+                stats.AttackSpeed
+            )
+        end
     end
 
     return {
@@ -188,8 +213,8 @@ Returns:
 local function reuse_plan(contract: any, stats: any): any
     local delay = Rules.skill_reuse_delay(
         contract.SourceReuseDelayMs,
-        stats.MagicAttackSpeed,
-        stats.MagicReuseMultiplier
+        stats.AttackSpeed,
+        stats.ReuseMultiplier
     )
     local mastery_possible = stats.SkillMastery > 0
 
@@ -270,10 +295,6 @@ function C4SourceCastTimingService:resolve(
     if not contract then
         return nil, contract_reason
     end
-    if not contract.SourceIsMagic then
-        return nil, "OriginalMagicTimingRequired"
-    end
-
     local boundary, boundary_reason =
         self._boundary_provider(user_id)
     if not boundary then
@@ -283,15 +304,22 @@ function C4SourceCastTimingService:resolve(
         return nil, "OriginalCastSourceScopeMismatch"
     end
 
-    local stats, stats_reason = timing_stats(boundary)
+    local stats, stats_reason = timing_stats(
+        boundary,
+        contract.SourceIsMagic
+    )
     if not stats then
         return nil, stats_reason
     end
 
-    local spiritshot, blessed = peek_magic_shots(
-        self._shots,
-        user_id
-    )
+    local spiritshot = false
+    local blessed = false
+    if contract.SourceIsMagic then
+        spiritshot, blessed = peek_magic_shots(
+            self._shots,
+            user_id
+        )
+    end
     local times = cast_times(
         contract,
         stats,
@@ -306,8 +334,16 @@ function C4SourceCastTimingService:resolve(
         SourceScopeId = contract.SourceScopeId,
         SourceSkillId = contract.SourceSkillId,
         SourceRank = contract.SourceRank,
-        SourceMagicAttackSpeed = stats.MagicAttackSpeed,
-        SourceMagicReuseMultiplier = stats.MagicReuseMultiplier,
+        SourceAttackSpeed = stats.AttackSpeed,
+        SourceSkillReuseMultiplier = stats.ReuseMultiplier,
+        SourceMagicAttackSpeed = if contract.SourceIsMagic
+            then stats.AttackSpeed else nil,
+        SourceMagicReuseMultiplier = if contract.SourceIsMagic
+            then stats.ReuseMultiplier else nil,
+        SourcePhysicalAttackSpeed = if contract.SourceIsMagic
+            then nil else stats.AttackSpeed,
+        SourcePhysicalReuseMultiplier = if contract.SourceIsMagic
+            then nil else stats.ReuseMultiplier,
         SourceSkillMastery = stats.SkillMastery,
         SpiritshotCharged = spiritshot,
         BlessedSpiritshotCharged = blessed,
@@ -344,10 +380,13 @@ function C4SourceCastTimingService.capability(): any
         Available = true,
         FinalMagicCastTimeIntegrated = true,
         FinalMagicCoolTimeIntegrated = true,
+        FinalPhysicalCastTimeIntegrated = true,
+        FinalPhysicalCoolTimeIntegrated = true,
         ReadOnlyShotAccelerationIntegrated = true,
         CastInterruptWindowIntegrated = true,
         SourceCastAndEffectRangesIntegrated = true,
         MagicReuseMultiplierIntegrated = true,
+        PhysicalReuseMultiplierIntegrated = true,
         ZeroMasteryFinalReuseIntegrated = true,
         SkillMasteryRollIntegrated = false,
         MasteryReuseBlocker = MASTERY_BLOCKER,
