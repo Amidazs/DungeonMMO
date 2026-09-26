@@ -279,6 +279,44 @@ function FakeExecutor:status_skill_npc(
 end
 
 --[[
+Provides the target-area periodic executor contract used by composition.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed area poison skill.
+    creative_rank (number): Authenticated creative rank.
+    source_radius (number): Exact source radius.
+    sequence_id (number?): Trusted action sequence.
+
+Returns:
+    (any?, string?): Fake area-status application.
+]]
+function FakeExecutor:status_area_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player and target == enemy)
+    assert(creative_skill_id == "EmberweaverVenomCloud")
+    assert(creative_rank >= 1)
+    assert(source_radius == 200)
+    assert(type(sequence_id) == "number")
+
+    return {
+        Kind = "C4LiveNpcPeriodicStatusArea",
+        Applied = true,
+        StatusApplied = true,
+        TargetCount = 2,
+        LandedCount = 2,
+    }, nil
+end
+
+
+--[[
 Provides a disposable combined direct-magic/slow executor path.
 
 Args:
