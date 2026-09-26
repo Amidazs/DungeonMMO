@@ -301,6 +301,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverFrostLance", 2)
     own_skill(wizard, "EmberweaverEmberField", 3)
     own_skill(wizard, "EmberweaverLifeSiphon", 4)
+    own_skill(wizard, "EmberweaverSlumberHex", 6)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -387,6 +388,9 @@ local function check_default_off()
             and capability.MagicAreaSingleShotSnapshot
             and capability.MagicDrainCalculation
             and capability.MagicDrainSourceAbsorptionIntegrated
+            and capability.SleepControlCalculation
+            and capability.SleepControlEffectSuccessIntegrated
+            and capability.SleepControlConsumesOneMagicShot
             and capability.MovementSlowEffectSuccessIntegrated
             and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
@@ -1175,6 +1179,53 @@ local function check_human_wizard_life_siphon()
 end
 
 --[[
+Checks Slumber Hex preserves exact C4 Sleep control semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms rank mapping, WIT land roll, duration and one shot.
+]]
+local function check_human_wizard_slumber_hex()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.sleep_skill(
+        WIZARD_ID,
+        marauder,
+        "EmberweaverSlumberHex",
+        6
+    ))
+
+    check(
+        result.Kind == "SleepControl"
+            and result.SourceSkillId == 1069
+            and result.SourceRank == 6
+            and result.DurationSeconds == 30
+            and result.SaveVs == "WIT"
+            and result.EffectPower == 80
+            and result.BreaksOnDamage
+            and result.StopsMovement
+            and result.StopsAttacks
+            and result.StopsCasting,
+        "Slumber Hex rank six preserves exact Sleep source contract"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.Roll >= 0
+            and result.Roll <= 99
+            and result.Roll % 1 == 0
+            and result.Landed == (result.Roll < result.Rate),
+        "Slumber Hex consumes one Spiritshot and owns its WIT land roll"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1507,6 +1558,7 @@ local function main()
     check_human_wizard_frost_lance()
     check_human_wizard_ember_field()
     check_human_wizard_life_siphon()
+    check_human_wizard_slumber_hex()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1525,7 +1577,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true frost=true area=true drain=true "
+        .. "status=true pdam=true mdam=true wizard=true frost=true ".. "area=true drain=true sleep=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
