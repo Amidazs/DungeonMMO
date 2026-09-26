@@ -3042,6 +3042,203 @@ function C4SourceCombatCalculationService.mana_heal_skill(
 end
 
 --[[
+Resolves one reviewed C4 summon skill into an exact companion source plan.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected summon skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact source summon plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.companion_summon_plan(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "SUMMON"
+        or sets.target ~= "TARGET_SELF"
+        or type(sets.npcId) ~= "number"
+        or sets.npcId <= 0
+        or type(sets.summonTotalLifeTime) ~= "number"
+        or sets.summonTotalLifeTime <= 0
+        or type(sets.summonTimeLostIdle) ~= "number"
+        or sets.summonTimeLostIdle < 0
+        or type(sets.summonTimeLostActive) ~= "number"
+        or sets.summonTimeLostActive < 0
+    then
+        return nil, "UnsupportedOriginalCompanionSummonSkill"
+    end
+
+    return {
+        Kind = "CompanionSummon",
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceNpcId = sets.npcId,
+        ExpPenalty = sets.expPenalty or 0,
+        TotalLifeTimeMs = sets.summonTotalLifeTime,
+        TimeLostIdleMs = sets.summonTimeLostIdle,
+        TimeLostActiveMs = sets.summonTimeLostActive,
+        ItemConsumeId = sets.itemConsumeId or 0,
+        ItemConsumeCount = sets.itemConsumeCount or 0,
+        ItemConsumeIdOverTime = sets.itemConsumeIdOT or 0,
+        ItemConsumeCountOverTime = sets.itemConsumeCountOT or 0,
+        ItemConsumeSteps = sets.itemConsumeSteps or 0,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 Servitor Heal rank.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected pet-heal skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact source pet-heal result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.companion_heal_plan(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "HEAL"
+        or sets.target ~= "TARGET_PET"
+    then
+        return nil, "UnsupportedOriginalCompanionHealSkill"
+    end
+
+    local power, power_reason = heal_power(effect)
+    if not power then
+        return nil, power_reason
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "CompanionHeal",
+        Amount = Formula.heal_amount(
+            power,
+            shot.Spiritshot,
+            shot.BlessedSpiritshot
+        ),
+        SourceHealPower = power,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 Servitor Recharge rank.
+
+The source handler multiplies authored power by the target's recharge-MP rate.
+The companion authority supplies that server-owned target multiplier.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected pet-recharge skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+    recharge_rate (number): Server-owned companion recharge multiplier.
+
+Returns:
+    (any?, string?): Exact source recharge result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.companion_recharge_plan(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number,
+    recharge_rate: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+    if type(recharge_rate) ~= "number"
+        or recharge_rate ~= recharge_rate
+        or recharge_rate < 0
+        or recharge_rate >= math.huge
+    then
+        return nil, "InvalidOriginalCompanionRechargeRate"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "MANARECHARGE"
+        or sets.target ~= "TARGET_PET"
+        or type(sets.power) ~= "number"
+        or sets.power < 0
+    then
+        return nil, "UnsupportedOriginalCompanionRechargeSkill"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "CompanionRecharge",
+        Amount = sets.power * recharge_rate,
+        SourcePower = sets.power,
+        RechargeRate = recharge_rate,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Returns immutable capability metadata for the source combat provider.
 
 Args:
@@ -3069,6 +3266,9 @@ function C4SourceCombatCalculationService.capability(): any
         MagicalMDAM = true,
         InstantHeal = true,
         ManaHealCalculation = true,
+        CompanionSummonCalculation = true,
+        CompanionHealCalculation = true,
+        CompanionRechargeCalculation = true,
         ManaHealHpConsumeIntegrated = true,
         PeriodicStatusCalculation = true,
         PeriodicStatusAreaCalculation = true,
