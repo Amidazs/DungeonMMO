@@ -1,8 +1,12 @@
 --!strict
 -- Server-only authoritative registry of currently active C4 source effects.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local SkillEffects = require(
+    ReplicatedStorage.Core.Shared.C4SkillEffectSource
+)
 local ProgressionRuntimeState = require(
     ServerScriptService.Core.Services.ProgressionRuntimeState
 )
@@ -218,6 +222,86 @@ function C4ActiveSourceEffectState.observe_timed(
     )
 
     return true, reason
+end
+
+--[[
+Observes one server-resolved timed C4 effect cast by another player.
+
+This path is intentionally source-rank based because the target does not own
+the caster's creative skill. The server executor must already have resolved the
+source identity from the caster. This registry revalidates that rank and
+operate type before it can influence the target's source-stat snapshot.
+
+Args:
+    owner (any): Server-owned target Player or disposable test owner.
+    creative_skill_id (string): Stable DungeonMMO skill identity.
+    creative_rank (number): Server-resolved caster creative rank.
+    source_skill_id (number): Server-resolved C4 source skill ID.
+    source_rank (number): Server-resolved C4 source rank.
+    duration_seconds (number): Positive server-owned effect duration.
+
+Returns:
+    (boolean, string?): Success or strict source/effect validation reason.
+]]
+function C4ActiveSourceEffectState.observe_external_timed(
+    owner: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_skill_id: number,
+    source_rank: number,
+    duration_seconds: number
+): (boolean, string?)
+    if not valid_owner(owner) then
+        return false, "InvalidActiveEffectOwner"
+    end
+    if type(creative_skill_id) ~= "string"
+        or creative_skill_id == ""
+        or type(creative_rank) ~= "number"
+        or creative_rank % 1 ~= 0
+        or creative_rank < 1
+        or type(source_skill_id) ~= "number"
+        or source_skill_id % 1 ~= 0
+        or source_skill_id < 1
+        or type(source_rank) ~= "number"
+        or source_rank % 1 ~= 0
+        or source_rank < 1
+        or type(duration_seconds) ~= "number"
+        or duration_seconds ~= duration_seconds
+        or duration_seconds <= 0
+        or duration_seconds > 3600
+    then
+        return false, "InvalidExternalTimedActiveEffect"
+    end
+
+    local effect = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not effect then
+        return false, "OriginalActiveEffectUnavailable"
+    end
+
+    local operate_type = effect.Sets.operateType
+    if operate_type ~= "ACTIVE"
+        and operate_type ~= "TOGGLE"
+    then
+        return false, "OriginalExternalEffectNotActive"
+    end
+
+    store_effect(
+        owner,
+        creative_skill_id,
+        creative_rank,
+        {
+            SkillId = source_skill_id,
+            Rank = source_rank,
+            OperateType = operate_type,
+        },
+        nil,
+        os.clock() + duration_seconds
+    )
+
+    return true, nil
 end
 
 --[[
