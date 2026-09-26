@@ -263,6 +263,32 @@ local MAPS = table.freeze({
             Offset = 1,
         }),
     }),
+    PalusKnight = table.freeze({
+        [2] = table.freeze({SkillId = "DuskguardMindRend"}),
+        [28] = table.freeze({SkillId = "DuskguardChallenge"}),
+        [70] = table.freeze({
+            SkillId = "DuskguardUmbralSiphon",
+            Offset = 2,
+        }),
+        [77] = table.freeze({
+            SkillId = "DuskguardAttackAura",
+            Offset = 1,
+        }),
+        [91] = table.freeze({
+            SkillId = "DuskguardDefenseAura",
+            Offset = 1,
+        }),
+        [110] = table.freeze({SkillId = "DuskguardLastStand"}),
+        [112] = table.freeze({SkillId = "DuskguardArrowWard"}),
+        [129] = table.freeze({SkillId = "DuskguardVenomHex"}),
+        [147] = table.freeze({SkillId = "DuskguardRunicResistance"}),
+        [153] = table.freeze({SkillId = "DuskguardShieldMastery"}),
+        [217] = table.freeze({SkillId = "DuskguardSteelTraining"}),
+        [223] = table.freeze({SkillId = "DuskguardCrimsonSting"}),
+        [232] = table.freeze({
+            SkillId = "DuskguardHeavyArmorTraining",
+        }),
+    }),
     HumanWarrior = table.freeze({
         [78] = table.freeze({SkillId = "IronvowBattleCall"}),
         [100] = table.freeze({SkillId = "IronvowStonebreaker"}),
