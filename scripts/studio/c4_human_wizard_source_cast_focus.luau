@@ -19,6 +19,8 @@ local FIXTURES = table.freeze({
     "C4SourceCastSchedulerServiceTest",
     "C4SourceDirectMagicCastServiceTest",
     "C4SourcePeriodicMagicCastServiceTest",
+    "C4SourceCompanionServiceTest",
+    "C4SourceCompanionCastServiceTest",
     "C4SourceCastRuntimeCompositionTest",
     "C4HumanWizardStagedCastIntegrationTest",
     "C4SourceCombatCalculationServiceTest",
