@@ -9,6 +9,7 @@ assert(
 local ServerScriptService = game:GetService("ServerScriptService")
 local core_tests = ServerScriptService.Core.Tests
 local combat_tests = ServerScriptService.Combat.Tests
+local dungeon_tests = ServerScriptService.Dungeon.Tests
 
 local FIXTURES = table.freeze({
     {Folder = core_tests, Name = "C4FirstTransferBranchesTest"},
@@ -91,6 +92,14 @@ local FIXTURES = table.freeze({
     {
         Folder = core_tests,
         Name = "C4DungeonSourceCastRuntimeTest",
+    },
+    {
+        Folder = dungeon_tests,
+        Name = "Phase2AFailurePathTest",
+    },
+    {
+        Folder = dungeon_tests,
+        Name = "DungeonEncounterBindingsTest",
     },
 })
 
