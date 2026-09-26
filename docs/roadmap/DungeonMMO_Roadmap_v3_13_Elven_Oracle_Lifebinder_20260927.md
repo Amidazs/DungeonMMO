@@ -11,7 +11,7 @@ acceptance complete.**
 
 Accepted code candidate:
 
-`aac122673d5e7b85179157c8365961c180513d5e`.
+`45fd554aecd58099b3a0fb359deaadf3118471b4`.
 
 Acceptance evidence:
 [Elven Oracle / Lifebinder v3.13](
@@ -116,7 +116,7 @@ A fresh unpublished Studio build was used:
 
 `DungeonMMO_ElvenOracle_Acceptance4.rbxlx`.
 
-The focused backend acceptance ran **25 / 25 suites PASS**, including:
+The final focused backend acceptance ran **25 / 25 suites PASS**, including:
 
 - Oracle source audit;
 - Lifebinder foundation;
