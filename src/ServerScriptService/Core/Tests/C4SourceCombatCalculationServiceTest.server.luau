@@ -1255,7 +1255,7 @@ local function check_npc_targets()
             and wizard_poison.SourceSkillId == 1168
             and wizard_poison.SourceRank == 3
             and wizard_poison.EffectType == "POISON"
-            and wizard_poison.TickDamage == 8
+            and wizard_poison.TickDamage == 24
             and wizard_poison.TickCount == 10
             and wizard_poison.TickSeconds == 3
             and wizard_poison.Spiritshot
