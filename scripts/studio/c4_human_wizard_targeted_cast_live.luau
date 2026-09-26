@@ -881,14 +881,41 @@ local function run()
         Runtime.get_c4_resource_migration_boundary(
             player.UserId
         )
-    assert(
-        boundary
-            and boundary_reason == nil
-            and boundary.ScopeId == "HumanWizard"
-            and boundary.CutoverPrerequisitesReady
-            and boundary.ReviewedSourceItemIds.Weapon == 6,
-        "Emberweaver source boundary not rehearsal-ready"
-    )
+    if not boundary
+        or boundary_reason ~= nil
+        or boundary.ScopeId ~= "HumanWizard"
+        or not boundary.CutoverPrerequisitesReady
+        or not boundary.ReviewedSourceItemIds
+        or boundary.ReviewedSourceItemIds.Weapon ~= 6
+    then
+        local blockers = boundary
+            and boundary.ActivationBlockers or {}
+        error(
+            "Emberweaver source boundary not rehearsal-ready: "
+                .. "reason="
+                .. tostring(boundary_reason)
+                .. " scope="
+                .. tostring(boundary and boundary.ScopeId)
+                .. " cutover="
+                .. tostring(
+                    boundary
+                        and boundary.CutoverPrerequisitesReady
+                )
+                .. " statReady="
+                .. tostring(
+                    boundary
+                        and boundary.SourceStatCandidateReady
+                )
+                .. " weapon="
+                .. tostring(
+                    boundary
+                        and boundary.ReviewedSourceItemIds
+                        and boundary.ReviewedSourceItemIds.Weapon
+                )
+                .. " blockers="
+                .. table.concat(blockers, ",")
+        )
+    end
 
     local cutover_bridge =
         ServerStorage:WaitForChild(
