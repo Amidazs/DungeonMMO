@@ -1,3 +1,23 @@
+## 26 September 2026 — CURRENT v3.09 Human Cleric GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_09_Human_Cleric_Level30_Complete_20260926.md);
+[evidence](
+../testing/c4-human-cleric-level30-complete-v3-09-20260926.md).
+
+Human Cleric / Dawnkeeper level-30 backend acceptance is complete.
+
+- source rank coverage: **88/88**;
+- focused Studio backend runner set: **24/24 PASS**;
+- Play-mode critical subset: **4/4 PASS**;
+- Resurrection UI + RemoteEvent + server acceptance rehearsal: **PASS**;
+- final Test9 CreatorErrors: **0**;
+- Base build: PASS;
+- Dungeon build: PASS.
+
+Key bounded counts: Foundation **156**, source effects **36**, hostile direct
+magic **4**, support cast **10**, Dungeon death/revive **54** assertions.
+
 ## 26 September 2026 — CURRENT v3.07 Withering Hex validation pending
 
 [Roadmap](
