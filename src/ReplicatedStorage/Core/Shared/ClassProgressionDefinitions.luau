@@ -195,6 +195,7 @@ local DEFINITIONS = table.freeze({
             "ScoutEvasiveFocus",
             "HumanScoutCriticalPower",
             "HumanScoutRestingRecovery",
+            "AshenbladeVitalForce",
             "HumanScoutPrecision",
         }),
     }),
@@ -209,6 +210,7 @@ local DEFINITIONS = table.freeze({
         StarterEquipment = table.freeze({}),
         TeachableSkills = table.freeze({
             "ElvenScoutGuard",
+            "GreenwardScoutElementalHeal",
             "GreenwardRenewal",
             "WayfinderArrow",
             "WayfinderCut",
