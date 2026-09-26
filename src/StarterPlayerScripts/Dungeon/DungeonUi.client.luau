@@ -353,6 +353,7 @@ local return_at: number? = nil
 local return_server_time = 0
 local return_received_at = 0
 local revive_action: string? = nil
+local current_skill_resurrection_offer: any? = nil
 local run_failed = false
 local terminal_view = false
 
@@ -467,7 +468,24 @@ local function apply_revive_state(payload: any)
     update_backdrop()
 
     local offer = payload.paid_offer
-    if mode == "Reviving" then
+    current_skill_resurrection_offer =
+        payload.skill_resurrection_offer
+
+    if type(current_skill_resurrection_offer) == "table" then
+        revive_title.Text = "RESURRECTION OFFER"
+        revive_action = "SkillResurrectionAccept"
+        revive_button.Text = "Accept Revive"
+        revive_hint.Text =
+            "A party member can return you to the fight."
+        revive_timer.Text =
+            "Accept to revive at your defeat location."
+        UiTheme.set_button_enabled(
+            revive_button,
+            true
+        )
+    elseif mode == "Reviving" then
+        revive_hint.Text =
+            "Revive to rejoin the fight, or abandon this expedition."
         revive_title.Text = "RETURNING"
         revive_action = nil
         revive_button.Text = "Revive in progress"
@@ -476,6 +494,8 @@ local function apply_revive_state(payload: any)
             false
         )
     elseif payload.free_available == true then
+        revive_hint.Text =
+            "Revive to rejoin the fight, or abandon this expedition."
         revive_title.Text = "DEFEATED"
         revive_action = "Free"
         revive_button.Text = "Use Free Revive"
@@ -484,6 +504,8 @@ local function apply_revive_state(payload: any)
             true
         )
     elseif type(offer) == "table" then
+        revive_hint.Text =
+            "Revive to rejoin the fight, or abandon this expedition."
         revive_title.Text = "DEFEATED"
         revive_action = "Paid"
         revive_button.Text = if RunService:IsStudio()
@@ -501,6 +523,8 @@ local function apply_revive_state(payload: any)
                 or offer.live_enabled == true
         )
     else
+        revive_hint.Text =
+            "Revive to rejoin the fight, or abandon this expedition."
         revive_title.Text = "DEFEATED"
         revive_action = nil
         revive_button.Text = "Revive unavailable"
@@ -638,6 +662,11 @@ Returns:
 ]]
 local function update_countdowns()
     if revive_panel.Visible
+        and type(current_skill_resurrection_offer) == "table"
+    then
+        revive_timer.Text =
+            "Accept to revive at your defeat location."
+    elseif revive_panel.Visible
         and current_member_mode == "Reviving"
         and type(revive_at) == "number" then
         local now = revive_server_time
