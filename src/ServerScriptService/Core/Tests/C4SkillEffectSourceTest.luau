@@ -134,6 +134,31 @@ local function check_known_vectors()
         and wizard_servitor.Effects[1].power == 294,
         "Human Wizard Servitor Heal rank9 exact source fields")
 
+    local cleric_heal = assert(Effects.get_rank(1011, 15))
+    check(cleric_heal.Sets.mpInitialConsume == 9
+        and cleric_heal.Sets.mpConsume == 35
+        and cleric_heal.Effects[1].power == 245
+        and cleric_heal.Sets.target == "TARGET_ONE",
+        "Human Cleric Heal rank15 exact source fields")
+
+    local cleric_root = assert(Effects.get_rank(1201, 6))
+    check(cleric_root.Sets.mpInitialConsume == 6
+        and cleric_root.Sets.mpConsume == 21
+        and cleric_root.Sets.magicLvl == 30
+        and cleric_root.Sets.effectPower == 80
+        and cleric_root.Effects[1].name == "Root"
+        and cleric_root.Effects[1].time == 30
+        and cleric_root.Effects[1].abnormal == "ROOT",
+        "Human Cleric Dryad Root rank6 exact source fields")
+
+    local cleric_robe = assert(Effects.get_rank(235, 6))
+    local cleric_robe_defence =
+        find_modifier(cleric_robe, "PHYSICAL_DEFENCE")
+    check(cleric_robe_defence ~= nil
+        and cleric_robe_defence.val == 17.4
+        and cleric_robe_defence.UsingKind == "Magic",
+        "Human Cleric Robe Mastery rank6 keeps Magic gear condition")
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -155,12 +180,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 95
-        and coverage.RequiredSkillRankPairs == 362
+    check(coverage.SkillCount == 107
+        and coverage.RequiredSkillRankPairs == 425
         and not coverage.LiveCombatIntegrated,
-        "All ten-path source skill/rank definitions are catalogued")
+        "All eleven-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=95 uniqueRankPairs=362 live=false")
+        .. "skills=107 uniqueRankPairs=425 live=false")
         :format(checks))
 end
 
