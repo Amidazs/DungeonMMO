@@ -58,6 +58,24 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "PhysicalAttackWeakening",
     }),
+    DawnkeeperExorcism = table.freeze({
+        SourceSkillId = 1031,
+        CastRange = 400,
+        EffectRange = 900,
+        ExecutionKind = "UndeadMagic",
+    }),
+    DawnkeeperSlumber = table.freeze({
+        SourceSkillId = 1069,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
+    DawnkeeperRootbind = table.freeze({
+        SourceSkillId = 1201,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "RootControl",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -70,6 +88,9 @@ local REVIEWED_SKILLS = table.freeze({
     "EmberweaverSlumberHex",
     "EmberweaverScorchMark",
     "EmberweaverWitheringHex",
+    "DawnkeeperExorcism",
+    "DawnkeeperSlumber",
+    "DawnkeeperRootbind",
 })
 
 --[[
@@ -172,7 +193,11 @@ function C4SourceDirectMagicCastService.new(
             ) == "function"
             and type(
                 executor.physical_attack_weakening_skill_npc
-            ) == "function",
+            ) == "function"
+            and type(
+                executor.magic_undead_skill_npc
+            ) == "function"
+            and type(executor.root_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -493,6 +518,24 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "UndeadMagic" then
+        applied, reason =
+            self._executor:magic_undead_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    elseif review.ExecutionKind == "RootControl" then
+        applied, reason =
+            self._executor:root_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     else
         applied, reason =
             self._executor:magic_skill_npc(
@@ -650,6 +693,9 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedElementalVulnerabilityFeedsMagicDamage = true,
         ReviewedPhysicalAttackWeakening = true,
         ReviewedPhysicalAttackWeakeningFeedsNpcDamage = true,
+        ReviewedUndeadOnlyMagic = true,
+        ReviewedRootControl = true,
+        ReviewedRootMovementOnly = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
