@@ -31,6 +31,15 @@ local EnemyWeakening = require(
 local ManaService = require(
     ServerScriptService.Combat.ManaService
 )
+local MageHealService = require(
+    ServerScriptService.Combat.MageHealService
+)
+local NpcRoot = require(
+    ServerScriptService.Combat.C4NpcRootService
+)
+local ActiveSourceEffects = require(
+    ServerScriptService.Core.Services.C4ActiveSourceEffectState
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -198,6 +207,11 @@ function C4SourceCombatExecutor.new(options: any?): any
             config.EnemyWeakeningProvider
             or EnemyWeakening,
         _mana = config.ManaProvider or ManaService,
+        _player_heal = config.PlayerHealProvider or MageHealService,
+        _npc_root = config.RootProvider or NpcRoot,
+        _active_source_effects =
+            config.ActiveSourceEffectProvider
+            or ActiveSourceEffects,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -597,6 +611,99 @@ function C4SourceCombatExecutor:_validate_npc_source_range(
 
     if distance_source > source_range then
         return false, "C4SourceCastTargetOutOfRange"
+    end
+
+    return true, nil
+end
+
+--[[
+Checks a source-unit range between two server-owned players.
+
+Args:
+    caster (any): Server-owned support caster.
+    target (any): Server-owned support target.
+    source_range (number): Reviewed C4 cast/effect range.
+
+Returns:
+    (boolean, string?): Range readiness or strict spatial denial reason.
+]]
+function C4SourceCombatExecutor:_validate_player_source_range(
+    caster: any,
+    target: any,
+    source_range: number
+): (boolean, string?)
+    if type(source_range) ~= "number"
+        or source_range ~= source_range
+        or source_range <= 0
+        or source_range >= math.huge
+    then
+        return false, "InvalidC4SourceCastRange"
+    end
+    if type(self._source_units_per_stud) ~= "number" then
+        return false, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local caster_model = combat_model(caster)
+    local target_model = combat_model(target)
+    if not caster_model or not target_model then
+        return false, "C4LiveCombatCharacterUnavailable"
+    end
+
+    local caster_root =
+        caster_model:FindFirstChild("HumanoidRootPart")
+    local target_root =
+        target_model:FindFirstChild("HumanoidRootPart")
+    if not caster_root or not target_root then
+        return false, "C4LiveCombatRootUnavailable"
+    end
+
+    local distance_source =
+        (caster_root.Position - target_root.Position).Magnitude
+        * self._source_units_per_stud
+    if distance_source > source_range then
+        return false, "C4SourceCastTargetOutOfRange"
+    end
+
+    return true, nil
+end
+
+--[[
+Validates one friendly source target, including self-targeting.
+
+Both actors must be current source-cutover participants. Same-player support is
+allowed because C4 TARGET_ONE support skills may be cast on self.
+
+Args:
+    caster (any): Server-owned support caster.
+    target (any): Server-owned support target.
+    source_range (number?): Optional reviewed source range.
+
+Returns:
+    (boolean, string?): Target readiness or strict denial reason.
+]]
+function C4SourceCombatExecutor:can_support_skill_player(
+    caster: any,
+    target: any,
+    source_range: number?
+): (boolean, string?)
+    local caster_ready, caster_reason =
+        self:_validate_actor(caster)
+    if not caster_ready then
+        return false, caster_reason
+    end
+
+    local target_ready, target_reason =
+        self:_validate_actor(target)
+    if not target_ready then
+        return false, target_reason
+    end
+
+    if source_range ~= nil then
+        return self:_validate_player_source_range(
+            caster,
+            target,
+            source_range
+        )
     end
 
     return true, nil
@@ -2360,6 +2467,286 @@ function C4SourceCombatExecutor:heal_skill(
 end
 
 --[[
+Executes one live source heal on a friendly player target.
+
+The source calculation consumes the caster's one magical shot. Actual health
+mutation uses the existing heal authority so contribution/support callbacks
+remain intact.
+
+Args:
+    caster (any): Server-owned healing player.
+    target (any): Server-owned friendly target.
+    creative_skill_id (string): Server-selected creative heal.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live targeted-heal evidence or denial reason.
+]]
+function C4SourceCombatExecutor:heal_skill_target(
+    caster: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason =
+        self:can_support_skill_player(caster, target)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.heal_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local provider = self._player_heal
+    if not provider
+        or type(provider.apply_heal) ~= "function"
+    then
+        return nil, "C4LivePlayerHealAuthorityUnavailable"
+    end
+
+    local effective = provider.apply_heal(
+        caster,
+        target,
+        calculated.Amount,
+        creative_skill_id
+    )
+    if type(effective) ~= "number"
+        or effective < 0
+        or effective ~= effective
+    then
+        return nil, "InvalidC4LivePlayerHealResult"
+    end
+
+    return {
+        Kind = "C4LiveTargetHealSkill",
+        Calculation = calculated,
+        Applied = true,
+        RawHeal = calculated.Amount,
+        EffectiveHeal = effective,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
+Executes one live source support buff on a friendly player target.
+
+The target active-effect registry receives only the server-resolved C4 source
+identity. That lets existing unified source stats consume the exact modifiers
+without requiring the target to own the caster's skill.
+
+Args:
+    caster (any): Server-owned buff caster.
+    target (any): Server-owned friendly target.
+    creative_skill_id (string): Reviewed creative support buff.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live timed-buff evidence or denial reason.
+]]
+function C4SourceCombatExecutor:support_buff_skill_target(
+    caster: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason =
+        self:can_support_skill_player(caster, target)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.support_buff_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local authority = self._active_source_effects
+    if not authority
+        or type(
+            authority.observe_external_timed
+        ) ~= "function"
+    then
+        return nil, "C4LiveSupportBuffAuthorityUnavailable"
+    end
+
+    local observed, observe_reason =
+        authority.observe_external_timed(
+            target,
+            creative_skill_id,
+            creative_rank,
+            calculated.SourceSkillId,
+            calculated.SourceRank,
+            calculated.DurationSeconds
+        )
+    if not observed then
+        return nil, observe_reason
+    end
+
+    return {
+        Kind = "C4LiveSupportBuff",
+        Calculation = calculated,
+        Applied = true,
+        DurationSeconds = calculated.DurationSeconds,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+        TargetUserId = target.UserId,
+    }, nil
+end
+
+--[[
+Executes one live C4 Root control skill against an NPC.
+
+A resisted cast changes no NPC runtime state. A landed cast delegates to the
+root authority, which suppresses movement only and remains through damage.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed creative Root skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live Root evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:root_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.root_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcRoot",
+            Calculation = calculated,
+            Applied = false,
+            RootApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local authority = self._npc_root
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcRootAuthorityUnavailable"
+    end
+
+    local applied = authority.apply(
+        enemy,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcRootApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcRoot",
+        Calculation = calculated,
+        Applied = true,
+        RootApplied = true,
+        Landed = true,
+        DurationSeconds = calculated.DurationSeconds,
+        BreaksOnDamage = false,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
+Executes one reviewed C4 undead-only MDAM spell against an NPC.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed undead-only spell.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative sequence.
+
+Returns:
+    (any?, string?): Live magic damage evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:magic_undead_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+    if boundary.SourceNpcRace ~= "UNDEAD" then
+        return nil, "C4UndeadMagicTargetRequired"
+    end
+
+    local calculated, combat_reason =
+        self._combat.magic_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "Magic",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcUndeadMagic",
+        Calculation = calculated,
+        Applied = true,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+    }, nil
+end
+
+--[[
 Executes one complete live player-vs-player C4 ordinary attack.
 
 All transforms, elevation mapping, night state, calculation rolls,
@@ -2551,6 +2938,9 @@ function C4SourceCombatExecutor:capability(): any
         PhysicalSkillLiveApplication = true,
         MagicSkillLiveApplication = true,
         SelfHealLiveApplication = true,
+        TargetHealLiveApplication = true,
+        PlayerSupportBuffLiveApplication = true,
+        ExternalTimedSourceEffectsIntegrated = true,
         SelfManaHealLiveApplication = true,
         ManaAuthorityConfigured = type(self._mana) == "table",
         NpcBoundaryProviderConfigured =
@@ -2571,6 +2961,10 @@ function C4SourceCombatExecutor:capability(): any
             type(self._npc_corpse_boundary_provider) == "function",
         NpcSleepLiveApplication = true,
         NpcSleepBreaksOnDirectDamage = true,
+        NpcRootLiveApplication = true,
+        NpcRootMovementOnly = true,
+        NpcRootBreaksOnDamage = false,
+        NpcUndeadMagicLiveApplication = true,
         NpcSleepAuthorityConfigured =
             type(self._npc_sleep) == "table",
         NpcElementalVulnerabilityLiveApplication = true,
