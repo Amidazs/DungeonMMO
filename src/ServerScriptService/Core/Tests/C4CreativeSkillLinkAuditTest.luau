@@ -9,8 +9,8 @@ local Map = require(Shared.C4CreativeSkillSourceMap)
 local report = Audit.report()
 assert(report.ClassPaths == 11 and report.SourceLearningRows == 657,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 635
-    and report.ExplicitMissingRows == 22,
+assert(report.CandidateRows == 645
+    and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
 assert(report.CandidateRows + report.ExplicitMissingRows == 657,
     "Every historical rank requires a candidate or an explicit gap")
@@ -28,7 +28,7 @@ local wind_two = assert(Map.resolve("HumanMystic", 1177, 2))
 local elven_heal = assert(Map.resolve("ElvenKnight", 58, 4))
 local rogue_blade = assert(Map.resolve("HumanRogue", 16, 10))
 local elf_aura = assert(Map.resolve("ElvenScout", 91, 2))
-local elf_gap = assert(Map.resolve("ElvenScout", 58, 4))
+local elf_heal = assert(Map.resolve("ElvenScout", 58, 4))
 local wizard_bolt = assert(Map.resolve("HumanWizard", 1220, 1))
 local wizard_companion = assert(Map.resolve("HumanWizard", 1111, 1))
 local cleric_heal = assert(Map.resolve("HumanCleric", 1011, 7))
@@ -41,8 +41,10 @@ assert(wind_one.CreativeSkillId == "WindStrike"
 assert(elven_heal.CreativeRank == 1
     and rogue_blade.CreativeRank == 1
     and elf_aura.CreativeRank == 1
-    and elf_gap.Status == "Missing",
-    "Original first-transfer offsets and missing Elf Scout heal matter")
+    and elf_heal.Status == "Candidate"
+    and elf_heal.CreativeSkillId == "GreenwardScoutElementalHeal"
+    and elf_heal.CreativeRank == 1,
+    "Original first-transfer offsets and live Elf Scout heal matter")
 assert(wizard_bolt.Status == "Candidate"
     and wizard_bolt.CreativeSkillId == "EmberweaverEmberBolt"
     and wizard_bolt.CreativeRank == 1
