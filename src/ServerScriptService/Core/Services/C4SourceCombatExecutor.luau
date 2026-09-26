@@ -28,6 +28,9 @@ local NpcElementalVulnerability = require(
 local EnemyWeakening = require(
     ServerScriptService.Combat.EnemyWeakeningService
 )
+local ManaService = require(
+    ServerScriptService.Combat.ManaService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -191,6 +194,7 @@ function C4SourceCombatExecutor.new(options: any?): any
         _enemy_weakening =
             config.EnemyWeakeningProvider
             or EnemyWeakening,
+        _mana = config.ManaProvider or ManaService,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -298,6 +302,41 @@ function C4SourceCombatExecutor:set_enabled(
     end
 
     self._enabled = enabled
+    return true, nil
+end
+
+--[[
+Checks independent live/source gates for a self-targeted source skill.
+
+Args:
+    actor (any): Server-owned casting player.
+
+Returns:
+    (boolean, string?): Ready state or strict denial reason.
+]]
+function C4SourceCombatExecutor:_validate_self_actor(
+    actor: any
+): (boolean, string?)
+    if not self._enabled then
+        return false, "C4LiveCombatExecutorDisabled"
+    end
+    if type(actor) ~= "userdata"
+        and type(actor) ~= "table"
+    then
+        return false, "InvalidC4LiveCombatAttacker"
+    end
+    if type(actor.UserId) ~= "number" then
+        return false, "InvalidC4LiveCombatAttacker"
+    end
+    if not self._combat.is_enabled() then
+        return false, "C4SourceCombatCalculationDisabled"
+    end
+    if type(self._resources) ~= "table"
+        or self._resources.is_active(actor) ~= true
+    then
+        return false, "C4LiveCombatParticipantNotCutOver"
+    end
+
     return true, nil
 end
 
@@ -1239,6 +1278,79 @@ function C4SourceCombatExecutor:status_area_skill_npc(
         SourceSkillRadius = source_radius,
         Spiritshot = calculated.Spiritshot,
         BlessedSpiritshot = calculated.BlessedSpiritshot,
+    }, nil
+end
+
+--[[
+Executes one live C4 self MANAHEAL skill.
+
+HP is consumed at hit time and is capped so the caster remains at least at one
+HP, matching the source cast path. MP restoration is then clamped by the
+authoritative ManaService. The source calculation owns one magical shot.
+
+Args:
+    caster (any): Server-owned casting player.
+    creative_skill_id (string): Reviewed self mana-heal skill.
+    creative_rank (number): Server-resolved purchased rank.
+    _sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live HP-to-MP evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:mana_heal_self(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    local ready, ready_reason = self:_validate_self_actor(caster)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.mana_heal_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local humanoid, humanoid_reason =
+        self._humanoid_provider(caster)
+    if not humanoid then
+        return nil, humanoid_reason
+    end
+    if not self._mana
+        or type(self._mana.restore) ~= "function"
+    then
+        return nil, "C4LiveManaAuthorityUnavailable"
+    end
+
+    local health_before = humanoid.Health
+    local hp_consumed = math.min(
+        calculated.HpConsume,
+        math.max(0, health_before - 1)
+    )
+    humanoid.Health = health_before - hp_consumed
+
+    local mana_restored = self._mana.restore(
+        caster,
+        calculated.ManaRestore
+    )
+
+    return {
+        Kind = "C4LiveManaHeal",
+        Calculation = calculated,
+        Applied = true,
+        HpRequested = calculated.HpConsume,
+        HpConsumed = hp_consumed,
+        HealthBefore = health_before,
+        HealthAfter = humanoid.Health,
+        ManaRequested = calculated.ManaRestore,
+        ManaRestored = mana_restored,
     }, nil
 end
 
@@ -2309,6 +2421,8 @@ function C4SourceCombatExecutor:capability(): any
         PhysicalSkillLiveApplication = true,
         MagicSkillLiveApplication = true,
         SelfHealLiveApplication = true,
+        SelfManaHealLiveApplication = true,
+        ManaAuthorityConfigured = type(self._mana) == "table",
         NpcBoundaryProviderConfigured =
             type(self._npc_boundary_provider) == "function",
         NpcDamageObserverConfigured =
