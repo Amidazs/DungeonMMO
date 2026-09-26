@@ -118,6 +118,10 @@ local DEFINITIONS = table.freeze({
             "EmberweaverVenomCloud",
             "EmberweaverBloodToMana",
             "EmberweaverCorpseSiphon",
+            "EmberweaverManaCompanion",
+            "EmberweaverServitorRecharge",
+            "EmberweaverServitorHeal",
+            "EmberweaverCombatCompanion",
         }),
     }),
 
