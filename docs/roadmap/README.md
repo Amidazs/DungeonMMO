@@ -1,3 +1,17 @@
+**v3.08 HUMAN WIZARD LEVEL-30 BACKEND GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_08_Human_Wizard_Level30_Complete_20260926.md)
+and [green evidence](
+../testing/c4-human-wizard-level30-complete-v3-08-20260926.md).
+Human Wizard / Emberweaver now maps **93/93 source learning rows through level
+30 with 0 Human Wizard gaps**. The companion families 1111/1126/1127/1225 are
+server-owned, and Venom Cloud, Blood To Mana and Corpse Siphon are integrated
+through the staged source runtime. Fresh Studio acceptance is **18/18 focused**
+and **39/39 expanded backend suites PASS**. A genuine unpublished Play
+rehearsal confirmed companion server spawn, client replication, source reagent
+consumption, Servitor Heal/Recharge and clean owner teardown. Companion final
+art and reviewed source NPC combat templates/AI remain separate creature
+content; no unreviewed C4 NPC stats were invented.
+
 **v3.07 HUMAN WIZARD WITHERING HEX — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_07_Human_Wizard_Withering_Hex_20260926.md)
 and [pending evidence](
