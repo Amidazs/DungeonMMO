@@ -47,6 +47,7 @@ local area_magic_calls = 0
 local drain_magic_calls = 0
 local sleep_calls = 0
 local vulnerability_calls = 0
+local weakening_calls = 0
 local last_area_radius = nil
 local status_calls = 0
 
@@ -451,6 +452,43 @@ function FakeExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Records one staged physical-attack weakening executor handoff.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected private selected NPC target.
+    creative_skill_id (string): Reviewed Withering Hex skill.
+    creative_rank (number): Authenticated creative rank.
+    sequence_id (number?): Trusted action sequence.
+
+Returns:
+    (any?, string?): Fake live weakening executor evidence.
+]]
+function FakeExecutor:physical_attack_weakening_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player and target == enemy)
+    assert(creative_skill_id == "EmberweaverWitheringHex")
+    assert(creative_rank == 3)
+    assert(type(sequence_id) == "number")
+    weakening_calls += 1
+
+    return {
+        Kind = "C4LiveNpcPhysicalAttackWeakening",
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackMultiplier = 0.8,
+        PowerReductionFraction = 0.2,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
 Counts one cross-service staged-cast assertion.
 
 Args:
@@ -540,6 +578,7 @@ local function wizard_character(): any
     own_skill(character, "EmberweaverLifeSiphon", 4)
     own_skill(character, "EmberweaverSlumberHex", 6)
     own_skill(character, "EmberweaverScorchMark", 2)
+    own_skill(character, "EmberweaverWitheringHex", 3)
     own_skill(character, "EmberweaverVenomHex", 2)
 
     return character
@@ -879,6 +918,55 @@ local function check_scorch_mark(direct: any)
 end
 
 --[[
+Checks Withering Hex through the real source scheduler and weakening path.
+
+Args:
+    direct (any): Enabled targeted-magic bridge.
+
+Returns:
+    nil: Confirms exact source rank, timing, ranges and split-MP costs.
+]]
+local function check_withering_hex(direct: any)
+    local started = assert(direct:begin_cast(
+        player,
+        enemy,
+        "EmberweaverWitheringHex",
+        153
+    ))
+    check(
+        started.SourceSkillId == 1164
+            and started.SourceRank == 4
+            and started.LaunchAt == 154.5
+            and started.ReuseReadyAt == 159
+            and started.SourceCastRange == 600
+            and started.SourceEffectRange == 1100
+            and last_preflight_range == 600
+            and mana_current == 14,
+        "Withering Hex crosses exact source weakening start contract"
+    )
+
+    local launched = assert(direct:launch_if_ready(
+        player,
+        started.CastId,
+        154.5,
+        1017
+    ))
+    check(
+        launched.Applied
+            and launched.Application.Kind
+                == "C4LiveNpcPhysicalAttackWeakening"
+            and launched.Application.WeakeningApplied
+            and launched.Application.PhysicalAttackMultiplier == 0.8
+            and launched.Application.PowerReductionFraction == 0.2
+            and launched.Application.DurationSeconds == 15
+            and last_preflight_range == 1100
+            and weakening_calls == 1
+            and mana_current == 3,
+        "Withering Hex commits exact MP and reaches weakening executor"
+    )
+end
+
+--[[
 Checks Venom Hex through the same real source scheduler/resource pipeline.
 
 Args:
@@ -978,6 +1066,7 @@ local function main()
     drain_magic_calls = 0
     sleep_calls = 0
     vulnerability_calls = 0
+    weakening_calls = 0
     last_area_radius = nil
     status_calls = 0
 
@@ -989,6 +1078,7 @@ local function main()
     check_life_siphon(direct)
     check_slumber_hex(direct)
     check_scorch_mark(direct)
+    check_withering_hex(direct)
     mana_current = 58
     check_venom_hex(periodic)
     check_cross_family_overlap(direct, periodic)
@@ -998,7 +1088,7 @@ local function main()
     print((
         "[C4 Wizard Staged Integration] TEST_PASS_PENDING_STUDIO: "
         .. "%d assertions direct=3 area=1 drain=1 sleep=1 "
-        .. "fire_vuln=1 poison=1 shared_scheduler=true"
+        .. "fire_vuln=1 patk_down=1 poison=1 shared_scheduler=true"
     ):format(checks))
 end
 
