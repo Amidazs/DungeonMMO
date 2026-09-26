@@ -302,6 +302,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverEmberField", 3)
     own_skill(wizard, "EmberweaverLifeSiphon", 4)
     own_skill(wizard, "EmberweaverSlumberHex", 6)
+    own_skill(wizard, "EmberweaverScorchMark", 2)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -391,6 +392,9 @@ local function check_default_off()
             and capability.SleepControlCalculation
             and capability.SleepControlEffectSuccessIntegrated
             and capability.SleepControlConsumesOneMagicShot
+            and capability.ElementalVulnerabilityCalculation
+            and capability.ElementalVulnerabilityEffectSuccessIntegrated
+            and capability.ElementalVulnerabilityConsumesOneMagicShot
             and capability.MovementSlowEffectSuccessIntegrated
             and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
@@ -1226,6 +1230,52 @@ local function check_human_wizard_slumber_hex()
 end
 
 --[[
+Checks Scorch Mark preserves exact C4 elemental-vulnerability semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms rank mapping, WIT roll, multiplier and one shot.
+]]
+local function check_human_wizard_scorch_mark()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.elemental_vulnerability_skill(
+        WIZARD_ID,
+        marauder,
+        "EmberweaverScorchMark",
+        2
+    ))
+
+    check(
+        result.Kind == "ElementalVulnerability"
+            and result.SourceSkillId == 1083
+            and result.SourceRank == 2
+            and result.VulnerabilityStat == "FIRE_VULN"
+            and result.VulnerabilityMultiplier == 1.25
+            and result.DurationSeconds == 15
+            and result.SaveVs == "WIT"
+            and result.EffectPower == 80
+            and result.MagicLevel == 30,
+        "Scorch Mark rank two preserves exact fire vulnerability contract"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.Roll >= 0
+            and result.Roll <= 99
+            and result.Roll % 1 == 0
+            and result.Landed == (result.Roll < result.Rate),
+        "Scorch Mark consumes one Spiritshot and owns its WIT land roll"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1559,6 +1609,7 @@ local function main()
     check_human_wizard_ember_field()
     check_human_wizard_life_siphon()
     check_human_wizard_slumber_hex()
+    check_human_wizard_scorch_mark()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1578,7 +1629,7 @@ local function main()
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "status=true pdam=true mdam=true wizard=true frost=true "
-        .. "area=true drain=true sleep=true "
+        .. "area=true drain=true sleep=true fire_vuln=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
