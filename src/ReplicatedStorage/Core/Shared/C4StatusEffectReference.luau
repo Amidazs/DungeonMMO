@@ -537,7 +537,9 @@ function C4StatusEffectReference.physical_attack_weakening_plan(
         IsMagic = true,
         MagicLevel = magic_level,
         PhysicalAttackMultiplier = matched.Multiplier,
-        PowerReductionFraction = 1 - matched.Multiplier,
+        PowerReductionFraction = math.round(
+            (1 - matched.Multiplier) * 1000000
+        ) / 1000000,
         DurationSeconds = matched.DurationSeconds,
         StackType = matched.StackType,
         StackOrder = matched.StackOrder,
