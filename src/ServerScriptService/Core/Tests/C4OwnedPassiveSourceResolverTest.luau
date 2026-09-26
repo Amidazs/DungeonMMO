@@ -308,6 +308,44 @@ local function check_elven_wizard_owned_passives()
 end
 
 --[[
+Checks Lifebinder owned passives resolve exact Elven Oracle source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms level-30 Elven Oracle passive source ownership.
+]]
+local function check_elven_oracle_owned_passives()
+    local character = original_character(
+        "Elf",
+        "Lifebinder",
+        30
+    )
+    own_passive(character, "LifebinderQuickPrayer", 2)
+    own_passive(character, "LifebinderRobeTraining", 6)
+    own_passive(character, "LifebinderLightArmorTraining", 6)
+
+    local result = assert(Resolver.for_character(character))
+    local reuse = assert(find_source_rank(result, 164))
+    local robe = assert(find_source_rank(result, 235))
+    local light = assert(find_source_rank(result, 236))
+
+    check(
+        result.Ready
+            and result.ScopeId == "ElvenOracle"
+            and reuse.Rank == 2
+            and reuse.CreativeSkillId == "LifebinderQuickPrayer"
+            and robe.Rank == 6
+            and robe.CreativeSkillId == "LifebinderRobeTraining"
+            and light.Rank == 6
+            and light.CreativeSkillId
+                == "LifebinderLightArmorTraining",
+        "owned Lifebinder passives resolve exact Elven Oracle ranks"
+    )
+end
+
+--[[
 Checks unsupported or corrupted owned passive state remains fail-closed.
 
 Args:
@@ -358,6 +396,7 @@ local function main()
     check_human_wizard_reuse_passive()
     check_human_cleric_owned_passives()
     check_elven_wizard_owned_passives()
+    check_elven_oracle_owned_passives()
     check_fail_closed_owned_state()
 
     print((
