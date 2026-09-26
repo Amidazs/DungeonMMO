@@ -43,6 +43,8 @@ local mana_current = 200
 local source_active = true
 local last_preflight_range = nil
 local magic_calls = 0
+local area_magic_calls = 0
+local last_area_radius = nil
 local status_calls = 0
 
 local FakeResources = {}
@@ -300,6 +302,43 @@ function FakeExecutor:magic_slow_skill_npc(
 end
 
 --[[
+Records one staged TARGET_AREA magic executor handoff.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected private selected NPC target.
+    creative_skill_id (string): Reviewed Ember Field skill.
+    creative_rank (number): Authenticated creative rank.
+    source_radius (number): Exact source skill radius.
+    sequence_id (number?): Trusted action sequence.
+
+Returns:
+    (any?, string?): Fake live area executor evidence.
+]]
+function FakeExecutor:magic_area_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player and target == enemy)
+    assert(creative_skill_id == "EmberweaverEmberField")
+    assert(creative_rank == 3)
+    assert(type(sequence_id) == "number")
+    area_magic_calls += 1
+    last_area_radius = source_radius
+
+    return {
+        Kind = "C4LiveNpcMagicArea",
+        Applied = true,
+        TargetCount = 2,
+        SourceSkillRadius = source_radius,
+    }, nil
+end
+
+--[[
 Counts one cross-service staged-cast assertion.
 
 Args:
@@ -385,6 +424,7 @@ local function wizard_character(): any
     own_skill(character, "EmberweaverEmberBolt", 6)
     own_skill(character, "EmberweaverFlameBurst", 6)
     own_skill(character, "EmberweaverFocusedBolt", 3)
+    own_skill(character, "EmberweaverEmberField", 3)
     own_skill(character, "EmberweaverVenomHex", 2)
 
     return character
@@ -534,6 +574,51 @@ local function check_other_direct_spells(direct: any)
 end
 
 --[[
+Checks Ember Field through the real source scheduler and TARGET_AREA path.
+
+Args:
+    direct (any): Enabled targeted-magic bridge.
+
+Returns:
+    nil: Confirms exact source rank, radius, timing, ranges and MP costs.
+]]
+local function check_ember_field(direct: any)
+    local started = assert(direct:begin_cast(
+        player,
+        enemy,
+        "EmberweaverEmberField",
+        125
+    ))
+    check(
+        started.SourceSkillId == 1181
+            and started.SourceRank == 3
+            and started.LaunchAt == 129
+            and started.ReuseReadyAt == 136.25
+            and started.SourceCastRange == 500
+            and started.SourceEffectRange == 1000
+            and last_preflight_range == 500
+            and mana_current == 124,
+        "Ember Field crosses exact source TARGET_AREA start contract"
+    )
+
+    local launched = assert(direct:launch_if_ready(
+        player,
+        started.CastId,
+        129,
+        1013
+    ))
+    check(
+        launched.Applied
+            and launched.Application.TargetCount == 2
+            and last_preflight_range == 1000
+            and last_area_radius == 200
+            and area_magic_calls == 1
+            and mana_current == 92,
+        "Ember Field commits exact launch MP and source radius"
+    )
+end
+
+--[[
 Checks Venom Hex through the same real source scheduler/resource pipeline.
 
 Args:
@@ -557,7 +642,7 @@ local function check_venom_hex(periodic: any)
             and started.SourceCastRange == 600
             and started.SourceEffectRange == 1100
             and last_preflight_range == 600
-            and mana_current == 126,
+            and mana_current == 86,
         "Venom Hex crosses exact source start contract"
     )
 
@@ -571,7 +656,7 @@ local function check_venom_hex(periodic: any)
         resolved.StatusResolved
             and resolved.Landed
             and last_preflight_range == 1100
-            and mana_current == 105
+            and mana_current == 65
             and status_calls == 1,
         "Venom Hex commits launch MP then reaches poison executor once"
     )
@@ -607,7 +692,7 @@ local function check_cross_family_overlap(
     check(
         blocked == nil
             and reason == "C4SourceCastAlreadyScheduled"
-            and mana_current == 99,
+            and mana_current == 59,
         "shared scheduler blocks cross-family overlap before second MP spend"
     )
 
@@ -629,12 +714,15 @@ local function main()
     source_active = true
     last_preflight_range = nil
     magic_calls = 0
+    area_magic_calls = 0
+    last_area_radius = nil
     status_calls = 0
 
     local direct, periodic = staged_services()
 
     check_ember_bolt(direct)
     check_other_direct_spells(direct)
+    check_ember_field(direct)
     check_venom_hex(periodic)
     check_cross_family_overlap(direct, periodic)
 
@@ -642,7 +730,7 @@ local function main()
 
     print((
         "[C4 Wizard Staged Integration] TEST_PASS_PENDING_STUDIO: "
-        .. "%d assertions direct=3 poison=1 shared_scheduler=true"
+        .. "%d assertions direct=3 area=1 poison=1 shared_scheduler=true"
     ):format(checks))
 end
 
