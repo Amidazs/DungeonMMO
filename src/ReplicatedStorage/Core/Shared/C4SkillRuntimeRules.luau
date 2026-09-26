@@ -260,6 +260,59 @@ function C4SkillRuntimeRules.magic_cool_time(
 end
 
 --[[
+Returns Chronicle 4 physical-skill cast time.
+
+The pinned source uses the same 333 / attack-speed scaling for active skills,
+but non-magic skills use P.Atk.Spd and receive no Spiritshot acceleration.
+The source 500 ms floor still applies when authored hitTime is at least 500 ms.
+
+Args:
+    source_time_ms (number): Original skill hitTime.
+    physical_attack_speed (number): Final source P.Atk.Spd.
+
+Returns:
+    number: Source-equivalent final physical cast time in milliseconds.
+]]
+function C4SkillRuntimeRules.physical_cast_time(
+    source_time_ms: number,
+    physical_attack_speed: number
+): number
+    local cast_ms = Formulas.skill_cast_time(
+        source_time_ms,
+        physical_attack_speed
+    )
+
+    if source_time_ms >= 500 and cast_ms < 500 then
+        return 500
+    end
+
+    return cast_ms
+end
+
+--[[
+Returns Chronicle 4 physical-skill cool time.
+
+Physical coolTime uses P.Atk.Spd with the same source scaling as hitTime but
+does not receive the later 500 ms hit-time floor.
+
+Args:
+    source_time_ms (number): Original skill coolTime.
+    physical_attack_speed (number): Final source P.Atk.Spd.
+
+Returns:
+    number: Source-equivalent final physical cool time in milliseconds.
+]]
+function C4SkillRuntimeRules.physical_cool_time(
+    source_time_ms: number,
+    physical_attack_speed: number
+): number
+    return Formulas.skill_cast_time(
+        source_time_ms,
+        physical_attack_speed
+    )
+end
+
+--[[
 Returns source reuse delay after reuse-rate and attack-speed scaling.
 
 This reproduces the pinned source calculation order but does not determine
