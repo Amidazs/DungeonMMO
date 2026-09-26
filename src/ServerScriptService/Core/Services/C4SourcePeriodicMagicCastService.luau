@@ -10,6 +10,14 @@ local REVIEWED_PERIODIC_MAGIC = table.freeze({
         SourceSkillId = 1168,
         CastRange = 600,
         EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
+    EmberweaverVenomCloud = table.freeze({
+        SourceSkillId = 1167,
+        CastRange = 500,
+        EffectRange = 1000,
+        SourceRadius = 200,
+        ExecutionKind = "TargetArea",
     }),
 })
 
@@ -74,6 +82,12 @@ local function store_pending(
         CastRange = started.SourceCastRange,
         EffectRange = started.SourceEffectRange,
         Enemy = enemy,
+        ExecutionKind = reviewed_skill(
+            started.CreativeSkillId
+        ).ExecutionKind,
+        SourceRadius = reviewed_skill(
+            started.CreativeSkillId
+        ).SourceRadius,
     }
 
     self._pending_by_owner[player] = record
@@ -135,7 +149,8 @@ function C4SourcePeriodicMagicCastService.new(
     assert(
         executor
             and type(executor.can_status_skill_npc) == "function"
-            and type(executor.status_skill_npc) == "function",
+            and type(executor.status_skill_npc) == "function"
+            and type(executor.status_area_skill_npc) == "function",
         "Periodic magic bridge requires source combat executor"
     )
 
@@ -368,17 +383,39 @@ function C4SourcePeriodicMagicCastService:launch_if_ready(
         return nil, "C4PeriodicMagicLaunchPlanChanged"
     end
 
-    local resolved, resolve_reason =
-        self._executor:status_skill_npc(
-            player,
-            record.Enemy,
-            launch.CreativeSkillId,
-            launch.CreativeRank,
-            sequence_id
-        )
+    local resolved
+    local resolve_reason
+
+    if record.ExecutionKind == "TargetArea" then
+        resolved, resolve_reason =
+            self._executor:status_area_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                record.SourceRadius,
+                sequence_id
+            )
+    else
+        resolved, resolve_reason =
+            self._executor:status_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    end
+
     if not resolved then
         return nil, resolve_reason
     end
+
+    local landed = resolved.Landed == true
+        or (
+            type(resolved.LandedCount) == "number"
+            and resolved.LandedCount > 0
+        )
 
     return {
         Kind = "C4ScheduledPeriodicMagic",
@@ -390,8 +427,10 @@ function C4SourcePeriodicMagicCastService:launch_if_ready(
         Launch = launch,
         Resolution = resolved,
         StatusResolved = true,
-        Landed = resolved.Landed == true,
+        Landed = landed,
         StatusApplied = resolved.StatusApplied == true,
+        TargetCount = resolved.TargetCount,
+        LandedCount = resolved.LandedCount,
         ShotConsumedBySourceCalculation = true,
         ClientAuthority = false,
     }, nil
@@ -450,6 +489,9 @@ function C4SourcePeriodicMagicCastService:capability(): any
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
         ReviewedPeriodicMagicOnly = true,
+        ReviewedTargetedPoison = true,
+        ReviewedTargetAreaPoison = true,
+        ReviewedTargetAreaSourceRadius = true,
         ReviewedSkill = "EmberweaverVenomHex",
         ReviewedSourceSkillId = 1168,
         TargetBoundAtCastStart = true,
