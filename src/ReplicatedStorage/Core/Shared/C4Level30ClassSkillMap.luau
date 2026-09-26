@@ -105,6 +105,10 @@ local HUMAN_WIZARD = table.freeze({
     PoisonCloud = "EmberweaverVenomCloud",
     HealthToMana = "EmberweaverBloodToMana",
     CorpseHealthDrain = "EmberweaverCorpseSiphon",
+    ManaCompanion = "EmberweaverManaCompanion",
+    ServitorRecharge = "EmberweaverServitorRecharge",
+    ServitorHeal = "EmberweaverServitorHeal",
+    CombatCompanion = "EmberweaverCombatCompanion",
 })
 
 local ELVEN_KNIGHT = table.freeze({
