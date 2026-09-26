@@ -160,7 +160,9 @@ function RuntimeServices.new(place_kind: string): any
         c4_source_cast_runtime =
             C4SourceCastRuntimeComposition.new(
                 c4_source_shots,
-                c4_source_combat_executor
+                c4_source_combat_executor,
+                inventory,
+                C4SourceCombatCalculationService
             )
     end
 
