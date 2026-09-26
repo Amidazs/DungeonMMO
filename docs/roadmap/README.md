@@ -1,3 +1,12 @@
+**v3.14 PALUS KNIGHT / DUSKGUARD — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md)
+and [evidence](
+../testing/c4-palus-knight-duskguard-v3-14-green-20260927.md).
+Duskguard is complete through level 30 at 50/50 source rows with 23/23 fresh
+Studio suites and a genuine unpublished Play pass. Play also closed the
+physical-skill scheduler gap, so non-magic active skills now use exact
+P.Atk.Spd/physical-reuse timing. Final CreatorError count: 0.
+
 **v3.13 ELVEN ORACLE / LIFEBINDER — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_13_Elven_Oracle_Lifebinder_20260927.md)
 and [acceptance evidence](
