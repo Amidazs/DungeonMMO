@@ -8,6 +8,7 @@ local Shared = ReplicatedStorage.Core.Shared
 local Effects = require(Shared.C4SkillEffectSource)
 local SourceMap = require(Shared.C4CreativeSkillSourceMap)
 local SourceRanks = require(Shared.C4HumanClericLevel30Sources)
+local Skills = require(Shared.C4HumanClericSkillDefinitions)
 local Status = require(Shared.C4StatusEffectReference)
 
 local checks = 0
@@ -57,15 +58,10 @@ Returns:
     number: Highest source rank represented by the Cleric schedule.
 ]]
 local function highest_rank(source_skill_id: number): number
-    local map = SourceMap.get_for_branch("HumanCleric")
-    local candidate = assert(map[source_skill_id])
-    local definition = assert(
-        Shared.C4HumanClericSkillDefinitions
-    )
-    local skill_module = require(definition)
-    local creative = assert(skill_module.get(candidate.SkillId))
-    local highest_creative = creative.MaxRank
-    return highest_creative + (candidate.Offset or 0)
+    local scope = assert(SourceMap.get_scope("HumanCleric"))
+    local candidate = assert(scope.Candidates[source_skill_id])
+    local creative = assert(Skills.get(candidate.SkillId))
+    return creative.MaxRank + (candidate.Offset or 0)
 end
 
 --[[
@@ -108,9 +104,9 @@ local function main()
         "source inventory remains pinned to original Cleric"
     )
 
-    local map = SourceMap.get_for_branch("HumanCleric")
+    local scope = assert(SourceMap.get_scope("HumanCleric"))
     for category, source_skill_id in pairs(EXPECTED) do
-        local candidate = assert(map[source_skill_id])
+        local candidate = assert(scope.Candidates[source_skill_id])
         check(
             type(candidate.SkillId) == "string"
                 and candidate.SkillId ~= "",
