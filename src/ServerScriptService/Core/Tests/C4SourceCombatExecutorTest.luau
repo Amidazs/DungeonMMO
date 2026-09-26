@@ -247,6 +247,44 @@ function FakeCombat.drain_skill(
 end
 
 --[[
+Returns one disposable source Sleep result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected reviewed NPC boundary.
+    creative_skill_id (string): Expected Sleep skill identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source Sleep result.
+]]
+function FakeCombat.sleep_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "EmberweaverSlumberHex")
+    assert(creative_rank == 6)
+
+    return {
+        Kind = "SleepControl",
+        Landed = true,
+        Rate = 80,
+        Roll = 0,
+        DurationSeconds = 30,
+        BreaksOnDamage = true,
+        StopsMovement = true,
+        StopsAttacks = true,
+        StopsCasting = true,
+        SourceSkillId = 1069,
+        SourceRank = 6,
+    }, nil
+end
+
+--[[
 Returns one disposable source self-heal result.
 
 Args:
@@ -538,6 +576,9 @@ local function main()
             and capability.NpcMagicAreaSingleShotSnapshot
             and capability.NpcMagicDrainLiveApplication
             and capability.NpcMagicDrainUsesAppliedHealthDamage
+            and capability.NpcSleepLiveApplication
+            and capability.NpcSleepBreaksOnDirectDamage
+            and capability.NpcSleepAuthorityConfigured
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcSourceRangePreflight
@@ -776,6 +817,50 @@ local function main()
             and not npc_events[3].Lethal,
         "NPC source damage emits existing trusted bookkeeping context"
     )
+
+    local sleep_humanoid =
+        enemy:FindFirstChildOfClass("Humanoid")
+    assert(sleep_humanoid)
+    table.clear(npc_events)
+
+    local sleep = assert(executor:sleep_skill_npc(
+        attacker,
+        enemy,
+        "EmberweaverSlumberHex",
+        6,
+        206
+    ))
+    check(
+        sleep.Kind == "C4LiveNpcSleep"
+            and sleep.Applied
+            and sleep.SleepApplied
+            and sleep.Landed
+            and sleep.DurationSeconds == 30
+            and sleep.BreaksOnDamage
+            and enemy:GetAttribute("C4Sleeping") == true
+            and type(enemy:GetAttribute("C4SleepEndsAt")) == "number"
+            and #npc_events == 0,
+        "landed source Sleep suppresses NPC without dealing damage"
+    )
+
+    local wake_hit = assert(executor:magic_skill_npc(
+        attacker,
+        enemy,
+        "WindStrike",
+        1,
+        207
+    ))
+    check(
+        wake_hit.HealthDamage == 8
+            and enemy:GetAttribute("C4Sleeping") == false
+            and enemy:GetAttribute("C4SleepEndsAt") == 0
+            and #npc_events == 1
+            and npc_events[1].Context.sequence_id == 207,
+        "normal direct source damage wakes Sleep before applying HP loss"
+    )
+
+    sleep_humanoid.Health = 70
+    table.clear(npc_events)
 
     table.clear(npc_events)
     local secondary_humanoid =
