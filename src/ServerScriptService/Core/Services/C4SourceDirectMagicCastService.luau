@@ -27,6 +27,13 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "MagicSlow",
     }),
+    EmberweaverEmberField = table.freeze({
+        SourceSkillId = 1181,
+        CastRange = 500,
+        EffectRange = 1000,
+        SourceRadius = 200,
+        ExecutionKind = "MagicArea",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -34,6 +41,7 @@ local REVIEWED_SKILLS = table.freeze({
     "EmberweaverFlameBurst",
     "EmberweaverFocusedBolt",
     "EmberweaverFrostLance",
+    "EmberweaverEmberField",
 })
 
 --[[
@@ -127,7 +135,8 @@ function C4SourceDirectMagicCastService.new(
         executor
             and type(executor.can_magic_skill_npc) == "function"
             and type(executor.magic_skill_npc) == "function"
-            and type(executor.magic_slow_skill_npc) == "function",
+            and type(executor.magic_slow_skill_npc) == "function"
+            and type(executor.magic_area_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -402,6 +411,16 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "MagicArea" then
+        applied, reason =
+            self._executor:magic_area_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                review.SourceRadius,
+                sequence_id
+            )
     else
         applied, reason =
             self._executor:magic_skill_npc(
@@ -549,6 +568,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedDirectMdamOnly = false,
         ReviewedTargetedMdam = true,
         ReviewedMovementSlowSideEffect = true,
+        ReviewedTargetAreaMdam = true,
+        ReviewedTargetAreaSourceRadius = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
