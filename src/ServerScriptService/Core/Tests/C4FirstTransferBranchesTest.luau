@@ -68,6 +68,15 @@ local function check_partial_branch(
         return
     end
 
+    if option.Id == "HumanCleric" then
+        check(
+            option.SourceSkillInventory
+                == "C4HumanClericLevel30Sources",
+            "Human Cleric partial branch needs its own source inventory"
+        )
+        return
+    end
+
     check(
         option.SourceSkillInventory == "C4ScoutSkillInventory",
         "Scout partial branch needs the scout source inventory"
@@ -132,8 +141,8 @@ local function main()
             end
         end
     end
-    check(total == 18 and partial == 3,
-        "Original C4 requires eighteen paths, three partially mapped")
+    check(total == 18 and partial == 4,
+        "Original C4 requires eighteen paths, four partially mapped")
     for _, race_id in ipairs({"DarkElf", "Orc", "Dwarf"}) do
         check(RaceDefinitions.get(race_id) == nil,
             "Source class registry cannot prematurely unlock a race")
