@@ -45,6 +45,13 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    EmberweaverEmberField = table.freeze({
+        CreativeRank = 3,
+        SourceSkillId = 1181,
+        SourceRank = 3,
+        CastRange = 500,
+        EffectRange = 1000,
+    }),
 })
 
 
@@ -65,6 +72,8 @@ local executor_state = {
     PreflightCalls = 0,
     MagicCalls = 0,
     SlowMagicCalls = 0,
+    AreaMagicCalls = 0,
+    LastAreaRadius = nil,
     TargetReady = true,
     TargetReason = nil,
     LastEnemy = nil,
@@ -326,6 +335,47 @@ function FakeExecutor:magic_slow_skill_npc(
 end
 
 --[[
+Applies one disposable source TARGET_AREA magic result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed Ember Field identifier.
+    creative_rank (number): Server-owned purchased rank.
+    source_radius (number): Reviewed source skill radius.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake area source executor result.
+]]
+function FakeExecutor:magic_area_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.AreaMagicCalls += 1
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+    executor_state.LastAreaRadius = source_radius
+
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverEmberField")
+
+    return {
+        Kind = "C4LiveNpcMagicArea",
+        Applied = true,
+        TargetCount = 3,
+        TotalHealthDamage = 24,
+        SourceSkillRadius = source_radius,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -364,6 +414,8 @@ local function reset_fakes()
     executor_state.PreflightCalls = 0
     executor_state.MagicCalls = 0
     executor_state.SlowMagicCalls = 0
+    executor_state.AreaMagicCalls = 0
+    executor_state.LastAreaRadius = nil
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
     executor_state.LastEnemy = nil
@@ -416,14 +468,14 @@ local function check_gate_and_allowlist()
     local blocked, blocked_reason = bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverEmberField",
+        "EmberweaverLifeSiphon",
         100
     )
     check(
         blocked == nil
             and blocked_reason == "C4DirectMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "bridge rejects unreviewed area-MDAM families"
+        "bridge rejects spell families with unimplemented drain semantics"
     )
 end
 
@@ -686,6 +738,42 @@ local function check_frost_lance_launch()
 end
 
 --[[
+Checks Ember Field selects the source TARGET_AREA executor path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact source radius and cast identity reach the area path.
+]]
+local function check_ember_field_launch()
+    local bridge, started = started_bridge(
+        575,
+        "EmberweaverEmberField"
+    )
+
+    local applied = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        579,
+        906
+    ))
+
+    check(
+        applied.Applied
+            and applied.Application.TargetCount == 3
+            and executor_state.AreaMagicCalls == 1
+            and executor_state.MagicCalls == 0
+            and executor_state.SlowMagicCalls == 0
+            and executor_state.LastRank == 3
+            and executor_state.LastSequence == 906
+            and executor_state.LastAreaRadius == 200
+            and executor_state.LastRange == 1000,
+        "Ember Field reaches source area executor with radius 200"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -729,6 +817,7 @@ local function check_reviewed_direct_families()
         "EmberweaverFlameBurst",
         "EmberweaverFocusedBolt",
         "EmberweaverFrostLance",
+        "EmberweaverEmberField",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -810,8 +899,10 @@ local function main()
             and not capability.ReviewedDirectMdamOnly
             and capability.ReviewedTargetedMdam
             and capability.ReviewedMovementSlowSideEffect
-            and capability.ReviewedSkillCount == 4
-            and #capability.ReviewedSkills == 4
+            and capability.ReviewedTargetAreaMdam
+            and capability.ReviewedTargetAreaSourceRadius
+            and capability.ReviewedSkillCount == 5
+            and #capability.ReviewedSkills == 5
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
@@ -832,6 +923,7 @@ local function main()
     check_cancel_and_replay()
     check_launch_plan_change()
     check_frost_lance_launch()
+    check_ember_field_launch()
     check_owner_cleanup()
 
     print((
