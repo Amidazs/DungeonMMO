@@ -24,6 +24,24 @@ local REVIEWED = table.freeze({
         SourceSkillId = 1127,
         Kind = "Heal",
     }),
+    MoonweaverManaCompanion = table.freeze({
+        SourceSkillId = 1226,
+        Kind = "Summon",
+        Role = "Mana",
+    }),
+    MoonweaverCombatCompanion = table.freeze({
+        SourceSkillId = 1227,
+        Kind = "Summon",
+        Role = "Combat",
+    }),
+    MoonweaverServitorRecharge = table.freeze({
+        SourceSkillId = 1126,
+        Kind = "Recharge",
+    }),
+    MoonweaverServitorHeal = table.freeze({
+        SourceSkillId = 1127,
+        Kind = "Heal",
+    }),
 })
 
 --[[
