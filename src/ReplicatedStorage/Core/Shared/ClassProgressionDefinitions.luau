@@ -125,6 +125,43 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Dawnkeeper = table.freeze({
+        Id = "Dawnkeeper",
+        DisplayName = "Dawnkeeper",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Human"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "DawnkeeperArcaneResistance",
+            "DawnkeeperQuickPrayer",
+            "DawnkeeperManaReservoir",
+            "DawnkeeperFastCasting",
+            "DawnkeeperManaRecovery",
+            "DawnkeeperRobeTraining",
+            "DawnkeeperLightArmorTraining",
+            "DawnkeeperWeaponTraining",
+            "DawnkeeperHealingLight",
+            "DawnkeeperBattleMend",
+            "DawnkeeperRevive",
+            "DawnkeeperGroupMend",
+            "DawnkeeperExorcism",
+            "DawnkeeperMindWard",
+            "DawnkeeperStoneWard",
+            "DawnkeeperSacredEdge",
+            "DawnkeeperMight",
+            "DawnkeeperSlumber",
+            "DawnkeeperBreathBlessing",
+            "DawnkeeperFocus",
+            "DawnkeeperConcentration",
+            "DawnkeeperInsight",
+            "DawnkeeperFireWard",
+            "DawnkeeperRootbind",
+            "DawnkeeperWindstep",
+        }),
+    }),
+
     -- An original first-transfer award is separate from legacy Rogue/
     -- Ranger starter profiles and their old specialist class identities.
     Ashenblade = table.freeze({
