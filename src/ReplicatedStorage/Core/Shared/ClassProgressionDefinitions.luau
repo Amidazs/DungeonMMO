@@ -162,6 +162,40 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Moonweaver = table.freeze({
+        Id = "Moonweaver",
+        DisplayName = "Moonweaver",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Elf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "MoonweaverArcaneResistance",
+            "MoonweaverQuickWeave",
+            "MoonweaverManaReservoir",
+            "MoonweaverFastCasting",
+            "MoonweaverManaRecovery",
+            "MoonweaverRobeTraining",
+            "MoonweaverFocusTraining",
+            "MoonweaverManaChanneling",
+            "MoonweaverSlumberHex",
+            "MoonweaverConcentration",
+            "MoonweaverServitorRecharge",
+            "MoonweaverServitorHeal",
+            "MoonweaverWitheringHex",
+            "MoonweaverFlameBurst",
+            "MoonweaverTidalBolt",
+            "MoonweaverEmberField",
+            "MoonweaverTidalWard",
+            "MoonweaverFrostLance",
+            "MoonweaverManaCompanion",
+            "MoonweaverCombatCompanion",
+            "MoonweaverSolarSpark",
+            "MoonweaverFocusedBolt",
+        }),
+    }),
+
     -- An original first-transfer award is separate from legacy Rogue/
     -- Ranger starter profiles and their old specialist class identities.
     Ashenblade = table.freeze({
