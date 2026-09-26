@@ -1812,6 +1812,8 @@ local function initialize_session_services(session: any): (any?, boolean)
         on_recoverable_wipe = reset_wiped_encounter,
     })
     death_ref = death_service
+    runtime.C4SourceCombatExecutor
+        :set_player_resurrection_provider(death_service)
     return recovery_plan, true
 end
 
@@ -2400,10 +2402,39 @@ revive_request.OnServerEvent:Connect(function(player: Player, action: any)
         if not result.ok then emit_revive_state(player.UserId, {error = result.reason}) end
     elseif action == "Paid" then
         if RunService:IsStudio() then
-            local result = purchase_service:simulate_approved_purchase(player.UserId, active_session_id)
-            if not result.ok then emit_revive_state(player.UserId, {error = result.reason}) end
+            local result = purchase_service:simulate_approved_purchase(
+                player.UserId,
+                active_session_id
+            )
+            if not result.ok then
+                emit_revive_state(
+                    player.UserId,
+                    {error = result.reason}
+                )
+            end
         else
-            emit_revive_state(player.UserId, {error = "PaidRevivesLiveDisabled"})
+            emit_revive_state(
+                player.UserId,
+                {error = "PaidRevivesLiveDisabled"}
+            )
+        end
+    elseif action == "SkillResurrectionAccept" then
+        local result =
+            death_service:accept_skill_resurrection(player)
+        if not result.ok then
+            emit_revive_state(
+                player.UserId,
+                {error = result.reason}
+            )
+        end
+    elseif action == "SkillResurrectionDecline" then
+        local result =
+            death_service:decline_skill_resurrection(player)
+        if not result.ok then
+            emit_revive_state(
+                player.UserId,
+                {error = result.reason}
+            )
         end
     end
 end)
