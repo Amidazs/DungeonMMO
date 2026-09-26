@@ -1,3 +1,22 @@
+## 26 September 2026 — v3.06 Human Wizard Scorch Mark staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_06_Human_Wizard_Scorch_Mark_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-scorch-mark-v3-06-pending-20260926.md).
+Scorch Mark rank 2 now maps to source Surrenders To Fire 1083:2 with exact
+WIT/effect-success inputs, FIRE_VULN x1.25 for 15 seconds, 3 + 11 MP,
+750/1250 ranges and the current 1.5-second cast / 6-second reuse result. A
+shared NPC elemental-vulnerability authority decorates reviewed NPC source
+boundaries rather than mutating source data, allowing later fire MDAM to use
+the exact source elemental multiplier. Supported Marauder/Captain life cleanup
+removes stale elemental debuffs. Local diff/build validation passes.
+
+The source-cast focus runner now has 16 suites and the broad Wizard runner has
+36 suites. Both still require Studio execution before v3.06 can be marked
+green. Permanent edits remain GitHub-only; Desktop Commander is for local
+fast-forward/build/test work.
+
 ## 26 September 2026 — v3.05 Human Wizard Slumber Hex staged
 
 [Roadmap](
