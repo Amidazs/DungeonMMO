@@ -1,3 +1,13 @@
+**v3.13 ELVEN ORACLE / LIFEBINDER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_13_Elven_Oracle_Lifebinder_20260927.md)
+and [acceptance evidence](
+../testing/c4-elven-oracle-lifebinder-v3-13-green-20260927.md).
+Elven Oracle class 29 is complete through level 30 with 91/91 mapped source
+rank rows and 25 creative families. Fresh Studio acceptance is 25/25 PASS and
+the unpublished Play rehearsal passed Wind Shackle, Agility and Mana Recharge
+with zero CreatorErrors. The missing common Elven Oracle source-tree path that
+initially blocked live cutover was fixed with the exact pinned C4 rows.
+
 **v3.12 ELVEN WIZARD / MOONWEAVER LEVEL 30 — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_12_Elven_Wizard_Level30_Complete_20260926.md)
 and [acceptance evidence](
