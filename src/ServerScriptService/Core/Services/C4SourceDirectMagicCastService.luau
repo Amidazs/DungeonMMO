@@ -21,12 +21,19 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    EmberweaverFrostLance = table.freeze({
+        SourceSkillId = 1184,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "MagicSlow",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
     "EmberweaverEmberBolt",
     "EmberweaverFlameBurst",
     "EmberweaverFocusedBolt",
+    "EmberweaverFrostLance",
 })
 
 --[[
@@ -119,7 +126,8 @@ function C4SourceDirectMagicCastService.new(
     assert(
         executor
             and type(executor.can_magic_skill_npc) == "function"
-            and type(executor.magic_skill_npc) == "function",
+            and type(executor.magic_skill_npc) == "function"
+            and type(executor.magic_slow_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -379,14 +387,31 @@ local function execute_launch(
     launch: any,
     sequence_id: number?
 ): (any?, string?)
-    local applied, reason =
-        self._executor:magic_skill_npc(
-            player,
-            record.Enemy,
-            launch.CreativeSkillId,
-            launch.CreativeRank,
-            sequence_id
-        )
+    local review = assert(reviewed_skill(
+        launch.CreativeSkillId
+    ))
+    local applied
+    local reason
+
+    if review.ExecutionKind == "MagicSlow" then
+        applied, reason =
+            self._executor:magic_slow_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    else
+        applied, reason =
+            self._executor:magic_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    end
     if not applied then
         return nil, reason
     end
@@ -521,7 +546,9 @@ function C4SourceDirectMagicCastService:capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
-        ReviewedDirectMdamOnly = true,
+        ReviewedDirectMdamOnly = false,
+        ReviewedTargetedMdam = true,
+        ReviewedMovementSlowSideEffect = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
