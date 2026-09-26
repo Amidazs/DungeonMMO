@@ -62,6 +62,18 @@ function FakeExecutor:can_magic_skill_npc(
     return true, nil
 end
 
+function FakeExecutor:can_undead_magic_skill_npc(
+    attacker: any,
+    enemy: any,
+    source_range: number?
+): (boolean, string?)
+    return self:can_magic_skill_npc(
+        attacker,
+        enemy,
+        source_range
+    )
+end
+
 --[[
 Reports one disposable status target as ready.
 
