@@ -197,7 +197,7 @@ Args:
     None.
 
 Returns:
-    nil: Nine C4 ranks remain source-only until a real executor exists.
+    nil: Nine C4 ranks preserve source semantics behind the live family.
 ]]
 local function check_scout_heal_migration_plan()
     local original_rows = Tree.find_skill("ElvenScout", 58)
@@ -219,11 +219,11 @@ local function check_scout_heal_migration_plan()
                     + effect.Sets.mpConsume
             and planned.SourceTarget == "TARGET_SELF",
             "Scout rank preserves C4 SP, MP, heal output and targeting")
-        check(planned.SourceOnly and not planned.LiveLearnable
-            and not planned.LiveCastable
+        check(planned.SourceOnly and planned.LiveLearnable
+            and planned.LiveCastable
             and planned.ExactC4HealFormulaCertified
             and planned.SplitMPTransactionCertified,
-            "Certified source semantics must not grant free live healing")
+            "Certified source semantics back the separately purchased heal")
     end
     check(ScoutHeal.get_rank(3) == nil
         and ScoutHeal.get_rank(13) == nil,
@@ -241,17 +241,21 @@ local function check_scout_heal_migration_plan()
             and #plan.Rows == bracket[2]
             and plan.ExactC4HealFormulaCertified
             and plan.SplitMPTransactionCertified
-            and not plan.LiveCastable,
-            "Scout sees certified source heal ranks without a live grant")
+            and plan.LiveLearnable
+            and plan.LiveCastable,
+            "Scout sees certified source heal ranks behind its live family")
         local preview = assert(Runtime.get_c4_source_skill_tree(OWNER_ID))
         for _, original in ipairs(plan.Rows) do
             local row = assert(find_row(
                 preview, 58, original.SourceSkillRank
             ))
-            check(row.CreativeLinkStatus == "Missing"
-                and row.CreativeSkillId == nil
+            check(row.CreativeLinkStatus == "Candidate"
+                and row.CreativeSkillId
+                    == "GreenwardScoutElementalHeal"
+                and row.CreativeSkillRank
+                    == original.PlannedCreativeRank
                 and row.SourceOnlyMigrationPlan == original,
-                "Scout source plan does not become a fake live candidate")
+                "Scout source plan maps to the independent live heal family")
         end
     end
     local warden = seed("Elf", "GreenwardWarden", 30)
@@ -283,7 +287,7 @@ local function main()
     check_heal_source_and_denials()
     check_scout_heal_migration_plan()
     print(("[C4 Ten-Path Skills] SOURCE_ONLY_PASS: %d assertions "
-        .. "rows=569 candidates=528 gaps=41 live=false")
+        .. "rows=569 scout_heal_live=true")
         :format(checks))
 end
 
