@@ -1,3 +1,25 @@
+## 26 September 2026 — CURRENT v3.06 Scorch Mark implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_06_Human_Wizard_Scorch_Mark_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-scorch-mark-v3-06-pending-20260926.md).
+Human Wizard Scorch Mark now preserves source Surrenders To Fire 1083:2:
+magical WIT DEBUFF, effect power 80, magic level 30, 750/1250 source ranges,
+FIRE_VULN x1.25 and a 15-second duration. The cast owns one magical shot.
+A landed debuff is held by a reusable server-owned NPC elemental-vulnerability
+authority. Source NPC data stays immutable; subsequent source calculations use
+a temporary decorated boundary, so existing fire MDAM automatically reads the
+1.25 vulnerability through the normal elemental formula. Weaker refreshes do
+not multiply or reduce the active effect, and supported NPC life reset/death
+clears old elemental state.
+
+Fresh diff check plus Base/Dungeon Rojo builds pass at core code candidate
+`29b28b0d0aaa417fc12196810c27c17ce67b5bb9`. Studio focused/live
+acceptance remains pending.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.05 Slumber Hex implemented
 
 [Roadmap](
