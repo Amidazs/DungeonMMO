@@ -236,6 +236,40 @@ local function check_human_wizard_reuse_passive()
 end
 
 --[[
+Checks Dawnkeeper owned passives resolve exact inherited Cleric ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact level-30 Cleric passive source ownership.
+]]
+local function check_human_cleric_owned_passives()
+    local character = original_character(
+        "Human",
+        "Dawnkeeper",
+        30
+    )
+    own_passive(character, "DawnkeeperQuickPrayer", 2)
+    own_passive(character, "DawnkeeperRobeTraining", 6)
+    own_passive(character, "DawnkeeperLightArmorTraining", 6)
+
+    local result = assert(Resolver.for_character(character))
+    local reuse = assert(find_source_rank(result, 164))
+    local robe = assert(find_source_rank(result, 235))
+    local light = assert(find_source_rank(result, 236))
+
+    check(
+        result.Ready
+            and result.ScopeId == "HumanCleric"
+            and reuse.Rank == 2
+            and robe.Rank == 6
+            and light.Rank == 6,
+        "owned Dawnkeeper passives resolve exact Cleric source ranks"
+    )
+end
+
+--[[
 Checks unsupported or corrupted owned passive state remains fail-closed.
 
 Args:
@@ -284,6 +318,7 @@ local function main()
     check_starter_owned_ranks()
     check_first_transfer_inheritance()
     check_human_wizard_reuse_passive()
+    check_human_cleric_owned_passives()
     check_fail_closed_owned_state()
 
     print((
