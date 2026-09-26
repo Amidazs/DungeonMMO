@@ -18,6 +18,68 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    DuskguardTrainer = table.freeze({
+        Id = "DuskguardTrainer",
+        DisplayName = "Duskguard Training",
+        AllowedRaces = table.freeze({"DarkElf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Duskguard"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "DuskguardUmbralSiphon",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardDefenseAura",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardLastStand",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardVenomHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardRunicResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardShieldMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardSteelTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardMindRend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardChallenge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardArrowWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardCrimsonSting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskguardAttackAura",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
     EmberweaverTrainer = table.freeze({
         Id = "EmberweaverTrainer",
         DisplayName = "Emberweaver Training",
