@@ -31,6 +31,7 @@ local Runtime = require(
 local FIGHTER_ID = 938181
 local MAGE_ID = 938182
 local WIZARD_ID = 938186
+local DUSKGUARD_ID = 938187
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -114,6 +115,7 @@ local function empty_active_snapshot(user_id: number): any?
     if user_id ~= FIGHTER_ID
         and user_id ~= MAGE_ID
         and user_id ~= WIZARD_ID
+        and user_id ~= DUSKGUARD_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -189,7 +191,7 @@ local function starter_character(
     character.Level = 30
     character.Identity = {
         Version = 1,
-        RaceId = "Human",
+        RaceId = if career then career.RaceId else "Human",
         BaseClassId = base_class,
         ClassId = class_id,
         CreationStage = "Complete",
@@ -307,7 +309,22 @@ local function seed_characters()
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
+    local duskguard = starter_character(
+        DUSKGUARD_ID,
+        "Duskguard"
+    )
+    own_skill(duskguard, "DuskguardUmbralSiphon", 8)
+    own_skill(duskguard, "DuskguardDefenseAura", 1)
+    own_skill(duskguard, "DuskguardLastStand", 1)
+    own_skill(duskguard, "DuskguardVenomHex", 1)
+    own_skill(duskguard, "DuskguardMindRend", 2)
+    own_skill(duskguard, "DuskguardChallenge", 6)
+    own_skill(duskguard, "DuskguardArrowWard", 1)
+    own_skill(duskguard, "DuskguardCrimsonSting", 6)
+    own_skill(duskguard, "DuskguardAttackAura", 1)
+
     Runtime.set_character(WIZARD_ID, wizard)
+    Runtime.set_character(DUSKGUARD_ID, duskguard)
     Runtime.set_character(
         TARGET_ID,
         starter_character(TARGET_ID, "Oathguard")
@@ -1327,6 +1344,116 @@ local function check_human_wizard_withering_hex()
 end
 
 --[[
+Checks level-30 Duskguard active source families.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms inherited drain, poison, taunt, confusion and self buffs.
+]]
+local function check_duskguard_source_families()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    local drain = assert(Combat.drain_skill(
+        DUSKGUARD_ID,
+        marauder,
+        "DuskguardUmbralSiphon",
+        8
+    ))
+    check(
+        drain.SourceSkillId == 70
+            and drain.SourceRank == 10
+            and drain.Damage.SourceSkillPower == 35
+            and drain.AbsorbPart == 0.2
+            and drain.Damage.SourceElement == "DARK"
+            and drain.Spiritshot
+            and not shot_state.Spiritshot,
+        "Duskguard drain rank eight resolves source 70:10 exactly"
+    )
+
+    shot_state.Spiritshot = true
+    local poison = assert(Combat.status_skill(
+        DUSKGUARD_ID,
+        marauder,
+        "DuskguardVenomHex",
+        1
+    ))
+    check(
+        poison.SourceSkillId == 129
+            and poison.SourceRank == 1
+            and poison.EffectType == "POISON"
+            and poison.TickDamage == 18
+            and poison.TickCount == 10
+            and poison.TickSeconds == 3
+            and poison.Spiritshot
+            and not shot_state.Spiritshot,
+        "Duskguard Venom Hex preserves exact Poison 129:1 plan"
+    )
+
+    local aggro = assert(Combat.aggro_skill(
+        DUSKGUARD_ID,
+        "DuskguardChallenge",
+        6
+    ))
+    check(
+        aggro.SourceSkillId == 28
+            and aggro.SourceRank == 6
+            and aggro.ThreatPower == 803,
+        "Duskguard Challenge preserves exact Aggression rank six power"
+    )
+
+    shot_state.Spiritshot = true
+    local confusion = assert(Combat.confusion_skill(
+        DUSKGUARD_ID,
+        marauder,
+        "DuskguardMindRend",
+        2
+    ))
+    check(
+        confusion.SourceSkillId == 2
+            and confusion.SourceRank == 2
+            and confusion.RetargetCount == 5
+            and confusion.RetargetSeconds == 6
+            and confusion.DurationSeconds == 30
+            and confusion.Spiritshot
+            and not shot_state.Spiritshot,
+        "Duskguard Mind Rend preserves exact five-by-six Confusion plan"
+    )
+
+    shot_state.Spiritshot = true
+    local attack_aura = assert(Combat.self_buff_skill(
+        DUSKGUARD_ID,
+        "DuskguardAttackAura",
+        1
+    ))
+    check(
+        attack_aura.SourceSkillId == 77
+            and attack_aura.SourceRank == 2
+            and attack_aura.DurationSeconds == 1200
+            and attack_aura.StackType == "pAtk"
+            and attack_aura.StackOrder == 1.12
+            and attack_aura.Spiritshot
+            and not shot_state.Spiritshot,
+        "Duskguard Attack Aura preserves source 77:2 timed buff"
+    )
+
+    local last_stand = assert(Combat.self_buff_skill(
+        DUSKGUARD_ID,
+        "DuskguardLastStand",
+        1
+    ))
+    check(
+        last_stand.SourceSkillId == 110
+            and last_stand.SourceRank == 1
+            and last_stand.DurationSeconds == 30
+            and last_stand.Immobile,
+        "Duskguard Last Stand preserves exact immobile defense buff"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1662,6 +1789,7 @@ local function main()
     check_human_wizard_slumber_hex()
     check_human_wizard_scorch_mark()
     check_human_wizard_withering_hex()
+    check_duskguard_source_families()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1671,6 +1799,7 @@ local function main()
     Runtime.clear_character(FIGHTER_ID)
     Runtime.clear_character(MAGE_ID)
     Runtime.clear_character(WIZARD_ID)
+    Runtime.clear_character(DUSKGUARD_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
@@ -1682,7 +1811,7 @@ local function main()
         .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "status=true pdam=true mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
-        .. "patk_down=true heal=true npc=true live=false"
+        .. "patk_down=true duskguard=true heal=true npc=true live=false"
     ):format(checks))
 end
 
