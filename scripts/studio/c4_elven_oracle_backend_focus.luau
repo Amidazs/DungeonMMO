@@ -11,6 +11,8 @@ local core_tests = ServerScriptService.Core.Tests
 local combat_tests = ServerScriptService.Combat.Tests
 local dungeon_tests = ServerScriptService.Dungeon.Tests
 
+local FIXTURE_TIMEOUT_SECONDS = 12
+
 local FIXTURES = table.freeze({
     {Folder = core_tests, Name = "C4ElvenOracleSourceAuditTest"},
     {Folder = core_tests, Name = "C4ElvenOracleFoundationTest"},
@@ -55,9 +57,30 @@ local function run_test(fixture_spec: any): boolean
     fixture.Source = source.Source .. "\nreturn true\n"
     fixture.Parent = source.Parent
 
-    local ok, result = pcall(require, fixture)
-    fixture:Destroy()
+    local finished = false
+    local ok = false
+    local result = nil
+    local thread = task.spawn(function()
+        ok, result = pcall(require, fixture)
+        finished = true
+    end)
+    local deadline = os.clock() + FIXTURE_TIMEOUT_SECONDS
 
+    while not finished and os.clock() < deadline do
+        task.wait(0.05)
+    end
+
+    if not finished then
+        task.cancel(thread)
+        fixture:Destroy()
+        warn(
+            "[Lifebinder Backend] TIMEOUT "
+                .. fixture_spec.Name
+        )
+        return false
+    end
+
+    fixture:Destroy()
     if not ok or result ~= true then
         warn(
             "[Lifebinder Backend] FAIL "
