@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 10 and report.SourceLearningRows == 569,
+assert(report.ClassPaths == 11 and report.SourceLearningRows == 657,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 547
+assert(report.CandidateRows == 635
     and report.ExplicitMissingRows == 22,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 569,
+assert(report.CandidateRows + report.ExplicitMissingRows == 657,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -31,6 +31,8 @@ local elf_aura = assert(Map.resolve("ElvenScout", 91, 2))
 local elf_gap = assert(Map.resolve("ElvenScout", 58, 4))
 local wizard_bolt = assert(Map.resolve("HumanWizard", 1220, 1))
 local wizard_companion = assert(Map.resolve("HumanWizard", 1111, 1))
+local cleric_heal = assert(Map.resolve("HumanCleric", 1011, 7))
+local cleric_shield = assert(Map.resolve("HumanCleric", 1040, 2))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -48,6 +50,14 @@ assert(wizard_bolt.Status == "Candidate"
     and wizard_companion.CreativeSkillId
         == "EmberweaverManaCompanion",
     "Wizard direct and companion skills both map after summon authority")
+
+assert(cleric_heal.Status == "Candidate"
+    and cleric_heal.CreativeSkillId == "DawnkeeperHealingLight"
+    and cleric_heal.CreativeRank == 1
+    and cleric_shield.Status == "Candidate"
+    and cleric_shield.CreativeSkillId == "DawnkeeperStoneWard"
+    and cleric_shield.CreativeRank == 1,
+    "Cleric inherited source ranks map to exact Dawnkeeper creative ranks")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
