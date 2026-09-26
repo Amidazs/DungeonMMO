@@ -170,6 +170,42 @@ local MAPS = table.freeze({
         [1201] = table.freeze({SkillId = "DawnkeeperRootbind"}),
         [1204] = table.freeze({SkillId = "DawnkeeperWindstep"}),
     }),
+    ElvenWizard = table.freeze({
+        [146] = table.freeze({
+            SkillId = "MoonweaverArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "MoonweaverQuickWeave"}),
+        [213] = table.freeze({SkillId = "MoonweaverManaReservoir"}),
+        [228] = table.freeze({SkillId = "MoonweaverFastCasting"}),
+        [229] = table.freeze({SkillId = "MoonweaverManaRecovery"}),
+        [234] = table.freeze({SkillId = "MoonweaverRobeTraining"}),
+        [249] = table.freeze({
+            SkillId = "MoonweaverFocusTraining",
+            Offset = 2,
+        }),
+        [285] = table.freeze({SkillId = "MoonweaverManaChanneling"}),
+        [1069] = table.freeze({SkillId = "MoonweaverSlumberHex"}),
+        [1078] = table.freeze({SkillId = "MoonweaverConcentration"}),
+        [1126] = table.freeze({SkillId = "MoonweaverServitorRecharge"}),
+        [1127] = table.freeze({SkillId = "MoonweaverServitorHeal"}),
+        [1164] = table.freeze({
+            SkillId = "MoonweaverWitheringHex",
+            Offset = 1,
+        }),
+        [1172] = table.freeze({SkillId = "MoonweaverFlameBurst"}),
+        [1175] = table.freeze({SkillId = "MoonweaverTidalBolt"}),
+        [1181] = table.freeze({SkillId = "MoonweaverEmberField"}),
+        [1182] = table.freeze({SkillId = "MoonweaverTidalWard"}),
+        [1184] = table.freeze({
+            SkillId = "MoonweaverFrostLance",
+            Offset = 4,
+        }),
+        [1226] = table.freeze({SkillId = "MoonweaverManaCompanion"}),
+        [1227] = table.freeze({SkillId = "MoonweaverCombatCompanion"}),
+        [1264] = table.freeze({SkillId = "MoonweaverSolarSpark"}),
+        [1274] = table.freeze({SkillId = "MoonweaverFocusedBolt"}),
+    }),
     HumanWarrior = table.freeze({
         [78] = table.freeze({SkillId = "IronvowBattleCall"}),
         [100] = table.freeze({SkillId = "IronvowStonebreaker"}),
@@ -303,6 +339,9 @@ local GAPS = table.freeze({
 
     }),
     HumanCleric = table.freeze({
+
+    }),
+    ElvenWizard = table.freeze({
 
     }),
     HumanWarrior = table.freeze({
