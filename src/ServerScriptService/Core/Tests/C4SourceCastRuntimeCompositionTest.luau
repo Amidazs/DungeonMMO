@@ -190,6 +190,35 @@ function FakeExecutor:magic_drain_skill_npc(
 end
 
 --[[
+Provides a minimal source Sleep executor contract.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable target.
+    _skill_id (string): Creative skill identifier.
+    _rank (number): Creative skill rank.
+    _sequence_id (number?): Disposable sequence.
+
+Returns:
+    (any?, string?): Successful fake Sleep application.
+]]
+function FakeExecutor:sleep_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        SleepApplied = true,
+        Landed = true,
+        DurationSeconds = 30,
+        BreaksOnDamage = true,
+    }, nil
+end
+
+--[[
 Provides a minimal periodic-status executor contract.
 
 Args:
