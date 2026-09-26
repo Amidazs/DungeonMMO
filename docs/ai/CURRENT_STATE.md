@@ -1,3 +1,20 @@
+## 26 September 2026 — CURRENT v3.05 Slumber Hex implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_05_Human_Wizard_Slumber_Hex_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-slumber-hex-v3-05-pending-20260926.md).
+Human Wizard Slumber Hex now preserves source Sleep 1069:6: magical WIT
+DEBUFF, effect power 80, magic level 30, 600/1100 source ranges and a
+30-second duration. The cast owns one magical shot. A landed Sleep suppresses
+supported NPC movement and attacks, interrupts active Marauder/Captain attack
+sequences and wakes before ordinary direct source damage. Periodic NPC
+Bleed/Poison ticks remain outside that wake path, matching the pinned
+attackable-NPC source behavior. Local diff check plus Base/Dungeon Rojo builds
+pass; Studio focused/live acceptance remains pending.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.04 Life Siphon implemented
 
 [Roadmap](
