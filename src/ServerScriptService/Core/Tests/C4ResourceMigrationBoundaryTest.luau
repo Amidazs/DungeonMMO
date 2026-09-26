@@ -542,7 +542,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=12 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=13 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
