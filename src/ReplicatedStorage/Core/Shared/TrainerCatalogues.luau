@@ -506,6 +506,9 @@ local DEFINITIONS = table.freeze({
                 SkillId = "HumanScoutRestingRecovery", Mode = "LearnOrRank",
             }),
             table.freeze({
+                SkillId = "AshenbladeVitalForce", Mode = "LearnOrRank",
+            }),
+            table.freeze({
                 SkillId = "HumanScoutPrecision", Mode = "LearnOrRank",
             }),
         }),
@@ -520,6 +523,10 @@ local DEFINITIONS = table.freeze({
         Skills = table.freeze({
             table.freeze({
                 SkillId = "ElvenScoutGuard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GreenwardScoutElementalHeal",
                 Mode = "LearnOrRank",
             }),
             table.freeze({
