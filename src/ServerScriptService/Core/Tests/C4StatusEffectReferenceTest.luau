@@ -96,6 +96,26 @@ local function main()
         "Ice Bolt rank six keeps exact 30 percent 120-second source slow"
     )
 
+    local sleep = assert(Status.sleep_plan(1069, 6))
+    check(
+        sleep.SourceSkillId == 1069
+            and sleep.SourceRank == 6
+            and sleep.EffectType == "SLEEP"
+            and sleep.SaveVs == "WIT"
+            and sleep.EffectPower == 80
+            and sleep.MagicLevel == 30
+            and sleep.IsMagic,
+        "Sleep rank six keeps exact WIT-resisted source inputs"
+    )
+    check(
+        sleep.DurationSeconds == 30
+            and sleep.BreaksOnDamage
+            and sleep.StopsMovement
+            and sleep.StopsAttacks
+            and sleep.StopsCasting,
+        "Sleep rank six keeps 30-second action lock and damage wake"
+    )
+
     local bleed_rate = assert(Status.effect_success_rate({
         Power = 100,
         TargetStatBonus = 1,
@@ -204,7 +224,7 @@ local function main()
 
     print((
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
-            .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 nonlethal=true"
+            .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 ".. "sleep=30@damage_wake nonlethal=true"
     ):format(checks))
 end
 
