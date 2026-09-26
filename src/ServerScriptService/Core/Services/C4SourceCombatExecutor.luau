@@ -1348,6 +1348,90 @@ function C4SourceCombatExecutor:magic_area_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC C4 DRAIN skill.
+
+For reviewed living NPCs the pinned source drain amount is exactly the target HP
+removed by the magic hit, capped naturally by remaining HP. The caster then
+receives absorbAbs plus absorbPart times that drained HP, capped at MaxHealth.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative drain skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live damage/heal evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:magic_drain_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.drain_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "MagicDrain",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    local requested_heal =
+        calculated.AbsorbAbs
+        + calculated.AbsorbPart * applied.HealthDamage
+    local healed, heal_reason = self:_apply_player_heal(
+        attacker,
+        requested_heal
+    )
+    if not healed then
+        return nil, heal_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcMagicDrain",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+        DrainableHealthDamage = applied.HealthDamage,
+        RequestedHeal = requested_heal,
+        EffectiveHeal = healed.EffectiveHeal,
+        CasterHealthBefore = healed.HealthBefore,
+        CasterHealthAfter = healed.HealthAfter,
+        AbsorbPart = calculated.AbsorbPart,
+        AbsorbAbs = calculated.AbsorbAbs,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -1817,6 +1901,8 @@ function C4SourceCombatExecutor:capability(): any
         NpcMagicAreaLiveApplication = true,
         NpcMagicAreaCasterRadiusSourceSemantics = true,
         NpcMagicAreaSingleShotSnapshot = true,
+        NpcMagicDrainLiveApplication = true,
+        NpcMagicDrainUsesAppliedHealthDamage = true,
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
