@@ -1,3 +1,25 @@
+## 26 September 2026 — v3.01 Human Wizard targeted cast batch GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_01_Human_Wizard_Targeted_Cast_Batch_20260926.md);
+[green evidence](
+../testing/c4-human-wizard-targeted-cast-batch-v3-01-20260926.md).
+Human Wizard v3.01 is now fully GREEN. Fresh Base and Dungeon
+Rojo builds pass, the cast-focused runner is **15/15 PASS**, and the expanded
+big backend runner is **35/35 PASS**. The unpublished Dungeon Play rehearsal
+also passes all four staged spell families: Ember Bolt, Flame Burst and Focused
+Bolt deal real source-calculated NPC damage, while Venom Hex resolves source
+Poison rank 3 and applied an exact 24-damage first tick in the accepted run.
+Spiritshots were consumed exactly once by source calculation, contribution and
+threat bookkeeping updated, and the final live log contains **0 project
+CreatorErrors**. The validation also corrected a stale paid-revive test fixture
+and stopped two Dungeon regression scripts from auto-running during Play. The
+cast bridges remain disabled by default and ordinary client spell input is not
+wired yet.
+
+Permanent edits remain GitHub-only; Desktop Commander is for fast-forward,
+disposable builds and unpublished Studio validation.
+
 ## 26 September 2026 — v3.01 Human Wizard backend batch staged
 
 [Roadmap](
