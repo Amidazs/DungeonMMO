@@ -797,7 +797,9 @@ Returns:
     nil: Ends only after direct/support/companion paths and rollback pass.
 ]]
 local function run()
+    print("[Moonweaver Live] RUN_START")
     local player = admitted_player()
+    print("[Moonweaver Live] PLAYER_READY " .. player.Name)
     local enemy = rehearsal_enemy(player)
     face_enemy(player, enemy)
 
@@ -805,6 +807,7 @@ local function run()
         player.UserId,
         moonweaver_character(player.UserId)
     )
+    print("[Moonweaver Live] CHARACTER_BOUND")
 
     local boundary, reason =
         Runtime.get_c4_resource_migration_boundary(
@@ -817,11 +820,13 @@ local function run()
             and boundary.CutoverPrerequisitesReady,
         "Moonweaver source boundary is not live-rehearsal ready"
     )
+    print("[Moonweaver Live] BOUNDARY_READY")
 
     local cutover =
         ServerStorage:WaitForChild(CUTOVER_BRIDGE, 20)
     local bridge =
         ServerStorage:WaitForChild(LIVE_BRIDGE, 20)
+    print("[Moonweaver Live] BRIDGES_READY")
 
     local enabled = cutover:Invoke("enable", {
         UserIds = {player.UserId},
@@ -834,6 +839,7 @@ local function run()
             and enabled.snapshot.ActivePlayerCount == 1,
         "Moonweaver source cutover failed"
     )
+    print("[Moonweaver Live] CUTOVER_READY")
 
     local cast_enabled = bridge:Invoke("enable_casts")
     assert(
@@ -843,6 +849,7 @@ local function run()
             and cast_enabled.capability.CompanionMagicCurrentlyEnabled,
         "Moonweaver cast bridges did not enable"
     )
+    print("[Moonweaver Live] CASTS_READY")
 
     assert(bridge:Invoke("add_item", {
         UserId = player.UserId,
@@ -854,6 +861,7 @@ local function run()
         ItemId = "emberweaver_spirit_ore",
         Quantity = 5,
     }).ok)
+    print("[Moonweaver Live] ITEMS_READY")
 
     local damage = cast_tidal_bolt(
         bridge,
