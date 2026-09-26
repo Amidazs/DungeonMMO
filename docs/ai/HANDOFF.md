@@ -1,3 +1,22 @@
+## 26 September 2026 — v3.03 Human Wizard Ember Field staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_03_Human_Wizard_Ember_Field_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-ember-field-v3-03-pending-20260926.md).
+Ember Field now preserves source Flame Strike 1181:3 TARGET_AREA behavior with
+FIRE power 19, 200 source-unit radius and one shared magical-shot snapshot
+across all targets. The primary target stays bound to the cast while additional
+reviewed NPCs are selected server-side from the caster radius and restricted to
+the same Dungeon encounter. Per-target source damage continues through existing
+contribution, threat and quest bookkeeping. Fresh diff check plus Base/Dungeon
+Rojo builds pass at
+`19173565960c2137a2f95e8699dea83e7e3bd6a3`.
+
+Next validation is the existing Wizard focused runner, large backend runner and
+one unpublished multi-NPC Ember Field rehearsal. Permanent edits remain
+GitHub-only; Desktop Commander is for fast-forward/build/test work.
+
 ## 26 September 2026 — v3.02 Human Wizard Frost Lance staged
 
 [Roadmap](
