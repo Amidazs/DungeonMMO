@@ -1,3 +1,17 @@
+## 27 September 2026 — v3.14 Duskguard acceptance GREEN
+
+- Palus Knight source ranks: **50/50 mapped**.
+- Duskguard creative families: **13**.
+- Fresh backend suite: **23/23 PASS**.
+- Unpublished Play: **PASS**.
+- Challenge: 803 live threat / zero damage.
+- Last Stand: 30-second live immobility.
+- Umbral Siphon: ~282.90 damage / ~28.95 effective heal.
+- Final CreatorErrors: **0**.
+- Physical active-skill timing regression added and passing.
+
+Next acceptance track: Dark Elf Assassin.
+
 ## 27 September 2026 — v3.13 Lifebinder GREEN
 
 [Roadmap](
