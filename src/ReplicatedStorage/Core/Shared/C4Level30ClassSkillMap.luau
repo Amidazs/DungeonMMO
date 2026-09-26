@@ -113,6 +113,31 @@ local HUMAN_WIZARD = table.freeze({
     CombatServitorSummon = "EmberweaverCombatCompanion",
 })
 
+local ELVEN_WIZARD = table.freeze({
+    MagicResistance = "MoonweaverArcaneResistance",
+    SpellReuse = "MoonweaverQuickWeave",
+    ManaCapacity = "MoonweaverManaReservoir",
+    FastSpellCasting = "MoonweaverFastCasting",
+    ManaRecovery = "MoonweaverManaRecovery",
+    RobeMastery = "MoonweaverRobeTraining",
+    WeaponMastery = "MoonweaverFocusTraining",
+    ManaRechargeEfficiency = "MoonweaverManaChanneling",
+    Sleep = "MoonweaverSlumberHex",
+    CastConcentration = "MoonweaverConcentration",
+    ServitorRecharge = "MoonweaverServitorRecharge",
+    ServitorHeal = "MoonweaverServitorHeal",
+    AttackWeakness = "MoonweaverWitheringHex",
+    CloseMagicBurst = "MoonweaverFlameBurst",
+    WaterBolt = "MoonweaverTidalBolt",
+    FireAreaAttack = "MoonweaverEmberField",
+    ResistWater = "MoonweaverTidalWard",
+    FrostSlowBolt = "MoonweaverFrostLance",
+    ManaServitorSummon = "MoonweaverManaCompanion",
+    CombatServitorSummon = "MoonweaverCombatCompanion",
+    HolyBolt = "MoonweaverSolarSpark",
+    EfficientMagicBolt = "MoonweaverFocusedBolt",
+})
+
 local HUMAN_CLERIC = table.freeze({
     MagicResistance = "DawnkeeperArcaneResistance",
     SpellReuse = "DawnkeeperQuickPrayer",
@@ -183,6 +208,9 @@ function SkillMap.get(
     end
     if branch_id == "HumanCleric" then
         return HUMAN_CLERIC[source_category]
+    end
+    if branch_id == "ElvenWizard" then
+        return ELVEN_WIZARD[source_category]
     end
     if branch_id == "ElvenKnight" then
         return ELVEN_KNIGHT[source_category]
