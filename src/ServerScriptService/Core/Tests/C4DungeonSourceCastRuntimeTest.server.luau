@@ -1,4 +1,15 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_RUNTIME_COMPOSITION_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[C4 Dungeon Cast Runtime] SKIP: runtime composition regression "
+            .. "runs in focused Edit mode"
+    )
+    return
+end
+
 -- Real RuntimeServices Dungeon composition regression for staged C4 casts.
 
 local ServerScriptService = game:GetService("ServerScriptService")
