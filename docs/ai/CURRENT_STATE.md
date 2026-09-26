@@ -1,3 +1,30 @@
+## 26 September 2026 — CURRENT v3.08 Human Wizard level-30 backend GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_08_Human_Wizard_Level30_Complete_20260926.md);
+[green evidence](
+../testing/c4-human-wizard-level30-complete-v3-08-20260926.md).
+Human Wizard / Emberweaver backend skill coverage is now **93/93 source rank
+rows mapped through level 30 with 0 Human Wizard gaps**. The remaining
+companion families are server-owned: Mana Companion 1111, Servitor Recharge
+1126, Servitor Heal 1127 and Combat Companion 1225. Venom Cloud, Blood To Mana
+and Corpse Siphon are also integrated through source calculation/execution
+boundaries. Companion lifecycle preserves source NPC identity, EXP penalty,
+lifetime loss and Spirit Ore consumption without inventing unreviewed source
+NPC combat statistics.
+
+Fresh unpublished Studio acceptance is **18/18 source-cast suites PASS** and
+**39/39 expanded backend suites PASS**. Human Wizard foundation is **199
+assertions PASS**, companion lifecycle **9 PASS**, companion cast bridge **6
+PASS**, and cast runtime composition **3 PASS**. A genuine unpublished Dungeon
+Play rehearsal confirmed server summon -> client replication, source NPC 12006,
+initial reagent count 3, Servitor Heal 35 -> 100 HP, Servitor Recharge 20 -> 61
+MP and clean owner teardown. Final companion meshes/animations and reviewed
+source NPC combat templates/AI remain creature-content work rather than missing
+Human Wizard skill rows.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.07 Withering Hex implemented
 
 [Roadmap](
