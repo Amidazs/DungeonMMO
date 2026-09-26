@@ -1,3 +1,31 @@
+## 27 September 2026 — CURRENT v3.13 Lifebinder GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_13_Elven_Oracle_Lifebinder_20260927.md);
+[green acceptance evidence](
+../testing/c4-elven-oracle-lifebinder-v3-13-green-20260927.md).
+
+Elven Oracle / Lifebinder is now green through level 30. Exact source class 29
+coverage is **91 / 91 rank rows** across 25 creative families. The common C4
+learning-tree source now includes the Elven Oracle path, taking tracked source
+coverage to 13 paths / 830 rows / 114 unique skill IDs.
+
+Fresh Studio acceptance is **25 / 25 suites PASS**. A real unpublished Play
+rehearsal also passed Wind Shackle, Agility and Mana Recharge through the live
+source-cutover/cast runtime. Observed evidence included exact rate=0.2,
+duration=15, Agility duration=1200 with +2 evasion, Mana Recharge restoring
+52 MP, final VERIFIED_PLAY_MODE_PASS and **0 CreatorErrors**.
+
+The acceptance run exposed and fixed a genuine migration-boundary defect:
+Elven Oracle was missing from the common source skill tree, which correctly
+blocked live cutover with OriginalSkillTreeUnavailable. The exact 91 class-29
+rows are now present rather than weakening that fail-closed guard.
+
+Accepted core candidate:
+`aac122673d5e7b85179157c8365961c180513d5e`.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.12 Elven Wizard level 30 GREEN
 
 [Roadmap](
