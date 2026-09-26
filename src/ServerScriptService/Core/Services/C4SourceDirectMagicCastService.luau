@@ -121,6 +121,30 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "RootControl",
     }),
+    LifebinderExorcism = table.freeze({
+        SourceSkillId = 1031,
+        CastRange = 400,
+        EffectRange = 900,
+        ExecutionKind = "UndeadMagic",
+    }),
+    LifebinderSlumber = table.freeze({
+        SourceSkillId = 1069,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
+    LifebinderRootbind = table.freeze({
+        SourceSkillId = 1201,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "RootControl",
+    }),
+    LifebinderWindShackle = table.freeze({
+        SourceSkillId = 1206,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "PhysicalAttackRateWeakening",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -144,6 +168,10 @@ local REVIEWED_SKILLS = table.freeze({
     "DawnkeeperExorcism",
     "DawnkeeperSlumber",
     "DawnkeeperRootbind",
+    "LifebinderExorcism",
+    "LifebinderSlumber",
+    "LifebinderRootbind",
+    "LifebinderWindShackle",
 })
 
 --[[
@@ -249,6 +277,9 @@ function C4SourceDirectMagicCastService.new(
             ) == "function"
             and type(
                 executor.physical_attack_weakening_skill_npc
+            ) == "function"
+            and type(
+                executor.physical_attack_rate_weakening_skill_npc
             ) == "function"
             and type(
                 executor.magic_undead_skill_npc
@@ -608,6 +639,15 @@ local function execute_launch(
     elseif review.ExecutionKind == "RootControl" then
         applied, reason =
             self._executor:root_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    elseif review.ExecutionKind == "PhysicalAttackRateWeakening" then
+        applied, reason =
+            self._executor:physical_attack_rate_weakening_skill_npc(
                 player,
                 record.Enemy,
                 launch.CreativeSkillId,
