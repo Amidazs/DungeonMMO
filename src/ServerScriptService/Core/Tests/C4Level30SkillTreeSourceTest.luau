@@ -68,6 +68,7 @@ local function main()
     check_scope("HumanCleric", 88)
     check_scope("ElvenFighter", 43)
     check_scope("ElvenMystic", 42)
+    check_scope("ElvenWizard", 82)
     check_scope("HumanWarrior", 62)
     check_scope("HumanKnight", 54)
     check_scope("HumanRogue", 59)
@@ -137,7 +138,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=11 rows=657 uniqueSkillIds=107 live=false")
+        .. "paths=12 rows=739 uniqueSkillIds=112 live=false")
         :format(checks))
 end
 
