@@ -2693,6 +2693,73 @@ function C4SourceCombatExecutor:heal_skill_target(
 end
 
 --[[
+Executes one live source mana recharge on a friendly player target.
+
+The source calculation owns the one magical shot and exact target
+RECHARGE_MP_RATE. The existing ManaService owns clamping and current MP.
+
+Args:
+    caster (any): Server-owned recharge caster.
+    target (any): Server-owned friendly target.
+    creative_skill_id (string): Reviewed creative recharge skill.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live recharge evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:mana_recharge_skill_target(
+    caster: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason =
+        self:can_support_skill_player(caster, target)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.mana_recharge_skill(
+            caster.UserId,
+            target.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if not self._mana
+        or type(self._mana.restore) ~= "function"
+    then
+        return nil, "C4LiveManaAuthorityUnavailable"
+    end
+
+    local restored = self._mana.restore(
+        target,
+        calculated.Amount
+    )
+    if type(restored) ~= "number"
+        or restored < 0
+        or restored ~= restored
+    then
+        return nil, "InvalidC4LiveManaRechargeResult"
+    end
+
+    return {
+        Kind = "C4LiveTargetManaRecharge",
+        Calculation = calculated,
+        Applied = true,
+        RawRecharge = calculated.Amount,
+        EffectiveRecharge = restored,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+        TargetUserId = target.UserId,
+    }, nil
+end
+
+--[[
 Executes one live source support buff on a friendly player target.
 
 The target active-effect registry receives only the server-resolved C4 source
@@ -3339,6 +3406,7 @@ function C4SourceCombatExecutor:capability(): any
             self._player_resurrection ~= nil,
         SupportBuffLiveApplication = true,
         TargetHealLiveApplication = true,
+        TargetManaRechargeLiveApplication = true,
         PlayerSupportBuffLiveApplication = true,
         ExternalTimedSourceEffectsIntegrated = true,
         SelfManaHealLiveApplication = true,
