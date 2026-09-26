@@ -212,6 +212,41 @@ function FakeCombat.magic_area_skill(
 end
 
 --[[
+Returns one disposable source DRAIN result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected reviewed NPC boundary.
+    creative_skill_id (string): Expected drain skill identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source drain result.
+]]
+function FakeCombat.drain_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "EmberweaverLifeSiphon")
+    assert(creative_rank == 4)
+
+    return {
+        Kind = "MagicDrain",
+        Amount = 40,
+        AbsorbPart = 0.4,
+        AbsorbAbs = 0,
+        Spiritshot = true,
+        BlessedSpiritshot = false,
+        SourceSkillId = 1147,
+        SourceRank = 6,
+    }, nil
+end
+
+--[[
 Returns one disposable source self-heal result.
 
 Args:
@@ -501,6 +536,8 @@ local function main()
             and capability.NpcMagicAreaLiveApplication
             and capability.NpcMagicAreaCasterRadiusSourceSemantics
             and capability.NpcMagicAreaSingleShotSnapshot
+            and capability.NpcMagicDrainLiveApplication
+            and capability.NpcMagicDrainUsesAppliedHealthDamage
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcSourceRangePreflight
@@ -774,6 +811,46 @@ local function main()
             and npc_events[1].Context.sequence_id == 204
             and npc_events[2].Context.sequence_id == 204,
         "area source damage preserves per-target bookkeeping callbacks"
+    )
+
+    local drain_target_humanoid =
+        enemy:FindFirstChildOfClass("Humanoid")
+    local drain_caster_humanoid =
+        attacker.Character:FindFirstChildOfClass("Humanoid")
+    assert(drain_target_humanoid and drain_caster_humanoid)
+
+    drain_target_humanoid.Health = 10
+    drain_caster_humanoid.Health = 70
+    table.clear(npc_events)
+
+    local drain = assert(executor:magic_drain_skill_npc(
+        attacker,
+        enemy,
+        "EmberweaverLifeSiphon",
+        4,
+        205
+    ))
+    check(
+        drain.Kind == "C4LiveNpcMagicDrain"
+            and drain.RawDamage == 40
+            and drain.HealthDamage == 10
+            and drain.DrainableHealthDamage == 10
+            and drain.RequestedHeal == 4
+            and drain.EffectiveHeal == 4
+            and drain.CasterHealthBefore == 70
+            and drain.CasterHealthAfter == 74
+            and drain.Lethal,
+        "source drain heals only from actual remaining NPC HP removed"
+    )
+    check(
+        #npc_events == 1
+            and npc_events[1].Context.source_kind == "MagicDrain"
+            and npc_events[1].Context.source_id
+                == "EmberweaverLifeSiphon"
+            and npc_events[1].Context.sequence_id == 205
+            and npc_events[1].Damage == 10
+            and npc_events[1].Lethal,
+        "source drain preserves trusted NPC damage bookkeeping"
     )
 
     local enemy_humanoid =
