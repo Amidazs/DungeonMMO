@@ -819,8 +819,8 @@ local function main()
         attacker.Character:FindFirstChildOfClass("Humanoid")
     assert(drain_target_humanoid and drain_caster_humanoid)
 
-    drain_target_humanoid.Health = 10
-    drain_caster_humanoid.Health = 70
+    drain_target_humanoid.Health = 50
+    drain_caster_humanoid.Health = 90
     table.clear(npc_events)
 
     local drain = assert(executor:magic_drain_skill_npc(
@@ -833,14 +833,14 @@ local function main()
     check(
         drain.Kind == "C4LiveNpcMagicDrain"
             and drain.RawDamage == 40
-            and drain.HealthDamage == 10
-            and drain.DrainableHealthDamage == 10
-            and drain.RequestedHeal == 4
-            and drain.EffectiveHeal == 4
-            and drain.CasterHealthBefore == 70
-            and drain.CasterHealthAfter == 74
-            and drain.Lethal,
-        "source drain heals only from actual remaining NPC HP removed"
+            and drain.HealthDamage == 40
+            and drain.DrainableHealthDamage == 40
+            and drain.RequestedHeal == 16
+            and drain.EffectiveHeal == 10
+            and drain.CasterHealthBefore == 90
+            and drain.CasterHealthAfter == 100
+            and not drain.Lethal,
+        "source drain heals from HP damage and caps at caster MaxHealth"
     )
     check(
         #npc_events == 1
@@ -848,8 +848,8 @@ local function main()
             and npc_events[1].Context.source_id
                 == "EmberweaverLifeSiphon"
             and npc_events[1].Context.sequence_id == 205
-            and npc_events[1].Damage == 10
-            and npc_events[1].Lethal,
+            and npc_events[1].Damage == 40
+            and not npc_events[1].Lethal,
         "source drain preserves trusted NPC damage bookkeeping"
     )
 
