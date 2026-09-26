@@ -2274,6 +2274,88 @@ function C4SourceCombatExecutor:physical_attack_weakening_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC physical-attack-speed weakening debuff.
+
+A resisted cast changes no runtime state. A landed cast delegates to the
+shared NPC weakening authority with zero power reduction and the exact source
+cadence reduction.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative weakening debuff.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live cadence-weakening evidence or denial reason.
+]]
+function C4SourceCombatExecutor:physical_attack_rate_weakening_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_attack_rate_weakening_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcPhysicalAttackRateWeakening",
+            Calculation = calculated,
+            Applied = false,
+            WeakeningApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local authority = self._enemy_weakening
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcPhysicalAttackRateWeakeningAuthorityUnavailable"
+    end
+
+    local applied = authority.apply(
+        enemy,
+        0,
+        calculated.RateReductionFraction,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcPhysicalAttackRateWeakeningApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalAttackRateWeakening",
+        Calculation = calculated,
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackSpeedMultiplier =
+            calculated.PhysicalAttackSpeedMultiplier,
+        RateReductionFraction =
+            calculated.RateReductionFraction,
+        DurationSeconds = calculated.DurationSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -3295,6 +3377,9 @@ function C4SourceCombatExecutor:capability(): any
         NpcPhysicalAttackWeakeningLeavesAttackRateNeutral = true,
         NpcPhysicalAttackWeakeningAuthorityConfigured =
             type(self._enemy_weakening) == "table",
+        NpcPhysicalAttackRateWeakeningLiveApplication = true,
+        NpcPhysicalAttackRateWeakeningUsesOutgoingCadenceRules = true,
+        NpcPhysicalAttackRateWeakeningLeavesPowerNeutral = true,
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
