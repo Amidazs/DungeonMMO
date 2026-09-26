@@ -1,3 +1,16 @@
+**v3.02 HUMAN WIZARD FROST LANCE — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_02_Human_Wizard_Frost_Lance_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-frost-lance-v3-02-pending-20260926.md).
+Frost Lance now preserves source Ice Bolt 1184:6 direct WATER damage and its
+WIT-resisted 0.7 movement multiplier for 120 seconds. The combined source
+calculation owns one magical shot, live NPC damage preserves contribution and
+threat bookkeeping, and landed movement control uses the shared server
+non-stacking slow authority. Fresh Base and Dungeon Rojo builds pass at
+`484363b3ffec2d911314201380fe5408ad154d40`; Studio runners and the live
+Frost Lance rehearsal remain pending, so v3.01 is still the latest fully green
+Wizard batch.
+
 **v3.01 HUMAN WIZARD TARGETED CAST BATCH GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_01_Human_Wizard_Targeted_Cast_Batch_20260926.md)
 and [green evidence](
