@@ -1931,6 +1931,110 @@ function C4SourceCombatCalculationService.magic_area_skill(
 end
 
 --[[
+Calculates one reviewed C4 DRAIN skill against a source target.
+
+The pinned C4 drain handler uses the normal magic-damage formula, then heals
+the caster by absorbAbs plus absorbPart times drainable target HP damage. For
+NPC targets without CP, the drainable amount is the lesser of calculated
+damage and current target HP. The live executor applies that cap from actual
+server-owned HP mutation.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative drain skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source drain damage and absorption contract.
+]]
+function C4SourceCombatCalculationService.drain_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "DRAIN"
+        or type(sets.power) ~= "number"
+        or sets.target ~= "TARGET_ONE"
+    then
+        return nil, "UnsupportedOriginalDrainSkillType"
+    end
+
+    local absorb_part = sets.absorbPart
+    local absorb_abs = sets.absorbAbs or 0
+    if type(absorb_part) ~= "number"
+        or absorb_part < 0
+        or absorb_part >= math.huge
+        or type(absorb_abs) ~= "number"
+        or absorb_abs < 0
+        or absorb_abs >= math.huge
+    then
+        return nil, "InvalidOriginalDrainAbsorption"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local damage, damage_reason = calculate_magic_target(
+        attacker,
+        defender,
+        target_kind,
+        source,
+        effect,
+        shot
+    )
+    if not damage then
+        return nil, damage_reason
+    end
+
+    return {
+        Kind = "MagicDrain",
+        Amount = damage.Amount,
+        Damage = damage,
+        AbsorbPart = absorb_part,
+        AbsorbAbs = absorb_abs,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Calculates one reviewed direct magic hit with a C4 movement-slow side effect.
 
 The direct MDAM calculation owns the single Spiritshot consumption. The same
@@ -2283,6 +2387,8 @@ function C4SourceCombatCalculationService.capability(): any
         MagicMovementSlowCalculation = true,
         MagicAreaDamageCalculation = true,
         MagicAreaSingleShotSnapshot = true,
+        MagicDrainCalculation = true,
+        MagicDrainSourceAbsorptionIntegrated = true,
         MovementSlowEffectSuccessIntegrated = true,
         MovementSlowUsesSingleMagicShot = true,
         PeriodicStatusEffectSuccessIntegrated = true,
