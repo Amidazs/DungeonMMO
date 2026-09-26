@@ -66,6 +66,13 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    EmberweaverScorchMark = table.freeze({
+        CreativeRank = 2,
+        SourceSkillId = 1083,
+        SourceRank = 2,
+        CastRange = 750,
+        EffectRange = 1250,
+    }),
 })
 
 
@@ -89,6 +96,7 @@ local executor_state = {
     AreaMagicCalls = 0,
     DrainMagicCalls = 0,
     SleepCalls = 0,
+    VulnerabilityCalls = 0,
     LastAreaRadius = nil,
     TargetReady = true,
     TargetReason = nil,
@@ -471,6 +479,46 @@ function FakeExecutor:sleep_skill_npc(
 end
 
 --[[
+Applies one disposable source elemental-vulnerability result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed Scorch Mark identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake elemental-vulnerability executor result.
+]]
+function FakeExecutor:elemental_vulnerability_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.VulnerabilityCalls += 1
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverScorchMark")
+
+    return {
+        Kind = "C4LiveNpcElementalVulnerability",
+        Applied = true,
+        VulnerabilityApplied = true,
+        Landed = true,
+        VulnerabilityStat = "FIRE_VULN",
+        VulnerabilityMultiplier = 1.25,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -512,6 +560,7 @@ local function reset_fakes()
     executor_state.AreaMagicCalls = 0
     executor_state.DrainMagicCalls = 0
     executor_state.SleepCalls = 0
+    executor_state.VulnerabilityCalls = 0
     executor_state.LastAreaRadius = nil
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
@@ -945,6 +994,46 @@ local function check_slumber_hex_launch()
 end
 
 --[[
+Checks Scorch Mark selects the elemental-vulnerability executor path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact rank and sequence reach vulnerability execution.
+]]
+local function check_scorch_mark_launch()
+    local bridge, started = started_bridge(
+        620,
+        "EmberweaverScorchMark"
+    )
+
+    local applied = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        621.5,
+        909
+    ))
+
+    check(
+        applied.Applied
+            and applied.Application.Kind
+                == "C4LiveNpcElementalVulnerability"
+            and applied.Application.VulnerabilityApplied
+            and applied.Application.VulnerabilityStat
+                == "FIRE_VULN"
+            and applied.Application.VulnerabilityMultiplier
+                == 1.25
+            and applied.Application.DurationSeconds == 15
+            and executor_state.VulnerabilityCalls == 1
+            and executor_state.LastRank == 2
+            and executor_state.LastSequence == 909
+            and executor_state.LastRange == 1250,
+        "Scorch Mark reaches source vulnerability executor once"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -991,6 +1080,7 @@ local function check_reviewed_direct_families()
         "EmberweaverEmberField",
         "EmberweaverLifeSiphon",
         "EmberweaverSlumberHex",
+        "EmberweaverScorchMark",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -1078,8 +1168,10 @@ local function main()
             and capability.ReviewedMagicDrainSourceAbsorption
             and capability.ReviewedSleepControl
             and capability.ReviewedSleepBreaksOnDamage
-            and capability.ReviewedSkillCount == 7
-            and #capability.ReviewedSkills == 7
+            and capability.ReviewedElementalVulnerability
+            and capability.ReviewedElementalVulnerabilityFeedsMagicDamage
+            and capability.ReviewedSkillCount == 8
+            and #capability.ReviewedSkills == 8
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
@@ -1103,6 +1195,7 @@ local function main()
     check_ember_field_launch()
     check_life_siphon_launch()
     check_slumber_hex_launch()
+    check_scorch_mark_launch()
     check_owner_cleanup()
 
     print((
