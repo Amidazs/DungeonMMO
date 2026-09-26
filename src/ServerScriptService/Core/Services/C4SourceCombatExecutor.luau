@@ -601,6 +601,42 @@ function C4SourceCombatExecutor:can_corpse_skill_npc(
 end
 
 --[[
+Checks one undead-only source magic target before any resource mutation.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (any): Current reviewed server NPC.
+    source_range (number?): Optional source-unit cast/effect range.
+
+Returns:
+    (boolean, string?): Readiness or strict undead/range denial reason.
+]]
+function C4SourceCombatExecutor:can_undead_magic_skill_npc(
+    attacker: any,
+    enemy: any,
+    source_range: number?
+): (boolean, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return false, boundary_reason
+    end
+    if boundary.SourceNpcRace ~= "UNDEAD" then
+        return false, "C4UndeadMagicTargetRequired"
+    end
+
+    if source_range ~= nil then
+        return self:_validate_npc_source_range(
+            attacker,
+            enemy,
+            source_range
+        )
+    end
+
+    return true, nil
+end
+
+--[[
 Checks one source-unit range against authoritative Roblox root positions.
 
 The configured source-units-per-stud scale is the same explicit conversion
@@ -3247,6 +3283,7 @@ function C4SourceCombatExecutor:capability(): any
         NpcRootMovementOnly = true,
         NpcRootBreaksOnDamage = false,
         NpcUndeadMagicLiveApplication = true,
+        NpcUndeadMagicReadOnlyPreflight = true,
         NpcSleepAuthorityConfigured =
             type(self._npc_sleep) == "table",
         NpcElementalVulnerabilityLiveApplication = true,
