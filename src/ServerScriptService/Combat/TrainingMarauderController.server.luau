@@ -38,6 +38,11 @@ local StaggerService = require(script.Parent:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     script.Parent:WaitForChild("C4NpcSleepService")
 )
+local C4NpcElementalVulnerabilityService = require(
+    script.Parent:WaitForChild(
+        "C4NpcElementalVulnerabilityService"
+    )
+)
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
@@ -834,6 +839,9 @@ local function reset_runtime(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    C4NpcElementalVulnerabilityService.clear_all(
+        runtime.model
+    )
     set_current_target(runtime, nil)
     runtime.model:SetAttribute("MarauderAggroMode", "None")
     runtime.model:SetAttribute("AttackTelegraph", false)
