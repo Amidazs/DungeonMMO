@@ -26,6 +26,7 @@ local SOURCE_IDS = table.freeze({
     DawnkeeperHealingLight = 1011,
     DawnkeeperBattleMend = 1015,
     DawnkeeperGroupMend = 1027,
+    DawnkeeperRevive = 1016,
     DawnkeeperMindWard = 1035,
 })
 
@@ -195,6 +196,16 @@ function FakeExecutor.can_party_heal_skill(
     return true, nil
 end
 
+function FakeExecutor.can_resurrection_skill_player(
+    _self: any,
+    _caster: any,
+    _target: any,
+    source_range: number
+): (boolean, string?)
+    last_range = source_range
+    return true, nil
+end
+
 --[[
 Applies one fake targeted heal.
 
@@ -272,6 +283,22 @@ function FakeExecutor.party_heal_skill(
         Applied = true,
         AffectedPlayers = 2,
         EffectiveHeal = 80,
+    }, nil
+end
+
+function FakeExecutor.resurrection_skill_player(
+    _self: any,
+    _caster: any,
+    _target: any,
+    skill_id: string,
+    _rank: number
+): (any?, string?)
+    last_execution = skill_id
+    return {
+        Applied = true,
+        OfferCreated = true,
+        RequiresTargetAcceptance = true,
+        RestoreExperiencePower = 20,
     }, nil
 end
 
@@ -388,6 +415,34 @@ local function main()
         "Group Mend reaches server-owned party heal authority"
     )
 
+    local revive_start = assert(bridge:begin_cast(
+        caster,
+        target,
+        "DawnkeeperRevive",
+        350
+    ))
+    check(
+        revive_start.SourceSkillId == 1016
+            and revive_start.TargetBoundServerSide
+            and last_range == 400,
+        "Revive captures one dead server target at exact cast range"
+    )
+
+    local offered = assert(bridge:launch_if_ready(
+        caster,
+        revive_start.CastId,
+        352
+    ))
+    check(
+        offered.Applied
+            and offered.Application.OfferCreated
+            and offered.Application.RequiresTargetAcceptance
+            and offered.Application.RestoreExperiencePower == 20
+            and last_execution == "DawnkeeperRevive"
+            and last_range == 900,
+        "Revive creates a confirmation offer after effect-range recheck"
+    )
+
     party_ready = false
     local rejected, rejected_reason = bridge:begin_cast(
         caster,
@@ -404,10 +459,12 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 13
+        capability.ReviewedSkillCount == 14
             and capability.TargetHeal
             and capability.TargetBuff
             and capability.PartyHeal
+            and capability.ResurrectionOffer
+            and capability.ResurrectionTargetAcceptance
             and capability.ServerTargetAuthority
             and capability.ServerPartyRosterAuthority,
         "support bridge advertises all reviewed non-resurrection families"
