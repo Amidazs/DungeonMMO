@@ -1,3 +1,20 @@
+## 26 September 2026 — v3.05 Human Wizard Slumber Hex staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_05_Human_Wizard_Slumber_Hex_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-slumber-hex-v3-05-pending-20260926.md).
+Slumber Hex rank 6 now maps to source Sleep 1069:6 with exact WIT/effect
+success inputs, 30-second duration, 6 + 21 MP, 600/1100 ranges and the current
+2.5-second cast / 4.5-second reuse result. A reusable NPC Sleep authority now
+suppresses Training Marauder and Marauder Captain movement/attacks and direct
+source damage wakes the target before HP loss. Fresh diff check and Base /
+Dungeon builds pass.
+
+Next validation is the existing Wizard focused runner, large backend runner and
+one unpublished live Slumber Hex rehearsal. Permanent edits remain GitHub-only;
+Desktop Commander is for fast-forward/build/test work.
+
 ## 26 September 2026 — v3.04 Human Wizard Life Siphon staged
 
 [Roadmap](
