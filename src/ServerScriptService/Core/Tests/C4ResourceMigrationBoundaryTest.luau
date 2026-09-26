@@ -167,6 +167,8 @@ local function check_nine_paths()
         )
         check(
             plan.ExactBaseVitalsCertified
+                and type(plan.SourceWitBonus) == "number"
+                and plan.SourceWitBonus > 0
                 and not plan.CanApplyLive
                 and not plan.LiveHealthIntegrated
                 and not plan.LiveManaIntegrated
