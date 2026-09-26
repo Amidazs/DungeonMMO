@@ -161,6 +161,35 @@ function FakeExecutor:magic_area_skill_npc(
 end
 
 --[[
+Provides a minimal source magic-drain executor contract.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable selected target.
+    _skill_id (string): Creative skill identifier.
+    _rank (number): Creative skill rank.
+    _sequence_id (number?): Disposable sequence.
+
+Returns:
+    (any?, string?): Successful fake drain application.
+]]
+function FakeExecutor:magic_drain_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        HealthDamage = 10,
+        EffectiveHeal = 4,
+        AbsorbPart = 0.4,
+        AbsorbAbs = 0,
+    }, nil
+end
+
+--[[
 Provides a minimal periodic-status executor contract.
 
 Args:
