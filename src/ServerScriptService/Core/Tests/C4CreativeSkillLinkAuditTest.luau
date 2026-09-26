@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 13 and report.SourceLearningRows == 830,
+assert(report.ClassPaths == 14 and report.SourceLearningRows == 880,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 818
+assert(report.CandidateRows == 868
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 830,
+assert(report.CandidateRows + report.ExplicitMissingRows == 880,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
