@@ -15,6 +15,9 @@ local Data9 = require(
 local Data10 = require(
     script.Parent.C4SkillEffectSourceData10HumanCleric
 )
+local Data11 = require(
+    script.Parent.C4SkillEffectSourceData11ElvenWizard
+)
 
 local C4SkillEffectSource = {}
 
@@ -31,6 +34,7 @@ local SOURCES = table.freeze({
     Data8,
     Data9,
     Data10,
+    Data11,
 })
 
 local BY_ID = {}
