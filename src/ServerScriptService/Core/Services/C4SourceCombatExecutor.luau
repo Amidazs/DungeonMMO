@@ -212,6 +212,8 @@ function C4SourceCombatExecutor.new(options: any?): any
         _mana = config.ManaProvider or ManaService,
         _player_heal = config.PlayerHealProvider or MageHealService,
         _party_heal = config.PartyHealProvider or PartyHealService,
+        _player_resurrection =
+            config.PlayerResurrectionProvider,
         _npc_root = config.RootProvider or NpcRoot,
         _active_source_effects =
             config.ActiveSourceEffectProvider
@@ -276,6 +278,39 @@ function C4SourceCombatExecutor:set_npc_damage_observer(
         "C4 NPC damage observer must be a function or nil"
     )
     self._npc_damage_observer = observer
+end
+
+--[[
+Installs the current Dungeon player-resurrection authority.
+
+RuntimeServices creates the combat executor before a concrete Dungeon death
+service exists, so the live Dungeon runtime installs this provider once its
+session-bound death authority has been created.
+
+Args:
+    provider (any?): Object exposing can_skill_resurrect and
+        request_skill_resurrection, or nil to clear the binding.
+
+Returns:
+    nil: Replaces only this executor's resurrection provider.
+]]
+function C4SourceCombatExecutor:set_player_resurrection_provider(
+    provider: any?
+)
+    assert(
+        provider == nil
+            or (
+                type(provider) == "table"
+                and type(
+                    provider.can_skill_resurrect
+                ) == "function"
+                and type(
+                    provider.request_skill_resurrection
+                ) == "function"
+            ),
+        "C4 resurrection provider contract is invalid"
+    )
+    self._player_resurrection = provider
 end
 
 --[[
@@ -2666,6 +2701,115 @@ function C4SourceCombatExecutor:can_party_heal_skill(
 end
 
 --[[
+Checks whether one dead friendly player is a legal resurrection target.
+
+The live Dungeon death service owns party membership and dead-member state.
+This preflight does not spend MP or consume a magical shot.
+
+Args:
+    caster (any): Living server-owned support caster.
+    target (any): Dead server-owned party target.
+    source_range (number): Reviewed C4 cast/effect range.
+
+Returns:
+    (boolean, string?): Readiness or strict denial reason.
+]]
+function C4SourceCombatExecutor:can_resurrection_skill_player(
+    caster: any,
+    target: any,
+    source_range: number
+): (boolean, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return false, ready_reason
+    end
+    if not target
+        or type(target.UserId) ~= "number"
+        or target == caster
+    then
+        return false, "InvalidC4ResurrectionTarget"
+    end
+
+    local authority = self._player_resurrection
+    if not authority then
+        return false, "C4PlayerResurrectionAuthorityUnavailable"
+    end
+
+    local legal, legal_reason =
+        authority:can_skill_resurrect(caster, target)
+    if not legal then
+        return false, legal_reason
+    end
+
+    return self:_validate_player_source_range(
+        caster,
+        target,
+        source_range
+    )
+end
+
+--[[
+Executes one C4 Resurrection cast as a target-confirmed proposal.
+
+The cast consumes the caster's magical shot and then asks the Dungeon death
+authority to create a resurrection offer. It never silently revives a player.
+
+Args:
+    caster (any): Living server-owned support caster.
+    target (any): Dead server-owned party target.
+    creative_skill_id (string): Reviewed Resurrection skill.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Proposal evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:resurrection_skill_player(
+    caster: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local authority = self._player_resurrection
+    if not authority then
+        return nil, "C4PlayerResurrectionAuthorityUnavailable"
+    end
+
+    local calculated, combat_reason =
+        self._combat.resurrection_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local result = authority:request_skill_resurrection(
+        caster,
+        target,
+        calculated.RestoreExperiencePower
+    )
+    if type(result) ~= "table" or result.ok ~= true then
+        return nil, if type(result) == "table"
+            then result.reason
+            else "C4PlayerResurrectionRequestFailed"
+    end
+
+    return {
+        Kind = "C4LivePlayerResurrectionOffer",
+        Calculation = calculated,
+        Applied = true,
+        OfferCreated = true,
+        RequiresTargetAcceptance = true,
+        RestoreExperiencePower =
+            calculated.RestoreExperiencePower,
+        TargetUserId = target.UserId,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
 Executes one live source TARGET_PARTY heal.
 
 The source calculator consumes the caster's one magical shot and returns the
@@ -3071,6 +3215,10 @@ function C4SourceCombatExecutor:capability(): any
         SelfHealLiveApplication = true,
         TargetHealLiveApplication = true,
         PartyHealLiveApplication = true,
+        PlayerResurrectionOfferLiveApplication = true,
+        PlayerResurrectionRequiresTargetAcceptance = true,
+        PlayerResurrectionAuthorityConfigured =
+            self._player_resurrection ~= nil,
         SupportBuffLiveApplication = true,
         TargetHealLiveApplication = true,
         PlayerSupportBuffLiveApplication = true,
