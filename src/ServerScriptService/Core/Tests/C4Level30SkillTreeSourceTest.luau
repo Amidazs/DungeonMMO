@@ -65,6 +65,7 @@ local function main()
     check_scope("HumanFighter", 39)
     check_scope("HumanMystic", 44)
     check_scope("HumanWizard", 93)
+    check_scope("HumanCleric", 88)
     check_scope("ElvenFighter", 43)
     check_scope("ElvenMystic", 42)
     check_scope("HumanWarrior", 62)
@@ -74,9 +75,9 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 10
-        and coverage.RowCount == 569
-        and coverage.UniqueSourceSkillIds == 95
+    check(coverage.PathCount == 11
+        and coverage.RowCount == 657
+        and coverage.UniqueSourceSkillIds == 107
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
         "All ten tracked original paths have exact source learning rows")
@@ -106,6 +107,15 @@ local function main()
         and wizard_servitor[9].SP == 3500,
         "Human Wizard Servitor Heal ranks stay source-only metadata")
 
+    local cleric_heal = Source.find_skill("HumanCleric", 1011)
+    check(#cleric_heal == 9
+        and cleric_heal[1].SkillLevel == 7
+        and cleric_heal[1].MinLevel == 20
+        and cleric_heal[9].SkillLevel == 15
+        and cleric_heal[9].SP == 4400
+        and cleric_heal[9].MinLevel == 30,
+        "Human Cleric Heal ranks 7-15 preserve source SP/levels")
+
     local common = Source.find_skill("ElvenKnight", 1320)
     check(#common == 2
         and common[1].SkillLevel == 2
@@ -127,7 +137,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=10 rows=569 uniqueSkillIds=95 live=false")
+        .. "paths=11 rows=657 uniqueSkillIds=107 live=false")
         :format(checks))
 end
 
