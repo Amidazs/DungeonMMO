@@ -38,6 +38,13 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    EmberweaverFrostLance = table.freeze({
+        CreativeRank = 2,
+        SourceSkillId = 1184,
+        SourceRank = 6,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
 })
 
 
@@ -57,6 +64,7 @@ local scheduler_state = {
 local executor_state = {
     PreflightCalls = 0,
     MagicCalls = 0,
+    SlowMagicCalls = 0,
     TargetReady = true,
     TargetReason = nil,
     LastEnemy = nil,
@@ -278,6 +286,46 @@ function FakeExecutor:magic_skill_npc(
 end
 
 --[[
+Applies one disposable direct MDAM plus movement-slow result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected privately captured NPC.
+    creative_skill_id (string): Reviewed Frost Lance identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake combined source executor result.
+]]
+function FakeExecutor:magic_slow_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.SlowMagicCalls += 1
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverFrostLance")
+
+    return {
+        Kind = "C4LiveNpcMagicMovementSlow",
+        Applied = true,
+        SlowLanded = true,
+        SlowApplied = true,
+        SpeedMultiplier = 0.7,
+        SlowFraction = 0.3,
+        DurationSeconds = 120,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -315,6 +363,7 @@ local function reset_fakes()
 
     executor_state.PreflightCalls = 0
     executor_state.MagicCalls = 0
+    executor_state.SlowMagicCalls = 0
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
     executor_state.LastEnemy = nil
@@ -367,14 +416,14 @@ local function check_gate_and_allowlist()
     local blocked, blocked_reason = bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverFrostLance",
+        "EmberweaverEmberField",
         100
     )
     check(
         blocked == nil
             and blocked_reason == "C4DirectMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "bridge rejects MDAM families with unimplemented side effects"
+        "bridge rejects unreviewed area-MDAM families"
     )
 end
 
@@ -603,6 +652,40 @@ local function check_launch_plan_change()
 end
 
 --[[
+Checks Frost Lance selects the combined damage-and-slow executor path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms direct damage execution is not used for the slow spell.
+]]
+local function check_frost_lance_launch()
+    local bridge, started = started_bridge(
+        550,
+        "EmberweaverFrostLance"
+    )
+
+    local applied = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        554,
+        905
+    ))
+
+    check(
+        applied.Applied
+            and applied.Application.SlowApplied
+            and executor_state.SlowMagicCalls == 1
+            and executor_state.MagicCalls == 0
+            and executor_state.LastRank == 2
+            and executor_state.LastSequence == 905
+            and executor_state.LastRange == 1100,
+        "Frost Lance reaches combined source damage/slow executor once"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -645,6 +728,7 @@ local function check_reviewed_direct_families()
         "EmberweaverEmberBolt",
         "EmberweaverFlameBurst",
         "EmberweaverFocusedBolt",
+        "EmberweaverFrostLance",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -723,9 +807,11 @@ local function main()
         capability.Available
             and capability.DefaultEnabled == false
             and not capability.CurrentlyEnabled
-            and capability.ReviewedDirectMdamOnly
-            and capability.ReviewedSkillCount == 3
-            and #capability.ReviewedSkills == 3
+            and not capability.ReviewedDirectMdamOnly
+            and capability.ReviewedTargetedMdam
+            and capability.ReviewedMovementSlowSideEffect
+            and capability.ReviewedSkillCount == 4
+            and #capability.ReviewedSkills == 4
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
@@ -745,6 +831,7 @@ local function main()
     check_target_revalidation()
     check_cancel_and_replay()
     check_launch_plan_change()
+    check_frost_lance_launch()
     check_owner_cleanup()
 
     print((
