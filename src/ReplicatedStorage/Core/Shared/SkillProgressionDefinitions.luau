@@ -2499,6 +2499,30 @@ local DEFINITIONS = table.freeze({
         WeaponTags = table.freeze({}),
     }),
 
+    -- Exact C4 Elven Scout Elemental Heal ranks 4-12, exposed as
+    -- nine creative class ranks at levels 20/24/28.
+    GreenwardScoutElementalHeal = table.freeze({
+        Id = "GreenwardScoutElementalHeal",
+        Tier = "Common",
+        MaxRank = 9,
+        Kind = "Support",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({"GreenwardScout"}),
+        RankLevels = table.freeze({
+            [1] = 20,
+            [2] = 20,
+            [3] = 20,
+            [4] = 24,
+            [5] = 24,
+            [6] = 24,
+            [7] = 28,
+            [8] = 28,
+            [9] = 28,
+        }),
+        WeaponTags = table.freeze({}),
+    }),
+
     -- C4 first-transfer Human Rogue seated-recovery ranks 24/32.
     -- Stamina regeneration is the functional DungeonMMO analogue.
     HumanScoutRestingRecovery = table.freeze({
@@ -2511,6 +2535,21 @@ local DEFINITIONS = table.freeze({
         AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
         RankLevels = table.freeze({[1] = 24, [2] = 32}),
         RestingStaminaBonusPerRank = 0.10,
+        WeaponTags = table.freeze({}),
+    }),
+
+    -- Exact C4 Vital Force source passive. Its live source-cutover
+    -- contribution comes from source skill 148:1:
+    -- REG_HP_RATE +1.9 and REG_MP_RATE +0.9.
+    AshenbladeVitalForce = table.freeze({
+        Id = "AshenbladeVitalForce",
+        Tier = "Common",
+        MaxRank = 1,
+        Kind = "Passive",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedFirstTransferClasses = table.freeze({"Ashenblade"}),
+        RankLevels = table.freeze({[1] = 24}),
         WeaponTags = table.freeze({}),
     }),
 
