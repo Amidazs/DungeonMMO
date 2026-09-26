@@ -1,3 +1,15 @@
+**v3.06 HUMAN WIZARD SCORCH MARK — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_06_Human_Wizard_Scorch_Mark_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-scorch-mark-v3-06-pending-20260926.md).
+Scorch Mark now preserves source Surrenders To Fire 1083:2: WIT-resisted
+effect power 80, FIRE_VULN x1.25 for 15 seconds, one magical shot and exact
+source cast/range/resource timing. A reusable NPC elemental-vulnerability
+authority feeds the existing source elemental damage formula through temporary
+boundary decoration without mutating pinned source data. Local diff check and
+Base/Dungeon Rojo builds pass; Studio runners and live rehearsal remain
+pending.
+
 **v3.05 HUMAN WIZARD SLUMBER HEX — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_05_Human_Wizard_Slumber_Hex_20260926.md)
 and [pending evidence](
