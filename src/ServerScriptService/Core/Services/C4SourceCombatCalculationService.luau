@@ -2904,6 +2904,69 @@ function C4SourceCombatCalculationService.heal_skill(
 end
 
 --[[
+Resolves one reviewed C4 self MANAHEAL skill.
+
+Body To Mind restores its source power directly and consumes HP at hit time.
+The C4 mana-heal handler also clears one magical shot after execution, even
+though the shot does not amplify the restored MP amount.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected creative mana-heal skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source mana-heal contract or strict denial reason.
+]]
+function C4SourceCombatCalculationService.mana_heal_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "MANAHEAL"
+        or sets.target ~= "TARGET_SELF"
+        or type(sets.power) ~= "number"
+        or sets.power < 0
+        or type(sets.hpConsume) ~= "number"
+        or sets.hpConsume < 0
+    then
+        return nil, "UnsupportedOriginalManaHealSkill"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "ManaHeal",
+        ManaRestore = sets.power,
+        HpConsume = sets.hpConsume,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Returns immutable capability metadata for the source combat provider.
 
 Args:
@@ -2930,6 +2993,8 @@ function C4SourceCombatCalculationService.capability(): any
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
+        ManaHealCalculation = true,
+        ManaHealHpConsumeIntegrated = true,
         PeriodicStatusCalculation = true,
         PeriodicStatusAreaCalculation = true,
         PeriodicStatusAreaSingleShotSnapshot = true,
