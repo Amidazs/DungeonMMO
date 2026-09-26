@@ -158,7 +158,11 @@ function PartyHealService.cast(
         or heal_per_member ~= heal_per_member
         or heal_per_member == math.huge
         or range_studs <= 0 or range_studs > 40
-        or skill_id ~= "MysticPartyHeal" then
+        or (
+            skill_id ~= "MysticPartyHeal"
+            and skill_id ~= "DawnkeeperGroupMend"
+        )
+    then
         return false, 0, 0
     end
     local members = party_members(caster)
