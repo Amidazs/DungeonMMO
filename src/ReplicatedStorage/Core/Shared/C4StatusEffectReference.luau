@@ -326,6 +326,113 @@ function C4StatusEffectReference.sleep_plan(
 end
 
 --[[
+Builds the reviewed C4 elemental-vulnerability debuff plan.
+
+Surrender-style effects are magical WIT-resisted DEBUFFs that temporarily
+multiply exactly one elemental vulnerability stat. They do not deal damage.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen vulnerability plan or strict source-data reason.
+]]
+function C4StatusEffectReference.elemental_vulnerability_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1083 then
+        return nil, "UnsupportedOriginalElementalVulnerabilitySkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalElementalVulnerabilitySkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "DEBUFF"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or sets.target ~= "TARGET_ONE"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "OriginalElementalVulnerabilityContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Debuff" then
+            local vulnerability_stat = nil
+            local vulnerability_multiplier = nil
+
+            for _, modifier in ipairs(effect.Modifiers or {}) do
+                if modifier.Operation == "mul"
+                    and modifier.stat == "FIRE_VULN"
+                then
+                    vulnerability_stat = modifier.stat
+                    vulnerability_multiplier = modifier.val
+                end
+            end
+
+            if vulnerability_stat then
+                if matched ~= nil then
+                    return nil,
+                        "DuplicateOriginalElementalVulnerabilityEffect"
+                end
+                matched = {
+                    Stat = vulnerability_stat,
+                    Multiplier = vulnerability_multiplier,
+                    Count = effect.count,
+                    DurationSeconds = effect.time,
+                    StackType = effect.stackType,
+                    StackOrder = effect.stackOrder,
+                }
+            end
+        end
+    end
+
+    if not matched
+        or matched.Count ~= 1
+        or type(matched.Multiplier) ~= "number"
+        or matched.Multiplier <= 0
+        or matched.Multiplier >= math.huge
+        or type(matched.DurationSeconds) ~= "number"
+        or matched.DurationSeconds <= 0
+        or matched.StackType ~= "FireAtr"
+        or matched.StackOrder ~= matched.Multiplier
+    then
+        return nil, "OriginalElementalVulnerabilityEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalElementalVulnerabilityMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "DEBUFF",
+        SaveVs = "WIT",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        VulnerabilityStat = matched.Stat,
+        VulnerabilityMultiplier = matched.Multiplier,
+        DurationSeconds = matched.DurationSeconds,
+        StackType = matched.StackType,
+        StackOrder = matched.StackOrder,
+    }), nil
+end
+
+--[[
 Calculates exact C4 hostile-effect land rate before the final random roll.
 
 This reproduces Formulas.calcEffectSuccess for the reviewed Bleed/Poison scope:
