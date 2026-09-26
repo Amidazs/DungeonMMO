@@ -39,6 +39,44 @@ local function validate_enemy(enemy: any): (boolean, string?)
 end
 
 --[[
+Resolves a reviewed C4 source boundary for one dead server-owned NPC corpse.
+
+Corpse-target skills need the same archetype source data as living combat but
+must accept Health == 0 while still rejecting arbitrary/off-Workspace models.
+
+Args:
+    enemy (any): Candidate dead Dungeon enemy Model.
+
+Returns:
+    (any?, string?): Frozen source boundary or strict denial reason.
+]]
+function C4NpcSourceBoundaryService.for_corpse_model(
+    enemy: any
+): (any?, string?)
+    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model") then
+        return nil, "InvalidC4NpcCorpseSourceOwner"
+    end
+    if not enemy:IsDescendantOf(Workspace) then
+        return nil, "C4NpcCorpseSourceOwnerUnavailable"
+    end
+
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    if not humanoid or humanoid.Health > 0 then
+        return nil, "C4NpcCorpseSourceOwnerUnavailable"
+    end
+
+    local archetype_id =
+        enemy:GetAttribute(ARCHETYPE_ATTRIBUTE)
+    if type(archetype_id) ~= "string"
+        or archetype_id == ""
+    then
+        return nil, "C4NpcSourceArchetypeUnavailable"
+    end
+
+    return Reference.get(archetype_id)
+end
+
+--[[
 Resolves a reviewed C4 combat boundary for one genuine enemy Model.
 
 Only a server-created Dungeon archetype attribute selects the creative mapping.
@@ -86,6 +124,7 @@ function C4NpcSourceBoundaryService.capability(): any
             ARCHETYPE_ATTRIBUTE,
         DisplayNameUsedForMapping = false,
         ClientStatsAccepted = false,
+        CorpseTargetBoundaryAvailable = true,
         SourceNamesPlayerFacing = false,
         SupportedArchetypes =
             Reference.supported_archetypes(),
