@@ -84,6 +84,7 @@ local FIXTURES = table.freeze({
     },
     {Folder = core_tests, Name = "C4CombatDispatchAdapterTest"},
     {Folder = combat_tests, Name = "ManaServiceTest"},
+    {Folder = combat_tests, Name = "C4EnemyWeakeningTest"},
     {
         Folder = combat_tests,
         Name = "C4DamageDispatchIntegrationTest",
