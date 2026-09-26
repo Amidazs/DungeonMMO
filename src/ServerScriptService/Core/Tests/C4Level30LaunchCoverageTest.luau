@@ -151,6 +151,27 @@ local function main()
         "Human Cleric rank schedule maps only through earned Dawnkeeper"
     )
 
+    local elven_wizard = assert(Coverage.for_branch("ElvenWizard"))
+    check(
+        elven_wizard.SourceClass == "Elven Wizard"
+            and elven_wizard.SourceInventoryAuditedThroughCap
+            and elven_wizard.SourceRankEntriesThroughCap == 82
+            and elven_wizard.SourceRankEntriesByLevel[20] == 24
+            and elven_wizard.SourceRankEntriesByLevel[25] == 29
+            and elven_wizard.SourceRankEntriesByLevel[30] == 29
+            and #elven_wizard.SourceBrackets == 3,
+        "Elven Wizard retains exact 20/25/30 source-rank inventory"
+    )
+    check(
+        elven_wizard.CurrentCareerId == nil
+            and elven_wizard.TrainerMappedRankEntries == 0
+            and elven_wizard.MissingRankScheduleEntries == 82
+            and not elven_wizard.SourceRankScheduleMapped
+            and elven_wizard.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Elven Wizard source audit stays distinct from implementation"
+    )
+
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
     check(warrior.Status == "RankScheduleMappedEffectsPending"
         and warrior.SourceRankEntriesThroughCap == 62
@@ -183,8 +204,8 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 7,
-        "Exactly seven first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 8,
+        "Exactly eight first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 7,
