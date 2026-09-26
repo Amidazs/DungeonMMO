@@ -15,6 +15,9 @@ local SourceCombat = require(
 local NpcBoundaries = require(
     Services.C4NpcSourceBoundaryService
 )
+local MovementSlow = require(
+    ServerScriptService.Combat.RangerSlowService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -170,6 +173,7 @@ function C4SourceCombatExecutor.new(options: any?): any
             config.NpcBoundaryProvider
             or NpcBoundaries.for_model,
         _npc_damage_observer = config.NpcDamageObserver,
+        _movement_slow = config.MovementSlowProvider or MovementSlow,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -1122,6 +1126,92 @@ function C4SourceCombatExecutor:magic_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
+
+Damage is applied through the normal source NPC bookkeeping path. A landed
+slow is applied only if the NPC survives that damage, using the shared
+non-stacking server movement-slow authority.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative slow spell.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live damage/slow evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:magic_slow_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.magic_slow_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "MagicSkill",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    local slow_applied = false
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    if calculated.SlowLanded
+        and humanoid
+        and humanoid.Health > 0
+        and self._movement_slow
+        and type(self._movement_slow.apply) == "function"
+    then
+        slow_applied = self._movement_slow.apply(
+            enemy,
+            calculated.SlowFraction,
+            calculated.DurationSeconds
+        ) == true
+    end
+
+    return {
+        Kind = "C4LiveNpcMagicMovementSlow",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+        SlowLanded = calculated.SlowLanded,
+        SlowApplied = slow_applied,
+        SpeedMultiplier = calculated.SpeedMultiplier,
+        SlowFraction = calculated.SlowFraction,
+        DurationSeconds = calculated.DurationSeconds,
+    }, nil
+end
+
+--[[
 Executes one live player-versus-player source PDAM skill.
 
 The source calculation provider owns skill identity, criticals, shots,
@@ -1502,6 +1592,8 @@ function C4SourceCombatExecutor:capability(): any
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
+        NpcMagicMovementSlowLiveApplication = true,
+        NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
         NpcStatusSkillReadOnlyPreflight = true,
         NpcSourceRangePreflight = true,
