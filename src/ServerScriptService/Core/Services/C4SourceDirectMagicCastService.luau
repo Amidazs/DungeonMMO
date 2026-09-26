@@ -183,6 +183,9 @@ function C4SourceDirectMagicCastService.new(
     assert(
         executor
             and type(executor.can_magic_skill_npc) == "function"
+            and type(
+                executor.can_undead_magic_skill_npc
+            ) == "function"
             and type(executor.magic_skill_npc) == "function"
             and type(executor.magic_slow_skill_npc) == "function"
             and type(executor.magic_area_skill_npc) == "function"
@@ -268,6 +271,9 @@ local function store_pending(
         CastRange = started.SourceCastRange,
         EffectRange = started.SourceEffectRange,
         Enemy = enemy,
+        ExecutionKind = assert(
+            reviewed_skill(started.CreativeSkillId)
+        ).ExecutionKind,
     }
 
     self._pending_by_owner[player] = record
@@ -309,12 +315,23 @@ function C4SourceDirectMagicCastService:begin_cast(
         return nil, "C4DirectMagicCastAlreadyPending"
     end
 
-    local target_ready, target_reason =
-        self._executor:can_magic_skill_npc(
-            player,
-            enemy,
-            review.CastRange
-        )
+    local target_ready
+    local target_reason
+    if review.ExecutionKind == "UndeadMagic" then
+        target_ready, target_reason =
+            self._executor:can_undead_magic_skill_npc(
+                player,
+                enemy,
+                review.CastRange
+            )
+    else
+        target_ready, target_reason =
+            self._executor:can_magic_skill_npc(
+                player,
+                enemy,
+                review.CastRange
+            )
+    end
     if not target_ready then
         return nil, target_reason
     end
@@ -379,6 +396,14 @@ local function revalidate_target(
     player: any,
     record: any
 ): (boolean, string?)
+    if record.ExecutionKind == "UndeadMagic" then
+        return self._executor:can_undead_magic_skill_npc(
+            player,
+            record.Enemy,
+            record.EffectRange
+        )
+    end
+
     return self._executor:can_magic_skill_npc(
         player,
         record.Enemy,
@@ -689,6 +714,7 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedMagicDrainSourceAbsorption = true,
         ReviewedSleepControl = true,
         ReviewedSleepBreaksOnDamage = true,
+        ReviewedUndeadMagicPreflight = true,
         ReviewedElementalVulnerability = true,
         ReviewedElementalVulnerabilityFeedsMagicDamage = true,
         ReviewedPhysicalAttackWeakening = true,
