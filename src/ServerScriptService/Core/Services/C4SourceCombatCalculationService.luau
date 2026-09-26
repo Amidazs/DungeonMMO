@@ -1774,6 +1774,123 @@ function C4SourceCombatCalculationService.magic_skill(
 end
 
 --[[
+Calculates one reviewed direct magic hit with a C4 movement-slow side effect.
+
+The direct MDAM calculation owns the single Spiritshot consumption. The same
+captured shot state is then reused by the source hostile-effect formula so a
+combined spell can never consume a second shot for its slow roll.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative slow spell.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Combined source damage/slow result or denial reason.
+]]
+function C4SourceCombatCalculationService.magic_slow_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, _, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason = StatusEffects.movement_slow_plan(
+        source.SkillId,
+        source.Rank
+    )
+    if not plan then
+        return nil, plan_reason
+    end
+
+    local target_wit_bonus = defender.SourceWitBonus
+    if type(target_wit_bonus) ~= "number"
+        or target_wit_bonus <= 0
+    then
+        return nil, "OriginalMovementSlowWitBonusUnavailable"
+    end
+
+    local damage, damage_reason =
+        C4SourceCombatCalculationService.magic_skill(
+            attacker_user_id,
+            defender_target,
+            creative_skill_id,
+            creative_rank
+        )
+    if not damage then
+        return nil, damage_reason
+    end
+
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local slow, slow_reason =
+        StatusEffects.resolve_effect_success({
+            Power = plan.EffectPower,
+            TargetStatBonus = target_wit_bonus,
+            TargetVulnerability = 1,
+            IsMagic = plan.IsMagic,
+            AttackerMAtk =
+                attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            TargetMDef =
+                defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            Spiritshot = damage.Spiritshot,
+            BlessedSpiritshot = damage.BlessedSpiritshot,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = plan.MagicLevel,
+        }, roll)
+    if not slow then
+        return nil, slow_reason
+    end
+
+    return {
+        Kind = "MagicDamageMovementSlow",
+        Amount = damage.Amount,
+        Damage = damage,
+        SlowLanded = slow.Landed,
+        SlowRate = slow.Rate,
+        SlowRoll = slow.Roll,
+        SpeedMultiplier = plan.SpeedMultiplier,
+        SlowFraction = plan.SlowFraction,
+        DurationSeconds = plan.DurationSeconds,
+        SaveVs = plan.SaveVs,
+        EffectPower = plan.EffectPower,
+        Spiritshot = damage.Spiritshot,
+        BlessedSpiritshot = damage.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 hostile periodic-status cast.
 
 This path handles DEBUFF application only. It does not apply or schedule ticks.
@@ -2006,6 +2123,9 @@ function C4SourceCombatCalculationService.capability(): any
         MagicalMDAM = true,
         InstantHeal = true,
         PeriodicStatusCalculation = true,
+        MagicMovementSlowCalculation = true,
+        MovementSlowEffectSuccessIntegrated = true,
+        MovementSlowUsesSingleMagicShot = true,
         PeriodicStatusEffectSuccessIntegrated = true,
         PeriodicStatusNonlethalSemanticsIntegrated = true,
         ShotsIntegrated = true,
