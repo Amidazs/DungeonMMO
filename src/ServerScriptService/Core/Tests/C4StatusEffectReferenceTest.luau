@@ -224,7 +224,8 @@ local function main()
 
     print((
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
-            .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 ".. "sleep=30@damage_wake nonlethal=true"
+            .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 "
+            .. "sleep=30@damage_wake nonlethal=true"
     ):format(checks))
 end
 
