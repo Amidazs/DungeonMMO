@@ -34,6 +34,9 @@ local CompanionService = require(
 local CompanionMagic = require(
     Services.C4SourceCompanionCastService
 )
+local DuskguardCast = require(
+    Services.C4SourceDuskguardCastService
+)
 
 local C4SourceCastRuntimeComposition = {}
 C4SourceCastRuntimeComposition.__index =
@@ -112,6 +115,10 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         companions
     )
+    local duskguard_cast = DuskguardCast.new(
+        scheduler,
+        source_executor
+    )
 
     return setmetatable({
         SourceShots = source_shots,
@@ -125,6 +132,7 @@ function C4SourceCastRuntimeComposition.new(
         CorpseMagic = corpse_magic,
         Companions = companions,
         CompanionMagic = companion_magic,
+        DuskguardCast = duskguard_cast,
     }, C4SourceCastRuntimeComposition)
 end
 
@@ -146,6 +154,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     self.SelfMagic:clear_owner(player)
     self.CorpseMagic:clear_owner(player)
     self.CompanionMagic:clear_owner(player)
+    self.DuskguardCast:clear_owner(player)
     self.Companions:clear_owner(player, "OwnerCleared")
 
     if player and type(player.UserId) == "number" then
@@ -169,6 +178,7 @@ function C4SourceCastRuntimeComposition:capability(): any
     local self_magic = self.SelfMagic:capability()
     local corpse_magic = self.CorpseMagic:capability()
     local companion_magic = self.CompanionMagic:capability()
+    local duskguard_cast = self.DuskguardCast:capability()
 
     return {
         Available = true,
@@ -207,6 +217,11 @@ function C4SourceCastRuntimeComposition:capability(): any
             companion_magic.DefaultEnabled == true,
         CompanionMagicCurrentlyEnabled =
             companion_magic.CurrentlyEnabled == true,
+        DuskguardCastBridge = true,
+        DuskguardCastDefaultEnabled =
+            duskguard_cast.DefaultEnabled == true,
+        DuskguardCastCurrentlyEnabled =
+            duskguard_cast.CurrentlyEnabled == true,
     }
 end
 
