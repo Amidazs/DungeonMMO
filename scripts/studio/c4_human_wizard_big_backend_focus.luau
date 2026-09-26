@@ -67,6 +67,14 @@ local FIXTURES = table.freeze({
     },
     {
         Folder = core_tests,
+        Name = "C4SourceCompanionServiceTest",
+    },
+    {
+        Folder = core_tests,
+        Name = "C4SourceCompanionCastServiceTest",
+    },
+    {
+        Folder = core_tests,
         Name = "C4SourceCastRuntimeCompositionTest",
     },
     {
