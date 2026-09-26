@@ -6,6 +6,8 @@ assert(
     "Moonweaver live rehearsal requires an unpublished local place"
 )
 
+print("[Moonweaver Live] EDIT_START")
+
 local ServerScriptService = game:GetService("ServerScriptService")
 local StudioTestService = game:GetService("StudioTestService")
 local Workspace = game:GetService("Workspace")
@@ -291,6 +293,7 @@ ProgressionService.bind_default(runtime.ProgressionService)
 ]==]
 
 replace_once(bridge_anchor, bridge_replacement)
+print("[Moonweaver Live] EDIT_PATCHED")
 
 Workspace:SetAttribute(
     "DungeonMMOStudioDungeonId",
@@ -943,6 +946,7 @@ end)
 ]==]
 
 driver.Parent = ServerScriptService
+print("[Moonweaver Live] EDIT_DRIVER_READY")
 
 local ok, result = pcall(function()
     return StudioTestService:ExecutePlayModeAsync(
