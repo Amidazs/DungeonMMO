@@ -1,3 +1,26 @@
+## 27 September 2026 — CURRENT v3.14 Palus Knight / Duskguard GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md);
+[green evidence](
+../testing/c4-palus-knight-duskguard-v3-14-green-20260927.md).
+
+Palus Knight / Duskguard level-30 backend is now fully green: **50/50 source
+rank rows**, **13 creative families**, **23/23 fresh backend suites** and a
+genuine unpublished Play rehearsal. Play proved Challenge through real threat
+(803 threat, zero damage), Last Stand through the real 30-second immobility
+authority, and Umbral Siphon through real NPC HP loss plus caster healing.
+Final project CreatorError count was **0**.
+
+The Play rehearsal exposed and closed a real source scheduler gap: physical
+active skills now use P.Atk.Spd and PHYSICAL_SKILL_REUSE rather than being
+rejected by the formerly magic-only timing service. Magic timing and shot
+acceleration remain unchanged.
+
+Next active class: Dark Elf **Assassin** first-transfer catalogue.
+
+No main merge, publish, production DataStore mutation or animation edits.
+
 ## 27 September 2026 — CURRENT v3.13 Lifebinder GREEN
 
 [Roadmap](
