@@ -27,6 +27,11 @@ local NPC_BOUNDARY = {
     SourceNpcId = 525,
     SourceNpcRace = "ANIMAL",
 }
+local NPC_BOUNDARY_SECONDARY = {
+    SourceTargetKind = "Npc",
+    SourceNpcId = 325,
+    SourceNpcRace = "NONE",
+}
 
 local FakeCombat = {}
 local FakeResources = {}
@@ -163,6 +168,46 @@ function FakeCombat.magic_skill(
     return {
         Kind = "MagicDamage",
         Amount = 8,
+    }, nil
+end
+
+--[[
+Returns one disposable source TARGET_AREA MDAM result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_targets ({any}): Reviewed ordered NPC boundaries.
+    creative_skill_id (string): Expected area skill identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake multi-target source result.
+]]
+function FakeCombat.magic_area_skill(
+    attacker_user_id: number,
+    defender_targets: {any},
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(creative_skill_id == "EmberweaverEmberField")
+    assert(creative_rank == 3)
+    assert(#defender_targets == 2)
+    assert(defender_targets[1] == NPC_BOUNDARY)
+    assert(defender_targets[2] == NPC_BOUNDARY_SECONDARY)
+
+    return {
+        Kind = "MagicAreaDamage",
+        Results = {
+            {Kind = "MagicDamage", Amount = 7},
+            {Kind = "MagicDamage", Amount = 9},
+        },
+        TargetCount = 2,
+        SourceSkillId = 1181,
+        SourceRank = 3,
+        SourceSkillRadius = 200,
+        Spiritshot = true,
+        BlessedSpiritshot = false,
     }, nil
 end
 
@@ -395,13 +440,26 @@ local function main()
         Vector3.new(0, 0, 0)
     )
     local enemy = fixture_npc(Vector3.new(0, 0, 0))
+    local secondary = fixture_npc(Vector3.new(0, 2, -6))
+    local outsider = fixture_npc(Vector3.new(0, 2, -5))
+    enemy:SetAttribute("DungeonEncounterId", "TEMP_Area")
+    secondary:SetAttribute("DungeonEncounterId", "TEMP_Area")
+    outsider:SetAttribute("DungeonEncounterId", "TEMP_Other")
 
     local executor = ExecutorModule.new({
         CombatProvider = FakeCombat,
         ResourceAuthority = FakeResources,
         NpcBoundaryProvider = function(target: Model): any
-            assert(target == enemy)
-            return NPC_BOUNDARY, nil
+            if target == enemy then
+                return NPC_BOUNDARY, nil
+            end
+            if target == secondary then
+                return NPC_BOUNDARY_SECONDARY, nil
+            end
+            if target == outsider then
+                return NPC_BOUNDARY_SECONDARY, nil
+            end
+            error("unexpected NPC boundary target")
         end,
         NpcDamageObserver = function(
             context: any,
@@ -440,6 +498,9 @@ local function main()
             and capability.NpcNormalAttackLiveApplication
             and capability.NpcPhysicalSkillLiveApplication
             and capability.NpcMagicSkillLiveApplication
+            and capability.NpcMagicAreaLiveApplication
+            and capability.NpcMagicAreaCasterRadiusSourceSemantics
+            and capability.NpcMagicAreaSingleShotSnapshot
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcSourceRangePreflight
@@ -679,6 +740,42 @@ local function main()
         "NPC source damage emits existing trusted bookkeeping context"
     )
 
+    table.clear(npc_events)
+    local secondary_humanoid =
+        secondary:FindFirstChildOfClass("Humanoid")
+    local outsider_humanoid =
+        outsider:FindFirstChildOfClass("Humanoid")
+    assert(secondary_humanoid and outsider_humanoid)
+
+    local area = assert(executor:magic_area_skill_npc(
+        attacker,
+        enemy,
+        "EmberweaverEmberField",
+        3,
+        200,
+        204
+    ))
+    check(
+        area.Kind == "C4LiveNpcMagicArea"
+            and area.Applied
+            and area.TargetCount == 2
+            and area.TotalHealthDamage == 16
+            and area.SourceSkillRadius == 200
+            and area.Spiritshot
+            and enemy:FindFirstChildOfClass("Humanoid").Health == 63
+            and secondary_humanoid.Health == 91
+            and outsider_humanoid.Health == 100,
+        "TARGET_AREA keeps primary and hits same-encounter caster-radius NPCs"
+    )
+    check(
+        #npc_events == 2
+            and npc_events[1].Context.source_kind == "MagicArea"
+            and npc_events[2].Context.source_kind == "MagicArea"
+            and npc_events[1].Context.sequence_id == 204
+            and npc_events[2].Context.sequence_id == 204,
+        "area source damage preserves per-target bookkeeping callbacks"
+    )
+
     local enemy_humanoid =
         enemy:FindFirstChildOfClass("Humanoid")
     assert(enemy_humanoid)
@@ -796,6 +893,8 @@ local function main()
     attacker.Character:Destroy()
     defender.Character:Destroy()
     enemy:Destroy()
+    secondary:Destroy()
+    outsider:Destroy()
 
     print((
         "[C4 Source Combat Executor] LIVE_EXECUTOR_PASS: %d assertions "
