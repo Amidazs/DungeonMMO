@@ -1,6 +1,6 @@
 --!strict
--- C4 source-effect catalogue for every source skill used by the nine
--- currently implemented original paths through character level 30.
+-- C4 source-effect catalogue for source skills used by implemented
+-- level-30 original paths and the current Human Cleric foundation.
 local Data1 = require(script.Parent.C4SkillEffectSourceData01)
 local Data2 = require(script.Parent.C4SkillEffectSourceData02)
 local Data3 = require(script.Parent.C4SkillEffectSourceData03)
@@ -11,6 +11,9 @@ local Data7 = require(script.Parent.C4SkillEffectSourceData07)
 local Data8 = require(script.Parent.C4SkillEffectSourceData08)
 local Data9 = require(
     script.Parent.C4SkillEffectSourceData09HumanWizard
+)
+local Data10 = require(
+    script.Parent.C4SkillEffectSourceData10HumanCleric
 )
 
 local C4SkillEffectSource = {}
@@ -27,6 +30,7 @@ local SOURCES = table.freeze({
     Data7,
     Data8,
     Data9,
+    Data10,
 })
 
 local BY_ID = {}
@@ -34,7 +38,7 @@ local BY_ID = {}
 --[[
 Merges one additional rank subset for a source skill already catalogued.
 
-Human Wizard inherits several Human Mystic source skills at later ranks.
+First-transfer classes may inherit starter source skills at later ranks.
 Keeping those later ranks in a separate generated file avoids rewriting the
 previously accepted source shards while still producing one immutable runtime
 definition per historical skill ID.
