@@ -2152,6 +2152,81 @@ function C4SourceCombatCalculationService.magic_slow_skill(
 end
 
 --[[
+Resolves one reviewed C4 corpse-target DRAIN skill.
+
+Corpse Life Drain computes magic damage in the source handler, but a dead NPC
+has no drainable HP. Its live source effect is therefore the fixed absorbAbs
+heal, followed by immediate corpse decay.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Reviewed source boundary for the dead NPC.
+    creative_skill_id (string): Server-selected corpse-drain skill.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Source corpse-drain contract or strict denial reason.
+]]
+function C4SourceCombatCalculationService.corpse_drain_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "DRAIN"
+        or sets.target ~= "TARGET_CORPSE_MOB"
+        or type(sets.absorbAbs) ~= "number"
+        or sets.absorbAbs < 0
+        or type(sets.absorbPart) ~= "number"
+        or sets.absorbPart ~= 0
+    then
+        return nil, "UnsupportedOriginalCorpseDrainSkill"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "CorpseDrain",
+        HealAmount = sets.absorbAbs,
+        AbsorbAbs = sets.absorbAbs,
+        AbsorbPart = sets.absorbPart,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        ConsumesCorpse = true,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 Sleep cast against a source target.
 
 The source SkillDebuff path snapshots and consumes one magical shot for the
@@ -3003,6 +3078,8 @@ function C4SourceCombatCalculationService.capability(): any
         MagicAreaSingleShotSnapshot = true,
         MagicDrainCalculation = true,
         MagicDrainSourceAbsorptionIntegrated = true,
+        CorpseDrainCalculation = true,
+        CorpseDrainFixedAbsorptionIntegrated = true,
         SleepControlCalculation = true,
         SleepControlEffectSuccessIntegrated = true,
         SleepControlConsumesOneMagicShot = true,
