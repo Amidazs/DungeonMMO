@@ -1,3 +1,24 @@
+## 26 September 2026 — CURRENT v3.03 Ember Field implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_03_Human_Wizard_Ember_Field_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-ember-field-v3-03-pending-20260926.md).
+Human Wizard Ember Field is now implemented through the staged source cast
+pipeline. Rank 3 preserves source Flame Strike 1181:3: FIRE MDAM power 19,
+magic level 30, 500/1000 cast/effect ranges and the exact 200-source-unit
+TARGET_AREA radius. The source calculator snapshots one magical shot for the
+whole target list and resolves target-specific magic rolls from that shared shot
+state. Live area selection remains server-owned: the selected NPC is retained,
+same-encounter reviewed NPCs inside caster radius are added, and nearby NPCs
+from another encounter are excluded. Every damaged NPC still flows through the
+existing threat/contribution/quest observer path. Fresh diff check and Base /
+Dungeon Rojo builds pass at code candidate
+`19173565960c2137a2f95e8699dea83e7e3bd6a3`; Studio focused/live acceptance
+is pending.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.02 Frost Lance implemented
 
 [Roadmap](
