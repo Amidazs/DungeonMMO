@@ -1577,7 +1577,8 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true frost=true ".. "area=true drain=true sleep=true "
+        .. "status=true pdam=true mdam=true wizard=true frost=true "
+        .. "area=true drain=true sleep=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
