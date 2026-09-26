@@ -1,3 +1,25 @@
+## 27 September 2026 — v3.13 Lifebinder GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_13_Elven_Oracle_Lifebinder_20260927.md);
+[acceptance evidence](
+../testing/c4-elven-oracle-lifebinder-v3-13-green-20260927.md).
+
+Elven Oracle / Lifebinder acceptance is complete.
+
+- Exact source schedule: **91 / 91 rows** through level 30.
+- Focused/backend Studio acceptance: **25 / 25 PASS**.
+- Real unpublished Play: **PASS**.
+- Wind Shackle: rate weakening **0.20**, duration **15s**.
+- Agility: **1200s**, EVASION_RATE **+2**.
+- Mana Recharge: live authoritative MP restored **52**.
+- Final project CreatorErrors: **0**.
+- Base and Dungeon Rojo builds: PASS.
+- `git diff --check`: PASS.
+
+The Lifebinder Studio runner now has a per-fixture timeout so a yielding
+regression reports TIMEOUT rather than hanging automation indefinitely.
+
 ## 26 September 2026 — v3.12 Moonweaver acceptance GREEN
 
 Moonweaver / Elven Wizard level-30 closure is accepted.
