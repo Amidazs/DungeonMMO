@@ -244,6 +244,44 @@ function FakeExecutor:status_skill_npc(
 end
 
 --[[
+Provides the reviewed target-area poison executor contract.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected captured NPC.
+    creative_skill_id (string): Reviewed Venom Cloud skill.
+    creative_rank (number): Server-owned rank.
+    source_radius (number): Reviewed source area radius.
+    sequence_id (number?): Existing trusted action sequence.
+
+Returns:
+    (any?, string?): Fake target-area poison resolution.
+]]
+function FakeExecutor:status_area_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverVenomCloud")
+    assert(creative_rank >= 1)
+    assert(source_radius == 200)
+    executor_state.LastSequence = sequence_id
+
+    return {
+        Kind = "C4LiveNpcPeriodicStatusArea",
+        Applied = true,
+        StatusApplied = true,
+        TargetCount = 2,
+        LandedCount = 2,
+    }, nil
+end
+
+--[[
 Counts one periodic-magic bridge assertion.
 
 Args:
@@ -330,14 +368,14 @@ local function check_gate_and_review()
     local blocked, blocked_reason = bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverVenomCloud",
+        "EmberweaverEmberField",
         100
     )
     check(
         blocked == nil
             and blocked_reason == "C4PeriodicMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "area poison remains outside first periodic bridge"
+        "unreviewed periodic skill remains outside the bridge"
     )
 end
 
@@ -623,6 +661,9 @@ local function main()
             and capability.DefaultEnabled == false
             and not capability.CurrentlyEnabled
             and capability.ReviewedPeriodicMagicOnly
+            and capability.ReviewedTargetedPoison
+            and capability.ReviewedTargetAreaPoison
+            and capability.ReviewedTargetAreaSourceRadius
             and capability.ReviewedSkill == "EmberweaverVenomHex"
             and capability.ReviewedSourceSkillId == 1168
             and capability.TargetBoundAtCastStart
