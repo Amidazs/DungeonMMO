@@ -139,7 +139,7 @@ local function main()
     end
     check_target(1016, "TARGET_CORPSE_PLAYER")
     check_target(1027, "TARGET_PARTY")
-    check_target(1031, "TARGET_ONE")
+    check_target(1031, "TARGET_UNDEAD")
 
     local recharge = assert(Effects.get_rank(1013, 2))
     check(
