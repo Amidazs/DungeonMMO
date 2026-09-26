@@ -233,6 +233,31 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Duskguard = table.freeze({
+        Id = "Duskguard",
+        DisplayName = "Duskguard",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"DarkElf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "DuskguardUmbralSiphon",
+            "DuskguardDefenseAura",
+            "DuskguardLastStand",
+            "DuskguardVenomHex",
+            "DuskguardRunicResistance",
+            "DuskguardShieldMastery",
+            "DuskguardSteelTraining",
+            "DuskguardHeavyArmorTraining",
+            "DuskguardMindRend",
+            "DuskguardChallenge",
+            "DuskguardArrowWard",
+            "DuskguardCrimsonSting",
+            "DuskguardAttackAura",
+        }),
+    }),
+
     -- An original first-transfer award is separate from legacy Rogue/
     -- Ranger starter profiles and their old specialist class identities.
     Ashenblade = table.freeze({
