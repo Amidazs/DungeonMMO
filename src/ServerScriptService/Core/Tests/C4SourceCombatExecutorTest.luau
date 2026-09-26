@@ -321,6 +321,42 @@ function FakeCombat.elemental_vulnerability_skill(
 end
 
 --[[
+Returns one disposable source physical-attack weakening result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected reviewed NPC boundary.
+    creative_skill_id (string): Expected Withering Hex identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source physical-attack weakening result.
+]]
+function FakeCombat.physical_attack_weakening_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "EmberweaverWitheringHex")
+    assert(creative_rank == 3)
+
+    return {
+        Kind = "PhysicalAttackWeakening",
+        Landed = true,
+        Rate = 80,
+        Roll = 0,
+        PhysicalAttackMultiplier = 0.8,
+        PowerReductionFraction = 0.2,
+        DurationSeconds = 15,
+        SourceSkillId = 1164,
+        SourceRank = 4,
+    }, nil
+end
+
+--[[
 Returns one disposable source self-heal result.
 
 Args:
@@ -618,6 +654,10 @@ local function main()
             and capability.NpcElementalVulnerabilityLiveApplication
             and capability.NpcElementalVulnerabilityBoundaryDecoration
             and capability.NpcElementalVulnerabilityAuthorityConfigured
+            and capability.NpcPhysicalAttackWeakeningLiveApplication
+            and capability.NpcPhysicalAttackWeakeningUsesOutgoingDamageRules
+            and capability.NpcPhysicalAttackWeakeningLeavesAttackRateNeutral
+            and capability.NpcPhysicalAttackWeakeningAuthorityConfigured
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcSourceRangePreflight
@@ -882,6 +922,30 @@ local function main()
             ) == "number"
             and #npc_events == 0,
         "landed source fire vulnerability applies without dealing damage"
+    )
+
+    table.clear(npc_events)
+    local weakness = assert(
+        executor:physical_attack_weakening_skill_npc(
+            attacker,
+            enemy,
+            "EmberweaverWitheringHex",
+            3,
+            2056
+        )
+    )
+    check(
+        weakness.Kind == "C4LiveNpcPhysicalAttackWeakening"
+            and weakness.Applied
+            and weakness.WeakeningApplied
+            and weakness.Landed
+            and weakness.PhysicalAttackMultiplier == 0.8
+            and weakness.PowerReductionFraction == 0.2
+            and weakness.DurationSeconds == 15
+            and enemy:GetAttribute("C4PowerWeakening") == 0.2
+            and enemy:GetAttribute("C4RateWeakening") == 0
+            and #npc_events == 0,
+        "landed source attack weakness reduces power without damage or rate"
     )
 
     local sleep_humanoid =
