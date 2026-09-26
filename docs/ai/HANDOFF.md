@@ -1,3 +1,21 @@
+## 26 September 2026 — v3.04 Human Wizard Life Siphon staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_04_Human_Wizard_Life_Siphon_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-life-siphon-v3-04-pending-20260926.md).
+Life Siphon now preserves source Vampiric Touch 1147:6 DRAIN behavior: DARK
+power 32, one magical shot, 40 percent absorption from actual NPC HP removed
+and caster MaxHealth capping. The targeted magic bridge now routes six Wizard
+families, with Life Siphon selecting the dedicated drain executor. Source NPC
+damage continues through existing contribution, threat and quest bookkeeping.
+Fresh diff check plus Base/Dungeon Rojo builds pass at
+`5291dac8eaa4497a928001e953f4ae533c73ce34`.
+
+Next validation remains the existing Wizard focused runner, large backend
+runner and one unpublished Life Siphon rehearsal. Permanent edits remain
+GitHub-only; Desktop Commander is for fast-forward/build/test work.
+
 ## 26 September 2026 — v3.03 Human Wizard Ember Field staged
 
 [Roadmap](
