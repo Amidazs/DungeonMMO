@@ -99,6 +99,10 @@ local function check_all_templates()
         STR = 21, DEX = 24, CON = 25,
         INT = 37, WIT = 23, MEN = 40,
     }
+    local dark_elf = {
+        STR = 41, DEX = 34, CON = 32,
+        INT = 25, WIT = 12, MEN = 26,
+    }
     check_template("Human", "Fighter", 0, 1, human)
     check_template("Human", "Mage", 10, 1, human_mage)
     check_template("Elf", "Fighter", 18, 1, elf)
@@ -112,6 +116,7 @@ local function check_all_templates()
     check_template("Elf", "Lifebinder", 29, 20, elf_mage)
     check_template("Elf", "GreenwardWarden", 19, 20, elf)
     check_template("Elf", "GreenwardScout", 22, 20, elf)
+    check_template("DarkElf", "Duskguard", 32, 20, dark_elf)
 end
 
 --[[
@@ -226,6 +231,11 @@ local function check_growth_vectors()
         RawHP = 874.688, RawMP = 325.91,
         RawCP = 354.944,
     })
+    check_vitals("DarkElf", "Duskguard", 30, {
+        HP = 856, MP = 325, CP = 430,
+        RawHP = 856.539, RawMP = 325.91,
+        RawCP = 430.464,
+    })
 end
 
 --[[
@@ -239,12 +249,12 @@ Returns:
 ]]
 local function check_scope_boundaries()
     local coverage = Source.coverage()
-    check(coverage.PathCount == 13
-        and coverage.VerifiedPrimaryStatTemplates == 13
-        and coverage.VerifiedLevelGrowthTemplates == 13
+    check(coverage.PathCount == 14
+        and coverage.VerifiedPrimaryStatTemplates == 14
+        and coverage.VerifiedLevelGrowthTemplates == 14
         and coverage.VerifiedLevelCap == 30
         and not coverage.LiveCombatIntegrated,
-        "Thirteen exact templates do not imply live combat migration")
+        "Fourteen exact templates do not imply live combat migration")
     check(Source.get("Human", "Ranger") == nil
         and Source.get("Elf", "Rogue") == nil
         and Source.get("Elf", "Oathguard") == nil,
@@ -288,7 +298,7 @@ local function main()
     check_growth_vectors()
     check_scope_boundaries()
     print(("[C4 Primary Stats] EXACT_SOURCE_PASS: %d assertions, "
-        .. "13 templates, 13 growth curves through level 30, live=false")
+        .. "14 templates, 14 growth curves through level 30, live=false")
         :format(checks))
 end
 
