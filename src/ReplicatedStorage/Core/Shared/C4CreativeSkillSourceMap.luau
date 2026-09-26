@@ -212,6 +212,7 @@ local MAPS = table.freeze({
         [111] = table.freeze({SkillId = "ScoutEvasiveFocus"}),
         [113] = table.freeze({SkillId = "RangerLongRange"}),
         [137] = table.freeze({SkillId = "HumanScoutPrecision"}),
+        [148] = table.freeze({SkillId = "AshenbladeVitalForce"}),
         [169] = table.freeze({SkillId = "ScoutFleetFoot"}),
         [173] = table.freeze({SkillId = "ScoutFallResistance"}),
         [193] = table.freeze({SkillId = "HumanScoutCriticalPower"}),
@@ -249,6 +250,10 @@ local MAPS = table.freeze({
         [21] = table.freeze({SkillId = "ElvenScoutPoisonRecovery"}),
         [27] = table.freeze({SkillId = "ScoutLockpicking"}),
         [56] = table.freeze({SkillId = "WayfinderArrow", Offset = 9}),
+        [58] = table.freeze({
+            SkillId = "GreenwardScoutElementalHeal",
+            Offset = 3,
+        }),
         [61] = table.freeze({SkillId = "ElvenScoutCureWounds"}),
         [77] = table.freeze({SkillId = "ElvenScoutBattleFocus", Offset = 1}),
         [91] = table.freeze({SkillId = "ElvenScoutGuard", Offset = 1}),
@@ -307,13 +312,13 @@ local GAPS = table.freeze({
 
     }),
     HumanRogue = table.freeze({
-        [148] = "Vital Force is not equivalent to a stamina-resting passive",
+
     }),
     ElvenKnight = table.freeze({
 
     }),
     ElvenScout = table.freeze({
-        [58] = "Current ElvenRenewal is not a verified nine-rank direct Elemental Heal equivalent",
+
     }),
 })
 
