@@ -1304,8 +1304,12 @@ local function main()
             and capability.ReviewedElementalVulnerabilityFeedsMagicDamage
             and capability.ReviewedPhysicalAttackWeakening
             and capability.ReviewedPhysicalAttackWeakeningFeedsNpcDamage
-            and capability.ReviewedSkillCount == 9
-            and #capability.ReviewedSkills == 9
+            and capability.ReviewedUndeadMagicPreflight
+            and capability.ReviewedUndeadOnlyMagic
+            and capability.ReviewedRootControl
+            and capability.ReviewedRootMovementOnly
+            and capability.ReviewedSkillCount == 12
+            and #capability.ReviewedSkills == 12
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
