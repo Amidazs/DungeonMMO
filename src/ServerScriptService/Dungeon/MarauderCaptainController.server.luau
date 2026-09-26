@@ -19,6 +19,9 @@ local PlayerBleedStatusService = require(
     Combat:WaitForChild("PlayerBleedStatusService")
 )
 local StaggerService = require(Combat:WaitForChild("StaggerService"))
+local C4NpcSleepService = require(
+    Combat:WaitForChild("C4NpcSleepService")
+)
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
 local PresentationService = require(Combat:WaitForChild("MarauderPresentationService"))
 local Factory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
@@ -202,7 +205,7 @@ local function clear_attack(runtime: Runtime)
 end
 
 local function perform_attack(runtime: Runtime, target_player: Player, target_character: Model, target_root: BasePart)
-    if runtime.attacking or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) then return end
+    if runtime.attacking or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then return end
     local boss_attack = OptionalBossAttackRules.resolve(
         runtime.model, runtime.patternIndex,
         runtime.humanoid.Health / math.max(1, runtime.humanoid.MaxHealth)
@@ -232,14 +235,14 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
     runtime.body.Color = definition.TELEGRAPH_COLOR
     PresentationService.play_attack_windup(runtime.model, definition.PRESENTATION, definition.WIND_UP_SECONDS)
     task.wait(definition.WIND_UP_SECONDS)
-    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) then
+    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then
         clear_attack(runtime)
         return
     end
 
     PresentationService.play_attack_strike(runtime.model, definition.PRESENTATION, definition.ATTACK_LOCK_SECONDS)
     task.wait(definition.ATTACK_LOCK_SECONDS)
-    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) then
+    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then
         clear_attack(runtime)
         return
     end
@@ -281,6 +284,7 @@ local function attach(model: Instance)
     model:SetAttribute("MarauderAggroMode", "None")
     humanoid.Died:Connect(function()
         ThreatService.clear(model)
+        C4NpcSleepService.clear(model)
         runtime.attackSequence += 1
         runtime.attacking = false
         model:SetAttribute("AttackTelegraph", false)
@@ -315,6 +319,14 @@ RunService.Heartbeat:Connect(function(dt)
             model:SetAttribute("AttackTelegraph", false)
             model:SetAttribute("AttackName", "")
             model:SetAttribute("MarauderAIState", "Staggered")
+        elseif C4NpcSleepService.is_sleeping(model) then
+            if runtime.attacking then runtime.attackSequence += 1 end
+            runtime.attacking = false
+            runtime.humanoid:Move(Vector3.zero)
+            model:SetAttribute("AttackTelegraph", false)
+            model:SetAttribute("AttackName", "")
+            model:SetAttribute("MarauderAIState", "Sleeping")
+            PresentationService.reset_pose(model, 0)
         elseif not runtime.attacking then
             local player, character, target_root, distance = threat_target(runtime)
             if not player or not character or not target_root then
