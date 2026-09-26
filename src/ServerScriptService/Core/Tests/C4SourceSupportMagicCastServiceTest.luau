@@ -246,6 +246,20 @@ Args:
 Returns:
     (any?, string?): Fake buff evidence.
 ]]
+function FakeExecutor.mana_recharge_skill_target(
+    _self: any,
+    _caster: any,
+    _target: any,
+    skill_id: string,
+    _rank: number
+): (any?, string?)
+    last_execution = skill_id
+    return {
+        Applied = true,
+        EffectiveRecharge = 52,
+    }, nil
+end
+
 function FakeExecutor.support_buff_skill_target(
     _self: any,
     _caster: any,
