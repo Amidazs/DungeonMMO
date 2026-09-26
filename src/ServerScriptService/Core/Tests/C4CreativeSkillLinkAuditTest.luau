@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 12 and report.SourceLearningRows == 739,
+assert(report.ClassPaths == 13 and report.SourceLearningRows == 830,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 727
+assert(report.CandidateRows == 818
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 739,
+assert(report.CandidateRows + report.ExplicitMissingRows == 830,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -33,6 +33,8 @@ local wizard_bolt = assert(Map.resolve("HumanWizard", 1220, 1))
 local wizard_companion = assert(Map.resolve("HumanWizard", 1111, 1))
 local cleric_heal = assert(Map.resolve("HumanCleric", 1011, 7))
 local cleric_shield = assert(Map.resolve("HumanCleric", 1040, 2))
+local oracle_recharge = assert(Map.resolve("ElvenOracle", 1013, 2))
+local oracle_shackle = assert(Map.resolve("ElvenOracle", 1206, 4))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -60,6 +62,14 @@ assert(cleric_heal.Status == "Candidate"
     and cleric_shield.CreativeSkillId == "DawnkeeperStoneWard"
     and cleric_shield.CreativeRank == 1,
     "Cleric inherited source ranks map to exact Dawnkeeper creative ranks")
+
+assert(oracle_recharge.Status == "Candidate"
+    and oracle_recharge.CreativeSkillId == "LifebinderManaRecharge"
+    and oracle_recharge.CreativeRank == 2
+    and oracle_shackle.Status == "Candidate"
+    and oracle_shackle.CreativeSkillId == "LifebinderWindShackle"
+    and oracle_shackle.CreativeRank == 3,
+    "Oracle source ranks map to exact Lifebinder creative ranks")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
