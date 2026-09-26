@@ -1,3 +1,13 @@
+**v3.09 HUMAN CLERIC / DAWNKEEPER LEVEL 30 — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_09_Human_Cleric_Level30_Complete_20260926.md)
+and [acceptance evidence](
+../testing/c4-human-cleric-level30-complete-v3-09-20260926.md).
+Human Cleric is **88/88 mapped** through level 30. Friendly healing/buffs,
+party heal, Resurrection confirmation, undead-only Exorcism, Sleep and Root
+are integrated. Fresh Studio acceptance is **24/24 PASS**, Play-critical
+acceptance is **4/4 PASS**, the real resurrection UI/request round trip passed,
+and the final Test9 log contains **0 CreatorErrors**.
+
 **v3.08 HUMAN WIZARD LEVEL-30 BACKEND GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_08_Human_Wizard_Level30_Complete_20260926.md)
 and [green evidence](
