@@ -3,7 +3,7 @@
 Date: 27 September 2026.
 Branch: `wip/phase-4-test-hud-integration-v1`.
 Accepted code candidate:
-`aac122673d5e7b85179157c8365961c180513d5e`.
+`45fd554aecd58099b3a0fb359deaadf3118471b4`.
 
 ## Source catalogue
 
