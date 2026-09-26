@@ -23,6 +23,45 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    PalusKnight = table.freeze({
+        Id = "DuskguardVigil",
+        BranchId = "PalusKnight",
+        SourceTitle = "The Duskguard Vigil",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "WardenNyx",
+        Recommendation = "DuskguardOathSeal",
+        Steps = table.freeze({
+            talk("WardenNyx", "Accept the Duskguard vigil."),
+            talk(
+                "WatcherVeyra",
+                "Trace the raiders threatening the shadow border."
+            ),
+            defeat(
+                "GloomfangRaider",
+                3,
+                "Recover three personally earned nightsteel tokens."
+            ),
+            talk(
+                "WatcherVeyra",
+                "Return the recovered nightsteel tokens."
+            ),
+            defeat(
+                "UmbralSiegebreaker",
+                1,
+                "Recover the siegebreaker's personal dusk seal."
+            ),
+            talk(
+                "WardenNyx",
+                "Present the dusk seal and complete the vigil."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "NightsteelTokens3",
+            "UmbralDuskSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     -- Independent DungeonMMO Warrior route. These identifiers belong
     -- to original game actors and owned loot, not third-party content.
     -- Independent Human Knight story; no borrowed NPC, item or
