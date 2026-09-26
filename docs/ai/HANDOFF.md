@@ -1,3 +1,20 @@
+## 26 September 2026 — v3.07 Human Wizard Withering Hex staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_07_Human_Wizard_Withering_Hex_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-withering-hex-v3-07-pending-20260926.md).
+Withering Hex rank 3 now maps to source Curse: Weakness 1164:4 with exact
+WIT/effect-success inputs, PHYSICAL_ATTACK x0.8 for 15 seconds, 3 + 11 MP,
+600/1100 ranges and the current 1.5-second cast / 6-second reuse result. It
+reuses the existing EnemyWeakeningService with no attack-rate component, and
+supported Marauder/Captain outgoing damage already consumes that authority.
+
+The source-cast focus runner remains 16 suites. The broad Wizard runner now has
+37 suites because C4EnemyWeakeningTest was added. Both still require Studio
+execution before v3.07 can be marked green. Permanent edits remain GitHub-only;
+Desktop Commander is for local fast-forward/build/test work.
+
 ## 26 September 2026 — v3.06 Human Wizard Scorch Mark staged
 
 [Roadmap](
