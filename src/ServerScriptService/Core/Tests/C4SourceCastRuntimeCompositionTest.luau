@@ -523,6 +523,44 @@ function FakeExecutor:corpse_drain_skill_npc(
     }, nil
 end
 
+function FakeExecutor:self_buff_skill(
+    _owner: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {Applied = true}, nil
+end
+
+function FakeExecutor:aggro_skill_npc(
+    _owner: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {Applied = true, Threat = 803}, nil
+end
+
+function FakeExecutor:confusion_skill_npc(
+    _owner: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {Applied = true, Landed = true}, nil
+end
+
+function FakeExecutor:physical_status_skill_npc(
+    _owner: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {Applied = true, StatusApplied = true}, nil
+end
+
 local FakeInventory = {}
 
 function FakeInventory:consume_item(
@@ -619,6 +657,7 @@ local function main()
             and capability.CorpseMagicBridge
             and capability.CompanionAuthority
             and capability.CompanionMagicBridge
+            and capability.DuskguardCastBridge
             and not capability.DirectMagicDefaultEnabled
             and not capability.DirectMagicCurrentlyEnabled
             and not capability.SupportMagicDefaultEnabled
@@ -634,7 +673,8 @@ local function main()
             and not runtime.PeriodicMagic:is_enabled()
             and not runtime.SelfMagic:is_enabled()
             and not runtime.CorpseMagic:is_enabled()
-            and not runtime.CompanionMagic:is_enabled(),
+            and not runtime.CompanionMagic:is_enabled()
+            and not runtime.DuskguardCast:is_enabled(),
         "composed staged bridges remain disabled until trusted activation"
     )
 
