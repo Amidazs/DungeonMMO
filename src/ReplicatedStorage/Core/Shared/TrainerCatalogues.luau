@@ -139,6 +139,115 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+    DawnkeeperTrainer = table.freeze({
+        Id = "DawnkeeperTrainer",
+        DisplayName = "Dawnkeeper Training",
+        AllowedRaces = table.freeze({"Human"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedClasses = table.freeze({"Dawnkeeper"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "DawnkeeperArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperQuickPrayer",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperWeaponTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperHealingLight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperBattleMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperRevive",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperGroupMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperExorcism",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperMindWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperStoneWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperSacredEdge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperMight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperSlumber",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperBreathBlessing",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperInsight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperFireWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperRootbind",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DawnkeeperWindstep",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     -- The physical Knight trainer requires an authentic personal quest
     -- and first-transfer mentor; server checks proximity and ownership.
     OathguardTrainer = table.freeze({
