@@ -23,6 +23,7 @@ local FIXTURES = table.freeze({
     "C4HumanWizardStagedCastIntegrationTest",
     "C4SourceCombatCalculationServiceTest",
     "C4SourceCombatExecutorTest",
+    "C4NpcElementalVulnerabilityServiceTest",
     "C4DungeonSourceCastRuntimeTest",
 })
 
