@@ -1,4 +1,15 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_RUNTIME_COMPOSITION_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[Bestiary Reputation Runtime Composition Tests] SKIP: runtime composition regression "
+            .. "runs in focused Edit mode"
+    )
+    return
+end
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
