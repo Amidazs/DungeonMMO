@@ -2,6 +2,9 @@
 local ClassProgressionDefinitions = {}
 
 local HUMAN_ELF = table.freeze({"Human", "Elf"})
+local FIGHTER_RACES = table.freeze({
+    "Human", "Elf", "DarkElf",
+})
 
 local DEFINITIONS = table.freeze({
     Fighter = table.freeze({
@@ -9,7 +12,7 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Fighter",
         SourceC4StarterName = "Fighter",
         FreshCreationAllowed = true,
-        AllowedRaces = HUMAN_ELF,
+        AllowedRaces = FIGHTER_RACES,
         StarterSkills = table.freeze({
             "ShieldBash",
             "Mend",
