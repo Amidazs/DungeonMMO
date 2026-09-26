@@ -1,3 +1,14 @@
+**v3.12 ELVEN WIZARD / MOONWEAVER LEVEL 30 — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_12_Elven_Wizard_Level30_Complete_20260926.md)
+and [acceptance evidence](
+../testing/c4-elven-wizard-level30-complete-v3-12-20260926.md).
+Moonweaver is **82/82 mapped** through level 30 with zero source gaps and 22
+reviewed families. Fresh focused Studio acceptance is **16/16 PASS**. A real
+unpublished Play rehearsal proved Tidal Bolt WATER damage and Spiritshot
+consumption, Tidal Ward's exact 1200-second duration, source NPC 12065 Mana
+Companion, Servitor Heal/Recharge and owner cleanup. Final accepted live log
+contains **0 FLog::CreatorError entries**.
+
 **v3.09 HUMAN CLERIC / DAWNKEEPER LEVEL 30 — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_09_Human_Cleric_Level30_Complete_20260926.md)
 and [acceptance evidence](
