@@ -255,6 +255,34 @@ local DEFINITIONS = table.freeze({
         ARCANE_WAND,
         nil
     ),
+    EmberweaverManaCompanion = make_skill(
+        "EmberweaverManaCompanion",
+        "Summon",
+        {{20, 1}, {25, 1}, {30, 1}},
+        ARCANE_WAND,
+        {SourceCompanionRole = "Mana"}
+    ),
+    EmberweaverServitorRecharge = make_skill(
+        "EmberweaverServitorRecharge",
+        "Support",
+        {{25, 2}, {30, 2}},
+        ARCANE_WAND,
+        {RequiresOwnedCompanion = true}
+    ),
+    EmberweaverServitorHeal = make_skill(
+        "EmberweaverServitorHeal",
+        "Support",
+        {{20, 3}, {25, 3}, {30, 3}},
+        ARCANE_WAND,
+        {RequiresOwnedCompanion = true}
+    ),
+    EmberweaverCombatCompanion = make_skill(
+        "EmberweaverCombatCompanion",
+        "Summon",
+        {{20, 1}, {25, 1}, {30, 1}},
+        ARCANE_WAND,
+        {SourceCompanionRole = "Combat"}
+    ),
 })
 
 --[[
