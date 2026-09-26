@@ -244,8 +244,8 @@ local function main()
 
     local mapped, missing = mapped_rank_totals()
     check(
-        mapped == 74 and missing == 19,
-        "Non-servitor source schedule must be 74 mapped / 19 reserved"
+        mapped == 93 and missing == 0,
+        "Human Wizard source schedule must be fully mapped through level 30"
     )
     for _, category in ipairs({
         "ServitorHeal",
@@ -254,18 +254,18 @@ local function main()
         "CombatServitorSummon",
     }) do
         check(
-            SkillMap.get("HumanWizard", category) == nil,
-            "Servitor family must remain unmapped before summon authority"
+            SkillMap.get("HumanWizard", category) ~= nil,
+            "Companion family must map after server summon authority exists"
         )
     end
 
     local audit = assert(Coverage.for_branch("HumanWizard"))
     check(
         audit.SourceRankEntriesThroughCap == 93
-            and audit.TrainerMappedRankEntries == 74
-            and audit.MissingRankScheduleEntries == 19
-            and not audit.SourceRankScheduleMapped,
-        "Launch audit distinguishes mapped spells from reserved summons"
+            and audit.TrainerMappedRankEntries == 93
+            and audit.MissingRankScheduleEntries == 0
+            and audit.SourceRankScheduleMapped,
+        "Launch audit closes Human Wizard level-30 rank coverage"
     )
 
     print(("[Human Wizard Foundation] PASS: %d assertions")
