@@ -6,6 +6,12 @@ C4SourceSupportMagicCastService.__index =
     C4SourceSupportMagicCastService
 
 local REVIEWED = table.freeze({
+    MoonweaverTidalWard = table.freeze({
+        SourceSkillId = 1182,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
     DawnkeeperHealingLight = table.freeze({
         SourceSkillId = 1011,
         Kind = "TargetHeal",
