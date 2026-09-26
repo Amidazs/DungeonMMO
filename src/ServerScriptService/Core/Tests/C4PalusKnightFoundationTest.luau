@@ -112,10 +112,13 @@ local function main()
         )
     end
 
-    local source_links = SourceMap.coverage("PalusKnight")
+    local source_links = assert(SourceMap.get_scope("PalusKnight"))
+    local gap_count = 0
+    for _ in pairs(source_links.Gaps or {}) do
+        gap_count += 1
+    end
     check(
-        source_links
-            and source_links.GapCount == 0,
+        gap_count == 0,
         "Palus Knight has no creative source-map gaps"
     )
 
