@@ -139,6 +139,103 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+    MoonweaverTrainer = table.freeze({
+        Id = "MoonweaverTrainer",
+        DisplayName = "Moonweaver Training",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedClasses = table.freeze({"Moonweaver"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "MoonweaverArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverQuickWeave",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverFocusTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverManaChanneling",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverSlumberHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverServitorRecharge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverServitorHeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverWitheringHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverFlameBurst",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverTidalBolt",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverEmberField",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverTidalWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverFrostLance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverManaCompanion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverCombatCompanion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverSolarSpark",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "MoonweaverFocusedBolt",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     DawnkeeperTrainer = table.freeze({
         Id = "DawnkeeperTrainer",
         DisplayName = "Dawnkeeper Training",
