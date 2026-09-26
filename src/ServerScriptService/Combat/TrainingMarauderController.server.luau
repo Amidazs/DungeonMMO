@@ -842,6 +842,7 @@ local function reset_runtime(runtime: MarauderRuntime)
     C4NpcElementalVulnerabilityService.clear_all(
         runtime.model
     )
+    EnemyWeakeningService.clear(runtime.model)
     set_current_target(runtime, nil)
     runtime.model:SetAttribute("MarauderAggroMode", "None")
     runtime.model:SetAttribute("AttackTelegraph", false)
@@ -861,6 +862,7 @@ local function handle_death(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    EnemyWeakeningService.clear(runtime.model)
     set_current_target(runtime, nil)
     clear_attack_presentation(runtime)
     MarauderPresentationService.play_death(runtime.model)
