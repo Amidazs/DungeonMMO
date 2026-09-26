@@ -23,6 +23,12 @@ local REVIEWED = table.freeze({
         Kind = "PartyHeal",
         SourceRadius = 1000,
     }),
+    DawnkeeperRevive = table.freeze({
+        SourceSkillId = 1016,
+        Kind = "Resurrection",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
     DawnkeeperMindWard = table.freeze({
         SourceSkillId = 1035,
         Kind = "TargetBuff",
@@ -133,11 +139,17 @@ function C4SourceSupportMagicCastService.new(
                 executor.can_support_skill_player
             ) == "function"
             and type(executor.can_party_heal_skill) == "function"
+            and type(
+                executor.can_resurrection_skill_player
+            ) == "function"
             and type(executor.heal_skill_target) == "function"
             and type(
                 executor.support_buff_skill_target
             ) == "function"
-            and type(executor.party_heal_skill) == "function",
+            and type(executor.party_heal_skill) == "function"
+            and type(
+                executor.resurrection_skill_player
+            ) == "function",
         "Support magic bridge requires source support executor"
     )
 
@@ -203,6 +215,14 @@ local function preflight(
 
     if target == nil then
         return false, "C4SupportMagicTargetRequired"
+    end
+
+    if review.Kind == "Resurrection" then
+        return self._executor:can_resurrection_skill_player(
+            caster,
+            target,
+            review.CastRange
+        )
     end
 
     return self._executor:can_support_skill_player(
@@ -358,6 +378,13 @@ local function revalidate(
             record.SourceRadius
         )
     end
+    if record.Kind == "Resurrection" then
+        return self._executor:can_resurrection_skill_player(
+            caster,
+            record.Target,
+            record.EffectRange
+        )
+    end
 
     return self._executor:can_support_skill_player(
         caster,
@@ -401,6 +428,14 @@ local function execute(
     if record.Kind == "PartyHeal" then
         return self._executor:party_heal_skill(
             caster,
+            record.CreativeSkillId,
+            record.CreativeRank
+        )
+    end
+    if record.Kind == "Resurrection" then
+        return self._executor:resurrection_skill_player(
+            caster,
+            record.Target,
             record.CreativeSkillId,
             record.CreativeRank
         )
@@ -524,6 +559,8 @@ function C4SourceSupportMagicCastService:capability(): any
         TargetHeal = true,
         TargetBuff = true,
         PartyHeal = true,
+        ResurrectionOffer = true,
+        ResurrectionTargetAcceptance = true,
         ServerTargetAuthority = true,
         ServerPartyRosterAuthority = true,
         ClientAuthority = false,
