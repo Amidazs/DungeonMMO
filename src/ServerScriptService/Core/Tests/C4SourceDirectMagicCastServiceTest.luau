@@ -583,6 +583,30 @@ Args:
 Returns:
     (any?, string?): Fake physical-attack weakening result.
 ]]
+function FakeExecutor:physical_attack_rate_weakening_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player)
+    assert(target == enemy)
+
+    return {
+        Kind = "C4LiveNpcPhysicalAttackRateWeakening",
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackSpeedMultiplier = 0.8,
+        RateReductionFraction = 0.2,
+        DurationSeconds = 15,
+        CreativeSkillId = creative_skill_id,
+        CreativeRank = creative_rank,
+        SequenceId = sequence_id,
+    }, nil
+end
+
 function FakeExecutor:physical_attack_weakening_skill_npc(
     subject: any,
     target: any,
