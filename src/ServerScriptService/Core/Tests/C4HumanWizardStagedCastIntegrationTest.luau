@@ -46,6 +46,7 @@ local magic_calls = 0
 local area_magic_calls = 0
 local drain_magic_calls = 0
 local sleep_calls = 0
+local vulnerability_calls = 0
 local last_area_radius = nil
 local status_calls = 0
 
@@ -413,6 +414,43 @@ function FakeExecutor:sleep_skill_npc(
 end
 
 --[[
+Records one staged elemental-vulnerability executor handoff.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected private selected NPC target.
+    creative_skill_id (string): Reviewed Scorch Mark skill.
+    creative_rank (number): Authenticated creative rank.
+    sequence_id (number?): Trusted action sequence.
+
+Returns:
+    (any?, string?): Fake live vulnerability executor evidence.
+]]
+function FakeExecutor:elemental_vulnerability_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player and target == enemy)
+    assert(creative_skill_id == "EmberweaverScorchMark")
+    assert(creative_rank == 2)
+    assert(type(sequence_id) == "number")
+    vulnerability_calls += 1
+
+    return {
+        Kind = "C4LiveNpcElementalVulnerability",
+        Applied = true,
+        VulnerabilityApplied = true,
+        Landed = true,
+        VulnerabilityStat = "FIRE_VULN",
+        VulnerabilityMultiplier = 1.25,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
 Counts one cross-service staged-cast assertion.
 
 Args:
@@ -501,6 +539,7 @@ local function wizard_character(): any
     own_skill(character, "EmberweaverEmberField", 3)
     own_skill(character, "EmberweaverLifeSiphon", 4)
     own_skill(character, "EmberweaverSlumberHex", 6)
+    own_skill(character, "EmberweaverScorchMark", 2)
     own_skill(character, "EmberweaverVenomHex", 2)
 
     return character
@@ -789,6 +828,57 @@ local function check_slumber_hex(direct: any)
 end
 
 --[[
+Checks Scorch Mark through the real source scheduler and debuff path.
+
+Args:
+    direct (any): Enabled targeted-magic bridge.
+
+Returns:
+    nil: Confirms exact source rank, timing, ranges and split-MP costs.
+]]
+local function check_scorch_mark(direct: any)
+    local started = assert(direct:begin_cast(
+        player,
+        enemy,
+        "EmberweaverScorchMark",
+        151
+    ))
+    check(
+        started.SourceSkillId == 1083
+            and started.SourceRank == 2
+            and started.LaunchAt == 152.5
+            and started.ReuseReadyAt == 157
+            and started.SourceCastRange == 750
+            and started.SourceEffectRange == 1250
+            and last_preflight_range == 750
+            and mana_current == 28,
+        "Scorch Mark crosses exact source debuff start contract"
+    )
+
+    local launched = assert(direct:launch_if_ready(
+        player,
+        started.CastId,
+        152.5,
+        1016
+    ))
+    check(
+        launched.Applied
+            and launched.Application.Kind
+                == "C4LiveNpcElementalVulnerability"
+            and launched.Application.VulnerabilityApplied
+            and launched.Application.VulnerabilityStat
+                == "FIRE_VULN"
+            and launched.Application.VulnerabilityMultiplier
+                == 1.25
+            and launched.Application.DurationSeconds == 15
+            and last_preflight_range == 1250
+            and vulnerability_calls == 1
+            and mana_current == 17,
+        "Scorch Mark commits exact MP and reaches vulnerability executor"
+    )
+end
+
+--[[
 Checks Venom Hex through the same real source scheduler/resource pipeline.
 
 Args:
@@ -887,6 +977,7 @@ local function main()
     area_magic_calls = 0
     drain_magic_calls = 0
     sleep_calls = 0
+    vulnerability_calls = 0
     last_area_radius = nil
     status_calls = 0
 
@@ -897,6 +988,7 @@ local function main()
     check_ember_field(direct)
     check_life_siphon(direct)
     check_slumber_hex(direct)
+    check_scorch_mark(direct)
     mana_current = 58
     check_venom_hex(periodic)
     check_cross_family_overlap(direct, periodic)
@@ -906,7 +998,7 @@ local function main()
     print((
         "[C4 Wizard Staged Integration] TEST_PASS_PENDING_STUDIO: "
         .. "%d assertions direct=3 area=1 drain=1 sleep=1 "
-        .. "poison=1 shared_scheduler=true"
+        .. "fire_vuln=1 poison=1 shared_scheduler=true"
     ):format(checks))
 end
 
