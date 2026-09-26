@@ -249,6 +249,36 @@ function FakeExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Provides a minimal source physical-attack weakening executor contract.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable target.
+    _skill_id (string): Creative skill identifier.
+    _rank (number): Creative skill rank.
+    _sequence_id (number?): Disposable sequence.
+
+Returns:
+    (any?, string?): Successful fake weakening application.
+]]
+function FakeExecutor:physical_attack_weakening_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackMultiplier = 0.8,
+        PowerReductionFraction = 0.2,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
 Provides a minimal periodic-status executor contract.
 
 Args:
