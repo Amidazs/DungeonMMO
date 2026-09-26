@@ -156,6 +156,45 @@ local QUESTS = table.freeze({
         }),
         WorldBindingStatus = "NotImplemented",
     }),
+    ElvenOracle = table.freeze({
+        Id = "LifebinderVigil",
+        BranchId = "ElvenOracle",
+        SourceTitle = "The Lifebinder Vigil",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "SeerAelwyn",
+        Recommendation = "LifebinderVow",
+        Steps = table.freeze({
+            talk("SeerAelwyn", "Accept the Lifebinder vigil."),
+            talk(
+                "KeeperThalia",
+                "Learn where the wounded grove spirits were taken."
+            ),
+            defeat(
+                "DuskrootDefiler",
+                3,
+                "Recover three personally earned living-bark fragments."
+            ),
+            talk(
+                "KeeperThalia",
+                "Return the living-bark fragments."
+            ),
+            defeat(
+                "BlightveilBinder",
+                1,
+                "Recover the binder's personal moonleaf seal."
+            ),
+            talk(
+                "SeerAelwyn",
+                "Present the moonleaf seal and complete the vigil."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "LivingBarkFragments3",
+            "BlightveilMoonleafSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanCleric = table.freeze({
         Id = "DawnkeeperVigil",
         BranchId = "HumanCleric",
@@ -267,7 +306,8 @@ function SourceQuests.inventoried(): {any}
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.HumanWizard,
         QUESTS.HumanCleric, QUESTS.ElvenWizard,
-        QUESTS.ElvenScout, QUESTS.ElvenKnight,
+        QUESTS.ElvenOracle, QUESTS.ElvenScout,
+        QUESTS.ElvenKnight,
     })
 end
 
