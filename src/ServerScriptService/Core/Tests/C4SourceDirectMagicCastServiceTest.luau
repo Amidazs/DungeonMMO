@@ -59,6 +59,13 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    EmberweaverSlumberHex = table.freeze({
+        CreativeRank = 6,
+        SourceSkillId = 1069,
+        SourceRank = 6,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
 })
 
 
@@ -81,6 +88,7 @@ local executor_state = {
     SlowMagicCalls = 0,
     AreaMagicCalls = 0,
     DrainMagicCalls = 0,
+    SleepCalls = 0,
     LastAreaRadius = nil,
     TargetReady = true,
     TargetReason = nil,
@@ -424,6 +432,45 @@ function FakeExecutor:magic_drain_skill_npc(
 end
 
 --[[
+Applies one disposable source Sleep result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed Slumber Hex identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake Sleep executor result.
+]]
+function FakeExecutor:sleep_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.SleepCalls += 1
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+
+    assert(subject == player)
+    assert(target == enemy)
+    assert(creative_skill_id == "EmberweaverSlumberHex")
+
+    return {
+        Kind = "C4LiveNpcSleep",
+        Applied = true,
+        SleepApplied = true,
+        Landed = true,
+        DurationSeconds = 30,
+        BreaksOnDamage = true,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -464,6 +511,7 @@ local function reset_fakes()
     executor_state.SlowMagicCalls = 0
     executor_state.AreaMagicCalls = 0
     executor_state.DrainMagicCalls = 0
+    executor_state.SleepCalls = 0
     executor_state.LastAreaRadius = nil
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
@@ -517,14 +565,14 @@ local function check_gate_and_allowlist()
     local blocked, blocked_reason = bridge:begin_cast(
         player,
         enemy,
-        "EmberweaverSlumberHex",
+        "EmberweaverScorchMark",
         100
     )
     check(
         blocked == nil
             and blocked_reason == "C4DirectMagicSkillNotReviewed"
             and scheduler_state.BeginCalls == 0,
-        "bridge rejects spell families with unimplemented sleep semantics"
+        "bridge rejects spell families with unimplemented vulnerability semantics"
     )
 end
 
@@ -860,6 +908,43 @@ local function check_life_siphon_launch()
 end
 
 --[[
+Checks Slumber Hex selects the source Sleep executor path.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact rank and sequence reach Sleep execution.
+]]
+local function check_slumber_hex_launch()
+    local bridge, started = started_bridge(
+        610,
+        "EmberweaverSlumberHex"
+    )
+
+    local applied = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        612.5,
+        908
+    ))
+
+    check(
+        applied.Applied
+            and applied.Application.Kind == "C4LiveNpcSleep"
+            and applied.Application.SleepApplied
+            and applied.Application.DurationSeconds == 30
+            and applied.Application.BreaksOnDamage
+            and executor_state.SleepCalls == 1
+            and executor_state.MagicCalls == 0
+            and executor_state.LastRank == 6
+            and executor_state.LastSequence == 908
+            and executor_state.LastRange == 1100,
+        "Slumber Hex reaches source Sleep executor once"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -905,6 +990,7 @@ local function check_reviewed_direct_families()
         "EmberweaverFrostLance",
         "EmberweaverEmberField",
         "EmberweaverLifeSiphon",
+        "EmberweaverSlumberHex",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -990,8 +1076,10 @@ local function main()
             and capability.ReviewedTargetAreaSourceRadius
             and capability.ReviewedMagicDrain
             and capability.ReviewedMagicDrainSourceAbsorption
-            and capability.ReviewedSkillCount == 6
-            and #capability.ReviewedSkills == 6
+            and capability.ReviewedSleepControl
+            and capability.ReviewedSleepBreaksOnDamage
+            and capability.ReviewedSkillCount == 7
+            and #capability.ReviewedSkills == 7
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
@@ -1014,6 +1102,7 @@ local function main()
     check_frost_lance_launch()
     check_ember_field_launch()
     check_life_siphon_launch()
+    check_slumber_hex_launch()
     check_owner_cleanup()
 
     print((
