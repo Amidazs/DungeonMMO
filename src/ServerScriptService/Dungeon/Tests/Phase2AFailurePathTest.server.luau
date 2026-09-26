@@ -168,6 +168,19 @@ function death_sessions:mark_failed(
     return {ok = true, session = death_session}
 end
 
+function death_sessions:grant_paid_revive_once(
+    _session_id: string,
+    user_id: number,
+    _purchase_id: string
+): any
+    local member = death_session.Members[tostring(user_id)]
+    member.PaidReviveCount += 1
+    member.Mode = "Active"
+    death_session.WipeDecisionEndsAt = nil
+
+    return {ok = true, session = death_session}
+end
+
 local latest_checkpoint = {
     Id = "Room2Start",
     Sequence = 2,
@@ -226,6 +239,18 @@ check(
 check(
     death_service:on_player_died(death_player, CFrame.new()).ok,
     "Second death must enter the paid revive flow."
+)
+check(
+    not death_service:complete_paid_revive(death_player).ok,
+    "Paid revive completion must reject an ungranted purchase."
+)
+check(
+    death_sessions:grant_paid_revive_once(
+        death_session.SessionId,
+        death_player.UserId,
+        "TEMP_Phase2APaidRevive"
+    ).ok,
+    "Paid revive purchase must be recorded before respawn."
 )
 check(
     death_service:complete_paid_revive(death_player).ok,
