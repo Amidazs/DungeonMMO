@@ -56,15 +56,28 @@ local function source_scopes(
     current_scope_id: string
 ): {string}
     local identity = character.Identity
-    local race_prefix = if identity.RaceId == "Elf"
-        then "Elven"
-        else "Human"
+    local race_prefix = nil
+
+    if identity.RaceId == "Human" then
+        race_prefix = "Human"
+    elseif identity.RaceId == "Elf" then
+        race_prefix = "Elven"
+    end
+
+    if not race_prefix then
+        return {current_scope_id}
+    end
+
     local base_suffix = if identity.BaseClassId == "Mage"
         then "Mystic"
         else "Fighter"
     local starter_scope = race_prefix .. base_suffix
 
     if starter_scope == current_scope_id then
+        return {current_scope_id}
+    end
+
+    if not Tree.get(starter_scope) then
         return {current_scope_id}
     end
 
