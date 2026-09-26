@@ -25,6 +25,9 @@ local NpcSleep = require(
 local NpcElementalVulnerability = require(
     ServerScriptService.Combat.C4NpcElementalVulnerabilityService
 )
+local EnemyWeakening = require(
+    ServerScriptService.Combat.EnemyWeakeningService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -185,6 +188,9 @@ function C4SourceCombatExecutor.new(options: any?): any
         _npc_elemental_vulnerability =
             config.ElementalVulnerabilityProvider
             or NpcElementalVulnerability,
+        _enemy_weakening =
+            config.EnemyWeakeningProvider
+            or EnemyWeakening,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -1629,6 +1635,88 @@ function C4SourceCombatExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC physical-attack weakening debuff.
+
+A resisted cast changes no runtime state. A landed cast delegates to the
+shared NPC weakening authority with only a power reduction; attack cadence is
+left unchanged because source Curse: Weakness modifies PHYSICAL_ATTACK only.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative weakening debuff.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live weakening evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:physical_attack_weakening_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_attack_weakening_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcPhysicalAttackWeakening",
+            Calculation = calculated,
+            Applied = false,
+            WeakeningApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local authority = self._enemy_weakening
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcPhysicalAttackWeakeningAuthorityUnavailable"
+    end
+
+    local applied = authority.apply(
+        enemy,
+        calculated.PowerReductionFraction,
+        0,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcPhysicalAttackWeakeningApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalAttackWeakening",
+        Calculation = calculated,
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackMultiplier =
+            calculated.PhysicalAttackMultiplier,
+        PowerReductionFraction =
+            calculated.PowerReductionFraction,
+        DurationSeconds = calculated.DurationSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -2108,6 +2196,11 @@ function C4SourceCombatExecutor:capability(): any
         NpcElementalVulnerabilityBoundaryDecoration = true,
         NpcElementalVulnerabilityAuthorityConfigured =
             type(self._npc_elemental_vulnerability) == "table",
+        NpcPhysicalAttackWeakeningLiveApplication = true,
+        NpcPhysicalAttackWeakeningUsesOutgoingDamageRules = true,
+        NpcPhysicalAttackWeakeningLeavesAttackRateNeutral = true,
+        NpcPhysicalAttackWeakeningAuthorityConfigured =
+            type(self._enemy_weakening) == "table",
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
