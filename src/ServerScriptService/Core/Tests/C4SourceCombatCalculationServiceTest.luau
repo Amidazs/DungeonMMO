@@ -298,6 +298,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverFlameBurst", 6)
     own_skill(wizard, "EmberweaverFocusedBolt", 3)
     own_skill(wizard, "EmberweaverVenomHex", 2)
+    own_skill(wizard, "EmberweaverFrostLance", 2)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -379,6 +380,9 @@ local function check_default_off()
             and capability.MagicSpiritshotIntegrated
             and capability.HealSpiritshotIntegrated
             and capability.PeriodicStatusCalculation
+            and capability.MagicMovementSlowCalculation
+            and capability.MovementSlowEffectSuccessIntegrated
+            and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
             and capability.PeriodicStatusNonlethalSemanticsIntegrated
             and not capability.LiveDamageApplied,
@@ -1014,6 +1018,62 @@ local function check_human_wizard_neutral_magic()
 end
 
 --[[
+Checks Frost Lance combines exact source MDAM and its WIT-resisted slow.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms rank mapping, slow plan and one-use Spiritshot ownership.
+]]
+local function check_human_wizard_frost_lance()
+    local target = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+
+    check(
+        type(target.SourceWitBonus) == "number"
+            and target.SourceWitBonus > 0,
+        "source boundary exposes target WIT bonus for control resistance"
+    )
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.magic_slow_skill(
+        WIZARD_ID,
+        TARGET_ID,
+        "EmberweaverFrostLance",
+        2
+    ))
+
+    check(
+        result.Kind == "MagicDamageMovementSlow"
+            and result.SourceSkillId == 1184
+            and result.SourceRank == 6
+            and result.Damage.SourceSkillPower == 16
+            and result.Damage.SourceElement == "WATER"
+            and result.SpeedMultiplier == 0.7
+            and math.abs(result.SlowFraction - 0.3) <= 0.00001
+            and result.DurationSeconds == 120
+            and result.SaveVs == "WIT"
+            and result.EffectPower == 60,
+        "Frost Lance rank two preserves exact Ice Bolt damage/slow source"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.SlowRoll >= 0
+            and result.SlowRoll <= 99
+            and result.SlowRoll % 1 == 0
+            and result.SlowLanded
+                == (result.SlowRoll < result.SlowRate),
+        "Frost Lance uses one Spiritshot for damage and the slow roll"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1343,6 +1403,7 @@ local function main()
     check_magic()
     check_human_wizard_magic()
     check_human_wizard_neutral_magic()
+    check_human_wizard_frost_lance()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1361,7 +1422,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true "
+        .. "status=true pdam=true mdam=true wizard=true frost=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
