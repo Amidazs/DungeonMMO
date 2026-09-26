@@ -378,7 +378,6 @@ local function lifebinder_character(user_id)
     character.Equipment.Weapon =
         "apprentice_arcane_wand"
 
-    own_skill(character, "LifebinderQuickPrayer", 2)
     own_skill(character, "LifebinderWindShackle", 3)
     own_skill(character, "LifebinderAgility", 1)
     own_skill(character, "LifebinderManaRecharge", 2)
