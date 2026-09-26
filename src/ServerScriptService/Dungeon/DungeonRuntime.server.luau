@@ -37,6 +37,9 @@ local C4CombatCutoverRegistry = require(
 local C4CombatDispatchAdapter = require(
     Services:WaitForChild("C4CombatDispatchAdapter")
 )
+local C4SourceCombatCalculationService = require(
+    Services:WaitForChild("C4SourceCombatCalculationService")
+)
 local C4CombatCutoverStudioBridge = require(
     Services:WaitForChild("C4CombatCutoverStudioBridge")
 )
@@ -154,6 +157,9 @@ local loadout_request = remotes:WaitForChild("LoadoutRequest") :: RemoteEvent
 local return_request = remotes:WaitForChild("ReturnRequest") :: RemoteEvent
 
 local runtime = RuntimeServices.new("Dungeon")
+C4SourceCombatCalculationService.set_shot_authority(
+    runtime.C4SourceShotService
+)
 assert(
     runtime.C4CombatCutoverCoordinator ~= nil,
     "Dungeon runtime requires C4 cutover coordinator"
