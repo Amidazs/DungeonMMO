@@ -143,12 +143,12 @@ local function main()
         "Human Cleric retains exact 20/25/30 source-rank inventory"
     )
     check(
-        cleric.CurrentCareerId == nil
-            and cleric.TrainerMappedRankEntries == 0
-            and cleric.MissingRankScheduleEntries == 88
-            and not cleric.SourceRankScheduleMapped
-            and cleric.Status == "SourceRanksAuditedClassUnimplemented",
-        "Human Cleric source audit does not pretend the class exists"
+        cleric.CurrentCareerId == "Dawnkeeper"
+            and cleric.TrainerMappedRankEntries == 88
+            and cleric.MissingRankScheduleEntries == 0
+            and cleric.SourceRankScheduleMapped
+            and cleric.Status == "RankScheduleMappedEffectsPending",
+        "Human Cleric rank schedule maps only through earned Dawnkeeper"
     )
 
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
@@ -187,8 +187,8 @@ local function main()
         "Exactly seven first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 6,
-        "Six implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 7,
+        "Seven implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
