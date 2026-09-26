@@ -1,3 +1,15 @@
+**v3.04 HUMAN WIZARD LIFE SIPHON — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_04_Human_Wizard_Life_Siphon_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-life-siphon-v3-04-pending-20260926.md).
+Life Siphon now preserves source Vampiric Touch 1147:6 DARK DRAIN damage and
+its exact 40 percent HP absorption. One magical shot is consumed, healing is
+calculated from actual NPC HP removed and capped at caster MaxHealth, while
+damage still preserves existing source threat/contribution/quest bookkeeping.
+Fresh diff check and Base/Dungeon Rojo builds pass at
+`5291dac8eaa4497a928001e953f4ae533c73ce34`; Studio runners and live
+rehearsal remain pending.
+
 **v3.03 HUMAN WIZARD EMBER FIELD — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_03_Human_Wizard_Ember_Field_20260926.md)
 and [pending evidence](
