@@ -566,6 +566,19 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    -- Creative name for C4 source reagent item 1458 (Spirit Ore).
+    -- Summon skill source metadata retains the historical numeric ID while
+    -- production inventory uses this stable DungeonMMO item identifier.
+    emberweaver_spirit_ore = table.freeze({
+        Id = "emberweaver_spirit_ore",
+        Name = "Arcane Spirit Ore",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Basic",
+        Stackable = true,
+        SourceC4ItemId = 1458,
+    }),
+
     iron_ore = table.freeze({
         Id = "iron_ore",
         Name = "Iron Ore",
