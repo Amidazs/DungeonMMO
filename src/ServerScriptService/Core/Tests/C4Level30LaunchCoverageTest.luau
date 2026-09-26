@@ -125,11 +125,31 @@ local function main()
         and wizard.SourceBrackets[4] == 30,
         "Human Wizard C4 source ranks must retain exact launch brackets")
     check(wizard.CurrentCareerId == "Emberweaver"
-        and wizard.TrainerMappedRankEntries == 74
-        and wizard.MissingRankScheduleEntries == 19
-        and not wizard.SourceRankScheduleMapped
-        and wizard.Status == "SkillRankParityOutstanding",
-        "Human Wizard maps non-servitor ranks without claiming summons")
+        and wizard.TrainerMappedRankEntries == 93
+        and wizard.MissingRankScheduleEntries == 0
+        and wizard.SourceRankScheduleMapped
+        and wizard.Status == "RankScheduleMappedEffectsPending",
+        "Human Wizard level-30 rank schedule is fully mapped")
+
+    local cleric = assert(Coverage.for_branch("HumanCleric"))
+    check(
+        cleric.SourceClass == "Cleric"
+            and cleric.SourceInventoryAuditedThroughCap
+            and cleric.SourceRankEntriesThroughCap == 88
+            and cleric.SourceRankEntriesByLevel[20] == 26
+            and cleric.SourceRankEntriesByLevel[25] == 31
+            and cleric.SourceRankEntriesByLevel[30] == 31
+            and #cleric.SourceBrackets == 3,
+        "Human Cleric retains exact 20/25/30 source-rank inventory"
+    )
+    check(
+        cleric.CurrentCareerId == nil
+            and cleric.TrainerMappedRankEntries == 0
+            and cleric.MissingRankScheduleEntries == 88
+            and not cleric.SourceRankScheduleMapped
+            and cleric.Status == "SourceRanksAuditedClassUnimplemented",
+        "Human Cleric source audit does not pretend the class exists"
+    )
 
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
     check(warrior.Status == "RankScheduleMappedEffectsPending"
@@ -163,12 +183,12 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 6,
-        "Exactly six first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 7,
+        "Exactly seven first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 5,
-        "Only the five implemented Fighter transfers map trainer ranks"
+        report.RankSchedulesMappedBranches == 6,
+        "Six implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
