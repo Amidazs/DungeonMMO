@@ -7,12 +7,12 @@ local C4StatusEffectReference = {}
 
 local SUPPORTED_EFFECTS = table.freeze({
     BLEED = table.freeze({
-        EffectName = "Bleed",
+        EffectNames = table.freeze({"Bleed"}),
         SaveVs = "CON",
         VulnerabilityStat = "BLEED_VULN",
     }),
     POISON = table.freeze({
-        EffectName = "Poison",
+        EffectNames = table.freeze({"Poison", "DamOverTime"}),
         SaveVs = "MEN",
         VulnerabilityStat = "POISON_VULN",
     }),
@@ -100,7 +100,15 @@ function C4StatusEffectReference.periodic_plan(
 
     local matched = nil
     for _, effect in ipairs(rank.Effects) do
-        if effect.name == supported.EffectName then
+        local name_supported = false
+        for _, effect_name in ipairs(supported.EffectNames) do
+            if effect.name == effect_name then
+                name_supported = true
+                break
+            end
+        end
+
+        if name_supported then
             if matched ~= nil then
                 return nil, "DuplicateOriginalPeriodicStatusEffect"
             end
