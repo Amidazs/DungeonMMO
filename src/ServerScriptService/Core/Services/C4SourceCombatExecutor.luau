@@ -34,6 +34,9 @@ local ManaService = require(
 local MageHealService = require(
     ServerScriptService.Combat.MageHealService
 )
+local PartyHealService = require(
+    ServerScriptService.Combat.PartyHealService
+)
 local NpcRoot = require(
     ServerScriptService.Combat.C4NpcRootService
 )
@@ -208,6 +211,7 @@ function C4SourceCombatExecutor.new(options: any?): any
             or EnemyWeakening,
         _mana = config.ManaProvider or ManaService,
         _player_heal = config.PlayerHealProvider or MageHealService,
+        _party_heal = config.PartyHealProvider or PartyHealService,
         _npc_root = config.RootProvider or NpcRoot,
         _active_source_effects =
             config.ActiveSourceEffectProvider
@@ -2607,6 +2611,78 @@ function C4SourceCombatExecutor:support_buff_skill_target(
 end
 
 --[[
+Executes one live source TARGET_PARTY heal.
+
+The source calculator consumes the caster's one magical shot and returns the
+exact C4 radius. The existing server party-heal authority owns roster,
+line-of-sight and actual health mutation.
+
+Args:
+    caster (any): Server-owned healing player.
+    creative_skill_id (string): Reviewed party-heal skill.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live party-heal evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:party_heal_skill(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.party_heal_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if type(self._source_units_per_stud) ~= "number"
+        or self._source_units_per_stud <= 0
+    then
+        return nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local provider = self._party_heal
+    if not provider or type(provider.cast) ~= "function" then
+        return nil, "C4LivePartyHealAuthorityUnavailable"
+    end
+
+    local radius_studs =
+        calculated.SourceSkillRadius
+        / self._source_units_per_stud
+    local applied, affected, total =
+        provider.cast(
+            caster,
+            calculated.Amount,
+            radius_studs,
+            creative_skill_id
+        )
+    if applied ~= true then
+        return nil, "C4LivePartyHealNoEligibleTargets"
+    end
+
+    return {
+        Kind = "C4LivePartyHeal",
+        Calculation = calculated,
+        Applied = true,
+        AffectedPlayers = affected,
+        EffectiveHeal = total,
+        RadiusStuds = radius_studs,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
 Executes one live C4 Root control skill against an NPC.
 
 A resisted cast changes no NPC runtime state. A landed cast delegates to the
@@ -2938,6 +3014,9 @@ function C4SourceCombatExecutor:capability(): any
         PhysicalSkillLiveApplication = true,
         MagicSkillLiveApplication = true,
         SelfHealLiveApplication = true,
+        TargetHealLiveApplication = true,
+        PartyHealLiveApplication = true,
+        SupportBuffLiveApplication = true,
         TargetHealLiveApplication = true,
         PlayerSupportBuffLiveApplication = true,
         ExternalTimedSourceEffectsIntegrated = true,
