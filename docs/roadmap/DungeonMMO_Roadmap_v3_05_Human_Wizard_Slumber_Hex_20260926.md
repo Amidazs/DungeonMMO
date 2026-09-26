@@ -9,7 +9,7 @@ DungeonMMO_Roadmap_v3_04_Human_Wizard_Life_Siphon_20260926.md).
 
 **IMPLEMENTED — fresh Base/Dungeon builds pass; Studio acceptance pending.**
 
-Code candidate will be recorded after the final documentation fast-forward.
+Core code candidate: `e29c76645572fc1011d784e9c19c7517dbf08313`.
 
 Pending evidence:
 [Human Wizard Slumber Hex v3.05](
