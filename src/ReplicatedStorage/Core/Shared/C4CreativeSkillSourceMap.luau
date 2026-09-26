@@ -116,6 +116,60 @@ local MAPS = table.freeze({
             Offset = 1,
         }),
     }),
+    HumanCleric = table.freeze({
+        [146] = table.freeze({
+            SkillId = "DawnkeeperArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "DawnkeeperQuickPrayer"}),
+        [213] = table.freeze({SkillId = "DawnkeeperManaReservoir"}),
+        [228] = table.freeze({SkillId = "DawnkeeperFastCasting"}),
+        [229] = table.freeze({SkillId = "DawnkeeperManaRecovery"}),
+        [235] = table.freeze({SkillId = "DawnkeeperRobeTraining"}),
+        [236] = table.freeze({
+            SkillId = "DawnkeeperLightArmorTraining",
+        }),
+        [249] = table.freeze({
+            SkillId = "DawnkeeperWeaponTraining",
+            Offset = 2,
+        }),
+        [1011] = table.freeze({
+            SkillId = "DawnkeeperHealingLight",
+            Offset = 6,
+        }),
+        [1015] = table.freeze({
+            SkillId = "DawnkeeperBattleMend",
+            Offset = 3,
+        }),
+        [1016] = table.freeze({SkillId = "DawnkeeperRevive"}),
+        [1027] = table.freeze({
+            SkillId = "DawnkeeperGroupMend",
+            Offset = 3,
+        }),
+        [1031] = table.freeze({SkillId = "DawnkeeperExorcism"}),
+        [1035] = table.freeze({SkillId = "DawnkeeperMindWard"}),
+        [1040] = table.freeze({
+            SkillId = "DawnkeeperStoneWard",
+            Offset = 1,
+        }),
+        [1043] = table.freeze({SkillId = "DawnkeeperSacredEdge"}),
+        [1068] = table.freeze({
+            SkillId = "DawnkeeperMight",
+            Offset = 1,
+        }),
+        [1069] = table.freeze({SkillId = "DawnkeeperSlumber"}),
+        [1073] = table.freeze({
+            SkillId = "DawnkeeperBreathBlessing",
+        }),
+        [1077] = table.freeze({SkillId = "DawnkeeperFocus"}),
+        [1078] = table.freeze({
+            SkillId = "DawnkeeperConcentration",
+        }),
+        [1085] = table.freeze({SkillId = "DawnkeeperInsight"}),
+        [1191] = table.freeze({SkillId = "DawnkeeperFireWard"}),
+        [1201] = table.freeze({SkillId = "DawnkeeperRootbind"}),
+        [1204] = table.freeze({SkillId = "DawnkeeperWindstep"}),
+    }),
     HumanWarrior = table.freeze({
         [78] = table.freeze({SkillId = "IronvowBattleCall"}),
         [100] = table.freeze({SkillId = "IronvowStonebreaker"}),
@@ -241,6 +295,9 @@ local GAPS = table.freeze({
         [1322] = "Common Craft is not the current recipe-reading passive",
     }),
     HumanWizard = table.freeze({
+
+    }),
+    HumanCleric = table.freeze({
 
     }),
     HumanWarrior = table.freeze({
