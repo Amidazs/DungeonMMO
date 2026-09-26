@@ -19,6 +19,12 @@ local DirectMagic = require(
 local PeriodicMagic = require(
     Services.C4SourcePeriodicMagicCastService
 )
+local SelfMagic = require(
+    Services.C4SourceSelfMagicCastService
+)
+local CorpseMagic = require(
+    Services.C4SourceCorpseMagicCastService
+)
 
 local C4SourceCastRuntimeComposition = {}
 C4SourceCastRuntimeComposition.__index =
@@ -61,6 +67,14 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local self_magic = SelfMagic.new(
+        scheduler,
+        source_executor
+    )
+    local corpse_magic = CorpseMagic.new(
+        scheduler,
+        source_executor
+    )
 
     return setmetatable({
         SourceShots = source_shots,
@@ -69,6 +83,8 @@ function C4SourceCastRuntimeComposition.new(
         Scheduler = scheduler,
         DirectMagic = direct_magic,
         PeriodicMagic = periodic_magic,
+        SelfMagic = self_magic,
+        CorpseMagic = corpse_magic,
     }, C4SourceCastRuntimeComposition)
 end
 
@@ -86,6 +102,8 @@ function C4SourceCastRuntimeComposition:clear_owner(
 )
     self.DirectMagic:clear_owner(player)
     self.PeriodicMagic:clear_owner(player)
+    self.SelfMagic:clear_owner(player)
+    self.CorpseMagic:clear_owner(player)
 
     if player and type(player.UserId) == "number" then
         self.SourceShots:remove_player(player.UserId)
@@ -104,6 +122,8 @@ Returns:
 function C4SourceCastRuntimeComposition:capability(): any
     local direct = self.DirectMagic:capability()
     local periodic = self.PeriodicMagic:capability()
+    local self_magic = self.SelfMagic:capability()
+    local corpse_magic = self.CorpseMagic:capability()
 
     return {
         Available = true,
@@ -121,6 +141,16 @@ function C4SourceCastRuntimeComposition:capability(): any
             periodic.DefaultEnabled == true,
         PeriodicMagicCurrentlyEnabled =
             periodic.CurrentlyEnabled == true,
+        SelfMagicBridge = true,
+        SelfMagicDefaultEnabled =
+            self_magic.DefaultEnabled == true,
+        SelfMagicCurrentlyEnabled =
+            self_magic.CurrentlyEnabled == true,
+        CorpseMagicBridge = true,
+        CorpseMagicDefaultEnabled =
+            corpse_magic.DefaultEnabled == true,
+        CorpseMagicCurrentlyEnabled =
+            corpse_magic.CurrentlyEnabled == true,
     }
 end
 
