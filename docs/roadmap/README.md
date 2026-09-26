@@ -1,3 +1,14 @@
+**v3.07 HUMAN WIZARD WITHERING HEX — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_07_Human_Wizard_Withering_Hex_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-withering-hex-v3-07-pending-20260926.md).
+Withering Hex now preserves source Curse: Weakness 1164:4: WIT-resisted
+effect power 80, PHYSICAL_ATTACK x0.8 for 15 seconds, one magical shot and
+exact source cast/range/resource timing. The existing NPC weakening authority
+provides the live 20 percent outgoing power reduction without changing attack
+rate. Local diff check and Base/Dungeon Rojo builds pass; Studio runners and
+live rehearsal remain pending.
+
 **v3.06 HUMAN WIZARD SCORCH MARK — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_06_Human_Wizard_Scorch_Mark_20260926.md)
 and [pending evidence](
