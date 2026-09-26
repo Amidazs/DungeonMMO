@@ -1,5 +1,5 @@
 --!strict
--- Disabled-by-default scheduled Human Wizard self-magic bridge.
+-- Disabled-by-default scheduled source self-magic bridge.
 
 local C4SourceSelfMagicCastService = {}
 C4SourceSelfMagicCastService.__index = C4SourceSelfMagicCastService
@@ -8,6 +8,10 @@ local REVIEWED_SELF_MAGIC = table.freeze({
     EmberweaverBloodToMana = table.freeze({
         SourceSkillId = 1157,
         ExecutionKind = "ManaHeal",
+    }),
+    GreenwardScoutElementalHeal = table.freeze({
+        SourceSkillId = 58,
+        ExecutionKind = "Heal",
     }),
 })
 
@@ -66,7 +70,8 @@ function C4SourceSelfMagicCastService.new(
     )
     assert(
         executor
-            and type(executor.mana_heal_self) == "function",
+            and type(executor.mana_heal_self) == "function"
+            and type(executor.heal_skill) == "function",
         "Self magic bridge requires source combat executor"
     )
 
@@ -242,12 +247,23 @@ function C4SourceSelfMagicCastService:launch_if_ready(
         return nil, "C4SelfMagicLaunchPlanChanged"
     end
 
-    local applied, apply_reason = self._executor:mana_heal_self(
-        player,
-        launch.CreativeSkillId,
-        launch.CreativeRank,
-        sequence_id
-    )
+    local applied
+    local apply_reason
+
+    if record.ExecutionKind == "Heal" then
+        applied, apply_reason = self._executor:heal_skill(
+            player,
+            launch.CreativeSkillId,
+            launch.CreativeRank
+        )
+    else
+        applied, apply_reason = self._executor:mana_heal_self(
+            player,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            sequence_id
+        )
+    end
     if not applied then
         return nil, apply_reason
     end
@@ -292,6 +308,7 @@ function C4SourceSelfMagicCastService:capability(): any
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
         ReviewedBloodToMana = true,
+        ReviewedScoutElementalHeal = true,
         ServerTargetAuthority = true,
         ClientAuthority = false,
     }
