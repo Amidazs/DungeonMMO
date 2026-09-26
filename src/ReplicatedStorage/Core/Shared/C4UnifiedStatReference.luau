@@ -38,15 +38,26 @@ local function is_learnable(
     if not scope then return false end
     local paths = {scope}
     if scope.ClassId ~= "Fighter" and scope.ClassId ~= "Mage" then
-        local starter = if scope.RaceId == "Elf"
-            then "Elven" else "Human"
-        local base = if scope.ClassId == "GreenwardScout"
-            or scope.ClassId == "GreenwardWarden"
-            or scope.ClassId == "Ashenblade"
-            or scope.ClassId == "Ironvow"
-            or scope.ClassId == "Oathguard"
-            then "Fighter" else "Mystic"
-        table.insert(paths, assert(Tree.get(starter .. base)))
+        local starter_prefix = nil
+        if scope.RaceId == "Human" then
+            starter_prefix = "Human"
+        elseif scope.RaceId == "Elf" then
+            starter_prefix = "Elven"
+        end
+
+        if starter_prefix then
+            local base = if scope.ClassId == "GreenwardScout"
+                or scope.ClassId == "GreenwardWarden"
+                or scope.ClassId == "Ashenblade"
+                or scope.ClassId == "Ironvow"
+                or scope.ClassId == "Oathguard"
+                then "Fighter"
+                else "Mystic"
+            local starter = Tree.get(starter_prefix .. base)
+            if starter then
+                table.insert(paths, starter)
+            end
+        end
     end
     for _, current in ipairs(paths) do
         for _, row in ipairs(current.Rows) do
