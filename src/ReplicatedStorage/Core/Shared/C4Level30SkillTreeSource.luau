@@ -2,6 +2,9 @@
 -- Exact level<=30 learning rows for currently implemented original paths.
 -- This is source metadata, not a live trainer switch.
 local C4Level30SkillTreeSource = {}
+local ElvenWizardRows = require(
+    script.Parent.C4ElvenWizardSkillTreeRows
+)
 
 local SOURCE_COMMIT =
     "07f8536384e799f128d44198dd7ab23519660eea"
@@ -432,6 +435,13 @@ local CLASSES = table.freeze({
         {1184, 4, "Ice Bolt", 1100, 14, "PinnedC4SkillTree"},
         {1206, 1, "Wind Shackle", 2100, 14, "PinnedC4SkillTree"},
         }),
+    }),
+    ElvenWizard = table.freeze({
+        ScopeId = "ElvenWizard",
+        RaceId = "Elf",
+        ClassId = "Moonweaver",
+        SourceClassId = 26,
+        Rows = ElvenWizardRows,
     }),
     HumanWarrior = table.freeze({
         ScopeId = "HumanWarrior",
@@ -868,7 +878,7 @@ function C4Level30SkillTreeSource.coverage(): any
     for _, scope_id in ipairs({
         "HumanFighter", "HumanMystic", "HumanWizard",
         "HumanCleric", "ElvenFighter", "ElvenMystic",
-        "HumanWarrior", "HumanKnight", "HumanRogue",
+        "ElvenWizard", "HumanWarrior", "HumanKnight", "HumanRogue",
         "ElvenKnight", "ElvenScout",
     }) do
         local source = assert(CLASSES[scope_id])
