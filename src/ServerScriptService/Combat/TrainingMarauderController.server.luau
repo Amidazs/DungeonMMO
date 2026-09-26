@@ -35,6 +35,9 @@ local MarauderSpacingRules = require(
     script.Parent:WaitForChild("MarauderSpacingRules")
 )
 local StaggerService = require(script.Parent:WaitForChild("StaggerService"))
+local C4NpcSleepService = require(
+    script.Parent:WaitForChild("C4NpcSleepService")
+)
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
@@ -419,7 +422,8 @@ end
 local function restore_body_if_idle(runtime: MarauderRuntime)
     if runtime.humanoid.Health <= 0
         or runtime.attacking
-        or StaggerService.is_staggered(runtime.model) then
+        or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model) then
         return
     end
 
@@ -620,6 +624,7 @@ local function attack_is_interrupted(
     return runtime.life_sequence ~= life_sequence
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model)
 end
 
 
@@ -627,7 +632,8 @@ end
 local function attack(runtime: MarauderRuntime, player: Player)
     if runtime.attacking
         or runtime.humanoid.Health <= 0
-        or StaggerService.is_staggered(runtime.model) then
+        or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model) then
         return
     end
 
@@ -749,6 +755,16 @@ local function update_hostile_loop(runtime: MarauderRuntime, delta_seconds: numb
         return
     end
 
+    if C4NpcSleepService.is_sleeping(runtime.model) then
+        if runtime.attacking then
+            clear_attack_presentation(runtime)
+        end
+        runtime.humanoid:Move(Vector3.zero)
+        set_ai_state(runtime, "Sleeping")
+        MarauderPresentationService.reset_pose(runtime.model, 0)
+        return
+    end
+
     if runtime.attacking then
         set_ai_state(runtime, "Attacking")
         return
@@ -817,6 +833,7 @@ local function reset_runtime(runtime: MarauderRuntime)
     runtime.stagger_feedback_sequence += 1
 
     StaggerService.clear(runtime.model)
+    C4NpcSleepService.clear(runtime.model)
     set_current_target(runtime, nil)
     runtime.model:SetAttribute("MarauderAggroMode", "None")
     runtime.model:SetAttribute("AttackTelegraph", false)
@@ -835,6 +852,7 @@ local function handle_death(runtime: MarauderRuntime)
     local expected_sequence = runtime.life_sequence
 
     StaggerService.clear(runtime.model)
+    C4NpcSleepService.clear(runtime.model)
     set_current_target(runtime, nil)
     clear_attack_presentation(runtime)
     MarauderPresentationService.play_death(runtime.model)
