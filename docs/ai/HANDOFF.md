@@ -1,3 +1,19 @@
+## 27 September 2026 — v3.14 Duskguard accepted; move to Assassin
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md);
+[green evidence](
+../testing/c4-palus-knight-duskguard-v3-14-green-20260927.md).
+
+Duskguard is accepted green at 50/50 mapped source rows, 23/23 fresh Studio
+backend suites and a genuine unpublished Play rehearsal with zero project
+CreatorErrors. Challenge, Last Stand and Umbral Siphon all crossed real live
+authorities. Physical source cast timing was fixed during Play acceptance.
+
+Continue with the other Dark Elf Fighter first-transfer path, source
+**Assassin**. Preserve exact C4 values but use an independent DungeonMMO
+creative class/skill naming layer.
+
 ## 27 September 2026 — v3.13 Lifebinder accepted
 
 [Roadmap](
