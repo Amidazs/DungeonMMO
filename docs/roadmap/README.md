@@ -1,3 +1,13 @@
+**v3.05 HUMAN WIZARD SLUMBER HEX — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_05_Human_Wizard_Slumber_Hex_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-slumber-hex-v3-05-pending-20260926.md).
+Slumber Hex now preserves source Sleep 1069:6: WIT-resisted effect power 80,
+30-second action/movement suppression, one magical shot and direct-damage wake
+semantics. Training Marauders and the Marauder Captain now consume the shared
+server NPC Sleep authority. Local diff check and Base/Dungeon Rojo builds pass;
+Studio runners and live rehearsal remain pending.
+
 **v3.04 HUMAN WIZARD LIFE SIPHON — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_04_Human_Wizard_Life_Siphon_20260926.md)
 and [pending evidence](
