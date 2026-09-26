@@ -285,6 +285,42 @@ function FakeCombat.sleep_skill(
 end
 
 --[[
+Returns one disposable source elemental-vulnerability result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected reviewed NPC boundary.
+    creative_skill_id (string): Expected Scorch Mark identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source vulnerability result.
+]]
+function FakeCombat.elemental_vulnerability_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "EmberweaverScorchMark")
+    assert(creative_rank == 2)
+
+    return {
+        Kind = "ElementalVulnerability",
+        Landed = true,
+        Rate = 80,
+        Roll = 0,
+        VulnerabilityStat = "FIRE_VULN",
+        VulnerabilityMultiplier = 1.25,
+        DurationSeconds = 15,
+        SourceSkillId = 1083,
+        SourceRank = 2,
+    }, nil
+end
+
+--[[
 Returns one disposable source self-heal result.
 
 Args:
@@ -579,6 +615,9 @@ local function main()
             and capability.NpcSleepLiveApplication
             and capability.NpcSleepBreaksOnDirectDamage
             and capability.NpcSleepAuthorityConfigured
+            and capability.NpcElementalVulnerabilityLiveApplication
+            and capability.NpcElementalVulnerabilityBoundaryDecoration
+            and capability.NpcElementalVulnerabilityAuthorityConfigured
             and capability.NpcMagicSkillReadOnlyPreflight
             and capability.NpcStatusSkillReadOnlyPreflight
             and capability.NpcSourceRangePreflight
@@ -816,6 +855,33 @@ local function main()
             and npc_events[3].Damage == 8
             and not npc_events[3].Lethal,
         "NPC source damage emits existing trusted bookkeeping context"
+    )
+
+    table.clear(npc_events)
+    local scorch = assert(
+        executor:elemental_vulnerability_skill_npc(
+            attacker,
+            enemy,
+            "EmberweaverScorchMark",
+            2,
+            2055
+        )
+    )
+    check(
+        scorch.Kind == "C4LiveNpcElementalVulnerability"
+            and scorch.Applied
+            and scorch.VulnerabilityApplied
+            and scorch.Landed
+            and scorch.VulnerabilityStat == "FIRE_VULN"
+            and scorch.VulnerabilityMultiplier == 1.25
+            and scorch.DurationSeconds == 15
+            and enemy:GetAttribute("C4FIRE_VULNMultiplier")
+                == 1.25
+            and type(
+                enemy:GetAttribute("C4FIRE_VULNEndsAt")
+            ) == "number"
+            and #npc_events == 0,
+        "landed source fire vulnerability applies without dealing damage"
     )
 
     local sleep_humanoid =
