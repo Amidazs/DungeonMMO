@@ -40,6 +40,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "MagicDrain",
     }),
+    EmberweaverSlumberHex = table.freeze({
+        SourceSkillId = 1069,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -49,6 +55,7 @@ local REVIEWED_SKILLS = table.freeze({
     "EmberweaverFrostLance",
     "EmberweaverEmberField",
     "EmberweaverLifeSiphon",
+    "EmberweaverSlumberHex",
 })
 
 --[[
@@ -144,7 +151,8 @@ function C4SourceDirectMagicCastService.new(
             and type(executor.magic_skill_npc) == "function"
             and type(executor.magic_slow_skill_npc) == "function"
             and type(executor.magic_area_skill_npc) == "function"
-            and type(executor.magic_drain_skill_npc) == "function",
+            and type(executor.magic_drain_skill_npc) == "function"
+            and type(executor.sleep_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -438,6 +446,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "SleepControl" then
+        applied, reason =
+            self._executor:sleep_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     else
         applied, reason =
             self._executor:magic_skill_npc(
@@ -589,6 +606,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedTargetAreaSourceRadius = true,
         ReviewedMagicDrain = true,
         ReviewedMagicDrainSourceAbsorption = true,
+        ReviewedSleepControl = true,
+        ReviewedSleepBreaksOnDamage = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
