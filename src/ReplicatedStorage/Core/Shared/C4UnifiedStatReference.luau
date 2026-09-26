@@ -131,6 +131,7 @@ local function source_stats(
         MAX_CP = naked.MaxCP,
         REG_HP_RATE = regen.REG_HP_RATE,
         REG_MP_RATE = regen.REG_MP_RATE,
+        RECHARGE_MP_RATE = 1,
         REG_CP_RATE = regen.REG_CP_RATE,
     }
 end
