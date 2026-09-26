@@ -1,4 +1,9 @@
 --!strict
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    return
+end
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
