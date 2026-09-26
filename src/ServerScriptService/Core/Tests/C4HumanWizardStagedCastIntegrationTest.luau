@@ -256,6 +256,38 @@ function FakeExecutor:magic_skill_npc(
     }, nil
 end
 
+function FakeExecutor:magic_undead_skill_npc(
+    attacker: any,
+    enemy: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    return self:magic_skill_npc(
+        attacker,
+        enemy,
+        skill_id,
+        rank,
+        sequence_id
+    )
+end
+
+function FakeExecutor:root_skill_npc(
+    attacker: any,
+    enemy: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    return self:sleep_skill_npc(
+        attacker,
+        enemy,
+        skill_id,
+        rank,
+        sequence_id
+    )
+end
+
 --[[
 Records one staged periodic-status executor handoff.
 
