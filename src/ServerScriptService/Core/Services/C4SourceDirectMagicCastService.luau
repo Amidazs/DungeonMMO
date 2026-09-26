@@ -46,6 +46,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "SleepControl",
     }),
+    EmberweaverScorchMark = table.freeze({
+        SourceSkillId = 1083,
+        CastRange = 750,
+        EffectRange = 1250,
+        ExecutionKind = "ElementalVulnerability",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -56,6 +62,7 @@ local REVIEWED_SKILLS = table.freeze({
     "EmberweaverEmberField",
     "EmberweaverLifeSiphon",
     "EmberweaverSlumberHex",
+    "EmberweaverScorchMark",
 })
 
 --[[
@@ -152,7 +159,10 @@ function C4SourceDirectMagicCastService.new(
             and type(executor.magic_slow_skill_npc) == "function"
             and type(executor.magic_area_skill_npc) == "function"
             and type(executor.magic_drain_skill_npc) == "function"
-            and type(executor.sleep_skill_npc) == "function",
+            and type(executor.sleep_skill_npc) == "function"
+            and type(
+                executor.elemental_vulnerability_skill_npc
+            ) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -455,6 +465,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "ElementalVulnerability" then
+        applied, reason =
+            self._executor:elemental_vulnerability_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     else
         applied, reason =
             self._executor:magic_skill_npc(
@@ -608,6 +627,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedMagicDrainSourceAbsorption = true,
         ReviewedSleepControl = true,
         ReviewedSleepBreaksOnDamage = true,
+        ReviewedElementalVulnerability = true,
+        ReviewedElementalVulnerabilityFeedsMagicDamage = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
