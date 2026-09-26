@@ -2338,6 +2338,118 @@ function C4SourceCombatCalculationService.sleep_skill(
 end
 
 --[[
+Resolves one reviewed C4 Root cast against a source target.
+
+The exact WIT-resisted hostile-effect calculation owns one magical shot. Root
+stops movement only and remains active through normal damage.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative Root skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source Root land result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.root_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, _, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason = StatusEffects.root_plan(
+        source.SkillId,
+        source.Rank
+    )
+    if not plan then
+        return nil, plan_reason
+    end
+
+    local target_wit_bonus = defender.SourceWitBonus
+    if type(target_wit_bonus) ~= "number"
+        or target_wit_bonus <= 0
+    then
+        return nil, "OriginalRootWitBonusUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = plan.EffectPower,
+            TargetStatBonus = target_wit_bonus,
+            TargetVulnerability = 1,
+            IsMagic = plan.IsMagic,
+            AttackerMAtk =
+                attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            TargetMDef =
+                defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            Spiritshot = shot.Spiritshot,
+            BlessedSpiritshot = shot.BlessedSpiritshot,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = plan.MagicLevel,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "RootControl",
+        Landed = resolved.Landed,
+        Rate = resolved.Rate,
+        Roll = resolved.Roll,
+        DurationSeconds = plan.DurationSeconds,
+        BreaksOnDamage = plan.BreaksOnDamage,
+        StopsMovement = plan.StopsMovement,
+        StopsAttacks = plan.StopsAttacks,
+        StopsCasting = plan.StopsCasting,
+        SaveVs = plan.SaveVs,
+        EffectPower = plan.EffectPower,
+        MagicLevel = plan.MagicLevel,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 elemental-vulnerability debuff cast.
 
 The cast snapshots and consumes one magical shot, then uses that shot state in
@@ -2979,6 +3091,157 @@ function C4SourceCombatCalculationService.heal_skill(
 end
 
 --[[
+Resolves one reviewed C4 single-target support buff.
+
+The source Buff handler applies its effect rows to the target and consumes one
+magical shot once per cast. The returned source identity is suitable for the
+server active-effect registry; no client-supplied modifier is accepted.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected support buff.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source timed-buff plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.support_buff_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "BUFF"
+        or sets.target ~= "TARGET_ONE"
+        or sets.operateType ~= "ACTIVE"
+    then
+        return nil, "UnsupportedOriginalSupportBuffSkill"
+    end
+
+    local matched = nil
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Buff" then
+            if matched then
+                return nil, "DuplicateOriginalSupportBuffEffect"
+            end
+            matched = row
+        end
+    end
+
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalSupportBuffEffectUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "SupportBuff",
+        DurationSeconds = matched.time,
+        StackType = matched.stackType,
+        StackOrder = matched.stackOrder,
+        Modifiers = matched.Modifiers or {},
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 TARGET_PARTY HEAL cast.
+
+The source heal effect power is calculated once with the cast-owned magical
+shot. Target enumeration and actual health mutation remain server runtime
+responsibilities.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected party-heal skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact heal/radius plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.party_heal_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "HEAL"
+        or sets.target ~= "TARGET_PARTY"
+        or type(sets.skillRadius) ~= "number"
+        or sets.skillRadius <= 0
+    then
+        return nil, "UnsupportedOriginalPartyHealSkill"
+    end
+
+    local power, power_reason = heal_power(effect)
+    if not power then
+        return nil, power_reason
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "PartyHeal",
+        Amount = Formula.heal_amount(
+            power,
+            shot.Spiritshot,
+            shot.BlessedSpiritshot
+        ),
+        SourceHealPower = power,
+        SourceSkillRadius = sets.skillRadius,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 self MANAHEAL skill.
 
 Body To Mind restores its source power directly and consumes HP at hit time.
@@ -3265,6 +3528,10 @@ function C4SourceCombatCalculationService.capability(): any
         PhysicalPDAM = true,
         MagicalMDAM = true,
         InstantHeal = true,
+        TargetHealCalculation = true,
+        PartyHealCalculation = true,
+        SupportBuffCalculation = true,
+        RootControlCalculation = true,
         ManaHealCalculation = true,
         CompanionSummonCalculation = true,
         CompanionHealCalculation = true,
