@@ -22,6 +22,11 @@ local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     Combat:WaitForChild("C4NpcSleepService")
 )
+local C4NpcElementalVulnerabilityService = require(
+    Combat:WaitForChild(
+        "C4NpcElementalVulnerabilityService"
+    )
+)
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
 local PresentationService = require(Combat:WaitForChild("MarauderPresentationService"))
 local Factory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
@@ -285,6 +290,7 @@ local function attach(model: Instance)
     humanoid.Died:Connect(function()
         ThreatService.clear(model)
         C4NpcSleepService.clear(model)
+        C4NpcElementalVulnerabilityService.clear_all(model)
         runtime.attackSequence += 1
         runtime.attacking = false
         model:SetAttribute("AttackTelegraph", false)
