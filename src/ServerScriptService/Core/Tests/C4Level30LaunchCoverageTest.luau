@@ -204,12 +204,12 @@ local function main()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 9,
-        "Exactly nine first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 10,
+        "Exactly ten first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 9,
-        "Nine implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 10,
+        "Ten implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
