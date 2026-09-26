@@ -121,8 +121,6 @@ Returns:
 local function source_fields(sets: any): (any?, string?)
     local required = {}
     for _, field_name in ipairs({
-        "mpInitialConsume",
-        "mpConsume",
         "hitTime",
         "reuseDelay",
     }) do
@@ -134,6 +132,16 @@ local function source_fields(sets: any): (any?, string?)
             return nil, reason
         end
         required[field_name] = value
+    end
+
+    local initial_mp = sets.mpInitialConsume or 0
+    local ongoing_mp = sets.mpConsume or 0
+    if type(initial_mp) ~= "number"
+        or initial_mp < 0
+        or type(ongoing_mp) ~= "number"
+        or ongoing_mp < 0
+    then
+        return nil, "InvalidOriginalCastMpFields"
     end
 
     local optional = {}
@@ -153,8 +161,8 @@ local function source_fields(sets: any): (any?, string?)
     end
 
     return {
-        InitialMp = required.mpInitialConsume,
-        OngoingMp = required.mpConsume,
+        InitialMp = initial_mp,
+        OngoingMp = ongoing_mp,
         HitTimeMs = required.hitTime,
         ReuseDelayMs = required.reuseDelay,
         CoolTimeMs = optional.coolTime,
