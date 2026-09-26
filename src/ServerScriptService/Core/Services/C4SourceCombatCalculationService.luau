@@ -3171,6 +3171,78 @@ function C4SourceCombatCalculationService.support_buff_skill(
 end
 
 --[[
+Resolves one reviewed C4 player-resurrection skill.
+
+C4 Resurrection targets a dead player, consumes one magical shot, and carries
+its source power into the target's revive confirmation flow. The Dungeon
+runtime owns the actual dead-member/session transition.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected resurrection skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact source resurrection plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.resurrection_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "BUFF"
+        or sets.target ~= "TARGET_CORPSE_PLAYER"
+        or type(sets.power) ~= "number"
+        or sets.power < 0
+    then
+        return nil, "UnsupportedOriginalResurrectionSkill"
+    end
+
+    local has_resurrect = false
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Resurrect" then
+            has_resurrect = true
+            break
+        end
+    end
+    if not has_resurrect then
+        return nil, "OriginalResurrectionEffectUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "PlayerResurrection",
+        RestoreExperiencePower = sets.power,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        RequiresTargetAcceptance = true,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 TARGET_PARTY HEAL cast.
 
 The source heal effect power is calculated once with the cast-owned magical
@@ -3530,6 +3602,8 @@ function C4SourceCombatCalculationService.capability(): any
         InstantHeal = true,
         TargetHealCalculation = true,
         PartyHealCalculation = true,
+        ResurrectionCalculation = true,
+        ResurrectionRequiresTargetAcceptance = true,
         SupportBuffCalculation = true,
         RootControlCalculation = true,
         ManaHealCalculation = true,
