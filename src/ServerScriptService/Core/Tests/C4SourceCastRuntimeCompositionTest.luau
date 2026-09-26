@@ -304,6 +304,108 @@ function FakeExecutor:status_skill_npc(
     }, nil
 end
 
+function FakeExecutor:status_area_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    source_radius: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        StatusApplied = true,
+        TargetCount = 1,
+        LandedCount = 1,
+        SourceSkillRadius = source_radius,
+    }, nil
+end
+
+function FakeExecutor:mana_heal_self(
+    _attacker: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        HpConsumed = 10,
+        ManaRestored = 22,
+    }, nil
+end
+
+function FakeExecutor:can_corpse_skill_npc(
+    _attacker: any,
+    _corpse: any,
+    _source_range: number?
+): (boolean, string?)
+    return true, nil
+end
+
+function FakeExecutor:corpse_drain_skill_npc(
+    _attacker: any,
+    _corpse: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        CorpseConsumed = true,
+        EffectiveHeal = 260,
+    }, nil
+end
+
+local FakeInventory = {}
+
+function FakeInventory:consume_item(
+    _user_id: number,
+    _item_id: string,
+    _quantity: number?
+): any
+    return {ok = true}
+end
+
+local FakeSourceCombat = {}
+
+function FakeSourceCombat.companion_summon_plan(
+    _user_id: number,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        SourceSkillId = 1111,
+        SourceRank = 1,
+        SourceNpcId = 12006,
+        ExpPenalty = 0.3,
+        TotalLifeTimeMs = 1200000,
+        TimeLostIdleMs = 500,
+        TimeLostActiveMs = 1000,
+        ItemConsumeId = 1458,
+        ItemConsumeCount = 3,
+        ItemConsumeIdOverTime = 1458,
+        ItemConsumeCountOverTime = 0,
+        ItemConsumeSteps = 1,
+    }, nil
+end
+
+function FakeSourceCombat.companion_heal_plan(
+    _user_id: number,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {Amount = 145, SourceSkillId = 1127, SourceRank = 1}, nil
+end
+
+function FakeSourceCombat.companion_recharge_plan(
+    _user_id: number,
+    _skill_id: string,
+    _rank: number,
+    _rate: number
+): (any?, string?)
+    return {Amount = 41, SourceSkillId = 1126, SourceRank = 1}, nil
+end
+
 --[[
 Counts one source-cast composition assertion.
 
@@ -331,7 +433,9 @@ Returns:
 local function main()
     local runtime = Composition.new(
         FakeShots,
-        FakeExecutor
+        FakeExecutor,
+        FakeInventory,
+        FakeSourceCombat
     )
     local capability = runtime:capability()
 
@@ -343,6 +447,10 @@ local function main()
             and capability.SourceCastScheduler
             and capability.DirectMagicBridge
             and capability.PeriodicMagicBridge
+            and capability.SelfMagicBridge
+            and capability.CorpseMagicBridge
+            and capability.CompanionAuthority
+            and capability.CompanionMagicBridge
             and not capability.DirectMagicDefaultEnabled
             and not capability.DirectMagicCurrentlyEnabled
             and not capability.PeriodicMagicDefaultEnabled
@@ -352,7 +460,10 @@ local function main()
 
     check(
         not runtime.DirectMagic:is_enabled()
-            and not runtime.PeriodicMagic:is_enabled(),
+            and not runtime.PeriodicMagic:is_enabled()
+            and not runtime.SelfMagic:is_enabled()
+            and not runtime.CorpseMagic:is_enabled()
+            and not runtime.CompanionMagic:is_enabled(),
         "composed staged bridges remain disabled until trusted activation"
     )
 
