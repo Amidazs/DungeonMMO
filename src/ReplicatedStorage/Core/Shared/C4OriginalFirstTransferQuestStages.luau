@@ -123,6 +123,39 @@ local QUESTS = table.freeze({
         }),
         WorldBindingStatus = "NotImplemented",
     }),
+    ElvenWizard = table.freeze({
+        Id = "MoonwellConcord",
+        BranchId = "ElvenWizard",
+        SourceTitle = "The Moonwell Concord",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "ArcanistLethiel",
+        Recommendation = "MoonwellConcordSeal",
+        Steps = table.freeze({
+            talk("ArcanistLethiel", "Accept the Moonwell concord trial."),
+            talk("LorekeeperVaela", "Trace the fractured moonwell wards."),
+            defeat(
+                "DuskbloomAcolyte",
+                3,
+                "Recover three personally earned moonwell fragments."
+            ),
+            talk("LorekeeperVaela", "Return the moonwell fragments."),
+            defeat(
+                "TideglassBinder",
+                1,
+                "Recover the binder's personal tideglass sigil."
+            ),
+            talk(
+                "ArcanistLethiel",
+                "Present the sigil and complete the concord."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "MoonwellFragments3",
+            "TideglassBinderSigil",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     HumanCleric = table.freeze({
         Id = "DawnkeeperVigil",
         BranchId = "HumanCleric",
@@ -233,8 +266,8 @@ function SourceQuests.inventoried(): {any}
     return table.freeze({
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.HumanWizard,
-        QUESTS.HumanCleric, QUESTS.ElvenScout,
-        QUESTS.ElvenKnight,
+        QUESTS.HumanCleric, QUESTS.ElvenWizard,
+        QUESTS.ElvenScout, QUESTS.ElvenKnight,
     })
 end
 
