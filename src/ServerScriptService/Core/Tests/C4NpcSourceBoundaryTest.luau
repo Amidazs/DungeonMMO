@@ -76,6 +76,7 @@ local function check_marauder()
             and boundary.Level == 5
             and boundary.SourceNpcRace == "NONE"
             and boundary.SourceRaceSkillId == 4295
+            and boundary.SourceWitBonus == 1
             and boundary.PlayerFacingSourceNameExposed == false,
         "creative Marauder keeps internal pinned source identity only"
     )
@@ -118,7 +119,8 @@ local function check_wolf()
         boundary.SourceNpcId == 525
             and boundary.Level == 4
             and boundary.SourceNpcRace == "ANIMAL"
-            and boundary.SourceRaceSkillId == 4293,
+            and boundary.SourceRaceSkillId == 4293
+            and boundary.SourceWitBonus == 1,
         "creative Wolf maps to the reviewed C4 animal source record"
     )
     check(
