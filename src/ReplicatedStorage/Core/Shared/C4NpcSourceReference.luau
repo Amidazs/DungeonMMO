@@ -223,6 +223,7 @@ function C4NpcSourceReference.get(
     local stats = final_stats(row)
     local con_bonus = source_bonus("CON", row.CON)
     local dex_bonus = source_bonus("DEX", row.DEX)
+    local wit_bonus = source_bonus("WIT", row.WIT)
     local men_bonus = source_bonus("MEN", row.MEN)
     local str_bonus = source_bonus("STR", row.STR)
 
@@ -239,6 +240,7 @@ function C4NpcSourceReference.get(
         SourceStatCandidate = stats,
         SourceConBonus = con_bonus,
         SourceDexBonus = dex_bonus,
+        SourceWitBonus = wit_bonus,
         SourceMenBonus = men_bonus,
         SourceStrBonus = str_bonus,
         SourceAttackRange = row.AttackRange,
