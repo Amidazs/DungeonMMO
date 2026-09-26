@@ -1,3 +1,24 @@
+## 27 September 2026 — v3.13 Lifebinder accepted
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_13_Elven_Oracle_Lifebinder_20260927.md);
+[green evidence](
+../testing/c4-elven-oracle-lifebinder-v3-13-green-20260927.md).
+
+Elven Oracle / Lifebinder is complete through level 30: 91/91 source rank rows,
+25 creative families, exact class-29 source tree integration, 25/25 focused
+Studio/backend suites, and a successful unpublished Play rehearsal. Wind
+Shackle, Agility and Mana Recharge all crossed the real source runtime, with
+final CreatorError count zero.
+
+The next backend work should continue the remaining original C4 first-transfer
+careers in branch order, using the same gate:
+source catalogue -> creative schedule -> exact effects -> runtime routing ->
+focused Studio suites -> unpublished Play rehearsal -> documentation.
+
+Permanent source/document edits remain GitHub-only. Desktop Commander is for
+fast-forward, builds and live Studio/Play validation.
+
 ## 26 September 2026 — v3.12 Elven Wizard / Moonweaver accepted
 
 [Roadmap](
