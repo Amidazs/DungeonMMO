@@ -905,7 +905,8 @@ local function main()
 
     print((
         "[C4 Wizard Staged Integration] TEST_PASS_PENDING_STUDIO: "
-        .. "%d assertions direct=3 area=1 drain=1 sleep=1 poison=1 ".. "shared_scheduler=true"
+        .. "%d assertions direct=3 area=1 drain=1 sleep=1 "
+        .. "poison=1 shared_scheduler=true"
     ):format(checks))
 end
 
