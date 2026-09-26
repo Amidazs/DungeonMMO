@@ -116,6 +116,28 @@ function FakeExecutor:can_resurrection_skill_player(
     return true, nil
 end
 
+--[[
+Provides a minimal self-heal executor contract.
+
+Args:
+    _caster (any): Disposable self-healing cast owner.
+    _skill_id (string): Reviewed creative self-heal skill.
+    _rank (number): Reviewed creative rank.
+
+Returns:
+    (any?, string?): Successful fake self-heal application.
+]]
+function FakeExecutor:heal_skill(
+    _caster: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        EffectiveHeal = 95,
+    }, nil
+end
+
 function FakeExecutor:heal_skill_target(
     _caster: any,
     _target: any,
