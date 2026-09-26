@@ -22,6 +22,9 @@ local MovementSlow = require(
 local NpcSleep = require(
     ServerScriptService.Combat.C4NpcSleepService
 )
+local NpcElementalVulnerability = require(
+    ServerScriptService.Combat.C4NpcElementalVulnerabilityService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -179,6 +182,9 @@ function C4SourceCombatExecutor.new(options: any?): any
         _npc_damage_observer = config.NpcDamageObserver,
         _movement_slow = config.MovementSlowProvider or MovementSlow,
         _npc_sleep = config.SleepProvider or NpcSleep,
+        _npc_elemental_vulnerability =
+            config.ElementalVulnerabilityProvider
+            or NpcElementalVulnerability,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -408,7 +414,25 @@ function C4SourceCombatExecutor:_validate_npc_target(
         return nil, "C4NpcDamageObserverUnavailable"
     end
 
-    return self._npc_boundary_provider(enemy)
+    local boundary, boundary_reason =
+        self._npc_boundary_provider(enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    if self._npc_elemental_vulnerability
+        and type(
+            self._npc_elemental_vulnerability.decorate_boundary
+        ) == "function"
+    then
+        boundary =
+            self._npc_elemental_vulnerability.decorate_boundary(
+                enemy,
+                boundary
+            )
+    end
+
+    return boundary, nil
 end
 
 --[[
@@ -1523,6 +1547,88 @@ function C4SourceCombatExecutor:sleep_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC elemental-vulnerability debuff.
+
+A resisted cast changes no runtime state. A landed cast installs the exact
+source multiplier and duration in the shared NPC elemental authority. Future
+source magic calculations receive a decorated boundary, so elemental damage
+uses the debuff without mutating the immutable source reference table.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative debuff.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live vulnerability evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:elemental_vulnerability_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.elemental_vulnerability_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcElementalVulnerability",
+            Calculation = calculated,
+            Applied = false,
+            VulnerabilityApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local authority = self._npc_elemental_vulnerability
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcElementalVulnerabilityAuthorityUnavailable"
+    end
+
+    local applied = authority.apply(
+        enemy,
+        calculated.VulnerabilityStat,
+        calculated.VulnerabilityMultiplier,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcElementalVulnerabilityApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcElementalVulnerability",
+        Calculation = calculated,
+        Applied = true,
+        VulnerabilityApplied = true,
+        Landed = true,
+        VulnerabilityStat = calculated.VulnerabilityStat,
+        VulnerabilityMultiplier =
+            calculated.VulnerabilityMultiplier,
+        DurationSeconds = calculated.DurationSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC MDAM skill with a reviewed movement slow.
 
 Damage is applied through the normal source NPC bookkeeping path. A landed
@@ -1998,6 +2104,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcSleepBreaksOnDirectDamage = true,
         NpcSleepAuthorityConfigured =
             type(self._npc_sleep) == "table",
+        NpcElementalVulnerabilityLiveApplication = true,
+        NpcElementalVulnerabilityBoundaryDecoration = true,
+        NpcElementalVulnerabilityAuthorityConfigured =
+            type(self._npc_elemental_vulnerability) == "table",
         NpcMagicMovementSlowLiveApplication = true,
         NpcMagicMovementSlowSharedNonStackingAuthority = true,
         NpcMagicSkillReadOnlyPreflight = true,
