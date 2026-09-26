@@ -243,6 +243,89 @@ function C4StatusEffectReference.movement_slow_plan(
 end
 
 --[[
+Builds the reviewed C4 Sleep control plan.
+
+Sleep is a magical WIT-resisted DEBUFF with one duration effect. It is kept
+separate from periodic statuses because it suppresses movement/actions and
+breaks on normal damage instead of scheduling damage ticks.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen Sleep plan or strict source-data reason.
+]]
+function C4StatusEffectReference.sleep_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1069 then
+        return nil, "UnsupportedOriginalSleepSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalSleepSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "SLEEP"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+        or sets.target ~= "TARGET_ONE"
+    then
+        return nil, "OriginalSleepContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Sleep"
+            and effect.abnormal == "SLEEP"
+        then
+            if matched ~= nil then
+                return nil, "DuplicateOriginalSleepEffect"
+            end
+            matched = effect
+        end
+    end
+
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalSleepEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalSleepMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "SLEEP",
+        SaveVs = "WIT",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        DurationSeconds = matched.time,
+        BreaksOnDamage = true,
+        StopsMovement = true,
+        StopsAttacks = true,
+        StopsCasting = true,
+    }), nil
+end
+
+--[[
 Calculates exact C4 hostile-effect land rate before the final random roll.
 
 This reproduces Formulas.calcEffectSuccess for the reviewed Bleed/Poison scope:
