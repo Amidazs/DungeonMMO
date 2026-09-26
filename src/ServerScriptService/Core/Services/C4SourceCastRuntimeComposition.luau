@@ -25,6 +25,12 @@ local SelfMagic = require(
 local CorpseMagic = require(
     Services.C4SourceCorpseMagicCastService
 )
+local CompanionService = require(
+    Services.C4SourceCompanionService
+)
+local CompanionMagic = require(
+    Services.C4SourceCompanionCastService
+)
 
 local C4SourceCastRuntimeComposition = {}
 C4SourceCastRuntimeComposition.__index =
@@ -36,13 +42,17 @@ Builds the disabled-by-default Dungeon source cast service graph.
 Args:
     source_shots (any): Existing server-owned C4 source shot authority.
     source_executor (any): Existing disabled source combat executor.
+    inventory (any): Existing server-owned inventory authority.
+    source_combat (any): Existing C4 source calculation provider.
 
 Returns:
     any: Composed resource, timing, scheduler and direct-MDAM services.
 ]]
 function C4SourceCastRuntimeComposition.new(
     source_shots: any,
-    source_executor: any
+    source_executor: any,
+    inventory: any,
+    source_combat: any
 ): any
     assert(
         source_shots
@@ -54,6 +64,18 @@ function C4SourceCastRuntimeComposition.new(
         source_executor
             and type(source_executor.magic_skill_npc) == "function",
         "Source cast runtime requires source combat executor"
+    )
+    assert(
+        inventory
+            and type(inventory.consume_item) == "function",
+        "Source cast runtime requires inventory authority"
+    )
+    assert(
+        source_combat
+            and type(
+                source_combat.companion_summon_plan
+            ) == "function",
+        "Source cast runtime requires source companion calculations"
     )
 
     local resources = CastResources.new()
@@ -75,6 +97,14 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local companions = CompanionService.new(
+        inventory,
+        source_combat
+    )
+    local companion_magic = CompanionMagic.new(
+        scheduler,
+        companions
+    )
 
     return setmetatable({
         SourceShots = source_shots,
@@ -85,6 +115,8 @@ function C4SourceCastRuntimeComposition.new(
         PeriodicMagic = periodic_magic,
         SelfMagic = self_magic,
         CorpseMagic = corpse_magic,
+        Companions = companions,
+        CompanionMagic = companion_magic,
     }, C4SourceCastRuntimeComposition)
 end
 
@@ -104,6 +136,8 @@ function C4SourceCastRuntimeComposition:clear_owner(
     self.PeriodicMagic:clear_owner(player)
     self.SelfMagic:clear_owner(player)
     self.CorpseMagic:clear_owner(player)
+    self.CompanionMagic:clear_owner(player)
+    self.Companions:clear_owner(player, "OwnerCleared")
 
     if player and type(player.UserId) == "number" then
         self.SourceShots:remove_player(player.UserId)
@@ -124,6 +158,7 @@ function C4SourceCastRuntimeComposition:capability(): any
     local periodic = self.PeriodicMagic:capability()
     local self_magic = self.SelfMagic:capability()
     local corpse_magic = self.CorpseMagic:capability()
+    local companion_magic = self.CompanionMagic:capability()
 
     return {
         Available = true,
@@ -151,6 +186,12 @@ function C4SourceCastRuntimeComposition:capability(): any
             corpse_magic.DefaultEnabled == true,
         CorpseMagicCurrentlyEnabled =
             corpse_magic.CurrentlyEnabled == true,
+        CompanionAuthority = true,
+        CompanionMagicBridge = true,
+        CompanionMagicDefaultEnabled =
+            companion_magic.DefaultEnabled == true,
+        CompanionMagicCurrentlyEnabled =
+            companion_magic.CurrentlyEnabled == true,
     }
 end
 
