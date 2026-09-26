@@ -9,6 +9,9 @@ local HumanClericSkills = require(
 local ElvenWizardSkills = require(
     script.Parent.C4ElvenWizardSkillDefinitions
 )
+local ElvenOracleSkills = require(
+    script.Parent.C4ElvenOracleSkillDefinitions
+)
 
 local DEFINITIONS = table.freeze({
     -- C4 level-one starting-class protection analogue. The actual
@@ -3041,6 +3044,7 @@ function SkillProgressionDefinitions.get(
         or HumanWizardSkills.get(skill_id)
         or HumanClericSkills.get(skill_id)
         or ElvenWizardSkills.get(skill_id)
+        or ElvenOracleSkills.get(skill_id)
 end
 
 function SkillProgressionDefinitions.all(): any
@@ -3056,6 +3060,9 @@ function SkillProgressionDefinitions.all(): any
         combined[skill_id] = definition
     end
     for skill_id, definition in pairs(ElvenWizardSkills.all()) do
+        combined[skill_id] = definition
+    end
+    for skill_id, definition in pairs(ElvenOracleSkills.all()) do
         combined[skill_id] = definition
     end
 
