@@ -22,6 +22,9 @@ local StaggerService = require(Combat:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     Combat:WaitForChild("C4NpcSleepService")
 )
+local C4NpcConfusionService = require(
+    Combat:WaitForChild("C4NpcConfusionService")
+)
 local C4NpcRootService = require(
     Combat:WaitForChild("C4NpcRootService")
 )
@@ -108,6 +111,8 @@ local function threat_target(
             local distance = delta.Magnitude
             table.insert(candidates, {
                 player = player,
+                character = character,
+                root = root,
                 distance = distance,
             })
             by_user_id[player.UserId] = {
@@ -116,6 +121,39 @@ local function threat_target(
                 distance = distance,
             }
         end
+    end
+
+    if C4NpcConfusionService.is_confused(runtime.model) then
+        local forced =
+            C4NpcConfusionService.choose_player_target(
+                runtime.model,
+                candidates
+            )
+        if not forced then
+            runtime.model:SetAttribute(
+                "MarauderAggroTargetUserId",
+                0
+            )
+            runtime.model:SetAttribute(
+                "MarauderAggroMode",
+                "ConfusionNoTarget"
+            )
+            return nil, nil, nil, math.huge
+        end
+
+        local selected = by_user_id[forced.player.UserId]
+        runtime.model:SetAttribute(
+            "MarauderAggroTargetUserId",
+            forced.player.UserId
+        )
+        runtime.model:SetAttribute(
+            "MarauderAggroMode",
+            "Confusion"
+        )
+        return forced.player,
+            selected.character,
+            selected.root,
+            selected.distance
     end
 
     local player, mode = ThreatService.select_target(
@@ -213,7 +251,19 @@ local function clear_attack(runtime: Runtime)
 end
 
 local function perform_attack(runtime: Runtime, target_player: Player, target_character: Model, target_root: BasePart)
-    if runtime.attacking or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then return end
+    if runtime.attacking
+        or runtime.humanoid.Health <= 0
+        or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model)
+        or (
+            C4NpcConfusionService.is_confused(runtime.model)
+            and C4NpcConfusionService.caster_user_id(
+                runtime.model
+            ) == target_player.UserId
+        )
+    then
+        return
+    end
     local boss_attack = OptionalBossAttackRules.resolve(
         runtime.model, runtime.patternIndex,
         runtime.humanoid.Health / math.max(1, runtime.humanoid.MaxHealth)
@@ -243,14 +293,34 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
     runtime.body.Color = definition.TELEGRAPH_COLOR
     PresentationService.play_attack_windup(runtime.model, definition.PRESENTATION, definition.WIND_UP_SECONDS)
     task.wait(definition.WIND_UP_SECONDS)
-    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then
+    if runtime.attackSequence ~= sequence
+        or runtime.humanoid.Health <= 0
+        or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model)
+        or (
+            C4NpcConfusionService.is_confused(runtime.model)
+            and C4NpcConfusionService.caster_user_id(
+                runtime.model
+            ) == target_player.UserId
+        )
+    then
         clear_attack(runtime)
         return
     end
 
     PresentationService.play_attack_strike(runtime.model, definition.PRESENTATION, definition.ATTACK_LOCK_SECONDS)
     task.wait(definition.ATTACK_LOCK_SECONDS)
-    if runtime.attackSequence ~= sequence or runtime.humanoid.Health <= 0 or StaggerService.is_staggered(runtime.model) or C4NpcSleepService.is_sleeping(runtime.model) then
+    if runtime.attackSequence ~= sequence
+        or runtime.humanoid.Health <= 0
+        or StaggerService.is_staggered(runtime.model)
+        or C4NpcSleepService.is_sleeping(runtime.model)
+        or (
+            C4NpcConfusionService.is_confused(runtime.model)
+            and C4NpcConfusionService.caster_user_id(
+                runtime.model
+            ) == target_player.UserId
+        )
+    then
         clear_attack(runtime)
         return
     end
@@ -293,6 +363,7 @@ local function attach(model: Instance)
     humanoid.Died:Connect(function()
         ThreatService.clear(model)
         C4NpcSleepService.clear(model)
+        C4NpcConfusionService.clear(model)
         C4NpcRootService.clear(model)
         C4NpcElementalVulnerabilityService.clear_all(model)
         EnemyWeakeningService.clear(model)
