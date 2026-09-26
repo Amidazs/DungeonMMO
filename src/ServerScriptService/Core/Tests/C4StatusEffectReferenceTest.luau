@@ -116,6 +116,27 @@ local function main()
         "Sleep rank six keeps 30-second action lock and damage wake"
     )
 
+    local fire_vulnerability = assert(
+        Status.elemental_vulnerability_plan(1083, 2)
+    )
+    check(
+        fire_vulnerability.SourceSkillId == 1083
+            and fire_vulnerability.SourceRank == 2
+            and fire_vulnerability.SaveVs == "WIT"
+            and fire_vulnerability.EffectPower == 80
+            and fire_vulnerability.MagicLevel == 30
+            and fire_vulnerability.IsMagic,
+        "Surrender to Fire rank two keeps exact WIT land inputs"
+    )
+    check(
+        fire_vulnerability.VulnerabilityStat == "FIRE_VULN"
+            and fire_vulnerability.VulnerabilityMultiplier == 1.25
+            and fire_vulnerability.DurationSeconds == 15
+            and fire_vulnerability.StackType == "FireAtr"
+            and fire_vulnerability.StackOrder == 1.25,
+        "Surrender to Fire keeps exact 25 percent 15-second vulnerability"
+    )
+
     local bleed_rate = assert(Status.effect_success_rate({
         Power = 100,
         TargetStatBonus = 1,
@@ -225,7 +246,8 @@ local function main()
     print((
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
             .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 "
-            .. "sleep=30@damage_wake nonlethal=true"
+            .. "sleep=30@damage_wake fire_vuln=1.25@15 "
+            .. "nonlethal=true"
     ):format(checks))
 end
 
