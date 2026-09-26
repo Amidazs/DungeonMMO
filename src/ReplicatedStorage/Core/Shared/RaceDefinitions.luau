@@ -44,6 +44,29 @@ local ELF_VISUAL = table.freeze({
     Kind = "ElfEars",
 })
 
+local DARK_ELF_BASE_ATTRIBUTES = table.freeze({
+    Strength = 5,
+    Dexterity = 5,
+    Vitality = 5,
+    Intellect = 5,
+    Spirit = 5,
+})
+
+-- Legacy attribute modifiers remain neutral. Exact C4 combat stats are
+-- supplied by C4PrimaryStatReference rather than inventing a new race bonus.
+local DARK_ELF_PASSIVE = table.freeze({
+    Id = "DarkElfSourceBaseline",
+    DisplayName = "Dark Elf Source Baseline",
+    MaxHealthMultiplier = 1,
+    BasicAttackRateMultiplier = 1,
+    CritChanceBonus = 0,
+    CritDamageBonus = 0,
+})
+
+local DARK_ELF_VISUAL = table.freeze({
+    Kind = "DarkElf",
+})
+
 local DEFINITIONS = table.freeze({
     Human = table.freeze({
         Id = "Human",
@@ -58,6 +81,13 @@ local DEFINITIONS = table.freeze({
         BaseAttributes = ELF_BASE_ATTRIBUTES,
         Passive = ELF_PASSIVE,
         Visual = ELF_VISUAL,
+    }),
+    DarkElf = table.freeze({
+        Id = "DarkElf",
+        DisplayName = "Dark Elf",
+        BaseAttributes = DARK_ELF_BASE_ATTRIBUTES,
+        Passive = DARK_ELF_PASSIVE,
+        Visual = DARK_ELF_VISUAL,
     }),
 })
 
