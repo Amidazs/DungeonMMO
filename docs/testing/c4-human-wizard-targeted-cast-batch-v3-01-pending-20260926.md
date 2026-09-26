@@ -1,3 +1,8 @@
+> **Superseded:** this pre-validation plan is retained for history. Fresh
+> acceptance is recorded in
+> [c4-human-wizard-targeted-cast-batch-v3-01-20260926.md](
+> c4-human-wizard-targeted-cast-batch-v3-01-20260926.md).
+
 # Human Wizard Targeted Cast Batch v3.01 — Pending Validation
 
 Date: 26 September 2026.
