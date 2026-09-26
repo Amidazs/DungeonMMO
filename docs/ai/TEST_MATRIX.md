@@ -1,3 +1,22 @@
+## 26 September 2026 — v3.12 Moonweaver acceptance GREEN
+
+Moonweaver / Elven Wizard level-30 closure is accepted.
+
+- source schedule: **82/82 mapped, 0 gaps**;
+- focused backend closure: **16/16 fixtures PASS**;
+- live Tidal Bolt 1175:6: PASS, real WATER damage **434.3759765625**;
+- single Spiritshot consumption and threat bookkeeping: PASS;
+- Tidal Ward 1182:1 duration **1200 seconds**: PASS;
+- Mana Companion 1226:3 / source NPC **12065**: PASS;
+- Servitor Heal: **65 HP** effective in accepted rehearsal;
+- Servitor Recharge: **52 MP** effective in accepted rehearsal;
+- owner cleanup: PASS;
+- final accepted Play log: **0 FLog::CreatorError**.
+
+Acceptance evidence:
+[c4-elven-wizard-level30-complete-v3-12-20260926.md](
+../testing/c4-elven-wizard-level30-complete-v3-12-20260926.md).
+
 ## 26 September 2026 — CURRENT v3.09 Human Cleric GREEN
 
 [Roadmap](
