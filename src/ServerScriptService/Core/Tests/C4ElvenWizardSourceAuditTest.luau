@@ -97,8 +97,8 @@ local function main()
         #branches == 2
             and branch.SourceSkillInventory
                 == "C4ElvenWizardLevel30Sources"
-            and branch.GameplayStatus == "NotImplemented",
-        "source audit does not silently make Elven Wizard playable"
+            and branch.GameplayStatus == "Partial",
+        "Moonweaver foundation is explicit while release remains partial"
     )
 
     local audit = assert(Coverage.for_branch("ElvenWizard"))
@@ -110,13 +110,13 @@ local function main()
         "launch coverage reads the exact independently counted inventory"
     )
     check(
-        audit.CurrentCareerId == nil
-            and audit.TrainerMappedRankEntries == 0
-            and audit.MissingRankScheduleEntries == 82
-            and not audit.SourceRankScheduleMapped
+        audit.CurrentCareerId == "Moonweaver"
+            and audit.TrainerMappedRankEntries == 82
+            and audit.MissingRankScheduleEntries == 0
+            and audit.SourceRankScheduleMapped
             and audit.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "all 82 rows remain implementation work after source audit"
+                == "RankScheduleMappedEffectsPending",
+        "all 82 rows now have class-bound Moonweaver training schedules"
     )
 
     print((
