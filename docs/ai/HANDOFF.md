@@ -1,3 +1,24 @@
+## 26 September 2026 — v3.02 Human Wizard Frost Lance staged
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_02_Human_Wizard_Frost_Lance_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-frost-lance-v3-02-pending-20260926.md).
+Frost Lance now uses exact source Ice Bolt 1184:6 behavior: WATER MDAM power
+16 plus a WIT-resisted 30 percent movement slow for the source 120-second
+duration. Source WIT resistance is exposed for players and reviewed NPCs, the
+combined damage/slow calculation consumes at most one magical shot, and live
+NPC damage continues through the existing contribution/threat bookkeeping
+path before the shared server slow authority applies a landed slow. The
+targeted direct bridge now reviews four spells, with Frost Lance selecting its
+combined executor path. Fresh Base/Dungeon Rojo builds pass at
+`484363b3ffec2d911314201380fe5408ad154d40`.
+
+Next validation is the existing 15-suite Wizard focus, 35-suite large backend
+runner and one unpublished Dungeon Frost Lance rehearsal. Do not mark v3.02
+green until those Studio checks and clean logs pass. Permanent edits remain
+GitHub-only; Desktop Commander is limited to fast-forward/build/test work.
+
 ## 26 September 2026 — v3.01 Human Wizard targeted cast batch GREEN
 
 [Roadmap](
