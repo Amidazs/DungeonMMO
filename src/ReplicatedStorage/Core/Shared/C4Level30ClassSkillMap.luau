@@ -194,6 +194,22 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local PALUS_KNIGHT = table.freeze({
+    HealthDrain = "DuskguardUmbralSiphon",
+    DefenseAura = "DuskguardDefenseAura",
+    UltimateDefense = "DuskguardLastStand",
+    Poison = "DuskguardVenomHex",
+    MagicResistance = "DuskguardRunicResistance",
+    ShieldMastery = "DuskguardShieldMastery",
+    SwordBluntMastery = "DuskguardSteelTraining",
+    HeavyArmorMastery = "DuskguardHeavyArmorTraining",
+    Confusion = "DuskguardMindRend",
+    Aggression = "DuskguardChallenge",
+    BowDefense = "DuskguardArrowWard",
+    BleedAttack = "DuskguardCrimsonSting",
+    AttackAura = "DuskguardAttackAura",
+})
+
 local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
@@ -245,6 +261,9 @@ function SkillMap.get(
     end
     if branch_id == "ElvenKnight" then
         return ELVEN_KNIGHT[source_category]
+    end
+    if branch_id == "PalusKnight" then
+        return PALUS_KNIGHT[source_category]
     end
     if branch_id ~= "HumanRogue" and branch_id ~= "ElvenScout"
     then
