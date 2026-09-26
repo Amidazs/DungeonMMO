@@ -279,8 +279,6 @@ Workspace:SetAttribute(
 local driver = Instance.new("Script")
 driver.Name = "C4HumanWizardTargetedCastServer_TEMP"
 driver.Source = [==[
-local CollectionService =
-    game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage =
     game:GetService("ReplicatedStorage")
@@ -486,82 +484,43 @@ local function admitted_player()
 end
 
 --[[
-Returns one physical Dungeon environment anchor.
+Creates one disposable live NPC using an actually reviewed source archetype.
 
-Args:
-    anchor_id (string): Stable authored environment anchor ID.
-
-Returns:
-    BasePart: Matching physical anchor.
-]]
-local function environment_anchor(anchor_id)
-    return wait_for(function()
-        for _, part in ipairs(
-            CollectionService:GetTagged(
-                "DungeonMMOEnvironmentAnchor"
-            )
-        ) do
-            if part:IsA("BasePart")
-                and part:GetAttribute("AnchorId")
-                    == anchor_id
-            then
-                return part
-            end
-        end
-    end, anchor_id, 25)
-end
-
---[[
-Starts room one and returns one living reviewed NPC.
+The model is a real Workspace Humanoid target. Only its server-created
+DungeonEnemyArchetypeId selects the pinned source NPC boundary.
 
 Args:
     player (Player): Admitted real Studio player.
 
 Returns:
-    Model: Live Dungeon NPC with source boundary data.
+    Model: Live source-reviewed Marauder rehearsal target.
 ]]
-local function room_one_enemy(player)
-    local trigger =
-        environment_anchor("Temple.Room1.Trigger")
-    local root =
-        player.Character.HumanoidRootPart
-
-    root.CFrame = trigger.CFrame * CFrame.new(0, 0, 8)
-    root.AssemblyLinearVelocity = Vector3.zero
-    player.Character:FindFirstChildOfClass("Humanoid"):MoveTo(
-        trigger.Position + Vector3.new(0, 0, -2)
+local function rehearsal_enemy(player)
+    local character = assert(player.Character)
+    local player_root = assert(
+        character:FindFirstChild("HumanoidRootPart")
     )
 
-    local enemy_folder = wait_for(function()
-        local runtime = Workspace:FindFirstChild(
-            "DungeonGameplayRuntime"
-        )
-        return runtime
-            and runtime:FindFirstChild("DungeonEnemies")
-    end, "Dungeon enemy folder", 20)
+    local enemy = Instance.new("Model")
+    enemy.Name = "TEMP_C4WizardRehearsalMarauder"
+    enemy:SetAttribute("DungeonEnemyArchetypeId", "Marauder")
+    enemy:SetAttribute("C4RehearsalTarget", true)
 
-    local enemy = wait_for(function()
-        for _, candidate in ipairs(
-            enemy_folder:GetChildren()
-        ) do
-            local humanoid =
-                candidate:FindFirstChildOfClass("Humanoid")
+    local root = Instance.new("Part")
+    root.Name = "HumanoidRootPart"
+    root.Anchored = true
+    root.CanCollide = false
+    root.Size = Vector3.new(2, 2, 1)
+    root.CFrame = player_root.CFrame * CFrame.new(0, 0, -6)
+    root.Parent = enemy
 
-            if candidate:IsA("Model")
-                and humanoid
-                and humanoid.Health > 0
-                and candidate.PrimaryPart
-            then
-                return candidate
-            end
-        end
-    end, "reviewed room-one NPC", 20)
-
-    enemy.PrimaryPart.Anchored = true
-    local humanoid =
-        assert(enemy:FindFirstChildOfClass("Humanoid"))
+    local humanoid = Instance.new("Humanoid")
     humanoid.MaxHealth = 5000
     humanoid.Health = 5000
+    humanoid.Parent = enemy
+
+    enemy.PrimaryPart = root
+    enemy.Parent = Workspace
 
     return enemy
 end
@@ -869,7 +828,7 @@ Returns:
 ]]
 local function run()
     local player = admitted_player()
-    local enemy = room_one_enemy(player)
+    local enemy = rehearsal_enemy(player)
     face_enemy(player, enemy)
 
     Runtime.set_character(
