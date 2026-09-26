@@ -150,6 +150,18 @@ function FakeExecutor:heal_skill_target(
     }, nil
 end
 
+function FakeExecutor:mana_recharge_skill_target(
+    _caster: any,
+    _target: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        EffectiveRecharge = 52,
+    }, nil
+end
+
 function FakeExecutor:support_buff_skill_target(
     _caster: any,
     _target: any,
@@ -399,6 +411,23 @@ Args:
 Returns:
     (any?, string?): Successful fake weakening application.
 ]]
+function FakeExecutor:physical_attack_rate_weakening_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        WeakeningApplied = true,
+        Landed = true,
+        PhysicalAttackSpeedMultiplier = 0.8,
+        RateReductionFraction = 0.2,
+        DurationSeconds = 15,
+    }, nil
+end
+
 function FakeExecutor:physical_attack_weakening_skill_npc(
     _attacker: any,
     _enemy: any,
