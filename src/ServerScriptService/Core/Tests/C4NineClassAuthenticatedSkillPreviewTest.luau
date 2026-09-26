@@ -104,7 +104,7 @@ Args:
     None.
 
 Returns:
-    nil: Checks all 569 level-30 source rows and 22 unresolved gaps.
+    nil: Checks all 569 level-30 source rows and 12 unresolved gaps.
 ]]
 local function check_tracked_class_trees()
     local paths = {
@@ -144,8 +144,8 @@ local function check_tracked_class_trees()
         gaps += preview.ExplicitMissingRows
         Runtime.clear_character(OWNER_ID)
     end
-    check(rows == 569 and candidates == 547 and gaps == 22,
-        "Ten tracked source trees expose 569/547/22 rank inventory")
+    check(rows == 569 and candidates == 557 and gaps == 12,
+        "Ten tracked source trees expose 569/557/12 rank inventory")
 end
 
 --[[
@@ -161,8 +161,9 @@ local function check_heal_source_and_denials()
     seed("Elf", "GreenwardScout", 20)
     local scout = assert(Runtime.get_c4_source_skill_tree(OWNER_ID))
     local first = assert(find_row(scout, 58, 4))
-    check(first.CreativeLinkStatus == "Missing"
-        and first.CreativeSkillId == nil
+    check(first.CreativeLinkStatus == "Candidate"
+        and first.CreativeSkillId == "GreenwardScoutElementalHeal"
+        and first.CreativeSkillRank == 1
         and first.SourceTotalMP == 53
         and first.SourceTarget == "TARGET_SELF"
         and first.OriginalEffects[1].power == 95,
