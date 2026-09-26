@@ -38,6 +38,9 @@ local StaggerService = require(script.Parent:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     script.Parent:WaitForChild("C4NpcSleepService")
 )
+local C4NpcRootService = require(
+    script.Parent:WaitForChild("C4NpcRootService")
+)
 local C4NpcElementalVulnerabilityService = require(
     script.Parent:WaitForChild(
         "C4NpcElementalVulnerabilityService"
@@ -386,10 +389,18 @@ local function chase_target(
     delta_seconds: number
 )
     local offset = get_planar_offset(runtime.root.Position, context.root.Position)
+    local movement_multiplier =
+        RangerSlowService.get_multiplier(runtime.model)
+
+    if C4NpcRootService.is_rooted(runtime.model) then
+        movement_multiplier = 0
+        set_ai_state(runtime, "Rooted")
+    end
+
     local movement_distance = MarauderBehaviorRules.get_chase_step(
         context.distance,
         delta_seconds,
-        RangerSlowService.get_multiplier(runtime.model)
+        movement_multiplier
     )
 
     if movement_distance <= 0 or offset.Magnitude <= 1e-6 then
@@ -839,6 +850,7 @@ local function reset_runtime(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    C4NpcRootService.clear(runtime.model)
     C4NpcElementalVulnerabilityService.clear_all(
         runtime.model
     )
@@ -862,6 +874,7 @@ local function handle_death(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    C4NpcRootService.clear(runtime.model)
     EnemyWeakeningService.clear(runtime.model)
     set_current_target(runtime, nil)
     clear_attack_presentation(runtime)
