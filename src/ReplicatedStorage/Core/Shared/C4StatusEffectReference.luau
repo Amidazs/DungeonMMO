@@ -86,10 +86,20 @@ function C4StatusEffectReference.periodic_plan(
     local effect_type = sets.effectType
     local supported = SUPPORTED_EFFECTS[effect_type]
 
-    if sets.skillType ~= "DEBUFF" or not supported then
+    local physical_pdam_bleed =
+        sets.skillType == "PDAM"
+        and effect_type == "BLEED"
+    if (sets.skillType ~= "DEBUFF" and not physical_pdam_bleed)
+        or not supported
+    then
         return nil, "UnsupportedOriginalPeriodicStatusType"
     end
-    if sets.saveVs ~= supported.SaveVs then
+
+    local save_vs = sets.saveVs
+    if save_vs == nil and physical_pdam_bleed then
+        save_vs = "CON"
+    end
+    if save_vs ~= supported.SaveVs then
         return nil, "OriginalPeriodicStatusSaveStatMismatch"
     end
     if type(sets.effectPower) ~= "number"
@@ -137,7 +147,7 @@ function C4StatusEffectReference.periodic_plan(
         SourceSkillId = source_skill_id,
         SourceRank = source_rank,
         EffectType = effect_type,
-        SaveVs = supported.SaveVs,
+        SaveVs = save_vs,
         VulnerabilityStat = supported.VulnerabilityStat,
         EffectPower = sets.effectPower,
         IsMagic = sets.isMagic == true,
