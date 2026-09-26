@@ -104,7 +104,7 @@ Args:
     None.
 
 Returns:
-    nil: Checks all 569 level-30 source rows and 41 unresolved gaps.
+    nil: Checks all 569 level-30 source rows and 22 unresolved gaps.
 ]]
 local function check_tracked_class_trees()
     local paths = {
@@ -144,8 +144,8 @@ local function check_tracked_class_trees()
         gaps += preview.ExplicitMissingRows
         Runtime.clear_character(OWNER_ID)
     end
-    check(rows == 569 and candidates == 528 and gaps == 41,
-        "Ten tracked source trees expose 569/528/41 rank inventory")
+    check(rows == 569 and candidates == 547 and gaps == 22,
+        "Ten tracked source trees expose 569/547/22 rank inventory")
 end
 
 --[[
