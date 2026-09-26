@@ -1,3 +1,27 @@
+## 26 September 2026 — CURRENT v3.12 Elven Wizard level 30 GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_12_Elven_Wizard_Level30_Complete_20260926.md);
+[acceptance evidence](
+../testing/c4-elven-wizard-level30-complete-v3-12-20260926.md).
+
+Elven Wizard / Moonweaver backend coverage through level 30 is complete:
+**82/82 source rows mapped, zero gaps, 22 reviewed source families**. Fresh
+unpublished Studio closure is **16/16 focused fixtures PASS**.
+
+A genuine unpublished Dungeon Play rehearsal also passed the real critical
+runtime path: Tidal Bolt 1175:6 dealt **434.3759765625** WATER damage with
+single Spiritshot consumption and threat bookkeeping, Tidal Ward retained its
+exact 1200-second source duration, Mana Companion spawned as source NPC 12065,
+Servitor Heal restored 65 HP, Servitor Recharge restored 52 MP, and owner
+cleanup removed the companion. The final accepted live log contains
+**0 FLog::CreatorError entries**.
+
+Accepted code/test HEAD before documentation:
+`c3e9dde0866388ea6ce7a4b08ab2925ececfecc8`.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.09 Human Cleric level 30 GREEN
 
 [Roadmap](
