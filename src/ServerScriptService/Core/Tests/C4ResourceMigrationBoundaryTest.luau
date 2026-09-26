@@ -1,5 +1,5 @@
 --!strict
--- Authenticated ten-path C4 resource cutover boundary regression.
+-- Authenticated C4 resource cutover boundary regression.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -144,6 +144,7 @@ local function check_reviewed_paths()
         {"Human", "Emberweaver", 705, 492, 355},
         {"Human", "Dawnkeeper", 770, 492, 387},
         {"Elf", "Moonweaver", 682, 495, 343},
+        {"Elf", "Lifebinder", 744, 495, 374},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
     }
