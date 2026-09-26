@@ -1,3 +1,16 @@
+**v3.03 HUMAN WIZARD EMBER FIELD — STUDIO VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_03_Human_Wizard_Ember_Field_20260926.md)
+and [pending evidence](
+../testing/c4-human-wizard-ember-field-v3-03-pending-20260926.md).
+Ember Field now preserves source Flame Strike 1181:3 FIRE MDAM and its exact
+200-source-unit TARGET_AREA radius. One magical shot is shared across all
+target calculations, server-side area discovery retains the selected NPC and
+adds only same-encounter reviewed NPCs in caster radius, and every damaged NPC
+uses the existing contribution/threat/quest bookkeeping path. Fresh diff check
+and Base/Dungeon Rojo builds pass at
+`19173565960c2137a2f95e8699dea83e7e3bd6a3`; Studio runners and the live
+multi-NPC rehearsal remain pending.
+
 **v3.02 HUMAN WIZARD FROST LANCE — STUDIO VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_02_Human_Wizard_Frost_Lance_20260926.md)
 and [pending evidence](
