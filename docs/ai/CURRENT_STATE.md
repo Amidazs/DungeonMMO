@@ -1,3 +1,22 @@
+## 26 September 2026 — CURRENT v3.04 Life Siphon implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_04_Human_Wizard_Life_Siphon_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-life-siphon-v3-04-pending-20260926.md).
+Human Wizard Life Siphon is now implemented through the staged source cast
+pipeline. Creative rank 4 preserves Vampiric Touch 1147:6: DARK DRAIN power
+32, 600/1100 source ranges and exact 0.4 absorbPart with absorbAbs 0. The
+source calculator owns one magical shot and the live NPC executor computes
+healing from actual HP removed before capping the caster at MaxHealth. Damage
+still uses the normal source NPC observer path, preserving threat,
+contribution and quest bookkeeping. Fresh diff check plus Base/Dungeon Rojo
+builds pass at code candidate
+`5291dac8eaa4497a928001e953f4ae533c73ce34`; Studio focused/live acceptance
+is pending.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.03 Ember Field implemented
 
 [Roadmap](
