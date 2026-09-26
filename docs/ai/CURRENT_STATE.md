@@ -1,3 +1,24 @@
+## 26 September 2026 — CURRENT v3.07 Withering Hex implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_07_Human_Wizard_Withering_Hex_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-withering-hex-v3-07-pending-20260926.md).
+Human Wizard Withering Hex now preserves source Curse: Weakness 1164:4:
+magical WIT DEBUFF, source effect type CONFUSION, effect power 80, magic level
+30, 600/1100 source ranges, PHYSICAL_ATTACK x0.8 and a 15-second duration.
+The cast owns one magical shot. A landed debuff uses the existing server-owned
+EnemyWeakeningService with exactly 0.20 power reduction and zero attack-rate
+reduction, so supported NPC outgoing physical damage becomes 80 percent while
+attack cadence remains unchanged. Marauder and Captain life cleanup explicitly
+clears this weakening state.
+
+Fresh diff check plus Base/Dungeon Rojo builds pass at core code candidate
+`b2fb6ac0348501b49a2abf471874137f60599f81`. Studio focused/live
+acceptance remains pending.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.06 Scorch Mark implemented
 
 [Roadmap](
