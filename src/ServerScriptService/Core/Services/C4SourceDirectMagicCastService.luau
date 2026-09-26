@@ -52,6 +52,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1250,
         ExecutionKind = "ElementalVulnerability",
     }),
+    EmberweaverWitheringHex = table.freeze({
+        SourceSkillId = 1164,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "PhysicalAttackWeakening",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -63,6 +69,7 @@ local REVIEWED_SKILLS = table.freeze({
     "EmberweaverLifeSiphon",
     "EmberweaverSlumberHex",
     "EmberweaverScorchMark",
+    "EmberweaverWitheringHex",
 })
 
 --[[
@@ -162,6 +169,9 @@ function C4SourceDirectMagicCastService.new(
             and type(executor.sleep_skill_npc) == "function"
             and type(
                 executor.elemental_vulnerability_skill_npc
+            ) == "function"
+            and type(
+                executor.physical_attack_weakening_skill_npc
             ) == "function",
         "Direct magic bridge requires source combat executor"
     )
@@ -474,6 +484,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "PhysicalAttackWeakening" then
+        applied, reason =
+            self._executor:physical_attack_weakening_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     else
         applied, reason =
             self._executor:magic_skill_npc(
@@ -629,6 +648,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedSleepBreaksOnDamage = true,
         ReviewedElementalVulnerability = true,
         ReviewedElementalVulnerabilityFeedsMagicDamage = true,
+        ReviewedPhysicalAttackWeakening = true,
+        ReviewedPhysicalAttackWeakeningFeedsNpcDamage = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
