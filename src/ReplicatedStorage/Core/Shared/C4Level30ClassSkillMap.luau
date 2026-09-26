@@ -111,6 +111,34 @@ local HUMAN_WIZARD = table.freeze({
     CombatServitorSummon = "EmberweaverCombatCompanion",
 })
 
+local HUMAN_CLERIC = table.freeze({
+    MagicResistance = "DawnkeeperArcaneResistance",
+    SpellReuse = "DawnkeeperQuickPrayer",
+    ManaCapacity = "DawnkeeperManaReservoir",
+    FastSpellCasting = "DawnkeeperFastCasting",
+    ManaRecovery = "DawnkeeperManaRecovery",
+    RobeMastery = "DawnkeeperRobeTraining",
+    LightArmorMastery = "DawnkeeperLightArmorTraining",
+    WeaponMastery = "DawnkeeperWeaponTraining",
+    Heal = "DawnkeeperHealingLight",
+    BattleHeal = "DawnkeeperBattleMend",
+    Resurrection = "DawnkeeperRevive",
+    GroupHeal = "DawnkeeperGroupMend",
+    DisruptUndead = "DawnkeeperExorcism",
+    MentalShield = "DawnkeeperMindWard",
+    Shield = "DawnkeeperStoneWard",
+    HolyWeapon = "DawnkeeperSacredEdge",
+    Might = "DawnkeeperMight",
+    Sleep = "DawnkeeperSlumber",
+    KissOfEva = "DawnkeeperBreathBlessing",
+    Focus = "DawnkeeperFocus",
+    Concentration = "DawnkeeperConcentration",
+    Acumen = "DawnkeeperInsight",
+    ResistFire = "DawnkeeperFireWard",
+    DryadRoot = "DawnkeeperRootbind",
+    WindWalk = "DawnkeeperWindstep",
+})
+
 local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
@@ -150,6 +178,9 @@ function SkillMap.get(
     end
     if branch_id == "HumanWizard" then
         return HUMAN_WIZARD[source_category]
+    end
+    if branch_id == "HumanCleric" then
+        return HUMAN_CLERIC[source_category]
     end
     if branch_id == "ElvenKnight" then
         return ELVEN_KNIGHT[source_category]
