@@ -1,3 +1,22 @@
+## 26 September 2026 — v3.12 Elven Wizard / Moonweaver accepted
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_12_Elven_Wizard_Level30_Complete_20260926.md);
+[evidence](
+../testing/c4-elven-wizard-level30-complete-v3-12-20260926.md).
+
+Moonweaver is green through level 30: **82/82 source rows**, no gaps,
+**16/16 focused Studio fixtures**, and a genuine unpublished Play rehearsal.
+The live run proved real WATER damage, exact Tidal Ward duration, source NPC
+12065 companion spawning, Spirit Ore-backed companion ownership, Servitor
+Heal/Recharge and clean owner teardown. Final accepted live log:
+**0 project CreatorErrors**.
+
+Continue the remaining first-transfer careers with the same source-audit,
+runtime-integration, focused-Studio and genuine-Play acceptance pattern.
+Permanent edits remain GitHub-only; Desktop Commander is for disposable
+build/test/playtest evidence.
+
 ## 26 September 2026 — v3.09 Human Cleric level 30 accepted
 
 [Roadmap](
