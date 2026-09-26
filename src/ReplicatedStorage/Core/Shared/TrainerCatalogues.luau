@@ -236,6 +236,116 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+    LifebinderTrainer = table.freeze({
+        Id = "LifebinderTrainer",
+        DisplayName = "Lifebinder Training",
+        AllowedRaces = table.freeze({"Elf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedClasses = table.freeze({"Lifebinder"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "LifebinderArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderQuickPrayer",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderWeaponTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderHealingLight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderManaRecharge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderBattleMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderRevive",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderGroupMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderExorcism",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderMindWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderStoneWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderSacredEdge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderMight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderSlumber",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderBreathBlessing",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderAgility",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderRootbind",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderWindstep",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "LifebinderWindShackle",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
     DawnkeeperTrainer = table.freeze({
         Id = "DawnkeeperTrainer",
         DisplayName = "Dawnkeeper Training",
