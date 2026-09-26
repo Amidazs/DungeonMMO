@@ -46,6 +46,40 @@ local function check(condition: boolean, description: string)
 end
 
 --[[
+Checks source inventory metadata for one partially implemented branch.
+
+Args:
+    option (any): First-transfer branch metadata under test.
+    race_id (string): Source race used by scout inventory audit.
+
+Returns:
+    nil: Raises when a partial branch claims the wrong source inventory.
+]]
+local function check_partial_branch(
+    option: any,
+    race_id: string
+)
+    if option.Id == "HumanWizard" then
+        check(
+            option.SourceSkillInventory
+                == "C4HumanWizardLevel30Sources",
+            "Human Wizard partial branch needs its own source inventory"
+        )
+        return
+    end
+
+    check(
+        option.SourceSkillInventory == "C4ScoutSkillInventory",
+        "Scout partial branch needs the scout source inventory"
+    )
+    local audit = assert(Inventory.audit(race_id))
+    check(
+        audit.Missing == 0,
+        "Previously implemented Rogue/Scout ranks regressed"
+    )
+end
+
+--[[
 Checks original five-race paths without claiming unimplemented gameplay.
 
 Args:
@@ -89,12 +123,7 @@ local function main()
                     "Unimplemented C4 transfer was falsely made playable")
                 if option.GameplayStatus == "Partial" then
                     partial += 1
-                    check(option.SourceSkillInventory
-                        == "C4ScoutSkillInventory",
-                        "Unmapped class incorrectly claims a skill list")
-                    local audit = assert(Inventory.audit(race_id))
-                    check(audit.Missing == 0,
-                        "Previously implemented Rogue/Scout ranks regressed")
+                    check_partial_branch(option, race_id)
                 else
                     check(option.GameplayStatus == "NotImplemented",
                         "Unfinished source class was marked implemented")
@@ -103,8 +132,8 @@ local function main()
             end
         end
     end
-    check(total == 18 and partial == 2,
-        "Original C4 requires eighteen paths, two partially mapped")
+    check(total == 18 and partial == 3,
+        "Original C4 requires eighteen paths, three partially mapped")
     for _, race_id in ipairs({"DarkElf", "Orc", "Dwarf"}) do
         check(RaceDefinitions.get(race_id) == nil,
             "Source class registry cannot prematurely unlock a race")
