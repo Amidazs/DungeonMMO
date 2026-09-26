@@ -38,6 +38,9 @@ local StaggerService = require(script.Parent:WaitForChild("StaggerService"))
 local C4NpcSleepService = require(
     script.Parent:WaitForChild("C4NpcSleepService")
 )
+local C4NpcConfusionService = require(
+    script.Parent:WaitForChild("C4NpcConfusionService")
+)
 local C4NpcRootService = require(
     script.Parent:WaitForChild("C4NpcRootService")
 )
@@ -243,10 +246,35 @@ local function update_target(runtime: MarauderRuntime): TargetContext?
         then
             table.insert(candidates, {
                 player = player,
+                character = context.character,
+                root = context.root,
                 distance = context.distance,
             })
             contexts_by_user_id[player.UserId] = context
         end
+    end
+
+    if C4NpcConfusionService.is_confused(runtime.model) then
+        local forced =
+            C4NpcConfusionService.choose_player_target(
+                runtime.model,
+                candidates
+            )
+        if forced then
+            set_current_target(runtime, forced.player)
+            runtime.model:SetAttribute(
+                "MarauderAggroMode",
+                "Confusion"
+            )
+            return contexts_by_user_id[forced.player.UserId]
+        end
+
+        set_current_target(runtime, nil)
+        runtime.model:SetAttribute(
+            "MarauderAggroMode",
+            "ConfusionNoTarget"
+        )
+        return nil
     end
 
     local selected, mode = ThreatService.select_target(
@@ -637,10 +665,17 @@ local function attack_is_interrupted(
     runtime: MarauderRuntime,
     life_sequence: number
 ): boolean
+    local confused_caster =
+        C4NpcConfusionService.caster_user_id(runtime.model)
+    local attacking_caster = runtime.current_target
+        and confused_caster
+        and runtime.current_target.UserId == confused_caster
+
     return runtime.life_sequence ~= life_sequence
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
         or C4NpcSleepService.is_sleeping(runtime.model)
+        or attacking_caster == true
 end
 
 
@@ -850,6 +885,7 @@ local function reset_runtime(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    C4NpcConfusionService.clear(runtime.model)
     C4NpcRootService.clear(runtime.model)
     C4NpcElementalVulnerabilityService.clear_all(
         runtime.model
@@ -874,6 +910,7 @@ local function handle_death(runtime: MarauderRuntime)
 
     StaggerService.clear(runtime.model)
     C4NpcSleepService.clear(runtime.model)
+    C4NpcConfusionService.clear(runtime.model)
     C4NpcRootService.clear(runtime.model)
     EnemyWeakeningService.clear(runtime.model)
     set_current_target(runtime, nil)
