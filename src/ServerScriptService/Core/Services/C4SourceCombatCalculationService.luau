@@ -1645,43 +1645,14 @@ Args:
 Returns:
     (any?, string?): Source magical result or strict denial reason.
 ]]
-function C4SourceCombatCalculationService.magic_skill(
-    attacker_user_id: number,
-    defender_target: any,
-    creative_skill_id: string,
-    creative_rank: number
+local function calculate_magic_target(
+    attacker: any,
+    defender: any,
+    target_kind: string,
+    source: any,
+    effect: any,
+    shot: any
 ): (any?, string?)
-    if not feature_enabled then
-        return nil, "C4SourceCombatCalculationDisabled"
-    end
-
-    local attacker, attacker_reason =
-        source_boundary(attacker_user_id)
-    if not attacker then
-        return nil, attacker_reason
-    end
-
-    local defender, target_kind, defender_reason =
-        source_target_boundary(defender_target)
-    if not defender or not target_kind then
-        return nil, defender_reason
-    end
-
-    local source, effect, source_reason = source_skill(
-        attacker_user_id,
-        creative_skill_id,
-        creative_rank
-    )
-    if not source or not effect then
-        return nil, source_reason
-    end
-
-    if effect.Sets.skillType ~= "MDAM"
-        or type(effect.Sets.power) ~= "number"
-    then
-        return nil, "UnsupportedOriginalMagicSkillType"
-    end
-
     local critical_rate =
         attacker.SourceStatCandidate.MAGICAL_CRITICAL_RATE
     if type(critical_rate) ~= "number"
@@ -1718,12 +1689,6 @@ function C4SourceCombatCalculationService.magic_skill(
         )
     if pvp_multiplier == nil then
         return nil, pvp_reason
-    end
-
-    local shot, shot_reason =
-        consume_magic_shot(attacker_user_id)
-    if not shot then
-        return nil, shot_reason
     end
 
     local amount = Formula.magic_damage({
@@ -1768,6 +1733,173 @@ function C4SourceCombatCalculationService.magic_skill(
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Calculates C4 MDAM skill damage against one reviewed source target.
+
+The one-use magical shot is consumed once before target-specific critical,
+failure, elemental and PvP calculations are resolved.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Player UserId or reviewed server NPC boundary.
+    creative_skill_id (string): Server-selected creative magic skill ID.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source magical result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.magic_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    if effect.Sets.skillType ~= "MDAM"
+        or type(effect.Sets.power) ~= "number"
+    then
+        return nil, "UnsupportedOriginalMagicSkillType"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return calculate_magic_target(
+        attacker,
+        defender,
+        target_kind,
+        source,
+        effect,
+        shot
+    )
+end
+
+--[[
+Calculates one C4 TARGET_AREA MDAM cast against reviewed source targets.
+
+The source SkillMdam handler snapshots Spiritshot/Blessed Spiritshot once,
+uses that same shot state for every target, then consumes the charge once after
+the target loop. This method preserves that one-charge multi-target behavior.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_targets ({any}): Ordered reviewed source target boundaries.
+    creative_skill_id (string): Server-selected creative area skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Ordered per-target source results and area metadata.
+]]
+function C4SourceCombatCalculationService.magic_area_skill(
+    attacker_user_id: number,
+    defender_targets: {any},
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+    if type(defender_targets) ~= "table"
+        or #defender_targets < 1
+    then
+        return nil, "OriginalMagicAreaTargetsUnavailable"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "MDAM"
+        or sets.target ~= "TARGET_AREA"
+        or type(sets.power) ~= "number"
+        or type(sets.skillRadius) ~= "number"
+        or sets.skillRadius <= 0
+    then
+        return nil, "UnsupportedOriginalMagicAreaSkill"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local results = {}
+    for index, defender_target in ipairs(defender_targets) do
+        local defender, target_kind, defender_reason =
+            source_target_boundary(defender_target)
+        if not defender or not target_kind then
+            return nil, defender_reason
+        end
+
+        local result, result_reason = calculate_magic_target(
+            attacker,
+            defender,
+            target_kind,
+            source,
+            effect,
+            shot
+        )
+        if not result then
+            return nil, result_reason
+        end
+
+        results[index] = result
+    end
+
+    return {
+        Kind = "MagicAreaDamage",
+        Results = results,
+        TargetCount = #results,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceSkillRadius = sets.skillRadius,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
@@ -2124,6 +2256,8 @@ function C4SourceCombatCalculationService.capability(): any
         InstantHeal = true,
         PeriodicStatusCalculation = true,
         MagicMovementSlowCalculation = true,
+        MagicAreaDamageCalculation = true,
+        MagicAreaSingleShotSnapshot = true,
         MovementSlowEffectSuccessIntegrated = true,
         MovementSlowUsesSingleMagicShot = true,
         PeriodicStatusEffectSuccessIntegrated = true,
