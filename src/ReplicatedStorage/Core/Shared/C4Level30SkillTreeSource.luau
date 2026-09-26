@@ -867,7 +867,7 @@ function C4Level30SkillTreeSource.coverage(): any
     local skills = {}
     for _, scope_id in ipairs({
         "HumanFighter", "HumanMystic", "HumanWizard",
-        "ElvenFighter", "ElvenMystic",
+        "HumanCleric", "ElvenFighter", "ElvenMystic",
         "HumanWarrior", "HumanKnight", "HumanRogue",
         "ElvenKnight", "ElvenScout",
     }) do
