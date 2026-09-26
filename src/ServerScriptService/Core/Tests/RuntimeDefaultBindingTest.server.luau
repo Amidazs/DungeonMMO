@@ -1,4 +1,15 @@
 --!strict
+-- FOCUSED_EDIT_ONLY_RUNTIME_COMPOSITION_TEST
+local RunService = game:GetService("RunService")
+
+if RunService:IsRunning() then
+    print(
+        "[Runtime Default Binding Tests] SKIP: runtime composition regression "
+            .. "runs in focused Edit mode"
+    )
+    return
+end
+
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Services = ServerScriptService:WaitForChild("Core"):WaitForChild("Services")
