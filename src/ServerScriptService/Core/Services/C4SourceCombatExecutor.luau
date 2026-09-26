@@ -185,6 +185,9 @@ function C4SourceCombatExecutor.new(options: any?): any
         _npc_boundary_provider =
             config.NpcBoundaryProvider
             or NpcBoundaries.for_model,
+        _npc_corpse_boundary_provider =
+            config.CorpseBoundaryProvider
+            or NpcBoundaries.for_corpse_model,
         _npc_damage_observer = config.NpcDamageObserver,
         _movement_slow = config.MovementSlowProvider or MovementSlow,
         _npc_sleep = config.SleepProvider or NpcSleep,
@@ -478,6 +481,70 @@ function C4SourceCombatExecutor:_validate_npc_target(
     end
 
     return boundary, nil
+end
+
+--[[
+Validates one player caster and one current server-owned NPC corpse.
+
+Args:
+    attacker (any): Server-owned casting player.
+    corpse (any): Current dead server NPC Model.
+
+Returns:
+    (any?, string?): Reviewed corpse boundary or strict denial reason.
+]]
+function C4SourceCombatExecutor:_validate_npc_corpse(
+    attacker: any,
+    corpse: any
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(attacker)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    if typeof(corpse) ~= "Instance"
+        or not corpse:IsA("Model")
+    then
+        return nil, "InvalidC4LiveNpcCorpseTarget"
+    end
+    if type(self._npc_corpse_boundary_provider) ~= "function" then
+        return nil, "C4NpcCorpseSourceBoundaryUnavailable"
+    end
+
+    return self._npc_corpse_boundary_provider(corpse)
+end
+
+--[[
+Checks one corpse-target source cast without mutating the world.
+
+Args:
+    attacker (any): Server-owned casting player.
+    corpse (any): Current reviewed NPC corpse.
+    source_range (number?): Optional source-unit cast/effect range.
+
+Returns:
+    (boolean, string?): Readiness or strict denial reason.
+]]
+function C4SourceCombatExecutor:can_corpse_skill_npc(
+    attacker: any,
+    corpse: any,
+    source_range: number?
+): (boolean, string?)
+    local boundary, reason =
+        self:_validate_npc_corpse(attacker, corpse)
+    if not boundary then
+        return false, reason
+    end
+
+    if source_range ~= nil then
+        return self:_validate_npc_source_range(
+            attacker,
+            corpse,
+            source_range
+        )
+    end
+
+    return true, nil
 end
 
 --[[
@@ -1717,6 +1784,69 @@ function C4SourceCombatExecutor:magic_drain_skill_npc(
 end
 
 --[[
+Executes one live C4 corpse-target drain.
+
+The source fixed absorption heals the caster, then the reviewed dead NPC corpse
+is consumed so it cannot be drained repeatedly.
+
+Args:
+    attacker (any): Server-owned casting player.
+    corpse (Model): Current reviewed dead NPC.
+    creative_skill_id (string): Reviewed corpse-drain skill.
+    creative_rank (number): Server-resolved purchased rank.
+    _sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live corpse-drain evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:corpse_drain_skill_npc(
+    attacker: any,
+    corpse: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_corpse(attacker, corpse)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.corpse_drain_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local healed, heal_reason = self:_apply_player_heal(
+        attacker,
+        calculated.HealAmount
+    )
+    if not healed then
+        return nil, heal_reason
+    end
+
+    corpse:SetAttribute("C4CorpseConsumed", true)
+    corpse:Destroy()
+
+    return {
+        Kind = "C4LiveNpcCorpseDrain",
+        Calculation = calculated,
+        Applied = true,
+        CorpseConsumed = true,
+        RequestedHeal = calculated.HealAmount,
+        EffectiveHeal = healed.EffectiveHeal,
+        CasterHealthBefore = healed.HealthBefore,
+        CasterHealthAfter = healed.HealthAfter,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC C4 Sleep control skill.
 
 A resisted cast applies no control state. A landed cast delegates to the
@@ -2435,6 +2565,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcMagicAreaSingleShotSnapshot = true,
         NpcMagicDrainLiveApplication = true,
         NpcMagicDrainUsesAppliedHealthDamage = true,
+        NpcCorpseDrainLiveApplication = true,
+        NpcCorpseDrainConsumesCorpse = true,
+        NpcCorpseBoundaryProviderConfigured =
+            type(self._npc_corpse_boundary_provider) == "function",
         NpcSleepLiveApplication = true,
         NpcSleepBreaksOnDirectDamage = true,
         NpcSleepAuthorityConfigured =
