@@ -299,6 +299,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverFocusedBolt", 3)
     own_skill(wizard, "EmberweaverVenomHex", 2)
     own_skill(wizard, "EmberweaverFrostLance", 2)
+    own_skill(wizard, "EmberweaverEmberField", 3)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -381,6 +382,8 @@ local function check_default_off()
             and capability.HealSpiritshotIntegrated
             and capability.PeriodicStatusCalculation
             and capability.MagicMovementSlowCalculation
+            and capability.MagicAreaDamageCalculation
+            and capability.MagicAreaSingleShotSnapshot
             and capability.MovementSlowEffectSuccessIntegrated
             and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
@@ -1074,6 +1077,59 @@ local function check_human_wizard_frost_lance()
 end
 
 --[[
+Checks Ember Field uses one source shot snapshot across all area targets.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms TARGET_AREA metadata and shared shot state per target.
+]]
+local function check_human_wizard_ember_field()
+    local marauder = assert(NpcSource.get("Marauder"))
+    local wolf = assert(NpcSource.get("Wolf"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.magic_area_skill(
+        WIZARD_ID,
+        {marauder, wolf},
+        "EmberweaverEmberField",
+        3
+    ))
+
+    check(
+        result.Kind == "MagicAreaDamage"
+            and result.SourceSkillId == 1181
+            and result.SourceRank == 3
+            and result.SourceSkillRadius == 200
+            and result.TargetCount == 2
+            and #result.Results == 2,
+        "Ember Field rank three preserves exact TARGET_AREA source contract"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.Results[1].Spiritshot
+            and result.Results[2].Spiritshot,
+        "one Spiritshot snapshot is shared across both area targets"
+    )
+
+    for _, target_result in ipairs(result.Results) do
+        check(
+            target_result.SourceSkillId == 1181
+                and target_result.SourceRank == 3
+                and target_result.SourceSkillPower == 19
+                and target_result.SourceElement == "FIRE"
+                and target_result.TargetKind == "Npc",
+            "each Ember Field target uses exact source fire MDAM"
+        )
+    end
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1404,6 +1460,7 @@ local function main()
     check_human_wizard_magic()
     check_human_wizard_neutral_magic()
     check_human_wizard_frost_lance()
+    check_human_wizard_ember_field()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1422,7 +1479,7 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true frost=true "
+        .. "status=true pdam=true mdam=true wizard=true frost=true area=true "
         .. "heal=true npc=true live=false"
     ):format(checks))
 end
