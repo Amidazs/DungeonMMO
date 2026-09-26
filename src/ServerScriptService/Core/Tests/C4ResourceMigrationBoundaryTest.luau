@@ -142,6 +142,7 @@ local function check_nine_paths()
         {"Human", "Oathguard", 1018, 320, 610},
         {"Human", "Ashenblade", 983, 320, 399},
         {"Human", "Emberweaver", 705, 492, 355},
+        {"Human", "Dawnkeeper", 770, 492, 387},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
     }
@@ -539,7 +540,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=10 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=11 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
