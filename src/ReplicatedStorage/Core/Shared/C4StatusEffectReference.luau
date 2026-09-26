@@ -142,6 +142,107 @@ function C4StatusEffectReference.periodic_plan(
 end
 
 --[[
+Builds the reviewed C4 movement-slow side effect for Ice Bolt.
+
+This is intentionally separate from periodic Bleed/Poison planning because
+the source skill also deals direct MDAM and its Debuff effect changes movement
+speed rather than scheduling damage ticks.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen movement-slow plan or strict source-data reason.
+]]
+function C4StatusEffectReference.movement_slow_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1184 then
+        return nil, "UnsupportedOriginalMovementSlowSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalMovementSlowSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "MDAM"
+        or sets.effectType ~= "DEBUFF"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "OriginalMovementSlowContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        local speed_multiplier = nil
+
+        for _, modifier in ipairs(effect.Modifiers or {}) do
+            if modifier.Operation == "mul"
+                and modifier.stat == "RUN_SPEED"
+            then
+                speed_multiplier = modifier.val
+            end
+        end
+
+        if speed_multiplier ~= nil then
+            if matched ~= nil then
+                return nil, "DuplicateOriginalMovementSlowEffect"
+            end
+            matched = {
+                SpeedMultiplier = speed_multiplier,
+                Count = effect.count,
+                DurationSeconds = effect.time,
+                StackType = effect.stackType,
+                StackOrder = effect.stackOrder,
+            }
+        end
+    end
+
+    if not matched
+        or type(matched.SpeedMultiplier) ~= "number"
+        or matched.SpeedMultiplier <= 0
+        or matched.SpeedMultiplier >= 1
+        or matched.Count ~= 1
+        or type(matched.DurationSeconds) ~= "number"
+        or matched.DurationSeconds <= 0
+        or matched.StackType ~= "RunSpeedDown"
+        or matched.StackOrder ~= matched.SpeedMultiplier
+    then
+        return nil, "OriginalMovementSlowEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalMovementSlowMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = sets.effectType,
+        SaveVs = sets.saveVs,
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        SpeedMultiplier = matched.SpeedMultiplier,
+        SlowFraction = 1 - matched.SpeedMultiplier,
+        DurationSeconds = matched.DurationSeconds,
+        StackType = matched.StackType,
+        StackOrder = matched.StackOrder,
+    }), nil
+end
+
+--[[
 Calculates exact C4 hostile-effect land rate before the final random roll.
 
 This reproduces Formulas.calcEffectSuccess for the reviewed Bleed/Poison scope:
