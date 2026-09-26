@@ -3287,6 +3287,285 @@ function C4SourceCombatCalculationService.mana_recharge_skill(
 end
 
 --[[
+Resolves one reviewed C4 self-targeted timed buff.
+
+This path accepts normal Buff and ImmobileBuff source rows. It consumes one
+magical shot only when the source marks the skill magical, then returns the
+exact timed source identity for the active-effect registry.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected self-buff skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source self-buff plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.self_buff_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "BUFF"
+        or sets.target ~= "TARGET_SELF"
+        or sets.operateType ~= "ACTIVE"
+    then
+        return nil, "UnsupportedOriginalSelfBuffSkill"
+    end
+
+    local matched = nil
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Buff" or row.name == "ImmobileBuff" then
+            if matched then
+                return nil, "DuplicateOriginalSelfBuffEffect"
+            end
+            matched = row
+        end
+    end
+
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalSelfBuffEffectUnavailable"
+    end
+
+    local shot = {
+        Spiritshot = false,
+        BlessedSpiritshot = false,
+    }
+    if sets.isMagic == true then
+        local consumed, shot_reason =
+            consume_magic_shot(caster_user_id)
+        if not consumed then
+            return nil, shot_reason
+        end
+        shot = consumed
+    end
+
+    return {
+        Kind = "SelfBuff",
+        DurationSeconds = matched.time,
+        StackType = matched.stackType,
+        StackOrder = matched.stackOrder,
+        Modifiers = matched.Modifiers or effect.Modifiers or {},
+        Immobile = matched.name == "ImmobileBuff",
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 Aggression threat skill.
+
+Aggression deals no health damage. Its authored power is authoritative threat
+strength and the TargetMe effect forces the caster above the current threat
+leader through the existing server threat ledger.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected taunt skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source Aggression plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.aggro_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "AGGDAMAGE"
+        or sets.target ~= "TARGET_ONE"
+        or type(sets.power) ~= "number"
+        or sets.power <= 0
+    then
+        return nil, "UnsupportedOriginalAggressionSkill"
+    end
+
+    local target_me = false
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "TargetMe" then
+            target_me = true
+            break
+        end
+    end
+    if not target_me then
+        return nil, "OriginalAggressionTargetMeUnavailable"
+    end
+
+    return {
+        Kind = "Aggression",
+        ThreatPower = sets.power,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 Confusion debuff.
+
+The exact source effect retargets every six seconds for five actions. This
+calculation owns the magical hostile-effect roll while live target selection
+remains server AI authority.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    defender_target (any): Reviewed source target boundary.
+    creative_skill_id (string): Server-selected Confusion skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Source Confusion result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.confusion_skill(
+    caster_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(caster_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "CONFUSION"
+        or sets.target ~= "TARGET_MOB"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "UnsupportedOriginalConfusionSkill"
+    end
+
+    local matched = nil
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Confusion"
+            and row.abnormal == "CONFUSED"
+        then
+            matched = row
+            break
+        end
+    end
+    if not matched
+        or matched.count ~= 5
+        or matched.time ~= 6
+    then
+        return nil, "OriginalConfusionEffectUnavailable"
+    end
+
+    local target_wit_bonus = defender.SourceWitBonus
+    if type(target_wit_bonus) ~= "number"
+        or target_wit_bonus <= 0
+    then
+        return nil, "OriginalConfusionWitBonusUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = sets.effectPower,
+            TargetStatBonus = target_wit_bonus,
+            TargetVulnerability = 1,
+            IsMagic = true,
+            AttackerMAtk =
+                attacker.SourceStatCandidate.MAGICAL_ATTACK,
+            TargetMDef =
+                defender.SourceStatCandidate.MAGICAL_DEFENCE,
+            Spiritshot = shot.Spiritshot,
+            BlessedSpiritshot = shot.BlessedSpiritshot,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = magic_level,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "ConfusionControl",
+        Landed = resolved.Landed,
+        Rate = resolved.Rate,
+        Roll = resolved.Roll,
+        RetargetCount = matched.count,
+        RetargetSeconds = matched.time,
+        DurationSeconds = matched.count * matched.time,
+        RadiusSourceUnits = 600,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 single-target support buff.
 
 The source Buff handler applies its effect rows to the target and consumes one
@@ -3801,6 +4080,9 @@ function C4SourceCombatCalculationService.capability(): any
         ResurrectionCalculation = true,
         ResurrectionRequiresTargetAcceptance = true,
         SupportBuffCalculation = true,
+        SelfTimedBuffCalculation = true,
+        AggressionThreatCalculation = true,
+        ConfusionControlCalculation = true,
         RootControlCalculation = true,
         ManaRechargeCalculation = true,
         ManaRechargeTargetRateIntegrated = true,
