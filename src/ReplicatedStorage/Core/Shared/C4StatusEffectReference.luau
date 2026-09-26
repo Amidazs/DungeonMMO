@@ -334,6 +334,88 @@ function C4StatusEffectReference.sleep_plan(
 end
 
 --[[
+Builds the reviewed C4 Root control plan.
+
+Dryad Root is a magical WIT-resisted DEBUFF. It stops movement for its source
+duration but does not suppress attacks or casting and does not break on damage.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen Root plan or strict source-data reason.
+]]
+function C4StatusEffectReference.root_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1201 then
+        return nil, "UnsupportedOriginalRootSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalRootSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "ROOT"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+        or sets.target ~= "TARGET_ONE"
+    then
+        return nil, "OriginalRootContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Root"
+            and effect.abnormal == "ROOT"
+        then
+            if matched ~= nil then
+                return nil, "DuplicateOriginalRootEffect"
+            end
+            matched = effect
+        end
+    end
+
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalRootEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalRootMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "ROOT",
+        SaveVs = "WIT",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        DurationSeconds = matched.time,
+        BreaksOnDamage = false,
+        StopsMovement = true,
+        StopsAttacks = false,
+        StopsCasting = false,
+    }), nil
+end
+
+--[[
 Builds the reviewed C4 elemental-vulnerability debuff plan.
 
 Surrender-style effects are magical WIT-resisted DEBUFFs that temporarily
