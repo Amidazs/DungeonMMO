@@ -31,6 +31,8 @@ local boundary_state = {
     SourceStatCandidate = {
         MAGICAL_ATTACK_SPEED = 333,
         MAGICAL_SKILL_REUSE = 1,
+        PHYSICAL_ATTACK_SPEED = 333,
+        PHYSICAL_SKILL_REUSE = 1,
         SKILL_MASTERY = 0,
     },
 }
@@ -156,6 +158,56 @@ Returns:
 local function service(): any
     return TimingService.new(FakeShots, {
         CastContract = CastContract,
+        BoundaryProvider = boundary_provider,
+    })
+end
+
+local FakePhysicalContract = {}
+
+--[[
+Returns one exact non-magic active-skill timing contract.
+
+Args:
+    user_id (number): Expected owner.
+    creative_skill_id (string): Expected physical skill identifier.
+
+Returns:
+    (any?, string?): Disposable physical timing contract.
+]]
+function FakePhysicalContract.resolve(
+    user_id: number,
+    creative_skill_id: string
+): (any?, string?)
+    assert(user_id == USER_ID)
+    assert(creative_skill_id == "TEMP_PhysicalSkill")
+
+    return {
+        CreativeSkillId = creative_skill_id,
+        CreativeRank = 1,
+        SourceScopeId = "HumanWizard",
+        SourceSkillId = 9999,
+        SourceRank = 1,
+        SourceIsMagic = false,
+        SourceHitTimeMs = 1080,
+        SourceCoolTimeMs = 720,
+        SourceReuseDelayMs = 11000,
+        SourceCastRange = 40,
+        SourceEffectRange = 400,
+    }, nil
+end
+
+--[[
+Creates the timing service around one deterministic physical contract.
+
+Args:
+    None.
+
+Returns:
+    any: Source timing planner exercising P.Atk.Spd semantics.
+]]
+local function physical_service(): any
+    return TimingService.new(FakeShots, {
+        CastContract = FakePhysicalContract,
         BoundaryProvider = boundary_provider,
     })
 end
@@ -408,6 +460,68 @@ local function check_reuse_multiplier_and_mastery()
 end
 
 --[[
+Checks non-magic active skills use P.Atk.Spd and physical reuse.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source physical timing without magical-shot acceleration.
+]]
+local function check_physical_skill_timing()
+    boundary_state.ScopeId = "HumanWizard"
+    boundary_state.SourceStatCandidateReady = true
+    boundary_state.SourceStatCandidate.PHYSICAL_ATTACK_SPEED = 333
+    boundary_state.SourceStatCandidate.PHYSICAL_SKILL_REUSE = 1
+    boundary_state.SourceStatCandidate.SKILL_MASTERY = 0
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = true
+    snapshot_calls = 0
+
+    local normal = assert(physical_service():resolve(
+        USER_ID,
+        "TEMP_PhysicalSkill"
+    ))
+    check(
+        normal.SourcePhysicalAttackSpeed == 333
+            and normal.SourcePhysicalReuseMultiplier == 1
+            and normal.SourceMagicAttackSpeed == nil
+            and normal.SourceAuthoredHitTimeMs == 1080
+            and normal.FinalHitTimeMs == 1080
+            and normal.FinalCoolTimeMs == 720
+            and normal.FinalReuseDelayMs == 11000,
+        "physical timing uses exact P.Atk.Spd and physical reuse"
+    )
+    check(
+        snapshot_calls == 0
+            and not normal.SpiritshotCharged
+            and not normal.BlessedSpiritshotCharged
+            and shot_state.Spiritshot
+            and shot_state.BlessedSpiritshot,
+        "physical timing never reads or accelerates from magical shots"
+    )
+
+    boundary_state.SourceStatCandidate.PHYSICAL_ATTACK_SPEED = 666
+    boundary_state.SourceStatCandidate.PHYSICAL_SKILL_REUSE = 0.8
+
+    local fast = assert(physical_service():resolve(
+        USER_ID,
+        "TEMP_PhysicalSkill"
+    ))
+    check(
+        fast.FinalHitTimeMs == 540
+            and fast.FinalCoolTimeMs == 360
+            and fast.FinalReuseDelayMs == 4400,
+        "physical speed and reuse scaling follow the pinned source order"
+    )
+
+    boundary_state.SourceStatCandidate.PHYSICAL_ATTACK_SPEED = 333
+    boundary_state.SourceStatCandidate.PHYSICAL_SKILL_REUSE = 1
+    shot_state.Spiritshot = false
+    shot_state.BlessedSpiritshot = false
+end
+
+--[[
 Runs Human Wizard source cast-time planning acceptance.
 
 Args:
@@ -424,10 +538,13 @@ local function main()
         capability.Available
             and capability.FinalMagicCastTimeIntegrated
             and capability.FinalMagicCoolTimeIntegrated
+            and capability.FinalPhysicalCastTimeIntegrated
+            and capability.FinalPhysicalCoolTimeIntegrated
             and capability.ReadOnlyShotAccelerationIntegrated
             and capability.CastInterruptWindowIntegrated
             and capability.SourceCastAndEffectRangesIntegrated
             and capability.MagicReuseMultiplierIntegrated
+            and capability.PhysicalReuseMultiplierIntegrated
             and capability.ZeroMasteryFinalReuseIntegrated
             and not capability.SkillMasteryRollIntegrated
             and capability.MasteryReuseBlocker
@@ -441,13 +558,14 @@ local function main()
     check_frost_lance_cool_time()
     check_boundary_rules()
     check_reuse_multiplier_and_mastery()
+    check_physical_skill_timing()
 
     Runtime.clear_character(USER_ID)
 
     print((
         "[C4 Source Cast Timing] SOURCE_ONLY_PASS: %d assertions "
-        .. "hit=true cool=true shots=peek reuse=true mastery=blocked "
-        .. "live=false"
+        .. "hit=true cool=true physical=true shots=peek reuse=true "
+        .. "mastery=blocked live=false"
     ):format(checks))
 end
 
