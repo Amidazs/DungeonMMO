@@ -206,6 +206,63 @@ local MAPS = table.freeze({
         [1264] = table.freeze({SkillId = "MoonweaverSolarSpark"}),
         [1274] = table.freeze({SkillId = "MoonweaverFocusedBolt"}),
     }),
+    ElvenOracle = table.freeze({
+        [146] = table.freeze({
+            SkillId = "LifebinderArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "LifebinderQuickPrayer"}),
+        [213] = table.freeze({SkillId = "LifebinderManaReservoir"}),
+        [228] = table.freeze({SkillId = "LifebinderFastCasting"}),
+        [229] = table.freeze({SkillId = "LifebinderManaRecovery"}),
+        [235] = table.freeze({SkillId = "LifebinderRobeTraining"}),
+        [236] = table.freeze({
+            SkillId = "LifebinderLightArmorTraining",
+        }),
+        [249] = table.freeze({
+            SkillId = "LifebinderWeaponTraining",
+            Offset = 2,
+        }),
+        [1011] = table.freeze({
+            SkillId = "LifebinderHealingLight",
+            Offset = 6,
+        }),
+        [1013] = table.freeze({SkillId = "LifebinderManaRecharge"}),
+        [1015] = table.freeze({
+            SkillId = "LifebinderBattleMend",
+            Offset = 3,
+        }),
+        [1016] = table.freeze({SkillId = "LifebinderRevive"}),
+        [1027] = table.freeze({
+            SkillId = "LifebinderGroupMend",
+            Offset = 3,
+        }),
+        [1031] = table.freeze({SkillId = "LifebinderExorcism"}),
+        [1035] = table.freeze({SkillId = "LifebinderMindWard"}),
+        [1040] = table.freeze({
+            SkillId = "LifebinderStoneWard",
+            Offset = 1,
+        }),
+        [1043] = table.freeze({SkillId = "LifebinderSacredEdge"}),
+        [1068] = table.freeze({
+            SkillId = "LifebinderMight",
+            Offset = 1,
+        }),
+        [1069] = table.freeze({SkillId = "LifebinderSlumber"}),
+        [1073] = table.freeze({
+            SkillId = "LifebinderBreathBlessing",
+        }),
+        [1078] = table.freeze({
+            SkillId = "LifebinderConcentration",
+        }),
+        [1087] = table.freeze({SkillId = "LifebinderAgility"}),
+        [1201] = table.freeze({SkillId = "LifebinderRootbind"}),
+        [1204] = table.freeze({SkillId = "LifebinderWindstep"}),
+        [1206] = table.freeze({
+            SkillId = "LifebinderWindShackle",
+            Offset = 1,
+        }),
+    }),
     HumanWarrior = table.freeze({
         [78] = table.freeze({SkillId = "IronvowBattleCall"}),
         [100] = table.freeze({SkillId = "IronvowStonebreaker"}),
@@ -342,6 +399,9 @@ local GAPS = table.freeze({
 
     }),
     ElvenWizard = table.freeze({
+
+    }),
+    ElvenOracle = table.freeze({
 
     }),
     HumanWarrior = table.freeze({
