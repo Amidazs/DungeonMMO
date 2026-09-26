@@ -163,13 +163,13 @@ local function main()
         "Elven Wizard retains exact 20/25/30 source-rank inventory"
     )
     check(
-        elven_wizard.CurrentCareerId == nil
-            and elven_wizard.TrainerMappedRankEntries == 0
-            and elven_wizard.MissingRankScheduleEntries == 82
-            and not elven_wizard.SourceRankScheduleMapped
+        elven_wizard.CurrentCareerId == "Moonweaver"
+            and elven_wizard.TrainerMappedRankEntries == 82
+            and elven_wizard.MissingRankScheduleEntries == 0
+            and elven_wizard.SourceRankScheduleMapped
             and elven_wizard.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "Elven Wizard source audit stays distinct from implementation"
+                == "RankScheduleMappedEffectsPending",
+        "Elven Wizard rank schedule maps only through earned Moonweaver"
     )
 
     local warrior = assert(Coverage.for_branch("HumanWarrior"))
@@ -208,8 +208,8 @@ local function main()
         "Exactly eight first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 7,
-        "Seven implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 8,
+        "Eight implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
