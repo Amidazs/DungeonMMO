@@ -81,6 +81,57 @@ function FakeExecutor:can_status_skill_npc(
     return true, nil
 end
 
+function FakeExecutor:can_support_skill_player(
+    _caster: any,
+    _target: any,
+    _source_range: number?
+): (boolean, string?)
+    return true, nil
+end
+
+function FakeExecutor:can_party_heal_skill(
+    _caster: any,
+    _source_radius: number
+): (boolean, string?)
+    return true, nil
+end
+
+function FakeExecutor:heal_skill_target(
+    _caster: any,
+    _target: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        EffectiveHeal = 25,
+    }, nil
+end
+
+function FakeExecutor:support_buff_skill_target(
+    _caster: any,
+    _target: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        DurationSeconds = 1200,
+    }, nil
+end
+
+function FakeExecutor:party_heal_skill(
+    _caster: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        AffectedPlayers = 2,
+        EffectiveHeal = 50,
+    }, nil
+end
+
 --[[
 Provides a minimal direct-magic executor contract.
 
@@ -446,6 +497,7 @@ local function main()
             and capability.SourceCastTiming
             and capability.SourceCastScheduler
             and capability.DirectMagicBridge
+            and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
             and capability.CorpseMagicBridge
@@ -453,6 +505,8 @@ local function main()
             and capability.CompanionMagicBridge
             and not capability.DirectMagicDefaultEnabled
             and not capability.DirectMagicCurrentlyEnabled
+            and not capability.SupportMagicDefaultEnabled
+            and not capability.SupportMagicCurrentlyEnabled
             and not capability.PeriodicMagicDefaultEnabled
             and not capability.PeriodicMagicCurrentlyEnabled,
         "Dungeon cast composition keeps both staged bridges default-off"
@@ -460,6 +514,7 @@ local function main()
 
     check(
         not runtime.DirectMagic:is_enabled()
+            and not runtime.SupportMagic:is_enabled()
             and not runtime.PeriodicMagic:is_enabled()
             and not runtime.SelfMagic:is_enabled()
             and not runtime.CorpseMagic:is_enabled()
