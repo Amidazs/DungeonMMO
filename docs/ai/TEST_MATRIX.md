@@ -1,3 +1,25 @@
+## 26 September 2026 — CURRENT v3.06 Scorch Mark validation pending
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_06_Human_Wizard_Scorch_Mark_20260926.md);
+[pending validation](
+../testing/c4-human-wizard-scorch-mark-v3-06-pending-20260926.md).
+Scorch Mark backend implementation is locally build-clean but has not yet
+received Studio acceptance. The source-cast runner now contains **16 suites**
+and the broad Human Wizard backend runner contains **36 suites**. New focused
+coverage includes the reusable NPC elemental-vulnerability authority plus
+source 1083:2 calculation, live executor routing and staged-cast integration.
+
+Pending Studio runners:
+`c4_human_wizard_source_cast_focus.luau` (**16 suites pending**).
+`c4_human_wizard_big_backend_focus.luau` (**36 suites pending**).
+
+Required live proof:
+Scorch Mark lands -> FIRE_VULN becomes 1.25 -> a reviewed fire spell resolves
+with elemental multiplier 1.25 -> non-fire vulnerabilities stay neutral ->
+death/respawn clears the runtime debuff -> final log has zero project
+CreatorErrors.
+
 ## 26 September 2026 — CURRENT v3.01 Human Wizard targeted cast GREEN
 
 [Roadmap](
