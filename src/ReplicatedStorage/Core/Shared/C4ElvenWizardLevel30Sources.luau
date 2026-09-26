@@ -27,6 +27,7 @@ local ELVEN_WIZARD = table.freeze({
             EfficientMagicBolt = 1,
         }),
         [25] = table.freeze({
+            MagicResistance = 2,
             FastSpellCasting = 1,
             ManaRecovery = 1,
             RobeMastery = 2,
