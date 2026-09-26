@@ -166,6 +166,34 @@ local HUMAN_CLERIC = table.freeze({
     WindWalk = "DawnkeeperWindstep",
 })
 
+local ELVEN_ORACLE = table.freeze({
+    MagicResistance = "LifebinderArcaneResistance",
+    SpellReuse = "LifebinderQuickPrayer",
+    ManaCapacity = "LifebinderManaReservoir",
+    FastSpellCasting = "LifebinderFastCasting",
+    ManaRecovery = "LifebinderManaRecovery",
+    RobeMastery = "LifebinderRobeTraining",
+    LightArmorMastery = "LifebinderLightArmorTraining",
+    WeaponMastery = "LifebinderWeaponTraining",
+    Heal = "LifebinderHealingLight",
+    Recharge = "LifebinderManaRecharge",
+    BattleHeal = "LifebinderBattleMend",
+    Resurrection = "LifebinderRevive",
+    GroupHeal = "LifebinderGroupMend",
+    DisruptUndead = "LifebinderExorcism",
+    MentalShield = "LifebinderMindWard",
+    Shield = "LifebinderStoneWard",
+    HolyWeapon = "LifebinderSacredEdge",
+    Might = "LifebinderMight",
+    Sleep = "LifebinderSlumber",
+    KissOfEva = "LifebinderBreathBlessing",
+    Concentration = "LifebinderConcentration",
+    Agility = "LifebinderAgility",
+    DryadRoot = "LifebinderRootbind",
+    WindWalk = "LifebinderWindstep",
+    WindShackle = "LifebinderWindShackle",
+})
+
 local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
@@ -211,6 +239,9 @@ function SkillMap.get(
     end
     if branch_id == "ElvenWizard" then
         return ELVEN_WIZARD[source_category]
+    end
+    if branch_id == "ElvenOracle" then
+        return ELVEN_ORACLE[source_category]
     end
     if branch_id == "ElvenKnight" then
         return ELVEN_KNIGHT[source_category]
