@@ -1,3 +1,21 @@
+## 26 September 2026 — v3.09 Human Cleric level 30 accepted
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_09_Human_Cleric_Level30_Complete_20260926.md);
+[evidence](
+../testing/c4-human-cleric-level30-complete-v3-09-20260926.md).
+
+Dawnkeeper is now green through level 30: **88/88 source rank rows**, no
+missing rows, **24/24** focused Studio backend suites and **4/4** Play-mode
+critical suites. The live Resurrection rehearsal passed end to end through the
+actual Dungeon UI and `ReviveRequest` action, including target acceptance,
+source restore-power evidence, respawn, Active-mode restoration and panel
+dismissal. Test9 finished with **0 CreatorErrors**.
+
+The Human Wizard v3.08 and Human Cleric v3.09 level-30 backend batches are now
+both accepted. Permanent edits remain GitHub-only; Desktop Commander is for
+local build/Studio/playtest evidence.
+
 ## 26 September 2026 — v3.07 Human Wizard Withering Hex staged
 
 [Roadmap](
