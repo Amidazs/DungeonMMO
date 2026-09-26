@@ -1,3 +1,24 @@
+## 26 September 2026 — CURRENT v3.07 Withering Hex validation pending
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_07_Human_Wizard_Withering_Hex_20260926.md);
+[pending validation](
+../testing/c4-human-wizard-withering-hex-v3-07-pending-20260926.md).
+Withering Hex backend implementation is locally build-clean but has not yet
+received Studio acceptance. The source-cast runner remains **16 suites** and
+the broad Human Wizard backend runner is now **37 suites**, adding the existing
+C4EnemyWeakeningTest to prove outgoing NPC damage reduction and non-stacking
+weakening behavior.
+
+Pending Studio runners:
+`c4_human_wizard_source_cast_focus.luau` (**16 suites pending**).
+`c4_human_wizard_big_backend_focus.luau` (**37 suites pending**).
+
+Required live proof:
+Withering Hex lands -> power weakening becomes 0.20 -> outgoing NPC physical
+damage uses x0.8 -> attack interval stays neutral -> death/respawn clears the
+weakening -> final log has zero project CreatorErrors.
+
 ## 26 September 2026 — CURRENT v3.06 Scorch Mark validation pending
 
 [Roadmap](
