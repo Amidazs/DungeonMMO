@@ -1110,6 +1110,139 @@ function C4SourceCombatExecutor:status_skill_npc(
 end
 
 --[[
+Executes one live C4 TARGET_AREA periodic-status cast against server NPCs.
+
+The selected NPC plus same-encounter reviewed NPCs inside the source radius are
+calculated with one shared magical-shot snapshot. Each landed target receives
+its own exact periodic status generation.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed selected NPC.
+    creative_skill_id (string): Server-selected creative area status skill.
+    creative_rank (number): Server-resolved purchased rank.
+    source_radius (number): Reviewed C4 skillRadius in source units.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live area-status evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:status_area_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    local primary_boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not primary_boundary then
+        return nil, boundary_reason
+    end
+
+    local targets, boundaries, area_reason =
+        self:_collect_npc_area_targets(
+            attacker,
+            enemy,
+            primary_boundary,
+            source_radius
+        )
+    if not targets or not boundaries then
+        return nil, area_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.status_area_skill(
+            attacker.UserId,
+            boundaries,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.SourceSkillRadius ~= source_radius
+        or #calculated.Results ~= #targets
+    then
+        return nil, "C4PeriodicAreaCalculationContractMismatch"
+    end
+
+    local applications = {}
+    for index, target in ipairs(targets) do
+        local result = calculated.Results[index]
+        if result.Landed ~= true then
+            table.insert(applications, {
+                Target = target,
+                Calculation = result,
+                Landed = false,
+                StatusApplied = false,
+            })
+            continue
+        end
+
+        local source_kind = if result.EffectType == "POISON"
+            then "StatusMagic"
+            elseif result.EffectType == "BLEED"
+            then "StatusPhysical"
+            else nil
+        if not source_kind then
+            return nil, "UnsupportedC4LivePeriodicStatusType"
+        end
+
+        self._next_status_serial += 1
+        local record = {
+            Serial = self._next_status_serial,
+            Attacker = attacker,
+            Target = target,
+            CreativeSkillId = creative_skill_id,
+            SourceSkillId = result.SourceSkillId,
+            SourceRank = result.SourceRank,
+            SourceKind = source_kind,
+            TickDamage = result.TickDamage,
+            TickSeconds = result.TickSeconds,
+            Remaining = result.TickCount,
+            SequenceId = sequence_id,
+        }
+
+        local target_records = self._npc_periodic_statuses[target]
+        if type(target_records) ~= "table" then
+            target_records = {}
+            self._npc_periodic_statuses[target] = target_records
+        end
+        target_records[result.SourceSkillId] = record
+        self:_schedule_npc_status_tick(record)
+
+        table.insert(applications, {
+            Target = target,
+            Calculation = result,
+            Landed = true,
+            StatusApplied = true,
+        })
+    end
+
+    local landed_count = 0
+    for _, application in ipairs(applications) do
+        if application.Landed then
+            landed_count += 1
+        end
+    end
+
+    return {
+        Kind = "C4LiveNpcPeriodicStatusArea",
+        Calculation = calculated,
+        Applications = applications,
+        Applied = landed_count > 0,
+        StatusApplied = landed_count > 0,
+        TargetCount = #applications,
+        LandedCount = landed_count,
+        SourceSkillRadius = source_radius,
+        Spiritshot = calculated.Spiritshot,
+        BlessedSpiritshot = calculated.BlessedSpiritshot,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC source PDAM skill.
 
 Args:
@@ -2207,6 +2340,8 @@ function C4SourceCombatExecutor:capability(): any
         NpcStatusSkillReadOnlyPreflight = true,
         NpcSourceRangePreflight = true,
         NpcPeriodicStatusLiveApplication = true,
+        NpcPeriodicStatusAreaLiveApplication = true,
+        NpcPeriodicStatusAreaSingleShotSnapshot = true,
         NpcPeriodicStatusNonlethal = true,
         NpcPeriodicStatusRefreshBySourceSkill = true,
         NpcDamageBypassesCombatPoints = true,
