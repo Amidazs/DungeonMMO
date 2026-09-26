@@ -76,6 +76,26 @@ local function main()
         "Poison rank one keeps source 8 x 10 every three seconds"
     )
 
+    local frost = assert(Status.movement_slow_plan(1184, 6))
+    check(
+        frost.SourceSkillId == 1184
+            and frost.SourceRank == 6
+            and frost.EffectType == "DEBUFF"
+            and frost.SaveVs == "WIT"
+            and frost.EffectPower == 60
+            and frost.MagicLevel == 20
+            and frost.IsMagic,
+        "Ice Bolt rank six keeps exact WIT-resisted slow inputs"
+    )
+    check(
+        frost.SpeedMultiplier == 0.7
+            and math.abs(frost.SlowFraction - 0.3) <= 0.00001
+            and frost.DurationSeconds == 120
+            and frost.StackType == "RunSpeedDown"
+            and frost.StackOrder == 0.7,
+        "Ice Bolt rank six keeps exact 30 percent 120-second source slow"
+    )
+
     local bleed_rate = assert(Status.effect_success_rate({
         Power = 100,
         TargetStatBonus = 1,
@@ -184,7 +204,7 @@ local function main()
 
     print((
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
-            .. "bleed=13x4@5 poison=8x10@3 nonlethal=true"
+            .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 nonlethal=true"
     ):format(checks))
 end
 
