@@ -1,3 +1,28 @@
+## 26 September 2026 — CURRENT v3.09 Human Cleric level 30 GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_09_Human_Cleric_Level30_Complete_20260926.md);
+[acceptance evidence](
+../testing/c4-human-cleric-level30-complete-v3-09-20260926.md).
+
+Human Cleric / Dawnkeeper backend coverage through level 30 is complete:
+**88/88 source rows mapped, zero gaps**. The complete friendly-support set,
+Resurrection offer/accept flow and hostile Exorcism/Sleep/Root families are
+wired through the source cast/runtime authorities.
+
+Fresh Studio acceptance on
+`DungeonMMO_HumanCleric_Full_Test9.rbxlx` is **24/24 PASS**. A separate
+Play-mode critical subset is **4/4 PASS**. A real unpublished client/server
+resurrection rehearsal showed the actual Dungeon UI offer, sent
+`SkillResurrectionAccept`, preserved source restore power 20, respawned at
+the reviewed location, returned the member to Active and closed the revive
+panel. Final Test9 log scan: **0 CreatorErrors**.
+
+Accepted code/test HEAD before documentation:
+`ab4a778ddf6eb673fe6c11c1722980e1e555a13a`.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.08 Human Wizard level-30 backend GREEN
 
 [Roadmap](
