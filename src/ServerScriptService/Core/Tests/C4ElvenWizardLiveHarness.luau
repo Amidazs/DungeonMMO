@@ -981,6 +981,13 @@ end
 disable_conflicting_physical_regressions()
 print("[Moonweaver Live] EDIT_DRIVER_READY")
 
+if Workspace:GetAttribute(
+    "C4MoonweaverManualPreparationOnly"
+) == true then
+    print("[Moonweaver Live] MANUAL_PREPARATION_READY")
+    return true
+end
+
 local ok, result = pcall(function()
     return StudioTestService:ExecutePlayModeAsync(
         "TEMP_C4MoonweaverLive"
