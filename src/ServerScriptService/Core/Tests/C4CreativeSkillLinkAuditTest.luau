@@ -9,8 +9,8 @@ local Map = require(Shared.C4CreativeSkillSourceMap)
 local report = Audit.report()
 assert(report.ClassPaths == 10 and report.SourceLearningRows == 569,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 528
-    and report.ExplicitMissingRows == 41,
+assert(report.CandidateRows == 547
+    and report.ExplicitMissingRows == 22,
     "Tracked source rows must preserve candidate and explicit-gap totals")
 assert(report.CandidateRows + report.ExplicitMissingRows == 569,
     "Every historical rank requires a candidate or an explicit gap")
@@ -44,8 +44,10 @@ assert(elven_heal.CreativeRank == 1
 assert(wizard_bolt.Status == "Candidate"
     and wizard_bolt.CreativeSkillId == "EmberweaverEmberBolt"
     and wizard_bolt.CreativeRank == 1
-    and wizard_companion.Status == "Missing",
-    "Wizard direct spell maps while companion skill stays explicit gap")
+    and wizard_companion.Status == "Candidate"
+    and wizard_companion.CreativeSkillId
+        == "EmberweaverManaCompanion",
+    "Wizard direct and companion skills both map after summon authority")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
