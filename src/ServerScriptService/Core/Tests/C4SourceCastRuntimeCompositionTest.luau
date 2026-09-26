@@ -132,6 +132,35 @@ function FakeExecutor:magic_slow_skill_npc(
 end
 
 --[[
+Provides a minimal TARGET_AREA magic executor contract.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable selected target.
+    _skill_id (string): Creative skill identifier.
+    _rank (number): Creative skill rank.
+    source_radius (number): Reviewed source area radius.
+    _sequence_id (number?): Disposable sequence.
+
+Returns:
+    (any?, string?): Successful fake area application.
+]]
+function FakeExecutor:magic_area_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    source_radius: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        TargetCount = 1,
+        SourceSkillRadius = source_radius,
+    }, nil
+end
+
+--[[
 Provides a minimal periodic-status executor contract.
 
 Args:
