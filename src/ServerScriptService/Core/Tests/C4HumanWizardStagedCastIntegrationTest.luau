@@ -273,6 +273,33 @@ function FakeExecutor:status_skill_npc(
 end
 
 --[[
+Provides a disposable combined direct-magic/slow executor path.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable target.
+    _skill_id (string): Creative skill identifier.
+    _rank (number): Creative skill rank.
+    _sequence_id (number?): Disposable sequence.
+
+Returns:
+    (any?, string?): Successful fake combined application.
+]]
+function FakeExecutor:magic_slow_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        SlowLanded = true,
+        SlowApplied = true,
+    }, nil
+end
+
+--[[
 Counts one cross-service staged-cast assertion.
 
 Args:
