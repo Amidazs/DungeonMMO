@@ -303,6 +303,7 @@ local function seed_characters()
     own_skill(wizard, "EmberweaverLifeSiphon", 4)
     own_skill(wizard, "EmberweaverSlumberHex", 6)
     own_skill(wizard, "EmberweaverScorchMark", 2)
+    own_skill(wizard, "EmberweaverWitheringHex", 3)
 
     Runtime.set_character(FIGHTER_ID, fighter)
     Runtime.set_character(MAGE_ID, mage)
@@ -395,6 +396,9 @@ local function check_default_off()
             and capability.ElementalVulnerabilityCalculation
             and capability.ElementalVulnerabilityEffectSuccessIntegrated
             and capability.ElementalVulnerabilityConsumesOneMagicShot
+            and capability.PhysicalAttackWeakeningCalculation
+            and capability.PhysicalAttackWeakeningEffectSuccessIntegrated
+            and capability.PhysicalAttackWeakeningConsumesOneMagicShot
             and capability.MovementSlowEffectSuccessIntegrated
             and capability.MovementSlowUsesSingleMagicShot
             and capability.PeriodicStatusEffectSuccessIntegrated
@@ -1276,6 +1280,53 @@ local function check_human_wizard_scorch_mark()
 end
 
 --[[
+Checks Withering Hex preserves exact C4 physical-attack weakening semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms rank mapping, WIT roll, multiplier and one shot.
+]]
+local function check_human_wizard_withering_hex()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.physical_attack_weakening_skill(
+        WIZARD_ID,
+        marauder,
+        "EmberweaverWitheringHex",
+        3
+    ))
+
+    check(
+        result.Kind == "PhysicalAttackWeakening"
+            and result.SourceSkillId == 1164
+            and result.SourceRank == 4
+            and result.PhysicalAttackMultiplier == 0.8
+            and result.PowerReductionFraction == 0.2
+            and result.DurationSeconds == 15
+            and result.SaveVs == "WIT"
+            and result.EffectType == "CONFUSION"
+            and result.EffectPower == 80
+            and result.MagicLevel == 30,
+        "Withering Hex rank three preserves source attack weakness"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.Roll >= 0
+            and result.Roll <= 99
+            and result.Roll % 1 == 0
+            and result.Landed == (result.Roll < result.Rate),
+        "Withering Hex consumes one Spiritshot and owns its WIT land roll"
+    )
+end
+
+--[[
 Checks HEAL uses direct source EffectHeal power, not M.Atk.
 
 Args:
@@ -1610,6 +1661,7 @@ local function main()
     check_human_wizard_life_siphon()
     check_human_wizard_slumber_hex()
     check_human_wizard_scorch_mark()
+    check_human_wizard_withering_hex()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1630,7 +1682,7 @@ local function main()
         .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "status=true pdam=true mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
-        .. "heal=true npc=true live=false"
+        .. "patk_down=true heal=true npc=true live=false"
     ):format(checks))
 end
 
