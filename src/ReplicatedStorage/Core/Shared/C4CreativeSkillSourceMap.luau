@@ -84,6 +84,9 @@ local MAPS = table.freeze({
             SkillId = "EmberweaverConcentration",
         }),
         [1083] = table.freeze({SkillId = "EmberweaverScorchMark"}),
+        [1111] = table.freeze({SkillId = "EmberweaverManaCompanion"}),
+        [1126] = table.freeze({SkillId = "EmberweaverServitorRecharge"}),
+        [1127] = table.freeze({SkillId = "EmberweaverServitorHeal"}),
         [1147] = table.freeze({
             SkillId = "EmberweaverLifeSiphon",
             Offset = 2,
@@ -106,6 +109,7 @@ local MAPS = table.freeze({
             Offset = 4,
         }),
         [1220] = table.freeze({SkillId = "EmberweaverEmberBolt"}),
+        [1225] = table.freeze({SkillId = "EmberweaverCombatCompanion"}),
         [1274] = table.freeze({SkillId = "EmberweaverFocusedBolt"}),
         [1320] = table.freeze({
             SkillId = "EmberweaverCommonItemCreation",
@@ -237,10 +241,7 @@ local GAPS = table.freeze({
         [1322] = "Common Craft is not the current recipe-reading passive",
     }),
     HumanWizard = table.freeze({
-        [1111] = "Mana companion requires server-owned summon authority",
-        [1126] = "Servitor MP recovery requires a real owned companion",
-        [1127] = "Servitor healing requires a real owned companion",
-        [1225] = "Combat companion requires server-owned summon authority",
+
     }),
     HumanWarrior = table.freeze({
 
