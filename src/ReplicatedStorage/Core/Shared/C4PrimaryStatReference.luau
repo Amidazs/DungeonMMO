@@ -217,6 +217,22 @@ local TEMPLATES = table.freeze({
         CpBase = 213.5, CpAdd = 17.70, CpMod = 0.22,
         ConBonus = 0.93, MenBonus = 1.49,
     }),
+    PalusKnight = table.freeze({
+        SourceClassId = 32,
+        SourceClassName = "PALUS_KNIGHT",
+        ClassBaseLevel = 20,
+        STR = 41, DEX = 34, CON = 32,
+        INT = 25, WIT = 12, MEN = 26,
+        BasePAtk = 4, BasePDef = 80, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 35, BaseCritRate = 45,
+        BaseAccuracy = 35, BaseRunSpd = 122,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 379, HpAdd = 35.20, HpMod = 0.37,
+        MpBase = 144, MpAdd = 9.90, MpMod = 0.14,
+        CpBase = 189.5, CpAdd = 17.60, CpMod = 0.22,
+        ConBonus = 1.14, MenBonus = 1.30,
+    }),
     ElvenKnight = table.freeze({
         SourceClassId = 19,
         SourceClassName = "ELF_KNIGHT",
@@ -272,6 +288,7 @@ local FIRST_TRANSFERS = table.freeze({
     Lifebinder = "ElvenOracle",
     GreenwardWarden = "ElvenKnight",
     GreenwardScout = "ElvenScout",
+    Duskguard = "PalusKnight",
 })
 
 local PRIMARY_NAMES = table.freeze({
