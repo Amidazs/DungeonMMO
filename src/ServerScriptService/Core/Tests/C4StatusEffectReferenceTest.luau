@@ -137,6 +137,28 @@ local function main()
         "Surrender to Fire keeps exact 25 percent 15-second vulnerability"
     )
 
+    local attack_weakness = assert(
+        Status.physical_attack_weakening_plan(1164, 4)
+    )
+    check(
+        attack_weakness.SourceSkillId == 1164
+            and attack_weakness.SourceRank == 4
+            and attack_weakness.EffectType == "CONFUSION"
+            and attack_weakness.SaveVs == "WIT"
+            and attack_weakness.EffectPower == 80
+            and attack_weakness.MagicLevel == 30
+            and attack_weakness.IsMagic,
+        "Curse Weakness rank four keeps exact WIT land inputs"
+    )
+    check(
+        attack_weakness.PhysicalAttackMultiplier == 0.8
+            and attack_weakness.PowerReductionFraction == 0.2
+            and attack_weakness.DurationSeconds == 15
+            and attack_weakness.StackType == "pAtkDown"
+            and attack_weakness.StackOrder == 0.8,
+        "Curse Weakness keeps exact 20 percent 15-second attack reduction"
+    )
+
     local bleed_rate = assert(Status.effect_success_rate({
         Power = 100,
         TargetStatBonus = 1,
@@ -247,7 +269,7 @@ local function main()
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
             .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 "
             .. "sleep=30@damage_wake fire_vuln=1.25@15 "
-            .. "nonlethal=true"
+            .. "patk=0.8@15 nonlethal=true"
     ):format(checks))
 end
 
