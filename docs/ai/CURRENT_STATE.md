@@ -1,3 +1,23 @@
+## 26 September 2026 — CURRENT v3.02 Frost Lance implemented
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_02_Human_Wizard_Frost_Lance_20260926.md);
+[pending Studio acceptance](
+../testing/c4-human-wizard-frost-lance-v3-02-pending-20260926.md).
+Human Wizard Frost Lance is now implemented through the staged source cast
+pipeline. Rank 2 preserves source Ice Bolt 1184:6: WATER MDAM power 16,
+WIT-resisted effect power 60, exact 0.7 RUN_SPEED multiplier for 120 seconds,
+and 600/1100 source cast/effect ranges. Player and NPC source boundaries now
+expose WIT bonus for the hostile-effect formula. Damage owns the single
+Spiritshot consumption and the slow roll reuses that shot state. Live NPC
+damage still uses the existing contribution/threat observer path, while a
+landed slow uses the shared server non-stacking NPC slow authority. Fresh Base
+and Dungeon Rojo builds pass at candidate
+`484363b3ffec2d911314201380fe5408ad154d40`; Studio focused/live acceptance
+is still pending, so v3.01 remains the latest fully green Wizard batch.
+
+No main merge, publish, production save mutation or animation edits.
+
 ## 26 September 2026 — CURRENT v3.01 targeted cast batch GREEN
 
 [Roadmap](
