@@ -43,6 +43,15 @@ local NpcRoot = require(
 local ActiveSourceEffects = require(
     ServerScriptService.Core.Services.C4ActiveSourceEffectState
 )
+local ThreatService = require(
+    ServerScriptService.Combat.ThreatService
+)
+local NpcConfusion = require(
+    ServerScriptService.Combat.C4NpcConfusionService
+)
+local PlayerImmobile = require(
+    ServerScriptService.Combat.C4PlayerImmobileService
+)
 
 local C4SourceCombatExecutor = {}
 C4SourceCombatExecutor.__index = C4SourceCombatExecutor
@@ -218,6 +227,11 @@ function C4SourceCombatExecutor.new(options: any?): any
         _active_source_effects =
             config.ActiveSourceEffectProvider
             or ActiveSourceEffects,
+        _threat = config.ThreatProvider or ThreatService,
+        _npc_confusion =
+            config.ConfusionProvider or NpcConfusion,
+        _player_immobile =
+            config.ImmobileProvider or PlayerImmobile,
         _humanoid_provider =
             config.HumanoidProvider or default_humanoid_provider,
         _spatial_context_provider =
@@ -1600,6 +1614,293 @@ function C4SourceCombatExecutor:mana_heal_self(
         HealthAfter = humanoid.Health,
         ManaRequested = calculated.ManaRestore,
         ManaRestored = mana_restored,
+    }, nil
+end
+
+--[[
+Executes one reviewed self-targeted timed C4 buff.
+
+Args:
+    caster (any): Server-owned casting player.
+    creative_skill_id (string): Reviewed creative self-buff.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Live timed self-buff evidence or denial reason.
+]]
+function C4SourceCombatExecutor:self_buff_skill(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.self_buff_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local authority = self._active_source_effects
+    if not authority
+        or type(authority.observe_external_timed) ~= "function"
+    then
+        return nil, "C4LiveSelfBuffAuthorityUnavailable"
+    end
+
+    local observed, observe_reason =
+        authority.observe_external_timed(
+            caster,
+            creative_skill_id,
+            creative_rank,
+            calculated.SourceSkillId,
+            calculated.SourceRank,
+            calculated.DurationSeconds
+        )
+    if not observed then
+        return nil, observe_reason
+    end
+
+    if calculated.Immobile then
+        if not self._player_immobile
+            or type(self._player_immobile.apply) ~= "function"
+        then
+            return nil, "C4LiveImmobileAuthorityUnavailable"
+        end
+
+        local immobile, immobile_reason =
+            self._player_immobile.apply(
+                caster,
+                calculated.DurationSeconds
+            )
+        if not immobile then
+            return nil, immobile_reason
+        end
+    end
+
+    return {
+        Kind = "C4LiveSelfBuff",
+        Calculation = calculated,
+        Applied = true,
+        DurationSeconds = calculated.DurationSeconds,
+        Immobile = calculated.Immobile,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
+Executes one reviewed zero-damage C4 Aggression skill against an NPC.
+
+Args:
+    caster (any): Server-owned taunting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed creative taunt.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Live threat evidence or denial reason.
+]]
+function C4SourceCombatExecutor:aggro_skill_npc(
+    caster: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(caster, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.aggro_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if not self._threat
+        or type(self._threat.taunt) ~= "function"
+    then
+        return nil, "C4LiveThreatAuthorityUnavailable"
+    end
+
+    local threat = self._threat.taunt(
+        enemy,
+        caster,
+        calculated.ThreatPower
+    )
+
+    return {
+        Kind = "C4LiveNpcAggression",
+        Calculation = calculated,
+        Applied = true,
+        HealthDamage = 0,
+        Threat = threat,
+        ThreatPower = calculated.ThreatPower,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
+Executes one reviewed C4 Confusion debuff on a server NPC.
+
+Args:
+    caster (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed creative Confusion skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Live confusion evidence or denial reason.
+]]
+function C4SourceCombatExecutor:confusion_skill_npc(
+    caster: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(caster, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.confusion_skill(
+            caster.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcConfusion",
+            Calculation = calculated,
+            Applied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    if type(self._source_units_per_stud) ~= "number"
+        or self._source_units_per_stud <= 0
+    then
+        return nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+    if not self._npc_confusion
+        or type(self._npc_confusion.apply) ~= "function"
+    then
+        return nil, "C4LiveConfusionAuthorityUnavailable"
+    end
+
+    local applied, apply_reason =
+        self._npc_confusion.apply(
+            enemy,
+            caster.UserId,
+            calculated.RetargetCount,
+            calculated.RetargetSeconds,
+            calculated.RadiusSourceUnits
+                / self._source_units_per_stud
+        )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcConfusion",
+        Calculation = calculated,
+        Applied = true,
+        Landed = true,
+        DurationSeconds = calculated.DurationSeconds,
+        RetargetCount = calculated.RetargetCount,
+        RetargetSeconds = calculated.RetargetSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
+Executes one PDAM skill and then its reviewed physical periodic side effect.
+
+The direct strike consumes Soulshot once through the source PDAM calculation.
+The physical Bleed application uses no magical shot and is attempted only
+after real positive HP damage, matching the pinned SkillPdam ordering.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed physical status skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Combined direct-damage and periodic-status evidence.
+]]
+function C4SourceCombatExecutor:physical_status_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local damage, damage_reason = self:physical_skill_npc(
+        attacker,
+        enemy,
+        creative_skill_id,
+        creative_rank,
+        sequence_id
+    )
+    if not damage then
+        return nil, damage_reason
+    end
+
+    if damage.HealthDamage <= 0 or damage.Lethal then
+        return {
+            Kind = "C4LiveNpcPhysicalStatusSkill",
+            Applied = true,
+            Damage = damage,
+            Status = nil,
+            StatusApplied = false,
+        }, nil
+    end
+
+    local status, status_reason = self:status_skill_npc(
+        attacker,
+        enemy,
+        creative_skill_id,
+        creative_rank,
+        sequence_id
+    )
+    if not status then
+        return nil, status_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalStatusSkill",
+        Applied = true,
+        Damage = damage,
+        Status = status,
+        StatusApplied = status.StatusApplied == true,
+        Landed = status.Landed == true,
     }, nil
 end
 
@@ -3417,6 +3718,10 @@ function C4SourceCombatExecutor:capability(): any
             type(self._npc_damage_observer) == "function",
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
+        SelfTimedBuffLiveApplication = true,
+        AggressionThreatLiveApplication = true,
+        NpcConfusionLiveApplication = true,
+        NpcPhysicalStatusLiveApplication = true,
         NpcMagicSkillLiveApplication = true,
         NpcMagicAreaLiveApplication = true,
         NpcMagicAreaCasterRadiusSourceSemantics = true,
