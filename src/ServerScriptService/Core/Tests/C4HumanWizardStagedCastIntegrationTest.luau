@@ -44,6 +44,7 @@ local source_active = true
 local last_preflight_range = nil
 local magic_calls = 0
 local area_magic_calls = 0
+local drain_magic_calls = 0
 local last_area_radius = nil
 local status_calls = 0
 
@@ -339,6 +340,42 @@ function FakeExecutor:magic_area_skill_npc(
 end
 
 --[[
+Records one staged source magic-drain executor handoff.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected private selected NPC target.
+    creative_skill_id (string): Reviewed Life Siphon skill.
+    creative_rank (number): Authenticated creative rank.
+    sequence_id (number?): Trusted action sequence.
+
+Returns:
+    (any?, string?): Fake live drain executor evidence.
+]]
+function FakeExecutor:magic_drain_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player and target == enemy)
+    assert(creative_skill_id == "EmberweaverLifeSiphon")
+    assert(creative_rank == 4)
+    assert(type(sequence_id) == "number")
+    drain_magic_calls += 1
+
+    return {
+        Kind = "C4LiveNpcMagicDrain",
+        Applied = true,
+        HealthDamage = 40,
+        EffectiveHeal = 16,
+        AbsorbPart = 0.4,
+        AbsorbAbs = 0,
+    }, nil
+end
+
+--[[
 Counts one cross-service staged-cast assertion.
 
 Args:
@@ -425,6 +462,7 @@ local function wizard_character(): any
     own_skill(character, "EmberweaverFlameBurst", 6)
     own_skill(character, "EmberweaverFocusedBolt", 3)
     own_skill(character, "EmberweaverEmberField", 3)
+    own_skill(character, "EmberweaverLifeSiphon", 4)
     own_skill(character, "EmberweaverVenomHex", 2)
 
     return character
@@ -619,6 +657,53 @@ local function check_ember_field(direct: any)
 end
 
 --[[
+Checks Life Siphon through the real source scheduler and drain path.
+
+Args:
+    direct (any): Enabled targeted-magic bridge.
+
+Returns:
+    nil: Confirms exact source rank, timing, ranges and split-MP costs.
+]]
+local function check_life_siphon(direct: any)
+    local started = assert(direct:begin_cast(
+        player,
+        enemy,
+        "EmberweaverLifeSiphon",
+        140
+    ))
+    check(
+        started.SourceSkillId == 1147
+            and started.SourceRank == 6
+            and started.LaunchAt == 144
+            and started.ReuseReadyAt == 149
+            and started.SourceCastRange == 600
+            and started.SourceEffectRange == 1100
+            and last_preflight_range == 600
+            and mana_current == 85,
+        "Life Siphon crosses exact source drain start contract"
+    )
+
+    local launched = assert(direct:launch_if_ready(
+        player,
+        started.CastId,
+        144,
+        1014
+    ))
+    check(
+        launched.Applied
+            and launched.Application.Kind == "C4LiveNpcMagicDrain"
+            and launched.Application.AbsorbPart == 0.4
+            and launched.Application.AbsorbAbs == 0
+            and launched.Application.EffectiveHeal == 16
+            and last_preflight_range == 1100
+            and drain_magic_calls == 1
+            and mana_current == 58,
+        "Life Siphon commits exact MP and reaches source drain executor"
+    )
+end
+
+--[[
 Checks Venom Hex through the same real source scheduler/resource pipeline.
 
 Args:
@@ -632,31 +717,31 @@ local function check_venom_hex(periodic: any)
         player,
         enemy,
         "EmberweaverVenomHex",
-        130
+        150
     ))
     check(
         started.SourceSkillId == 1168
             and started.SourceRank == 3
-            and started.LaunchAt == 134
-            and started.ReuseReadyAt == 139
+            and started.LaunchAt == 154
+            and started.ReuseReadyAt == 159
             and started.SourceCastRange == 600
             and started.SourceEffectRange == 1100
             and last_preflight_range == 600
-            and mana_current == 86,
+            and mana_current == 52,
         "Venom Hex crosses exact source start contract"
     )
 
     local resolved = assert(periodic:launch_if_ready(
         player,
         started.CastId,
-        134,
+        154,
         1020
     ))
     check(
         resolved.StatusResolved
             and resolved.Landed
             and last_preflight_range == 1100
-            and mana_current == 65
+            and mana_current == 31
             and status_calls == 1,
         "Venom Hex commits launch MP then reaches poison executor once"
     )
@@ -680,19 +765,19 @@ local function check_cross_family_overlap(
         player,
         enemy,
         "EmberweaverEmberBolt",
-        150
+        160
     ))
 
     local blocked, reason = periodic:begin_cast(
         player,
         enemy,
         "EmberweaverVenomHex",
-        150.1
+        160.1
     )
     check(
         blocked == nil
             and reason == "C4SourceCastAlreadyScheduled"
-            and mana_current == 59,
+            and mana_current == 25,
         "shared scheduler blocks cross-family overlap before second MP spend"
     )
 
@@ -715,6 +800,7 @@ local function main()
     last_preflight_range = nil
     magic_calls = 0
     area_magic_calls = 0
+    drain_magic_calls = 0
     last_area_radius = nil
     status_calls = 0
 
@@ -723,6 +809,7 @@ local function main()
     check_ember_bolt(direct)
     check_other_direct_spells(direct)
     check_ember_field(direct)
+    check_life_siphon(direct)
     check_venom_hex(periodic)
     check_cross_family_overlap(direct, periodic)
 
@@ -730,7 +817,7 @@ local function main()
 
     print((
         "[C4 Wizard Staged Integration] TEST_PASS_PENDING_STUDIO: "
-        .. "%d assertions direct=3 area=1 poison=1 shared_scheduler=true"
+        .. "%d assertions direct=3 area=1 drain=1 poison=1 shared_scheduler=true"
     ):format(checks))
 end
 
