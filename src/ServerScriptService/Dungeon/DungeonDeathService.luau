@@ -69,6 +69,7 @@ function DungeonDeathService.new(session_service:any, checkpoint_service:any, se
     self._paid_offer_provider=config.paid_offer_provider or function(_user_id:number) return nil end
     self._on_member_mode=config.on_member_mode or function(_user_id:number,_mode:string) end
     self._death_cframes={}; self._revive_ends_at={}
+    self._skill_resurrection_requests = {}
     self._completed_paid_revive_counts = {}
     self._on_recoverable_wipe = config.on_recoverable_wipe
     self._wipe_reset_requested = false
@@ -85,6 +86,8 @@ function DungeonDeathService:_emit(user_id:number)
         paid_offer=self._paid_offer_provider(user_id),
         wipe_ends_at=session.WipeDecisionEndsAt,
         revive_at=self._revive_ends_at[user_id],
+        skill_resurrection_offer =
+            self._skill_resurrection_requests[user_id],
     })
 end
 
@@ -160,6 +163,7 @@ function DungeonDeathService:_finish_automatic_revive(player:any)
     local member=session.Members[tostring(player.UserId)]
     if not member or member.Mode ~= "Reviving" then return end
     self._revive_ends_at[player.UserId]=nil
+    self._skill_resurrection_requests[player.UserId] = nil
     if member.Connected ~= true then
         self._sessions:set_member_mode(self._session_id,player.UserId,"Active")
         self._sessions:set_wipe_deadline(self._session_id,nil)
@@ -179,7 +183,210 @@ function DungeonDeathService:_finish_automatic_revive(player:any)
     self:_refresh_wipe_state(); self:_emit(player.UserId)
 end
 
+--[[
+Checks whether one living party member may offer skill resurrection.
+
+Args:
+    caster (any): Living server-owned party caster.
+    target (any): Dead server-owned party target.
+
+Returns:
+    (boolean, string?): Readiness or strict session-state reason.
+]]
+function DungeonDeathService:can_skill_resurrect(
+    caster: any,
+    target: any
+): (boolean, string?)
+    local session = self._sessions:get(self._session_id)
+    if not session or session.State ~= "Active" then
+        return false, "SessionNotActive"
+    end
+    if not caster or not target
+        or type(caster.UserId) ~= "number"
+        or type(target.UserId) ~= "number"
+        or caster.UserId == target.UserId
+    then
+        return false, "InvalidSkillResurrectionParticipants"
+    end
+
+    local caster_member =
+        session.Members[tostring(caster.UserId)]
+    local target_member =
+        session.Members[tostring(target.UserId)]
+    if not caster_member or not target_member then
+        return false, "NotPartyMember"
+    end
+    if caster_member.Connected ~= true
+        or caster_member.Mode ~= "Active"
+    then
+        return false, "SkillResurrectionCasterNotActive"
+    end
+    if target_member.Connected ~= true then
+        return false, "SkillResurrectionTargetDisconnected"
+    end
+    if target_member.Mode ~= "Dead"
+        and target_member.Mode ~= "Spectating"
+        and target_member.Mode ~= "Reviving"
+    then
+        return false, "SkillResurrectionTargetNotDead"
+    end
+
+    return true, nil
+end
+
+--[[
+Creates one C4-style resurrection proposal for the dead player.
+
+The source implementation asks the dead player to accept. This method only
+records that server-owned proposal; it never revives on cast completion.
+
+Args:
+    caster (any): Living party caster.
+    target (any): Dead party target.
+    restore_experience_power (number): Exact source Resurrection power.
+
+Returns:
+    any: Operation result containing the accepted proposal metadata.
+]]
+function DungeonDeathService:request_skill_resurrection(
+    caster: any,
+    target: any,
+    restore_experience_power: number
+): any
+    local ready, reason = self:can_skill_resurrect(
+        caster,
+        target
+    )
+    if not ready then
+        return operation(false, reason)
+    end
+    if type(restore_experience_power) ~= "number"
+        or restore_experience_power < 0
+        or restore_experience_power ~= restore_experience_power
+    then
+        return operation(false, "InvalidSkillResurrectionPower")
+    end
+
+    local user_id = target.UserId
+    if self._skill_resurrection_requests[user_id] then
+        return operation(false, "SkillResurrectionAlreadyOffered")
+    end
+
+    local offer = {
+        caster_user_id = caster.UserId,
+        restore_experience_power = restore_experience_power,
+    }
+    self._skill_resurrection_requests[user_id] = offer
+    self:_emit(user_id)
+
+    return operation(true, nil, {
+        offer = offer,
+    })
+end
+
+--[[
+Declines and clears one pending skill-resurrection proposal.
+
+Args:
+    target (any): Dead player declining the current proposal.
+
+Returns:
+    any: Operation result indicating whether an offer existed.
+]]
+function DungeonDeathService:decline_skill_resurrection(
+    target: any
+): any
+    if not target or type(target.UserId) ~= "number" then
+        return operation(false, "InvalidSkillResurrectionTarget")
+    end
+
+    local user_id = target.UserId
+    if not self._skill_resurrection_requests[user_id] then
+        return operation(false, "SkillResurrectionOfferMissing")
+    end
+
+    self._skill_resurrection_requests[user_id] = nil
+    self:_emit(user_id)
+    return operation(true, nil)
+end
+
+--[[
+Accepts one pending skill resurrection at the recorded death location.
+
+The game has no C4 death-XP penalty yet, so source Resurrection power is
+retained as evidence rather than fabricating an XP refund. The normal Dungeon
+spawn authority restores the character and combat resources.
+
+Args:
+    target (any): Dead player accepting their current proposal.
+
+Returns:
+    any: Operation result with source-power and spawn evidence.
+]]
+function DungeonDeathService:accept_skill_resurrection(
+    target: any
+): any
+    if not target or type(target.UserId) ~= "number" then
+        return operation(false, "InvalidSkillResurrectionTarget")
+    end
+
+    local user_id = target.UserId
+    local offer = self._skill_resurrection_requests[user_id]
+    if not offer then
+        return operation(false, "SkillResurrectionOfferMissing")
+    end
+
+    local session = self._sessions:get(self._session_id)
+    local member = session
+        and session.Members[tostring(user_id)]
+    if not session or session.State ~= "Active"
+        or not member
+        or member.Connected ~= true
+        or member.Mode == "Active"
+    then
+        self._skill_resurrection_requests[user_id] = nil
+        return operation(false, "SkillResurrectionTargetUnavailable")
+    end
+
+    local target_cframe = self._death_cframes[user_id]
+    if not target_cframe then
+        local checkpoint = self._checkpoints:get_active_checkpoint()
+        target_cframe = checkpoint.CFrame
+    end
+
+    self._skill_resurrection_requests[user_id] = nil
+    self._revive_ends_at[user_id] = nil
+
+    local spawned = self._spawn_player(target, target_cframe)
+    if not spawned then
+        self:_emit(user_id)
+        return operation(false, "RespawnFailed")
+    end
+
+    local changed = self._sessions:set_member_mode(
+        self._session_id,
+        user_id,
+        "Active"
+    )
+    if not changed.ok then
+        return changed
+    end
+
+    self._sessions:set_wipe_deadline(self._session_id, nil)
+    self._on_member_mode(user_id, "Active")
+    self:_refresh_wipe_state()
+    self:_emit(user_id)
+
+    return operation(true, nil, {
+        cframe = target_cframe,
+        restore_experience_power =
+            offer.restore_experience_power,
+        caster_user_id = offer.caster_user_id,
+    })
+end
+
 function DungeonDeathService:on_player_died(player:any, death_cframe:CFrame):any
+    self._skill_resurrection_requests[player.UserId] = nil
     local session=self._sessions:get(self._session_id)
     if not session or session.State ~= "Active" then return operation(false,"SessionNotActive") end
     local member=session.Members[tostring(player.UserId)]; if not member then return operation(false,"NotMember") end
@@ -224,6 +431,7 @@ function DungeonDeathService:complete_paid_revive(player: any): any
         return operation(false, "SessionNotActive")
     end
 
+    self._skill_resurrection_requests[player.UserId] = nil
     local member = session.Members[tostring(player.UserId)]
     if not member then
         return operation(false, "NotMember")
