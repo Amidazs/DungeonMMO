@@ -3208,6 +3208,85 @@ function C4SourceCombatCalculationService.heal_skill(
 end
 
 --[[
+Resolves one reviewed C4 MANARECHARGE cast on a friendly player target.
+
+The source recharge handler restores authored power multiplied by the target's
+server-owned RECHARGE_MP_RATE. Spiritshot state is consumed once by the cast
+but does not multiply the restored MP.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    target_user_id (number): Authenticated friendly target.
+    creative_skill_id (string): Server-selected recharge skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact source recharge result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.mana_recharge_skill(
+    caster_user_id: number,
+    target_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local target, target_reason = source_boundary(target_user_id)
+    if not target then
+        return nil, target_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "MANARECHARGE"
+        or sets.target ~= "TARGET_ONE"
+        or type(sets.power) ~= "number"
+        or sets.power < 0
+    then
+        return nil, "UnsupportedOriginalManaRechargeSkill"
+    end
+
+    local recharge_rate =
+        target.SourceStatCandidate.RECHARGE_MP_RATE
+    if type(recharge_rate) ~= "number"
+        or recharge_rate ~= recharge_rate
+        or recharge_rate < 0
+        or recharge_rate >= math.huge
+    then
+        return nil, "OriginalRechargeMpRateUnavailable"
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "ManaRecharge",
+        Amount = sets.power * recharge_rate,
+        SourcePower = sets.power,
+        RechargeRate = recharge_rate,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 single-target support buff.
 
 The source Buff handler applies its effect rows to the target and consumes one
@@ -3723,6 +3802,8 @@ function C4SourceCombatCalculationService.capability(): any
         ResurrectionRequiresTargetAcceptance = true,
         SupportBuffCalculation = true,
         RootControlCalculation = true,
+        ManaRechargeCalculation = true,
+        ManaRechargeTargetRateIntegrated = true,
         ManaHealCalculation = true,
         CompanionSummonCalculation = true,
         CompanionHealCalculation = true,
