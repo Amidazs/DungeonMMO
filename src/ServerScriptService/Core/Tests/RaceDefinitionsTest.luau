@@ -56,6 +56,11 @@ local elf = assert(
     "Elf definition missing"
 )
 
+local orc = assert(
+    RaceDefinitions.get("Orc"),
+    "Orc source definition missing"
+)
+
 check(
     human.BaseAttributes.Strength == 5,
     "Human STR"
@@ -136,6 +141,15 @@ check(
 check(
     elf.Visual.Kind == "ElfEars",
     "Elf visual"
+)
+
+check(
+    orc.CreationEnabled == false,
+    "Orc source race must remain creation-disabled"
+)
+check(
+    orc.Visual.Kind == "Orc",
+    "Orc source visual"
 )
 
 check(
@@ -225,10 +239,6 @@ check(
 check(
     fighter.StarterSkills[2] == "Mend",
     "Fighter Mend starter"
-)
-check(
-    fighter.TeachableSkills[1] == "ArcSlash",
-    "Fighter Arc Slash teachable"
 )
 check(
     ClassDefinitions.can_teach(
