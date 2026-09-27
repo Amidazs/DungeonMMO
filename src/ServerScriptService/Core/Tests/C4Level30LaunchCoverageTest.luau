@@ -366,16 +366,41 @@ local function main()
         "Gearwright maps all 50 Artisan rows without enabling Dwarf creation"
     )
 
+    local scavenger =
+        assert(Coverage.for_branch("DwarfScavenger"))
+    check(
+        scavenger.SourceClass == "Scavenger"
+            and scavenger.CurrentCareerId == "Deepclaimer"
+            and scavenger.SourceInventoryAuditedThroughCap
+            and scavenger.SourceRankEntriesThroughCap == 49
+            and scavenger.SourceRankEntriesByLevel[20] == 14
+            and scavenger.SourceRankEntriesByLevel[24] == 12
+            and scavenger.SourceRankEntriesByLevel[28] == 23
+            and #scavenger.SourceBrackets == 3
+            and scavenger.SourceBrackets[1] == 20
+            and scavenger.SourceBrackets[2] == 24
+            and scavenger.SourceBrackets[3] == 28,
+        "Scavenger retains exact class-54 launch source inventory"
+    )
+    check(
+        scavenger.TrainerMappedRankEntries == 49
+            and scavenger.MissingRankScheduleEntries == 0
+            and scavenger.SourceRankScheduleMapped
+            and scavenger.Status
+                == "RankScheduleMappedEffectsPending",
+        "Deepclaimer maps all 49 Scavenger rows without enabling Dwarf creation"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 17,
-        "Exactly seventeen first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 18,
+        "All eighteen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 17,
-        "Seventeen first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 18,
+        "All eighteen first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
