@@ -71,6 +71,24 @@ local function is_learnable(
 end
 
 --[[
+Checks whether a reviewed source weapon contributes equipped stat functions.
+
+C4 class fists are returned as weapon identity when the paperdoll right hand
+is empty, but their XML stat functions are never attached by ListenerStats.
+
+Args:
+    resolved (any): Reviewed source paperdoll resolution.
+
+Returns:
+    boolean: True only for an actually equipped stat-bearing weapon.
+]]
+local function has_equipped_weapon_stats(resolved: any): boolean
+    local weapon = resolved.Items.Weapon
+
+    return weapon ~= nil and weapon.VirtualFist ~= true
+end
+
+--[[
 Uses exactly the source-defined naked stats as passive calculator inputs.
 
 No item additive stats, enchantments or active buff results are guessed.
@@ -239,7 +257,7 @@ function C4UnifiedStatReference.get_with_source_items(
     local reference = Primary.get(race_id, class_id)
     if not reference then return nil, "UnreviewedClassOrSourceRanks" end
     local naked, naked_reason = Derived.get_naked_combat(
-        race_id, class_id, level, resolved.Items.Weapon ~= nil
+        race_id, class_id, level, has_equipped_weapon_stats(resolved)
     )
     if not naked then return nil, naked_reason end
     for _, rank_id in ipairs(source_ranks) do
@@ -320,7 +338,7 @@ function C4UnifiedStatReference.get_with_source_effects(
         race_id,
         class_id,
         level,
-        resolved.Items.Weapon ~= nil
+        has_equipped_weapon_stats(resolved)
     )
     if not naked then
         return nil, naked_reason
