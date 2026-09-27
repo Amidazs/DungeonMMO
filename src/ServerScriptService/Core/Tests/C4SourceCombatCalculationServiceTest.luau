@@ -36,6 +36,7 @@ local VEILBLADE_ID = 938188
 local NIGHTWEAVER_ID = 938189
 local ORC_FIST_ID = 938190
 local ORC_WRONG_WEAPON_ID = 938191
+local SPIRITCLAW_ID = 938192
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -124,6 +125,7 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= NIGHTWEAVER_ID
         and user_id ~= ORC_FIST_ID
         and user_id ~= ORC_WRONG_WEAPON_ID
+        and user_id ~= SPIRITCLAW_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -397,6 +399,15 @@ local function seed_characters()
     orc_wrong.Equipment.Weapon = "marauder_sword"
     own_skill(orc_wrong, "OrcIronPunch", 1)
     Runtime.set_character(ORC_WRONG_WEAPON_ID, orc_wrong)
+
+    local spiritclaw = starter_character(
+        SPIRITCLAW_ID,
+        "Spiritclaw"
+    )
+    spiritclaw.Equipment.Weapon = "orc_training_fist"
+    own_skill(spiritclaw, "SpiritclawForceBurst", 6)
+    own_skill(spiritclaw, "SpiritclawCripplingPalm", 3)
+    Runtime.set_character(SPIRITCLAW_ID, spiritclaw)
 end
 
 --[[
@@ -454,6 +465,11 @@ local function check_default_off()
             and capability.ShotsIntegrated
             and capability.ShotAuthorityInstalled
             and capability.PhysicalSoulshotIntegrated
+            and capability.ChargedPhysicalDamageCalculation
+            and capability.ChargedPhysicalConsumesAfterSourceGate
+            and capability.ChargedPhysicalRemainingChargeMultiplier
+            and capability.PhysicalMovementSlowCalculation
+            and capability.PhysicalMovementSlowConsumesNoShot
             and capability.MagicSpiritshotIntegrated
             and capability.HealSpiritshotIntegrated
             and capability.PeriodicStatusCalculation
@@ -1014,6 +1030,74 @@ local function check_magic()
             and not result.LiveApplied,
         "magic provider resolves exact source Wind Strike rank"
     )
+end
+
+--[[
+Checks Spiritclaw Force Burst and Crippling Palm exact source semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms charge multiplier, shot ownership and non-magical WIT slow.
+]]
+local function check_spiritclaw_force_and_slow()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Soulshot = true
+    local burst = assert(Combat.charged_physical_skill(
+        SPIRITCLAW_ID,
+        marauder,
+        "SpiritclawForceBurst",
+        6,
+        0,
+        FRONT_CONTEXT
+    ))
+    check(
+        burst.Kind == "ChargedPhysicalDamage"
+            and burst.SourceSkillId == 54
+            and burst.SourceRank == 6
+            and burst.SourceSkillPower == 222
+            and burst.RequiredCharges == 1
+            and burst.RemainingCharges == 0
+            and burst.SourceChargeDamageMultiplier == 0.8
+            and burst.Amount > 0,
+        "Force Burst rank six preserves exact charged-damage contract"
+    )
+    check(
+        burst.Soulshot
+            and not shot_state.Soulshot,
+        "Force Burst consumes exactly one physical Soulshot"
+    )
+
+    shot_state.Soulshot = true
+    local slow = assert(Combat.physical_slow_skill(
+        SPIRITCLAW_ID,
+        marauder,
+        "SpiritclawCripplingPalm",
+        3
+    ))
+    check(
+        slow.Kind == "PhysicalMovementSlow"
+            and slow.SourceSkillId == 95
+            and slow.SourceRank == 3
+            and slow.SpeedMultiplier == 0.7
+            and math.abs(slow.SlowFraction - 0.3) <= 0.00001
+            and slow.DurationSeconds == 120
+            and slow.SaveVs == "WIT"
+            and slow.EffectPower == 80,
+        "Crippling Palm rank three preserves exact non-magical slow"
+    )
+    check(
+        shot_state.Soulshot
+            and slow.SlowRoll >= 0
+            and slow.SlowRoll <= 99
+            and slow.SlowRoll % 1 == 0
+            and slow.SlowLanded
+                == (slow.SlowRoll < slow.SlowRate),
+        "Crippling Palm owns its WIT roll without consuming a shot"
+    )
+    shot_state.Soulshot = false
 end
 
 --[[
@@ -2051,6 +2135,7 @@ local function main()
     check_shield_resolution()
     check_physical()
     check_orc_physical_weapon_condition()
+    check_spiritclaw_force_and_slow()
     check_magic()
     check_human_wizard_magic()
     check_human_wizard_neutral_magic()
@@ -2076,6 +2161,9 @@ local function main()
     Runtime.clear_character(DUSKGUARD_ID)
     Runtime.clear_character(VEILBLADE_ID)
     Runtime.clear_character(NIGHTWEAVER_ID)
+    Runtime.clear_character(ORC_FIST_ID)
+    Runtime.clear_character(ORC_WRONG_WEAPON_ID)
+    Runtime.clear_character(SPIRITCLAW_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
@@ -2085,7 +2173,8 @@ local function main()
         .. "hit=true critical=true variance=true shield=true "
         .. "normal=true vuln=true pvp=true pdamcrit=true "
         .. "magiccrit=true magicfailure=true element=true shots=true "
-        .. "status=true pdam=true mdam=true wizard=true frost=true "
+        .. "status=true pdam=true charged=true physicalslow=true "
+        .. "mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
         .. "poison_vuln=true concentration=true patk_down=true "
         .. "duskguard=true blow=true heal=true npc=true live=false"
