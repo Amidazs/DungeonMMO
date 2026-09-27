@@ -29,6 +29,8 @@ function ProfessionSelectionRules.capacity(character: any?): any
 
     if awarded and awarded.Id == "Gearwright" then
         creation = 2
+    elseif awarded and awarded.Id == "Deepclaimer" then
+        gathering = 2
     end
 
     return {
