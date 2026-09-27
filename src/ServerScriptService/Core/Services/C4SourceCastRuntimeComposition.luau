@@ -19,6 +19,9 @@ local DirectMagic = require(
 local PhysicalCast = require(
     Services.C4SourcePhysicalCastService
 )
+local ChargeService = require(
+    Services.C4SourceChargeService
+)
 local CastInterruption = require(
     Services.C4SourceCastInterruptionService
 )
@@ -128,13 +131,15 @@ function C4SourceCastRuntimeComposition.new(
     local resources = CastResources.new()
     local timing = CastTiming.new(source_shots)
     local scheduler = CastScheduler.new(resources, timing)
+    local charges = ChargeService.new()
     local direct_magic = DirectMagic.new(
         scheduler,
         source_executor
     )
     local physical_cast = PhysicalCast.new(
         scheduler,
-        source_executor
+        source_executor,
+        charges
     )
     local support_magic = SupportMagic.new(
         scheduler,
@@ -148,7 +153,10 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
-    local self_effect = SelfEffect.new(scheduler)
+    local self_effect = SelfEffect.new(
+        scheduler,
+        {Charges = charges}
+    )
     local source_toggle = SourceToggle.new()
     source_toggle:bind_runtime()
     local corpse_magic = CorpseMagic.new(
@@ -202,6 +210,7 @@ function C4SourceCastRuntimeComposition.new(
         Resources = resources,
         Timing = timing,
         Scheduler = scheduler,
+        Charges = charges,
         Interruption = interruption,
         DirectMagic = direct_magic,
         PhysicalCast = physical_cast,
@@ -241,6 +250,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     self.CompanionMagic:clear_owner(player)
     self.DuskguardCast:clear_owner(player)
     self.VeilbladeCast:clear_owner(player)
+    self.Charges:clear_owner(player)
     self.Companions:clear_owner(player, "OwnerCleared")
 
     if player and type(player.UserId) == "number" then
@@ -276,6 +286,8 @@ function C4SourceCastRuntimeComposition:capability(): any
         SourceCastResources = true,
         SourceCastTiming = true,
         SourceCastScheduler = true,
+        SourceChargeAuthority = true,
+        SourceChargeCapability = self.Charges:capability(),
         SourceCastInterruption = true,
         SourceCastInterruptionCapability =
             self.Interruption:capability(),
