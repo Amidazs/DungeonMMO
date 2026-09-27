@@ -35,30 +35,73 @@ Args:
 Returns:
     {Player}: Up to four genuine, unique and connected party members.
 ]]
-local function party_members(caster: Player): {Player}
+local function session_members(
+    caster: Player,
+    minimum_size: number
+): {Player}
     if not roster_provider or caster.Parent ~= Players then
         return {}
     end
+
     local roster = roster_provider(caster)
-    if type(roster) ~= "table" or #roster < 2
-        or #roster > MAX_TARGETS then
+    if type(roster) ~= "table"
+        or #roster < minimum_size
+        or #roster > MAX_TARGETS
+    then
         return {}
     end
+
     local members = {}
     local seen: {[number]: boolean} = {}
     local includes_caster = false
+
     for _, member in ipairs(roster) do
-        if typeof(member) ~= "Instance" or not member:IsA("Player")
+        if typeof(member) ~= "Instance"
+            or not member:IsA("Player")
             or member.Parent ~= Players
             or Players:GetPlayerByUserId(member.UserId) ~= member
-            or seen[member.UserId] then
+            or seen[member.UserId]
+        then
             return {}
         end
+
         seen[member.UserId] = true
         includes_caster = includes_caster or member == caster
         table.insert(members, member)
     end
+
     return if includes_caster then members else {}
+end
+
+--[[
+Resolves a real two-to-four-player party for group healing.
+
+Args:
+    caster (Player): Authenticated caster in the active Dungeon session.
+
+Returns:
+    {Player}: Validated party members, or an empty table when solo/invalid.
+]]
+local function party_members(caster: Player): {Player}
+    return session_members(caster, 2)
+end
+
+--[[
+Resolves source TARGET_PARTY candidates.
+
+C4 TARGET_PARTY always includes the living caster, including a solo caster,
+then adds living party members inside the source radius. Unlike the existing
+party-heal targeting rules, the source target handler does not perform a
+line-of-sight check.
+
+Args:
+    caster (Player): Authenticated source caster in the active session.
+
+Returns:
+    {Player}: One-to-four validated active session members.
+]]
+local function support_members(caster: Player): {Player}
+    return session_members(caster, 1)
 end
 
 --[[
@@ -72,6 +115,49 @@ Args:
 Returns:
     boolean: Whether this party member can receive healing right now.
 ]]
+--[[
+Checks the exact live-player subset for C4 TARGET_PARTY support effects.
+
+The source target handler includes the caster and living party members within
+radius. It does not require injury and does not perform a line-of-sight test.
+
+Args:
+    caster (Player): Living source caster.
+    target (Player): Validated active session member.
+    range_studs (number): Converted source skill radius.
+
+Returns:
+    boolean: Whether this member belongs in the current source target list.
+]]
+local function is_living_in_range(
+    caster: Player,
+    target: Player,
+    range_studs: number
+): boolean
+    local source = caster.Character
+    local character = target.Character
+    local source_humanoid = source
+        and source:FindFirstChildOfClass("Humanoid")
+    local humanoid = character
+        and character:FindFirstChildOfClass("Humanoid")
+    local source_root = source
+        and source:FindFirstChild("HumanoidRootPart")
+    local root = character
+        and character:FindFirstChild("HumanoidRootPart")
+
+    return source ~= nil
+        and character ~= nil
+        and source_humanoid ~= nil
+        and source_humanoid.Health > 0
+        and humanoid ~= nil
+        and humanoid.Health > 0
+        and source_root ~= nil
+        and source_root:IsA("BasePart")
+        and root ~= nil
+        and root:IsA("BasePart")
+        and (source_root.Position - root.Position).Magnitude <= range_studs
+end
+
 local function is_injured_in_range(
     caster: Player, target: Player, range_studs: number
 ): boolean
@@ -119,6 +205,47 @@ Args:
 Returns:
     boolean: True only for a valid party with an eligible injured member.
 ]]
+--[[
+Returns C4 TARGET_PARTY player targets using the authoritative Dungeon roster.
+
+The caster is always first when eligible, including solo sessions. Other
+members preserve the current server roster order.
+
+Args:
+    caster (Player): Authenticated source caster.
+    range_studs (number): Converted positive source radius.
+
+Returns:
+    {Player}: Living source support targets in range.
+]]
+function PartyHealService.support_targets(
+    caster: Player,
+    range_studs: number
+): {Player}
+    if type(range_studs) ~= "number" or range_studs <= 0 then
+        return {}
+    end
+
+    local eligible = {}
+    local members = support_members(caster)
+
+    if table.find(members, caster)
+        and is_living_in_range(caster, caster, range_studs)
+    then
+        table.insert(eligible, caster)
+    end
+
+    for _, member in ipairs(members) do
+        if member ~= caster
+            and is_living_in_range(caster, member, range_studs)
+        then
+            table.insert(eligible, member)
+        end
+    end
+
+    return eligible
+end
+
 function PartyHealService.has_injured_member(
     caster: Player, range_studs: number
 ): boolean
