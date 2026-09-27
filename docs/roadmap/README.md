@@ -1,15 +1,23 @@
-**v3.15 DARK ELF ASSASSIN / VEILBLADE — NIGHT CHECKPOINT:** [roadmap](
+**v3.16 DARK WIZARD SOURCE AUDIT — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_16_Dark_Wizard_Source_Audit_20260927.md)
+and [evidence](
+../testing/c4-dark-wizard-source-audit-v3-16-20260927.md).
+Pinned C4 class 39 now has an independent level-30 source inventory:
+**86 rank rows / 25 source families** at exact 20/25/30 brackets
+(**25 / 31 / 30**). The branch remains deliberately unimplemented:
+no creative career, trainer, quest, or mapped skill rows yet. Fresh Base and
+Dungeon builds pass and the focused source audit is **2/2 PASS**.
+
+**v3.15 DARK ELF ASSASSIN / VEILBLADE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md)
-and [checkpoint evidence](
+and [acceptance evidence](
 ../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
-Veilblade is mapped through level 30 at **72 source rank rows / 23 creative
-families / 0 source gaps** with exact class-35 primary stats and a dedicated
-server-owned active-skill bridge. The first Studio pass found four real
-count/compatibility regressions; those causes are fixed and fresh
-`git diff --check` plus Base/Dungeon builds pass. Final post-fix **28-suite**
-Studio acceptance and a genuine Play rehearsal remain pending because the local
-StudioMCP bridge became unstable during the last rerun attempts. Do not mark
-v3.15 green until those two gates pass.
+Veilblade is green through level 30 at **72/72 source rank rows / 23 creative
+families / 0 source gaps**, **29/29 focused Studio suites**, and a genuine
+unpublished Play rehearsal with **0 project CreatorErrors**. Final acceptance
+also added the source-faithful C4 BLOW path for Mortal Blow / Wayfinder Cut,
+including raw DEX, BLOW_RATE, positional success, separate blow damage, and
+real miss semantics.
 
 **v3.14 PALUS KNIGHT / DUSKGUARD — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md)
