@@ -15,6 +15,7 @@ local ItemDefinitions = require(
 local C4CreativeItemSourceMap = {}
 
 local LINKS = table.freeze({
+    orc_training_fist = 248,
     marauder_sword = 1,
     greenward_training_mace = 4,
     stonewatch_training_mace = 4,
