@@ -1,3 +1,35 @@
+## 28 September 2026 — v3.24 Gearwright validation pending
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_24_Gearwright_Validation_Pending_20260928.md).
+
+Gearwright backend implementation is prepared but **not yet GREEN**.
+
+Implemented/pinned:
+
+- Dwarven Fighter class 53: 15 rows / 9 families;
+- Artisan class 56: 50 rows / 14 families at 20/24/28 = 16/15/19;
+- creative first-transfer class: Gearwright;
+- exact level-30 stats: 1161 HP / 327 MP / 921 CP;
+- Gearwright 1 gathering + 2 crafting capacity;
+- blueprint ranks from Create Item 2/3;
+- shared runtime routes for Hammer Shock, Wild Sweep, Bandage and Clockwork
+  Golem;
+- Dwarven Fighter active/passive inheritance;
+- focused Studio runner:
+  `scripts/studio/c4_dwarf_artisan_backend_focus.luau`.
+
+Current source totals: **23 paths / 1370 rows / 170 source IDs** and
+**170 skills / 648 rank-effect pairs**. Launch audit is **17 / 18**.
+
+Fresh Base/Dungeon builds and diff check pass. Studio focused tests and a real
+unpublished Play rehearsal are still pending because Studio integration was
+unavailable. **Do not start Scavenger** until Gearwright passes those tests and
+is documented GREEN.
+
+Permanent source/document edits remain GitHub-only. Desktop Commander remains
+for local pull/build/Studio/Play evidence when those capabilities are exposed.
+
 ## 28 September 2026 — v3.23 Dwarf profession model accepted
 
 [Roadmap](
