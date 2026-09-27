@@ -110,8 +110,13 @@ local function test_ladder(
     check(not skills:learn_trainer_skill(user_id, skill_id).ok,
         skill_id .. " cannot be bought before level twenty")
     set_progress(profiles, user_id, skill_id, 20, 0)
-    check(skills:learn_trainer_skill(user_id, skill_id).rank == 1,
-        skill_id .. " earned rank one must be trainable")
+    local learned = skills:learn_trainer_skill(user_id, skill_id)
+    check(
+        learned.rank == 1,
+        skill_id
+            .. " earned rank one must be trainable; reason="
+            .. tostring(learned.reason)
+    )
     for rank = 2, 15 do
         local level = LEVELS[math.ceil(rank / 3)]
         set_progress(profiles, user_id, skill_id, level - 1, 560)
