@@ -258,12 +258,12 @@ local function main()
         "Shillien Oracle retains exact class-42 launch source inventory"
     )
     check(
-        shillien_oracle.TrainerMappedRankEntries == 0
-            and shillien_oracle.MissingRankScheduleEntries == 92
-            and not shillien_oracle.SourceRankScheduleMapped
+        shillien_oracle.TrainerMappedRankEntries == 92
+            and shillien_oracle.MissingRankScheduleEntries == 0
+            and shillien_oracle.SourceRankScheduleMapped
             and shillien_oracle.Status
-                == "SkillRankParityOutstanding",
-        "Duskseer foundation must still fail closed on all 92 rank rows"
+                == "RankScheduleMappedEffectsPending",
+        "Shillien Oracle rank schedule maps only through earned Duskseer"
     )
 
     local report = Coverage.report()
@@ -274,8 +274,8 @@ local function main()
         "Exactly thirteen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 12,
-        "Twelve implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 13,
+        "Thirteen implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
