@@ -9,16 +9,32 @@ local REVIEWED = table.freeze({
         SourceSkillId = 3,
         CastRange = 40,
         EffectRange = 400,
+        ExecutionKind = "SingleTarget",
     }),
     OrcIronPunch = table.freeze({
         SourceSkillId = 29,
         CastRange = 40,
         EffectRange = 400,
+        ExecutionKind = "SingleTarget",
     }),
     WarhowlCrushingBlow = table.freeze({
         SourceSkillId = 255,
         CastRange = 40,
         EffectRange = 400,
+        ExecutionKind = "SingleTarget",
+    }),
+    WarhowlSkullbreaker = table.freeze({
+        SourceSkillId = 100,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "Stun",
+    }),
+    WarhowlSweepingArc = table.freeze({
+        SourceSkillId = 245,
+        CastRange = 40,
+        EffectRange = 400,
+        SourceRadius = 150,
+        ExecutionKind = "Area",
     }),
 })
 
@@ -197,6 +213,8 @@ function C4SourcePhysicalCastService:begin_cast(
         SourceSkillId = started.SourceSkillId,
         Target = target,
         EffectRange = review.EffectRange,
+        ExecutionKind = review.ExecutionKind,
+        SourceRadius = review.SourceRadius,
     }
 
     return {
@@ -213,6 +231,8 @@ function C4SourcePhysicalCastService:begin_cast(
         SourceCastRange = started.SourceCastRange,
         SourceEffectRange = started.SourceEffectRange,
         TargetBoundServerSide = true,
+        ExecutionKind = review.ExecutionKind,
+        SourceRadius = review.SourceRadius,
         SourceOnly = true,
         ShotStateConsumed = false,
     }, nil
@@ -239,6 +259,64 @@ function C4SourcePhysicalCastService:cancel_cast(
 
     self._pending_by_owner[player] = nil
     return self._scheduler:cancel_cast(player, cast_id)
+end
+
+--[[
+Executes one reviewed physical launch through its exact source family.
+
+Args:
+    self (any): Physical bridge.
+    player (any): Server-owned attacking player.
+    record (any): Private reviewed bridge record.
+    launch (any): Scheduler-approved source launch.
+    sequence_id (number?): Existing authoritative combat sequence.
+
+Returns:
+    (any?, string?): Live physical application or strict denial reason.
+]]
+local function execute_reviewed(
+    self: any,
+    player: any,
+    record: any,
+    launch: any,
+    sequence_id: number?
+): (any?, string?)
+    if record.ExecutionKind == "Stun" then
+        if type(self._executor.physical_stun_skill_npc) ~= "function" then
+            return nil, "C4PhysicalStunExecutorUnavailable"
+        end
+
+        return self._executor:physical_stun_skill_npc(
+            player,
+            record.Target,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            sequence_id
+        )
+    end
+
+    if record.ExecutionKind == "Area" then
+        if type(self._executor.physical_area_skill_npc) ~= "function" then
+            return nil, "C4PhysicalAreaExecutorUnavailable"
+        end
+
+        return self._executor:physical_area_skill_npc(
+            player,
+            record.Target,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            record.SourceRadius,
+            sequence_id
+        )
+    end
+
+    return self._executor:physical_skill_npc(
+        player,
+        record.Target,
+        launch.CreativeSkillId,
+        launch.CreativeRank,
+        sequence_id
+    )
 end
 
 --[[
@@ -299,14 +377,13 @@ function C4SourcePhysicalCastService:launch_if_ready(
         return nil, "C4PhysicalLaunchPlanChanged"
     end
 
-    local applied, apply_reason =
-        self._executor:physical_skill_npc(
-            player,
-            record.Target,
-            launch.CreativeSkillId,
-            launch.CreativeRank,
-            sequence_id
-        )
+    local applied, apply_reason = execute_reviewed(
+        self,
+        player,
+        record,
+        launch,
+        sequence_id
+    )
     if not applied then
         return nil, apply_reason
     end
@@ -357,8 +434,10 @@ function C4SourcePhysicalCastService:capability(): any
         CurrentlyEnabled = self._enabled,
         ReviewedActiveSkillCount = count,
         SingleTargetPdam = true,
-        StunPdamPending = true,
-        TargetAreaPdamPending = true,
+        StunPdam = true,
+        TargetAreaPdam = true,
+        StunPdamPending = false,
+        TargetAreaPdamPending = false,
         ServerTargetAuthority = true,
         ClientAuthority = false,
     }
