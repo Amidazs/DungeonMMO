@@ -43,6 +43,9 @@ local PartyHealService = require(
 local NpcRoot = require(
     ServerScriptService.Combat.C4NpcRootService
 )
+local NpcFear = require(
+    ServerScriptService.Combat.C4NpcFearService
+)
 local NpcStun = require(
     ServerScriptService.Combat.C4NpcStunService
 )
@@ -232,6 +235,7 @@ function C4SourceCombatExecutor.new(options: any?): any
         _player_resurrection =
             config.PlayerResurrectionProvider,
         _npc_root = config.RootProvider or NpcRoot,
+        _npc_fear = config.FearProvider or NpcFear,
         _npc_stun = config.StunProvider or NpcStun,
         _active_source_effects =
             config.ActiveSourceEffectProvider
@@ -3911,6 +3915,99 @@ function C4SourceCombatExecutor:party_heal_skill(
 end
 
 --[[
+Executes one live C4 Fear control skill against an NPC.
+
+A resisted cast changes no NPC runtime state. A landed cast delegates the
+source movement cadence to the dedicated server Fear authority.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Reviewed creative Fear skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live Fear evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:fear_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.fear_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcFear",
+            Calculation = calculated,
+            Applied = false,
+            FearApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local caster_model = combat_model(attacker)
+    if not caster_model then
+        return nil, "C4LiveCombatCharacterUnavailable"
+    end
+    if type(self._source_units_per_stud) ~= "number"
+        or self._source_units_per_stud <= 0
+    then
+        return nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local authority = self._npc_fear
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcFearAuthorityUnavailable"
+    end
+
+    local applied, apply_reason = authority.apply(
+        enemy,
+        caster_model,
+        calculated.ActionCount,
+        calculated.ActionSeconds,
+        calculated.FleeRangeSourceUnits,
+        self._source_units_per_stud
+    )
+    if applied ~= true then
+        return nil, apply_reason or "C4NpcFearApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcFear",
+        Calculation = calculated,
+        Applied = true,
+        FearApplied = true,
+        Landed = true,
+        ActionCount = calculated.ActionCount,
+        ActionSeconds = calculated.ActionSeconds,
+        DurationSeconds = calculated.DurationSeconds,
+        FleeRangeSourceUnits =
+            calculated.FleeRangeSourceUnits,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live C4 Root control skill against an NPC.
 
 A resisted cast changes no NPC runtime state. A landed cast delegates to the
@@ -4379,6 +4476,9 @@ function C4SourceCombatExecutor:capability(): any
         NpcSleepBreaksOnDirectDamage = true,
         NpcRootLiveApplication = true,
         NpcRootMovementOnly = true,
+        NpcFearLiveApplication = true,
+        NpcFearMovementAuthorityConfigured =
+            type(self._npc_fear) == "table",
         NpcRootBreaksOnDamage = false,
         NpcUndeadMagicLiveApplication = true,
         NpcUndeadMagicReadOnlyPreflight = true,
