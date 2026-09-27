@@ -26,6 +26,12 @@ local OrcMysticRows = require(
 local OrcShamanRows = require(
     script.Parent.C4OrcShamanSkillTreeRows
 )
+local DwarvenFighterRows = require(
+    script.Parent.C4DwarvenFighterSkillTreeRows
+)
+local DwarfArtisanRows = require(
+    script.Parent.C4DwarfArtisanSkillTreeRows
+)
 
 local SOURCE_COMMIT =
     "07f8536384e799f128d44198dd7ab23519660eea"
@@ -42,6 +48,20 @@ local L2HUB_EXPERTISE_URL =
 -- Row tuple:
 -- {skillId, skillLevel, sourceName, SP, minimumLevel, origin}
 local CLASSES = table.freeze({
+    DwarfArtisan = table.freeze({
+        ScopeId = "DwarfArtisan",
+        RaceId = "Dwarf",
+        ClassId = "Gearwright",
+        SourceClassId = 56,
+        Rows = DwarfArtisanRows,
+    }),
+    DwarvenFighter = table.freeze({
+        ScopeId = "DwarvenFighter",
+        RaceId = "Dwarf",
+        ClassId = "Fighter",
+        SourceClassId = 53,
+        Rows = DwarvenFighterRows,
+    }),
     OrcShaman = table.freeze({
         ScopeId = "OrcShaman",
         RaceId = "Orc",
@@ -1189,6 +1209,7 @@ function C4Level30SkillTreeSource.coverage(): any
         "ElvenWizard", "ElvenOracle", "PalusKnight",
         "DarkWizard", "ShillienOracle",
         "OrcRaider", "OrcMonk", "OrcShaman",
+        "DwarvenFighter", "DwarfArtisan",
         "HumanWarrior", "HumanKnight", "HumanRogue",
         "ElvenKnight", "ElvenScout",
     }) do
