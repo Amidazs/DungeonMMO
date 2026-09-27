@@ -194,6 +194,35 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local SHILLIEN_ORACLE = table.freeze({
+    AntiMagic = "DuskseerArcaneResistance",
+    QuickRecovery = "DuskseerQuickPrayer",
+    BoostMana = "DuskseerManaReservoir",
+    FastSpellCasting = "DuskseerFastCasting",
+    FastManaRecovery = "DuskseerManaRecovery",
+    RobeMastery = "DuskseerRobeTraining",
+    LightArmorMastery = "DuskseerLightArmorTraining",
+    WeaponMastery = "DuskseerWeaponTraining",
+    Heal = "DuskseerHealingLight",
+    Recharge = "DuskseerManaRecharge",
+    BattleHeal = "DuskseerBattleMend",
+    Resurrection = "DuskseerRevive",
+    GroupHeal = "DuskseerGroupMend",
+    DisruptUndead = "DuskseerExorcism",
+    MentalShield = "DuskseerMindWard",
+    Shield = "DuskseerStoneWard",
+    Empower = "DuskseerEmpower",
+    Might = "DuskseerMight",
+    Sleep = "DuskseerSlumber",
+    KissOfEva = "DuskseerBreathBlessing",
+    Focus = "DuskseerFocus",
+    Concentration = "DuskseerConcentration",
+    DryadRoot = "DuskseerRootbind",
+    WindWalk = "DuskseerWindstep",
+    WindShackle = "DuskseerWindShackle",
+    VampiricRage = "DuskseerBloodRite",
+})
+
 local DARK_WIZARD = table.freeze({
     AntiMagic = "NightweaverArcaneResistance",
     QuickRecovery = "NightweaverQuickWeave",
@@ -318,6 +347,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "ShillienOracle" then
+        return SHILLIEN_ORACLE[source_category]
     end
     if branch_id == "DarkWizard" then
         return DARK_WIZARD[source_category]
