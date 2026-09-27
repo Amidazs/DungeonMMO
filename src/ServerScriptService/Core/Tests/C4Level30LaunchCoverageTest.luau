@@ -216,12 +216,37 @@ local function main()
         "Dark Elf Assassin keeps its exact 20/24/28 source-rank schedule"
     )
 
+    local dark_wizard =
+        assert(Coverage.for_branch("DarkWizard"))
+    check(
+        dark_wizard.SourceClass == "Dark Wizard"
+            and dark_wizard.CurrentCareerId == nil
+            and dark_wizard.SourceInventoryAuditedThroughCap
+            and dark_wizard.SourceRankEntriesThroughCap == 86
+            and dark_wizard.SourceRankEntriesByLevel[20] == 25
+            and dark_wizard.SourceRankEntriesByLevel[25] == 31
+            and dark_wizard.SourceRankEntriesByLevel[30] == 30
+            and #dark_wizard.SourceBrackets == 3
+            and dark_wizard.SourceBrackets[1] == 20
+            and dark_wizard.SourceBrackets[2] == 25
+            and dark_wizard.SourceBrackets[3] == 30,
+        "Dark Wizard retains exact class-39 launch source inventory"
+    )
+    check(
+        dark_wizard.TrainerMappedRankEntries == 0
+            and dark_wizard.MissingRankScheduleEntries == 86
+            and not dark_wizard.SourceRankScheduleMapped
+            and dark_wizard.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Dark Wizard audit must not imply a playable career or trainer"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 11,
-        "Exactly eleven first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 12,
+        "Exactly twelve first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 11,
