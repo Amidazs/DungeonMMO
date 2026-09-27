@@ -489,6 +489,12 @@ function C4SourceCastSchedulerService:snapshot(player: any): any
         CastId = if record then record.CastId else nil,
         CreativeSkillId = if record
             then record.CreativeSkillId else nil,
+        SourceSkillId = if record
+            then record.SourceSkillId else nil,
+        SourceRank = if record
+            then record.SourceRank else nil,
+        InterruptAt = if record
+            then record.InterruptAt else nil,
         LaunchAt = if record then record.LaunchAt else nil,
         ReuseReadyAt = if record
             then record.ReuseReadyAt else nil,
