@@ -734,6 +734,10 @@ local function main()
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
+            and capability.SelfEffectBridge
+            and capability.SelfEffectReviewedSkillCount == 3
+            and capability.SourceToggleAuthority
+            and capability.SourceToggleReviewedSkillCount == 2
             and capability.CorpseMagicBridge
             and capability.CompanionAuthority
             and capability.CompanionMagicBridge
@@ -754,6 +758,8 @@ local function main()
             and not runtime.SupportMagic:is_enabled()
             and not runtime.PeriodicMagic:is_enabled()
             and not runtime.SelfMagic:is_enabled()
+            and not runtime.SelfEffect:is_enabled()
+            and not runtime.SourceToggle:is_enabled()
             and not runtime.CorpseMagic:is_enabled()
             and not runtime.CompanionMagic:is_enabled()
             and not runtime.DuskguardCast:is_enabled(),
