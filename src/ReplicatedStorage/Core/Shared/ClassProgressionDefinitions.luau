@@ -236,6 +236,17 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Nightweaver = table.freeze({
+        Id = "Nightweaver",
+        DisplayName = "Nightweaver",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"DarkElf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({}),
+    }),
+
     Veilblade = table.freeze({
         Id = "Veilblade",
         DisplayName = "Veilblade",
