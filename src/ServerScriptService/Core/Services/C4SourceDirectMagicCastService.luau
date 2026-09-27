@@ -215,6 +215,36 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "PhysicalAttackRateWeakening",
     }),
+    OrcMysticLifeDrain = table.freeze({
+        SourceSkillId = 1090,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "MagicDrain",
+    }),
+    OrcMysticDreamingSpirit = table.freeze({
+        SourceSkillId = 1097,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
+    AshspeakerLifeDrain = table.freeze({
+        SourceSkillId = 1090,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "MagicDrain",
+    }),
+    AshspeakerDreamingSpirit = table.freeze({
+        SourceSkillId = 1097,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
+    AshspeakerMadness = table.freeze({
+        SourceSkillId = 1105,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "ConfusionControl",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -254,6 +284,11 @@ local REVIEWED_SKILLS = table.freeze({
     "DuskseerSlumber",
     "DuskseerRootbind",
     "DuskseerWindShackle",
+    "OrcMysticLifeDrain",
+    "OrcMysticDreamingSpirit",
+    "AshspeakerLifeDrain",
+    "AshspeakerDreamingSpirit",
+    "AshspeakerMadness",
 })
 
 --[[
@@ -369,7 +404,8 @@ function C4SourceDirectMagicCastService.new(
             and type(
                 executor.magic_undead_skill_npc
             ) == "function"
-            and type(executor.root_skill_npc) == "function",
+            and type(executor.root_skill_npc) == "function"
+            and type(executor.confusion_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
 
@@ -742,6 +778,15 @@ local function execute_launch(
     elseif review.ExecutionKind == "PhysicalAttackRateWeakening" then
         applied, reason =
             self._executor:physical_attack_rate_weakening_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
+    elseif review.ExecutionKind == "ConfusionControl" then
+        applied, reason =
+            self._executor:confusion_skill_npc(
                 player,
                 record.Enemy,
                 launch.CreativeSkillId,
