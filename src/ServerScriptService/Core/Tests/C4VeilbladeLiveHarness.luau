@@ -632,25 +632,49 @@ local function cast_wayfinder_cut(bridge, player, enemy)
     local target_humanoid =
         assert(enemy:FindFirstChildOfClass("Humanoid"))
     local before = target_humanoid.Health
-    local result = bridge:Invoke("physical_skill", {
-        UserId = player.UserId,
-        Target = enemy,
-        SkillId = "WayfinderCut",
-        Rank = 9,
-        SequenceId = 4504,
-    })
-    assert(result.ok, tostring(result.reason))
+    local landed = nil
+
+    for attempt = 1, 12 do
+        local result = bridge:Invoke("physical_skill", {
+            UserId = player.UserId,
+            Target = enemy,
+            SkillId = "WayfinderCut",
+            Rank = 9,
+            SequenceId = 4503 + attempt,
+        })
+        assert(result.ok, tostring(result.reason))
+
+        local application = result.result
+        assert(
+            application.Kind == "C4LiveNpcPhysicalSkill",
+            "Wayfinder Cut left live physical skill authority"
+        )
+
+        if application.Applied then
+            landed = application
+            break
+        end
+
+        assert(
+            application.Miss
+                and application.HealthDamage == 0
+                and target_humanoid.Health == before,
+            "failed Wayfinder Cut mutated live target health"
+        )
+    end
+
     assert(
-        result.result.Kind == "C4LiveNpcPhysicalSkill"
-            and result.result.Applied
-            and result.result.HealthDamage > 0
+        landed
+            and landed.HealthDamage > 0
             and target_humanoid.Health < before,
-        "Wayfinder Cut did not reach live physical skill authority"
+        "Wayfinder Cut never landed within bounded live attempts"
     )
 
     print(
         "[Veilblade Live] WAYFINDER_CUT_PASS damage="
-            .. tostring(result.result.HealthDamage)
+            .. tostring(landed.HealthDamage)
+            .. " chance="
+            .. tostring(landed.Calculation.BlowChancePercent)
     )
 end
 
