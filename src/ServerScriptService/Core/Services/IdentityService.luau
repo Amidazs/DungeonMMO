@@ -125,8 +125,18 @@ function IdentityService.new(profile_service: any): any
     return self
 end
 
-function IdentityService:select_race(user_id: number, race_id: string): any
-    if not RaceDefinitions.get(race_id) then return rejected("UnknownRace") end
+function IdentityService:select_race(
+    user_id: number,
+    race_id: string
+): any
+    local race = RaceDefinitions.get(race_id)
+    if not race then
+        return rejected("UnknownRace")
+    end
+    if race.CreationEnabled == false then
+        return rejected("RaceCreationDisabled")
+    end
+
     local character = self._profiles:get_character(user_id)
     if not character then return rejected("ProfileNotLoaded") end
 
