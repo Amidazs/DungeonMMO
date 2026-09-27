@@ -33,6 +33,7 @@ local MAGE_ID = 938182
 local WIZARD_ID = 938186
 local DUSKGUARD_ID = 938187
 local VEILBLADE_ID = 938188
+local NIGHTWEAVER_ID = 938189
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -118,6 +119,7 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= WIZARD_ID
         and user_id ~= DUSKGUARD_ID
         and user_id ~= VEILBLADE_ID
+        and user_id ~= NIGHTWEAVER_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -336,6 +338,17 @@ local function seed_characters()
     own_skill(veilblade, "WayfinderCut", 9)
     Runtime.set_character(VEILBLADE_ID, veilblade)
 
+    local nightweaver = starter_character(
+        NIGHTWEAVER_ID,
+        "Nightweaver"
+    )
+    own_skill(
+        nightweaver,
+        "NightweaverVenomRend",
+        2
+    )
+    Runtime.set_character(NIGHTWEAVER_ID, nightweaver)
+
     Runtime.set_character(
         TARGET_ID,
         starter_character(TARGET_ID, "Oathguard")
@@ -400,6 +413,9 @@ local function check_default_off()
             and capability.MagicFailureFormulaAvailable
             and capability.MagicFailureResolutionIntegrated
             and not capability.MagicFailuresSourceDefaultEnabled
+            and capability.PoisonVulnerabilityCalculation
+            and capability.PoisonVulnerabilityEffectSuccessIntegrated
+            and capability.PoisonVulnerabilityConsumesOneMagicShot
             and capability.ElementalResolutionIntegrated
             and capability.NeutralNonElementalMagicIntegrated
             and capability.ElementalPlayerTargetSourceStatsIntegrated
@@ -1308,6 +1324,52 @@ local function check_human_wizard_scorch_mark()
 end
 
 --[[
+Checks Nightweaver Venom Rend preserves C4 poison-vulnerability semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms MEN land roll, poison multiplier and one magic shot.
+]]
+local function check_nightweaver_venom_rend()
+    local marauder = assert(NpcSource.get("Marauder"))
+
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.poison_vulnerability_skill(
+        NIGHTWEAVER_ID,
+        marauder,
+        "NightweaverVenomRend",
+        2
+    ))
+
+    check(
+        result.Kind == "PoisonVulnerability"
+            and result.SourceSkillId == 1224
+            and result.SourceRank == 2
+            and result.VulnerabilityStat == "POISON_VULN"
+            and result.VulnerabilityMultiplier == 1.25
+            and result.DurationSeconds == 15
+            and result.SaveVs == "MEN"
+            and result.EffectPower == 80
+            and result.MagicLevel == 30,
+        "Venom Rend rank two preserves exact poison vulnerability contract"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot
+            and result.Roll >= 0
+            and result.Roll <= 99
+            and result.Roll % 1 == 0
+            and result.Landed == (result.Roll < result.Rate),
+        "Venom Rend consumes one Spiritshot and owns its MEN land roll"
+    )
+end
+
+--[[
 Checks Withering Hex preserves exact C4 physical-attack weakening semantics.
 
 Args:
@@ -1882,6 +1944,7 @@ local function main()
     check_human_wizard_life_siphon()
     check_human_wizard_slumber_hex()
     check_human_wizard_scorch_mark()
+    check_nightweaver_venom_rend()
     check_human_wizard_withering_hex()
     check_duskguard_source_families()
     check_veilblade_blow()
@@ -1896,6 +1959,7 @@ local function main()
     Runtime.clear_character(WIZARD_ID)
     Runtime.clear_character(DUSKGUARD_ID)
     Runtime.clear_character(VEILBLADE_ID)
+    Runtime.clear_character(NIGHTWEAVER_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
