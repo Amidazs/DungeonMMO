@@ -194,6 +194,34 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local DARK_WIZARD = table.freeze({
+    AntiMagic = "NightweaverArcaneResistance",
+    QuickRecovery = "NightweaverQuickWeave",
+    BoostMana = "NightweaverManaReservoir",
+    RobeMastery = "NightweaverRobeTraining",
+    WeaponMastery = "NightweaverFocusTraining",
+    HigherManaGain = "NightweaverManaChanneling",
+    Concentration = "NightweaverConcentration",
+    ServitorHeal = "NightweaverServitorHeal",
+    SummonShadow = "NightweaverShadowCompanion",
+    VampiricTouch = "NightweaverUmbralSiphon",
+    Poison = "NightweaverVenomHex",
+    AuraBurn = "NightweaverFlameBurst",
+    Twister = "NightweaverGaleBolt",
+    FlameStrike = "NightweaverEmberField",
+    IceBolt = "NightweaverFrostLance",
+    SummonSilhouette = "NightweaverSilhouetteCompanion",
+    FastSpellCasting = "NightweaverFastCasting",
+    FastManaRecovery = "NightweaverManaRecovery",
+    Sleep = "NightweaverSlumberHex",
+    ServitorRecharge = "NightweaverServitorRecharge",
+    BodyToMind = "NightweaverBloodToMana",
+    PoisonCloud = "NightweaverVenomCloud",
+    SurrenderToPoison = "NightweaverVenomRend",
+    ShadowSpark = "NightweaverShadowSpark",
+    CorpseLifeDrain = "NightweaverCorpseSiphon",
+})
+
 local DARK_ELF_ASSASSIN = table.freeze({
     Confusion = "VeilbladeMindRend",
     MortalBlow = "WayfinderCut",
@@ -290,6 +318,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "DarkWizard" then
+        return DARK_WIZARD[source_category]
     end
     if branch_id == "DarkElfAssassin" then
         return DARK_ELF_ASSASSIN[source_category]
