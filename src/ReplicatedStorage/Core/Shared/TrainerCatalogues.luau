@@ -18,6 +18,67 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    DeepclaimerTrainer = table.freeze({
+        Id = "DeepclaimerTrainer",
+        DisplayName = "Deepclaimer Training",
+        AllowedRaces = table.freeze({"Dwarf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Deepclaimer"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "DeepclaimerFieldBandage",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerHammerShock",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerRestorativeDiscipline",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerPackTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerBluntTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerFortitude",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerPolearmTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerWildSweep",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerSalvageMark",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DeepclaimerSalvageFestival",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     GearwrightTrainer = table.freeze({
         Id = "GearwrightTrainer",
         DisplayName = "Gearwright Training",
