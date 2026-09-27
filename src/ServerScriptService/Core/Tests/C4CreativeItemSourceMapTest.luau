@@ -33,6 +33,7 @@ Returns:
 ]]
 local function check_reviewed_links()
     local expected = {
+        orc_training_fist = 248,
         marauder_sword = 1,
         greenward_training_mace = 4,
         stonewatch_training_mace = 4,
@@ -73,7 +74,7 @@ local function check_reviewed_links()
     }
 
     local rows = ItemMap.all()
-    check(#rows == 27, "all twenty-seven creative equipment items are reviewed")
+    check(#rows == 28, "all twenty-eight creative equipment items are reviewed")
 
     for creative_item_id, source_item_id in pairs(expected) do
         local link, reason = ItemMap.resolve(creative_item_id)
@@ -197,7 +198,7 @@ local function main()
 
     print((
         "[C4 Creative Item Map] SOURCE_ONLY_PASS: %d assertions "
-        .. "reviewed_items=27 body_sets=8 source_legs=true live=false"
+        .. "reviewed_items=28 body_sets=8 source_legs=true live=false"
     ):format(checks))
 end
 
