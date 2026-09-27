@@ -136,9 +136,18 @@ Returns:
     nil: Prints bounded source-interruption acceptance evidence.
 ]]
 local function main()
+    local bridge_cancel_calls = 0
     local service = Interruption.new(
         FakeScheduler,
-        boundary_provider
+        boundary_provider,
+        function(_player, cast_id)
+            assert(cast_id == scheduler_state.CastId)
+            bridge_cancel_calls += 1
+            return FakeScheduler:cancel_cast(
+                _player,
+                cast_id
+            )
+        end
     )
     local player = {
         UserId = 938199,
@@ -171,8 +180,9 @@ local function main()
             and neutral.RatePercent > 42
             and neutral.RatePercent < 43
             and scheduler_state.CancelCalls == 1
+            and bridge_cancel_calls == 1
             and not scheduler_state.Pending,
-        "neutral Dark Wizard cast is cancelled by a successful C4 roll"
+        "neutral Dark Wizard cast clears the owning bridge receipt"
     )
 
     reset(true, -25)
