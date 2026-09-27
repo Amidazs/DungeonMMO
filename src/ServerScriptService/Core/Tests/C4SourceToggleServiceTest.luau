@@ -1,5 +1,5 @@
 --!strict
--- Exact Warhowl Precision/Predator C4 toggle regression.
+-- Exact Orc Relax, Soul Cry and Warhowl C4 toggle regression.
 
 local ServerScriptService = game:GetService("ServerScriptService")
 local Service = require(
@@ -48,6 +48,7 @@ local OWNER = {
 
 local skill_ranks = {
     OrcRelax = 1,
+    AshspeakerSoulCry = 1,
     WarhowlPrecisionStance = 1,
     WarhowlPredatorStance = 3,
 }
@@ -112,6 +113,16 @@ function FakeRuntime.resolve_c4_active_source_effect(
         return {
             SkillId = 226,
             Rank = 1,
+            OperateType = "TOGGLE",
+        }, nil
+    end
+
+    if skill_id == "AshspeakerSoulCry"
+        and creative_rank == 1
+    then
+        return {
+            SkillId = 1001,
+            Rank = 3,
             OperateType = "TOGGLE",
         }, nil
     end
@@ -389,6 +400,43 @@ local function main()
         "Orc Relax deactivates immediately after standing"
     )
 
+    mana = 30
+    local soul_cry = assert(service:toggle(
+        OWNER,
+        "AshspeakerSoulCry"
+    ))
+    check(
+        soul_cry.Active
+            and soul_cry.SourceSkillId == 1001
+            and soul_cry.SourceRank == 3
+            and soul_cry.InitialMpSpent == 5
+            and soul_cry.UpkeepBase == 9
+            and soul_cry.UpkeepPeriod == 3
+            and soul_cry.UpkeepKind == "FlatMana"
+            and mana == 25,
+        "Ashspeaker Soul Cry resolves exact source rank-three activation"
+    )
+
+    service:step(1)
+    service:step(1)
+    service:step(1)
+    check(
+        mana == 16
+            and service:is_active(OWNER, "AshspeakerSoulCry"),
+        "Soul Cry consumes exact flat nine MP every three seconds"
+    )
+
+    mana = 8
+    service:step(1)
+    service:step(1)
+    service:step(1)
+    check(
+        not service:is_active(OWNER, "AshspeakerSoulCry")
+            and deactivated.AshspeakerSoulCry
+            and mana == 8,
+        "Soul Cry drops before an unaffordable periodic MP charge"
+    )
+
     humanoid.Health = 100
     humanoid.Sit = false
     local before_full_hp_attempt = mana
@@ -405,7 +453,9 @@ local function main()
 
     local capability = service:capability()
     check(
-        capability.ReviewedSkillCount == 3
+        capability.ReviewedSkillCount == 5
+            and capability.OrcSoulCrySourceSkillId == 1001
+            and capability.SoulCryFlatManaUpkeep
             and capability.RelaxFixedTwoSecondUpkeep
             and capability.RelaxRequiresSittingAndMissingHp
             and capability.MpConsumePerLevelFormula
@@ -415,11 +465,11 @@ local function main()
             and capability.OwnedSourceRankAuthority
             and capability.LegacyLoadoutIndependent
             and not capability.ClientAuthority,
-        "capability reports both exact source toggle families"
+        "capability reports all reviewed Orc source toggle families"
     )
 
     print((
-        "[C4 Warhowl Toggle] PASS: %d assertions reviewed=3"
+        "[C4 Orc Toggle] PASS: %d assertions reviewed=5"
     ):format(checks))
 end
 
