@@ -149,6 +149,31 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Deepclaimer = table.freeze({
+        Id = "Deepclaimer",
+        DisplayName = "Deepclaimer",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Dwarf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "DeepclaimerFieldBandage",
+            "DeepclaimerHammerShock",
+            "DeepclaimerRestorativeDiscipline",
+            "DeepclaimerPackTraining",
+            "DeepclaimerBluntTraining",
+            "DeepclaimerFortitude",
+            "DeepclaimerRecovery",
+            "DeepclaimerPolearmTraining",
+            "DeepclaimerLightArmorTraining",
+            "DeepclaimerHeavyArmorTraining",
+            "DeepclaimerWildSweep",
+            "DeepclaimerSalvageMark",
+            "DeepclaimerSalvageFestival",
+        }),
+    }),
+
     Ashspeaker = table.freeze({
         Id = "Ashspeaker",
         DisplayName = "Ashspeaker",
