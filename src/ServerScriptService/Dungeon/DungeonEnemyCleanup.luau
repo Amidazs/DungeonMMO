@@ -13,8 +13,10 @@ local DungeonEnemyCleanup = {}
 
 local RETIRED_ATTRIBUTE = "DungeonEnemyRetired"
 local DEFAULT_DESTROY_DELAY_SECONDS = 0.15
-local BEAST_CORPSE_LIFETIME_SECONDS = 45
+local HARVEST_CORPSE_LIFETIME_SECONDS = 45
 local BEAST_TAG = "DungeonMMOSkinnableBeast"
+local SALVAGE_OWNER_ATTRIBUTE = "C4SalvageOwnerUserId"
+local SALVAGE_CLAIMED_ATTRIBUTE = "C4SalvageClaimed"
 
 -- Args:
 --   instance: Instance; part or effect to disable on a defeated enemy.
@@ -45,7 +47,7 @@ end
 --   model: Model; an enemy that just completed its server reward path.
 -- Returns:
 --   boolean: whether this enemy is a registered animal-like corpse.
-local function should_preserve_corpse(model: Model): boolean
+local function is_skinnable_corpse(model: Model): boolean
     if not CollectionService:HasTag(model, BEAST_TAG)
         or Players:GetPlayerFromCharacter(model) ~= nil
     then
@@ -58,6 +60,42 @@ local function should_preserve_corpse(model: Model): boolean
             model:GetAttribute("CreatureSpeciesId"),
             model:GetAttribute("CreatureFamily")
         )
+end
+
+--[[
+Checks whether a defeated enemy still owns unclaimed Dwarf salvage.
+
+Args:
+    model (Model): Defeated server-owned enemy.
+
+Returns:
+    boolean: True only for an owner-bound, unclaimed Spoil corpse.
+]]
+local function is_salvage_corpse(model: Model): boolean
+    if Players:GetPlayerFromCharacter(model) ~= nil then
+        return false
+    end
+
+    local humanoid = model:FindFirstChildOfClass("Humanoid")
+    local owner_user_id = model:GetAttribute(SALVAGE_OWNER_ATTRIBUTE)
+    return humanoid ~= nil
+        and humanoid.Health <= 0
+        and type(owner_user_id) == "number"
+        and owner_user_id % 1 == 0
+        and model:GetAttribute(SALVAGE_CLAIMED_ATTRIBUTE) ~= true
+end
+
+--[[
+Checks whether a defeated enemy needs a short harvest window.
+
+Args:
+    model (Model): Enemy that completed its reward path.
+
+Returns:
+    boolean: True for skinnable beasts or unclaimed spoiled corpses.
+]]
+local function should_preserve_corpse(model: Model): boolean
+    return is_skinnable_corpse(model) or is_salvage_corpse(model)
 end
 
 -- Args:
@@ -83,12 +121,13 @@ function DungeonEnemyCleanup.retire(
 
     if preserve_corpse then
         -- retire() is called only after encounter rewards succeed. A beast
-        -- can be skinned after this existing server-owned loot boundary.
+        -- may be skinned and a spoiled corpse may be Swept only after this
+        -- existing server-owned normal-loot boundary.
         model:SetAttribute("LootComplete", true)
     end
 
     local default_delay = if preserve_corpse
-        then BEAST_CORPSE_LIFETIME_SECONDS
+        then HARVEST_CORPSE_LIFETIME_SECONDS
         else DEFAULT_DESTROY_DELAY_SECONDS
     local delay_seconds = if type(destroy_delay_seconds) == "number"
         then destroy_delay_seconds
