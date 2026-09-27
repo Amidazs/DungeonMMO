@@ -1,3 +1,41 @@
+## 27 September 2026 — CURRENT v3.21 Ashspeaker GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_21_Orc_Shaman_Ashspeaker_GREEN_20260927.md);
+[green acceptance evidence](
+../testing/c4-orc-shaman-ashspeaker-v3-21-green-20260927.md).
+
+Orc Mystic -> Orc Shaman / Ashspeaker is green through level 30:
+**35/35 inherited Orc Mystic source rows**, **77/77 Orc Shaman rank rows**
+across **29 Ashspeaker first-transfer families**, exact class-50
+**869 HP / 504 MP / 436 CP**, a fresh Base/Dungeon build,
+**21/21 focused Studio suites** and a genuine unpublished Play rehearsal with
+**0 CreatorErrors**.
+
+Play proved inherited Orc Mystic magic, Skullshock, Life Drain, Fear,
+Binding Seal Root aura, Chaos Seal accuracy aura, Venom, Soul Shield,
+party chants, Life Chant, Soul Cry and full source-cutover rollback.
+The accepted run ends with `VERIFIED_PLAY_MODE_PASS`.
+
+Tracked source coverage is now **21 paths / 1305 rows /
+162 unique source skill IDs** with **162 skills / 634 rank-effect pairs**.
+Launch source audits and mapped schedules are both **16 / 18**.
+
+The remaining first-transfer branches are exactly **Dwarf Artisan** and
+**Dwarf Scavenger**. Work is intentionally halted before any Dwarf source
+audit or implementation so Dwarf progression, crafting/profession interaction
+and spoil/sweep behavior can be discussed first.
+
+A separate legacy Ranger/Rogue `C4FirstTransferTrainingTest` fixture remains
+outside this Ashspeaker acceptance and currently reports
+`IdentityIncomplete`; it did not block the 21/21 Ashspeaker package.
+
+Accepted code/test HEAD before documentation:
+`f28824bdc0f3d2b6fbdf1b1940ec17b3f78cb1c5`.
+
+No Dwarf code, main merge, publish, production DataStore mutation or animation
+edits were performed.
+
 ## 27 September 2026 — CURRENT v3.20 Spiritclaw GREEN
 
 [Roadmap](
