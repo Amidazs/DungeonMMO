@@ -253,6 +253,8 @@ function C4SourceCombatExecutor.new(options: any?): any
         _status_delay = config.DelayProvider or task.delay,
         _npc_periodic_statuses = {},
         _next_status_serial = 0,
+        _player_periodic_supports = {},
+        _next_player_support_serial = 0,
         _source_units_per_stud = nil,
         _night_provider = nil,
     }, C4SourceCombatExecutor)
@@ -3794,6 +3796,366 @@ function C4SourceCombatExecutor:support_buff_skill_target(
 end
 
 --[[
+Collects the current player subset of one C4 TARGET_PARTY support cast.
+
+The shared Dungeon session roster owns membership. C4 semantics always include
+the living caster, including solo casts, then living party members in radius.
+
+Args:
+    caster (any): Authenticated source caster.
+    source_radius (number): Exact C4 radius in source units.
+
+Returns:
+    ({any}?, number?, string?): Targets, converted radius or denial reason.
+]]
+function C4SourceCombatExecutor:_party_support_targets(
+    caster: any,
+    source_radius: number
+): ({any}?, number?, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return nil, nil, ready_reason
+    end
+    if type(source_radius) ~= "number"
+        or source_radius ~= source_radius
+        or source_radius <= 0
+        or source_radius >= math.huge
+    then
+        return nil, nil, "InvalidC4SourcePartySupportRadius"
+    end
+    if type(self._source_units_per_stud) ~= "number"
+        or self._source_units_per_stud <= 0
+    then
+        return nil, nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local provider = self._party_heal
+    if not provider
+        or type(provider.support_targets) ~= "function"
+    then
+        return nil, nil, "C4LivePartySupportAuthorityUnavailable"
+    end
+
+    local radius_studs =
+        source_radius / self._source_units_per_stud
+    local targets = provider.support_targets(
+        caster,
+        radius_studs
+    )
+    if type(targets) ~= "table" or #targets < 1 then
+        return nil, nil, "C4LivePartySupportNoEligibleTargets"
+    end
+
+    return targets, radius_studs, nil
+end
+
+--[[
+Checks whether a reviewed TARGET_PARTY support cast can start.
+
+Args:
+    caster (any): Authenticated source caster.
+    source_radius (number): Exact source radius.
+
+Returns:
+    (boolean, string?): Readiness without spending MP or a magical shot.
+]]
+function C4SourceCombatExecutor:can_party_support_skill(
+    caster: any,
+    source_radius: number
+): (boolean, string?)
+    local targets, _, reason =
+        self:_party_support_targets(caster, source_radius)
+
+    return targets ~= nil, reason
+end
+
+--[[
+Applies one reviewed C4 TARGET_PARTY timed buff to current player targets.
+
+One source calculation consumes one magical shot. The same source rank is then
+registered independently on each authoritative target.
+
+Args:
+    caster (any): Authenticated source caster.
+    creative_skill_id (string): Reviewed creative party buff.
+    creative_rank (number): Server-owned purchased rank.
+
+Returns:
+    (any?, string?): Live multi-target buff evidence or denial reason.
+]]
+function C4SourceCombatExecutor:party_buff_skill(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local calculated, combat_reason =
+        self._combat.support_buff_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.TargetMode ~= "TARGET_PARTY"
+        or type(calculated.SourceSkillRadius) ~= "number"
+    then
+        return nil, "C4PartyBuffSourceContractMismatch"
+    end
+
+    local targets, radius_studs, target_reason =
+        self:_party_support_targets(
+            caster,
+            calculated.SourceSkillRadius
+        )
+    if not targets or not radius_studs then
+        return nil, target_reason
+    end
+
+    local authority = self._active_source_effects
+    if not authority
+        or type(authority.observe_external_timed) ~= "function"
+    then
+        return nil, "C4LiveSupportBuffAuthorityUnavailable"
+    end
+
+    for _, target in ipairs(targets) do
+        local observed, observe_reason =
+            authority.observe_external_timed(
+                target,
+                creative_skill_id,
+                creative_rank,
+                calculated.SourceSkillId,
+                calculated.SourceRank,
+                calculated.DurationSeconds
+            )
+        if not observed then
+            return nil, observe_reason
+        end
+    end
+
+    return {
+        Kind = "C4LivePartyBuff",
+        Calculation = calculated,
+        Applied = true,
+        AffectedPlayers = #targets,
+        RadiusStuds = radius_studs,
+        DurationSeconds = calculated.DurationSeconds,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
+Applies the currently supported subset of one C4 TARGET_ALLY buff.
+
+DungeonMMO does not yet expose a source-authenticated clan/alliance roster.
+The C4 target handler always includes the caster, so this method applies only
+that exact safe subset and never substitutes ordinary party members.
+
+Args:
+    caster (any): Authenticated source caster.
+    creative_skill_id (string): Reviewed creative ally buff.
+    creative_rank (number): Server-owned purchased rank.
+
+Returns:
+    (any?, string?): Self-subset ally-buff evidence or denial reason.
+]]
+function C4SourceCombatExecutor:ally_buff_skill_self(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local ready, ready_reason = self:_validate_actor(caster)
+    if not ready then
+        return nil, ready_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.support_buff_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.TargetMode ~= "TARGET_ALLY" then
+        return nil, "C4AllyBuffSourceContractMismatch"
+    end
+
+    local authority = self._active_source_effects
+    if not authority
+        or type(authority.observe_external_timed) ~= "function"
+    then
+        return nil, "C4LiveSupportBuffAuthorityUnavailable"
+    end
+
+    local observed, observe_reason =
+        authority.observe_external_timed(
+            caster,
+            creative_skill_id,
+            creative_rank,
+            calculated.SourceSkillId,
+            calculated.SourceRank,
+            calculated.DurationSeconds
+        )
+    if not observed then
+        return nil, observe_reason
+    end
+
+    return {
+        Kind = "C4LiveAllyBuffSelfSubset",
+        Calculation = calculated,
+        Applied = true,
+        AffectedPlayers = 1,
+        ClanAllianceTargetsPending = true,
+        DurationSeconds = calculated.DurationSeconds,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
+Schedules the next exact C4 player HealOverTime tick.
+
+Args:
+    self (any): Live source executor.
+    record (any): Current target/source generation.
+
+Returns:
+    nil: Schedules one callback through the injectable server delay authority.
+]]
+function C4SourceCombatExecutor:_schedule_player_regen_tick(
+    record: any
+)
+    self._status_delay(record.TickSeconds, function()
+        self:_run_player_regen_tick(record)
+    end)
+end
+
+--[[
+Executes one exact C4 player HealOverTime tick.
+
+A replacement cast invalidates older callbacks by serial. The HP authority
+clamps each authored tick and ignores dead/disconnected targets.
+
+Args:
+    record (any): Current target/source generation.
+
+Returns:
+    nil: Applies one tick and reschedules while the generation is current.
+]]
+function C4SourceCombatExecutor:_run_player_regen_tick(
+    record: any
+)
+    local current =
+        self._player_periodic_supports[record.Target]
+    if current ~= record then
+        return
+    end
+
+    local target_ready =
+        self:_validate_actor(record.Target)
+    if not target_ready then
+        self._player_periodic_supports[record.Target] = nil
+        return
+    end
+
+    self._player_heal.apply_heal(
+        record.Caster,
+        record.Target,
+        record.HealPerTick,
+        record.CreativeSkillId
+    )
+
+    record.Remaining -= 1
+    if record.Remaining <= 0 then
+        self._player_periodic_supports[record.Target] = nil
+        return
+    end
+
+    self:_schedule_player_regen_tick(record)
+end
+
+--[[
+Applies one reviewed C4 TARGET_PARTY HealOverTime buff.
+
+Target enumeration occurs once at launch as in the source skill handler. Each
+target receives the exact authored tick value/count/period, with replacement
+by a later generation on the same target.
+
+Args:
+    caster (any): Authenticated source caster.
+    creative_skill_id (string): Reviewed party regeneration skill.
+    creative_rank (number): Server-owned purchased rank.
+
+Returns:
+    (any?, string?): Scheduled party-regeneration evidence or denial reason.
+]]
+function C4SourceCombatExecutor:party_regen_skill(
+    caster: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    local calculated, combat_reason =
+        self._combat.party_regen_skill(
+            caster.UserId,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local targets, radius_studs, target_reason =
+        self:_party_support_targets(
+            caster,
+            calculated.SourceSkillRadius
+        )
+    if not targets or not radius_studs then
+        return nil, target_reason
+    end
+    if not self._player_heal
+        or type(self._player_heal.apply_heal) ~= "function"
+    then
+        return nil, "C4LivePlayerHealAuthorityUnavailable"
+    end
+
+    for _, target in ipairs(targets) do
+        self._next_player_support_serial += 1
+        local record = {
+            Serial = self._next_player_support_serial,
+            Caster = caster,
+            Target = target,
+            CreativeSkillId = creative_skill_id,
+            SourceSkillId = calculated.SourceSkillId,
+            SourceRank = calculated.SourceRank,
+            HealPerTick = calculated.HealPerTick,
+            TickSeconds = calculated.TickSeconds,
+            Remaining = calculated.TickCount,
+        }
+        self._player_periodic_supports[target] = record
+        self:_schedule_player_regen_tick(record)
+    end
+
+    return {
+        Kind = "C4LivePartyRegen",
+        Calculation = calculated,
+        Applied = true,
+        Scheduled = true,
+        AffectedPlayers = #targets,
+        RadiusStuds = radius_studs,
+        HealPerTick = calculated.HealPerTick,
+        TickCount = calculated.TickCount,
+        TickSeconds = calculated.TickSeconds,
+        DurationSeconds = calculated.DurationSeconds,
+        SourceSkillId = calculated.SourceSkillId,
+        SourceRank = calculated.SourceRank,
+    }, nil
+end
+
+--[[
 Checks whether a reviewed C4 party heal currently has an eligible target.
 
 The server-owned party roster, life state, range and line-of-sight remain in
@@ -4648,6 +5010,13 @@ function C4SourceCombatExecutor:capability(): any
         SelfHealLiveApplication = true,
         TargetHealLiveApplication = true,
         PartyHealLiveApplication = true,
+        PartySupportTargetCollection = true,
+        PartyTimedBuffLiveApplication = true,
+        PartyRegenLiveApplication = true,
+        PartySupportIncludesSoloCaster = true,
+        PartySupportCompanionTargetsPending = true,
+        AllyBuffCasterSubsetLiveApplication = true,
+        AllyClanAllianceTargetsPending = true,
         PlayerResurrectionOfferLiveApplication = true,
         PlayerResurrectionRequiresTargetAcceptance = true,
         PlayerResurrectionAuthorityConfigured =
