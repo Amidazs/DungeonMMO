@@ -680,6 +680,9 @@ local function main()
             and capability.SourceCastResources
             and capability.SourceCastTiming
             and capability.SourceCastScheduler
+            and capability.SourceCastInterruption
+            and capability.SourceCastInterruptionCapability
+                .AttackCancelRateIntegrated
             and capability.DirectMagicBridge
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
@@ -698,7 +701,8 @@ local function main()
     )
 
     check(
-        not runtime.DirectMagic:is_enabled()
+        runtime.Interruption ~= nil
+            and not runtime.DirectMagic:is_enabled()
             and not runtime.SupportMagic:is_enabled()
             and not runtime.PeriodicMagic:is_enabled()
             and not runtime.SelfMagic:is_enabled()
