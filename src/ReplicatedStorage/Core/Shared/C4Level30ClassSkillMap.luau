@@ -194,6 +194,38 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local ORC_SHAMAN = table.freeze({
+    StunAttack = "AshspeakerSkullshock",
+    AntiMagic = "AshspeakerArcaneResistance",
+    QuickRecovery = "AshspeakerQuickPrayer",
+    BoostMana = "AshspeakerManaReservoir",
+    FastSpellCasting = "AshspeakerFastCasting",
+    FastManaRecovery = "AshspeakerManaRecovery",
+    WeaponMastery = "AshspeakerWeaponTraining",
+    RobeMastery = "AshspeakerRobeTraining",
+    LightArmorMastery = "AshspeakerLightArmorTraining",
+    HeavyArmorMastery = "AshspeakerHeavyArmorTraining",
+    SoulCry = "AshspeakerSoulCry",
+    ChantOfFlame = "AshspeakerFlameChant",
+    PowerOfPaagrio = "AshspeakerWarPower",
+    ChantOfFire = "AshspeakerFireChant",
+    ChantOfBattle = "AshspeakerBattleChant",
+    ChantOfShielding = "AshspeakerShieldingChant",
+    SoulShield = "AshspeakerSoulShield",
+    LifeDrain = "AshspeakerLifeDrain",
+    Fear = "AshspeakerFear",
+    Venom = "AshspeakerVenom",
+    SealOfChaos = "AshspeakerChaosSeal",
+    DreamingSpirit = "AshspeakerDreamingSpirit",
+    BlazeQuake = "AshspeakerBlazeQuake",
+    AuraSink = "AshspeakerAuraSink",
+    Madness = "AshspeakerMadness",
+    FrostFlame = "AshspeakerFrostFlame",
+    SealOfBinding = "AshspeakerBindingSeal",
+    SealOfPoison = "AshspeakerPoisonSeal",
+    ChantOfLife = "AshspeakerLifeChant",
+})
+
 local ORC_MONK = table.freeze({
     IronPunch = "SpiritclawIronFist",
     FocusForce = "SpiritclawForceFocus",
@@ -379,6 +411,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "OrcShaman" then
+        return ORC_SHAMAN[source_category]
     end
     if branch_id == "OrcMonk" then
         return ORC_MONK[source_category]
