@@ -220,7 +220,7 @@ local function main()
         assert(Coverage.for_branch("DarkWizard"))
     check(
         dark_wizard.SourceClass == "Dark Wizard"
-            and dark_wizard.CurrentCareerId == nil
+            and dark_wizard.CurrentCareerId == "Nightweaver"
             and dark_wizard.SourceInventoryAuditedThroughCap
             and dark_wizard.SourceRankEntriesThroughCap == 86
             and dark_wizard.SourceRankEntriesByLevel[20] == 25
@@ -233,12 +233,12 @@ local function main()
         "Dark Wizard retains exact class-39 launch source inventory"
     )
     check(
-        dark_wizard.TrainerMappedRankEntries == 0
-            and dark_wizard.MissingRankScheduleEntries == 86
-            and not dark_wizard.SourceRankScheduleMapped
+        dark_wizard.TrainerMappedRankEntries == 86
+            and dark_wizard.MissingRankScheduleEntries == 0
+            and dark_wizard.SourceRankScheduleMapped
             and dark_wizard.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "Dark Wizard audit must not imply a playable career or trainer"
+                == "RankScheduleMappedEffectsPending",
+        "Dark Wizard rank schedule maps only through earned Nightweaver"
     )
 
     local report = Coverage.report()
@@ -249,8 +249,8 @@ local function main()
         "Exactly twelve first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 11,
-        "Eleven implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 12,
+        "Twelve implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
