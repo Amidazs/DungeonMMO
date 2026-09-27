@@ -65,6 +65,7 @@ local PARTIAL_SOURCE_INVENTORIES = table.freeze({
     PalusKnight = "C4PalusKnightLevel30Sources",
     DarkElfAssassin = "C4DarkElfAssassinLevel30Sources",
     DarkWizard = "C4DarkWizardLevel30Sources",
+    ShillienOracle = "C4ShillienOracleLevel30Sources",
 })
 
 local function check_partial_branch(
@@ -141,8 +142,8 @@ local function main()
             end
         end
     end
-    check(total == 18 and partial == 9,
-        "Original C4 requires eighteen paths, nine currently partial")
+    check(total == 18 and partial == 10,
+        "Original C4 requires eighteen paths, ten currently partial")
     check(
         RaceDefinitions.get("DarkElf") ~= nil,
         "Implemented Dark Elf paths require the registered race"
