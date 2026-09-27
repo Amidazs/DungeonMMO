@@ -1,3 +1,33 @@
+## 27 September 2026 — v3.19 Warhowl accepted GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_19_Orc_Raider_Warhowl_GREEN_20260927.md);
+[green evidence](
+../testing/c4-orc-raider-warhowl-v3-19-green-20260927.md).
+
+Orc Fighter -> Orc Raider / Warhowl is accepted green through level 30:
+**31/31 inherited Orc Fighter source rows**, **63/63 Orc Raider rows**,
+**16 creative first-transfer families**, exact **1269 HP / 327 MP / 884 CP**,
+**20/20 focused Studio suites**, and a successful genuine unpublished Play
+rehearsal with **0 project CreatorErrors**.
+
+The accepted Play run proved inherited Orc Iron Punch, Skullbreaker,
+Crushing Blow, Sweeping Arc, Woundbind, Fury, War Roar, Precision Stance,
+Predator Stance, inherited Orc Relax and source-cutover rollback.
+
+Live acceptance fixed the remaining toggle/loadout mismatch by authenticating
+source toggles from purchased rank + exact source identity rather than the
+legacy hotbar gate. The Skullbreaker harness also now accepts genuine source
+stun resistance while still proving the exact 9-second stun contract.
+
+Continue in source order with **Orc Monk**. Start from the pinned source audit
+and do not infer class IDs or mechanics. Preserve the same fail-closed sequence:
+source inventory -> creative career -> exact rank mapping -> mechanics ->
+focused Studio -> unpublished Play -> green documentation.
+
+Permanent edits remain GitHub-only; Desktop Commander remains for local
+pull/build/Studio/Play evidence.
+
 ## 27 September 2026 — v3.18 Duskseer accepted GREEN
 
 [Roadmap](
