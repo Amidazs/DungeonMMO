@@ -23,6 +23,67 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    DwarfArtisan = table.freeze({
+        Id = "GearwrightTrial",
+        BranchId = "DwarfArtisan",
+        SourceQuestId = 418,
+        SourceTitle = "The Gearwright Trials",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "ForgekeeperBrunna",
+        Recommendation = "GearwrightPassCertificate",
+        Steps = table.freeze({
+            talk(
+                "ForgekeeperBrunna",
+                "Accept the three smiths' Gearwright trials."
+            ),
+            defeat(
+                "TunnelGnawer",
+                10,
+                "Recover ten personally earned forge-test teeth."
+            ),
+            defeat(
+                "TunnelGnawerChief",
+                2,
+                "Recover two personally earned chief teeth."
+            ),
+            talk(
+                "ForgekeeperBrunna",
+                "Present the mine trophies for the first smith test."
+            ),
+            talk(
+                "MasterSmithKelda",
+                "Begin the second smith's test."
+            ),
+            talk(
+                "SmithPerrik",
+                "Trace the component chest stolen from the forge."
+            ),
+            defeat(
+                "AshclanForgeThief",
+                1,
+                "Recover the personally earned stolen component chest."
+            ),
+            talk(
+                "SmithPerrik",
+                "Return the recovered component chest."
+            ),
+            talk(
+                "MasterSmithKelda",
+                "Complete the second smith's examination."
+            ),
+            talk(
+                "ForgekeeperBrunna",
+                "Present the final certificate and become a Gearwright."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "ForgeTestTeeth10",
+            "ForgeChiefTeeth2",
+            "StolenComponentChest",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     OrcShaman = table.freeze({
         Id = "AshspeakerTrial",
         BranchId = "OrcShaman",
@@ -594,6 +655,7 @@ Returns:
 ]]
 function SourceQuests.inventoried(): {any}
     return table.freeze({
+        QUESTS.DwarfArtisan,
         QUESTS.DarkWizard,
         QUESTS.DarkElfAssassin,
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
