@@ -70,6 +70,10 @@ local PLANS = table.freeze({
     NightweaverBloodToMana = {
         CreativeRank = 1, SourceSkillId = 1157, SourceRank = 1,
     },
+    NightweaverVenomRend = {
+        CreativeRank = 2, SourceSkillId = 1224, SourceRank = 2,
+        CastRange = 750, EffectRange = 1250,
+    },
 })
 
 local checks = 0
@@ -329,6 +333,10 @@ install_direct_method("magic_area_skill_npc", "Area")
 install_direct_method("magic_drain_skill_npc", "Drain")
 install_direct_method("sleep_skill_npc", "Sleep")
 install_direct_method("elemental_vulnerability_skill_npc", "Elemental")
+install_direct_method(
+    "poison_vulnerability_skill_npc",
+    "PoisonVulnerability"
+)
 install_direct_method("physical_attack_weakening_skill_npc", "Weakening")
 install_direct_method(
     "physical_attack_rate_weakening_skill_npc",
@@ -574,6 +582,7 @@ local function check_direct_magic()
         "NightweaverShadowSpark",
         "NightweaverUmbralSiphon",
         "NightweaverSlumberHex",
+        "NightweaverVenomRend",
     }
 
     for index, skill_id in ipairs(skills) do
@@ -744,13 +753,13 @@ local function main()
     check_utility_magic()
 
     check(
-        checks == 15,
-        "all fifteen parity-safe active families are exercised"
+        checks == 16,
+        "all sixteen reviewed active families are exercised"
     )
 
     print((
         "[C4 Nightweaver Cast Routing] PASS: %d assertions "
-            .. "safe_active_families=15 venom_rend=pending"
+            .. "reviewed_active_families=16 venom_rend=live"
     ):format(checks))
 end
 
