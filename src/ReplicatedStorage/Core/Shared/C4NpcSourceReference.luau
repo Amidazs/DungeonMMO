@@ -189,6 +189,7 @@ local function final_stats(row: any): any
         DARK_VULN = 1,
         BLEED_VULN = 1,
         POISON_VULN = 1,
+        DEBUFF_VULN = 1,
         STUN_VULN = 1,
         BOW_WPN_VULN = 1,
         BLUNT_WPN_VULN = 1,
