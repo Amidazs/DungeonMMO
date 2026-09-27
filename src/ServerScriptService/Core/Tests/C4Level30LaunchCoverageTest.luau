@@ -245,7 +245,7 @@ local function main()
         assert(Coverage.for_branch("ShillienOracle"))
     check(
         shillien_oracle.SourceClass == "Shillien Oracle"
-            and shillien_oracle.CurrentCareerId == nil
+            and shillien_oracle.CurrentCareerId == "Duskseer"
             and shillien_oracle.SourceInventoryAuditedThroughCap
             and shillien_oracle.SourceRankEntriesThroughCap == 92
             and shillien_oracle.SourceRankEntriesByLevel[20] == 26
@@ -262,8 +262,8 @@ local function main()
             and shillien_oracle.MissingRankScheduleEntries == 92
             and not shillien_oracle.SourceRankScheduleMapped
             and shillien_oracle.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "Shillien Oracle source audit must not imply a playable career"
+                == "SkillRankParityOutstanding",
+        "Duskseer foundation must still fail closed on all 92 rank rows"
     )
 
     local report = Coverage.report()
