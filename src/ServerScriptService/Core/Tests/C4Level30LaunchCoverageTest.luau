@@ -308,12 +308,12 @@ local function main()
         "Orc Monk retains exact class-47 launch source inventory"
     )
     check(
-        orc_monk.TrainerMappedRankEntries == 0
-            and orc_monk.MissingRankScheduleEntries == 41
-            and not orc_monk.SourceRankScheduleMapped
+        orc_monk.TrainerMappedRankEntries == 41
+            and orc_monk.MissingRankScheduleEntries == 0
+            and orc_monk.SourceRankScheduleMapped
             and orc_monk.Status
-                == "SkillRankParityOutstanding",
-        "Spiritclaw foundation must still fail closed on all 41 rank rows"
+                == "RankScheduleMappedEffectsPending",
+        "Orc Monk rank schedule maps only through earned Spiritclaw"
     )
 
     local report = Coverage.report()
@@ -324,8 +324,8 @@ local function main()
         "Exactly fifteen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 14,
-        "Fourteen implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 15,
+        "Fifteen implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
