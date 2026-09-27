@@ -5,6 +5,9 @@ local C4Level30SkillTreeSource = {}
 local ElvenWizardRows = require(
     script.Parent.C4ElvenWizardSkillTreeRows
 )
+local DarkWizardRows = require(
+    script.Parent.C4DarkWizardSkillTreeRows
+)
 
 local SOURCE_COMMIT =
     "07f8536384e799f128d44198dd7ab23519660eea"
@@ -21,6 +24,13 @@ local L2HUB_EXPERTISE_URL =
 -- Row tuple:
 -- {skillId, skillLevel, sourceName, SP, minimumLevel, origin}
 local CLASSES = table.freeze({
+    DarkWizard = table.freeze({
+        ScopeId = "DarkWizard",
+        RaceId = "DarkElf",
+        ClassId = "Nightweaver",
+        SourceClassId = 39,
+        Rows = DarkWizardRows,
+    }),
     HumanFighter = table.freeze({
         ScopeId = "HumanFighter",
         RaceId = "Human",
@@ -1116,7 +1126,7 @@ function C4Level30SkillTreeSource.coverage(): any
         "HumanFighter", "HumanMystic", "HumanWizard",
         "HumanCleric", "ElvenFighter", "ElvenMystic",
         "ElvenWizard", "ElvenOracle", "PalusKnight",
-        "HumanWarrior", "HumanKnight", "HumanRogue",
+        "DarkWizard", "HumanWarrior", "HumanKnight", "HumanRogue",
         "ElvenKnight", "ElvenScout",
     }) do
         local source = assert(CLASSES[scope_id])
