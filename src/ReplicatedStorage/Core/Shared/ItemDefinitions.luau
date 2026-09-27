@@ -12,6 +12,36 @@ local ELF = table.freeze({"Elf"})
 local ORC = table.freeze({"Orc"})
 
 local DEFINITIONS = table.freeze({
+    dense_mineral_shard = table.freeze({
+        Id = "dense_mineral_shard",
+        Name = "Dense Mineral Shard",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Uncommon",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+    }),
+    salvaged_mechanism_fragment = table.freeze({
+        Id = "salvaged_mechanism_fragment",
+        Name = "Salvaged Mechanism Fragment",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Uncommon",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+    }),
+    ancient_binding_fragment = table.freeze({
+        Id = "ancient_binding_fragment",
+        Name = "Ancient Binding Fragment",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+    }),
     gearwright_field_repair_kit = table.freeze({
         Id = "gearwright_field_repair_kit",
         Name = "Gearwright Field Repair Kit",
