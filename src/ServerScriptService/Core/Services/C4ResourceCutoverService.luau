@@ -262,6 +262,131 @@ local function refresh_source_record(
 end
 
 --[[
+Refreshes an active source owner after a live C4 effect changes resource stats.
+
+Unlike cutover transitions, this preserves absolute current HP. Chronicle 4
+MAX_HP buffs change the maximum without scaling existing current HP; any
+separate HealPercentage effect is then applied explicitly by its executor.
+Mana and CP retain their current fractions because this helper is currently
+used only for active effects that alter HP maximum.
+
+Args:
+    player (Player): Active authenticated source-resource owner.
+
+Returns:
+    (boolean, string?): Success or strict source/resource denial reason.
+]]
+function C4ResourceCutoverService.refresh_active_effects(
+    player: Player
+): (boolean, string?)
+    local record = active_by_user_id[player.UserId]
+
+    if not feature_enabled or not record then
+        return false, "C4ResourceCutoverInactive"
+    end
+
+    local humanoid = living_humanoid(player)
+    if not humanoid then
+        return false, "C4ResourceOwnerUnavailable"
+    end
+
+    local boundary, reason = source_boundary(player)
+    if not boundary then
+        return false, reason
+    end
+
+    local current_health = humanoid.Health
+    local mana_fraction = resource_fraction(
+        ManaService.get(player),
+        ManaService.get_max(player)
+    )
+    local cp_snapshot = CombatPoints.snapshot(player)
+    local cp_fraction = if cp_snapshot.Configured
+        then resource_fraction(
+            cp_snapshot.CurrentCP,
+            cp_snapshot.MaxCP
+        )
+        else 1
+
+    local cp_ok, cp_reason =
+        CombatPoints.configure_fraction_from_boundary(
+            player,
+            boundary,
+            cp_fraction
+        )
+    if not cp_ok then
+        return false, cp_reason
+    end
+
+    update_record_source(record, boundary)
+    record.Character = player.Character
+    ManaService.refresh_player(player, true)
+
+    humanoid.MaxHealth = math.max(1, record.MaxHealth)
+    humanoid.Health = math.min(
+        humanoid.MaxHealth,
+        current_health
+    )
+
+    local actual_mana_fraction = resource_fraction(
+        ManaService.get(player),
+        ManaService.get_max(player)
+    )
+    if math.abs(actual_mana_fraction - mana_fraction) > 0.001 then
+        return false, "C4ManaFractionActiveEffectRefreshFailed"
+    end
+
+    return true, nil
+end
+
+--[[
+Heals one active source owner by a percentage of current authoritative Max HP.
+
+Args:
+    player (Player): Active authenticated source-resource owner.
+    percent (number): Finite nonnegative percentage of current MaxHealth.
+
+Returns:
+    (any?, string?): Exact requested/effective healing evidence or denial.
+]]
+function C4ResourceCutoverService.heal_percent_max_health(
+    player: Player,
+    percent: number
+): (any?, string?)
+    if not C4ResourceCutoverService.is_active(player) then
+        return nil, "C4ResourceCutoverInactive"
+    end
+    if type(percent) ~= "number"
+        or percent ~= percent
+        or percent < 0
+        or percent >= math.huge
+    then
+        return nil, "InvalidC4PercentHeal"
+    end
+
+    local humanoid = living_humanoid(player)
+    if not humanoid then
+        return nil, "C4ResourceOwnerUnavailable"
+    end
+
+    local before = humanoid.Health
+    local requested = humanoid.MaxHealth * percent / 100
+    humanoid.Health = math.min(
+        humanoid.MaxHealth,
+        before + requested
+    )
+
+    return {
+        RequestedHeal = requested,
+        EffectiveHeal = humanoid.Health - before,
+        HealthBefore = before,
+        HealthAfter = humanoid.Health,
+        MaxHealth = humanoid.MaxHealth,
+        Percent = percent,
+    }, nil
+end
+
+--[[
 Returns the optional source-resource override for progression readers.
 
 Args:
