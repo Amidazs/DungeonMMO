@@ -240,6 +240,24 @@ local function main()
         "missing authoritative active state cannot fake interruption stats"
     )
 
+    reset(true, 0)
+    service:set_roll_provider_for_test(function()
+        return 42
+    end)
+    local injected = assert(service:try_damage_interrupt(
+        player,
+        400,
+        nil,
+        100
+    ))
+    service:set_roll_provider_for_test(nil)
+    check(
+        injected.Interrupted
+            and injected.Roll == 42
+            and scheduler_state.CancelCalls == 1,
+        "Studio-only roll provider drives the real server roll path"
+    )
+
     local capability = service:capability()
     check(
         capability.PendingSourceCastsOnly
