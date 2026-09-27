@@ -1952,6 +1952,19 @@ function C4SourceCombatExecutor:physical_skill_npc(
         return nil, combat_reason
     end
 
+    if calculated.BlowMiss == true then
+        return {
+            Kind = "C4LiveNpcPhysicalSkill",
+            Calculation = calculated,
+            Applied = false,
+            Miss = true,
+            CPAbsorbed = 0,
+            HealthDamage = 0,
+            RawDamage = 0,
+            Lethal = false,
+        }, nil
+    end
+
     local applied, apply_reason = self:_apply_npc_damage(
         attacker,
         enemy,
