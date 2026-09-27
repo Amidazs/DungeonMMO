@@ -500,7 +500,10 @@ local function rehearsal_enemy(player, name, offset)
     local enemy = Instance.new("Model")
     enemy.Name = name
     enemy:SetAttribute("DungeonEnemyArchetypeId", "Marauder")
-    enemy:SetAttribute("DungeonEncounterId", "TEMP_Ashspeaker")
+    enemy:SetAttribute(
+        "DungeonEncounterId",
+        player.Character:GetAttribute("DungeonEncounterId")
+    )
 
     local root = Instance.new("Part")
     root.Name = "HumanoidRootPart"
