@@ -1069,7 +1069,10 @@ function C4SourceCombatExecutor:_apply_npc_damage(
         self._npc_sleep.wake_on_damage(enemy)
     end
     humanoid:TakeDamage(amount)
-    local health_after = humanoid.Health
+    local health_after = math.max(0, humanoid.Health)
+    if humanoid.Health ~= health_after then
+        humanoid.Health = health_after
+    end
     local applied_damage = math.max(
         0,
         health_before - health_after
