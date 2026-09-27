@@ -3481,6 +3481,8 @@ local function resolve_periodic_target(
         then defender.SourceConBonus
         elseif plan.SaveVs == "MEN"
         then defender.SourceMenBonus
+        elseif plan.SaveVs == "WIT"
+        then defender.SourceWitBonus
         else nil
     if type(target_stat_bonus) ~= "number"
         or target_stat_bonus <= 0
@@ -3528,6 +3530,7 @@ local function resolve_periodic_target(
         TickDamage = plan.TickDamage,
         TickCount = plan.TickCount,
         TickSeconds = plan.TickSeconds,
+        ResourceKind = plan.ResourceKind,
         Nonlethal = plan.Nonlethal,
         Spiritshot = shot.Spiritshot,
         BlessedSpiritshot = shot.BlessedSpiritshot,
@@ -3716,6 +3719,8 @@ function C4SourceCombatCalculationService.status_skill(
         target_stat_bonus = defender.SourceConBonus
     elseif plan.SaveVs == "MEN" then
         target_stat_bonus = defender.SourceMenBonus
+    elseif plan.SaveVs == "WIT" then
+        target_stat_bonus = defender.SourceWitBonus
     else
         return nil, "UnsupportedOriginalPeriodicStatusSaveStat"
     end
@@ -3779,6 +3784,7 @@ function C4SourceCombatCalculationService.status_skill(
         TickDamage = plan.TickDamage,
         TickCount = plan.TickCount,
         TickSeconds = plan.TickSeconds,
+        ResourceKind = plan.ResourceKind,
         Nonlethal = plan.Nonlethal,
         Spiritshot = shot.Spiritshot,
         BlessedSpiritshot = shot.BlessedSpiritshot,
