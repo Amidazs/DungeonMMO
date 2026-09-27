@@ -368,12 +368,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 170
-        and coverage.RequiredSkillRankPairs == 648
+    check(coverage.SkillCount == 171
+        and coverage.RequiredSkillRankPairs == 651
         and not coverage.LiveCombatIntegrated,
-        "All twenty-three-path source skill/rank definitions are catalogued")
+        "All twenty-four-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=170 uniqueRankPairs=648 live=false")
+        .. "skills=171 uniqueRankPairs=651 live=false")
         :format(checks))
 end
 
