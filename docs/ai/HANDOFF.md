@@ -1,3 +1,24 @@
+## 28 September 2026 — v3.23 Dwarf profession model accepted
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_23_Dwarf_Profession_Model_Accepted_20260928.md).
+
+The owner accepted the Dwarf economy model.
+
+Locked rules:
+
+- Dwarven Fighter: 1 gathering + 1 crafting;
+- Artisan: 1 gathering + 2 crafting + Dwarven Blueprints;
+- Scavenger: 2 gathering + 1 crafting + Spoil/Sweep salvage;
+- no default 2 gathering + 2 crafting Dwarf rule.
+
+Next implementation sequence: pinned Dwarven Fighter/Artisan audit -> creative
+name/rank map -> Artisan runtime and blueprint/profession bridge -> Studio ->
+unpublished Play -> Scavenger audit/runtime -> Spoil/Sweep -> 18/18 closeout.
+
+Permanent script/document edits remain GitHub-only. Desktop Commander remains
+for local pulls, builds and Studio/Play evidence.
+
 ## 27 September 2026 — v3.22 Dwarf design discussion active
 
 [Roadmap](
