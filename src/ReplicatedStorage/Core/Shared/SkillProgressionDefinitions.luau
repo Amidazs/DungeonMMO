@@ -1099,7 +1099,9 @@ local DEFINITIONS = table.freeze({
         MaxRank = 10,
         Kind = "Passive",
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({
             [1] = 20,
             [2] = 20,
@@ -1228,7 +1230,9 @@ local DEFINITIONS = table.freeze({
         MaxRank = 1,
         Kind = "Passive",
         AllowedBaseClasses = table.freeze({"Ranger", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 20}),
         BowRangeBonusStudsPerRank = 12,
         WeaponTags = table.freeze({"Longbow"}),
@@ -1252,9 +1256,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 5,
         Kind = "Support",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 24, [3] = 28,
             [4] = 32, [5] = 36,
@@ -1272,9 +1278,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 5,
         Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 24, [3] = 28,
             [4] = 32, [5] = 36,
@@ -1302,9 +1310,11 @@ local DEFINITIONS = table.freeze({
     ScoutLungCapacity = table.freeze({
         Id = "ScoutLungCapacity",
         Tier = "Common", MaxRank = 1, Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 20}),
         OxygenSecondsBonusPerRank = 15,
         WeaponTags = table.freeze({}),
@@ -1314,9 +1324,11 @@ local DEFINITIONS = table.freeze({
     ScoutFallResistance = table.freeze({
         Id = "ScoutFallResistance",
         Tier = "Common", MaxRank = 1, Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 20}),
         FallDamageReductionPerRank = 0.40,
         WeaponTags = table.freeze({}),
@@ -1383,10 +1395,10 @@ local DEFINITIONS = table.freeze({
     WayfinderArrow = table.freeze({
         Id = "WayfinderArrow",
         Tier = "Common", MaxRank = 9, Kind = "Physical",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedFirstTransferClasses = table.freeze({
-            "Ashenblade", "GreenwardScout",
+            "Ashenblade", "GreenwardScout", "Veilblade",
         }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 20, [3] = 20,
@@ -1409,10 +1421,10 @@ local DEFINITIONS = table.freeze({
     WayfinderCut = table.freeze({
         Id = "WayfinderCut",
         Tier = "Common", MaxRank = 9, Kind = "Physical",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedFirstTransferClasses = table.freeze({
-            "Ashenblade", "GreenwardScout",
+            "Ashenblade", "GreenwardScout", "Veilblade",
         }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 20, [3] = 20,
@@ -1438,10 +1450,10 @@ local DEFINITIONS = table.freeze({
     WayfinderBowMastery = table.freeze({
         Id = "WayfinderBowMastery",
         Tier = "Common", MaxRank = 9, Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedFirstTransferClasses = table.freeze({
-            "Ashenblade", "GreenwardScout",
+            "Ashenblade", "GreenwardScout", "Veilblade",
         }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 20, [3] = 20,
@@ -1459,10 +1471,10 @@ local DEFINITIONS = table.freeze({
     WayfinderDaggerMastery = table.freeze({
         Id = "WayfinderDaggerMastery",
         Tier = "Common", MaxRank = 4, Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedFirstTransferClasses = table.freeze({
-            "Ashenblade", "GreenwardScout",
+            "Ashenblade", "GreenwardScout", "Veilblade",
         }),
         RankLevels = table.freeze({
             [1] = 20, [2] = 24, [3] = 28, [4] = 28,
@@ -1480,10 +1492,10 @@ local DEFINITIONS = table.freeze({
     WayfinderWound = table.freeze({
         Id = "WayfinderWound", Tier = "Common",
         MaxRank = 1, Kind = "Physical",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedFirstTransferClasses = table.freeze({
-            "Ashenblade", "GreenwardScout",
+            "Ashenblade", "GreenwardScout", "Veilblade",
         }),
         RankLevels = table.freeze({[1] = 24}),
         Prerequisites = table.freeze({
@@ -2308,9 +2320,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 1,
         Kind = "Support",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 24}),
         WeaponTags = table.freeze({}),
     }),
@@ -2364,9 +2378,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 1,
         Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 28}),
         MovementBonusPerRank = 0.06,
         WeaponTags = table.freeze({}),
@@ -2393,9 +2409,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 1,
         Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 24}),
         EvasionChancePerRank = 0.03,
         WeaponTags = table.freeze({}),
@@ -2405,9 +2423,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 1,
         Kind = "Passive",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 28}),
         EvasionChancePerRank = 0.025,
         WeaponTags = table.freeze({}),
@@ -2487,9 +2507,11 @@ local DEFINITIONS = table.freeze({
         Tier = "Common",
         MaxRank = 1,
         Kind = "Support",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = table.freeze({"Human", "Elf", "DarkElf"}),
         AllowedBaseClasses = table.freeze({"Ranger", "Rogue", "Fighter"}),
-        AllowedFirstTransferClasses = table.freeze({"Ashenblade", "GreenwardScout"}),
+        AllowedFirstTransferClasses = table.freeze({
+            "Ashenblade", "GreenwardScout", "Veilblade",
+        }),
         RankLevels = table.freeze({[1] = 28}),
         WeaponTags = table.freeze({}),
     }),
