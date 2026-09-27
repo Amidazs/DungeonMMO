@@ -37,6 +37,18 @@ local WEAPON_VULNERABILITY_STATS = table.freeze({
     Sword = "SWORD_WPN_VULN",
 })
 
+local SOURCE_USING_KIND_TO_ITEM_KIND = table.freeze({
+    Sword = "Sword",
+    ["Big Sword"] = "Sword",
+    Blunt = "Blunt",
+    ["Big Blunt"] = "Blunt",
+    Pole = "Polearm",
+    Fist = "Fist",
+    ["Dual Fist"] = "DualFist",
+    Bow = "Bow",
+    Dagger = "Dagger",
+})
+
 local SOURCE_COMMIT =
     "07f8536384e799f128d44198dd7ab23519660eea"
 
@@ -384,6 +396,96 @@ local function source_multiplier(
     end
 
     return value, nil
+end
+
+--[[
+Normalizes one C4 XML using-kind token to a reviewed source item kind.
+
+Args:
+    source_kind (string): Raw C4 using-kind token.
+
+Returns:
+    string?: Reviewed source item kind, or nil for an unsupported token.
+]]
+local function normalize_source_using_kind(
+    source_kind: string
+): string?
+    local trimmed = string.match(source_kind, "^%s*(.-)%s*$")
+    if not trimmed or trimmed == "" then
+        return nil
+    end
+
+    return SOURCE_USING_KIND_TO_ITEM_KIND[trimmed]
+end
+
+--[[
+Validates an active physical skill's exact C4 <using kind="..."> condition.
+
+The check uses only the authenticated source-paperdoll weapon. Missing or
+wrong equipment fails before any shot consumption or damage calculation.
+
+Args:
+    attacker (any): Authenticated source-ready attacker boundary.
+    effect (any): Exact reviewed source effect rank.
+
+Returns:
+    (any?, string?): Weapon-condition evidence or strict denial reason.
+]]
+local function source_skill_weapon_condition(
+    attacker: any,
+    effect: any
+): (any?, string?)
+    local allowed = {}
+    local source_using = nil
+
+    for _, condition in pairs(effect.Conditions or {}) do
+        if condition.Tag == "using"
+            and type(condition.kind) == "string"
+        then
+            source_using = condition.kind
+
+            for token in string.gmatch(condition.kind, "[^,]+") do
+                local item_kind =
+                    normalize_source_using_kind(token)
+
+                if not item_kind then
+                    return nil,
+                        "UnsupportedOriginalSkillWeaponCondition"
+                end
+
+                allowed[item_kind] = true
+            end
+        end
+    end
+
+    if source_using == nil then
+        return {
+            Required = false,
+            SourceUsingKind = nil,
+            SourceWeaponId = nil,
+            SourceWeaponKind = nil,
+        }, nil
+    end
+
+    local source_ids = attacker.ReviewedSourceItemIds
+    local weapon_id = type(source_ids) == "table"
+        and source_ids.Weapon or nil
+    local weapon = type(weapon_id) == "number"
+        and SourceItems.get(weapon_id) or nil
+
+    if not weapon
+        or weapon.Slot ~= "Weapon"
+        or not allowed[weapon.Kind]
+    then
+        return nil, "OriginalSkillWeaponConditionNotMet"
+    end
+
+    return {
+        Required = true,
+        SourceUsingKind = source_using,
+        SourceWeaponId = weapon_id,
+        SourceWeaponKind = weapon.Kind,
+    }, nil
 end
 
 --[[
@@ -1475,6 +1577,12 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, source_reason
     end
 
+    local weapon_condition, weapon_reason =
+        source_skill_weapon_condition(attacker, effect)
+    if not weapon_condition then
+        return nil, weapon_reason
+    end
+
     local skill_type = effect.Sets.skillType
     local is_blow = skill_type == "BLOW"
     if (skill_type ~= "PDAM" and not is_blow)
@@ -1741,6 +1849,10 @@ function C4SourceCombatCalculationService.physical_skill(
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
         SourceSkillPower = effect.Sets.power,
+        SourceWeaponConditionRequired = weapon_condition.Required,
+        SourceUsingKind = weapon_condition.SourceUsingKind,
+        SourceConditionWeaponId = weapon_condition.SourceWeaponId,
+        SourceConditionWeaponKind = weapon_condition.SourceWeaponKind,
         SourceOnly = true,
         LiveApplied = false,
     }, nil
