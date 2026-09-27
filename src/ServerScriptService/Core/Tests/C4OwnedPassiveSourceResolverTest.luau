@@ -308,6 +308,90 @@ local function check_elven_wizard_owned_passives()
 end
 
 --[[
+Checks Nightweaver owned passives resolve exact Dark Wizard source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms all nine level-30 Dark Wizard passive families.
+]]
+local function check_nightweaver_owned_passives()
+    local character = original_character(
+        "DarkElf",
+        "Nightweaver",
+        30
+    )
+    own_passive(character, "NightweaverArcaneResistance", 6)
+    own_passive(character, "NightweaverQuickWeave", 2)
+    own_passive(character, "NightweaverManaReservoir", 2)
+    own_passive(character, "NightweaverRobeTraining", 6)
+    own_passive(character, "NightweaverFocusTraining", 5)
+    own_passive(character, "NightweaverManaChanneling", 6)
+    own_passive(character, "NightweaverConcentration", 2)
+    own_passive(character, "NightweaverFastCasting", 1)
+    own_passive(character, "NightweaverManaRecovery", 1)
+
+    local result = assert(Resolver.for_character(character))
+    local arcane = assert(find_source_rank(result, 146))
+    local reuse = assert(find_source_rank(result, 164))
+    local mana = assert(find_source_rank(result, 213))
+    local robe = assert(find_source_rank(result, 234))
+    local focus = assert(find_source_rank(result, 249))
+    local mana_gain = assert(find_source_rank(result, 285))
+    local concentration = assert(find_source_rank(result, 1078))
+    local casting = assert(find_source_rank(result, 228))
+    local recovery = assert(find_source_rank(result, 229))
+
+    check(
+        result.Ready
+            and result.ScopeId == "DarkWizard"
+            and #result.SourceRanks == 9
+            and #result.UnsupportedOwnedCreativePassives == 0
+            and #result.UnresolvedOwnedPassiveRanks == 0,
+        "all owned Nightweaver passives resolve without hidden gaps"
+    )
+    check(
+        arcane.Rank == 10
+            and arcane.CreativeSkillId
+                == "NightweaverArcaneResistance"
+            and arcane.CreativeRank == 6,
+        "Arcane Resistance rank six resolves Anti Magic rank ten"
+    )
+    check(
+        reuse.Rank == 2
+            and reuse.CreativeSkillId == "NightweaverQuickWeave"
+            and mana.Rank == 2
+            and mana.CreativeSkillId == "NightweaverManaReservoir",
+        "Nightweaver reuse and mana passives preserve source ranks"
+    )
+    check(
+        robe.Rank == 6
+            and robe.CreativeSkillId == "NightweaverRobeTraining"
+            and focus.Rank == 7
+            and focus.CreativeSkillId == "NightweaverFocusTraining",
+        "Nightweaver robe and weapon training preserve source offsets"
+    )
+    check(
+        mana_gain.Rank == 6
+            and mana_gain.CreativeSkillId
+                == "NightweaverManaChanneling"
+            and concentration.Rank == 2
+            and concentration.CreativeSkillId
+                == "NightweaverConcentration",
+        "Nightweaver mana gain and concentration preserve source ranks"
+    )
+    check(
+        casting.Rank == 1
+            and casting.CreativeSkillId == "NightweaverFastCasting"
+            and recovery.Rank == 1
+            and recovery.CreativeSkillId
+                == "NightweaverManaRecovery",
+        "Nightweaver casting and mana recovery preserve source rank one"
+    )
+end
+
+--[[
 Checks Lifebinder owned passives resolve exact Elven Oracle source ranks.
 
 Args:
@@ -396,6 +480,7 @@ local function main()
     check_human_wizard_reuse_passive()
     check_human_cleric_owned_passives()
     check_elven_wizard_owned_passives()
+    check_nightweaver_owned_passives()
     check_elven_oracle_owned_passives()
     check_fail_closed_owned_state()
 
