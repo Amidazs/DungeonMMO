@@ -1,3 +1,31 @@
+## 27 September 2026 — CURRENT v3.18 Duskseer GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_18_ShIllien_Oracle_Duskseer_GREEN_20260927.md);
+[green acceptance evidence](
+../testing/c4-shillien-oracle-duskseer-v3-18-green-20260927.md).
+
+Shillien Oracle / Duskseer is green through level 30: **92/92 source rank
+rows**, **26 creative families**, zero source-map gaps, exact class-42
+**732 HP / 482 MP / 368 CP**, **18/18 fresh focused Studio suites** and a
+genuine unpublished Play rehearsal with **0 project CreatorErrors**.
+
+Play proved Wind Shackle, Greater Empower, Blood Rite/Vampiric Rage and Mana
+Recharge through the real source runtime. Blood Rite carried exact
+`ABSORB_DAMAGE_PERCENT = 6` and a live non-bow normal attack healed 2 HP.
+
+Acceptance also closed two combat defects: Vampiric Rage now applies to both
+PvP and NPC non-bow normal attacks, and NPC overkill is clamped to remaining
+health for applied-damage bookkeeping while raw source damage remains separate.
+
+Accepted code/test HEAD before documentation:
+`95204b9278b4637f380bb29d1c53ae047bd67ca4`.
+
+Next source-order backend class: **Orc Raider**. Orc remains unavailable for
+character creation until its race/class foundation is deliberately implemented.
+
+No main merge, publish, production DataStore mutation or animation edits.
+
 ## 27 September 2026 — CURRENT v3.15 Veilblade GREEN
 
 [Roadmap](
