@@ -33,6 +33,7 @@ local WEAPON_VULNERABILITY_STATS = table.freeze({
     Bow = "BOW_WPN_VULN",
     Blunt = "BLUNT_WPN_VULN",
     Dagger = "DAGGER_WPN_VULN",
+    Fist = "FIST_WPN_VULN",
     Polearm = "POLE_WPN_VULN",
     Sword = "SWORD_WPN_VULN",
 })
