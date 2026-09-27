@@ -27,6 +27,9 @@ local ShillienOracleSkills = require(
 local OrcFighterSkills = require(
     script.Parent.C4OrcFighterSkillDefinitions
 )
+local OrcMysticSkills = require(
+    script.Parent.C4OrcMysticSkillDefinitions
+)
 local OrcRaiderSkills = require(
     script.Parent.C4OrcRaiderSkillDefinitions
 )
@@ -3096,6 +3099,7 @@ function SkillProgressionDefinitions.get(
         or DarkWizardSkills.get(skill_id)
         or ShillienOracleSkills.get(skill_id)
         or OrcFighterSkills.get(skill_id)
+        or OrcMysticSkills.get(skill_id)
         or OrcRaiderSkills.get(skill_id)
         or OrcMonkSkills.get(skill_id)
         or OrcShamanSkills.get(skill_id)
@@ -3137,6 +3141,11 @@ function SkillProgressionDefinitions.all(): any
     end
     for skill_id, definition in pairs(
         OrcFighterSkills.all()
+    ) do
+        combined[skill_id] = definition
+    end
+    for skill_id, definition in pairs(
+        OrcMysticSkills.all()
     ) do
         combined[skill_id] = definition
     end
