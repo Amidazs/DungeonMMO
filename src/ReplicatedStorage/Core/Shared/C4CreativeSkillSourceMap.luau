@@ -4,6 +4,17 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    OrcFighter = table.freeze({
+        [3] = table.freeze({SkillId = "OrcPowerStrike"}),
+        [29] = table.freeze({SkillId = "OrcIronPunch"}),
+        [134] = table.freeze({SkillId = "OrcToughness"}),
+        [141] = table.freeze({SkillId = "OrcWeaponTraining"}),
+        [142] = table.freeze({SkillId = "OrcArmorTraining"}),
+        [194] = table.freeze({SkillId = "OrcLucky"}),
+        [226] = table.freeze({SkillId = "OrcRelax"}),
+        [295] = table.freeze({SkillId = "OrcIronBody"}),
+        [1322] = table.freeze({SkillId = "OrcCommonCraft"}),
+    }),
     HumanFighter = table.freeze({
         [3] = table.freeze({SkillId = "IronCleave"}),
         [16] = table.freeze({SkillId = "FighterDaggerStrike"}),
@@ -522,6 +533,9 @@ local MAPS = table.freeze({
 })
 
 local GAPS = table.freeze({
+    OrcFighter = table.freeze({
+
+    }),
     HumanFighter = table.freeze({
         [194] = "Lucky is not represented by a verified equivalent",
         [1322] = "Common Craft is not the current recipe-reading passive",
