@@ -95,13 +95,23 @@ local function main()
         ClassAdvancement = {},
     }
     local forged_capacity = SelectionRules.capacity(forged)
+    local forged_slots = SelectionRules.normalize({
+        Gathering = "Mining",
+        Gathering2 = "Skinning",
+        Creation = "Blacksmithing",
+    }, forged)
     check(
         forged_capacity.Gathering == 1
             and forged_capacity.Creation == 1,
         "forged Deepclaimer identity cannot gain extra gathering"
     )
+    check(
+        forged_slots.Gathering2 == nil,
+        "forged persisted Gathering2 slot is stripped"
+    )
 
-    local profiles = Profiles.new(ProfileAdapter.new())
+    local adapter = ProfileAdapter.new()
+    local profiles = Profiles.new(adapter)
     check(profiles:load(USER_ID), "disposable profile loads")
     check(profiles:mutate(USER_ID, function(profile: any)
         award_deepclaimer(profile.Characters.Slot1)
@@ -147,6 +157,22 @@ local function main()
     check(
         snapshot.ProfessionSlots.Gathering2 == "Skinning",
         "snapshot exposes earned second gathering slot"
+    )
+
+    check(profiles:save(USER_ID, "DeepclaimerProfessionTest"),
+        "earned Deepclaimer profession slots save")
+    local restored = Profiles.new(adapter)
+    check(restored:load(USER_ID), "earned Deepclaimer profile reloads")
+    local restored_character = assert(
+        restored:get_character(USER_ID, 1)
+    )
+    check(
+        restored_character.ProfessionSlots.Gathering == "Mining"
+            and restored_character.ProfessionSlots.Gathering2
+                == "Skinning"
+            and restored_character.ProfessionSlots.Creation
+                == "Blacksmithing",
+        "earned 2G+1C capacity survives profile reload"
     )
 
     print(
