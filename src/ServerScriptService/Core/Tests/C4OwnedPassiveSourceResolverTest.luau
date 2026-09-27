@@ -387,6 +387,85 @@ local function check_nightweaver_owned_passives()
 end
 
 --[[
+Checks Duskseer owned passives resolve exact Shillien Oracle source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms all eight level-30 Shillien Oracle passive families.
+]]
+local function check_duskseer_owned_passives()
+    local character = original_character(
+        "DarkElf",
+        "Duskseer",
+        30
+    )
+    own_passive(character, "DuskseerArcaneResistance", 6)
+    own_passive(character, "DuskseerQuickPrayer", 2)
+    own_passive(character, "DuskseerManaReservoir", 2)
+    own_passive(character, "DuskseerFastCasting", 1)
+    own_passive(character, "DuskseerManaRecovery", 1)
+    own_passive(character, "DuskseerRobeTraining", 6)
+    own_passive(character, "DuskseerLightArmorTraining", 6)
+    own_passive(character, "DuskseerWeaponTraining", 5)
+
+    local result = assert(Resolver.for_character(character))
+    local arcane = assert(find_source_rank(result, 146))
+    local reuse = assert(find_source_rank(result, 164))
+    local mana = assert(find_source_rank(result, 213))
+    local casting = assert(find_source_rank(result, 228))
+    local recovery = assert(find_source_rank(result, 229))
+    local robe = assert(find_source_rank(result, 235))
+    local light = assert(find_source_rank(result, 236))
+    local weapon = assert(find_source_rank(result, 249))
+
+    check(
+        result.Ready
+            and result.ScopeId == "ShillienOracle"
+            and #result.SourceRanks == 8
+            and #result.UnsupportedOwnedCreativePassives == 0
+            and #result.UnresolvedOwnedPassiveRanks == 0,
+        "all owned Duskseer passives resolve without hidden gaps"
+    )
+    check(
+        arcane.Rank == 10
+            and arcane.CreativeSkillId
+                == "DuskseerArcaneResistance"
+            and arcane.CreativeRank == 6,
+        "Duskseer Arcane Resistance resolves Anti Magic rank ten"
+    )
+    check(
+        reuse.Rank == 2
+            and reuse.CreativeSkillId == "DuskseerQuickPrayer"
+            and mana.Rank == 2
+            and mana.CreativeSkillId == "DuskseerManaReservoir",
+        "Duskseer reuse and mana passives preserve source ranks"
+    )
+    check(
+        casting.Rank == 1
+            and casting.CreativeSkillId == "DuskseerFastCasting"
+            and recovery.Rank == 1
+            and recovery.CreativeSkillId == "DuskseerManaRecovery",
+        "Duskseer casting and recovery preserve source rank one"
+    )
+    check(
+        robe.Rank == 6
+            and robe.CreativeSkillId == "DuskseerRobeTraining"
+            and light.Rank == 6
+            and light.CreativeSkillId
+                == "DuskseerLightArmorTraining",
+        "Duskseer robe and light armour preserve exact source ranks"
+    )
+    check(
+        weapon.Rank == 7
+            and weapon.CreativeSkillId == "DuskseerWeaponTraining"
+            and weapon.CreativeRank == 5,
+        "Duskseer Weapon Training rank five resolves source rank seven"
+    )
+end
+
+--[[
 Checks Lifebinder owned passives resolve exact Elven Oracle source ranks.
 
 Args:
@@ -476,6 +555,7 @@ local function main()
     check_human_cleric_owned_passives()
     check_elven_wizard_owned_passives()
     check_nightweaver_owned_passives()
+    check_duskseer_owned_passives()
     check_elven_oracle_owned_passives()
     check_fail_closed_owned_state()
 
