@@ -14,6 +14,10 @@ local EXPECTED = table.freeze({
         Mage = table.freeze({[1] = 7, [5] = 1,
             [7] = 15, [14] = 21}),
     }),
+    Orc = table.freeze({
+        Fighter = table.freeze({[1] = 3, [5] = 9,
+            [10] = 9, [15] = 10}),
+    }),
     Elf = table.freeze({
         Fighter = table.freeze({[1] = 2, [5] = 13,
             [10] = 13, [15] = 15}),
@@ -82,8 +86,6 @@ local function main()
                 :format(race_id, class_id, total))
         end
     end
-    check(Inventory.get("Orc", "Fighter") == nil,
-        "Unsupported race must not claim source completeness")
     print(("[C4 Base Source] PASS: %d assertions.")
         :format(assertions))
 end
