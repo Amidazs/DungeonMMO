@@ -22,13 +22,92 @@ local function defeat(
     })
 end
 
+local function spoiled_defeat(
+    monster_id: string,
+    count: number,
+    summary: string
+): any
+    return table.freeze({
+        Kind = "QuestMonsterDefeat",
+        TargetId = monster_id,
+        Required = count,
+        Summary = summary,
+        RequiresSpoil = true,
+    })
+end
+
 local QUESTS = table.freeze({
+    DwarfScavenger = table.freeze({
+        Id = "DeepclaimerTrial",
+        BranchId = "DwarfScavenger",
+        SourceQuestId = 417,
+        SourceTitle = "The Deepclaimer Trial",
+        StartLevel = 19,
+        TransferLevel = 20,
+        TransferNpcId = "SalvageMasterRuna",
+        Recommendation = "DeepclaimerRavenSeal",
+        Steps = table.freeze({
+            talk(
+                "SalvageMasterRuna",
+                "Accept the Deepclaimer salvage trial."
+            ),
+            talk(
+                "QuartermasterMion",
+                "Complete the quartermaster's rotating supply errands."
+            ),
+            talk(
+                "ProspectorToma",
+                "Begin the field salvage examination."
+            ),
+            spoiled_defeat(
+                "HoneybackBear",
+                5,
+                "Spoil five honeyback bears and recover five honey jars."
+            ),
+            talk(
+                "ProspectorToma",
+                "Present the five spoiled honey jars."
+            ),
+            spoiled_defeat(
+                "TunnelTarantula",
+                20,
+                "Spoil tunnel tarantulas and recover twenty salvage beads."
+            ),
+            talk(
+                "ProspectorToma",
+                "Present the twenty spoiled salvage beads."
+            ),
+            talk(
+                "GatekeeperRaut",
+                "Deliver the sealed salvage parcel."
+            ),
+            talk(
+                "WandererTorai",
+                "Recover the wanderer's proof token."
+            ),
+            talk(
+                "GatekeeperRaut",
+                "Return the proof token and receive the raven seal."
+            ),
+            talk(
+                "SalvageMasterRuna",
+                "Present the raven seal and become a Deepclaimer."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "QuartermasterErrands",
+            "SpoiledHoneyJars5",
+            "SpoiledSalvageBeads20",
+            "WandererProofToken",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     DwarfArtisan = table.freeze({
         Id = "GearwrightTrial",
         BranchId = "DwarfArtisan",
         SourceQuestId = 418,
         SourceTitle = "The Gearwright Trials",
-        StartLevel = 18,
+        StartLevel = 19,
         TransferLevel = 20,
         TransferNpcId = "ForgekeeperBrunna",
         Recommendation = "GearwrightPassCertificate",
@@ -655,6 +734,7 @@ Returns:
 ]]
 function SourceQuests.inventoried(): {any}
     return table.freeze({
+        QUESTS.DwarfScavenger,
         QUESTS.DwarfArtisan,
         QUESTS.DarkWizard,
         QUESTS.DarkElfAssassin,
