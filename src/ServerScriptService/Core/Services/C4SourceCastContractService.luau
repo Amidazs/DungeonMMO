@@ -215,9 +215,16 @@ function C4SourceCastContractService.resolve(
         return nil, fields_reason
     end
 
+    local current_tree, tree_reason =
+        Runtime.get_c4_source_skill_tree(user_id)
+    if not current_tree then
+        return nil, tree_reason
+    end
+
     return table.freeze({
         CreativeSkillId = creative_skill_id,
         CreativeRank = creative_rank,
+        AuthenticatedScopeId = current_tree.ScopeId,
         SourceScopeId = source.ScopeId,
         SourceSkillId = source.SkillId,
         SourceRank = source.Rank,
@@ -253,6 +260,7 @@ function C4SourceCastContractService.capability(): any
     return {
         Available = true,
         ServerOwnedPurchasedRank = true,
+        AuthenticatedCharacterScopeBound = true,
         ExactSourceMpFields = true,
         ExactSourceTimingFields = true,
         ExactSourceRangeMetadata = true,
