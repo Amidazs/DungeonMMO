@@ -54,6 +54,12 @@ local REVIEWED = table.freeze({
         EffectRange = 400,
         ExecutionKind = "Stun",
     }),
+    AshspeakerSkullshock = table.freeze({
+        SourceSkillId = 100,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "Stun",
+    }),
     WarhowlSweepingArc = table.freeze({
         SourceSkillId = 245,
         CastRange = 40,
