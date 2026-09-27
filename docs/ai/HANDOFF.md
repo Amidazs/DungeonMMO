@@ -1,3 +1,37 @@
+## 27 September 2026 — v3.21 Ashspeaker accepted GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_21_Orc_Shaman_Ashspeaker_GREEN_20260927.md);
+[green evidence](
+../testing/c4-orc-shaman-ashspeaker-v3-21-green-20260927.md).
+
+Orc Mystic -> Orc Shaman / Ashspeaker is accepted green through level 30:
+**35/35 inherited Orc Mystic rows**, **77/77 Orc Shaman rows**,
+**29 first-transfer creative families**, exact
+**869 HP / 504 MP / 436 CP**, **21/21 focused Studio suites**, and a
+successful unpublished Play rehearsal with **0 CreatorErrors**.
+
+The live run proved inherited Orc Mystic magic, Skullshock, drain/fear,
+caster-centred Binding/Chaos seals, periodic Venom, Soul Shield, party chants,
+Life Chant, Soul Cry and complete source-cutover rollback. Final marker:
+`VERIFIED_PLAY_MODE_PASS`.
+
+Aggregate accepted source coverage is **21 paths / 1305 rows /
+162 unique source IDs** with **162 skills / 634 rank-effect pairs**.
+First-transfer source audits and mapped schedules are both **16 / 18**.
+
+**STOP at the Dwarf boundary.** The only remaining first-transfer branches are
+`DwarfArtisan` and `DwarfScavenger`. Do not audit, name, map or implement
+Dwarf race/class gameplay until the user has discussed how those paths should
+interact with DungeonMMO professions/crafting, trading and spoil/sweep-style
+mechanics.
+
+A legacy Ranger/Rogue first-transfer training fixture separately reports
+`IdentityIncomplete`; it is not an Ashspeaker regression.
+
+Permanent edits remain GitHub-only. Desktop Commander remains for local
+pull/build/Studio/Play evidence.
+
 ## 27 September 2026 — v3.20 Spiritclaw accepted GREEN
 
 [Roadmap](
