@@ -32,6 +32,25 @@ local REVIEWED_PERIODIC_MAGIC = table.freeze({
         SourceRadius = 200,
         ExecutionKind = "TargetArea",
     }),
+    OrcMysticVenom = table.freeze({
+        SourceSkillId = 1095,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
+    AshspeakerVenom = table.freeze({
+        SourceSkillId = 1095,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
+    AshspeakerPoisonSeal = table.freeze({
+        SourceSkillId = 1209,
+        CastRange = 0,
+        EffectRange = 200,
+        SourceRadius = 200,
+        ExecutionKind = "TargetArea",
+    }),
 })
 
 --[[
