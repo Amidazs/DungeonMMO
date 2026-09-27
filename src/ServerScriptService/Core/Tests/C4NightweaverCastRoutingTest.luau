@@ -754,7 +754,7 @@ local function main()
 
     check(
         checks == 16,
-        "all sixteen reviewed active families are exercised"
+        "all sixteen reviewed non-support active families are exercised"
     )
 
     print((
