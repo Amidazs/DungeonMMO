@@ -67,6 +67,27 @@ local DARK_ELF_VISUAL = table.freeze({
     Kind = "DarkElf",
 })
 
+local ORC_BASE_ATTRIBUTES = table.freeze({
+    Strength = 5,
+    Dexterity = 5,
+    Vitality = 5,
+    Intellect = 5,
+    Spirit = 5,
+})
+
+local ORC_PASSIVE = table.freeze({
+    Id = "OrcSourceBaseline",
+    DisplayName = "Orc Source Baseline",
+    MaxHealthMultiplier = 1,
+    BasicAttackRateMultiplier = 1,
+    CritChanceBonus = 0,
+    CritDamageBonus = 0,
+})
+
+local ORC_VISUAL = table.freeze({
+    Kind = "Orc",
+})
+
 local DEFINITIONS = table.freeze({
     Human = table.freeze({
         Id = "Human",
@@ -88,6 +109,14 @@ local DEFINITIONS = table.freeze({
         BaseAttributes = DARK_ELF_BASE_ATTRIBUTES,
         Passive = DARK_ELF_PASSIVE,
         Visual = DARK_ELF_VISUAL,
+    }),
+    Orc = table.freeze({
+        Id = "Orc",
+        DisplayName = "Orc",
+        CreationEnabled = false,
+        BaseAttributes = ORC_BASE_ATTRIBUTES,
+        Passive = ORC_PASSIVE,
+        Visual = ORC_VISUAL,
     }),
 })
 
