@@ -2506,6 +2506,86 @@ function C4SourceCombatExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Executes one live player-to-NPC poison-vulnerability debuff.
+
+A resisted cast changes no runtime state. A landed cast applies the source
+POISON_VULN multiplier through the shared server vulnerability authority.
+
+Args:
+    attacker (any): Server-owned casting player.
+    enemy (Model): Current reviewed server NPC.
+    creative_skill_id (string): Server-selected creative debuff.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live poison-vulnerability evidence or denial reason.
+]]
+function C4SourceCombatExecutor:poison_vulnerability_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.poison_vulnerability_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    if calculated.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcPoisonVulnerability",
+            Calculation = calculated,
+            Applied = false,
+            VulnerabilityApplied = false,
+            Landed = false,
+            SequenceId = sequence_id,
+        }, nil
+    end
+
+    local authority = self._npc_elemental_vulnerability
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcPoisonVulnerabilityAuthorityUnavailable"
+    end
+
+    local applied = authority.apply(
+        enemy,
+        calculated.VulnerabilityStat,
+        calculated.VulnerabilityMultiplier,
+        calculated.DurationSeconds
+    )
+    if applied ~= true then
+        return nil, "C4NpcPoisonVulnerabilityApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcPoisonVulnerability",
+        Calculation = calculated,
+        Applied = true,
+        VulnerabilityApplied = true,
+        Landed = true,
+        VulnerabilityStat = calculated.VulnerabilityStat,
+        VulnerabilityMultiplier =
+            calculated.VulnerabilityMultiplier,
+        DurationSeconds = calculated.DurationSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one live player-to-NPC physical-attack weakening debuff.
 
 A resisted cast changes no runtime state. A landed cast delegates to the
