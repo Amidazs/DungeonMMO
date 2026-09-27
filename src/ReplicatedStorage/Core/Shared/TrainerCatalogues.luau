@@ -18,6 +18,79 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    WarhowlTrainer = table.freeze({
+        Id = "WarhowlTrainer",
+        DisplayName = "Warhowl Training",
+        AllowedRaces = table.freeze({"Orc"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Warhowl"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "WarhowlWoundbind",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlFury",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlSkullbreaker",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlWarRoar",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlEndurance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlBloodFortitude",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlPolearmTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlSweepingArc",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlCrushingBlow",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlPrecisionStance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlSteelAndStoneTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlGreatWeaponTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WarhowlPredatorStance",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     DuskseerTrainer = table.freeze({
         Id = "DuskseerTrainer",
         DisplayName = "Duskseer Training",
