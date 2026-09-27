@@ -215,6 +215,39 @@ local function check_known_vectors()
         "Shillien Oracle Vampiric Rage rank one preserves six percent"
     )
 
+    local orc_punch = assert(Effects.get_rank(29, 9))
+    check(
+        orc_punch.Sets.mpConsume == 22
+            and orc_punch.Sets.magicLvl == 14
+            and orc_punch.Sets.power == 82
+            and orc_punch.Sets.hitTime == 1604
+            and orc_punch.Sets.coolTime == 296
+            and orc_punch.Sets.reuseDelay == 15000
+            and orc_punch.Sets.skillType == "PDAM"
+            and orc_punch.Conditions[1].kind == "Fist, Dual Fist",
+        "Orc Fighter Iron Punch rank nine preserves exact source fields"
+    )
+
+    local orc_toughness = assert(Effects.get_rank(134, 1))
+    check(
+        #orc_toughness.Modifiers == 3
+            and orc_toughness.Modifiers[1].stat == "ROOT_VULN"
+            and orc_toughness.Modifiers[1].val == 0.8
+            and orc_toughness.Modifiers[2].stat == "SLEEP_VULN"
+            and orc_toughness.Modifiers[2].val == 0.8
+            and orc_toughness.Modifiers[3].stat == "POISON_VULN"
+            and orc_toughness.Modifiers[3].val == 0.8,
+        "Orc Fighter Toughness preserves three exact vulnerability modifiers"
+    )
+
+    local orc_body = assert(Effects.get_rank(295, 1))
+    check(
+        #orc_body.Modifiers == 1
+            and orc_body.Modifiers[1].stat == "FALL"
+            and orc_body.Modifiers[1].val == 0.6,
+        "Orc Fighter Iron Body preserves exact fall modifier"
+    )
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -236,12 +269,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 124
-        and coverage.RequiredSkillRankPairs == 476
+    check(coverage.SkillCount == 127
+        and coverage.RequiredSkillRankPairs == 502
         and not coverage.LiveCombatIntegrated,
-        "All sixteen-path source skill/rank definitions are catalogued")
+        "All seventeen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=124 uniqueRankPairs=476 live=false")
+        .. "skills=127 uniqueRankPairs=502 live=false")
         :format(checks))
 end
 
