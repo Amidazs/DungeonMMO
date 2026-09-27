@@ -21,6 +21,7 @@ local CAREERS = table.freeze({
     ElvenWizard = "Moonweaver",
     ElvenOracle = "Lifebinder",
     PalusKnight = "Duskguard",
+    DarkWizard = "Nightweaver",
     HumanWarrior = "Ironvow", HumanKnight = "Oathguard",
     HumanRogue = "Ashenblade",
     ElvenKnight = "GreenwardWarden",
