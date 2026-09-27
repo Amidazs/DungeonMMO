@@ -88,4 +88,67 @@ check(disguised_root.Transparency == 1
     "tagged Marauder cannot become an animal corpse or loot source")
 disguised:Destroy()
 
+
+-- Spoiled non-beasts retain a visible post-loot corpse for Sweep.
+local spoiled = Instance.new("Model")
+spoiled.Name = "SpoiledMarauderCleanupTest"
+spoiled:SetAttribute("C4SalvageOwnerUserId", 956240)
+spoiled:SetAttribute("C4SalvageClaimed", false)
+spoiled:SetAttribute("LootComplete", false)
+
+local spoiled_root = Instance.new("Part")
+spoiled_root.Name = "HumanoidRootPart"
+spoiled_root.Transparency = 0
+spoiled_root.CanCollide = true
+spoiled_root.Parent = spoiled
+spoiled.PrimaryPart = spoiled_root
+
+local spoiled_humanoid = Instance.new("Humanoid")
+spoiled_humanoid.BreakJointsOnDeath = false
+spoiled_humanoid.Parent = spoiled
+spoiled_humanoid.Health = 0
+spoiled.Parent = workspace
+
+check(
+    DungeonEnemyCleanup.retire(spoiled, 10),
+    "spoiled non-beast should enter the harvest corpse window"
+)
+check(
+    spoiled_root.Transparency == 0
+        and spoiled_root.CanCollide == false,
+    "spoiled corpse stays visible but stops blocking combat"
+)
+check(
+    spoiled:GetAttribute("LootComplete") == true,
+    "normal encounter reward boundary completes before Sweep window"
+)
+spoiled:Destroy()
+
+-- A corpse already Swept has no reason to receive extended retention.
+local swept = Instance.new("Model")
+swept.Name = "SweptMarauderCleanupTest"
+swept:SetAttribute("C4SalvageOwnerUserId", 956240)
+swept:SetAttribute("C4SalvageClaimed", true)
+
+local swept_root = Instance.new("Part")
+swept_root.Name = "HumanoidRootPart"
+swept_root.Transparency = 0
+swept_root.Parent = swept
+
+local swept_humanoid = Instance.new("Humanoid")
+swept_humanoid.Parent = swept
+swept_humanoid.Health = 0
+swept.Parent = workspace
+
+check(
+    DungeonEnemyCleanup.retire(swept, 10),
+    "already Swept enemy still retires normally"
+)
+check(
+    swept_root.Transparency == 1
+        and swept:GetAttribute("LootComplete") ~= true,
+    "claimed salvage does not extend ordinary corpse retention"
+)
+swept:Destroy()
+
 print(string.format("[Dungeon Enemy Cleanup Tests] PASS: %d assertions.", assertions))
