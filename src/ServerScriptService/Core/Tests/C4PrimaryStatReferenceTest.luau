@@ -115,6 +115,10 @@ local function check_all_templates()
         STR = 27, DEX = 24, CON = 31,
         INT = 31, WIT = 15, MEN = 42,
     }
+    local dwarf = {
+        STR = 39, DEX = 29, CON = 45,
+        INT = 20, WIT = 10, MEN = 27,
+    }
     check_template("Human", "Fighter", 0, 1, human)
     check_template("Human", "Mage", 10, 1, human_mage)
     check_template("Elf", "Fighter", 18, 1, elf)
@@ -137,6 +141,9 @@ local function check_all_templates()
     check_template("Orc", "Ashspeaker", 50, 20, orc_mage)
     check_template("Orc", "Warhowl", 45, 20, orc)
     check_template("Orc", "Spiritclaw", 47, 20, orc)
+    check_template("Dwarf", "Fighter", 53, 1, dwarf)
+    check_template("Dwarf", "Gearwright", 56, 20, dwarf)
+    check_template("Dwarf", "Deepclaimer", 54, 20, dwarf)
 end
 
 --[[
@@ -296,6 +303,21 @@ local function check_growth_vectors()
         RawHP = 1230.7695, RawMP = 327.107,
         RawCP = 617.907,
     })
+    check_vitals("Dwarf", "Fighter", 30, {
+        HP = 1014, MP = 322, CP = 680,
+        RawHP = 1014.5417, RawMP = 322.7054,
+        RawCP = 680.4916,
+    })
+    check_vitals("Dwarf", "Gearwright", 30, {
+        HP = 1161, MP = 327, CP = 921,
+        RawHP = 1161.2345, RawMP = 327.107,
+        RawCP = 921.673,
+    })
+    check_vitals("Dwarf", "Deepclaimer", 30, {
+        HP = 1197, MP = 327, CP = 834,
+        RawHP = 1197.9745, RawMP = 327.107,
+        RawCP = 834.499,
+    })
 end
 
 --[[
@@ -309,12 +331,12 @@ Returns:
 ]]
 local function check_scope_boundaries()
     local coverage = Source.coverage()
-    check(coverage.PathCount == 22
-        and coverage.VerifiedPrimaryStatTemplates == 22
-        and coverage.VerifiedLevelGrowthTemplates == 22
+    check(coverage.PathCount == 25
+        and coverage.VerifiedPrimaryStatTemplates == 25
+        and coverage.VerifiedLevelGrowthTemplates == 25
         and coverage.VerifiedLevelCap == 30
         and not coverage.LiveCombatIntegrated,
-        "Twenty-two exact templates do not imply live combat migration")
+        "Twenty-five exact templates do not imply live combat migration")
     check(Source.get("Human", "Ranger") == nil
         and Source.get("Elf", "Rogue") == nil
         and Source.get("Elf", "Oathguard") == nil,
@@ -345,7 +367,7 @@ local function check_scope_boundaries()
 end
 
 --[[
-Runs the exact C4 twenty-two-template source regression.
+Runs the exact C4 twenty-five-template source regression.
 
 Args:
     None.
@@ -358,7 +380,7 @@ local function main()
     check_growth_vectors()
     check_scope_boundaries()
     print(("[C4 Primary Stats] EXACT_SOURCE_PASS: %d assertions, "
-        .. "22 templates, 22 growth curves through level 30, live=false")
+        .. "25 templates, 25 growth curves through level 30, live=false")
         :format(checks))
 end
 
