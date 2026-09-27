@@ -12,6 +12,18 @@ local OWNER = table.freeze({
 })
 
 local PLANS = table.freeze({
+    SpiritclawForceFocus = table.freeze({
+        SourceSkillId = 50,
+        SourceRank = 1,
+    }),
+    SpiritclawBearAspect = table.freeze({
+        SourceSkillId = 76,
+        SourceRank = 1,
+    }),
+    SpiritclawWolfAspect = table.freeze({
+        SourceSkillId = 83,
+        SourceRank = 1,
+    }),
     WarhowlWoundbind = table.freeze({
         SourceSkillId = 34,
         SourceRank = 1,
@@ -272,6 +284,39 @@ function FakeResources.heal_percent_max_health(
     }, nil
 end
 
+
+local charge_count = 0
+local FakeCharges = {}
+
+--[[
+Adds one deterministic Spiritclaw force charge.
+
+Args:
+    owner (any): Expected source owner.
+    maximum (number): Exact source maximum.
+
+Returns:
+    (any?, string?): Deterministic charge evidence.
+]]
+function FakeCharges:add_one(
+    owner: any,
+    maximum: number
+): (any?, string?)
+    if owner ~= OWNER or maximum ~= 1 then
+        return nil, "SelfEffectChargeTestInvalid"
+    end
+
+    local before = charge_count
+    charge_count = math.min(maximum, charge_count + 1)
+
+    return {
+        ChargeBefore = before,
+        ChargeAfter = charge_count,
+        MaximumCharges = maximum,
+        Added = charge_count > before,
+    }, nil
+end
+
 --[[
 Returns one queued deterministic source roll.
 
@@ -339,6 +384,7 @@ local function make_bridge(): any
         ActiveEffects = FakeActiveEffects,
         Bleed = FakeBleed,
         Resources = FakeResources,
+        Charges = FakeCharges,
         RandomRoll = random_roll,
         Delay = fake_delay,
     })
@@ -462,6 +508,102 @@ local function check_timed_buffs(bridge: any)
 end
 
 --[[
+Checks Spiritclaw Focus Force and both timed possession aspects.
+
+Args:
+    bridge (any): Enabled reviewed self-effect bridge.
+
+Returns:
+    nil: Confirms source charge cap and exact aspect durations.
+]]
+local function check_spiritclaw_effects(bridge: any)
+    charge_count = 0
+
+    local focus_start = assert(bridge:begin_cast(
+        OWNER,
+        "SpiritclawForceFocus",
+        140
+    ))
+    local focus = assert(bridge:launch_if_ready(
+        OWNER,
+        focus_start.CastId,
+        141
+    ))
+    check(
+        focus.Application.Kind == "C4SourceCharge"
+            and focus.Application.ChargeBefore == 0
+            and focus.Application.ChargeAfter == 1
+            and focus.Application.MaximumCharges == 1
+            and focus.Application.Added,
+        "Focus Force adds exactly one source charge"
+    )
+
+    local capped_start = assert(bridge:begin_cast(
+        OWNER,
+        "SpiritclawForceFocus",
+        142
+    ))
+    local capped = assert(bridge:launch_if_ready(
+        OWNER,
+        capped_start.CastId,
+        143
+    ))
+    check(
+        capped.Application.ChargeBefore == 1
+            and capped.Application.ChargeAfter == 1
+            and not capped.Application.Added,
+        "Focus Force cannot exceed source maxCharges one"
+    )
+
+    local bear_start = assert(bridge:begin_cast(
+        OWNER,
+        "SpiritclawBearAspect",
+        150
+    ))
+    local bear = assert(bridge:launch_if_ready(
+        OWNER,
+        bear_start.CastId,
+        151
+    ))
+    check(
+        bear.Application.DurationSeconds == 120
+            and observed.SpiritclawBearAspect.Duration == 120,
+        "Bear Aspect preserves exact 120-second source duration"
+    )
+
+    local wolf_start = assert(bridge:begin_cast(
+        OWNER,
+        "SpiritclawWolfAspect",
+        160
+    ))
+    local wolf = assert(bridge:launch_if_ready(
+        OWNER,
+        wolf_start.CastId,
+        161
+    ))
+    check(
+        wolf.Application.DurationSeconds == 120
+            and observed.SpiritclawWolfAspect.Duration == 120,
+        "Wolf Aspect preserves exact 120-second source duration"
+    )
+
+    check(
+        #delayed == 4
+            and delayed[3].Seconds == 120
+            and delayed[4].Seconds == 120,
+        "Spiritclaw aspects schedule exact source expiries"
+    )
+
+    delayed[3].Callback()
+    delayed[4].Callback()
+    check(
+        deactivated.SpiritclawBearAspect
+            and deactivated.SpiritclawWolfAspect,
+        "Spiritclaw aspect expiry clears exact active source effects"
+    )
+end
+
+--[[
 Runs the Warhowl scheduled self-effect regression.
 
 Args:
@@ -475,19 +617,22 @@ local function main()
 
     check_woundbind(bridge)
     check_timed_buffs(bridge)
+    check_spiritclaw_effects(bridge)
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 3
+        capability.ReviewedSkillCount == 6
+            and capability.SourceChargeBuilder
+            and capability.SpiritclawTimedAspects
             and capability.BleedNegateEffectPowerRoll
             and capability.TimedSourceBuffs
             and capability.BattleRoarMaxHpThenPercentHeal
             and not capability.ClientAuthority,
-        "capability reports all three reviewed self-effect families"
+        "capability reports all six reviewed Orc self-effect families"
     )
 
     print((
-        "[C4 Warhowl Self Effect] PASS: %d assertions reviewed=3"
+        "[C4 Warhowl Self Effect] PASS: %d assertions reviewed=6"
     ):format(checks))
 end
 
