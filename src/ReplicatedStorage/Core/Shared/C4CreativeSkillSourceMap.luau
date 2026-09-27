@@ -4,6 +4,45 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    DwarvenFighter = table.freeze({
+        [42] = table.freeze({SkillId = "DwarfSalvageClaim"}),
+        [141] = table.freeze({SkillId = "DwarfWeaponTraining"}),
+        [142] = table.freeze({SkillId = "DwarfArmorTraining"}),
+        [150] = table.freeze({SkillId = "DwarfPackTraining"}),
+        [172] = table.freeze({SkillId = "DwarfBlueprintFoundation"}),
+        [194] = table.freeze({SkillId = "DwarfFortune"}),
+        [254] = table.freeze({SkillId = "DwarfSalvageMark"}),
+        [1321] = table.freeze({SkillId = "DwarfWorkshopCraft"}),
+        [1322] = table.freeze({SkillId = "DwarfCommonCraft"}),
+    }),
+    DwarfArtisan = table.freeze({
+        [25] = table.freeze({SkillId = "GearwrightClockworkGolem"}),
+        [34] = table.freeze({SkillId = "GearwrightFieldBandage"}),
+        [100] = table.freeze({SkillId = "GearwrightHammerShock"}),
+        [148] = table.freeze({
+            SkillId = "GearwrightRestorativeDiscipline",
+        }),
+        [150] = table.freeze({
+            SkillId = "GearwrightPackTraining",
+            Offset = 1,
+        }),
+        [172] = table.freeze({
+            SkillId = "GearwrightBlueprintTraining",
+            Offset = 1,
+        }),
+        [205] = table.freeze({SkillId = "GearwrightBluntTraining"}),
+        [211] = table.freeze({SkillId = "GearwrightFortitude"}),
+        [212] = table.freeze({SkillId = "GearwrightRecovery"}),
+        [216] = table.freeze({SkillId = "GearwrightPolearmTraining"}),
+        [227] = table.freeze({
+            SkillId = "GearwrightLightArmorTraining",
+        }),
+        [231] = table.freeze({
+            SkillId = "GearwrightHeavyArmorTraining",
+        }),
+        [245] = table.freeze({SkillId = "GearwrightWildSweep"}),
+        [248] = table.freeze({SkillId = "GearwrightCrystallize"}),
+    }),
     OrcMystic = table.freeze({
         [118] = table.freeze({SkillId = "OrcMysticMovement"}),
         [134] = table.freeze({SkillId = "OrcMysticToughness"}),
@@ -676,6 +715,8 @@ local MAPS = table.freeze({
 })
 
 local GAPS = table.freeze({
+    DwarvenFighter = table.freeze({}),
+    DwarfArtisan = table.freeze({}),
     OrcMystic = table.freeze({
 
     }),
