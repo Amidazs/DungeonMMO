@@ -34,6 +34,8 @@ local WIZARD_ID = 938186
 local DUSKGUARD_ID = 938187
 local VEILBLADE_ID = 938188
 local NIGHTWEAVER_ID = 938189
+local ORC_FIST_ID = 938190
+local ORC_WRONG_WEAPON_ID = 938191
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -120,6 +122,8 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= DUSKGUARD_ID
         and user_id ~= VEILBLADE_ID
         and user_id ~= NIGHTWEAVER_ID
+        and user_id ~= ORC_FIST_ID
+        and user_id ~= ORC_WRONG_WEAPON_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -292,6 +296,7 @@ Returns:
 ]]
 local function seed_characters()
     local fighter = starter_character(FIGHTER_ID, "Fighter")
+    fighter.Equipment.Weapon = "marauder_sword"
     own_skill(fighter, "IronCleave", 1)
 
     local mage = starter_character(MAGE_ID, "Mage")
@@ -374,6 +379,24 @@ local function seed_characters()
         BOW_ATTACKER_ID,
         bow_attacker
     )
+
+    local orc_fist = starter_character(
+        ORC_FIST_ID,
+        "Fighter"
+    )
+    orc_fist.Identity.RaceId = "Orc"
+    orc_fist.Equipment.Weapon = "orc_training_fist"
+    own_skill(orc_fist, "OrcIronPunch", 1)
+    Runtime.set_character(ORC_FIST_ID, orc_fist)
+
+    local orc_wrong = starter_character(
+        ORC_WRONG_WEAPON_ID,
+        "Fighter"
+    )
+    orc_wrong.Identity.RaceId = "Orc"
+    orc_wrong.Equipment.Weapon = "marauder_sword"
+    own_skill(orc_wrong, "OrcIronPunch", 1)
+    Runtime.set_character(ORC_WRONG_WEAPON_ID, orc_wrong)
 end
 
 --[[
@@ -848,8 +871,11 @@ local function check_physical()
             and result.RandomDamage == 10
             and result.RandomDamageRoll >= -10
             and result.RandomDamageRoll <= 10
-            and result.Unarmed
-            and result.SourceWeaponId == nil
+            and not result.Unarmed
+            and result.SourceWeaponId == 1
+            and result.SourceWeaponConditionRequired
+            and result.SourceConditionWeaponId == 1
+            and result.SourceConditionWeaponKind == "Sword"
             and result.WeaponVulnerabilityMultiplier == 1
             and result.PvpStat == "PVP_PHYS_SKILL_DMG"
             and result.PvpMultiplier == 1
@@ -861,6 +887,46 @@ local function check_physical()
             and result.SourceStrBonus > 0
             and not result.LiveApplied,
         "physical provider retains exact source identity without applying HP"
+    )
+end
+
+--[[
+Checks Orc Iron Punch enforces the exact source fist weapon condition.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source item 248 is accepted and a sword is rejected.
+]]
+local function check_orc_physical_weapon_condition()
+    local fist_result = assert(Combat.physical_skill(
+        ORC_FIST_ID,
+        TARGET_ID,
+        "OrcIronPunch",
+        1
+    ))
+
+    check(
+        fist_result.SourceSkillId == 29
+            and fist_result.SourceRank == 1
+            and fist_result.SourceWeaponConditionRequired
+            and fist_result.SourceUsingKind == "Fist, Dual Fist"
+            and fist_result.SourceConditionWeaponId == 248
+            and fist_result.SourceConditionWeaponKind == "Fist",
+        "Orc Iron Punch accepts only the reviewed source fist family"
+    )
+
+    local denied, reason = Combat.physical_skill(
+        ORC_WRONG_WEAPON_ID,
+        TARGET_ID,
+        "OrcIronPunch",
+        1
+    )
+    check(
+        denied == nil
+            and reason == "OriginalSkillWeaponConditionNotMet",
+        "Orc Iron Punch rejects a reviewed sword before damage"
     )
 end
 
@@ -1981,6 +2047,7 @@ local function main()
     check_normal_attack_composition()
     check_shield_resolution()
     check_physical()
+    check_orc_physical_weapon_condition()
     check_magic()
     check_human_wizard_magic()
     check_human_wizard_neutral_magic()
