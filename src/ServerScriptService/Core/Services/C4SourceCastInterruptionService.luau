@@ -99,7 +99,8 @@ Returns:
 ]]
 function C4SourceCastInterruptionService.new(
     scheduler: any,
-    boundary_provider: any?
+    boundary_provider: any?,
+    cancel_provider: any?
 ): any
     assert(
         scheduler
@@ -112,11 +113,17 @@ function C4SourceCastInterruptionService.new(
             or type(boundary_provider) == "function",
         "Source cast interruption boundary provider must be a function"
     )
+    assert(
+        cancel_provider == nil
+            or type(cancel_provider) == "function",
+        "Source cast interruption cancel provider must be a function"
+    )
 
     return setmetatable({
         _scheduler = scheduler,
         _boundary_provider =
             boundary_provider or default_boundary_provider,
+        _cancel_provider = cancel_provider,
         _random = Random.new(),
         _test_roll_provider = nil,
     }, C4SourceCastInterruptionService)
@@ -253,11 +260,23 @@ function C4SourceCastInterruptionService:try_damage_interrupt(
     )
 
     if resolved.Interrupted then
-        local cancelled, cancel_reason =
-            self._scheduler:cancel_cast(
-                player,
-                snapshot.CastId
-            )
+        local cancelled
+        local cancel_reason
+
+        if self._cancel_provider then
+            cancelled, cancel_reason =
+                self._cancel_provider(
+                    player,
+                    snapshot.CastId
+                )
+        else
+            cancelled, cancel_reason =
+                self._scheduler:cancel_cast(
+                    player,
+                    snapshot.CastId
+                )
+        end
+
         if not cancelled then
             return nil, cancel_reason
                 or "C4SourceCastInterruptCancellationFailed"
