@@ -4596,11 +4596,43 @@ function C4SourceCombatCalculationService.confusion_skill(
 end
 
 --[[
-Resolves one reviewed C4 single-target support buff.
+Returns the single timed Buff effect row for a reviewed source rank.
 
-The source Buff handler applies its effect rows to the target and consumes one
-magical shot once per cast. The returned source identity is suitable for the
-server active-effect registry; no client-supplied modifier is accepted.
+Args:
+    effect (any): Exact source-effect rank definition.
+
+Returns:
+    (any?, string?): One timed Buff row or a strict source-data reason.
+]]
+local function timed_buff_effect(effect: any): (any?, string?)
+    local matched = nil
+
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Buff" then
+            if matched then
+                return nil, "DuplicateOriginalSupportBuffEffect"
+            end
+            matched = row
+        end
+    end
+
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalSupportBuffEffectUnavailable"
+    end
+
+    return matched, nil
+end
+
+--[[
+Resolves one reviewed C4 timed support buff.
+
+The source Buff handler supports TARGET_ONE, TARGET_PARTY and TARGET_ALLY.
+Target enumeration remains a live server responsibility. One magical shot is
+consumed once for the whole cast.
 
 Args:
     caster_user_id (number): Authenticated source-ready caster.
@@ -4629,43 +4661,134 @@ function C4SourceCombatCalculationService.support_buff_skill(
     end
 
     local sets = effect.Sets
+    local target_mode = sets.target
     if sets.skillType ~= "BUFF"
-        or sets.target ~= "TARGET_ONE"
         or sets.operateType ~= "ACTIVE"
+        or (
+            target_mode ~= "TARGET_ONE"
+            and target_mode ~= "TARGET_PARTY"
+            and target_mode ~= "TARGET_ALLY"
+        )
     then
         return nil, "UnsupportedOriginalSupportBuffSkill"
     end
 
-    local matched = nil
-    for _, row in ipairs(effect.Effects) do
-        if row.name == "Buff" then
-            if matched then
-                return nil, "DuplicateOriginalSupportBuffEffect"
-            end
-            matched = row
-        end
+    local matched, matched_reason = timed_buff_effect(effect)
+    if not matched then
+        return nil, matched_reason
     end
 
-    if not matched
-        or matched.count ~= 1
-        or type(matched.time) ~= "number"
-        or matched.time <= 0
+    local source_radius = sets.skillRadius
+    if target_mode ~= "TARGET_ONE"
+        and (
+            type(source_radius) ~= "number"
+            or source_radius <= 0
+        )
     then
-        return nil, "OriginalSupportBuffEffectUnavailable"
+        return nil, "OriginalSupportBuffRadiusUnavailable"
     end
 
-    local shot, shot_reason =
-        consume_magic_shot(caster_user_id)
+    local shot, shot_reason = consume_magic_shot(caster_user_id)
     if not shot then
         return nil, shot_reason
     end
 
     return {
         Kind = "SupportBuff",
+        TargetMode = target_mode,
+        SourceSkillRadius = source_radius,
         DurationSeconds = matched.time,
         StackType = matched.stackType,
         StackOrder = matched.stackOrder,
         Modifiers = matched.Modifiers or {},
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves one reviewed C4 TARGET_PARTY HealOverTime buff.
+
+The authored HealOverTime value is the exact per-tick HP amount in C4. It is
+not scaled by M.Atk or Spiritshot. The cast still consumes one magical shot.
+
+Args:
+    caster_user_id (number): Authenticated source-ready caster.
+    creative_skill_id (string): Server-selected party regeneration skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+
+Returns:
+    (any?, string?): Exact party HoT plan or strict denial reason.
+]]
+function C4SourceCombatCalculationService.party_regen_skill(
+    caster_user_id: number,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local source, effect, source_reason = source_skill(
+        caster_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "BUFF"
+        or sets.target ~= "TARGET_PARTY"
+        or sets.operateType ~= "ACTIVE"
+        or type(sets.skillRadius) ~= "number"
+        or sets.skillRadius <= 0
+    then
+        return nil, "UnsupportedOriginalPartyRegenSkill"
+    end
+
+    local matched = nil
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "HealOverTime" then
+            if matched then
+                return nil, "DuplicateOriginalPartyRegenEffect"
+            end
+            matched = row
+        end
+    end
+
+    if not matched
+        or type(matched.val) ~= "number"
+        or matched.val <= 0
+        or type(matched.count) ~= "number"
+        or matched.count <= 0
+        or matched.count % 1 ~= 0
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalPartyRegenEffectUnavailable"
+    end
+
+    local shot, shot_reason = consume_magic_shot(caster_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    return {
+        Kind = "PartyRegen",
+        TargetMode = "TARGET_PARTY",
+        SourceSkillRadius = sets.skillRadius,
+        HealPerTick = matched.val,
+        TickCount = matched.count,
+        TickSeconds = matched.time,
+        DurationSeconds = matched.count * matched.time,
+        StackType = matched.stackType,
+        StackOrder = matched.stackOrder,
         Spiritshot = shot.Spiritshot,
         BlessedSpiritshot = shot.BlessedSpiritshot,
         SourceSkillId = source.SkillId,
