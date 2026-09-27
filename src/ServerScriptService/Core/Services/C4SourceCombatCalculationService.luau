@@ -3839,7 +3839,10 @@ function C4SourceCombatCalculationService.status_area_skill(
 
     local sets = effect.Sets
     if sets.skillType ~= "DEBUFF"
-        or sets.target ~= "TARGET_AREA"
+        or (
+            sets.target ~= "TARGET_AREA"
+            and sets.target ~= "TARGET_AURA"
+        )
         or type(sets.skillRadius) ~= "number"
         or sets.skillRadius <= 0
     then
