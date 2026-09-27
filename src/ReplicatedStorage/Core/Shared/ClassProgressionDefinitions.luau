@@ -103,7 +103,18 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Orc"}),
         StarterSkills = table.freeze({}),
         StarterEquipment = table.freeze({}),
-        TeachableSkills = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "SpiritclawIronFist",
+            "SpiritclawForceFocus",
+            "SpiritclawForceBurst",
+            "SpiritclawBearAspect",
+            "SpiritclawWolfAspect",
+            "SpiritclawCripplingPalm",
+            "SpiritclawStunningFist",
+            "SpiritclawFistMastery",
+            "SpiritclawLightArmorTraining",
+            "SpiritclawAgileMovement",
+        }),
     }),
 
     Warhowl = table.freeze({
