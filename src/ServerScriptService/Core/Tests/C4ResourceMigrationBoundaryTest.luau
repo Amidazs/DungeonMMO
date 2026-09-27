@@ -175,6 +175,8 @@ local function check_reviewed_paths()
         {"DarkElf", "Veilblade", 831, 325, 337},
         {"DarkElf", "Nightweaver", 672, 482, 338},
         {"DarkElf", "Duskseer", 732, 482, 368},
+        {"Orc", "Fighter", 1075, 322, 562},
+        {"Orc", "Warhowl", 1269, 327, 884},
     }
 
     for _, row in ipairs(vectors) do
@@ -536,6 +538,74 @@ local function check_duskseer_active_buff_boundary()
 end
 
 --[[
+Checks inherited Orc Fighter and Raider passives reach Warhowl cutover.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-44/class-45 source passives remain ready.
+]]
+local function check_warhowl_passive_boundary()
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character("Orc", "Warhowl", 30)
+    character.Equipment.Weapon = "stonewatch_training_mace"
+
+    own_skill(character, "OrcToughness", 1)
+    own_skill(character, "OrcWeaponTraining", 3)
+    own_skill(character, "OrcArmorTraining", 5)
+    own_skill(character, "OrcIronBody", 1)
+    own_skill(character, "WarhowlEndurance", 1)
+    own_skill(character, "WarhowlBloodFortitude", 2)
+    own_skill(character, "WarhowlRecovery", 1)
+    own_skill(character, "WarhowlPolearmTraining", 4)
+    own_skill(character, "WarhowlLightArmorTraining", 7)
+    own_skill(character, "WarhowlHeavyArmorTraining", 7)
+    own_skill(character, "WarhowlSteelAndStoneTraining", 4)
+    own_skill(character, "WarhowlGreatWeaponTraining", 3)
+
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    local stats = assert(plan.SourceStatCandidate)
+
+    check(
+        plan.ScopeId == "OrcRaider"
+            and plan.SourceBaseMaxHealth == 1269
+            and plan.SourceBaseMaxMana == 327
+            and plan.SourceBaseMaxCP == 884
+            and #plan.ReviewedOwnedSourcePassiveRanks == 12
+            and plan.OwnedPassiveSourceMappingReady
+            and plan.OriginalOwnedPassiveMappingIntegrated
+            and plan.PassiveSourceStatCandidateReady
+            and plan.CombinedSourceStatCandidateReady
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "Warhowl inherited source passives cross the cutover boundary"
+    )
+    check(
+        stats.MAX_HP == 1369
+            and stats.ROOT_VULN == 0.8
+            and stats.SLEEP_VULN == 0.8
+            and stats.POISON_VULN == 0.8
+            and stats.FALL == 0.6,
+        "Warhowl boundary preserves Toughness and Iron Body effects"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
 Checks active Concentration reaches the dynamic attack-cancel source offset.
 
 Args:
@@ -803,6 +873,7 @@ local function main()
     check_nightweaver_passive_boundary()
     check_duskseer_passive_boundary()
     check_duskseer_active_buff_boundary()
+    check_warhowl_passive_boundary()
     check_concentration_interrupt_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
@@ -810,7 +881,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=17 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=19 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
