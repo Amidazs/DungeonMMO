@@ -22,6 +22,10 @@ C4SourceSelfEffectCastService.__index =
     C4SourceSelfEffectCastService
 
 local REVIEWED = table.freeze({
+    DeepclaimerFieldBandage = table.freeze({
+        SourceSkillId = 34,
+        Kind = "BleedCure",
+    }),
     GearwrightFieldBandage = table.freeze({
         SourceSkillId = 34,
         Kind = "BleedCure",
@@ -717,7 +721,7 @@ function C4SourceSelfEffectCastService:capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
-        ReviewedSkillCount = 7,
+        ReviewedSkillCount = 8,
         SourceChargeBuilder = true,
         SpiritclawTimedAspects = true,
         BleedNegateEffectPowerRoll = true,
