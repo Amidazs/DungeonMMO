@@ -85,9 +85,9 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 21
-        and coverage.RowCount == 1305
-        and coverage.UniqueSourceSkillIds == 162
+    check(coverage.PathCount == 23
+        and coverage.RowCount == 1370
+        and coverage.UniqueSourceSkillIds == 170
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
         "All twenty-one tracked original paths have exact source learning rows")
@@ -338,7 +338,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=21 rows=1305 uniqueSkillIds=162 live=false")
+        .. "paths=23 rows=1370 uniqueSkillIds=170 live=false")
         :format(checks))
 end
 
