@@ -118,7 +118,9 @@ local function profession_rejection(
     end
 
     if not ProfessionSelectionRules.can_use(
-        character.ProfessionSlots, profession_id
+        character.ProfessionSlots,
+        profession_id,
+        character
     ) then
         return "ProfessionNotSelected"
     end
