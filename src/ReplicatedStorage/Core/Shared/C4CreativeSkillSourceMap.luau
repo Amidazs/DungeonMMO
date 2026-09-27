@@ -322,6 +322,31 @@ local MAPS = table.freeze({
         [239] = table.freeze({SkillId = "OathguardEquipmentExpertise"}),
         [1320] = table.freeze({SkillId = "OathguardCommonItemCreation", Offset = 1}),
     }),
+    DarkElfAssassin = table.freeze({
+        [2] = table.freeze({SkillId = "VeilbladeMindRend"}),
+        [16] = table.freeze({SkillId = "WayfinderCut", Offset = 9}),
+        [27] = table.freeze({SkillId = "ScoutLockpicking"}),
+        [56] = table.freeze({SkillId = "WayfinderArrow", Offset = 9}),
+        [70] = table.freeze({SkillId = "VeilbladeUmbralSiphon", Offset = 2}),
+        [77] = table.freeze({SkillId = "VeilbladeAttackAura", Offset = 1}),
+        [91] = table.freeze({SkillId = "VeilbladeDefenseAura", Offset = 1}),
+        [96] = table.freeze({SkillId = "WayfinderWound"}),
+        [111] = table.freeze({SkillId = "ScoutEvasiveFocus"}),
+        [113] = table.freeze({SkillId = "RangerLongRange"}),
+        [129] = table.freeze({SkillId = "VeilbladeVenomHex"}),
+        [169] = table.freeze({SkillId = "ScoutFleetFoot"}),
+        [173] = table.freeze({SkillId = "ScoutFallResistance"}),
+        [193] = table.freeze({SkillId = "VeilbladeCriticalPower"}),
+        [195] = table.freeze({SkillId = "ScoutLungCapacity"}),
+        [198] = table.freeze({SkillId = "ScoutEvasion"}),
+        [208] = table.freeze({SkillId = "WayfinderBowMastery"}),
+        [209] = table.freeze({SkillId = "WayfinderDaggerMastery"}),
+        [223] = table.freeze({SkillId = "VeilbladeCrimsonSting"}),
+        [225] = table.freeze({SkillId = "ScoutRunningEvasion"}),
+        [233] = table.freeze({SkillId = "ScoutLightArmorMastery"}),
+        [256] = table.freeze({SkillId = "ScoutAccuracyToggle"}),
+        [312] = table.freeze({SkillId = "ScoutCriticalPowerToggle"}),
+    }),
     HumanRogue = table.freeze({
         [4] = table.freeze({SkillId = "HumanScoutSprint"}),
         [16] = table.freeze({SkillId = "WayfinderCut", Offset = 9}),
@@ -437,6 +462,9 @@ local GAPS = table.freeze({
 
     }),
     HumanKnight = table.freeze({
+
+    }),
+    DarkElfAssassin = table.freeze({
 
     }),
     HumanRogue = table.freeze({
