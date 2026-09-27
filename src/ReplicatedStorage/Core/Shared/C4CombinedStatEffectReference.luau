@@ -12,6 +12,7 @@ local NEUTRAL_STATS = table.freeze({
     BOW_WPN_VULN = 1,
     PHYSICAL_CRITICAL_POWER = 1,
     PHYSICAL_CRITICAL_POWER_ADD = 0,
+    BLOW_RATE = 1,
 })
 
 --[[
