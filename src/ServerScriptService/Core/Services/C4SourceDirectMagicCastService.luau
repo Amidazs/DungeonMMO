@@ -143,6 +143,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "SleepControl",
     }),
+    NightweaverVenomRend = table.freeze({
+        SourceSkillId = 1224,
+        CastRange = 750,
+        EffectRange = 1250,
+        ExecutionKind = "PoisonVulnerability",
+    }),
     DawnkeeperExorcism = table.freeze({
         SourceSkillId = 1031,
         CastRange = 400,
@@ -212,6 +218,7 @@ local REVIEWED_SKILLS = table.freeze({
     "NightweaverShadowSpark",
     "NightweaverUmbralSiphon",
     "NightweaverSlumberHex",
+    "NightweaverVenomRend",
     "DawnkeeperExorcism",
     "DawnkeeperSlumber",
     "DawnkeeperRootbind",
@@ -321,6 +328,9 @@ function C4SourceDirectMagicCastService.new(
             and type(executor.sleep_skill_npc) == "function"
             and type(
                 executor.elemental_vulnerability_skill_npc
+            ) == "function"
+            and type(
+                executor.poison_vulnerability_skill_npc
             ) == "function"
             and type(
                 executor.physical_attack_weakening_skill_npc
@@ -656,6 +666,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "PoisonVulnerability" then
+        applied, reason =
+            self._executor:poison_vulnerability_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     elseif review.ExecutionKind == "ElementalVulnerability" then
         applied, reason =
             self._executor:elemental_vulnerability_skill_npc(
@@ -856,6 +875,7 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedSleepBreaksOnDamage = true,
         ReviewedUndeadMagicPreflight = true,
         ReviewedElementalVulnerability = true,
+        ReviewedPoisonVulnerability = true,
         ReviewedElementalVulnerabilityFeedsMagicDamage = true,
         ReviewedPhysicalAttackWeakening = true,
         ReviewedPhysicalAttackWeakeningFeedsNpcDamage = true,
