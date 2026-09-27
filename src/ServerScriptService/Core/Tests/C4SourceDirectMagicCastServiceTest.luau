@@ -1364,6 +1364,7 @@ local function main()
             and capability.ReviewedSleepControl
             and capability.ReviewedSleepBreaksOnDamage
             and capability.ReviewedElementalVulnerability
+            and capability.ReviewedPoisonVulnerability
             and capability.ReviewedElementalVulnerabilityFeedsMagicDamage
             and capability.ReviewedPhysicalAttackWeakening
             and capability.ReviewedPhysicalAttackWeakeningFeedsNpcDamage
@@ -1371,8 +1372,8 @@ local function main()
             and capability.ReviewedUndeadOnlyMagic
             and capability.ReviewedRootControl
             and capability.ReviewedRootMovementOnly
-            and capability.ReviewedSkillCount == 24
-            and #capability.ReviewedSkills == 24
+            and capability.ReviewedSkillCount == 32
+            and #capability.ReviewedSkills == 32
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
