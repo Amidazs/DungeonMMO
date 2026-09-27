@@ -16,6 +16,9 @@ local CastScheduler = require(
 local DirectMagic = require(
     Services.C4SourceDirectMagicCastService
 )
+local PhysicalCast = require(
+    Services.C4SourcePhysicalCastService
+)
 local CastInterruption = require(
     Services.C4SourceCastInterruptionService
 )
@@ -123,6 +126,10 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local physical_cast = PhysicalCast.new(
+        scheduler,
+        source_executor
+    )
     local support_magic = SupportMagic.new(
         scheduler,
         source_executor
@@ -158,6 +165,7 @@ function C4SourceCastRuntimeComposition.new(
 
     local cancellable_bridges = {
         direct_magic,
+        physical_cast,
         support_magic,
         periodic_magic,
         self_magic,
@@ -186,6 +194,7 @@ function C4SourceCastRuntimeComposition.new(
         Scheduler = scheduler,
         Interruption = interruption,
         DirectMagic = direct_magic,
+        PhysicalCast = physical_cast,
         SupportMagic = support_magic,
         PeriodicMagic = periodic_magic,
         SelfMagic = self_magic,
@@ -210,6 +219,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     player: any
 )
     self.DirectMagic:clear_owner(player)
+    self.PhysicalCast:clear_owner(player)
     self.SupportMagic:clear_owner(player)
     self.PeriodicMagic:clear_owner(player)
     self.SelfMagic:clear_owner(player)
@@ -235,6 +245,7 @@ Returns:
 ]]
 function C4SourceCastRuntimeComposition:capability(): any
     local direct = self.DirectMagic:capability()
+    local physical = self.PhysicalCast:capability()
     local support = self.SupportMagic:capability()
     local periodic = self.PeriodicMagic:capability()
     local self_magic = self.SelfMagic:capability()
@@ -257,6 +268,13 @@ function C4SourceCastRuntimeComposition:capability(): any
             direct.DefaultEnabled == true,
         DirectMagicCurrentlyEnabled =
             direct.CurrentlyEnabled == true,
+        PhysicalCastBridge = true,
+        PhysicalCastDefaultEnabled =
+            physical.DefaultEnabled == true,
+        PhysicalCastCurrentlyEnabled =
+            physical.CurrentlyEnabled == true,
+        PhysicalCastReviewedActiveSkillCount =
+            physical.ReviewedActiveSkillCount,
         SupportMagicBridge = true,
         SupportMagicDefaultEnabled =
             support.DefaultEnabled == true,
