@@ -35,6 +35,32 @@ local NPC_BOUNDARY_SECONDARY = {
 
 local FakeCombat = {}
 local FakeResources = {}
+local slow_events = {}
+local FakeMovementSlow = {}
+
+--[[
+Records one deterministic NPC movement slow.
+
+Args:
+    enemy (Model): Expected reviewed NPC.
+    slow_fraction (number): Exact movement reduction fraction.
+    duration_seconds (number): Exact source duration.
+
+Returns:
+    boolean: True for the disposable reviewed NPC.
+]]
+function FakeMovementSlow.apply(
+    enemy: Model,
+    slow_fraction: number,
+    duration_seconds: number
+): boolean
+    table.insert(slow_events, {
+        Enemy = enemy,
+        SlowFraction = slow_fraction,
+        DurationSeconds = duration_seconds,
+    })
+    return true
+end
 
 --[[
 Counts one live-executor assertion.
@@ -168,6 +194,81 @@ function FakeCombat.physical_skill(
     return {
         Kind = "PhysicalDamage",
         Amount = 12,
+    }, nil
+end
+
+
+--[[
+Returns one disposable charged physical result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected NPC boundary.
+    creative_skill_id (string): Expected Force Burst identifier.
+    creative_rank (number): Expected purchased rank.
+    remaining_charges (number): Charges remaining after source spend.
+    spatial_context (any): Executor-derived source spatial context.
+
+Returns:
+    (any?, string?): Fake charged physical calculation.
+]]
+function FakeCombat.charged_physical_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    remaining_charges: number,
+    spatial_context: any
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "SpiritclawForceBurst")
+    assert(creative_rank == 6)
+    assert(remaining_charges == 0)
+    last_spatial = spatial_context
+
+    return {
+        Kind = "ChargedPhysicalDamage",
+        Amount = 20,
+        RequiredCharges = 1,
+        RemainingCharges = 0,
+        SourceChargeDamageMultiplier = 0.8,
+    }, nil
+end
+
+--[[
+Returns one disposable non-magical movement-slow result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected NPC boundary.
+    creative_skill_id (string): Expected Crippling Palm identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source physical-slow result.
+]]
+function FakeCombat.physical_slow_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "SpiritclawCripplingPalm")
+    assert(creative_rank == 3)
+
+    return {
+        Kind = "PhysicalMovementSlow",
+        SlowLanded = true,
+        SlowRate = 80,
+        SlowRoll = 0,
+        SpeedMultiplier = 0.7,
+        SlowFraction = 0.3,
+        DurationSeconds = 120,
+        SourceSkillId = 95,
+        SourceRank = 3,
     }, nil
 end
 
@@ -662,6 +763,7 @@ local function main()
     local executor = ExecutorModule.new({
         CombatProvider = FakeCombat,
         ResourceAuthority = FakeResources,
+        MovementSlowProvider = FakeMovementSlow,
         NpcBoundaryProvider = function(target: Model): any
             if target == enemy then
                 return NPC_BOUNDARY, nil
@@ -713,6 +815,8 @@ local function main()
             and capability.NpcDamageObserverConfigured
             and capability.NpcNormalAttackLiveApplication
             and capability.NpcPhysicalSkillLiveApplication
+            and capability.NpcChargedPhysicalSkillLiveApplication
+            and capability.NpcPhysicalMovementSlowLiveApplication
             and capability.NpcMagicSkillLiveApplication
             and capability.NpcMagicAreaLiveApplication
             and capability.NpcMagicAreaCasterRadiusSourceSemantics
@@ -1052,6 +1156,53 @@ local function main()
             and npc_events[3].Damage == 8
             and not npc_events[3].Lethal,
         "NPC source damage emits existing trusted bookkeeping context"
+    )
+
+    table.clear(npc_events)
+    local charged = assert(executor:charged_physical_skill_npc(
+        attacker,
+        enemy,
+        "SpiritclawForceBurst",
+        6,
+        0,
+        2051
+    ))
+    check(
+        charged.Kind == "C4LiveNpcChargedPhysicalSkill"
+            and charged.Applied
+            and charged.RawDamage == 20
+            and charged.HealthDamage == 20
+            and charged.RequiredCharges == 1
+            and charged.RemainingCharges == 0
+            and charged.SourceChargeDamageMultiplier == 0.8
+            and #npc_events == 1
+            and npc_events[1].Context.source_kind
+                == "ChargedPhysicalSkill",
+        "Force Burst applies exact charged source damage to NPC HP"
+    )
+
+    table.clear(npc_events)
+    table.clear(slow_events)
+    local cripple = assert(executor:physical_slow_skill_npc(
+        attacker,
+        enemy,
+        "SpiritclawCripplingPalm",
+        3,
+        2052
+    ))
+    check(
+        cripple.Kind == "C4LiveNpcPhysicalMovementSlow"
+            and cripple.Applied
+            and cripple.SlowLanded
+            and cripple.SlowApplied
+            and cripple.SpeedMultiplier == 0.7
+            and cripple.DurationSeconds == 120
+            and #slow_events == 1
+            and slow_events[1].Enemy == enemy
+            and slow_events[1].SlowFraction == 0.3
+            and slow_events[1].DurationSeconds == 120
+            and #npc_events == 0,
+        "Crippling Palm applies source slow without a damage event"
     )
 
     table.clear(npc_events)
