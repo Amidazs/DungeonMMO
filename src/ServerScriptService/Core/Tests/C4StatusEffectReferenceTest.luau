@@ -137,6 +137,25 @@ local function main()
         "Surrender to Fire keeps exact 25 percent 15-second vulnerability"
     )
 
+    local poison_vulnerability = assert(
+        Status.poison_vulnerability_plan(1224, 2)
+    )
+    check(
+        poison_vulnerability.SourceSkillId == 1224
+            and poison_vulnerability.SourceRank == 2
+            and poison_vulnerability.SaveVs == "MEN"
+            and poison_vulnerability.EffectPower == 80
+            and poison_vulnerability.MagicLevel == 30
+            and poison_vulnerability.IsMagic,
+        "Surrender to Poison rank two keeps exact MEN land inputs"
+    )
+    check(
+        poison_vulnerability.VulnerabilityStat == "POISON_VULN"
+            and poison_vulnerability.VulnerabilityMultiplier == 1.25
+            and poison_vulnerability.DurationSeconds == 15,
+        "Surrender to Poison keeps exact 25 percent 15-second vulnerability"
+    )
+
     local attack_weakness = assert(
         Status.physical_attack_weakening_plan(1164, 4)
     )
@@ -269,7 +288,7 @@ local function main()
         "[C4 Status Effect] SOURCE_STATUS_PASS: %d assertions "
             .. "bleed=13x4@5 poison=8x10@3 frost=0.7@120 "
             .. "sleep=30@damage_wake fire_vuln=1.25@15 "
-            .. "patk=0.8@15 nonlethal=true"
+            .. "poison_vuln=1.25@15 patk=0.8@15 nonlethal=true"
     ):format(checks))
 end
 
