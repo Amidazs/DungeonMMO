@@ -702,6 +702,42 @@ function FakeExecutor:physical_attack_weakening_skill_npc(
 end
 
 --[[
+Applies one disposable source Confusion result.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed Confusion identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake Confusion executor result.
+]]
+function FakeExecutor:confusion_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    assert(subject == player)
+    assert(target == enemy)
+
+    return {
+        Kind = "C4LiveNpcConfusion",
+        Applied = true,
+        Landed = true,
+        DurationSeconds = 30,
+        RetargetCount = 5,
+        RetargetSeconds = 6,
+        CreativeSkillId = creative_skill_id,
+        CreativeRank = creative_rank,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Counts one direct-magic bridge assertion.
 
 Args:
@@ -1404,8 +1440,9 @@ local function main()
             and capability.ReviewedUndeadOnlyMagic
             and capability.ReviewedRootControl
             and capability.ReviewedRootMovementOnly
-            and capability.ReviewedSkillCount == 36
-            and #capability.ReviewedSkills == 36
+            and capability.ReviewedConfusionControl
+            and capability.ReviewedSkillCount == 41
+            and #capability.ReviewedSkills == 41
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
