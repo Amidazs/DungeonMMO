@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 15 and report.SourceLearningRows == 966,
+assert(report.ClassPaths == 16 and report.SourceLearningRows == 1058,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 954
+assert(report.CandidateRows == 1046
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 966,
+assert(report.CandidateRows + report.ExplicitMissingRows == 1058,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -40,6 +40,11 @@ local nightweaver_drain = assert(Map.resolve("DarkWizard", 1147, 3))
 local nightweaver_poison = assert(Map.resolve("DarkWizard", 1168, 2))
 local nightweaver_frost = assert(Map.resolve("DarkWizard", 1184, 5))
 local nightweaver_surrender = assert(Map.resolve("DarkWizard", 1224, 1))
+local dusk_heal = assert(Map.resolve("ShillienOracle", 1011, 7))
+local dusk_weapon = assert(Map.resolve("ShillienOracle", 249, 3))
+local dusk_shackle = assert(Map.resolve("ShillienOracle", 1206, 2))
+local dusk_empower = assert(Map.resolve("ShillienOracle", 1059, 1))
+local dusk_blood = assert(Map.resolve("ShillienOracle", 1268, 1))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -88,6 +93,23 @@ assert(nightweaver_gale.Status == "Candidate"
     and nightweaver_surrender.CreativeSkillId == "NightweaverVenomRend"
     and nightweaver_surrender.CreativeRank == 1,
     "Dark Wizard offsets map to independent Nightweaver ranks")
+
+assert(dusk_heal.Status == "Candidate"
+    and dusk_heal.CreativeSkillId == "DuskseerHealingLight"
+    and dusk_heal.CreativeRank == 1
+    and dusk_weapon.CreativeSkillId == "DuskseerWeaponTraining"
+    and dusk_weapon.CreativeRank == 1
+    and dusk_shackle.CreativeSkillId == "DuskseerWindShackle"
+    and dusk_shackle.CreativeRank == 1,
+    "Shillien Oracle inherited rank offsets map to Duskseer ranks")
+
+assert(dusk_empower.Status == "Candidate"
+    and dusk_empower.CreativeSkillId == "DuskseerEmpower"
+    and dusk_empower.CreativeRank == 1
+    and dusk_blood.Status == "Candidate"
+    and dusk_blood.CreativeSkillId == "DuskseerBloodRite"
+    and dusk_blood.CreativeRank == 1,
+    "Shillien Oracle unique support families map independently")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
