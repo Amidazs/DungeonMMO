@@ -2245,6 +2245,154 @@ function C4SourceCombatExecutor:physical_skill_npc(
 end
 
 --[[
+Executes one charged C4 physical skill against a reviewed server NPC.
+
+Charge ownership and spend are handled by the physical cast bridge. This
+executor applies only the exact charged source damage result after that spend.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Reviewed NPC target.
+    creative_skill_id (string): Reviewed charged physical skill.
+    creative_rank (number): Server-resolved purchased rank.
+    remaining_charges (number): Charges remaining after source spend.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live charged physical application evidence.
+]]
+function C4SourceCombatExecutor:charged_physical_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    remaining_charges: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local spatial, spatial_reason =
+        self._spatial_context_provider(
+            self,
+            attacker,
+            enemy
+        )
+    if not spatial then
+        return nil, spatial_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.charged_physical_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank,
+            remaining_charges,
+            spatial
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local applied, apply_reason = self:_apply_npc_damage(
+        attacker,
+        enemy,
+        calculated.Amount,
+        "ChargedPhysicalSkill",
+        creative_skill_id,
+        sequence_id
+    )
+    if not applied then
+        return nil, apply_reason
+    end
+
+    return {
+        Kind = "C4LiveNpcChargedPhysicalSkill",
+        Calculation = calculated,
+        Applied = true,
+        CPAbsorbed = 0,
+        HealthDamage = applied.HealthDamage,
+        RawDamage = applied.RawDamage,
+        HealthBefore = applied.HealthBefore,
+        HealthAfter = applied.HealthAfter,
+        Lethal = applied.Lethal,
+        RequiredCharges = calculated.RequiredCharges,
+        RemainingCharges = calculated.RemainingCharges,
+        SourceChargeDamageMultiplier =
+            calculated.SourceChargeDamageMultiplier,
+    }, nil
+end
+
+--[[
+Executes one non-damaging C4 physical movement slow against a reviewed NPC.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Reviewed NPC target.
+    creative_skill_id (string): Reviewed physical slow skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative action sequence.
+
+Returns:
+    (any?, string?): Live slow application evidence.
+]]
+function C4SourceCombatExecutor:physical_slow_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_slow_skill(
+            attacker.UserId,
+            boundary,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+
+    local slow_applied = false
+    local humanoid = enemy:FindFirstChildOfClass("Humanoid")
+    if calculated.SlowLanded
+        and humanoid
+        and humanoid.Health > 0
+        and self._movement_slow
+        and type(self._movement_slow.apply) == "function"
+    then
+        slow_applied = self._movement_slow.apply(
+            enemy,
+            calculated.SlowFraction,
+            calculated.DurationSeconds
+        ) == true
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalMovementSlow",
+        Calculation = calculated,
+        Applied = true,
+        SlowLanded = calculated.SlowLanded,
+        SlowApplied = slow_applied,
+        SpeedMultiplier = calculated.SpeedMultiplier,
+        SlowFraction = calculated.SlowFraction,
+        DurationSeconds = calculated.DurationSeconds,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Checks whether one player-to-NPC source magic launch is currently legal.
 
 This is a read-only preflight used by the private cast scheduler handoff. It
@@ -4163,6 +4311,8 @@ function C4SourceCombatExecutor:capability(): any
             type(self._npc_damage_observer) == "function",
         NpcNormalAttackLiveApplication = true,
         NpcPhysicalSkillLiveApplication = true,
+        NpcChargedPhysicalSkillLiveApplication = true,
+        NpcPhysicalMovementSlowLiveApplication = true,
         SelfTimedBuffLiveApplication = true,
         AggressionThreatLiveApplication = true,
         NpcConfusionLiveApplication = true,
