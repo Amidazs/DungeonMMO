@@ -227,6 +227,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "SleepControl",
     }),
+    OrcMysticFear = table.freeze({
+        SourceSkillId = 1092,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "FearControl",
+    }),
     AshspeakerLifeDrain = table.freeze({
         SourceSkillId = 1090,
         CastRange = 600,
@@ -238,6 +244,12 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
         ExecutionKind = "SleepControl",
+    }),
+    AshspeakerFear = table.freeze({
+        SourceSkillId = 1092,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "FearControl",
     }),
     AshspeakerMadness = table.freeze({
         SourceSkillId = 1105,
@@ -286,8 +298,10 @@ local REVIEWED_SKILLS = table.freeze({
     "DuskseerWindShackle",
     "OrcMysticLifeDrain",
     "OrcMysticDreamingSpirit",
+    "OrcMysticFear",
     "AshspeakerLifeDrain",
     "AshspeakerDreamingSpirit",
+    "AshspeakerFear",
     "AshspeakerMadness",
 })
 
@@ -405,6 +419,7 @@ function C4SourceDirectMagicCastService.new(
                 executor.magic_undead_skill_npc
             ) == "function"
             and type(executor.root_skill_npc) == "function"
+            and type(executor.fear_skill_npc) == "function"
             and type(executor.confusion_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
     )
@@ -775,6 +790,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "FearControl" then
+        applied, reason =
+            self._executor:fear_skill_npc(
+                player,
+                record.Enemy,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                sequence_id
+            )
     elseif review.ExecutionKind == "PhysicalAttackRateWeakening" then
         applied, reason =
             self._executor:physical_attack_rate_weakening_skill_npc(
@@ -955,6 +979,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedUndeadOnlyMagic = true,
         ReviewedRootControl = true,
         ReviewedRootMovementOnly = true,
+        ReviewedFearControl = true,
+        ReviewedFearMovementCadence = true,
         ReviewedConfusionControl = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
