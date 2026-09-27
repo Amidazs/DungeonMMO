@@ -105,7 +105,11 @@ function SkillUnlockRules.can_train(
     -- Any original first-transfer skill requires the actual saved mentor
     -- receipt. This applies to Fighter and Mystic families alike.
     local first_transfer_classes = definition.AllowedFirstTransferClasses
-    if type(first_transfer_classes) == "table" then
+    local original_base = identity.BaseClassId == "Fighter"
+        or identity.BaseClassId == "Mage"
+    if type(first_transfer_classes) == "table"
+        and original_base
+    then
         local earned = FirstTransfers.awarded(character)
         local authorized = false
         for _, class_id in ipairs(first_transfer_classes) do
