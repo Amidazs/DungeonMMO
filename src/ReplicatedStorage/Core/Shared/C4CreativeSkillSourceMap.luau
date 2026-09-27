@@ -61,6 +61,50 @@ local MAPS = table.freeze({
         [1216] = table.freeze({SkillId = "MageHeal"}),
         [1320] = table.freeze({SkillId = "C4CommonItemCreation"}),
     }),
+    DarkWizard = table.freeze({
+        [146] = table.freeze({
+            SkillId = "NightweaverArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "NightweaverQuickWeave"}),
+        [213] = table.freeze({SkillId = "NightweaverManaReservoir"}),
+        [228] = table.freeze({SkillId = "NightweaverFastCasting"}),
+        [229] = table.freeze({SkillId = "NightweaverManaRecovery"}),
+        [234] = table.freeze({SkillId = "NightweaverRobeTraining"}),
+        [249] = table.freeze({
+            SkillId = "NightweaverFocusTraining",
+            Offset = 2,
+        }),
+        [285] = table.freeze({SkillId = "NightweaverManaChanneling"}),
+        [1069] = table.freeze({SkillId = "NightweaverSlumberHex"}),
+        [1078] = table.freeze({SkillId = "NightweaverConcentration"}),
+        [1126] = table.freeze({SkillId = "NightweaverServitorRecharge"}),
+        [1127] = table.freeze({SkillId = "NightweaverServitorHeal"}),
+        [1128] = table.freeze({SkillId = "NightweaverShadowCompanion"}),
+        [1147] = table.freeze({
+            SkillId = "NightweaverUmbralSiphon",
+            Offset = 2,
+        }),
+        [1151] = table.freeze({SkillId = "NightweaverCorpseSiphon"}),
+        [1157] = table.freeze({SkillId = "NightweaverBloodToMana"}),
+        [1167] = table.freeze({SkillId = "NightweaverVenomCloud"}),
+        [1168] = table.freeze({
+            SkillId = "NightweaverVenomHex",
+            Offset = 1,
+        }),
+        [1172] = table.freeze({SkillId = "NightweaverFlameBurst"}),
+        [1178] = table.freeze({SkillId = "NightweaverGaleBolt"}),
+        [1181] = table.freeze({SkillId = "NightweaverEmberField"}),
+        [1184] = table.freeze({
+            SkillId = "NightweaverFrostLance",
+            Offset = 4,
+        }),
+        [1224] = table.freeze({SkillId = "NightweaverVenomRend"}),
+        [1228] = table.freeze({
+            SkillId = "NightweaverSilhouetteCompanion",
+        }),
+        [1266] = table.freeze({SkillId = "NightweaverShadowSpark"}),
+    }),
     HumanWizard = table.freeze({
         [146] = table.freeze({
             SkillId = "EmberweaverArcaneResistance",
@@ -442,6 +486,9 @@ local GAPS = table.freeze({
 
 
         [1322] = "Common Craft is not the current recipe-reading passive",
+    }),
+    DarkWizard = table.freeze({
+
     }),
     HumanWizard = table.freeze({
 
