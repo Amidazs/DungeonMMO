@@ -239,14 +239,14 @@ local function crafting_ranks_at_level(
     local skill = Progression.get(skill_id)
     if not skill or skill.MaxRank ~= 1
         or skill.RankLevels[1] ~= level
-        or skill.Kind ~= "Passive"
         or skill.RequiresCraftingProfessionChoice ~= true
     then
         return 0
     end
 
     if skill_id == "C4RecipeReading" then
-        return if skill.RecipeReadingEnabled == true
+        return if skill.Kind == "Passive"
+            and skill.RecipeReadingEnabled == true
             and type(C4Crafting.can_read) == "function" then 1 else 0
     end
     if skill_id == "OrcCommonCraft" then
@@ -256,6 +256,7 @@ local function crafting_ranks_at_level(
             then 1 else 0
     end
     if skill_id ~= "C4CommonItemCreation"
+        or skill.Kind ~= "Passive"
         or skill.CommonItemCreationEnabled ~= true
         or type(C4Crafting.can_make_common) ~= "function"
     then
