@@ -120,6 +120,61 @@ function C4CombatFormulaReference.physical_damage(values: any): number
 end
 
 --[[
+Computes Chronicle 4 dagger BLOW damage after a successful blow roll.
+
+This transcribes SkillBlow -> calcBlowDamage for the source-neutral stat
+pipeline. The authenticated critical-power and dagger-vulnerability values are
+supplied explicitly so later buffs can flow through the same formula.
+
+Args:
+    values (any): P.Atk/P.Def, skill power, shot/shield state, critical-power,
+        dagger vulnerability, random-damage and PvP multipliers.
+
+Returns:
+    number: C4 blow damage before HP rounding/application.
+]]
+function C4CombatFormulaReference.blow_damage(values: any): number
+    local damage = positive(values.PAtk, "PAtk")
+    local defence = positive(values.PDef, "PDef")
+    local power = positive(values.SkillPower, "SkillPower")
+    local critical_power = tonumber(values.CriticalPowerMultiplier) or 1
+    local critical_add = tonumber(values.CriticalPowerAdd) or 0
+
+    assert(
+        critical_power >= 0 and critical_power < math.huge,
+        "Critical power multiplier must be finite and nonnegative"
+    )
+    assert(
+        critical_add == critical_add
+            and math.abs(critical_add) < math.huge,
+        "Critical power additive must be finite"
+    )
+
+    if values.Soulshot == true then
+        damage *= 2
+    end
+    if values.Shield == true then
+        if values.PerfectShield == true then
+            return 1
+        end
+        defence += math.max(tonumber(values.ShieldDefense) or 0, 0)
+    end
+
+    damage += (damage + power) * critical_power
+    damage += critical_add * 6.5
+    damage *= tonumber(values.DaggerVulnerabilityMultiplier) or 1
+    damage *= 70 / defence
+    damage *= tonumber(values.RandomDamageMultiplier) or 1
+    damage *= tonumber(values.PvpMultiplier) or 1
+
+    if values.NoblePvp == true then
+        damage *= 1.05
+    end
+
+    return math.max(damage, 1)
+end
+
+--[[
 Computes Chronicle 4 magical damage main formula.
 
 Args:
@@ -632,6 +687,65 @@ function C4CombatFormulaReference.resolve_physical_skill_critical(
         ChancePerThousand = chance,
         Roll = roll,
         Critical = chance > roll,
+    }
+end
+
+--[[
+Resolves Chronicle 4 BLOW success from position, DEX and BLOW_RATE.
+
+SkillBlow supplies base chances of 50 front, 60 side and 70 behind. The C4
+formula multiplies that chance by 1 + (DEX - 20) / 100 and the final
+BLOW_RATE stat, then succeeds only when the result is greater than Rnd.get(100).
+
+Args:
+    position_relation (string): Front, Side or Behind server relation.
+    dexterity (number): Authenticated source DEX.
+    blow_rate_multiplier (number): Final source BLOW_RATE multiplier.
+    roll (number): Server-owned integer roll from 0 through 99.
+
+Returns:
+    any: Exact source blow chance, roll and landed state.
+]]
+function C4CombatFormulaReference.resolve_blow(
+    position_relation: string,
+    dexterity: number,
+    blow_rate_multiplier: number,
+    roll: number
+): any
+    local base_chance = if position_relation == "Front"
+        then 50
+        elseif position_relation == "Side"
+        then 60
+        elseif position_relation == "Behind"
+        then 70
+        else nil
+
+    assert(base_chance ~= nil, "Blow position relation is invalid")
+    positive(dexterity, "DEX")
+    assert(
+        type(blow_rate_multiplier) == "number"
+            and blow_rate_multiplier == blow_rate_multiplier
+            and blow_rate_multiplier >= 0
+            and blow_rate_multiplier < math.huge,
+        "BLOW_RATE multiplier must be finite and nonnegative"
+    )
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 99,
+        "Blow roll must be an integer from 0 through 99"
+    )
+
+    local chance = base_chance
+        * (1 + ((dexterity - 20) / 100))
+        * blow_rate_multiplier
+
+    return {
+        BaseChance = base_chance,
+        ChancePercent = chance,
+        Roll = roll,
+        Landed = chance > roll,
     }
 end
 
