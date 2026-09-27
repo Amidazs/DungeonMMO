@@ -12,6 +12,10 @@ local OWNER = table.freeze({
 })
 
 local PLANS = table.freeze({
+    DeepclaimerFieldBandage = table.freeze({
+        SourceSkillId = 34,
+        SourceRank = 1,
+    }),
     GearwrightFieldBandage = table.freeze({
         SourceSkillId = 34,
         SourceRank = 1,
@@ -52,7 +56,7 @@ local bleeding = true
 local cured = 0
 local refreshes = 0
 local percent_heals = 0
-local rolls = {30, 31, 30}
+local rolls = {30, 31, 30, 30}
 
 local FakeScheduler = {}
 
@@ -465,6 +469,25 @@ local function check_woundbind(bridge: any)
             and cured == 2,
         "Gearwright Bandage reuses exact source negate bleed authority"
     )
+
+    bleeding = true
+    local deepclaimer_start = assert(bridge:begin_cast(
+        OWNER,
+        "DeepclaimerFieldBandage",
+        114
+    ))
+    local deepclaimer_bandage = assert(bridge:launch_if_ready(
+        OWNER,
+        deepclaimer_start.CastId,
+        115
+    ))
+    check(
+        deepclaimer_bandage.Application.Roll == 30
+            and deepclaimer_bandage.Application.Landed
+            and deepclaimer_bandage.Application.Cured
+            and cured == 3,
+        "Deepclaimer Bandage reuses exact source negate bleed authority"
+    )
 end
 
 --[[
@@ -644,18 +667,18 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 7
+        capability.ReviewedSkillCount == 8
             and capability.SourceChargeBuilder
             and capability.SpiritclawTimedAspects
             and capability.BleedNegateEffectPowerRoll
             and capability.TimedSourceBuffs
             and capability.BattleRoarMaxHpThenPercentHeal
             and not capability.ClientAuthority,
-        "capability reports all seven reviewed self-effect families"
+        "capability reports all eight reviewed self-effect families"
     )
 
     print((
-        "[C4 Self Effect] PASS: %d assertions reviewed=7"
+        "[C4 Self Effect] PASS: %d assertions reviewed=8"
     ):format(checks))
 end
 
