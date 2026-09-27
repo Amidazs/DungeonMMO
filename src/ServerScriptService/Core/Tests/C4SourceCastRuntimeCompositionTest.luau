@@ -749,7 +749,7 @@ local function main()
                 .AttackCancelRateIntegrated
             and capability.DirectMagicBridge
             and capability.PhysicalCastBridge
-            and capability.PhysicalCastReviewedActiveSkillCount == 9
+            and capability.PhysicalCastReviewedActiveSkillCount == 10
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
