@@ -1,3 +1,34 @@
+## 27 September 2026 — v3.20 Spiritclaw accepted GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_20_Orc_Monk_Spiritclaw_GREEN_20260927.md);
+[green evidence](
+../testing/c4-orc-monk-spiritclaw-v3-20-green-20260927.md).
+
+Orc Fighter -> Orc Monk / Spiritclaw is accepted green through level 30:
+**31/31 inherited Orc Fighter source rows**, **41/41 Orc Monk rows**,
+**10 creative first-transfer families**, exact **1230 HP / 327 MP / 617 CP**,
+**15/15 focused Studio suites**, and a successful genuine unpublished Play
+rehearsal with **0 CreatorErrors**.
+
+The accepted Play run proved inherited Orc Iron Punch, Spiritclaw Iron Fist,
+Stunning Fist, Crippling Palm, Focus Force, Force Burst, Bear Aspect,
+Wolf Aspect, inherited Orc Relax and source-cutover rollback.
+
+Force charge authority is server-owned. Focus Force keeps exact
+**1000 ms** source reuse and caps at one charge; Force Burst rejects before
+cast spend without a charge, then consumes exactly one charge into the reviewed
+**0.8** charge damage multiplier.
+
+Continue in source order with **Orc Shaman**. Audit its pinned source class and
+starter inheritance before authoring gameplay; do not infer class IDs, skills,
+ranks or stats. Preserve the same sequence:
+source inventory -> creative career -> exact rank mapping -> mechanics ->
+focused Studio -> unpublished Play -> green documentation.
+
+Permanent edits remain GitHub-only; Desktop Commander remains for local
+pull/build/Studio/Play evidence.
+
 ## 27 September 2026 — v3.19 Warhowl accepted GREEN
 
 [Roadmap](
