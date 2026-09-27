@@ -11,6 +11,11 @@ local REVIEWED_CORPSE_MAGIC = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    NightweaverCorpseSiphon = table.freeze({
+        SourceSkillId = 1151,
+        CastRange = 400,
+        EffectRange = 900,
+    }),
 })
 
 --[[
