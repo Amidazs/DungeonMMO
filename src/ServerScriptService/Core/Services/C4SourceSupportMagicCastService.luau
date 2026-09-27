@@ -190,6 +190,18 @@ local REVIEWED = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    OrcMysticSoulShield = table.freeze({
+        SourceSkillId = 1010,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    AshspeakerSoulShield = table.freeze({
+        SourceSkillId = 1010,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
     DuskseerHealingLight = table.freeze({
         SourceSkillId = 1011,
         Kind = "TargetHeal",
