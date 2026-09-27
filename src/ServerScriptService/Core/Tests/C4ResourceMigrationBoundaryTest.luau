@@ -411,6 +411,52 @@ local function check_nightweaver_passive_boundary()
 end
 
 --[[
+Checks active Concentration reaches the dynamic attack-cancel source offset.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms the authoritative active rank enters combined source stats.
+]]
+local function check_concentration_interrupt_boundary()
+    active_snapshot = {
+        SourceRanks = {
+            {SkillId = 1078, Rank = 2},
+        },
+        UnresolvedEffects = {},
+        ActiveCount = 1,
+        ResolvedCount = 1,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character(
+        "DarkElf",
+        "Nightweaver",
+        30
+    )
+    own_skill(character, "NightweaverQuickWeave", 2)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        plan.ActiveEffectsIntegrated
+            and plan.SourceStatCandidateIncludesActiveEffects
+            and plan.SourceMenBonus == 1.45
+            and plan.SourceStatCandidate.ATTACK_CANCEL_RATE == -25
+            and plan.ReviewedActiveSourceRanks[1].SkillId == 1078
+            and plan.ReviewedActiveSourceRanks[1].Rank == 2
+            and plan.CutoverPrerequisitesReady,
+        "Concentration rank two supplies exact live interruption offset"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
 Checks unsupported actually-owned custom passives keep C4 cutover blocked.
 
 Args:
@@ -630,6 +676,7 @@ local function main()
     check_reviewed_equipment_boundary()
     check_human_wizard_reuse_boundary()
     check_nightweaver_passive_boundary()
+    check_concentration_interrupt_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
     check_denials()
