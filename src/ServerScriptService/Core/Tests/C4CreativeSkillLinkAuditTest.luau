@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 14 and report.SourceLearningRows == 880,
+assert(report.ClassPaths == 15 and report.SourceLearningRows == 966,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 868
+assert(report.CandidateRows == 954
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 880,
+assert(report.CandidateRows + report.ExplicitMissingRows == 966,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -35,6 +35,11 @@ local cleric_heal = assert(Map.resolve("HumanCleric", 1011, 7))
 local cleric_shield = assert(Map.resolve("HumanCleric", 1040, 2))
 local oracle_recharge = assert(Map.resolve("ElvenOracle", 1013, 2))
 local oracle_shackle = assert(Map.resolve("ElvenOracle", 1206, 4))
+local nightweaver_gale = assert(Map.resolve("DarkWizard", 1178, 1))
+local nightweaver_drain = assert(Map.resolve("DarkWizard", 1147, 3))
+local nightweaver_poison = assert(Map.resolve("DarkWizard", 1168, 2))
+local nightweaver_frost = assert(Map.resolve("DarkWizard", 1184, 5))
+local nightweaver_surrender = assert(Map.resolve("DarkWizard", 1224, 1))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -70,6 +75,19 @@ assert(oracle_recharge.Status == "Candidate"
     and oracle_shackle.CreativeSkillId == "LifebinderWindShackle"
     and oracle_shackle.CreativeRank == 3,
     "Oracle source ranks map to exact Lifebinder creative ranks")
+
+assert(nightweaver_gale.Status == "Candidate"
+    and nightweaver_gale.CreativeSkillId == "NightweaverGaleBolt"
+    and nightweaver_gale.CreativeRank == 1
+    and nightweaver_drain.CreativeSkillId == "NightweaverUmbralSiphon"
+    and nightweaver_drain.CreativeRank == 1
+    and nightweaver_poison.CreativeSkillId == "NightweaverVenomHex"
+    and nightweaver_poison.CreativeRank == 1
+    and nightweaver_frost.CreativeSkillId == "NightweaverFrostLance"
+    and nightweaver_frost.CreativeRank == 1
+    and nightweaver_surrender.CreativeSkillId == "NightweaverVenomRend"
+    and nightweaver_surrender.CreativeRank == 1,
+    "Dark Wizard offsets map to independent Nightweaver ranks")
 
 for _, class in ipairs(report.Classes) do
     local gaps = {}
