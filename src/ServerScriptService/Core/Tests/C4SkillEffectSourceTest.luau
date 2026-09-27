@@ -318,6 +318,35 @@ local function check_known_vectors()
         "Orc Monk Stunning Fist rank nine preserves exact stun contract"
     )
 
+    local shaman_weapon = assert(Effects.get_rank(250, 7))
+    check(
+        shaman_weapon.Modifiers[1].val == 9.5
+            and shaman_weapon.Modifiers[2].val == 11.9
+            and shaman_weapon.Modifiers[3].val == 1.45
+            and shaman_weapon.Modifiers[4].val == 1.17,
+        "Orc Shaman Weapon Mastery rank seven is source exact"
+    )
+
+    local shaman_sleep = assert(Effects.get_rank(1097, 5))
+    check(
+        shaman_sleep.Sets.magicLvl == 30
+            and shaman_sleep.Sets.mpInitialConsume == 6
+            and shaman_sleep.Sets.mpConsume == 21
+            and shaman_sleep.Effects[1].abnormal == "SLEEP"
+            and shaman_sleep.Effects[1].time == 30,
+        "Orc Shaman Dreaming Spirit rank five is source exact"
+    )
+
+    local shaman_life = assert(Effects.get_rank(1229, 3))
+    check(
+        shaman_life.Sets.magicLvl == 30
+            and shaman_life.Sets.mpInitialConsume == 18
+            and shaman_life.Sets.mpConsume == 70
+            and shaman_life.Effects[1].name == "HealOverTime"
+            and shaman_life.Effects[1].val == 18,
+        "Orc Shaman Chant of Life rank three is source exact"
+    )
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -339,12 +368,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 138
-        and coverage.RequiredSkillRankPairs == 553
+    check(coverage.SkillCount == 162
+        and coverage.RequiredSkillRankPairs == 634
         and not coverage.LiveCombatIntegrated,
-        "All nineteen-path source skill/rank definitions are catalogued")
+        "All twenty-one-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=138 uniqueRankPairs=553 live=false")
+        .. "skills=162 uniqueRankPairs=634 live=false")
         :format(checks))
 end
 
