@@ -79,6 +79,38 @@ local SOURCES = table.freeze({
             }),
         }),
     }),
+    Orc = table.freeze({
+        Fighter = table.freeze({
+            SourceUrl = "Pinned C4 skill_trees.sql class_id 44",
+            Levels = table.freeze({
+                [1] = table.freeze({
+                    Toughness = 1,
+                    NewbieProtection = 1,
+                    CommonItemCreation = 1,
+                }),
+                [5] = table.freeze({
+                    PowerStrike = 3,
+                    IronPunch = 3,
+                    PhysicalAttackMastery = 1,
+                    ArmorMastery = 1,
+                    SittingRecovery = 1,
+                }),
+                [10] = table.freeze({
+                    PowerStrike = 3,
+                    IronPunch = 3,
+                    PhysicalAttackMastery = 1,
+                    ArmorMastery = 2,
+                }),
+                [15] = table.freeze({
+                    PowerStrike = 3,
+                    IronPunch = 3,
+                    PhysicalAttackMastery = 1,
+                    ArmorMastery = 2,
+                    IronBody = 1,
+                }),
+            }),
+        }),
+    }),
     Elf = table.freeze({
         Fighter = table.freeze({
             SourceUrl = "https://l2hub.info/c4/classes/elven_fighter",
