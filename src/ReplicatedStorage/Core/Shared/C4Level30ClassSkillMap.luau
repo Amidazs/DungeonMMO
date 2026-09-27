@@ -357,6 +357,22 @@ local PALUS_KNIGHT = table.freeze({
     AttackAura = "DuskguardAttackAura",
 })
 
+local DWARF_SCAVENGER = table.freeze({
+    Bandage = "DeepclaimerFieldBandage",
+    StunAttack = "DeepclaimerHammerShock",
+    VitalForce = "DeepclaimerRestorativeDiscipline",
+    WeightLimit = "DeepclaimerPackTraining",
+    BluntMastery = "DeepclaimerBluntTraining",
+    BoostHP = "DeepclaimerFortitude",
+    FastHPRecovery = "DeepclaimerRecovery",
+    PolearmMastery = "DeepclaimerPolearmTraining",
+    LightArmorMastery = "DeepclaimerLightArmorTraining",
+    HeavyArmorMastery = "DeepclaimerHeavyArmorTraining",
+    WildSweep = "DeepclaimerWildSweep",
+    Spoil = "DeepclaimerSalvageMark",
+    SpoilFestival = "DeepclaimerSalvageFestival",
+})
+
 local DWARF_ARTISAN = table.freeze({
     MechanicGolem = "GearwrightClockworkGolem",
     Bandage = "GearwrightFieldBandage",
@@ -407,6 +423,9 @@ function SkillMap.get(
 ): string?
     if branch_id == "DwarfArtisan" then
         return DWARF_ARTISAN[source_category]
+    end
+    if branch_id == "DwarfScavenger" then
+        return DWARF_SCAVENGER[source_category]
     end
     if branch_id == "HumanWarrior" then
         return WARRIOR[source_category]
