@@ -926,6 +926,121 @@ function C4SourceCombatExecutor:_collect_npc_area_targets(
 end
 
 --[[
+Collects reviewed NPC targets around the authenticated caster.
+
+Unlike TARGET_AREA, TARGET_AURA has no selected primary target. The server
+discovers candidates around the caster root and restricts them to the caster's
+current encounter, preventing a client target from relocating the effect.
+
+Args:
+    attacker (any): Server-owned casting player.
+    source_radius (number): Exact C4 skillRadius in source units.
+
+Returns:
+    ({Model}?, {any}?, string?): Ordered models/boundaries or denial reason.
+]]
+function C4SourceCombatExecutor:_collect_npc_caster_aura_targets(
+    attacker: any,
+    source_radius: number
+): ({Model}?, {any}?, string?)
+    local ready, ready_reason = self:_validate_actor(attacker)
+    if not ready then
+        return nil, nil, ready_reason
+    end
+    if type(source_radius) ~= "number"
+        or source_radius ~= source_radius
+        or source_radius <= 0
+        or source_radius >= math.huge
+    then
+        return nil, nil, "InvalidC4SourceAreaRadius"
+    end
+    if type(self._source_units_per_stud) ~= "number" then
+        return nil, nil, "C4SourceCastRangeScaleUnconfigured"
+    end
+
+    local attacker_model = combat_model(attacker)
+    if not attacker_model then
+        return nil, nil, "C4LiveCombatCharacterUnavailable"
+    end
+
+    local attacker_root =
+        attacker_model:FindFirstChild("HumanoidRootPart")
+    if not attacker_root or not attacker_root:IsA("BasePart") then
+        return nil, nil, "C4LiveCombatRootUnavailable"
+    end
+
+    local radius_studs =
+        source_radius / self._source_units_per_stud
+    local params = OverlapParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {attacker_model}
+    params.RespectCanCollide = false
+
+    local encounter =
+        attacker_model:GetAttribute("DungeonEncounterId")
+    local models = {}
+    local boundaries = {}
+    local seen: {[Model]: boolean} = {}
+
+    for _, part in Workspace:GetPartBoundsInRadius(
+        attacker_root.Position,
+        radius_studs,
+        params
+    ) do
+        local candidate = combat_model_from_descendant(part)
+        if not candidate
+            or candidate == attacker_model
+            or seen[candidate]
+        then
+            continue
+        end
+        seen[candidate] = true
+
+        if candidate:GetAttribute("DungeonEncounterId") ~= encounter then
+            continue
+        end
+
+        local boundary =
+            self:_validate_npc_target(attacker, candidate)
+        if boundary then
+            table.insert(models, candidate)
+            table.insert(boundaries, boundary)
+        end
+    end
+
+    return models, boundaries, nil
+end
+
+--[[
+Checks whether one caster-centred source aura can start.
+
+No NPC target is accepted. This validates only authenticated caster state,
+explicit source scaling and a living caster root.
+
+Args:
+    attacker (any): Server-owned casting player.
+    source_radius (number): Exact source aura radius.
+
+Returns:
+    (boolean, string?): Aura readiness or strict denial reason.
+]]
+function C4SourceCombatExecutor:can_aura_skill_npc(
+    attacker: any,
+    source_radius: number
+): (boolean, string?)
+    local targets, _, reason =
+        self:_collect_npc_caster_aura_targets(
+            attacker,
+            source_radius
+        )
+    if not targets then
+        return false, reason
+    end
+
+    return true, nil
+end
+
+--[[
 Applies one already-calculated player-versus-player source hit through CP then
 HP.
 
@@ -4084,6 +4199,100 @@ function C4SourceCombatExecutor:root_skill_npc(
 end
 
 --[[
+Executes one caster-centred C4 Root aura against reviewed NPCs.
+
+Targets are discovered at launch from the caster position. The calculator owns
+one shared magical-shot consumption and independent WIT rolls; only landed
+targets receive the server root state.
+
+Args:
+    attacker (any): Server-owned casting player.
+    creative_skill_id (string): Reviewed creative aura Root skill.
+    creative_rank (number): Server-resolved purchased rank.
+    source_radius (number): Exact source skill radius.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live caster-aura Root evidence or denial reason.
+]]
+function C4SourceCombatExecutor:root_aura_skill_npc(
+    attacker: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    local targets, boundaries, collect_reason =
+        self:_collect_npc_caster_aura_targets(
+            attacker,
+            source_radius
+        )
+    if not targets or not boundaries then
+        return nil, collect_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.root_area_skill(
+            attacker.UserId,
+            boundaries,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.SourceRadius ~= source_radius
+        or #calculated.Results ~= #targets
+    then
+        return nil, "C4RootAuraCalculationContractMismatch"
+    end
+
+    local applications = {}
+    local landed_count = 0
+
+    for index, target in ipairs(targets) do
+        local result = calculated.Results[index]
+        local applied = false
+
+        if result.Landed then
+            local authority = self._npc_root
+            if not authority
+                or type(authority.apply) ~= "function"
+            then
+                return nil, "C4NpcRootAuthorityUnavailable"
+            end
+
+            applied = authority.apply(
+                target,
+                result.DurationSeconds
+            )
+            if applied ~= true then
+                return nil, "C4NpcRootApplicationFailed"
+            end
+            landed_count += 1
+        end
+
+        table.insert(applications, {
+            Target = target,
+            Calculation = result,
+            Landed = result.Landed,
+            RootApplied = applied,
+        })
+    end
+
+    return {
+        Kind = "C4LiveNpcRootAura",
+        Calculation = calculated,
+        Applications = applications,
+        Applied = landed_count > 0,
+        TargetCount = #targets,
+        LandedCount = landed_count,
+        SourceRadius = source_radius,
+        SequenceId = sequence_id,
+    }, nil
+end
+
+--[[
 Executes one reviewed C4 undead-only MDAM spell against an NPC.
 
 Args:
@@ -4476,6 +4685,8 @@ function C4SourceCombatExecutor:capability(): any
         NpcSleepBreaksOnDirectDamage = true,
         NpcRootLiveApplication = true,
         NpcRootMovementOnly = true,
+        NpcRootAuraLiveApplication = true,
+        NpcCasterAuraServerTargeting = true,
         NpcFearLiveApplication = true,
         NpcFearMovementAuthorityConfigured =
             type(self._npc_fear) == "table",
