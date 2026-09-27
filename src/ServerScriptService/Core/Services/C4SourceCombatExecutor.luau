@@ -3842,6 +3842,11 @@ function C4SourceCombatExecutor:normal_attack(
         RawDamage = applied.RawDamage,
         HealthBefore = applied.HealthBefore,
         HealthAfter = applied.HealthAfter,
+        AbsorbDamagePercent = absorbed.AbsorbDamagePercent,
+        RequestedAbsorbHeal = absorbed.RequestedHeal,
+        EffectiveAbsorbHeal = absorbed.EffectiveHeal,
+        CasterHealthBefore = absorbed.CasterHealthBefore,
+        CasterHealthAfter = absorbed.CasterHealthAfter,
     }, nil
 end
 
