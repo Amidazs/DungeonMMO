@@ -58,9 +58,7 @@ local function run_test(fixture_spec: any): boolean
     )
     local fixture = Instance.new("ModuleScript")
     fixture.Name = "TEMP_VEILBLADE_" .. fixture_spec.Name
-    fixture.Source = source.Source .. "
-return true
-"
+    fixture.Source = source.Source .. "\nreturn true\n"
     fixture.Parent = source.Parent
 
     local finished = false
