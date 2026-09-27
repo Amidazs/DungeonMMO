@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    OrcRaider = table.freeze({
+        Id = "WarhowlTrial",
+        BranchId = "OrcRaider",
+        SourceTitle = "The Warhowl Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "WarcallerGorun",
+        Recommendation = "WarhowlOathMark",
+        Steps = table.freeze({
+            talk(
+                "WarcallerGorun",
+                "Accept the Warhowl proving trial."
+            ),
+            talk(
+                "PitMasterKorga",
+                "Learn the raider trial grounds."
+            ),
+            defeat(
+                "AshjawMarauder",
+                4,
+                "Recover four personally earned ashjaw war marks."
+            ),
+            talk(
+                "PitMasterKorga",
+                "Return the four earned war marks."
+            ),
+            defeat(
+                "CraghideChampion",
+                1,
+                "Recover the champion's personal proving seal."
+            ),
+            talk(
+                "WarcallerGorun",
+                "Present the proving seal and take the Warhowl oath."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "AshjawWarMarks4",
+            "CraghideProvingSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     ShillienOracle = table.freeze({
         Id = "DuskseerCovenant",
         BranchId = "ShillienOracle",
