@@ -1,3 +1,28 @@
+## 27 September 2026 — v3.18 Duskseer accepted GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_18_ShIllien_Oracle_Duskseer_GREEN_20260927.md);
+[green evidence](
+../testing/c4-shillien-oracle-duskseer-v3-18-green-20260927.md).
+
+Shillien Oracle / Duskseer is accepted through level 30 at **92/92 mapped
+source rows** across **26 families**, exact class-42 stats/resources,
+**18/18 fresh Studio suites**, a successful unpublished Play rehearsal and
+**0 project CreatorErrors**.
+
+The live run proved Wind Shackle, Empower, Blood Rite and Mana Recharge. Blood
+Rite preserved source Vampiric Rage rank one at 6-percent ordinary-melee
+absorption. Acceptance fixed PvP/NPC absorption parity and NPC overkill
+bookkeeping.
+
+Continue in source order with **Orc Raider source audit**. Do not unlock the
+Orc race merely to perform the audit. Preserve the same fail-closed sequence:
+exact source inventory -> creative career -> exact rank mapping -> mechanics ->
+focused Studio -> unpublished Play -> documentation.
+
+Permanent edits remain GitHub-only; Desktop Commander remains for local
+pull/build/Studio/Play evidence.
+
 ## 27 September 2026 — v3.15 Veilblade accepted GREEN
 
 [Roadmap](
