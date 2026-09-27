@@ -307,7 +307,7 @@ local function main()
     check(coverage.SkillCount == 130
         and coverage.RequiredSkillRankPairs == 527
         and not coverage.LiveCombatIntegrated,
-        "All seventeen-path source skill/rank definitions are catalogued")
+        "All eighteen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
         .. "skills=130 uniqueRankPairs=527 live=false")
         :format(checks))
