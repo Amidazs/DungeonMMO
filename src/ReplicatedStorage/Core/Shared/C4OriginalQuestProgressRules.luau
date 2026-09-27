@@ -171,6 +171,9 @@ function Rules.can_progress(
     if step.RequiresTrialWeapon and event.TrialWeaponVerified ~= true then
         return false, "OriginalTrialWeaponRequired"
     end
+    if step.RequiresSpoil and event.SpoilVerified ~= true then
+        return false, "OriginalQuestSpoilRequired"
+    end
     if step.TargetId == "Vela" and current.Step == 2
         and event.TrialWeaponsGranted ~= true
     then
@@ -424,6 +427,17 @@ function Rules.advance(quest: any, current: any, event: any): any
         current.Proofs.SpartoiBone10 = true
     end
     if current.Count >= step.Required then
+        if quest.BranchId == "DwarfScavenger" then
+            if step.TargetId == "QuartermasterMion" then
+                current.Proofs.QuartermasterErrands = true
+            elseif step.TargetId == "HoneybackBear" then
+                current.Proofs.SpoiledHoneyJars5 = true
+            elseif step.TargetId == "TunnelTarantula" then
+                current.Proofs.SpoiledSalvageBeads20 = true
+            elseif step.TargetId == "WandererTorai" then
+                current.Proofs.WandererProofToken = true
+            end
+        end
         current.Step += 1
         current.Count = 0
     end
