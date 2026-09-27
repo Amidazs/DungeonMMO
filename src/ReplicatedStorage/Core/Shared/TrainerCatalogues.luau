@@ -24,7 +24,108 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"DarkElf"}),
         AllowedBaseClasses = table.freeze({"Mage"}),
         AllowedClasses = table.freeze({"Nightweaver"}),
-        Skills = table.freeze({}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "NightweaverArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverQuickWeave",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverFocusTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverManaChanneling",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverServitorHeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverShadowCompanion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverUmbralSiphon",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverVenomHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverFlameBurst",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverGaleBolt",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverEmberField",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverFrostLance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverSilhouetteCompanion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverSlumberHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverServitorRecharge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverBloodToMana",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverVenomCloud",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverVenomRend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverShadowSpark",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "NightweaverCorpseSiphon",
+                Mode = "LearnOrRank",
+            }),
+        }),
     }),
     VeilbladeTrainer = table.freeze({
         Id = "VeilbladeTrainer",
