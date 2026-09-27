@@ -357,6 +357,23 @@ local PALUS_KNIGHT = table.freeze({
     AttackAura = "DuskguardAttackAura",
 })
 
+local DWARF_ARTISAN = table.freeze({
+    MechanicGolem = "GearwrightClockworkGolem",
+    Bandage = "GearwrightFieldBandage",
+    StunAttack = "GearwrightHammerShock",
+    VitalForce = "GearwrightRestorativeDiscipline",
+    WeightLimit = "GearwrightPackTraining",
+    CreateItem = "GearwrightBlueprintTraining",
+    BluntMastery = "GearwrightBluntTraining",
+    BoostHP = "GearwrightFortitude",
+    FastHPRecovery = "GearwrightRecovery",
+    PolearmMastery = "GearwrightPolearmTraining",
+    LightArmorMastery = "GearwrightLightArmorTraining",
+    HeavyArmorMastery = "GearwrightHeavyArmorTraining",
+    WildSweep = "GearwrightWildSweep",
+    Crystallize = "GearwrightCrystallize",
+})
+
 local ELVEN_KNIGHT = table.freeze({
     SwordBluntMastery = "GreenwardWardenSteelTraining",
     HeavyArmorMastery = "GreenwardWardenHeavyArmorTraining",
@@ -388,6 +405,9 @@ Returns:
 function SkillMap.get(
     branch_id: string, source_category: string
 ): string?
+    if branch_id == "DwarfArtisan" then
+        return DWARF_ARTISAN[source_category]
+    end
     if branch_id == "HumanWarrior" then
         return WARRIOR[source_category]
     end
