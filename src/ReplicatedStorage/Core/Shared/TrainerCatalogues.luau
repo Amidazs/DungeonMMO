@@ -24,7 +24,112 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"DarkElf"}),
         AllowedBaseClasses = table.freeze({"Mage"}),
         AllowedClasses = table.freeze({"Duskseer"}),
-        Skills = table.freeze({}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "DuskseerArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerQuickPrayer",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerWeaponTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerHealingLight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerManaRecharge",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerBattleMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerRevive",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerGroupMend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerExorcism",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerMindWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerStoneWard",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerEmpower",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerMight",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerSlumber",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerBreathBlessing",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerConcentration",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerRootbind",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerWindstep",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerWindShackle",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "DuskseerBloodRite",
+                Mode = "LearnOrRank",
+            }),
+        }),
     }),
     NightweaverTrainer = table.freeze({
         Id = "NightweaverTrainer",
