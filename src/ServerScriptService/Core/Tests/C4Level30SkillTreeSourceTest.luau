@@ -85,14 +85,15 @@ local function main()
     check_scope("ElvenScout", 77)
     check_scope("DwarvenFighter", 15)
     check_scope("DwarfArtisan", 50)
+    check_scope("DwarfScavenger", 49)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 23
-        and coverage.RowCount == 1370
-        and coverage.UniqueSourceSkillIds == 170
+    check(coverage.PathCount == 24
+        and coverage.RowCount == 1419
+        and coverage.UniqueSourceSkillIds == 171
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All twenty-three tracked original paths have exact source learning rows")
+        "All twenty-four tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -340,7 +341,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=23 rows=1370 uniqueSkillIds=170 live=false")
+        .. "paths=24 rows=1419 uniqueSkillIds=171 live=false")
         :format(checks))
 end
 
