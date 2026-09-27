@@ -42,6 +42,24 @@ local REVIEWED = table.freeze({
         SourceSkillId = 1127,
         Kind = "Heal",
     }),
+    NightweaverShadowCompanion = table.freeze({
+        SourceSkillId = 1128,
+        Kind = "Summon",
+        Role = "Combat",
+    }),
+    NightweaverSilhouetteCompanion = table.freeze({
+        SourceSkillId = 1228,
+        Kind = "Summon",
+        Role = "Combat",
+    }),
+    NightweaverServitorRecharge = table.freeze({
+        SourceSkillId = 1126,
+        Kind = "Recharge",
+    }),
+    NightweaverServitorHeal = table.freeze({
+        SourceSkillId = 1127,
+        Kind = "Heal",
+    }),
 })
 
 --[[
