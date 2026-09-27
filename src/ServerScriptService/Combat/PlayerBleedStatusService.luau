@@ -106,6 +106,34 @@ function Bleed.cure(
 end
 
 --[[
+Removes the current authentic bleed after an exact source negate-effect roll.
+
+This path deliberately has no tier gate. C4 NegateEffect removes a matching
+BLEED effect when its independent effect-power roll succeeds. The caller must
+already own that trusted source roll; replicated status attributes are never
+accepted as authority.
+
+Args:
+    character (Model?): Authentic current player character.
+
+Returns:
+    boolean: True only when the real active bleed was removed.
+]]
+function Bleed.cure_source(character: Model?): boolean
+    if not character or not Bleed.is_bleeding(character) then
+        return false
+    end
+
+    local current = records[character]
+    if not current then
+        return false
+    end
+
+    clear_matching(character, current.serial)
+    return true
+end
+
+--[[
 Applies the next nonstacking status tick through bounded damage authority.
 
 Args:
