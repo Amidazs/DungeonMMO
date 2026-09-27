@@ -17,6 +17,7 @@ local EXPECTED = table.freeze({
     Orc = table.freeze({
         Fighter = table.freeze({[1] = 3, [5] = 9,
             [10] = 9, [15] = 10}),
+        Mage = table.freeze({[1] = 7, [7] = 12, [14] = 16}),
     }),
     Elf = table.freeze({
         Fighter = table.freeze({[1] = 2, [5] = 13,
