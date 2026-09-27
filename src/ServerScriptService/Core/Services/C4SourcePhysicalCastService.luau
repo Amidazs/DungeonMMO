@@ -5,6 +5,19 @@ local C4SourcePhysicalCastService = {}
 C4SourcePhysicalCastService.__index = C4SourcePhysicalCastService
 
 local REVIEWED = table.freeze({
+    GearwrightHammerShock = table.freeze({
+        SourceSkillId = 100,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "Stun",
+    }),
+    GearwrightWildSweep = table.freeze({
+        SourceSkillId = 245,
+        CastRange = 40,
+        EffectRange = 400,
+        SourceRadius = 150,
+        ExecutionKind = "Area",
+    }),
     OrcPowerStrike = table.freeze({
         SourceSkillId = 3,
         CastRange = 40,
