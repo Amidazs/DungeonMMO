@@ -187,6 +187,27 @@ local function main()
         "Sleep rank six keeps 30-second action lock and damage wake"
     )
 
+    local chaos = assert(Status.accuracy_aura_plan(1096, 1))
+    check(
+        chaos.SourceSkillId == 1096
+            and chaos.SourceRank == 1
+            and chaos.SaveVs == "WIT"
+            and chaos.EffectPower == 40
+            and chaos.MagicLevel == 30
+            and chaos.IsMagic
+            and chaos.TargetMode == "TARGET_AURA",
+        "Chaos Seal keeps exact magical WIT-resisted aura inputs"
+    )
+    check(
+        chaos.VulnerabilityStat == "DEBUFF_VULN"
+            and chaos.AccuracyPenalty == 12
+            and chaos.DurationSeconds == 15
+            and chaos.SourceRadius == 200
+            and chaos.StackType == "accuracyDown"
+            and chaos.StackOrder == 12,
+        "Chaos Seal keeps exact 12-point 15-second accuracy penalty"
+    )
+
     local fire_vulnerability = assert(
         Status.elemental_vulnerability_plan(1083, 2)
     )
