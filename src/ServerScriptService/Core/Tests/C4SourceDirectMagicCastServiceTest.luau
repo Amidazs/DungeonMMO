@@ -143,6 +143,20 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    AshspeakerBindingSeal = table.freeze({
+        CreativeRank = 2,
+        SourceSkillId = 1208,
+        SourceRank = 2,
+        CastRange = nil,
+        EffectRange = nil,
+    }),
+    AshspeakerChaosSeal = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1096,
+        SourceRank = 1,
+        CastRange = nil,
+        EffectRange = nil,
+    }),
 })
 
 
@@ -168,6 +182,8 @@ local executor_state = {
     SleepCalls = 0,
     VulnerabilityCalls = 0,
     WeakeningCalls = 0,
+    RootAuraCalls = 0,
+    AccuracyAuraCalls = 0,
     LastAreaRadius = nil,
     TargetReady = true,
     TargetReason = nil,
@@ -361,6 +377,35 @@ function FakeExecutor:can_undead_magic_skill_npc(
 end
 
 --[[
+Preflights one disposable caster-centred NPC aura.
+
+Args:
+    subject (any): Expected cast owner.
+    source_radius (number): Reviewed source aura radius.
+
+Returns:
+    (boolean, string?): Configured aura readiness.
+]]
+function FakeExecutor:can_aura_skill_npc(
+    subject: any,
+    source_radius: number
+): (boolean, string?)
+    executor_state.PreflightCalls += 1
+    executor_state.LastEnemy = nil
+    executor_state.LastRange = source_radius
+
+    if subject ~= player then
+        return false, "C4DirectMagicCastOwnerInvalid"
+    end
+    if not executor_state.TargetReady then
+        return false, executor_state.TargetReason
+            or "C4NpcSourceBoundaryUnavailable"
+    end
+
+    return true, nil
+end
+
+--[[
 Applies one disposable direct MDAM result.
 
 Args:
@@ -447,6 +492,76 @@ function FakeExecutor:fear_skill_npc(
         rank,
         sequence_id
     )
+end
+
+--[[
+Applies one disposable Root Aura result.
+
+Args:
+    _attacker (any): Expected cast owner.
+    _skill_id (string): Reviewed Binding Seal identity.
+    rank (number): Creative rank.
+    source_radius (number): Exact source aura radius.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful fake Root Aura evidence.
+]]
+function FakeExecutor:root_aura_skill_npc(
+    _attacker: any,
+    _skill_id: string,
+    rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.RootAuraCalls += 1
+    executor_state.LastRank = rank
+    executor_state.LastRange = source_radius
+    executor_state.LastSequence = sequence_id
+
+    return {
+        Kind = "C4LiveNpcRootAura",
+        Applied = true,
+        RootApplied = true,
+        TargetCount = 2,
+        LandedCount = 2,
+    }, nil
+end
+
+--[[
+Applies one disposable accuracy-aura result.
+
+Args:
+    _attacker (any): Expected cast owner.
+    _skill_id (string): Reviewed Chaos Seal identity.
+    rank (number): Creative rank.
+    source_radius (number): Exact source aura radius.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful fake accuracy-debuff evidence.
+]]
+function FakeExecutor:accuracy_aura_skill_npc(
+    _attacker: any,
+    _skill_id: string,
+    rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.AccuracyAuraCalls += 1
+    executor_state.LastRank = rank
+    executor_state.LastRange = source_radius
+    executor_state.LastSequence = sequence_id
+
+    return {
+        Kind = "C4LiveNpcAccuracyAura",
+        Applied = true,
+        AccuracyDebuffApplied = true,
+        AccuracyPenalty = 12,
+        DurationSeconds = 15,
+        TargetCount = 2,
+        LandedCount = 2,
+    }, nil
 end
 
 --[[
@@ -840,6 +955,8 @@ local function reset_fakes()
     executor_state.SleepCalls = 0
     executor_state.VulnerabilityCalls = 0
     executor_state.WeakeningCalls = 0
+    executor_state.RootAuraCalls = 0
+    executor_state.AccuracyAuraCalls = 0
     executor_state.LastAreaRadius = nil
     executor_state.TargetReady = true
     executor_state.TargetReason = nil
@@ -1427,6 +1544,50 @@ local function check_orc_hostile_launches()
             and launched.Application.RetargetSeconds == 6,
         "Ashspeaker Madness reaches the exact Confusion executor"
     )
+
+    local root_bridge, root_start = started_bridge(
+        580,
+        "AshspeakerBindingSeal"
+    )
+    local rooted = assert(root_bridge:launch_if_ready(
+        player,
+        root_start.CastId,
+        590,
+        980
+    ))
+    check(
+        rooted.Applied
+            and rooted.Application.Kind == "C4LiveNpcRootAura"
+            and rooted.Application.RootApplied
+            and executor_state.RootAuraCalls == 1
+            and executor_state.LastRank == 2
+            and executor_state.LastRange == 200
+            and executor_state.LastSequence == 980,
+        "Ashspeaker Binding Seal reaches caster-centred Root Aura"
+    )
+
+    local chaos_bridge, chaos_start = started_bridge(
+        600,
+        "AshspeakerChaosSeal"
+    )
+    local chaos = assert(chaos_bridge:launch_if_ready(
+        player,
+        chaos_start.CastId,
+        610,
+        981
+    ))
+    check(
+        chaos.Applied
+            and chaos.Application.Kind == "C4LiveNpcAccuracyAura"
+            and chaos.Application.AccuracyDebuffApplied
+            and chaos.Application.AccuracyPenalty == 12
+            and chaos.Application.DurationSeconds == 15
+            and executor_state.AccuracyAuraCalls == 1
+            and executor_state.LastRank == 1
+            and executor_state.LastRange == 200
+            and executor_state.LastSequence == 981,
+        "Ashspeaker Chaos Seal reaches exact accuracy-aura executor"
+    )
 end
 
 --[[
@@ -1583,11 +1744,15 @@ local function main()
             and capability.ReviewedUndeadOnlyMagic
             and capability.ReviewedRootControl
             and capability.ReviewedRootMovementOnly
+            and capability.ReviewedRootAuraControl
+            and capability.ReviewedAccuracyAuraControl
+            and capability.ReviewedAccuracyAuraFeedsNpcNormalHits
+            and capability.ReviewedCasterAuraServerTargeting
             and capability.ReviewedFearControl
             and capability.ReviewedFearMovementCadence
             and capability.ReviewedConfusionControl
-            and capability.ReviewedSkillCount == 43
-            and #capability.ReviewedSkills == 43
+            and capability.ReviewedSkillCount == 45
+            and #capability.ReviewedSkills == 45
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
