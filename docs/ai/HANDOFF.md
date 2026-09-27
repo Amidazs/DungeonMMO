@@ -1,3 +1,37 @@
+## 27 September 2026 — v3.15 Veilblade night handoff
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
+[checkpoint evidence](
+../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
+
+Resume from the Veilblade checkpoint. Source class 35 is represented by
+Veilblade at **72/72 rank rows**, **23 families**, zero creative gaps. Six
+Assassin-specific active families use the dedicated source cast bridge, while
+shared Scout/Wayfinder systems cover the common source families. Exact Assassin
+primary stats and source DEX/blow inputs are present.
+
+Tonight's first Studio pass exposed four concrete failures and those causes were
+fixed. Static validation is clean. Do **not** call the class green yet: the
+post-fix 28-suite rerun and live Play rehearsal were blocked by StudioMCP
+connection instability.
+
+Tomorrow's sequence:
+1. `git pull --ff-only`;
+2. fresh Base + Dungeon build;
+3. restart StudioMCP and Studio;
+4. run
+   `scripts/studio/c4_dark_elf_assassin_backend_focus.luau`
+   (**28 suites**);
+5. fix remaining project failures only;
+6. run unpublished Veilblade Play proof for drain, poison, physical status,
+   shared dagger/blow and one toggle/passive path;
+7. scan final project CreatorErrors;
+8. record green evidence and advance roadmap.
+
+Permanent source/document edits remain GitHub-only. Desktop Commander is for
+local build, Studio and Play validation.
+
 ## 27 September 2026 — v3.14 Duskguard accepted; move to Assassin
 
 [Roadmap](
