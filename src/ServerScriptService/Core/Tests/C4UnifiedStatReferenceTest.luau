@@ -132,6 +132,41 @@ local function check_equipment_and_class_gates()
 end
 
 --[[
+Checks the C4 class-fist fallback keeps naked stats while retaining Fist kind.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source item 248 is identity-only for stat staging.
+]]
+local function check_orc_virtual_fist()
+    local result = assert(C4.get_with_source_items(
+        "Orc",
+        "Fighter",
+        30,
+        {Weapon = 248},
+        {}
+    ))
+
+    check(
+        result.ScopeId == "OrcFighter"
+            and result.SourceItemIds.Weapon == 248
+            and result.SourceKinds.Weapon == "Fist"
+            and result.Naked.WeaponCriticalFormulaApplied == false,
+        "Orc class fist stays a virtual Fist source identity"
+    )
+    check(
+        result.EquippedStats.PHYSICAL_ATTACK == 5
+            and result.EquippedStats.MAGICAL_ATTACK == 5
+            and result.EquippedStats.PHYSICAL_ATTACK_SPEED == 318
+            and result.EquippedStats.CRITICAL_RATE == 40
+            and result.EquippedStats.ACCURACY_COMBAT == 61,
+        "virtual Orc fist preserves exact naked C4 combat stats"
+    )
+end
+
+--[[
 Checks exact Human Wizard Quick Recovery reuse multipliers.
 
 Args:
@@ -392,6 +427,7 @@ Returns:
 local function main()
     check_all_class_vitals()
     check_equipment_and_class_gates()
+    check_orc_virtual_fist()
     check_human_wizard_reuse()
     check_nightweaver_passives()
     check_duskseer_passives()
