@@ -1,5 +1,5 @@
 --!strict
--- Server-owned C4 TOGGLE authority for reviewed Warhowl stances.
+-- Server-owned C4 TOGGLE authority for reviewed source toggles.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -26,6 +26,14 @@ local REVIEWED = table.freeze({
     OrcRelax = table.freeze({
         SourceSkillId = 226,
         UpkeepKind = "Relax",
+    }),
+    OrcMysticSoulCry = table.freeze({
+        SourceSkillId = 1001,
+        UpkeepKind = "FlatMana",
+    }),
+    AshspeakerSoulCry = table.freeze({
+        SourceSkillId = 1001,
+        UpkeepKind = "FlatMana",
     }),
     WarhowlPrecisionStance = table.freeze({
         SourceSkillId = 256,
@@ -115,6 +123,10 @@ local function upkeep_effect(
             or (
                 upkeep_kind == "Relax"
                 and row.name == "Relax"
+            )
+            or (
+                upkeep_kind == "FlatMana"
+                and row.name == "ManaDamOverTime"
             )
 
         if supported
@@ -646,7 +658,9 @@ function C4SourceToggleService:step(delta_time: number)
                 end
 
                 local cost
-                if record.UpkeepKind == "Relax" then
+                if record.UpkeepKind == "Relax"
+                    or record.UpkeepKind == "FlatMana"
+                then
                     cost = record.UpkeepBase
                 else
                     cost = C4SourceToggleService.upkeep_cost(
@@ -735,8 +749,10 @@ function C4SourceToggleService:capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
-        ReviewedSkillCount = 3,
+        ReviewedSkillCount = 5,
         OrcRelaxSourceSkillId = 226,
+        OrcSoulCrySourceSkillId = 1001,
+        SoulCryFlatManaUpkeep = true,
         RelaxFixedTwoSecondUpkeep = true,
         RelaxRequiresSittingAndMissingHp = true,
         PrecisionStanceSourceSkillId = 256,
