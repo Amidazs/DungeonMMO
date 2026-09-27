@@ -186,6 +186,35 @@ local function check_known_vectors()
         and poison_surrender.Effects[1].Modifiers[1].val == 1.25,
         "Dark Wizard poison surrender rank2 exact source debuff")
 
+    local dusk_empower = assert(Effects.get_rank(1059, 1))
+    check(
+        dusk_empower.Sets.mpInitialConsume == 5
+            and dusk_empower.Sets.mpConsume == 18
+            and dusk_empower.Sets.skillType == "BUFF"
+            and dusk_empower.Sets.target == "TARGET_ONE"
+            and dusk_empower.Effects[1].time == 1200
+            and dusk_empower.Effects[1].Modifiers[1].Operation
+                == "mul"
+            and dusk_empower.Effects[1].Modifiers[1].stat
+                == "MAGICAL_ATTACK"
+            and dusk_empower.Effects[1].Modifiers[1].val == 1.55,
+        "Shillien Oracle Empower rank one preserves exact source buff"
+    )
+
+    local dusk_blood = assert(Effects.get_rank(1268, 1))
+    check(
+        dusk_blood.Sets.mpInitialConsume == 6
+            and dusk_blood.Sets.mpConsume == 21
+            and dusk_blood.Sets.skillType == "BUFF"
+            and dusk_blood.Effects[1].time == 1200
+            and dusk_blood.Effects[1].Modifiers[1].Operation
+                == "add"
+            and dusk_blood.Effects[1].Modifiers[1].stat
+                == "ABSORB_DAMAGE_PERCENT"
+            and dusk_blood.Effects[1].Modifiers[1].val == 6,
+        "Shillien Oracle Vampiric Rage rank one preserves six percent"
+    )
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -207,12 +236,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 122
-        and coverage.RequiredSkillRankPairs == 474
+    check(coverage.SkillCount == 124
+        and coverage.RequiredSkillRankPairs == 476
         and not coverage.LiveCombatIntegrated,
-        "All fifteen-path source skill/rank definitions are catalogued")
+        "All sixteen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=122 uniqueRankPairs=474 live=false")
+        .. "skills=124 uniqueRankPairs=476 live=false")
         :format(checks))
 end
 
