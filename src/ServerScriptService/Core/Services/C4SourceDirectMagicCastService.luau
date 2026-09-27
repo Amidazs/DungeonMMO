@@ -257,6 +257,11 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "ConfusionControl",
     }),
+    AshspeakerBindingSeal = table.freeze({
+        SourceSkillId = 1208,
+        SourceRadius = 200,
+        ExecutionKind = "RootAuraControl",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -303,6 +308,7 @@ local REVIEWED_SKILLS = table.freeze({
     "AshspeakerDreamingSpirit",
     "AshspeakerFear",
     "AshspeakerMadness",
+    "AshspeakerBindingSeal",
 })
 
 --[[
@@ -395,6 +401,7 @@ function C4SourceDirectMagicCastService.new(
     assert(
         executor
             and type(executor.can_magic_skill_npc) == "function"
+            and type(executor.can_aura_skill_npc) == "function"
             and type(
                 executor.can_undead_magic_skill_npc
             ) == "function"
@@ -419,6 +426,7 @@ function C4SourceDirectMagicCastService.new(
                 executor.magic_undead_skill_npc
             ) == "function"
             and type(executor.root_skill_npc) == "function"
+            and type(executor.root_aura_skill_npc) == "function"
             and type(executor.fear_skill_npc) == "function"
             and type(executor.confusion_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
@@ -490,6 +498,9 @@ local function store_pending(
         SourceSkillId = started.SourceSkillId,
         CastRange = started.SourceCastRange,
         EffectRange = started.SourceEffectRange,
+        SourceRadius = assert(
+            reviewed_skill(started.CreativeSkillId)
+        ).SourceRadius,
         Enemy = enemy,
         ExecutionKind = assert(
             reviewed_skill(started.CreativeSkillId)
@@ -537,7 +548,13 @@ function C4SourceDirectMagicCastService:begin_cast(
 
     local target_ready
     local target_reason
-    if review.ExecutionKind == "UndeadMagic" then
+    if review.ExecutionKind == "RootAuraControl" then
+        target_ready, target_reason =
+            self._executor:can_aura_skill_npc(
+                player,
+                review.SourceRadius
+            )
+    elseif review.ExecutionKind == "UndeadMagic" then
         target_ready, target_reason =
             self._executor:can_undead_magic_skill_npc(
                 player,
@@ -616,6 +633,13 @@ local function revalidate_target(
     player: any,
     record: any
 ): (boolean, string?)
+    if record.ExecutionKind == "RootAuraControl" then
+        return self._executor:can_aura_skill_npc(
+            player,
+            record.SourceRadius
+        )
+    end
+
     if record.ExecutionKind == "UndeadMagic" then
         return self._executor:can_undead_magic_skill_npc(
             player,
@@ -799,6 +823,15 @@ local function execute_launch(
                 launch.CreativeRank,
                 sequence_id
             )
+    elseif review.ExecutionKind == "RootAuraControl" then
+        applied, reason =
+            self._executor:root_aura_skill_npc(
+                player,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                review.SourceRadius,
+                sequence_id
+            )
     elseif review.ExecutionKind == "PhysicalAttackRateWeakening" then
         applied, reason =
             self._executor:physical_attack_rate_weakening_skill_npc(
@@ -979,6 +1012,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedUndeadOnlyMagic = true,
         ReviewedRootControl = true,
         ReviewedRootMovementOnly = true,
+        ReviewedRootAuraControl = true,
+        ReviewedCasterAuraServerTargeting = true,
         ReviewedFearControl = true,
         ReviewedFearMovementCadence = true,
         ReviewedConfusionControl = true,
