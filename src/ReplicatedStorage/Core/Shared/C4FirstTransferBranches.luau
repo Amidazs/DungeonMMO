@@ -166,7 +166,9 @@ local BRANCHES = table.freeze({
                 SourceTransferLevel = TRANSFER_LEVEL,
                 SourceIndexUrl = SOURCE_URL,
                 SourceQuestUrl = QUEST_URL,
-                GameplayStatus = "NotImplemented",
+                GameplayStatus = "Partial",
+                SourceSkillInventory =
+                    "C4DarkElfAssassinLevel30Sources",
             }),
         }),
         Mage = table.freeze({
