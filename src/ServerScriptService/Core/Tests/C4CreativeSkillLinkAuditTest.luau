@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 16 and report.SourceLearningRows == 1058,
+assert(report.ClassPaths == 17 and report.SourceLearningRows == 1089,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 1046
+assert(report.CandidateRows == 1077
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 1058,
+assert(report.CandidateRows + report.ExplicitMissingRows == 1089,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -45,6 +45,9 @@ local dusk_weapon = assert(Map.resolve("ShillienOracle", 249, 3))
 local dusk_shackle = assert(Map.resolve("ShillienOracle", 1206, 2))
 local dusk_empower = assert(Map.resolve("ShillienOracle", 1059, 1))
 local dusk_blood = assert(Map.resolve("ShillienOracle", 1268, 1))
+local orc_punch = assert(Map.resolve("OrcFighter", 29, 9))
+local orc_toughness = assert(Map.resolve("OrcFighter", 134, 1))
+local orc_body = assert(Map.resolve("OrcFighter", 295, 1))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -102,6 +105,13 @@ assert(dusk_heal.Status == "Candidate"
     and dusk_shackle.CreativeSkillId == "DuskseerWindShackle"
     and dusk_shackle.CreativeRank == 1,
     "Shillien Oracle inherited rank offsets map to Duskseer ranks")
+
+assert(orc_punch.Status == "Candidate"
+    and orc_punch.CreativeSkillId == "OrcIronPunch"
+    and orc_punch.CreativeRank == 9
+    and orc_toughness.CreativeSkillId == "OrcToughness"
+    and orc_body.CreativeSkillId == "OrcIronBody",
+    "Orc Fighter unique source families map independently")
 
 assert(dusk_empower.Status == "Candidate"
     and dusk_empower.CreativeSkillId == "DuskseerEmpower"
