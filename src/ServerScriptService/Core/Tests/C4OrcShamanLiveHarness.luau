@@ -580,7 +580,9 @@ local function cast(
     skill_id,
     sequence_id
 )
-    if enemy then
+    if typeof(enemy) == "Instance"
+        and enemy:IsA("Model")
+    then
         face_enemy(player, enemy)
     end
 
