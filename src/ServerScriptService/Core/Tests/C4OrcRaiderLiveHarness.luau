@@ -611,11 +611,34 @@ local function rehearse_physical_skills(
         9,
         6102
     )
+    local stun_roll = assert(
+        stun.Stun,
+        "Warhowl Skullbreaker did not resolve its source stun roll"
+    )
     assert(
         stun.Kind == "C4LiveNpcPhysicalStunSkill"
-            and stun.DurationSeconds == 9,
-        "Warhowl Skullbreaker left the live stun route"
+            and stun_roll.DurationSeconds == 9
+            and type(stun_roll.Rate) == "number"
+            and type(stun_roll.Roll) == "number"
+            and stun_roll.Landed
+                == (stun_roll.Roll < stun_roll.Rate),
+        "Warhowl Skullbreaker left the live stun authority"
     )
+    if stun_roll.Landed then
+        assert(
+            stun.StunApplied
+                and stun.Landed
+                and stun.DurationSeconds == 9,
+            "landed Skullbreaker did not apply its 9-second stun"
+        )
+    else
+        assert(
+            not stun.StunApplied
+                and stun.Landed == false
+                and stun.DurationSeconds == nil,
+            "resisted Skullbreaker incorrectly applied stun state"
+        )
+    end
 
     local smash = cast_physical(
         bridge,
