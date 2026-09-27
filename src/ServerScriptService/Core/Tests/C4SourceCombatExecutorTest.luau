@@ -96,6 +96,28 @@ function FakeCombat.normal_attack(
         }, nil
     end
 
+    if combat_mode == "Absorb" then
+        return {
+            Kind = "NormalAttack",
+            Hit = true,
+            Miss = false,
+            Amount = 40,
+            AbsorbDamagePercent = 6,
+            AbsorbDamageEligible = true,
+        }, nil
+    end
+
+    if combat_mode == "BowAbsorb" then
+        return {
+            Kind = "NormalAttack",
+            Hit = true,
+            Miss = false,
+            Amount = 40,
+            AbsorbDamagePercent = 6,
+            AbsorbDamageEligible = false,
+        }, nil
+    end
+
     return {
         Kind = "NormalAttack",
         Hit = true,
@@ -681,6 +703,9 @@ local function main()
             and capability.ServerSpatialContext
             and capability.PlayableDamageRoutesThroughCP
             and capability.NormalAttackLiveApplication
+            and capability.NormalAttackAbsorbDamageLiveApplication
+            and capability.NormalAttackAbsorbSkipsBow
+            and capability.NormalAttackAbsorbUsesSourceDamage
             and capability.PhysicalSkillLiveApplication
             and capability.MagicSkillLiveApplication
             and capability.SelfHealLiveApplication
@@ -870,7 +895,43 @@ local function main()
     local attacker_humanoid =
         attacker.Character:FindFirstChildOfClass("Humanoid")
     assert(attacker_humanoid)
+
+    attacker_humanoid.Health = 50
+    combat_mode = "Absorb"
+    local pvp_absorb = assert(executor:normal_attack(
+        attacker,
+        defender
+    ))
+    check(
+        pvp_absorb.Hit
+            and pvp_absorb.RawDamage == 40
+            and pvp_absorb.CPAbsorbed == 3
+            and pvp_absorb.HealthDamage == 37
+            and pvp_absorb.AbsorbDamagePercent == 6
+            and pvp_absorb.RequestedAbsorbHeal == 2
+            and pvp_absorb.EffectiveAbsorbHeal == 2
+            and pvp_absorb.CasterHealthBefore == 50
+            and pvp_absorb.CasterHealthAfter == 52,
+        "Vampiric Rage absorbs from source PvP melee damage before CP"
+    )
+
+    attacker_humanoid.Health = 50
+    combat_mode = "BowAbsorb"
+    local bow_absorb = assert(executor:normal_attack(
+        attacker,
+        defender
+    ))
+    check(
+        bow_absorb.Hit
+            and bow_absorb.AbsorbDamagePercent == 6
+            and bow_absorb.RequestedAbsorbHeal == 0
+            and bow_absorb.EffectiveAbsorbHeal == 0
+            and attacker_humanoid.Health == 50,
+        "source bow attacks never trigger Vampiric Rage healing"
+    )
+
     attacker_humanoid.Health = 70
+    combat_mode = "Hit"
 
     local heal = assert(executor:heal_skill(
         attacker,
@@ -886,7 +947,35 @@ local function main()
         "live HEAL applies accepted source healing to server Humanoid"
     )
 
+    local enemy_humanoid =
+        enemy:FindFirstChildOfClass("Humanoid")
+    assert(enemy_humanoid)
+    enemy_humanoid.Health = 1
+    attacker_humanoid.Health = 50
+    combat_mode = "Absorb"
+
+    local npc_absorb = assert(executor:normal_attack_npc(
+        attacker,
+        enemy,
+        200
+    ))
+    check(
+        npc_absorb.Hit
+            and npc_absorb.RawDamage == 40
+            and npc_absorb.HealthDamage == 1
+            and npc_absorb.AbsorbDamagePercent == 6
+            and npc_absorb.RequestedAbsorbHeal == 2
+            and npc_absorb.EffectiveAbsorbHeal == 2
+            and npc_absorb.CasterHealthBefore == 50
+            and npc_absorb.CasterHealthAfter == 52,
+        "Vampiric Rage uses source melee damage rather than capped NPC HP"
+    )
+
+    table.clear(npc_events)
+    enemy_humanoid.Health = 100
+    attacker_humanoid.Health = 85
     combat_mode = "Hit"
+
     local npc_normal = assert(executor:normal_attack_npc(
         attacker,
         enemy,
