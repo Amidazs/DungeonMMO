@@ -18,6 +18,71 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    GearwrightTrainer = table.freeze({
+        Id = "GearwrightTrainer",
+        DisplayName = "Gearwright Training",
+        AllowedRaces = table.freeze({"Dwarf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Gearwright"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "GearwrightClockworkGolem",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightFieldBandage",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightHammerShock",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightRestorativeDiscipline",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightPackTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightBlueprintTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightBluntTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightFortitude",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightPolearmTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightWildSweep",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "GearwrightCrystallize",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
     AshspeakerTrainer = table.freeze({
         Id = "AshspeakerTrainer",
         DisplayName = "Ashspeaker Training",
