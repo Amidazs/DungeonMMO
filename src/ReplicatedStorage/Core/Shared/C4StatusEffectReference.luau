@@ -281,7 +281,9 @@ function C4StatusEffectReference.sleep_plan(
     source_skill_id: number,
     source_rank: number
 ): (any?, string?)
-    if source_skill_id ~= 1069 then
+    if source_skill_id ~= 1069
+        and source_skill_id ~= 1097
+    then
         return nil, "UnsupportedOriginalSleepSkill"
     end
 
