@@ -316,12 +316,37 @@ local function main()
         "Orc Monk rank schedule maps only through earned Spiritclaw"
     )
 
+    local orc_shaman =
+        assert(Coverage.for_branch("OrcShaman"))
+    check(
+        orc_shaman.SourceClass == "Orc Shaman"
+            and orc_shaman.CurrentCareerId == nil
+            and orc_shaman.SourceInventoryAuditedThroughCap
+            and orc_shaman.SourceRankEntriesThroughCap == 77
+            and orc_shaman.SourceRankEntriesByLevel[20] == 24
+            and orc_shaman.SourceRankEntriesByLevel[25] == 26
+            and orc_shaman.SourceRankEntriesByLevel[30] == 27
+            and #orc_shaman.SourceBrackets == 3
+            and orc_shaman.SourceBrackets[1] == 20
+            and orc_shaman.SourceBrackets[2] == 25
+            and orc_shaman.SourceBrackets[3] == 30,
+        "Orc Shaman retains exact class-50 launch source inventory"
+    )
+    check(
+        orc_shaman.TrainerMappedRankEntries == 0
+            and orc_shaman.MissingRankScheduleEntries == 77
+            and not orc_shaman.SourceRankScheduleMapped
+            and orc_shaman.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Orc Shaman source audit must not imply a playable career"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 15,
-        "Exactly fifteen first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 16,
+        "Exactly sixteen first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 15,
