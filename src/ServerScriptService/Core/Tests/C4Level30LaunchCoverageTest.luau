@@ -291,12 +291,37 @@ local function main()
         "Warhowl maps all 63 rows without unlocking fresh Orc creation"
     )
 
+    local orc_monk =
+        assert(Coverage.for_branch("OrcMonk"))
+    check(
+        orc_monk.SourceClass == "Orc Monk"
+            and orc_monk.CurrentCareerId == nil
+            and orc_monk.SourceInventoryAuditedThroughCap
+            and orc_monk.SourceRankEntriesThroughCap == 41
+            and orc_monk.SourceRankEntriesByLevel[20] == 12
+            and orc_monk.SourceRankEntriesByLevel[24] == 14
+            and orc_monk.SourceRankEntriesByLevel[28] == 15
+            and #orc_monk.SourceBrackets == 3
+            and orc_monk.SourceBrackets[1] == 20
+            and orc_monk.SourceBrackets[2] == 24
+            and orc_monk.SourceBrackets[3] == 28,
+        "Orc Monk retains exact class-47 launch source inventory"
+    )
+    check(
+        orc_monk.TrainerMappedRankEntries == 0
+            and orc_monk.MissingRankScheduleEntries == 41
+            and not orc_monk.SourceRankScheduleMapped
+            and orc_monk.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Orc Monk audit must not imply a playable career"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 14,
-        "Exactly fourteen first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 15,
+        "Exactly fifteen first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 14,
