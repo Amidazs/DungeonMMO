@@ -3358,6 +3358,142 @@ function C4SourceCombatCalculationService.root_area_skill(
 end
 
 --[[
+Resolves one C4 caster-centred accuracy-debuff aura.
+
+One magical-shot snapshot is consumed for the cast. Every reviewed NPC target
+receives an independent C4 WIT/debuff-vulnerability land roll.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready caster.
+    defender_targets ({any}): Ordered reviewed NPC source boundaries.
+    creative_skill_id (string): Server-selected Chaos Seal identity.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Per-target land results and exact source metadata.
+]]
+function C4SourceCombatCalculationService.accuracy_aura_skill(
+    attacker_user_id: number,
+    defender_targets: {any},
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+    if type(defender_targets) ~= "table"
+        or #defender_targets < 1
+    then
+        return nil, "OriginalAccuracyAuraTargetsUnavailable"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local source, _, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason =
+        StatusEffects.accuracy_aura_plan(
+            source.SkillId,
+            source.Rank
+        )
+    if not plan then
+        return nil, plan_reason
+    end
+
+    local shot, shot_reason =
+        consume_magic_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local results = {}
+    local landed_count = 0
+
+    for index, candidate in ipairs(defender_targets) do
+        local defender, defender_reason =
+            npc_source_boundary(candidate)
+        if not defender then
+            return nil, defender_reason
+        end
+
+        local stats = defender.SourceStatCandidate
+        local wit_bonus = defender.SourceWitBonus
+        local vulnerability =
+            stats and stats[plan.VulnerabilityStat]
+        if type(wit_bonus) ~= "number"
+            or wit_bonus <= 0
+            or type(vulnerability) ~= "number"
+            or vulnerability < 0
+        then
+            return nil, "OriginalAccuracyAuraTargetStatsUnavailable"
+        end
+
+        local roll = COMBAT_RANDOM:NextInteger(0, 99)
+        local resolved, resolve_reason =
+            StatusEffects.resolve_effect_success({
+                Power = plan.EffectPower,
+                TargetStatBonus = wit_bonus,
+                TargetVulnerability = vulnerability,
+                IsMagic = plan.IsMagic,
+                AttackerMAtk =
+                    attacker.SourceStatCandidate.MAGICAL_ATTACK,
+                TargetMDef = stats.MAGICAL_DEFENCE,
+                Spiritshot = shot.Spiritshot,
+                BlessedSpiritshot = shot.BlessedSpiritshot,
+                AttackerLevel = attacker.Level,
+                TargetLevel = defender.Level,
+                MagicLevel = plan.MagicLevel,
+            }, roll)
+        if not resolved then
+            return nil, resolve_reason
+        end
+
+        if resolved.Landed then
+            landed_count += 1
+        end
+
+        results[index] = table.freeze({
+            Landed = resolved.Landed,
+            Rate = resolved.Rate,
+            Roll = resolved.Roll,
+            AccuracyPenalty = plan.AccuracyPenalty,
+            DurationSeconds = plan.DurationSeconds,
+            SourceNpcId = defender.SourceNpcId,
+        })
+    end
+
+    return {
+        Kind = "AccuracyAuraControl",
+        Results = table.freeze(results),
+        TargetCount = #results,
+        LandedCount = landed_count,
+        SourceRadius = plan.SourceRadius,
+        AccuracyPenalty = plan.AccuracyPenalty,
+        DurationSeconds = plan.DurationSeconds,
+        SaveVs = plan.SaveVs,
+        EffectPower = plan.EffectPower,
+        MagicLevel = plan.MagicLevel,
+        Spiritshot = shot.Spiritshot,
+        BlessedSpiritshot = shot.BlessedSpiritshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
 Resolves one reviewed C4 elemental-vulnerability debuff cast.
 
 The cast snapshots and consumes one magical shot, then uses that shot state in
