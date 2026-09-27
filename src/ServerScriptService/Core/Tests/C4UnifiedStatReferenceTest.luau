@@ -21,13 +21,13 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all seventeen separate source templates at the level-30 launch cap.
+Checks all nineteen separate source templates at the level-30 launch cap.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all seventeen paths.
+    nil: Confirms exact archived HP, MP and CP across all nineteen paths.
 ]]
 local function check_all_class_vitals()
     local vectors = {
@@ -48,6 +48,8 @@ local function check_all_class_vitals()
         {"DarkElf", "Veilblade", 831, 325, 337},
         {"DarkElf", "Nightweaver", 672, 482, 338},
         {"DarkElf", "Duskseer", 732, 482, 368},
+        {"Orc", "Fighter", 1075, 322, 562},
+        {"Orc", "Warhowl", 1269, 327, 884},
     }
     for _, vector in ipairs(vectors) do
         local result, issue = C4.get(
@@ -374,6 +376,55 @@ local function check_duskseer_unique_active_buffs()
 end
 
 --[[
+Checks Warhowl inherits Orc Fighter passives before Raider passives.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-44/class-45 source passive composition.
+]]
+local function check_warhowl_inherited_passives()
+    local result = assert(C4.get(
+        "Orc",
+        "Warhowl",
+        30,
+        {Weapon = "Blunt"},
+        {
+            {SkillId = 134, Rank = 1},
+            {SkillId = 141, Rank = 3},
+            {SkillId = 142, Rank = 5},
+            {SkillId = 148, Rank = 1},
+            {SkillId = 211, Rank = 2},
+            {SkillId = 212, Rank = 1},
+            {SkillId = 216, Rank = 4},
+            {SkillId = 227, Rank = 7},
+            {SkillId = 231, Rank = 7},
+            {SkillId = 257, Rank = 4},
+            {SkillId = 293, Rank = 3},
+            {SkillId = 295, Rank = 1},
+        }
+    ))
+
+    local stats = result.PassiveStatSnapshot
+    check(
+        result.ScopeId == "OrcRaider"
+            and result.AppliedSourceModifiers == 12
+            and stats.MAX_HP == 1369
+            and stats.PHYSICAL_DEFENCE == 109
+            and math.abs(stats.PHYSICAL_ATTACK - 20.125) < 0.000001,
+        "Warhowl composes inherited Orc Fighter and Raider passives"
+    )
+    check(
+        stats.ROOT_VULN == 0.8
+            and stats.SLEEP_VULN == 0.8
+            and stats.POISON_VULN == 0.8
+            and stats.FALL == 0.6,
+        "Toughness and Iron Body preserve exact source multipliers"
+    )
+end
+
+--[[
 Checks Concentration contributes its dynamic attack-cancel offset.
 
 Args:
@@ -416,7 +467,7 @@ local function check_concentration_attack_cancel_offset()
 end
 
 --[[
-Executes complete seventeen-class source-only stat and loadout acceptance.
+Executes complete nineteen-class source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -432,9 +483,10 @@ local function main()
     check_nightweaver_passives()
     check_duskseer_passives()
     check_duskseer_unique_active_buffs()
+    check_warhowl_inherited_passives()
     check_concentration_attack_cancel_offset()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=17 live=false"):format(checks))
+        .. "paths=19 live=false"):format(checks))
 end
 
 main()
