@@ -1,3 +1,27 @@
+## 27 September 2026 — CURRENT v3.22 Dwarf design boundary
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_22_Dwarf_Profession_Design_Boundary_20260927.md).
+
+The latest accepted gameplay remains **v3.21 Ashspeaker GREEN**. The level-30
+C4 first-transfer catalogue is **16 / 18 complete**, with aggregate accepted
+coverage of **21 source paths / 1305 learning rows / 162 unique source skill
+IDs** and **162 skills / 634 rank-effect pairs**.
+
+The only remaining first-transfer branches are **Dwarf Artisan** and
+**Dwarf Scavenger**. No Dwarf audit, naming, source mapping, profession bridge,
+Spoil/Sweep runtime or Play work has begun.
+
+The profession/economy design is now under active discussion. The current
+candidate — **not yet accepted** — keeps normal Dwarven Fighters at
+1 gathering + 1 crafting, then grants Artisan 1 gathering + 2 crafting and
+Scavenger 2 gathering + 1 crafting. Artisan would additionally retain a
+class-owned Dwarven Blueprint layer, while Scavenger would retain
+class-owned Spoil/Sweep salvage.
+
+Do not implement that candidate until the owner explicitly chooses the Dwarf
+rule. Preserve the v3.21 accepted gameplay baseline while discussing it.
+
 ## 27 September 2026 — CURRENT v3.21 Ashspeaker GREEN
 
 [Roadmap](
