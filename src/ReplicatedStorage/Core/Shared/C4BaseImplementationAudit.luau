@@ -15,6 +15,34 @@ local C4BaseImplementationAudit = {}
 
 -- Different original C4 level-one and later Mystic rows may use the
 -- same source family but two different DungeonMMO authored skills.
+local ORC_FIGHTER_MAPPINGS = table.freeze({
+    Toughness = table.freeze({[1] = "OrcToughness"}),
+    Lucky = table.freeze({[1] = "OrcLucky"}),
+    CommonItemCreation = table.freeze({[1] = "OrcCommonCraft"}),
+    PowerStrike = table.freeze({
+        [5] = "OrcPowerStrike",
+        [10] = "OrcPowerStrike",
+        [15] = "OrcPowerStrike",
+    }),
+    IronPunch = table.freeze({
+        [5] = "OrcIronPunch",
+        [10] = "OrcIronPunch",
+        [15] = "OrcIronPunch",
+    }),
+    PhysicalAttackMastery = table.freeze({
+        [5] = "OrcWeaponTraining",
+        [10] = "OrcWeaponTraining",
+        [15] = "OrcWeaponTraining",
+    }),
+    ArmorMastery = table.freeze({
+        [5] = "OrcArmorTraining",
+        [10] = "OrcArmorTraining",
+        [15] = "OrcArmorTraining",
+    }),
+    SittingRecovery = table.freeze({[5] = "OrcRelax"}),
+    IronBody = table.freeze({[15] = "OrcIronBody"}),
+})
+
 local MAPPINGS = table.freeze({
     Fighter = table.freeze({
         RecipeReading = table.freeze({
@@ -221,6 +249,12 @@ local function crafting_ranks_at_level(
         return if skill.RecipeReadingEnabled == true
             and type(C4Crafting.can_read) == "function" then 1 else 0
     end
+    if skill_id == "OrcCommonCraft" then
+        return if skill.Kind == "Utility"
+            and skill.CommonCraftEnabled == true
+            and type(C4Crafting.can_make_common) == "function"
+            then 1 else 0
+    end
     if skill_id ~= "C4CommonItemCreation"
         or skill.CommonItemCreationEnabled ~= true
         or type(C4Crafting.can_make_common) ~= "function"
@@ -281,7 +315,9 @@ function C4BaseImplementationAudit.audit(
     race_id: string, class_id: string
 ): any?
     local source = Source.get(race_id, class_id)
-    local mapped = MAPPINGS[class_id]
+    local mapped = if race_id == "Orc" and class_id == "Fighter"
+        then ORC_FIGHTER_MAPPINGS
+        else MAPPINGS[class_id]
     if not source or not mapped then
         return nil
     end
