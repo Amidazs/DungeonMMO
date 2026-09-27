@@ -254,6 +254,7 @@ function C4UnifiedStatReference.get_with_source_items(
     values.MAX_MP += staged.DeferredMaxMp
     return {
         ScopeId = reference.ScopeId, Level = level,
+        PrimaryStats = reference.Stats,
         SourceItemIds = table.clone(item_ids),
         SourceKinds = resolved.Kinds, SourceCommit = resolved.SourceCommit,
         Naked = naked, EquippedStats = values,
@@ -355,6 +356,7 @@ function C4UnifiedStatReference.get_with_source_effects(
     return {
         ScopeId = reference.ScopeId,
         Level = level,
+        PrimaryStats = reference.Stats,
         SourceItemIds = table.clone(item_ids),
         SourceKinds = resolved.Kinds,
         SourceCommit = resolved.SourceCommit,
