@@ -28,6 +28,9 @@ local C4NpcConfusionService = require(
 local C4NpcRootService = require(
     Combat:WaitForChild("C4NpcRootService")
 )
+local C4NpcFearService = require(
+    Combat:WaitForChild("C4NpcFearService")
+)
 local C4NpcElementalVulnerabilityService = require(
     Combat:WaitForChild(
         "C4NpcElementalVulnerabilityService"
@@ -255,6 +258,7 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
         or C4NpcSleepService.is_sleeping(runtime.model)
+        or C4NpcFearService.is_feared(runtime.model)
         or (
             C4NpcConfusionService.is_confused(runtime.model)
             and C4NpcConfusionService.caster_user_id(
@@ -297,6 +301,7 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
         or C4NpcSleepService.is_sleeping(runtime.model)
+        or C4NpcFearService.is_feared(runtime.model)
         or (
             C4NpcConfusionService.is_confused(runtime.model)
             and C4NpcConfusionService.caster_user_id(
@@ -314,6 +319,7 @@ local function perform_attack(runtime: Runtime, target_player: Player, target_ch
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
         or C4NpcSleepService.is_sleeping(runtime.model)
+        or C4NpcFearService.is_feared(runtime.model)
         or (
             C4NpcConfusionService.is_confused(runtime.model)
             and C4NpcConfusionService.caster_user_id(
@@ -365,6 +371,7 @@ local function attach(model: Instance)
         C4NpcSleepService.clear(model)
         C4NpcConfusionService.clear(model)
         C4NpcRootService.clear(model)
+        C4NpcFearService.clear(model)
         C4NpcElementalVulnerabilityService.clear_all(model)
         EnemyWeakeningService.clear(model)
         runtime.attackSequence += 1
@@ -409,6 +416,53 @@ RunService.Heartbeat:Connect(function(dt)
             model:SetAttribute("AttackName", "")
             model:SetAttribute("MarauderAIState", "Sleeping")
             PresentationService.reset_pose(model, 0)
+        elseif C4NpcFearService.is_feared(model) then
+            if runtime.attacking then
+                runtime.attackSequence += 1
+            end
+            runtime.attacking = false
+            model:SetAttribute("AttackTelegraph", false)
+            model:SetAttribute("AttackName", "")
+
+            if C4NpcRootService.is_rooted(model) then
+                runtime.humanoid:Move(Vector3.zero)
+                model:SetAttribute("MarauderAIState", "Rooted")
+                PresentationService.reset_pose(model, 0)
+            else
+                local destination =
+                    C4NpcFearService.flee_destination(model)
+                if destination then
+                    local offset = Vector3.new(
+                        destination.X - runtime.root.Position.X,
+                        0,
+                        destination.Z - runtime.root.Position.Z
+                    )
+                    local multiplier =
+                        RangerSlowService.get_multiplier(model)
+                    local move = math.min(
+                        offset.Magnitude,
+                        CHASE_SPEED * multiplier * step
+                    )
+                    if offset.Magnitude > 0.01 and move > 0 then
+                        local next_position =
+                            runtime.root.Position
+                            + offset.Unit * move
+                        model:PivotTo(CFrame.lookAt(
+                            next_position,
+                            Vector3.new(
+                                destination.X,
+                                next_position.Y,
+                                destination.Z
+                            )
+                        ))
+                        PresentationService.set_chase_pose(
+                            model,
+                            os.clock()
+                        )
+                    end
+                end
+                model:SetAttribute("MarauderAIState", "Feared")
+            end
         elseif not runtime.attacking then
             local player, character, target_root, distance = threat_target(runtime)
             if not player or not character or not target_root then
