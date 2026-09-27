@@ -38,6 +38,12 @@ local REVIEWED_PERIODIC_MAGIC = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "SingleTarget",
     }),
+    OrcMysticChillFlame = table.freeze({
+        SourceSkillId = 1100,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
     AshspeakerVenom = table.freeze({
         SourceSkillId = 1095,
         CastRange = 600,
@@ -50,6 +56,25 @@ local REVIEWED_PERIODIC_MAGIC = table.freeze({
         EffectRange = 200,
         SourceRadius = 200,
         ExecutionKind = "TargetArea",
+    }),
+    AshspeakerBlazeQuake = table.freeze({
+        SourceSkillId = 1101,
+        CastRange = 0,
+        EffectRange = 200,
+        SourceRadius = 200,
+        ExecutionKind = "TargetArea",
+    }),
+    AshspeakerAuraSink = table.freeze({
+        SourceSkillId = 1102,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
+    AshspeakerFrostFlame = table.freeze({
+        SourceSkillId = 1107,
+        CastRange = 750,
+        EffectRange = 1250,
+        ExecutionKind = "SingleTarget",
     }),
 })
 
@@ -526,7 +551,9 @@ function C4SourcePeriodicMagicCastService:capability(): any
         ReviewedTargetAreaSourceRadius = true,
         ReviewedAuraPoison = true,
         ReviewedOrcVenom = true,
-        ReviewedSkillCount = 7,
+        ReviewedOrcHealthDot = true,
+        ReviewedOrcManaDot = true,
+        ReviewedSkillCount = 11,
         ReviewedSkill = "EmberweaverVenomHex",
         ReviewedSourceSkillId = 1168,
         TargetBoundAtCastStart = true,
