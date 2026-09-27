@@ -49,27 +49,10 @@ local function replace_once(
 end
 
 local bridge_anchor = [==[
-C4CombatCutoverStudioBridge.bind(
-    runtime.C4CombatCutoverCoordinator,
-    nil,
-    function(user_id: number): (any?, string?)
-        return ProgressionRuntimeState
-            .get_c4_resource_migration_boundary(user_id)
-    end
-)
 ProgressionService.bind_default(runtime.ProgressionService)
 ]==]
 
 local bridge_replacement = [==[
-C4CombatCutoverStudioBridge.bind(
-    runtime.C4CombatCutoverCoordinator,
-    nil,
-    function(user_id: number): (any?, string?)
-        return ProgressionRuntimeState
-            .get_c4_resource_migration_boundary(user_id)
-    end
-)
-
 if RunService:IsStudio()
     and game.PlaceId == 0
     and game.GameId == 0
@@ -608,7 +591,7 @@ local function cast_wind_shackle(bridge, player, enemy)
 end
 
 --[[
-Casts Agility on the real source-active player.
+Casts Empower on the real source-active player.
 
 Args:
     bridge (BindableFunction): Live cast bridge.
