@@ -3,6 +3,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local RunService = game:GetService("RunService")
 
 local Formula = require(
     ReplicatedStorage.Core.Shared.C4CombatFormulaReference
@@ -117,7 +118,34 @@ function C4SourceCastInterruptionService.new(
         _boundary_provider =
             boundary_provider or default_boundary_provider,
         _random = Random.new(),
+        _test_roll_provider = nil,
     }, C4SourceCastInterruptionService)
+end
+
+--[[
+Installs a deterministic roll provider for unpublished Studio rehearsals.
+
+Production servers reject this hook. The provider is server-local and cannot
+be reached by a RemoteEvent or client payload.
+
+Args:
+    provider (any?): Zero-argument integer-roll provider, or nil to clear.
+
+Returns:
+    nil: Updates only this interruption service instance.
+]]
+function C4SourceCastInterruptionService:set_roll_provider_for_test(
+    provider: any?
+)
+    assert(
+        RunService:IsStudio(),
+        "C4 cast interruption test rolls are Studio-only"
+    )
+    assert(
+        provider == nil or type(provider) == "function",
+        "C4 cast interruption test roll provider must be a function or nil"
+    )
+    self._test_roll_provider = provider
 end
 
 --[[
@@ -210,6 +238,9 @@ function C4SourceCastInterruptionService:try_damage_interrupt(
     end
 
     local roll = supplied_roll
+    if roll == nil and self._test_roll_provider then
+        roll = self._test_roll_provider()
+    end
     if roll == nil then
         roll = self._random:NextInteger(0, 99)
     end
