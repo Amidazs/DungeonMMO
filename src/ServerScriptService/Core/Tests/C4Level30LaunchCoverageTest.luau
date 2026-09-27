@@ -200,16 +200,32 @@ local function main()
         and not knight.LaunchSkillCatalogueReady,
         "Knight has all 54 source rank schedules, but live mechanic "
             .. "parity and launch certification are still outstanding")
+    local assassin =
+        assert(Coverage.for_branch("DarkElfAssassin"))
+    check(
+        assassin.SourceClass == "Assassin"
+            and assassin.CurrentCareerId == "Veilblade"
+            and assassin.SourceInventoryAuditedThroughCap
+            and assassin.SourceRankEntriesThroughCap == 72
+            and assassin.SourceRankEntriesByLevel[20] == 21
+            and assassin.SourceRankEntriesByLevel[24] == 25
+            and assassin.SourceRankEntriesByLevel[28] == 26
+            and assassin.TrainerMappedRankEntries == 72
+            and assassin.MissingRankScheduleEntries == 0
+            and assassin.SourceRankScheduleMapped,
+        "Dark Elf Assassin keeps its exact 20/24/28 source-rank schedule"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 10,
-        "Exactly ten first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 11,
+        "Exactly eleven first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 10,
-        "Ten implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 11,
+        "Eleven implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
