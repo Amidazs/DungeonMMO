@@ -69,6 +69,8 @@ local PARTIAL_SOURCE_INVENTORIES = table.freeze({
     OrcRaider = "C4OrcRaiderLevel30Sources",
     OrcMonk = "C4OrcMonkLevel30Sources",
     OrcShaman = "C4OrcShamanLevel30Sources",
+    DwarfArtisan = "C4DwarfArtisanLevel30Sources",
+    DwarfScavenger = "C4DwarfScavengerLevel30Sources",
 })
 
 local function check_partial_branch(
@@ -104,6 +106,7 @@ Returns:
 local function main()
     local total = 0
     local partial = 0
+    local backend_in_progress = 0
     local ids = {}
     check(#Branches.races() == 5,
         "Original Chronicle 4 has five playable source races")
@@ -117,11 +120,13 @@ local function main()
                 check(option.SourceClass == source_class
                     and option.SourceRace == race_id,
                     "Wrong original first transfer " .. source_class)
+                local expected_start = if race_id == "Dwarf"
+                    then 19 else 18
                 check(option.SourceTransferLevel == 20
-                    and option.SourceQuestStartLevel == 18
+                    and option.SourceQuestStartLevel == expected_start
                     and type(option.SourceQuestName) == "string"
                     and option.SourceQuestName ~= "",
-                    "Original first transfer needs its own level-18 quest")
+                    "Original first transfer needs its exact source quest level")
                 check(not ids[option.Id], "Duplicate original class ID")
                 ids[option.Id] = true
                 check(Branches.find(
@@ -137,6 +142,9 @@ local function main()
                 if option.GameplayStatus == "Partial" then
                     partial += 1
                     check_partial_branch(option, race_id)
+                elseif option.GameplayStatus == "BackendInProgress" then
+                    backend_in_progress += 1
+                    check_partial_branch(option, race_id)
                 else
                     check(option.GameplayStatus == "NotImplemented",
                         "Unfinished source class was marked implemented")
@@ -145,8 +153,10 @@ local function main()
             end
         end
     end
-    check(total == 18 and partial == 13,
-        "Original C4 requires eighteen paths, thirteen currently partial")
+    check(
+        total == 18 and partial == 13 and backend_in_progress == 2,
+        "Original C4 keeps eighteen paths with both Dwarf backends pending"
+    )
     check(
         RaceDefinitions.get("DarkElf") ~= nil,
         "Implemented Dark Elf paths require the registered race"
@@ -156,9 +166,10 @@ local function main()
         orc.CreationEnabled == false,
         "Orc source registry must remain disabled for fresh creation"
     )
+    local dwarf = assert(RaceDefinitions.get("Dwarf"))
     check(
-        RaceDefinitions.get("Dwarf") == nil,
-        "Dwarf source registry cannot prematurely unlock a race"
+        dwarf.CreationEnabled == false,
+        "Dwarf source registry must remain disabled for fresh creation"
     )
     check(Branches.get("Dwarf", "Mage") == nil,
         "Invented Dwarven Mystic path must not exist")
