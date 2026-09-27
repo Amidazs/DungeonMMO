@@ -176,8 +176,9 @@ local function main()
     check(Branches.find("Elf", "Fighter", "HumanRogue") == nil,
         "Cross-race class selection must be rejected")
     print(("[C4 First Transfers] PASS: %d assertions, "
-        .. "%d original source classes, %d partial."):format(
-        checks, total, partial
+        .. "%d original source classes, %d partial, "
+        .. "%d backend pending."):format(
+        checks, total, partial, backend_in_progress
     ))
 end
 
