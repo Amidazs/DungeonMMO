@@ -12,6 +12,7 @@ local ITEM_REFERENCES = table.freeze({
     -- SQL bodypart/weaponType and XML stat operations are both pinned.
     [248] = table.freeze({
         Id = 248, Slot = "Weapon", Kind = "Fist",
+        VirtualFist = true,
         SoulShotCount = 0, SpiritShotCount = 0,
         PhysicalAttack = 0, MagicalAttack = 0,
         RandomDamage = 5,
