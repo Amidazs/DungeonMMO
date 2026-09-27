@@ -13,6 +13,7 @@ local TEST_NAMES = table.freeze({
     "C4DwarfScavengerProgressionTest",
     "DwarfScavengerProfessionCapacityTest",
     "C4DwarfScavengerQuestRulesTest",
+    "C4DwarfFirstTransferAwardTest",
     "C4DwarfSalvageConfigTest",
     "C4DwarfSalvageServiceTest",
     "C4SourceSalvageCastServiceTest",
