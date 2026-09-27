@@ -201,9 +201,9 @@ local DEFINITIONS = table.freeze({
     ),
     EmberweaverConcentration = make_skill(
         "EmberweaverConcentration",
-        "Passive",
+        "Support",
         {{20, 1}, {30, 1}},
-        NO_WEAPON,
+        ARCANE_WAND,
         nil
     ),
     EmberweaverFastCasting = make_skill(
