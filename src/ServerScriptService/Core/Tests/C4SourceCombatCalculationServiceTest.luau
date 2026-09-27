@@ -37,6 +37,7 @@ local NIGHTWEAVER_ID = 938189
 local ORC_FIST_ID = 938190
 local ORC_WRONG_WEAPON_ID = 938191
 local SPIRITCLAW_ID = 938192
+local ASHSPEAKER_ID = 938193
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -126,6 +127,7 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= ORC_FIST_ID
         and user_id ~= ORC_WRONG_WEAPON_ID
         and user_id ~= SPIRITCLAW_ID
+        and user_id ~= ASHSPEAKER_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -408,6 +410,16 @@ local function seed_characters()
     own_skill(spiritclaw, "SpiritclawForceBurst", 6)
     own_skill(spiritclaw, "SpiritclawCripplingPalm", 3)
     Runtime.set_character(SPIRITCLAW_ID, spiritclaw)
+
+    local ashspeaker = starter_character(
+        ASHSPEAKER_ID,
+        "Ashspeaker"
+    )
+    own_skill(ashspeaker, "AshspeakerFlameChant", 1)
+    own_skill(ashspeaker, "AshspeakerWarPower", 1)
+    own_skill(ashspeaker, "AshspeakerLifeChant", 3)
+    own_skill(ashspeaker, "AshspeakerChaosSeal", 1)
+    Runtime.set_character(ASHSPEAKER_ID, ashspeaker)
 end
 
 --[[
@@ -2080,6 +2092,148 @@ local function check_veilblade_blow()
 end
 
 --[[
+Checks Ashspeaker party/ally buff source contracts.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact target modes, radii and authored modifiers.
+]]
+local function check_ashspeaker_support_sources()
+    shot_state.Spiritshot = true
+    local flame = assert(Combat.support_buff_skill(
+        ASHSPEAKER_ID,
+        "AshspeakerFlameChant",
+        1
+    ))
+    local flame_modifier = assert(flame.Modifiers[1])
+
+    check(
+        flame.SourceSkillId == 1002
+            and flame.SourceRank == 1
+            and flame.TargetMode == "TARGET_PARTY"
+            and flame.SourceSkillRadius == 1000
+            and flame.DurationSeconds == 1200
+            and flame.StackType == "mAtkSpeedUp"
+            and flame_modifier.Operation == "mul"
+            and flame_modifier.stat == "MAGICAL_ATTACK_SPEED"
+            and flame_modifier.val == 1.15,
+        "Flame Chant preserves exact C4 party-buff source contract"
+    )
+    check(
+        flame.Spiritshot and not shot_state.Spiritshot,
+        "Flame Chant consumes one magical shot per cast"
+    )
+
+    shot_state.Spiritshot = true
+    local war_power = assert(Combat.support_buff_skill(
+        ASHSPEAKER_ID,
+        "AshspeakerWarPower",
+        1
+    ))
+    local war_modifier = assert(war_power.Modifiers[1])
+
+    check(
+        war_power.SourceSkillId == 1003
+            and war_power.TargetMode == "TARGET_ALLY"
+            and war_power.SourceSkillRadius == 400
+            and war_power.DurationSeconds == 1200
+            and war_power.StackType == "pAtk"
+            and war_modifier.Operation == "mul"
+            and war_modifier.stat == "PHYSICAL_ATTACK"
+            and war_modifier.val == 1.08,
+        "War Power preserves exact C4 ally-buff source contract"
+    )
+    check(
+        war_power.Spiritshot and not shot_state.Spiritshot,
+        "War Power consumes one magical shot per cast"
+    )
+end
+
+--[[
+Checks Ashspeaker Life Chant exact HealOverTime source semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms rank-three authored ticks and party radius.
+]]
+local function check_ashspeaker_life_chant()
+    shot_state.Spiritshot = true
+    local result = assert(Combat.party_regen_skill(
+        ASHSPEAKER_ID,
+        "AshspeakerLifeChant",
+        3
+    ))
+
+    check(
+        result.SourceSkillId == 1229
+            and result.SourceRank == 3
+            and result.TargetMode == "TARGET_PARTY"
+            and result.SourceSkillRadius == 1000
+            and result.HealPerTick == 18
+            and result.TickCount == 15
+            and result.TickSeconds == 1
+            and result.DurationSeconds == 15
+            and result.StackType == "HpRecover",
+        "Life Chant rank three preserves exact 18 x 15 one-second HoT"
+    )
+    check(
+        result.Spiritshot and not shot_state.Spiritshot,
+        "Life Chant consumes one magical shot for the full party cast"
+    )
+end
+
+--[[
+Checks Ashspeaker Chaos Seal exact caster-aura calculation contract.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms WIT land inputs and authored accuracy penalty metadata.
+]]
+local function check_ashspeaker_chaos_seal()
+    shot_state.Spiritshot = true
+    local marauder = assert(NpcSource.get("Marauder"))
+    local result = assert(Combat.accuracy_aura_skill(
+        ASHSPEAKER_ID,
+        {marauder},
+        "AshspeakerChaosSeal",
+        1
+    ))
+    local target = assert(result.Results[1])
+
+    check(
+        result.Kind == "AccuracyAuraControl"
+            and result.SourceSkillId == 1096
+            and result.SourceRank == 1
+            and result.SourceRadius == 200
+            and result.AccuracyPenalty == 12
+            and result.DurationSeconds == 15
+            and result.SaveVs == "WIT"
+            and result.EffectPower == 40
+            and result.MagicLevel == 30
+            and result.TargetCount == 1,
+        "Chaos Seal preserves exact C4 caster-aura land contract"
+    )
+    check(
+        type(target.Landed) == "boolean"
+            and target.Rate >= 0
+            and target.Rate <= 100
+            and target.Roll >= 0
+            and target.Roll <= 99
+            and target.AccuracyPenalty == 12
+            and target.DurationSeconds == 15
+            and result.Spiritshot
+            and not shot_state.Spiritshot,
+        "Chaos Seal owns one shot and one bounded server land roll"
+    )
+end
+
+--[[
 Checks wrong skill families and unowned ranks fail closed.
 
 Args:
@@ -2136,6 +2290,9 @@ local function main()
     check_physical()
     check_orc_physical_weapon_condition()
     check_spiritclaw_force_and_slow()
+    check_ashspeaker_support_sources()
+    check_ashspeaker_life_chant()
+    check_ashspeaker_chaos_seal()
     check_magic()
     check_human_wizard_magic()
     check_human_wizard_neutral_magic()
@@ -2164,6 +2321,7 @@ local function main()
     Runtime.clear_character(ORC_FIST_ID)
     Runtime.clear_character(ORC_WRONG_WEAPON_ID)
     Runtime.clear_character(SPIRITCLAW_ID)
+    Runtime.clear_character(ASHSPEAKER_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
@@ -2177,7 +2335,8 @@ local function main()
         .. "mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
         .. "poison_vuln=true concentration=true patk_down=true "
-        .. "duskguard=true blow=true heal=true npc=true live=false"
+        .. "duskguard=true blow=true heal=true ashspeaker=true "
+        .. "npc=true live=false"
     ):format(checks))
 end
 
