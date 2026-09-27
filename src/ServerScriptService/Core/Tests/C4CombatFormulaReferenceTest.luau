@@ -240,9 +240,9 @@ local function main()
 
     local equal_blow = Formula.resolve_blow(
         "Front",
-        34,
+        20,
         1,
-        57
+        50
     )
     check(
         not equal_blow.Landed,
