@@ -15,6 +15,9 @@ local DarkElfAssassin = require(
     Shared.C4DarkElfAssassinLevel30Sources
 )
 local DarkWizard = require(Shared.C4DarkWizardLevel30Sources)
+local ShillienOracle = require(
+    Shared.C4ShillienOracleLevel30Sources
+)
 local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Classes = require(Shared.ClassProgressionDefinitions)
 local Skills = require(Shared.SkillProgressionDefinitions)
@@ -223,6 +226,8 @@ function Coverage.for_branch(branch_id: string): any?
         then DarkElfAssassin.get()
         elseif branch_id == "DarkWizard"
         then DarkWizard.get()
+        elseif branch_id == "ShillienOracle"
+        then ShillienOracle.get()
         else WarriorKnight.get(branch_id)
     local levels: {[number]: number} = {}
     local total: number? = nil
