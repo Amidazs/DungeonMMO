@@ -21,6 +21,9 @@ local DarkElfAssassinSkills = require(
 local DarkWizardSkills = require(
     script.Parent.C4DarkWizardSkillDefinitions
 )
+local ShillienOracleSkills = require(
+    script.Parent.C4ShillienOracleSkillDefinitions
+)
 
 local DEFINITIONS = table.freeze({
     -- C4 level-one starting-class protection analogue. The actual
@@ -3079,6 +3082,7 @@ function SkillProgressionDefinitions.get(
         or PalusKnightSkills.get(skill_id)
         or DarkElfAssassinSkills.get(skill_id)
         or DarkWizardSkills.get(skill_id)
+        or ShillienOracleSkills.get(skill_id)
 end
 
 function SkillProgressionDefinitions.all(): any
@@ -3108,6 +3112,11 @@ function SkillProgressionDefinitions.all(): any
         combined[skill_id] = definition
     end
     for skill_id, definition in pairs(DarkWizardSkills.all()) do
+        combined[skill_id] = definition
+    end
+    for skill_id, definition in pairs(
+        ShillienOracleSkills.all()
+    ) do
         combined[skill_id] = definition
     end
 
