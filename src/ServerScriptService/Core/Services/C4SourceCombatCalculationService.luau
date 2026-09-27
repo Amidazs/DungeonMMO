@@ -1444,10 +1444,20 @@ function C4SourceCombatCalculationService.normal_attack(
         return nil, pvp_reason
     end
 
-    local shot, shot_reason =
-        consume_physical_shot(attacker_user_id)
-    if not shot then
-        return nil, shot_reason
+    local shot = supplied_shot
+    if shot ~= nil then
+        if type(shot) ~= "table"
+            or type(shot.Soulshot) ~= "boolean"
+        then
+            return nil, "InvalidSuppliedPhysicalShotState"
+        end
+    else
+        local consumed, shot_reason =
+            consume_physical_shot(attacker_user_id)
+        if not consumed then
+            return nil, shot_reason
+        end
+        shot = consumed
     end
 
     local absorb_damage_percent = tonumber(
@@ -1552,7 +1562,8 @@ function C4SourceCombatCalculationService.physical_skill(
     defender_target: any,
     creative_skill_id: string,
     creative_rank: number,
-    spatial_context: any?
+    spatial_context: any?,
+    supplied_shot: any?
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -1859,6 +1870,236 @@ function C4SourceCombatCalculationService.physical_skill(
         LiveApplied = false,
     }, nil
 end
+--[[
+Calculates one exact C4 TARGET_AREA PDAM cast.
+
+The source SkillPdam handler captures Soulshot state once before iterating
+targets, then resolves shield, physical skill critical, random damage,
+vulnerability and final damage independently for each target.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_targets ({any}): Ordered reviewed source target boundaries.
+    creative_skill_id (string): Server-selected TARGET_AREA physical skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+    spatial_contexts ({any}?): Optional target-indexed shield contexts.
+
+Returns:
+    (any?, string?): Ordered per-target source damage results.
+]]
+function C4SourceCombatCalculationService.physical_area_skill(
+    attacker_user_id: number,
+    defender_targets: {any},
+    creative_skill_id: string,
+    creative_rank: number,
+    spatial_contexts: {any}?
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+    if type(defender_targets) ~= "table"
+        or #defender_targets < 1
+    then
+        return nil, "OriginalPhysicalAreaTargetsUnavailable"
+    end
+    if spatial_contexts ~= nil
+        and type(spatial_contexts) ~= "table"
+    then
+        return nil, "InvalidPhysicalAreaSpatialContexts"
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "PDAM"
+        or sets.target ~= "TARGET_AREA"
+        or type(sets.skillRadius) ~= "number"
+        or sets.skillRadius <= 0
+    then
+        return nil, "UnsupportedOriginalPhysicalAreaSkill"
+    end
+
+    local shot, shot_reason =
+        consume_physical_shot(attacker_user_id)
+    if not shot then
+        return nil, shot_reason
+    end
+
+    local results = {}
+    for index, target in ipairs(defender_targets) do
+        local spatial = if spatial_contexts
+            then spatial_contexts[index]
+            else nil
+
+        local result, result_reason =
+            C4SourceCombatCalculationService.physical_skill(
+                attacker_user_id,
+                target,
+                creative_skill_id,
+                creative_rank,
+                spatial,
+                shot
+            )
+        if not result then
+            return nil, result_reason
+        end
+
+        results[index] = result
+    end
+
+    return {
+        Kind = "PhysicalDamageArea",
+        Results = results,
+        TargetCount = #results,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        SourceSkillRadius = sets.skillRadius,
+        Soulshot = shot.Soulshot,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
+--[[
+Resolves the exact C4 Stun side effect attached to a PDAM hit.
+
+SkillPdam attempts effects only after positive damage. The caller supplies the
+already-captured Soulshot state from that damage calculation, so the stun roll
+does not consume a second shot. The source effect is physical, therefore the
+C4 magical M.Atk/M.Def exponent is not applied.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_target (any): Reviewed source target boundary.
+    creative_skill_id (string): Server-selected stun-bearing PDAM skill.
+    creative_rank (number): Server-resolved purchased creative rank.
+    soulshot (boolean): Soulshot state captured by the direct hit.
+
+Returns:
+    (any?, string?): Exact source Stun land result and duration.
+]]
+function C4SourceCombatCalculationService.stun_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    soulshot: boolean
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+    if type(soulshot) ~= "boolean" then
+        return nil, "InvalidOriginalStunSoulshotState"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local sets = effect.Sets
+    if sets.skillType ~= "PDAM"
+        or sets.target ~= "TARGET_ONE"
+        or sets.effectType ~= "STUN"
+        or sets.saveVs ~= "CON"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "UnsupportedOriginalStunSkill"
+    end
+
+    local matched = nil
+    for _, row in ipairs(effect.Effects) do
+        if row.name == "Stun"
+            and row.abnormal == "STUN"
+        then
+            if matched then
+                return nil, "DuplicateOriginalStunEffect"
+            end
+            matched = row
+        end
+    end
+    if not matched
+        or matched.count ~= 1
+        or type(matched.time) ~= "number"
+        or matched.time <= 0
+    then
+        return nil, "OriginalStunEffectUnavailable"
+    end
+
+    local target_con_bonus = defender.SourceConBonus
+    local stun_vulnerability =
+        defender.SourceStatCandidate.STUN_VULN
+    if type(target_con_bonus) ~= "number"
+        or target_con_bonus <= 0
+        or type(stun_vulnerability) ~= "number"
+        or stun_vulnerability < 0
+    then
+        return nil, "OriginalStunTargetStatsUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = sets.effectPower,
+            TargetStatBonus = target_con_bonus,
+            TargetVulnerability = stun_vulnerability,
+            IsMagic = false,
+            Spiritshot = soulshot,
+            BlessedSpiritshot = false,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = magic_level,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "StunControl",
+        Landed = resolved.Landed,
+        Rate = resolved.Rate,
+        Roll = resolved.Roll,
+        DurationSeconds = matched.time,
+        SaveVs = "CON",
+        VulnerabilityStat = "STUN_VULN",
+        VulnerabilityMultiplier = stun_vulnerability,
+        EffectPower = sets.effectPower,
+        MagicLevel = magic_level,
+        Soulshot = soulshot,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
 --[[
 Calculates C4 MDAM skill damage between source-ready players.
 
