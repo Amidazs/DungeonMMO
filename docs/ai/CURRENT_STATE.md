@@ -1,32 +1,29 @@
-## 27 September 2026 — CURRENT v3.15 Veilblade NIGHT CHECKPOINT
+## 27 September 2026 — CURRENT v3.15 Veilblade GREEN
 
 [Roadmap](
 ../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
-[checkpoint evidence](
+[green acceptance evidence](
 ../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
 
-Dark Elf Assassin / Veilblade is now implemented as a full level-30 backend
-checkpoint: **72 source rank rows**, **23 creative families**, **0 source-map
-gaps**, exact class-35 primary stats, a dedicated server-owned Veilblade cast
-bridge and reuse of the reviewed Scout/Wayfinder systems for the shared source
-families.
+Dark Elf Assassin / Veilblade is green through level 30: **72/72 source rank
+rows**, **23 creative families**, **0 source-map gaps**, exact class-35 primary
+stats and resources, **29/29 fresh focused Studio suites**, and a genuine
+unpublished Play rehearsal with **0 project CreatorErrors**.
 
-A bounded Studio run found four real compatibility/count regressions. They were
-fixed: exact Assassin row count, primary-stat coverage, legacy Scout training
-compatibility and Human Scout critical-training compatibility. Dark Elf
-Assassin launch coverage was added and the 28-suite Veilblade runner was fixed
-to append valid temporary ModuleScript source.
+The final acceptance exposed and closed a real combat gap: Mortal Blow /
+Wayfinder Cut was mapped correctly but source combat rejected the C4 `BLOW`
+skill type. The runtime now uses the pinned C4 positional blow chance with raw
+DEX and BLOW_RATE, the separate blow-damage calculation, and non-mutating miss
+semantics. Raw DEX is retained from primary stats through staged unified-stat
+candidates.
 
-Fresh static validation after the fixes is green: `git diff --check`, Base
-Rojo build and Dungeon Rojo build all PASS. Final fresh Studio/Play acceptance
-is **still pending** because StudioMCP became unstable and stopped reliably
-reporting the open Studio during the final rerun attempts.
+Accepted Play evidence includes Fleet Foot 1.06 movement, Defense Aura 1200s,
+live Umbral Siphon damage/healing, landed Venom Hex, Wayfinder Cut at a 79.8%
+rear-position source chance with 870.1875 damage, landed Crimson Sting bleed,
+and `VERIFIED_PLAY_MODE_PASS`.
 
-Checkpoint core HEAD before documentation:
-`7b0f54d7f76cc056c4ca71d82d6347dbd50f774a`.
-
-Tomorrow: rerun the **28-suite** Veilblade backend runner, then a genuine
-unpublished Play rehearsal before marking v3.15 green.
+Accepted code/test HEAD before documentation:
+`519185ca0c41d2969901d2454045d45ea3527315`.
 
 No main merge, publish, production DataStore mutation or animation edits.
 
