@@ -83,6 +83,8 @@ local function main()
     check_scope("HumanRogue", 59)
     check_scope("ElvenKnight", 56)
     check_scope("ElvenScout", 77)
+    check_scope("DwarvenFighter", 15)
+    check_scope("DwarfArtisan", 50)
 
     local coverage = Source.coverage()
     check(coverage.PathCount == 23
@@ -90,7 +92,7 @@ local function main()
         and coverage.UniqueSourceSkillIds == 170
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All twenty-one tracked original paths have exact source learning rows")
+        "All twenty-three tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
