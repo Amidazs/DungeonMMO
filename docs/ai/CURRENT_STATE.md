@@ -1,3 +1,23 @@
+## 28 September 2026 — CURRENT v3.23 Dwarf profession model accepted
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_23_Dwarf_Profession_Model_Accepted_20260928.md).
+
+The Dwarf profession/economy decision is now accepted.
+
+- Dwarven Fighter: **1 gathering + 1 crafting**;
+- Artisan: **1 gathering + 2 crafting** plus class-owned Dwarven Blueprints;
+- Scavenger: **2 gathering + 1 crafting** plus class-owned Spoil/Sweep.
+
+Do not implement a blanket 2 gathering + 2 crafting Dwarf bonus. Preserve
+ordinary-profession relevance, trading pressure, cross-player dependencies
+and alternate access to progression-critical materials.
+
+The latest accepted gameplay checkpoint remains **v3.21 Ashspeaker GREEN**.
+The level-30 C4 catalogue remains **16 / 18** first-transfer branches complete.
+The next gameplay gate is Dwarven Fighter inheritance + Artisan source audit,
+creative mapping, mechanics, focused Studio regression and unpublished Play.
+
 ## 27 September 2026 — CURRENT v3.22 Dwarf design boundary
 
 [Roadmap](
