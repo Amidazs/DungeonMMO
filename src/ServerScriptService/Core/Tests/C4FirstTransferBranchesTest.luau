@@ -149,10 +149,15 @@ local function main()
         RaceDefinitions.get("DarkElf") ~= nil,
         "Implemented Dark Elf paths require the registered race"
     )
-    for _, race_id in ipairs({"Orc", "Dwarf"}) do
-        check(RaceDefinitions.get(race_id) == nil,
-            "Source class registry cannot prematurely unlock a race")
-    end
+    local orc = assert(RaceDefinitions.get("Orc"))
+    check(
+        orc.CreationEnabled == false,
+        "Orc source registry must remain disabled for fresh creation"
+    )
+    check(
+        RaceDefinitions.get("Dwarf") == nil,
+        "Dwarf source registry cannot prematurely unlock a race"
+    )
     check(Branches.get("Dwarf", "Mage") == nil,
         "Invented Dwarven Mystic path must not exist")
     check(Branches.find("Elf", "Fighter", "HumanRogue") == nil,
