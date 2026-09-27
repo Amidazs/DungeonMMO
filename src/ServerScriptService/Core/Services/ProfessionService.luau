@@ -132,6 +132,13 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
     then
         return "WarriorCommonItemCreationNotLearned"
     end
+    if recipe.RequiredSkillId == "GearwrightBlueprintTraining"
+        and not C4ProfessionSkillRules.can_make_gearwright_blueprint(
+            character, recipe.ProfessionId, recipe.RequiredSkillRank
+        )
+    then
+        return "GearwrightBlueprintNotLearned"
+    end
 
     local professions = ensure_professions(character)
     local state = professions[recipe.ProfessionId]
@@ -319,11 +326,18 @@ function ProfessionService:build_snapshot(user_id: number): any
                     character, recipe.ProfessionId,
                     recipe.RequiredSkillRank
                 )
+        local gearwright_blueprint_unlocked =
+            recipe.RequiredSkillId ~= "GearwrightBlueprintTraining"
+                or C4ProfessionSkillRules.can_make_gearwright_blueprint(
+                    character, recipe.ProfessionId,
+                    recipe.RequiredSkillRank
+                )
         recipes[recipe_id] = {
             Unlocked = level_unlocked and knowledge_rejection == nil
                 and common_skill_unlocked and scout_skill_unlocked
                 and knight_skill_unlocked and warrior_skill_unlocked
                 and warden_skill_unlocked
+                and gearwright_blueprint_unlocked
                 and ProfessionSelectionRules.can_use(
                     slots, recipe.ProfessionId,
                     character
