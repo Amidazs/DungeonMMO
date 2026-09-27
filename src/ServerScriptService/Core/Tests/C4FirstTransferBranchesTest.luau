@@ -55,32 +55,32 @@ Args:
 Returns:
     nil: Raises when a partial branch claims the wrong source inventory.
 ]]
+local PARTIAL_SOURCE_INVENTORIES = table.freeze({
+    HumanRogue = "C4ScoutSkillInventory",
+    HumanWizard = "C4HumanWizardLevel30Sources",
+    HumanCleric = "C4HumanClericLevel30Sources",
+    ElvenScout = "C4ScoutSkillInventory",
+    ElvenWizard = "C4ElvenWizardLevel30Sources",
+    ElvenOracle = "C4ElvenOracleLevel30Sources",
+    PalusKnight = "C4PalusKnightLevel30Sources",
+    DarkElfAssassin = "C4DarkElfAssassinLevel30Sources",
+    DarkWizard = "C4DarkWizardLevel30Sources",
+})
+
 local function check_partial_branch(
     option: any,
     race_id: string
 )
-    if option.Id == "HumanWizard" then
-        check(
-            option.SourceSkillInventory
-                == "C4HumanWizardLevel30Sources",
-            "Human Wizard partial branch needs its own source inventory"
-        )
-        return
-    end
-
-    if option.Id == "HumanCleric" then
-        check(
-            option.SourceSkillInventory
-                == "C4HumanClericLevel30Sources",
-            "Human Cleric partial branch needs its own source inventory"
-        )
-        return
-    end
-
+    local expected_inventory = PARTIAL_SOURCE_INVENTORIES[option.Id]
     check(
-        option.SourceSkillInventory == "C4ScoutSkillInventory",
-        "Scout partial branch needs the scout source inventory"
+        option.SourceSkillInventory == expected_inventory,
+        option.Id .. " partial branch needs its reviewed source inventory"
     )
+
+    if expected_inventory ~= "C4ScoutSkillInventory" then
+        return
+    end
+
     local audit = assert(Inventory.audit(race_id))
     check(
         audit.Missing == 0,
@@ -141,8 +141,8 @@ local function main()
             end
         end
     end
-    check(total == 18 and partial == 4,
-        "Original C4 requires eighteen paths, four partially mapped")
+    check(total == 18 and partial == 9,
+        "Original C4 requires eighteen paths, nine currently partial")
     for _, race_id in ipairs({"DarkElf", "Orc", "Dwarf"}) do
         check(RaceDefinitions.get(race_id) == nil,
             "Source class registry cannot prematurely unlock a race")
