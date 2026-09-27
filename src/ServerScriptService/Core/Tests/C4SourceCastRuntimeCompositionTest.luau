@@ -62,6 +62,25 @@ function FakeExecutor:can_magic_skill_npc(
     return true, nil
 end
 
+--[[
+Reports one disposable physical target as ready.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable target.
+    _source_range (number?): Reviewed source range.
+
+Returns:
+    (boolean, string?): Always-ready test result.
+]]
+function FakeExecutor:can_physical_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _source_range: number?
+): (boolean, string?)
+    return true, nil
+end
+
 function FakeExecutor:can_undead_magic_skill_npc(
     attacker: any,
     enemy: any,
@@ -220,6 +239,32 @@ function FakeExecutor:magic_skill_npc(
     _sequence_id: number?
 ): (any?, string?)
     return {Applied = true}, nil
+end
+
+--[[
+Provides a minimal source physical-skill executor contract.
+
+Args:
+    _attacker (any): Disposable cast owner.
+    _enemy (any): Disposable target.
+    _skill_id (string): Creative physical skill.
+    _rank (number): Creative skill rank.
+    _sequence_id (number?): Disposable combat sequence.
+
+Returns:
+    (any?, string?): Successful fake physical application.
+]]
+function FakeExecutor:physical_skill_npc(
+    _attacker: any,
+    _enemy: any,
+    _skill_id: string,
+    _rank: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        HealthDamage = 17,
+    }, nil
 end
 
 function FakeExecutor:magic_undead_skill_npc(
@@ -684,6 +729,8 @@ local function main()
             and capability.SourceCastInterruptionCapability
                 .AttackCancelRateIntegrated
             and capability.DirectMagicBridge
+            and capability.PhysicalCastBridge
+            and capability.PhysicalCastReviewedActiveSkillCount == 3
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
@@ -703,6 +750,7 @@ local function main()
     check(
         runtime.Interruption ~= nil
             and not runtime.DirectMagic:is_enabled()
+            and not runtime.PhysicalCast:is_enabled()
             and not runtime.SupportMagic:is_enabled()
             and not runtime.PeriodicMagic:is_enabled()
             and not runtime.SelfMagic:is_enabled()
