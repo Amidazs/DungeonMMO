@@ -464,7 +464,9 @@ function C4StatusEffectReference.root_plan(
     source_skill_id: number,
     source_rank: number
 ): (any?, string?)
-    if source_skill_id ~= 1201 then
+    if source_skill_id ~= 1201
+        and source_skill_id ~= 1208
+    then
         return nil, "UnsupportedOriginalRootSkill"
     end
 
@@ -477,15 +479,28 @@ function C4StatusEffectReference.root_plan(
     end
 
     local sets = rank.Sets
+    local expected_target = if source_skill_id == 1208
+        then "TARGET_AURA" else "TARGET_ONE"
     if sets.skillType ~= "DEBUFF"
         or sets.effectType ~= "ROOT"
         or sets.saveVs ~= "WIT"
         or sets.isMagic ~= true
         or type(sets.effectPower) ~= "number"
         or sets.effectPower <= 0
-        or sets.target ~= "TARGET_ONE"
+        or sets.target ~= expected_target
     then
         return nil, "OriginalRootContractMismatch"
+    end
+
+    local source_radius = nil
+    if expected_target == "TARGET_AURA" then
+        source_radius = tonumber(sets.skillRadius)
+        if not source_radius
+            or source_radius <= 0
+            or source_radius >= math.huge
+        then
+            return nil, "OriginalRootRadiusUnavailable"
+        end
     end
 
     local matched = nil
@@ -522,6 +537,8 @@ function C4StatusEffectReference.root_plan(
         IsMagic = true,
         MagicLevel = magic_level,
         DurationSeconds = matched.time,
+        TargetMode = expected_target,
+        SourceRadius = source_radius,
         BreaksOnDamage = false,
         StopsMovement = true,
         StopsAttacks = false,
