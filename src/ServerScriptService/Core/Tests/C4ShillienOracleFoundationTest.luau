@@ -53,9 +53,9 @@ local function check_identity()
     check(
         class.FreshCreationAllowed == false
             and class.OriginalFirstTransferClass == true
-            and #class.TeachableSkills == 0
-            and #trainer.Skills == 0,
-        "Duskseer cannot bypass the mentor or unmapped trainer gate"
+            and #class.TeachableSkills == 26
+            and #trainer.Skills == 26,
+        "Duskseer class and trainer expose exactly 26 source families"
     )
     check(
         quest.BranchId == "ShillienOracle"
@@ -124,17 +124,17 @@ local function check_launch_gate()
 
     check(
         audit.SourceRankEntriesThroughCap == 92
-            and audit.TrainerMappedRankEntries == 0
-            and audit.MissingRankScheduleEntries == 92
-            and not audit.SourceRankScheduleMapped,
-        "Duskseer foundation does not claim any unmapped source rank"
+            and audit.TrainerMappedRankEntries == 92
+            and audit.MissingRankScheduleEntries == 0
+            and audit.SourceRankScheduleMapped,
+        "all 92 source rows have exact Duskseer training schedules"
     )
     check(
         audit.CurrentCareerId == "Duskseer"
-            and audit.Status == "SkillRankParityOutstanding"
+            and audit.Status == "RankScheduleMappedEffectsPending"
             and not audit.ExactSourceRankCoverageCertified
             and not audit.LaunchSkillCatalogueReady,
-        "Duskseer remains explicitly outside the release gate"
+        "mapped Duskseer ranks still require live effect acceptance"
     )
 end
 
@@ -153,7 +153,7 @@ local function main()
     check_launch_gate()
 
     print((
-        "[Duskseer Foundation] PASS: %d assertions rows=92 mapped=0"
+        "[Duskseer Foundation] PASS: %d assertions rows=92 mapped=92"
     ):format(checks))
 end
 
