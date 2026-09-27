@@ -314,7 +314,7 @@ Args:
     None.
 
 Returns:
-    nil: Confirms all nine level-30 Dark Wizard passive families.
+    nil: Confirms all eight level-30 Dark Wizard passive families.
 ]]
 local function check_nightweaver_owned_passives()
     local character = original_character(
@@ -328,7 +328,6 @@ local function check_nightweaver_owned_passives()
     own_passive(character, "NightweaverRobeTraining", 6)
     own_passive(character, "NightweaverFocusTraining", 5)
     own_passive(character, "NightweaverManaChanneling", 6)
-    own_passive(character, "NightweaverConcentration", 2)
     own_passive(character, "NightweaverFastCasting", 1)
     own_passive(character, "NightweaverManaRecovery", 1)
 
@@ -339,14 +338,13 @@ local function check_nightweaver_owned_passives()
     local robe = assert(find_source_rank(result, 234))
     local focus = assert(find_source_rank(result, 249))
     local mana_gain = assert(find_source_rank(result, 285))
-    local concentration = assert(find_source_rank(result, 1078))
     local casting = assert(find_source_rank(result, 228))
     local recovery = assert(find_source_rank(result, 229))
 
     check(
         result.Ready
             and result.ScopeId == "DarkWizard"
-            and #result.SourceRanks == 9
+            and #result.SourceRanks == 8
             and #result.UnsupportedOwnedCreativePassives == 0
             and #result.UnresolvedOwnedPassiveRanks == 0,
         "all owned Nightweaver passives resolve without hidden gaps"
@@ -375,11 +373,8 @@ local function check_nightweaver_owned_passives()
     check(
         mana_gain.Rank == 6
             and mana_gain.CreativeSkillId
-                == "NightweaverManaChanneling"
-            and concentration.Rank == 2
-            and concentration.CreativeSkillId
-                == "NightweaverConcentration",
-        "Nightweaver mana gain and concentration preserve source ranks"
+                == "NightweaverManaChanneling",
+        "Nightweaver mana gain preserves its exact source rank"
     )
     check(
         casting.Rank == 1
