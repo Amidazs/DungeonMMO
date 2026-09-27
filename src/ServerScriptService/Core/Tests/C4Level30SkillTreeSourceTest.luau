@@ -69,8 +69,10 @@ local function main()
     check_scope("ElvenFighter", 43)
     check_scope("ElvenMystic", 42)
     check_scope("OrcFighter", 31)
+    check_scope("OrcMystic", 35)
     check_scope("OrcRaider", 63)
     check_scope("OrcMonk", 41)
+    check_scope("OrcShaman", 77)
     check_scope("ElvenWizard", 82)
     check_scope("ElvenOracle", 91)
     check_scope("PalusKnight", 50)
@@ -83,12 +85,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 19
-        and coverage.RowCount == 1193
-        and coverage.UniqueSourceSkillIds == 138
+    check(coverage.PathCount == 21
+        and coverage.RowCount == 1305
+        and coverage.UniqueSourceSkillIds == 162
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All nineteen tracked original paths have exact source learning rows")
+        "All twenty-one tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -168,6 +170,36 @@ local function main()
             and monk_force[6].SP == 5700
             and monk_force[6].MinLevel == 28,
         "Orc Monk Force Blaster ranks 1-6 preserve source SP/levels"
+    )
+
+    local orc_mystic_drain =
+        Source.find_skill("OrcMystic", 1090)
+    check(
+        #orc_mystic_drain == 2
+            and orc_mystic_drain[1].SkillLevel == 1
+            and orc_mystic_drain[1].MinLevel == 7
+            and orc_mystic_drain[2].SkillLevel == 2
+            and orc_mystic_drain[2].MinLevel == 14,
+        "Orc Mystic Life Drain inheritance preserves exact ranks"
+    )
+
+    local shaman_stun = Source.find_skill("OrcShaman", 100)
+    check(
+        #shaman_stun == 9
+            and shaman_stun[1].SkillLevel == 1
+            and shaman_stun[1].MinLevel == 20
+            and shaman_stun[9].SkillLevel == 9
+            and shaman_stun[9].MinLevel == 30,
+        "Orc Shaman Stun Attack ranks preserve 20/25/30 brackets"
+    )
+
+    local shaman_life = Source.find_skill("OrcShaman", 1229)
+    check(
+        #shaman_life == 3
+            and shaman_life[1].MinLevel == 20
+            and shaman_life[2].MinLevel == 25
+            and shaman_life[3].MinLevel == 30,
+        "Orc Shaman Chant of Life preserves one rank per bracket"
     )
 
     local wizard_blaze = Source.find_skill("HumanWizard", 1220)
@@ -306,7 +338,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=19 rows=1193 uniqueSkillIds=138 live=false")
+        .. "paths=21 rows=1305 uniqueSkillIds=162 live=false")
         :format(checks))
 end
 
