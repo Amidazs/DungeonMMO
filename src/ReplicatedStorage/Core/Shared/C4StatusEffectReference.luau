@@ -10,11 +10,25 @@ local SUPPORTED_EFFECTS = table.freeze({
         EffectNames = table.freeze({"Bleed"}),
         SaveVs = "CON",
         VulnerabilityStat = "BLEED_VULN",
+        ResourceKind = "Health",
     }),
     POISON = table.freeze({
         EffectNames = table.freeze({"Poison", "DamOverTime"}),
         SaveVs = "MEN",
         VulnerabilityStat = "POISON_VULN",
+        ResourceKind = "Health",
+    }),
+    DMG_OVER_TIME = table.freeze({
+        EffectNames = table.freeze({"DamOverTime"}),
+        SaveVs = "WIT",
+        VulnerabilityStat = "DEBUFF_VULN",
+        ResourceKind = "Health",
+    }),
+    MANA_DMG_OVER_TIME = table.freeze({
+        EffectNames = table.freeze({"ManaDamOverTime"}),
+        SaveVs = "WIT",
+        VulnerabilityStat = "DEBUFF_VULN",
+        ResourceKind = "Mana",
     }),
 })
 
@@ -155,7 +169,8 @@ function C4StatusEffectReference.periodic_plan(
         TickDamage = matched.val,
         TickCount = matched.count,
         TickSeconds = matched.time,
-        Nonlethal = true,
+        ResourceKind = supported.ResourceKind,
+        Nonlethal = supported.ResourceKind == "Health",
     }), nil
 end
 
