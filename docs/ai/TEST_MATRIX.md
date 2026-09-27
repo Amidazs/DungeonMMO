@@ -1,31 +1,30 @@
-## 27 September 2026 — CURRENT v3.15 Veilblade checkpoint validation
+## 27 September 2026 — CURRENT v3.15 Veilblade GREEN
 
 [Roadmap](
 ../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
-[evidence](
+[acceptance evidence](
 ../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
 
-Dark Elf Assassin / Veilblade now has a dedicated **28-suite** unpublished
-backend runner:
-`scripts/studio/c4_dark_elf_assassin_backend_focus.luau`.
+Dark Elf Assassin / Veilblade acceptance is complete.
 
-Pre-fix Studio evidence already passed the Veilblade cast bridge (8 assertions),
-source cast contract, physical/magic timing, scheduler, source combat
-calculation/executor and Dungeon composition. The same run exposed four
-failures in source-row count, primary-stat coverage and legacy Scout training;
-all four causes are now fixed.
+- source rank coverage: **72 / 72**;
+- creative families: **23**, source-map gaps: **0**;
+- focused Studio/formula acceptance: **29 / 29 PASS**;
+- unpublished Play: **PASS**;
+- Scout Fleet Foot multiplier: **1.06**;
+- Defense Aura duration: **1200s**;
+- Umbral Siphon live damage/heal: PASS;
+- Venom Hex live poison: PASS;
+- Wayfinder Cut C4 BLOW: PASS, accepted rear chance **79.8%**,
+  live damage **870.1875**;
+- Crimson Sting live physical + bleed/status: PASS;
+- final `VERIFIED_PLAY_MODE_PASS`: PASS;
+- final project CreatorErrors: **0**;
+- diff check and fresh Dungeon build: PASS.
 
-Post-fix static gate:
-- diff check: PASS;
-- Base build: PASS;
-- Dungeon build: PASS.
-
-Post-fix Studio gate: **PENDING** due StudioMCP transport instability.
-Unpublished Play gate: **PENDING**.
-
-Required tomorrow:
-28/28 backend suites -> live Veilblade drain/poison/physical-status/shared
-dagger-or-blow/toggle proof -> zero project CreatorErrors -> mark v3.15 green.
+The acceptance cycle added source-faithful BLOW resolution, blow damage,
+server-owned miss behavior, raw DEX propagation and neutral BLOW_RATE support.
+The dedicated Veilblade focus runner now contains **29 suites**.
 
 ## 27 September 2026 — v3.14 Duskguard acceptance GREEN
 
