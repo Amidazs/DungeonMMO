@@ -9,7 +9,7 @@ Computes the original weapon base and class formula in source order.
 Args:
     stats (any): Fresh original naked-stat dictionary.
     naked (any): Source-derived STR/INT/DEX and level modifiers.
-    weapon (any): Verified source ID, slot and weapon XML values.
+    weapon (any): Verified equipped source weapon XML values.
 
 Returns:
     nil: Replaces only stats actually defined by this source weapon.
@@ -119,7 +119,9 @@ function C4EquippedStatReference.stage(
     local body = resolved.Items.Body
     local legs = resolved.Items.Legs
     local offhand = resolved.Items.OffHand
-    if weapon then apply_weapon(values, naked, weapon) end
+    if weapon and weapon.VirtualFist ~= true then
+        apply_weapon(values, naked, weapon)
+    end
     if resolved.Items.Head
         or body
         or legs
