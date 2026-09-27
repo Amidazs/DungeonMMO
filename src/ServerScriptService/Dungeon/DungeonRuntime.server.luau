@@ -16,6 +16,9 @@ local Combat = ServerScriptService:WaitForChild("Combat")
 local PartyHealService = require(
     Combat:WaitForChild("PartyHealService")
 )
+local DamageService = require(
+    Combat:WaitForChild("DamageService")
+)
 local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
 local SharedCombat = ReplicatedStorage:WaitForChild("Combat"):WaitForChild("Shared")
 
@@ -178,6 +181,18 @@ C4CombatCutoverStudioBridge.bind(
             .get_c4_resource_migration_boundary(user_id)
     end
 )
+assert(
+    runtime.C4SourceCastRuntime ~= nil,
+    "Dungeon runtime requires C4 source cast runtime"
+)
+DamageService.set_player_damage_observer(function(
+    defender: Player,
+    damage: number,
+    _context: any
+)
+    runtime.C4SourceCastRuntime.Interruption
+        :try_damage_interrupt(defender, damage)
+end)
 ProgressionService.bind_default(runtime.ProgressionService)
 ProficiencyService.bind_default(runtime.ProficiencyService)
 DungeonContributionBridge.bind_service(
