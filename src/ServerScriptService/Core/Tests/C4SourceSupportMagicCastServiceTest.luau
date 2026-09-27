@@ -34,6 +34,8 @@ local SOURCE_IDS = table.freeze({
     DuskseerConcentration = 1078,
     DuskseerEmpower = 1059,
     DuskseerBloodRite = 1268,
+    OrcMysticSoulShield = 1010,
+    AshspeakerSoulShield = 1010,
 })
 
 local FakeScheduler = {}
@@ -474,6 +476,37 @@ local function main()
         )
     end
 
+    for index, skill_id in ipairs({
+        "OrcMysticSoulShield",
+        "AshspeakerSoulShield",
+    }) do
+        local shield_start = assert(bridge:begin_cast(
+            caster,
+            target,
+            skill_id,
+            280 + index
+        ))
+        check(
+            shield_start.SourceSkillId == 1010
+                and shield_start.SourceRank == 1
+                and last_range == 400,
+            skill_id .. " binds exact Soul Shield source identity"
+        )
+
+        local shielded = assert(bridge:launch_if_ready(
+            caster,
+            shield_start.CastId,
+            290 + index
+        ))
+        check(
+            shielded.Applied
+                and shielded.Application.DurationSeconds == 1200
+                and last_execution == skill_id
+                and last_range == 900,
+            skill_id .. " reaches timed target-buff authority"
+        )
+    end
+
     local party_start = assert(bridge:begin_cast(
         caster,
         nil,
@@ -543,7 +576,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 45
+        capability.ReviewedSkillCount == 47
             and capability.TargetHeal
             and capability.TargetRecharge
             and capability.TargetBuff
