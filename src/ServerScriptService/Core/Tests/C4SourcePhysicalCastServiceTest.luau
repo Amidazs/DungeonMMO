@@ -10,9 +10,27 @@ local OWNER = table.freeze({UserId = 938260})
 local TARGET = table.freeze({Name = "TEMP_PhysicalTarget"})
 
 local PLANS = table.freeze({
-    OrcPowerStrike = table.freeze({SourceSkillId = 3}),
-    OrcIronPunch = table.freeze({SourceSkillId = 29}),
-    WarhowlCrushingBlow = table.freeze({SourceSkillId = 255}),
+    OrcPowerStrike = table.freeze({
+        SourceSkillId = 3,
+        ExecutionKind = "SingleTarget",
+    }),
+    OrcIronPunch = table.freeze({
+        SourceSkillId = 29,
+        ExecutionKind = "SingleTarget",
+    }),
+    WarhowlCrushingBlow = table.freeze({
+        SourceSkillId = 255,
+        ExecutionKind = "SingleTarget",
+    }),
+    WarhowlSkullbreaker = table.freeze({
+        SourceSkillId = 100,
+        ExecutionKind = "Stun",
+    }),
+    WarhowlSweepingArc = table.freeze({
+        SourceSkillId = 245,
+        ExecutionKind = "Area",
+        SourceRadius = 150,
+    }),
 })
 
 local checks = 0
@@ -198,12 +216,105 @@ function FakeExecutor:physical_skill_npc(
         SkillId = skill_id,
         Rank = rank,
         SequenceId = sequence_id,
+        Kind = "SingleTarget",
     }
 
     return {
         Kind = "C4LiveNpcPhysicalSkill",
         Applied = true,
         HealthDamage = 17,
+    }, nil
+end
+
+--[[
+Executes one deterministic stun-bearing physical hit.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    skill_id (string): Reviewed creative skill.
+    rank (number): Server-owned creative rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful live-shaped stun evidence.
+]]
+function FakeExecutor:physical_stun_skill_npc(
+    owner: any,
+    target: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    if owner ~= OWNER
+        or target ~= TARGET
+        or skill_id ~= "WarhowlSkullbreaker"
+        or rank ~= 1
+    then
+        return nil, "PhysicalTestStunExecutionInvalid"
+    end
+
+    last_execution = {
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+        Kind = "Stun",
+    }
+
+    return {
+        Kind = "C4LiveNpcPhysicalStunSkill",
+        Applied = true,
+        StunApplied = true,
+        Landed = true,
+        DurationSeconds = 9,
+    }, nil
+end
+
+--[[
+Executes one deterministic physical target-area hit.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    skill_id (string): Reviewed creative skill.
+    rank (number): Server-owned creative rank.
+    source_radius (number): Exact source skill radius.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful live-shaped area evidence.
+]]
+function FakeExecutor:physical_area_skill_npc(
+    owner: any,
+    target: any,
+    skill_id: string,
+    rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    if owner ~= OWNER
+        or target ~= TARGET
+        or skill_id ~= "WarhowlSweepingArc"
+        or rank ~= 1
+        or source_radius ~= 150
+    then
+        return nil, "PhysicalTestAreaExecutionInvalid"
+    end
+
+    last_execution = {
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+        Kind = "Area",
+        SourceRadius = source_radius,
+    }
+
+    return {
+        Kind = "C4LiveNpcPhysicalArea",
+        Applied = true,
+        TargetCount = 2,
+        TotalHealthDamage = 34,
+        SourceSkillRadius = source_radius,
     }, nil
 end
 
@@ -276,6 +387,8 @@ local function check_reviewed_skills(bridge: any)
         "OrcPowerStrike",
         "OrcIronPunch",
         "WarhowlCrushingBlow",
+        "WarhowlSkullbreaker",
+        "WarhowlSweepingArc",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -297,14 +410,34 @@ local function check_reviewed_skills(bridge: any)
             120 + index,
             500 + index
         ))
+        local plan = PLANS[skill_id]
         check(
             launched.Applied
-                and launched.Application.HealthDamage == 17
                 and last_preflight_range == 400
                 and last_execution.SkillId == skill_id
-                and last_execution.SequenceId == 500 + index,
-            skill_id .. " reaches live physical executor after effect range"
+                and last_execution.SequenceId == 500 + index
+                and last_execution.Kind == plan.ExecutionKind,
+            skill_id .. " reaches the reviewed live physical executor"
         )
+
+        if plan.ExecutionKind == "Stun" then
+            check(
+                launched.Application.StunApplied
+                    and launched.Application.DurationSeconds == 9,
+                "Skullbreaker preserves the stun-bearing executor route"
+            )
+        elseif plan.ExecutionKind == "Area" then
+            check(
+                launched.Application.SourceSkillRadius == 150
+                    and launched.Application.TargetCount == 2,
+                "Sweeping Arc preserves the exact 150 source radius"
+            )
+        else
+            check(
+                launched.Application.HealthDamage == 17,
+                skill_id .. " preserves single-target damage routing"
+            )
+        end
     end
 end
 
@@ -366,16 +499,18 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedActiveSkillCount == 3
+        capability.ReviewedActiveSkillCount == 5
             and capability.SingleTargetPdam
-            and capability.StunPdamPending
-            and capability.TargetAreaPdamPending
+            and capability.StunPdam
+            and capability.TargetAreaPdam
+            and not capability.StunPdamPending
+            and not capability.TargetAreaPdamPending
             and not capability.ClientAuthority,
-        "capability reports only the three completed physical families"
+        "capability reports all five reviewed Orc physical families"
     )
 
     print((
-        "[C4 Physical Cast] PASS: %d assertions reviewed=3"
+        "[C4 Physical Cast] PASS: %d assertions reviewed=5"
     ):format(checks))
 end
 
