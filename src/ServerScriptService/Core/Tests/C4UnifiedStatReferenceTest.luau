@@ -21,13 +21,13 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all sixteen separate source templates at the level-30 launch cap.
+Checks all seventeen separate source templates at the level-30 launch cap.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all sixteen paths.
+    nil: Confirms exact archived HP, MP and CP across all seventeen paths.
 ]]
 local function check_all_class_vitals()
     local vectors = {
@@ -47,6 +47,7 @@ local function check_all_class_vitals()
         {"DarkElf", "Duskguard", 856, 325, 430},
         {"DarkElf", "Veilblade", 831, 325, 337},
         {"DarkElf", "Nightweaver", 672, 482, 338},
+        {"DarkElf", "Duskseer", 732, 482, 368},
     }
     for _, vector in ipairs(vectors) do
         local result, issue = C4.get(
@@ -237,6 +238,107 @@ local function check_nightweaver_passives()
 end
 
 --[[
+Checks all eight true Duskseer passive families in calculator order.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact level-30 Shillien Oracle passive stat output.
+]]
+local function check_duskseer_passives()
+    local result = assert(C4.get(
+        "DarkElf",
+        "Duskseer",
+        30,
+        {},
+        {
+            {SkillId = 146, Rank = 10},
+            {SkillId = 164, Rank = 2},
+            {SkillId = 213, Rank = 2},
+            {SkillId = 228, Rank = 1},
+            {SkillId = 229, Rank = 1},
+            {SkillId = 235, Rank = 6},
+            {SkillId = 236, Rank = 6},
+            {SkillId = 249, Rank = 7},
+        }
+    ))
+
+    local stats = result.PassiveStatSnapshot
+    check(
+        result.ScopeId == "ShillienOracle"
+            and result.AppliedSourceModifiers == 9
+            and stats.MAGICAL_DEFENCE == 100
+            and stats.MAGICAL_SKILL_REUSE == 0.75
+            and stats.MAX_MP == 532
+            and stats.RECHARGE_MP_RATE == 1,
+        "Duskseer passives preserve exact defence, reuse and mana effects"
+    )
+    check(
+        math.abs(stats.MAGICAL_ATTACK_SPEED - 331.8) < 0.000001
+            and math.abs(stats.REG_MP_RATE - 3.68825) < 0.000001
+            and stats.MAGICAL_ATTACK == 27.11
+            and stats.PHYSICAL_ATTACK == 12.4,
+        "Duskseer casting, recovery and weapon modifiers stay source exact"
+    )
+end
+
+--[[
+Checks Duskseer Empower and Blood Rite share active calculator ordering.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-42 magic power and melee absorption modifiers.
+]]
+local function check_duskseer_unique_active_buffs()
+    local result = assert(C4.get_with_source_effects(
+        "DarkElf",
+        "Duskseer",
+        30,
+        {},
+        {
+            {SkillId = 146, Rank = 10},
+            {SkillId = 164, Rank = 2},
+            {SkillId = 213, Rank = 2},
+            {SkillId = 228, Rank = 1},
+            {SkillId = 229, Rank = 1},
+            {SkillId = 235, Rank = 6},
+            {SkillId = 236, Rank = 6},
+            {SkillId = 249, Rank = 7},
+        },
+        {
+            {SkillId = 1059, Rank = 1},
+            {SkillId = 1268, Rank = 1},
+        }
+    ))
+
+    local first = assert(result.SelectedActiveEffects[1])
+    local second = assert(result.SelectedActiveEffects[2])
+    check(
+        result.ScopeId == "ShillienOracle"
+            and result.AppliedSourceModifiers == 11
+            and math.abs(
+                result.EquippedStats.MAGICAL_ATTACK - 35.4755
+            ) < 0.000001
+            and result.EquippedStats.ABSORB_DAMAGE_PERCENT == 6,
+        "Duskseer unique active buffs preserve exact combined stats"
+    )
+    check(
+        first.SkillId == 1059
+            and first.Rank == 1
+            and first.StackType == "mAtk"
+            and first.StackOrder == 1.55
+            and second.SkillId == 1268
+            and second.Rank == 1
+            and second.StackType == "vampRage"
+            and second.StackOrder == 6,
+        "Duskseer Empower and Blood Rite preserve source stack identities"
+    )
+end
+
+--[[
 Checks Concentration contributes its dynamic attack-cancel offset.
 
 Args:
@@ -279,7 +381,7 @@ local function check_concentration_attack_cancel_offset()
 end
 
 --[[
-Executes complete sixteen-class source-only stat and loadout acceptance.
+Executes complete seventeen-class source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -292,9 +394,11 @@ local function main()
     check_equipment_and_class_gates()
     check_human_wizard_reuse()
     check_nightweaver_passives()
+    check_duskseer_passives()
+    check_duskseer_unique_active_buffs()
     check_concentration_attack_cancel_offset()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=16 live=false"):format(checks))
+        .. "paths=17 live=false"):format(checks))
 end
 
 main()
