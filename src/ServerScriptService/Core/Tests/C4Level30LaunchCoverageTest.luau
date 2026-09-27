@@ -333,12 +333,12 @@ local function main()
         "Orc Shaman retains exact class-50 launch source inventory"
     )
     check(
-        orc_shaman.TrainerMappedRankEntries == 0
-            and orc_shaman.MissingRankScheduleEntries == 77
-            and not orc_shaman.SourceRankScheduleMapped
+        orc_shaman.TrainerMappedRankEntries == 77
+            and orc_shaman.MissingRankScheduleEntries == 0
+            and orc_shaman.SourceRankScheduleMapped
             and orc_shaman.Status
-                == "SkillRankParityOutstanding",
-        "Ashspeaker foundation must still fail closed on all 77 rank rows"
+                == "RankScheduleMappedEffectsPending",
+        "Orc Shaman rank schedule maps only through earned Ashspeaker"
     )
 
     local report = Coverage.report()
@@ -349,8 +349,8 @@ local function main()
         "Exactly sixteen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 15,
-        "Fifteen implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 16,
+        "Sixteen implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
