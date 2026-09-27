@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    ShillienOracle = table.freeze({
+        Id = "DuskseerCovenant",
+        BranchId = "ShillienOracle",
+        SourceTitle = "The Duskseer Covenant",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "VeilPriestessMirel",
+        Recommendation = "DuskseerCovenantSeal",
+        Steps = table.freeze({
+            talk(
+                "VeilPriestessMirel",
+                "Accept the Duskseer covenant."
+            ),
+            talk(
+                "RitualistSaela",
+                "Learn the rites used to bind shadow and life."
+            ),
+            defeat(
+                "GloamLeechAcolyte",
+                4,
+                "Recover four personally earned duskglass beads."
+            ),
+            talk(
+                "RitualistSaela",
+                "Return the four duskglass beads."
+            ),
+            defeat(
+                "HollowChoirKeeper",
+                1,
+                "Recover the keeper's personal covenant seal."
+            ),
+            talk(
+                "VeilPriestessMirel",
+                "Present the seal and complete the covenant."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "DuskglassBeads4",
+            "HollowChoirSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     DarkWizard = table.freeze({
         Id = "NightweaverTrial",
         BranchId = "DarkWizard",
