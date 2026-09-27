@@ -10,6 +10,15 @@ local OWNER = table.freeze({UserId = 938260})
 local TARGET = table.freeze({Name = "TEMP_PhysicalTarget"})
 
 local PLANS = table.freeze({
+    GearwrightHammerShock = table.freeze({
+        SourceSkillId = 100,
+        ExecutionKind = "Stun",
+    }),
+    GearwrightWildSweep = table.freeze({
+        SourceSkillId = 245,
+        ExecutionKind = "Area",
+        SourceRadius = 150,
+    }),
     OrcPowerStrike = table.freeze({
         SourceSkillId = 3,
         ExecutionKind = "SingleTarget",
@@ -542,6 +551,8 @@ Returns:
 ]]
 local function check_reviewed_skills(bridge: any)
     local skill_ids = {
+        "GearwrightHammerShock",
+        "GearwrightWildSweep",
         "OrcPowerStrike",
         "OrcIronPunch",
         "SpiritclawIronFist",
@@ -712,7 +723,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedActiveSkillCount == 10
+        capability.ReviewedActiveSkillCount == 12
             and capability.SingleTargetPdam
             and capability.StunPdam
             and capability.ChargedPdam
@@ -721,11 +732,11 @@ local function main()
             and not capability.StunPdamPending
             and not capability.TargetAreaPdamPending
             and not capability.ClientAuthority,
-        "capability reports all ten reviewed Orc physical families"
+        "capability reports all twelve reviewed physical families"
     )
 
     print((
-        "[C4 Physical Cast] PASS: %d assertions reviewed=10"
+        "[C4 Physical Cast] PASS: %d assertions reviewed=12"
     ):format(checks))
 end
 
