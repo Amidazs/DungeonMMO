@@ -174,6 +174,7 @@ local function check_reviewed_paths()
         {"DarkElf", "Duskguard", 856, 325, 430},
         {"DarkElf", "Veilblade", 831, 325, 337},
         {"DarkElf", "Nightweaver", 672, 482, 338},
+        {"DarkElf", "Duskseer", 732, 482, 368},
     }
 
     for _, row in ipairs(vectors) do
@@ -405,6 +406,130 @@ local function check_nightweaver_passive_boundary()
                 stats.REG_MP_RATE - 3.68825
             ) < 0.000001,
         "Nightweaver boundary preserves exact passive stat values"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
+Checks all eight Duskseer passives reach the authenticated stat candidate.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms owned Shillien Oracle passives survive the runtime boundary.
+]]
+local function check_duskseer_passive_boundary()
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character(
+        "DarkElf",
+        "Duskseer",
+        30
+    )
+    own_skill(character, "DuskseerArcaneResistance", 6)
+    own_skill(character, "DuskseerQuickPrayer", 2)
+    own_skill(character, "DuskseerManaReservoir", 2)
+    own_skill(character, "DuskseerFastCasting", 1)
+    own_skill(character, "DuskseerManaRecovery", 1)
+    own_skill(character, "DuskseerRobeTraining", 6)
+    own_skill(character, "DuskseerLightArmorTraining", 6)
+    own_skill(character, "DuskseerWeaponTraining", 5)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    local stats = assert(plan.SourceStatCandidate)
+
+    check(
+        plan.ScopeId == "ShillienOracle"
+            and plan.SourceBaseMaxHealth == 732
+            and plan.SourceBaseMaxMana == 482
+            and plan.SourceBaseMaxCP == 368
+            and plan.OwnedPassiveSourceMappingReady
+            and plan.OriginalOwnedPassiveMappingIntegrated
+            and #plan.ReviewedOwnedSourcePassiveRanks == 8
+            and plan.PassiveSourceStatCandidateReady
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "all eight Duskseer passives cross the source boundary"
+    )
+    check(
+        stats.MAGICAL_DEFENCE == 100
+            and stats.MAGICAL_SKILL_REUSE == 0.75
+            and stats.MAX_MP == 532
+            and stats.RECHARGE_MP_RATE == 1
+            and math.abs(
+                stats.MAGICAL_ATTACK_SPEED - 331.8
+            ) < 0.000001
+            and math.abs(
+                stats.REG_MP_RATE - 3.68825
+            ) < 0.000001,
+        "Duskseer boundary preserves exact passive stat values"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
+Checks Duskseer Empower and Blood Rite enter the authenticated active state.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms unique class-42 active modifiers survive resource cutover.
+]]
+local function check_duskseer_active_buff_boundary()
+    active_snapshot = {
+        SourceRanks = {
+            {SkillId = 1059, Rank = 1},
+            {SkillId = 1268, Rank = 1},
+        },
+        UnresolvedEffects = {},
+        ActiveCount = 2,
+        ResolvedCount = 2,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character(
+        "DarkElf",
+        "Duskseer",
+        30
+    )
+    own_skill(character, "DuskseerQuickPrayer", 2)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    local stats = assert(plan.SourceStatCandidate)
+
+    check(
+        plan.ScopeId == "ShillienOracle"
+            and plan.ActiveEffectsIntegrated
+            and plan.SourceStatCandidateIncludesActiveEffects
+            and #plan.ReviewedActiveSourceRanks == 2
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "Duskseer unique active buffs cross the resource boundary"
+    )
+    check(
+        stats.ABSORB_DAMAGE_PERCENT == 6
+            and stats.MAGICAL_ATTACK > 0
+            and plan.ReviewedActiveSourceRanks[1].SkillId == 1059
+            and plan.ReviewedActiveSourceRanks[2].SkillId == 1268,
+        "Duskseer Empower and Blood Rite reach authenticated source stats"
     )
 
     Runtime.clear_character(TEST_OWNER)
@@ -676,6 +801,8 @@ local function main()
     check_reviewed_equipment_boundary()
     check_human_wizard_reuse_boundary()
     check_nightweaver_passive_boundary()
+    check_duskseer_passive_boundary()
+    check_duskseer_active_buff_boundary()
     check_concentration_interrupt_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
@@ -683,7 +810,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=16 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=17 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
