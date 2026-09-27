@@ -18,6 +18,14 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    DuskseerTrainer = table.freeze({
+        Id = "DuskseerTrainer",
+        DisplayName = "Duskseer Training",
+        AllowedRaces = table.freeze({"DarkElf"}),
+        AllowedBaseClasses = table.freeze({"Mage"}),
+        AllowedClasses = table.freeze({"Duskseer"}),
+        Skills = table.freeze({}),
+    }),
     NightweaverTrainer = table.freeze({
         Id = "NightweaverTrainer",
         DisplayName = "Nightweaver Training",
