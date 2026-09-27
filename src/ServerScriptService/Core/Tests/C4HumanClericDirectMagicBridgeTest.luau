@@ -258,6 +258,8 @@ FakeExecutor.magic_area_skill_npc = compatibility_result
 FakeExecutor.magic_drain_skill_npc = compatibility_result
 FakeExecutor.elemental_vulnerability_skill_npc =
     compatibility_result
+FakeExecutor.poison_vulnerability_skill_npc =
+    compatibility_result
 FakeExecutor.physical_attack_weakening_skill_npc =
     compatibility_result
 
