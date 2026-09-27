@@ -191,6 +191,30 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         EffectRange = 1100,
         ExecutionKind = "PhysicalAttackRateWeakening",
     }),
+    DuskseerExorcism = table.freeze({
+        SourceSkillId = 1031,
+        CastRange = 400,
+        EffectRange = 900,
+        ExecutionKind = "UndeadMagic",
+    }),
+    DuskseerSlumber = table.freeze({
+        SourceSkillId = 1069,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SleepControl",
+    }),
+    DuskseerRootbind = table.freeze({
+        SourceSkillId = 1201,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "RootControl",
+    }),
+    DuskseerWindShackle = table.freeze({
+        SourceSkillId = 1206,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "PhysicalAttackRateWeakening",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -226,6 +250,10 @@ local REVIEWED_SKILLS = table.freeze({
     "LifebinderSlumber",
     "LifebinderRootbind",
     "LifebinderWindShackle",
+    "DuskseerExorcism",
+    "DuskseerSlumber",
+    "DuskseerRootbind",
+    "DuskseerWindShackle",
 })
 
 --[[
