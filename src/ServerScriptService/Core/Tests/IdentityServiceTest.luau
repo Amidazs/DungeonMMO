@@ -253,10 +253,28 @@ local fresh_snapshot =
         fresh_before
     )
 
-local unknown_race =
+local disabled_orc =
     fresh_identity:select_race(
         fresh_user_id,
         "Orc"
+    )
+
+check(
+    disabled_orc.ok == false
+        and disabled_orc.reason
+            == "RaceCreationDisabled",
+    "Registered Orc must remain disabled for fresh creation."
+)
+
+check(
+    fresh_mutations() == 0,
+    "Disabled Orc selection must not mutate."
+)
+
+local unknown_race =
+    fresh_identity:select_race(
+        fresh_user_id,
+        "Dwarf"
     )
 
 check(
