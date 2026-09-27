@@ -6,6 +6,11 @@ C4SourceCompanionCastService.__index =
     C4SourceCompanionCastService
 
 local REVIEWED = table.freeze({
+    GearwrightClockworkGolem = table.freeze({
+        SourceSkillId = 25,
+        Kind = "Summon",
+        Role = "Combat",
+    }),
     EmberweaverManaCompanion = table.freeze({
         SourceSkillId = 1111,
         Kind = "Summon",
