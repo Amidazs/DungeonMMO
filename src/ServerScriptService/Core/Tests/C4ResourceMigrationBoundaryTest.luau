@@ -124,6 +124,30 @@ local function original_character(
 end
 
 --[[
+Stores one genuinely owned creative skill rank in a test character.
+
+Args:
+    character (any): Mutable server-owned character fixture.
+    skill_id (string): Creative skill identifier.
+    rank (number): Purchased creative rank.
+
+Returns:
+    nil: Mutates only the disposable progression state.
+]]
+local function own_skill(
+    character: any,
+    skill_id: string,
+    rank: number
+)
+    character.Progression.Skills[skill_id] = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = rank,
+        Proficiency = 0,
+    }
+end
+
+--[[
 Checks exact level-30 source HP/MP/CP for every supported original path.
 
 Args:
@@ -147,6 +171,9 @@ local function check_reviewed_paths()
         {"Elf", "Lifebinder", 744, 495, 374},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
+        {"DarkElf", "Duskguard", 856, 325, 430},
+        {"DarkElf", "Veilblade", 831, 325, 337},
+        {"DarkElf", "Nightweaver", 672, 482, 338},
     }
 
     for _, row in ipairs(vectors) do
@@ -312,6 +339,72 @@ local function check_human_wizard_reuse_boundary()
             and plan.CutoverPrerequisitesReady
             and #plan.ActivationBlockers == 0,
         "owned Quick Recovery rank two reaches final source stat candidate"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
+Checks all eight Nightweaver passives reach the authenticated stat candidate.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms owned Dark Wizard passives survive the runtime boundary.
+]]
+local function check_nightweaver_passive_boundary()
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character(
+        "DarkElf",
+        "Nightweaver",
+        30
+    )
+    own_skill(character, "NightweaverArcaneResistance", 6)
+    own_skill(character, "NightweaverQuickWeave", 2)
+    own_skill(character, "NightweaverManaReservoir", 2)
+    own_skill(character, "NightweaverRobeTraining", 6)
+    own_skill(character, "NightweaverFocusTraining", 5)
+    own_skill(character, "NightweaverManaChanneling", 6)
+    own_skill(character, "NightweaverFastCasting", 1)
+    own_skill(character, "NightweaverManaRecovery", 1)
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    local stats = assert(plan.SourceStatCandidate)
+
+    check(
+        plan.ScopeId == "DarkWizard"
+            and plan.OwnedPassiveSourceMappingReady
+            and plan.OriginalOwnedPassiveMappingIntegrated
+            and #plan.ReviewedOwnedSourcePassiveRanks == 8
+            and plan.PassiveSourceStatCandidateReady
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "all eight Nightweaver passives cross the source boundary"
+    )
+    check(
+        stats.MAGICAL_DEFENCE == 100
+            and stats.MAGICAL_SKILL_REUSE == 0.75
+            and stats.MAX_MP == 532
+            and stats.RECHARGE_MP_RATE == 33
+            and math.abs(
+                stats.MAGICAL_ATTACK_SPEED - 331.8
+            ) < 0.000001
+            and math.abs(
+                stats.REG_MP_RATE - 3.68825
+            ) < 0.000001,
+        "Nightweaver boundary preserves exact passive stat values"
     )
 
     Runtime.clear_character(TEST_OWNER)
@@ -536,13 +629,14 @@ local function main()
     check_reviewed_paths()
     check_reviewed_equipment_boundary()
     check_human_wizard_reuse_boundary()
+    check_nightweaver_passive_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
     check_denials()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=13 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=16 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
