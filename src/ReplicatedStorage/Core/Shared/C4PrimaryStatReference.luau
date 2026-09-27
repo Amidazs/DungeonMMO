@@ -646,7 +646,7 @@ function C4PrimaryStatReference.coverage(): any
     local paths = {
         {"Human", "Fighter"}, {"Human", "Mage"},
         {"Elf", "Fighter"}, {"Elf", "Mage"},
-        {"Orc", "Fighter"},
+        {"Orc", "Fighter"}, {"Orc", "Mage"},
     }
     for _, career in ipairs(FirstTransfers.all()) do
         table.insert(paths, {career.RaceId, career.Id})
