@@ -2903,6 +2903,11 @@ function C4SourceCombatExecutor:physical_skill(
         RawDamage = applied.RawDamage,
         HealthBefore = applied.HealthBefore,
         HealthAfter = applied.HealthAfter,
+        AbsorbDamagePercent = absorbed.AbsorbDamagePercent,
+        RequestedAbsorbHeal = absorbed.RequestedHeal,
+        EffectiveAbsorbHeal = absorbed.EffectiveHeal,
+        CasterHealthBefore = absorbed.CasterHealthBefore,
+        CasterHealthAfter = absorbed.CasterHealthAfter,
     }, nil
 end
 
@@ -3634,7 +3639,7 @@ truncates percentage healing to an integer before MaxHealth clamping.
 Args:
     attacker (any): Server-owned player who landed the normal attack.
     calculated (any): Source normal-attack calculation evidence.
-    applied_damage (number): Actual NPC HP removed by the accepted hit.
+    source_damage (number): Final accepted source normal-attack damage.
 
 Returns:
     (any?, string?): Absorption evidence or strict heal-authority reason.
@@ -3642,13 +3647,13 @@ Returns:
 function C4SourceCombatExecutor:_apply_normal_attack_absorb(
     attacker: any,
     calculated: any,
-    applied_damage: number
+    source_damage: number
 ): (any?, string?)
     local percent = tonumber(calculated.AbsorbDamagePercent) or 0
 
     if calculated.AbsorbDamageEligible ~= true
         or percent <= 0
-        or applied_damage <= 0
+        or source_damage <= 0
     then
         return {
             RequestedHeal = 0,
@@ -3658,7 +3663,7 @@ function C4SourceCombatExecutor:_apply_normal_attack_absorb(
     end
 
     local requested_heal = math.floor(
-        applied_damage * percent / 100
+        source_damage * percent / 100
     )
     if requested_heal <= 0 then
         return {
@@ -3744,7 +3749,7 @@ function C4SourceCombatExecutor:normal_attack_npc(
         self:_apply_normal_attack_absorb(
             attacker,
             calculated,
-            applied.HealthDamage
+            calculated.Amount
         )
     if not absorbed then
         return nil, absorb_reason
@@ -3821,6 +3826,16 @@ function C4SourceCombatExecutor:normal_attack(
         return nil, apply_reason
     end
 
+    local absorbed, absorb_reason =
+        self:_apply_normal_attack_absorb(
+            attacker,
+            calculated,
+            calculated.Amount
+        )
+    if not absorbed then
+        return nil, absorb_reason
+    end
+
     return {
         Kind = "C4LiveNormalAttack",
         Hit = true,
@@ -3864,6 +3879,9 @@ function C4SourceCombatExecutor:capability(): any
         ClientShieldAuthority = false,
         ClientShotAuthority = false,
         NormalAttackLiveApplication = true,
+        NormalAttackAbsorbDamageLiveApplication = true,
+        NormalAttackAbsorbSkipsBow = true,
+        NormalAttackAbsorbUsesSourceDamage = true,
         PhysicalSkillLiveApplication = true,
         MagicSkillLiveApplication = true,
         SelfHealLiveApplication = true,
