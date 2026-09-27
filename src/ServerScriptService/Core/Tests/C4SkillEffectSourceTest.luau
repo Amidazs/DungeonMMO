@@ -159,6 +159,33 @@ local function check_known_vectors()
         and cleric_robe_defence.UsingKind == "Magic",
         "Human Cleric Robe Mastery rank6 keeps Magic gear condition")
 
+    local dark_twister = assert(Effects.get_rank(1178, 6))
+    check(dark_twister.Sets.mpInitialConsume == 6
+        and dark_twister.Sets.mpConsume == 21
+        and dark_twister.Sets.magicLvl == 30
+        and dark_twister.Sets.power == 38
+        and dark_twister.Sets.element == "WIND"
+        and dark_twister.Sets.skillType == "MDAM",
+        "Dark Wizard Twister rank6 exact source fields")
+
+    local dark_shadow = assert(Effects.get_rank(1128, 3))
+    check(dark_shadow.Sets.target == "TARGET_SELF"
+        and dark_shadow.Sets.npcId == 12071
+        and dark_shadow.Sets.itemConsumeCount == 1
+        and dark_shadow.Sets.itemConsumeCountOT == 1
+        and dark_shadow.Sets.reuseDelay == 21600000
+        and dark_shadow.Sets.skillType == "SUMMON",
+        "Dark Wizard Shadow summon rank3 exact source fields")
+
+    local poison_surrender = assert(Effects.get_rank(1224, 2))
+    check(poison_surrender.Sets.magicLvl == 30
+        and poison_surrender.Sets.effectPower == 80
+        and poison_surrender.Sets.saveVs == "MEN"
+        and poison_surrender.Effects[1].Modifiers[1].stat
+            == "POISON_VULN"
+        and poison_surrender.Effects[1].Modifiers[1].val == 1.25,
+        "Dark Wizard poison surrender rank2 exact source debuff")
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -180,12 +207,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 117
-        and coverage.RequiredSkillRankPairs == 458
+    check(coverage.SkillCount == 122
+        and coverage.RequiredSkillRankPairs == 474
         and not coverage.LiveCombatIntegrated,
-        "All fourteen-path source skill/rank definitions are catalogued")
+        "All fifteen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=117 uniqueRankPairs=458 live=false")
+        .. "skills=122 uniqueRankPairs=474 live=false")
         :format(checks))
 end
 
