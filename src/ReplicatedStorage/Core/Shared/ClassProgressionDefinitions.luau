@@ -1,7 +1,7 @@
 --!strict
 local ClassProgressionDefinitions = {}
 
-local HUMAN_ELF = table.freeze({"Human", "Elf"})
+local HUMAN_ELF_ORC = table.freeze({"Human", "Elf", "Orc"})
 local FIGHTER_RACES = table.freeze({
     "Human", "Elf", "DarkElf",
 })
@@ -54,7 +54,7 @@ local DEFINITIONS = table.freeze({
         DisplayName = "Mystic",
         SourceC4StarterName = "Mystic",
         FreshCreationAllowed = true,
-        AllowedRaces = HUMAN_ELF,
+        AllowedRaces = HUMAN_ELF_ORC,
         StarterSkills = table.freeze({
             "WindStrike",
             "ArcaneWard",
@@ -93,6 +93,17 @@ local DEFINITIONS = table.freeze({
             "ArcaneDiscipline",
             "RestorativeTraining",
         }),
+    }),
+
+    Ashspeaker = table.freeze({
+        Id = "Ashspeaker",
+        DisplayName = "Ashspeaker",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Orc"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({}),
     }),
 
     Spiritclaw = table.freeze({
