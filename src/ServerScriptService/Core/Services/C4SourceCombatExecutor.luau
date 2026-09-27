@@ -3838,6 +3838,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcElementalVulnerabilityBoundaryDecoration = true,
         NpcElementalVulnerabilityAuthorityConfigured =
             type(self._npc_elemental_vulnerability) == "table",
+        NpcPoisonVulnerabilityLiveApplication = true,
+        NpcPoisonVulnerabilityBoundaryDecoration = true,
+        NpcPoisonVulnerabilityAuthorityConfigured =
+            type(self._npc_elemental_vulnerability) == "table",
         NpcPhysicalAttackWeakeningLiveApplication = true,
         NpcPhysicalAttackWeakeningUsesOutgoingDamageRules = true,
         NpcPhysicalAttackWeakeningLeavesAttackRateNeutral = true,
