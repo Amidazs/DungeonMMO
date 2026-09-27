@@ -72,6 +72,7 @@ local function main()
     check_scope("ElvenOracle", 91)
     check_scope("PalusKnight", 50)
     check_scope("DarkWizard", 86)
+    check_scope("ShillienOracle", 92)
     check_scope("HumanWarrior", 62)
     check_scope("HumanKnight", 54)
     check_scope("HumanRogue", 59)
@@ -79,12 +80,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 15
-        and coverage.RowCount == 966
-        and coverage.UniqueSourceSkillIds == 122
+    check(coverage.PathCount == 16
+        and coverage.RowCount == 1058
+        and coverage.UniqueSourceSkillIds == 124
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All fifteen tracked original paths have exact source learning rows")
+        "All sixteen tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -171,6 +172,45 @@ local function main()
         "Dark Wizard Shadow summon ranks preserve source SP/levels"
     )
 
+    local dusk_empower = Source.find_skill(
+        "ShillienOracle",
+        1059
+    )
+    check(
+        #dusk_empower == 1
+            and dusk_empower[1].SkillLevel == 1
+            and dusk_empower[1].SP == 6500
+            and dusk_empower[1].MinLevel == 25,
+        "Shillien Oracle Empower rank one preserves source SP/level"
+    )
+
+    local dusk_blood = Source.find_skill(
+        "ShillienOracle",
+        1268
+    )
+    check(
+        #dusk_blood == 1
+            and dusk_blood[1].SkillLevel == 1
+            and dusk_blood[1].SP == 12000
+            and dusk_blood[1].MinLevel == 30,
+        "Shillien Oracle Vampiric Rage enters exactly at level 30"
+    )
+
+    local dusk_shackle = Source.find_skill(
+        "ShillienOracle",
+        1206
+    )
+    check(
+        #dusk_shackle == 3
+            and dusk_shackle[1].SkillLevel == 2
+            and dusk_shackle[1].MinLevel == 20
+            and dusk_shackle[2].SkillLevel == 3
+            and dusk_shackle[2].MinLevel == 25
+            and dusk_shackle[3].SkillLevel == 4
+            and dusk_shackle[3].MinLevel == 30,
+        "Shillien Oracle Wind Shackle ranks 2-4 preserve brackets"
+    )
+
     local common = Source.find_skill("ElvenKnight", 1320)
     check(#common == 2
         and common[1].SkillLevel == 2
@@ -192,7 +232,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=15 rows=966 uniqueSkillIds=122 live=false")
+        .. "paths=16 rows=1058 uniqueSkillIds=124 live=false")
         :format(checks))
 end
 
