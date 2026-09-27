@@ -5,6 +5,17 @@ local Stages = require(script.Parent.C4OriginalFirstTransferQuestStages)
 local Definitions = {}
 
 local ENTRIES = table.freeze({
+    DwarfArtisan = table.freeze({
+        BranchId = "DwarfArtisan",
+        Id = "Gearwright",
+        DisplayName = "Gearwright",
+        RaceId = "Dwarf",
+        BaseClassId = "Fighter",
+        MentorId = "ForgekeeperBrunna",
+        MentorName = "Forgekeeper Brunna",
+        SkillId = "GearwrightHammerShock",
+        TrainerId = "GearwrightTrainer",
+    }),
     OrcShaman = table.freeze({
         BranchId = "OrcShaman",
         Id = "Ashspeaker",
@@ -178,6 +189,7 @@ local ENTRIES = table.freeze({
     }),
 })
 local BY_ID = table.freeze({
+    Gearwright = ENTRIES.DwarfArtisan,
     Ashspeaker = ENTRIES.OrcShaman,
     Spiritclaw = ENTRIES.OrcMonk,
     Warhowl = ENTRIES.OrcRaider,
@@ -233,6 +245,7 @@ Returns:
 ]]
 function Definitions.all(): {any}
     return table.freeze({
+        ENTRIES.DwarfArtisan,
         ENTRIES.OrcShaman,
         ENTRIES.OrcMonk,
         ENTRIES.OrcRaider,
