@@ -88,6 +88,27 @@ local ORC_VISUAL = table.freeze({
     Kind = "Orc",
 })
 
+local DWARF_BASE_ATTRIBUTES = table.freeze({
+    Strength = 5,
+    Dexterity = 5,
+    Vitality = 5,
+    Intellect = 5,
+    Spirit = 5,
+})
+
+local DWARF_PASSIVE = table.freeze({
+    Id = "DwarfSourceBaseline",
+    DisplayName = "Dwarf Source Baseline",
+    MaxHealthMultiplier = 1,
+    BasicAttackRateMultiplier = 1,
+    CritChanceBonus = 0,
+    CritDamageBonus = 0,
+})
+
+local DWARF_VISUAL = table.freeze({
+    Kind = "Dwarf",
+})
+
 local DEFINITIONS = table.freeze({
     Human = table.freeze({
         Id = "Human",
@@ -117,6 +138,14 @@ local DEFINITIONS = table.freeze({
         BaseAttributes = ORC_BASE_ATTRIBUTES,
         Passive = ORC_PASSIVE,
         Visual = ORC_VISUAL,
+    }),
+    Dwarf = table.freeze({
+        Id = "Dwarf",
+        DisplayName = "Dwarf",
+        CreationEnabled = false,
+        BaseAttributes = DWARF_BASE_ATTRIBUTES,
+        Passive = DWARF_PASSIVE,
+        Visual = DWARF_VISUAL,
     }),
 })
 
