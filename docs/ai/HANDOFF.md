@@ -1,3 +1,28 @@
+## 27 September 2026 — v3.22 Dwarf design discussion active
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_22_Dwarf_Profession_Design_Boundary_20260927.md).
+
+The latest accepted gameplay checkpoint is still **v3.21 Ashspeaker GREEN**.
+The launch catalogue is **16 / 18 first-transfer branches**; only
+`DwarfArtisan` and `DwarfScavenger` remain.
+
+Do **not** audit, name, map or implement either Dwarf branch until the owner
+finishes the profession/economy decision.
+
+Current discussion candidate, not yet approved:
+
+- Dwarven Fighter before transfer: 1 gathering + 1 crafting;
+- Artisan: 1 gathering + 2 crafting plus class-owned Dwarven Blueprints;
+- Scavenger: 2 gathering + 1 crafting plus class-owned Spoil/Sweep salvage.
+
+Avoid a blanket 2 gathering + 2 crafting Dwarf rule unless the owner
+deliberately overturns this direction, because it would substantially reduce
+the intended profession interdependence and trading pressure.
+
+Permanent script/document edits remain GitHub-only. Desktop Commander remains
+for local pulls, builds and Studio/Play acceptance.
+
 ## 27 September 2026 — v3.21 Ashspeaker accepted GREEN
 
 [Roadmap](
