@@ -202,6 +202,36 @@ local REVIEWED = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    AshspeakerFlameChant = table.freeze({
+        SourceSkillId = 1002,
+        Kind = "PartyBuff",
+        SourceRadius = 1000,
+    }),
+    AshspeakerWarPower = table.freeze({
+        SourceSkillId = 1003,
+        Kind = "AllyBuffSelf",
+        SourceRadius = 400,
+    }),
+    AshspeakerFireChant = table.freeze({
+        SourceSkillId = 1006,
+        Kind = "PartyBuff",
+        SourceRadius = 1000,
+    }),
+    AshspeakerBattleChant = table.freeze({
+        SourceSkillId = 1007,
+        Kind = "PartyBuff",
+        SourceRadius = 1000,
+    }),
+    AshspeakerShieldingChant = table.freeze({
+        SourceSkillId = 1009,
+        Kind = "PartyBuff",
+        SourceRadius = 1000,
+    }),
+    AshspeakerLifeChant = table.freeze({
+        SourceSkillId = 1229,
+        Kind = "PartyRegen",
+        SourceRadius = 1000,
+    }),
     DuskseerHealingLight = table.freeze({
         SourceSkillId = 1011,
         Kind = "TargetHeal",
@@ -336,6 +366,9 @@ function C4SourceSupportMagicCastService.new(
             ) == "function"
             and type(executor.can_party_heal_skill) == "function"
             and type(
+                executor.can_party_support_skill
+            ) == "function"
+            and type(
                 executor.can_resurrection_skill_player
             ) == "function"
             and type(executor.heal_skill_target) == "function"
@@ -346,6 +379,11 @@ function C4SourceSupportMagicCastService.new(
                 executor.support_buff_skill_target
             ) == "function"
             and type(executor.party_heal_skill) == "function"
+            and type(executor.party_buff_skill) == "function"
+            and type(executor.party_regen_skill) == "function"
+            and type(
+                executor.ally_buff_skill_self
+            ) == "function"
             and type(
                 executor.resurrection_skill_player
             ) == "function",
@@ -409,6 +447,20 @@ local function preflight(
         return self._executor:can_party_heal_skill(
             caster,
             review.SourceRadius
+        )
+    end
+    if review.Kind == "PartyBuff"
+        or review.Kind == "PartyRegen"
+    then
+        return self._executor:can_party_support_skill(
+            caster,
+            review.SourceRadius
+        )
+    end
+    if review.Kind == "AllyBuffSelf" then
+        return self._executor:can_support_skill_player(
+            caster,
+            caster
         )
     end
 
@@ -525,8 +577,15 @@ function C4SourceSupportMagicCastService:begin_cast(
         ReuseReadyAt = started.ReuseReadyAt,
         SourceCastRange = started.SourceCastRange,
         SourceEffectRange = started.SourceEffectRange,
-        TargetBoundServerSide = review.Kind ~= "PartyHeal",
-        PartyRosterServerSide = review.Kind == "PartyHeal",
+        TargetBoundServerSide =
+            review.Kind ~= "PartyHeal"
+            and review.Kind ~= "PartyBuff"
+            and review.Kind ~= "PartyRegen"
+            and review.Kind ~= "AllyBuffSelf",
+        PartyRosterServerSide =
+            review.Kind == "PartyHeal"
+            or review.Kind == "PartyBuff"
+            or review.Kind == "PartyRegen",
         SourceOnly = true,
         ShotStateConsumed = false,
     }, nil
@@ -575,6 +634,20 @@ local function revalidate(
         return self._executor:can_party_heal_skill(
             caster,
             record.SourceRadius
+        )
+    end
+    if record.Kind == "PartyBuff"
+        or record.Kind == "PartyRegen"
+    then
+        return self._executor:can_party_support_skill(
+            caster,
+            record.SourceRadius
+        )
+    end
+    if record.Kind == "AllyBuffSelf" then
+        return self._executor:can_support_skill_player(
+            caster,
+            caster
         )
     end
     if record.Kind == "Resurrection" then
@@ -634,6 +707,27 @@ local function execute(
     end
     if record.Kind == "PartyHeal" then
         return self._executor:party_heal_skill(
+            caster,
+            record.CreativeSkillId,
+            record.CreativeRank
+        )
+    end
+    if record.Kind == "PartyBuff" then
+        return self._executor:party_buff_skill(
+            caster,
+            record.CreativeSkillId,
+            record.CreativeRank
+        )
+    end
+    if record.Kind == "PartyRegen" then
+        return self._executor:party_regen_skill(
+            caster,
+            record.CreativeSkillId,
+            record.CreativeRank
+        )
+    end
+    if record.Kind == "AllyBuffSelf" then
+        return self._executor:ally_buff_skill_self(
             caster,
             record.CreativeSkillId,
             record.CreativeRank
@@ -767,6 +861,10 @@ function C4SourceSupportMagicCastService:capability(): any
         TargetRecharge = true,
         TargetBuff = true,
         PartyHeal = true,
+        PartyBuff = true,
+        PartyRegen = true,
+        AllyBuffSelfSubset = true,
+        ClanAllianceAllyTargetsPending = true,
         ResurrectionOffer = true,
         ResurrectionTargetAcceptance = true,
         ServerTargetAuthority = true,
