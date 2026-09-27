@@ -160,11 +160,11 @@ function C4StatusEffectReference.periodic_plan(
 end
 
 --[[
-Builds the reviewed C4 movement-slow side effect for Ice Bolt.
+Builds a reviewed C4 movement-slow plan.
 
-This is intentionally separate from periodic Bleed/Poison planning because
-the source skill also deals direct MDAM and its Debuff effect changes movement
-speed rather than scheduling damage ticks.
+Ice Bolt is a magical MDAM+DEBUFF skill. Orc Monk Cripple is a non-magical
+DEBUFF with the same WIT-resisted movement modifier. Both share the exact
+source success formula while retaining their different cast families.
 
 Args:
     source_skill_id (number): Historical C4 skill identifier.
@@ -177,7 +177,10 @@ function C4StatusEffectReference.movement_slow_plan(
     source_skill_id: number,
     source_rank: number
 ): (any?, string?)
-    if source_skill_id ~= 1184 then
+    local is_magic = source_skill_id == 1184
+    local expected_skill_type = if is_magic then "MDAM" else "DEBUFF"
+
+    if source_skill_id ~= 1184 and source_skill_id ~= 95 then
         return nil, "UnsupportedOriginalMovementSlowSkill"
     end
 
@@ -190,10 +193,10 @@ function C4StatusEffectReference.movement_slow_plan(
     end
 
     local sets = rank.Sets
-    if sets.skillType ~= "MDAM"
+    if sets.skillType ~= expected_skill_type
         or sets.effectType ~= "DEBUFF"
         or sets.saveVs ~= "WIT"
-        or sets.isMagic ~= true
+        or (is_magic and sets.isMagic ~= true)
         or type(sets.effectPower) ~= "number"
         or sets.effectPower <= 0
     then
@@ -250,7 +253,7 @@ function C4StatusEffectReference.movement_slow_plan(
         EffectType = sets.effectType,
         SaveVs = sets.saveVs,
         EffectPower = sets.effectPower,
-        IsMagic = true,
+        IsMagic = is_magic,
         MagicLevel = magic_level,
         SpeedMultiplier = matched.SpeedMultiplier,
         SlowFraction = 1 - matched.SpeedMultiplier,
