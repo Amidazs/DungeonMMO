@@ -43,6 +43,8 @@ local damage_callback:
     ((DamageContext, number, boolean) -> ())? = nil
 local player_resource_damage_resolver:
     ((Player, number, boolean) -> (number, number))? = nil
+local player_damage_observer:
+    ((Player, number, DamageContext) -> ())? = nil
 local source_damage_adapter:
     ((DamageContext) -> any)? = nil
 
@@ -74,6 +76,38 @@ function DamageService.set_player_resource_damage_resolver(
     callback: ((Player, number, boolean) -> (number, number))?
 )
     player_resource_damage_resolver = callback
+end
+
+--[[
+Installs the optional trusted player-damage observer.
+
+The observer receives only damage that reached player HP/CP after ordinary
+mitigation and ward absorption. It cannot alter the applied damage result.
+
+Args:
+    callback (((Player, number, DamageContext) -> ())?): Observer or nil.
+
+Returns:
+    nil: Future player damage may emit trusted post-resolution evidence.
+]]
+function DamageService.set_player_damage_observer(
+    callback: ((Player, number, DamageContext) -> ())?
+)
+    player_damage_observer = callback
+end
+
+--[[
+Returns the current player-damage observer for isolated server tests.
+
+Args:
+    None.
+
+Returns:
+    ((Player, number, DamageContext) -> ())?: Current observer.
+]]
+function DamageService.get_player_damage_observer_for_test():
+    ((Player, number, DamageContext) -> ())?
+    return player_damage_observer
 end
 
 --[[
@@ -332,6 +366,19 @@ function DamageService.apply_damage(context: DamageContext): number
 
     if health_damage > 0 then
         humanoid:TakeDamage(health_damage)
+    end
+
+    local player_resource_damage =
+        health_damage + cp_absorbed
+    if defender
+        and player_resource_damage > 0
+        and player_damage_observer
+    then
+        player_damage_observer(
+            defender,
+            player_resource_damage,
+            context
+        )
     end
 
     local observer = context.attacker
