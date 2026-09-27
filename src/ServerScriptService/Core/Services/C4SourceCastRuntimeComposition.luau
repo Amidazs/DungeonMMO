@@ -93,7 +93,6 @@ function C4SourceCastRuntimeComposition.new(
     local resources = CastResources.new()
     local timing = CastTiming.new(source_shots)
     local scheduler = CastScheduler.new(resources, timing)
-    local interruption = CastInterruption.new(scheduler)
     local direct_magic = DirectMagic.new(
         scheduler,
         source_executor
@@ -129,6 +128,40 @@ function C4SourceCastRuntimeComposition.new(
     local veilblade_cast = VeilbladeCast.new(
         scheduler,
         source_executor
+    )
+
+    local cancellable_bridges = {
+        direct_magic,
+        support_magic,
+        periodic_magic,
+        self_magic,
+        corpse_magic,
+        companion_magic,
+        duskguard_cast,
+        veilblade_cast,
+    }
+
+    local function cancel_cast_bridge(
+        player: any,
+        cast_id: number
+    ): (boolean, string?)
+        for _, bridge in ipairs(cancellable_bridges) do
+            local cancelled = bridge:cancel_cast(
+                player,
+                cast_id
+            )
+            if cancelled then
+                return true, nil
+            end
+        end
+
+        return false, "C4SourceCastInterruptBridgeReceiptInvalid"
+    end
+
+    local interruption = CastInterruption.new(
+        scheduler,
+        nil,
+        cancel_cast_bridge
     )
 
     return setmetatable({
