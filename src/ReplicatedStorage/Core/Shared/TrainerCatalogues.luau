@@ -18,6 +18,14 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    SpiritclawTrainer = table.freeze({
+        Id = "SpiritclawTrainer",
+        DisplayName = "Spiritclaw Training",
+        AllowedRaces = table.freeze({"Orc"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Spiritclaw"}),
+        Skills = table.freeze({}),
+    }),
     WarhowlTrainer = table.freeze({
         Id = "WarhowlTrainer",
         DisplayName = "Warhowl Training",
