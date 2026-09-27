@@ -95,6 +95,17 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    Spiritclaw = table.freeze({
+        Id = "Spiritclaw",
+        DisplayName = "Spiritclaw",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Orc"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({}),
+    }),
+
     Warhowl = table.freeze({
         Id = "Warhowl",
         DisplayName = "Warhowl",
