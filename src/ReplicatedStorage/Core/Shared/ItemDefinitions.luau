@@ -12,6 +12,26 @@ local ELF = table.freeze({"Elf"})
 local ORC = table.freeze({"Orc"})
 
 local DEFINITIONS = table.freeze({
+    gearwright_field_repair_kit = table.freeze({
+        Id = "gearwright_field_repair_kit",
+        Name = "Gearwright Field Repair Kit",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Uncommon",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+    }),
+    gearwright_runic_mechanism = table.freeze({
+        Id = "gearwright_runic_mechanism",
+        Name = "Gearwright Runic Mechanism",
+        Kind = "Material",
+        InventoryCategory = "Materials",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+    }),
     -- Backend-only Orc starter fist matching C4 source item 248.
     -- Final art/animations remain creature/equipment-content work.
     orc_training_fist = table.freeze({
