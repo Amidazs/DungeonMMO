@@ -4,6 +4,37 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    OrcMystic = table.freeze({
+        [118] = table.freeze({SkillId = "OrcMysticMovement"}),
+        [134] = table.freeze({SkillId = "OrcMysticToughness"}),
+        [146] = table.freeze({
+            SkillId = "OrcMysticArcaneResistance",
+        }),
+        [163] = table.freeze({SkillId = "OrcMysticSpellcraft"}),
+        [194] = table.freeze({SkillId = "OrcMysticLucky"}),
+        [214] = table.freeze({SkillId = "OrcMysticManaRecovery"}),
+        [250] = table.freeze({SkillId = "OrcMysticWeaponTraining"}),
+        [251] = table.freeze({SkillId = "OrcMysticRobeTraining"}),
+        [252] = table.freeze({
+            SkillId = "OrcMysticLightArmorTraining",
+        }),
+        [253] = table.freeze({
+            SkillId = "OrcMysticHeavyArmorTraining",
+        }),
+        [1001] = table.freeze({SkillId = "OrcMysticSoulCry"}),
+        [1007] = table.freeze({
+            SkillId = "OrcMysticBattleChant",
+        }),
+        [1010] = table.freeze({SkillId = "OrcMysticSoulShield"}),
+        [1090] = table.freeze({SkillId = "OrcMysticLifeDrain"}),
+        [1092] = table.freeze({SkillId = "OrcMysticFear"}),
+        [1095] = table.freeze({SkillId = "OrcMysticVenom"}),
+        [1097] = table.freeze({
+            SkillId = "OrcMysticDreamingSpirit",
+        }),
+        [1100] = table.freeze({SkillId = "OrcMysticChillFlame"}),
+        [1322] = table.freeze({SkillId = "OrcMysticCommonCraft"}),
+    }),
     OrcShaman = table.freeze({
         [100] = table.freeze({SkillId = "AshspeakerSkullshock"}),
         [146] = table.freeze({
@@ -645,6 +676,12 @@ local MAPS = table.freeze({
 })
 
 local GAPS = table.freeze({
+    OrcMystic = table.freeze({
+
+    }),
+    OrcShaman = table.freeze({
+
+    }),
     OrcMonk = table.freeze({
 
     }),
