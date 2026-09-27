@@ -270,7 +270,7 @@ local function main()
         assert(Coverage.for_branch("OrcRaider"))
     check(
         orc_raider.SourceClass == "Orc Raider"
-            and orc_raider.CurrentCareerId == nil
+            and orc_raider.CurrentCareerId == "Warhowl"
             and orc_raider.SourceInventoryAuditedThroughCap
             and orc_raider.SourceRankEntriesThroughCap == 63
             and orc_raider.SourceRankEntriesByLevel[20] == 19
@@ -283,12 +283,12 @@ local function main()
         "Orc Raider retains exact class-45 launch source inventory"
     )
     check(
-        orc_raider.TrainerMappedRankEntries == 0
-            and orc_raider.MissingRankScheduleEntries == 63
-            and not orc_raider.SourceRankScheduleMapped
+        orc_raider.TrainerMappedRankEntries == 63
+            and orc_raider.MissingRankScheduleEntries == 0
+            and orc_raider.SourceRankScheduleMapped
             and orc_raider.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "Orc Raider audit must not unlock Orc or imply a playable career"
+                == "RankScheduleMappedEffectsPending",
+        "Warhowl maps all 63 rows without unlocking fresh Orc creation"
     )
 
     local report = Coverage.report()
@@ -299,8 +299,8 @@ local function main()
         "Exactly fourteen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 13,
-        "Thirteen implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 14,
+        "Fourteen implemented first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
