@@ -783,6 +783,10 @@ local function rehearse_force_chain(bridge, player, enemy)
         "Focus Force did not create exactly one source charge"
     )
 
+    -- Focus Force has an exact 1000 ms C4 reuse. The second cast tests
+    -- maxCharges behavior, so it must not intentionally collide with reuse.
+    task.wait(1.1)
+
     local capped = cast_self_effect(
         bridge,
         player,
