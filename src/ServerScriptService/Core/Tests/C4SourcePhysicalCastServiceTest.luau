@@ -353,6 +353,14 @@ Args:
 Returns:
     (any?, string?): Deterministic charge spend evidence.
 ]]
+function FakeCharges:get(owner: any): (number?, string?)
+    if owner ~= OWNER then
+        return nil, "PhysicalTestChargeOwnerInvalid"
+    end
+
+    return fake_charge_count, nil
+end
+
 function FakeCharges:consume(
     owner: any,
     required: number
@@ -608,6 +616,34 @@ local function check_reviewed_skills(bridge: any)
 end
 
 --[[
+Checks Force Burst rejects before scheduling when no source charge exists.
+
+Args:
+    bridge (any): Enabled physical bridge.
+
+Returns:
+    nil: Confirms fail-closed pre-cast charge validation.
+]]
+local function check_charge_gate(bridge: any)
+    fake_charge_count = 0
+    local started, reason = bridge:begin_cast(
+        OWNER,
+        TARGET,
+        "SpiritclawForceBurst",
+        190
+    )
+
+    check(
+        started == nil
+            and reason == "C4SourceChargeInsufficient"
+            and pending[OWNER] == nil,
+        "Force Burst rejects before scheduler spend without a charge"
+    )
+
+    fake_charge_count = 1
+end
+
+--[[
 Checks private receipts and cleanup cannot leak between owners.
 
 Args:
@@ -665,6 +701,7 @@ local function main()
 
     check_gate(bridge)
     check_reviewed_skills(bridge)
+    check_charge_gate(bridge)
     check_cancellation(bridge)
 
     local capability = bridge:capability()
