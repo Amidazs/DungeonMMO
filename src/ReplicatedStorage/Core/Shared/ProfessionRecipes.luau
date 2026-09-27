@@ -2,6 +2,46 @@
 local ProfessionRecipes = {}
 
 local RECIPES = table.freeze({
+    gearwright_field_repair_kit = table.freeze({
+        Id = "gearwright_field_repair_kit",
+        Name = "Gearwright Field Repair Kit",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 1,
+        RequiredSkillId = "GearwrightBlueprintTraining",
+        RequiredSkillRank = 1,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_bar", Quantity = 2}),
+            table.freeze({ItemId = "cured_leather", Quantity = 1}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "gearwright_field_repair_kit",
+            Quantity = 1,
+        }),
+        XP = 24,
+    }),
+    gearwright_runic_mechanism = table.freeze({
+        Id = "gearwright_runic_mechanism",
+        Name = "Gearwright Runic Mechanism",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 2,
+        RequiredSkillId = "GearwrightBlueprintTraining",
+        RequiredSkillRank = 2,
+        Knowledge = table.freeze({Mode = "Default"}),
+        Inputs = table.freeze({
+            table.freeze({ItemId = "iron_bar", Quantity = 2}),
+            table.freeze({ItemId = "warding_rune", Quantity = 2}),
+            table.freeze({ItemId = "tempering_oil", Quantity = 1}),
+        }),
+        Output = table.freeze({
+            ItemId = "gearwright_runic_mechanism",
+            Quantity = 1,
+        }),
+        XP = 42,
+    }),
     -- Three genuine first-transfer C4 ranks per selected crafting career.
     -- Higher ranks consume real materials made by other professions;
     -- skill mastery never grants an additional creation profession.
@@ -959,6 +999,7 @@ local RECIPES = table.freeze({
 
 local STATION_ORDER = table.freeze({
     Blacksmithing = table.freeze({
+        "gearwright_field_repair_kit",
         "warden_forge_weapon_rank_1",
         "warden_forge_armor_rank_2",
         "warrior_forge_weapon_rank_1",
@@ -1001,6 +1042,7 @@ local STATION_ORDER = table.freeze({
         "stitch_leatherbound_gloves",
     }),
     Enchanting = table.freeze({
+        "gearwright_runic_mechanism",
         "warden_inscribe_rune_rank_1",
         "warden_inscribe_rune_rank_2",
         "warrior_inscribe_rune_rank_1",
