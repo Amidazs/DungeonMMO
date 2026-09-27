@@ -364,6 +364,90 @@ function C4StatusEffectReference.sleep_plan(
 end
 
 --[[
+Builds the reviewed C4 Fear control plan.
+
+C4 Fear is a magical MEN-resisted debuff. Its source effect owns five movement
+actions four seconds apart. Each action sends the victim 500 source units away
+from the caster on both horizontal axes.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen Fear plan or strict source-data reason.
+]]
+function C4StatusEffectReference.fear_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1092 then
+        return nil, "UnsupportedOriginalFearSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalFearSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "FEAR"
+        or sets.saveVs ~= "MEN"
+        or sets.isMagic ~= true
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+        or sets.target ~= "TARGET_ONE"
+    then
+        return nil, "OriginalFearContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Fear"
+            and effect.abnormal == "AFRAID"
+        then
+            if matched ~= nil then
+                return nil, "DuplicateOriginalFearEffect"
+            end
+            matched = effect
+        end
+    end
+
+    if not matched
+        or matched.count ~= 5
+        or matched.time ~= 4
+    then
+        return nil, "OriginalFearEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalFearMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "FEAR",
+        SaveVs = "MEN",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        ActionCount = matched.count,
+        ActionSeconds = matched.time,
+        DurationSeconds = matched.count * matched.time,
+        FleeRangeSourceUnits = 500,
+        ForcesMovement = true,
+        StopsAttacks = true,
+        StopsCasting = true,
+    }), nil
+end
+
+--[[
 Builds the reviewed C4 Root control plan.
 
 Dryad Root is a magical WIT-resisted DEBUFF. It stops movement for its source
