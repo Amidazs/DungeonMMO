@@ -9,6 +9,9 @@ local Shared = ReplicatedStorage.Core.Shared
 local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local ProfileSchema = require(Shared.ProfileSchema)
 local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
+local ActiveResolver = require(
+    Shared.C4ActiveSourceEffectResolver
+)
 local ActiveState = require(
     ServerScriptService.Core.Services.C4ActiveSourceEffectState
 )
@@ -267,6 +270,51 @@ local function check_inherited_active_source()
 end
 
 --[[
+Checks Warhowl resolves genuinely inherited Orc Fighter active skills.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms class-44 ACTIVE/TOGGLE ranks remain valid after transfer.
+]]
+local function check_orc_inherited_active_source()
+    local character = original_character("Orc", "Warhowl", 30)
+    own_skill(character, "OrcIronPunch", 9)
+    own_skill(character, "OrcRelax", 1)
+
+    local punch, punch_reason = ActiveResolver.resolve(
+        character,
+        "OrcIronPunch",
+        9
+    )
+    check(
+        punch ~= nil
+            and punch_reason == nil
+            and punch.ScopeId == "OrcFighter"
+            and punch.SkillId == 29
+            and punch.Rank == 9
+            and punch.OperateType == "ACTIVE",
+        "Warhowl resolves inherited Orc Iron Punch from class 44"
+    )
+
+    local relax, relax_reason = ActiveResolver.resolve(
+        character,
+        "OrcRelax",
+        1
+    )
+    check(
+        relax ~= nil
+            and relax_reason == nil
+            and relax.ScopeId == "OrcFighter"
+            and relax.SkillId == 226
+            and relax.Rank == 1
+            and relax.OperateType == "TOGGLE",
+        "Warhowl resolves inherited Orc Relax from class 44"
+    )
+end
+
+--[[
 Checks timed source observations expire from server-owned monotonic time.
 
 Args:
@@ -421,6 +469,7 @@ Returns:
 local function main()
     check_activation_authority()
     check_inherited_active_source()
+    check_orc_inherited_active_source()
     check_timed_source_state()
     check_unresolved_timed_state()
     check_denials()
