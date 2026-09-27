@@ -743,6 +743,25 @@ function FakeInventory:consume_item(
     return {ok = true}
 end
 
+--[[
+Supports composition of the disabled Dwarf salvage authority.
+
+Args:
+    _user_id (number): Disposable reward owner.
+    _item_id (string): Disposable salvage item.
+    _quantity (number?): Disposable quantity.
+
+Returns:
+    any: Successful fake inventory mutation.
+]]
+function FakeInventory:add_item(
+    _user_id: number,
+    _item_id: string,
+    _quantity: number?
+): any
+    return {ok = true}
+end
+
 local FakeSourceCombat = {}
 
 function FakeSourceCombat.companion_summon_plan(
@@ -830,17 +849,23 @@ local function main()
                 .AttackCancelRateIntegrated
             and capability.DirectMagicBridge
             and capability.PhysicalCastBridge
-            and capability.PhysicalCastReviewedActiveSkillCount == 10
+            and capability.PhysicalCastReviewedActiveSkillCount == 14
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
             and capability.SelfEffectBridge
-            and capability.SelfEffectReviewedSkillCount == 6
+            and capability.SelfEffectReviewedSkillCount == 8
             and capability.SourceToggleAuthority
             and capability.SourceToggleReviewedSkillCount == 5
             and capability.CorpseMagicBridge
             and capability.CompanionAuthority
             and capability.CompanionMagicBridge
+            and capability.DwarfSalvageAuthority
+            and capability.SourceSalvageBridge
+            and capability.SourceSalvageReviewedSkillCount == 4
+            and not capability.SourceSalvageDefaultEnabled
+            and not capability.SourceSalvageCurrentlyEnabled
+            and not capability.SourceSalvageFestivalAreaBound
             and capability.DuskguardCastBridge
             and not capability.DirectMagicDefaultEnabled
             and not capability.DirectMagicCurrentlyEnabled
@@ -862,6 +887,9 @@ local function main()
             and not runtime.SourceToggle:is_enabled()
             and not runtime.CorpseMagic:is_enabled()
             and not runtime.CompanionMagic:is_enabled()
+            and runtime.DwarfSalvage ~= nil
+            and runtime.SalvageMagic ~= nil
+            and not runtime.SalvageMagic:is_enabled()
             and not runtime.DuskguardCast:is_enabled(),
         "composed staged bridges remain disabled until trusted activation"
     )
