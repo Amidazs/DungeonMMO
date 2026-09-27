@@ -70,6 +70,7 @@ local function main()
     check_scope("ElvenMystic", 42)
     check_scope("OrcFighter", 31)
     check_scope("OrcRaider", 63)
+    check_scope("OrcMonk", 41)
     check_scope("ElvenWizard", 82)
     check_scope("ElvenOracle", 91)
     check_scope("PalusKnight", 50)
@@ -82,12 +83,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 18
-        and coverage.RowCount == 1152
-        and coverage.UniqueSourceSkillIds == 130
+    check(coverage.PathCount == 19
+        and coverage.RowCount == 1193
+        and coverage.UniqueSourceSkillIds == 138
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All eighteen tracked original paths have exact source learning rows")
+        "All nineteen tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -143,6 +144,30 @@ local function main()
             and raider_great[2].MinLevel == 24
             and raider_great[3].MinLevel == 28,
         "Orc Raider unique Rage and great-weapon brackets stay exact"
+    )
+
+    local monk_punch = Source.find_skill("OrcMonk", 29)
+    check(
+        #monk_punch == 9
+            and monk_punch[1].SkillLevel == 10
+            and monk_punch[1].SP == 2600
+            and monk_punch[1].MinLevel == 20
+            and monk_punch[9].SkillLevel == 18
+            and monk_punch[9].SP == 5700
+            and monk_punch[9].MinLevel == 28,
+        "Orc Monk inherited Iron Punch ranks 10-18 preserve brackets"
+    )
+
+    local monk_force = Source.find_skill("OrcMonk", 54)
+    check(
+        #monk_force == 6
+            and monk_force[1].SkillLevel == 1
+            and monk_force[1].SP == 3300
+            and monk_force[1].MinLevel == 24
+            and monk_force[6].SkillLevel == 6
+            and monk_force[6].SP == 5700
+            and monk_force[6].MinLevel == 28,
+        "Orc Monk Force Blaster ranks 1-6 preserve source SP/levels"
     )
 
     local wizard_blaze = Source.find_skill("HumanWizard", 1220)
@@ -281,7 +306,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=18 rows=1152 uniqueSkillIds=130 live=false")
+        .. "paths=19 rows=1193 uniqueSkillIds=138 live=false")
         :format(checks))
 end
 
