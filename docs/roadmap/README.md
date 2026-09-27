@@ -1,3 +1,16 @@
+**v3.15 DARK ELF ASSASSIN / VEILBLADE — NIGHT CHECKPOINT:** [roadmap](
+DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md)
+and [checkpoint evidence](
+../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
+Veilblade is mapped through level 30 at **72 source rank rows / 23 creative
+families / 0 source gaps** with exact class-35 primary stats and a dedicated
+server-owned active-skill bridge. The first Studio pass found four real
+count/compatibility regressions; those causes are fixed and fresh
+`git diff --check` plus Base/Dungeon builds pass. Final post-fix **28-suite**
+Studio acceptance and a genuine Play rehearsal remain pending because the local
+StudioMCP bridge became unstable during the last rerun attempts. Do not mark
+v3.15 green until those two gates pass.
+
 **v3.14 PALUS KNIGHT / DUSKGUARD — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md)
 and [evidence](
