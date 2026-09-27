@@ -9,6 +9,10 @@ local REVIEWED_SELF_MAGIC = table.freeze({
         SourceSkillId = 1157,
         ExecutionKind = "ManaHeal",
     }),
+    NightweaverBloodToMana = table.freeze({
+        SourceSkillId = 1157,
+        ExecutionKind = "ManaHeal",
+    }),
     GreenwardScoutElementalHeal = table.freeze({
         SourceSkillId = 58,
         ExecutionKind = "Heal",
