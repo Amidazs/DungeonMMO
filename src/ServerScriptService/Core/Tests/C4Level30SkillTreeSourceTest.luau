@@ -71,6 +71,7 @@ local function main()
     check_scope("ElvenWizard", 82)
     check_scope("ElvenOracle", 91)
     check_scope("PalusKnight", 50)
+    check_scope("DarkWizard", 86)
     check_scope("HumanWarrior", 62)
     check_scope("HumanKnight", 54)
     check_scope("HumanRogue", 59)
@@ -78,12 +79,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 14
-        and coverage.RowCount == 880
-        and coverage.UniqueSourceSkillIds == 117
+    check(coverage.PathCount == 15
+        and coverage.RowCount == 966
+        and coverage.UniqueSourceSkillIds == 122
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All fourteen tracked original paths have exact source learning rows")
+        "All fifteen tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -146,6 +147,30 @@ local function main()
         "Elven Oracle Wind Shackle ranks 2-4 preserve source levels"
     )
 
+    local dark_twister = Source.find_skill("DarkWizard", 1178)
+    check(
+        #dark_twister == 6
+            and dark_twister[1].SkillLevel == 1
+            and dark_twister[1].SP == 1600
+            and dark_twister[1].MinLevel == 20
+            and dark_twister[6].SkillLevel == 6
+            and dark_twister[6].SP == 5500
+            and dark_twister[6].MinLevel == 30,
+        "Dark Wizard Twister ranks 1-6 preserve source SP/levels"
+    )
+
+    local dark_shadow = Source.find_skill("DarkWizard", 1128)
+    check(
+        #dark_shadow == 3
+            and dark_shadow[1].SkillLevel == 1
+            and dark_shadow[1].SP == 3300
+            and dark_shadow[1].MinLevel == 20
+            and dark_shadow[3].SkillLevel == 3
+            and dark_shadow[3].SP == 11000
+            and dark_shadow[3].MinLevel == 30,
+        "Dark Wizard Shadow summon ranks preserve source SP/levels"
+    )
+
     local common = Source.find_skill("ElvenKnight", 1320)
     check(#common == 2
         and common[1].SkillLevel == 2
@@ -167,7 +192,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=14 rows=880 uniqueSkillIds=117 live=false")
+        .. "paths=15 rows=966 uniqueSkillIds=122 live=false")
         :format(checks))
 end
 
