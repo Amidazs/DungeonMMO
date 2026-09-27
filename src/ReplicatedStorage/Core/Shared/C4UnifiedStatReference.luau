@@ -46,6 +46,8 @@ local function is_learnable(
             starter_prefix = "Elven"
         elseif scope.RaceId == "Orc" then
             starter_prefix = "Orc"
+        elseif scope.RaceId == "Dwarf" then
+            starter_prefix = "Dwarven"
         end
 
         if starter_prefix then
