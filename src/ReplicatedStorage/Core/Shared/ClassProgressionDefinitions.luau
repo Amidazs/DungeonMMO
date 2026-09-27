@@ -3,7 +3,7 @@ local ClassProgressionDefinitions = {}
 
 local HUMAN_ELF_ORC = table.freeze({"Human", "Elf", "Orc"})
 local FIGHTER_RACES = table.freeze({
-    "Human", "Elf", "DarkElf",
+    "Human", "Elf", "DarkElf", "Dwarf",
 })
 
 local DEFINITIONS = table.freeze({
@@ -46,6 +46,15 @@ local DEFINITIONS = table.freeze({
             "OrcArmorTraining",
             "OrcRelax",
             "OrcIronBody",
+            "DwarfWorkshopCraft",
+            "DwarfSalvageClaim",
+            "DwarfWeaponTraining",
+            "DwarfArmorTraining",
+            "DwarfPackTraining",
+            "DwarfBlueprintFoundation",
+            "DwarfFortune",
+            "DwarfSalvageMark",
+            "DwarfCommonCraft",
         }),
     }),
 
@@ -111,6 +120,32 @@ local DEFINITIONS = table.freeze({
             "OrcMysticDreamingSpirit",
             "OrcMysticChillFlame",
             "OrcMysticCommonCraft",
+        }),
+    }),
+
+    Gearwright = table.freeze({
+        Id = "Gearwright",
+        DisplayName = "Gearwright",
+        FreshCreationAllowed = false,
+        OriginalFirstTransferClass = true,
+        AllowedRaces = table.freeze({"Dwarf"}),
+        StarterSkills = table.freeze({}),
+        StarterEquipment = table.freeze({}),
+        TeachableSkills = table.freeze({
+            "GearwrightClockworkGolem",
+            "GearwrightFieldBandage",
+            "GearwrightHammerShock",
+            "GearwrightRestorativeDiscipline",
+            "GearwrightPackTraining",
+            "GearwrightBlueprintTraining",
+            "GearwrightBluntTraining",
+            "GearwrightFortitude",
+            "GearwrightRecovery",
+            "GearwrightPolearmTraining",
+            "GearwrightLightArmorTraining",
+            "GearwrightHeavyArmorTraining",
+            "GearwrightWildSweep",
+            "GearwrightCrystallize",
         }),
     }),
 
