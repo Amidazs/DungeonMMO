@@ -101,8 +101,8 @@ local DEFINITIONS = table.freeze({
         {{20, 2}, {25, 2}, {30, 2}}, NO_WEAPON, nil
     ),
     NightweaverConcentration = make_skill(
-        "NightweaverConcentration", "Passive",
-        {{20, 1}, {30, 1}}, NO_WEAPON, nil
+        "NightweaverConcentration", "Support",
+        {{20, 1}, {30, 1}}, ARCANE_WAND, nil
     ),
     NightweaverServitorHeal = make_skill(
         "NightweaverServitorHeal", "Support",
