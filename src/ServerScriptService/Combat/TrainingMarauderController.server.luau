@@ -44,6 +44,9 @@ local C4NpcConfusionService = require(
 local C4NpcRootService = require(
     script.Parent:WaitForChild("C4NpcRootService")
 )
+local C4NpcFearService = require(
+    script.Parent:WaitForChild("C4NpcFearService")
+)
 local C4NpcElementalVulnerabilityService = require(
     script.Parent:WaitForChild(
         "C4NpcElementalVulnerabilityService"
@@ -467,7 +470,8 @@ local function restore_body_if_idle(runtime: MarauderRuntime)
     if runtime.humanoid.Health <= 0
         or runtime.attacking
         or StaggerService.is_staggered(runtime.model)
-        or C4NpcSleepService.is_sleeping(runtime.model) then
+        or C4NpcSleepService.is_sleeping(runtime.model)
+        or C4NpcFearService.is_feared(runtime.model) then
         return
     end
 
@@ -675,6 +679,7 @@ local function attack_is_interrupted(
         or runtime.humanoid.Health <= 0
         or StaggerService.is_staggered(runtime.model)
         or C4NpcSleepService.is_sleeping(runtime.model)
+        or C4NpcFearService.is_feared(runtime.model)
         or attacking_caster == true
 end
 
@@ -816,6 +821,59 @@ local function update_hostile_loop(runtime: MarauderRuntime, delta_seconds: numb
         return
     end
 
+    if C4NpcFearService.is_feared(runtime.model) then
+        if runtime.attacking then
+            clear_attack_presentation(runtime)
+        end
+
+        if C4NpcRootService.is_rooted(runtime.model) then
+            runtime.humanoid:Move(Vector3.zero)
+            set_ai_state(runtime, "Rooted")
+            MarauderPresentationService.reset_pose(
+                runtime.model,
+                0
+            )
+            return
+        end
+
+        local destination =
+            C4NpcFearService.flee_destination(runtime.model)
+        if destination then
+            local offset = Vector3.new(
+                destination.X - runtime.root.Position.X,
+                0,
+                destination.Z - runtime.root.Position.Z
+            )
+            local multiplier =
+                RangerSlowService.get_multiplier(runtime.model)
+            local distance = math.min(
+                offset.Magnitude,
+                MarauderConfig.CHASE_SPEED_STUDS_PER_SECOND
+                    * multiplier
+                    * delta_seconds
+            )
+            if offset.Magnitude > 0.01 and distance > 0 then
+                local next_position =
+                    runtime.root.Position
+                    + offset.Unit * distance
+                runtime.model:PivotTo(CFrame.lookAt(
+                    next_position,
+                    Vector3.new(
+                        destination.X,
+                        next_position.Y,
+                        destination.Z
+                    )
+                ))
+                MarauderPresentationService.set_chase_pose(
+                    runtime.model,
+                    os.clock()
+                )
+            end
+        end
+        set_ai_state(runtime, "Feared")
+        return
+    end
+
     if runtime.attacking then
         set_ai_state(runtime, "Attacking")
         return
@@ -887,6 +945,7 @@ local function reset_runtime(runtime: MarauderRuntime)
     C4NpcSleepService.clear(runtime.model)
     C4NpcConfusionService.clear(runtime.model)
     C4NpcRootService.clear(runtime.model)
+    C4NpcFearService.clear(runtime.model)
     C4NpcElementalVulnerabilityService.clear_all(
         runtime.model
     )
@@ -912,6 +971,7 @@ local function handle_death(runtime: MarauderRuntime)
     C4NpcSleepService.clear(runtime.model)
     C4NpcConfusionService.clear(runtime.model)
     C4NpcRootService.clear(runtime.model)
+    C4NpcFearService.clear(runtime.model)
     EnemyWeakeningService.clear(runtime.model)
     set_current_target(runtime, nil)
     clear_attack_presentation(runtime)
