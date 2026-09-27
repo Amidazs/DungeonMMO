@@ -321,6 +321,46 @@ local function main()
         "Perfect shield strict threshold accepts roll 96"
     )
 
+    local neutral_interrupt = Formula.resolve_attack_cancel(
+        400,
+        1.45,
+        0,
+        42
+    )
+    check_close(
+        neutral_interrupt.RatePercent,
+        15 + math.sqrt(5200) - 45,
+        "C4 cast interruption uses damage and MEN before source modifiers"
+    )
+    check(
+        neutral_interrupt.Interrupted,
+        "roll 42 interrupts an unprotected Dark Wizard cast"
+    )
+
+    local concentrated_interrupt = Formula.resolve_attack_cancel(
+        400,
+        1.45,
+        -25,
+        18
+    )
+    check_close(
+        concentrated_interrupt.RatePercent,
+        15 + math.sqrt(5200) - 45 - 25,
+        "Concentration rank two subtracts 25 from attack-cancel chance"
+    )
+    check(
+        not concentrated_interrupt.Interrupted,
+        "roll 18 survives the Concentration-reduced interrupt chance"
+    )
+    check(
+        Formula.attack_cancel_rate(1, 1.45, -25) == 1,
+        "source attack-cancel chance keeps the one-percent floor"
+    )
+    check(
+        Formula.attack_cancel_rate(10000, 0.9, 0) == 99,
+        "source attack-cancel chance keeps the 99-percent ceiling"
+    )
+
     check(Formula.magic_resist_threshold(30, 30) == 100,
         "Equal magic/target level source resistance threshold")
     check(Formula.magic_resist_threshold(31, 30) == 130,
