@@ -53,9 +53,9 @@ local function check_identity()
     check(
         class.FreshCreationAllowed == false
             and class.OriginalFirstTransferClass == true
-            and #class.TeachableSkills == 0
-            and #trainer.Skills == 0,
-        "Spiritclaw cannot bypass the mentor or unmapped trainer gate"
+            and #class.TeachableSkills == 10
+            and #trainer.Skills == 10,
+        "Spiritclaw exposes exactly ten class-47 source families"
     )
     check(
         quest.BranchId == "OrcMonk"
@@ -124,17 +124,17 @@ local function check_launch_gate()
 
     check(
         audit.SourceRankEntriesThroughCap == 41
-            and audit.TrainerMappedRankEntries == 0
-            and audit.MissingRankScheduleEntries == 41
-            and not audit.SourceRankScheduleMapped,
-        "Spiritclaw foundation does not claim unmapped source ranks"
+            and audit.TrainerMappedRankEntries == 41
+            and audit.MissingRankScheduleEntries == 0
+            and audit.SourceRankScheduleMapped,
+        "all 41 source rows have exact Spiritclaw training schedules"
     )
     check(
         audit.CurrentCareerId == "Spiritclaw"
-            and audit.Status == "SkillRankParityOutstanding"
+            and audit.Status == "RankScheduleMappedEffectsPending"
             and not audit.ExactSourceRankCoverageCertified
             and not audit.LaunchSkillCatalogueReady,
-        "Spiritclaw remains explicitly outside the release gate"
+        "mapped Spiritclaw ranks still require live effect acceptance"
     )
 end
 
@@ -153,7 +153,7 @@ local function main()
     check_launch_gate()
 
     print((
-        "[Spiritclaw Foundation] PASS: %d assertions rows=41 mapped=0"
+        "[Spiritclaw Foundation] PASS: %d assertions rows=41 mapped=41"
     ):format(checks))
 end
 
