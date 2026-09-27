@@ -18,6 +18,108 @@ local SkillUnlockRules = require(
 )
 
 local DEFINITIONS = table.freeze({
+    VeilbladeTrainer = table.freeze({
+        Id = "VeilbladeTrainer",
+        DisplayName = "Veilblade Training",
+        AllowedRaces = table.freeze({"DarkElf"}),
+        AllowedBaseClasses = table.freeze({"Fighter"}),
+        AllowedClasses = table.freeze({"Veilblade"}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "VeilbladeMindRend",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderCut",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLockpicking",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderArrow",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeUmbralSiphon",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeAttackAura",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeDefenseAura",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderWound",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasiveFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "RangerLongRange",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeVenomHex",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFleetFoot",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutFallResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeCriticalPower",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLungCapacity",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutEvasion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderBowMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "WayfinderDaggerMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "VeilbladeCrimsonSting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutRunningEvasion",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutLightArmorMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutAccuracyToggle",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "ScoutCriticalPowerToggle",
+                Mode = "LearnOrRank",
+            }),
+        }),
+    }),
+
     DuskguardTrainer = table.freeze({
         Id = "DuskguardTrainer",
         DisplayName = "Duskguard Training",
