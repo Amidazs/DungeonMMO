@@ -1,3 +1,35 @@
+## 27 September 2026 — CURRENT v3.15 Veilblade NIGHT CHECKPOINT
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
+[checkpoint evidence](
+../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
+
+Dark Elf Assassin / Veilblade is now implemented as a full level-30 backend
+checkpoint: **72 source rank rows**, **23 creative families**, **0 source-map
+gaps**, exact class-35 primary stats, a dedicated server-owned Veilblade cast
+bridge and reuse of the reviewed Scout/Wayfinder systems for the shared source
+families.
+
+A bounded Studio run found four real compatibility/count regressions. They were
+fixed: exact Assassin row count, primary-stat coverage, legacy Scout training
+compatibility and Human Scout critical-training compatibility. Dark Elf
+Assassin launch coverage was added and the 28-suite Veilblade runner was fixed
+to append valid temporary ModuleScript source.
+
+Fresh static validation after the fixes is green: `git diff --check`, Base
+Rojo build and Dungeon Rojo build all PASS. Final fresh Studio/Play acceptance
+is **still pending** because StudioMCP became unstable and stopped reliably
+reporting the open Studio during the final rerun attempts.
+
+Checkpoint core HEAD before documentation:
+`7b0f54d7f76cc056c4ca71d82d6347dbd50f774a`.
+
+Tomorrow: rerun the **28-suite** Veilblade backend runner, then a genuine
+unpublished Play rehearsal before marking v3.15 green.
+
+No main merge, publish, production DataStore mutation or animation edits.
+
 ## 27 September 2026 — CURRENT v3.14 Palus Knight / Duskguard GREEN
 
 [Roadmap](
