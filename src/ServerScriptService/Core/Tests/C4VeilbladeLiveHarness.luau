@@ -450,7 +450,7 @@ local function cast_defense_aura(bridge, player)
     assert(started.ok, tostring(started.reason))
     assert(
         started.result.SourceSkillId == 91
-            and started.result.SourceRank == 1,
+            and started.result.SourceRank == 2,
         "Defense Aura source contract drifted"
     )
 
@@ -467,7 +467,7 @@ local function cast_defense_aura(bridge, player)
         application.Applied
             and application.Kind == "C4LiveSelfBuff"
             and application.SourceSkillId == 91
-            and application.SourceRank == 1
+            and application.SourceRank == 2
             and application.DurationSeconds == 1200,
         "Defense Aura did not reach live timed source-effect authority"
     )
