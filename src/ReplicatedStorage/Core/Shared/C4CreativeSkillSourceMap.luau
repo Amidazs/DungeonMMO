@@ -4,6 +4,32 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    OrcRaider = table.freeze({
+        [34] = table.freeze({SkillId = "WarhowlWoundbind"}),
+        [94] = table.freeze({SkillId = "WarhowlFury"}),
+        [100] = table.freeze({SkillId = "WarhowlSkullbreaker"}),
+        [121] = table.freeze({SkillId = "WarhowlWarRoar"}),
+        [148] = table.freeze({SkillId = "WarhowlEndurance"}),
+        [211] = table.freeze({SkillId = "WarhowlBloodFortitude"}),
+        [212] = table.freeze({SkillId = "WarhowlRecovery"}),
+        [216] = table.freeze({SkillId = "WarhowlPolearmTraining"}),
+        [227] = table.freeze({
+            SkillId = "WarhowlLightArmorTraining",
+        }),
+        [231] = table.freeze({
+            SkillId = "WarhowlHeavyArmorTraining",
+        }),
+        [245] = table.freeze({SkillId = "WarhowlSweepingArc"}),
+        [255] = table.freeze({SkillId = "WarhowlCrushingBlow"}),
+        [256] = table.freeze({SkillId = "WarhowlPrecisionStance"}),
+        [257] = table.freeze({
+            SkillId = "WarhowlSteelAndStoneTraining",
+        }),
+        [293] = table.freeze({
+            SkillId = "WarhowlGreatWeaponTraining",
+        }),
+        [312] = table.freeze({SkillId = "WarhowlPredatorStance"}),
+    }),
     OrcFighter = table.freeze({
         [3] = table.freeze({SkillId = "OrcPowerStrike"}),
         [29] = table.freeze({SkillId = "OrcIronPunch"}),
@@ -533,6 +559,9 @@ local MAPS = table.freeze({
 })
 
 local GAPS = table.freeze({
+    OrcRaider = table.freeze({
+
+    }),
     OrcFighter = table.freeze({
 
     }),
