@@ -97,7 +97,8 @@ local function check_marauder()
         stats.ACCURACY_COMBAT == 38
             and stats.EVASION_RATE == 38
             and stats.CRITICAL_RATE == 418
-            and stats.MAGICAL_CRITICAL_RATE == 8,
+            and stats.MAGICAL_CRITICAL_RATE == 8
+            and stats.DEBUFF_VULN == 1,
         "Marauder source accuracy/evasion/critical stats are exact"
     )
 end
