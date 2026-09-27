@@ -8,6 +8,7 @@ local Shared = ReplicatedStorage.Core.Shared
 local Core = ServerScriptService.Core
 
 local SelectionRules = require(Shared.ProfessionSelectionRules)
+local ProfessionSkillRules = require(Shared.C4ProfessionSkillRules)
 local QuestStages = require(Shared.C4OriginalFirstTransferQuestStages)
 local Profiles = require(Core.Services.ProfileService)
 local Professions = require(Core.Services.ProfessionService)
@@ -49,13 +50,31 @@ local function award_gearwright(character: any)
         proofs[proof_id] = true
     end
 
-    character.Level = 20
+    character.Level = 28
     character.Identity = {
         Version = 1,
         CreationStage = "Complete",
         RaceId = "Dwarf",
         BaseClassId = "Fighter",
         ClassId = "Gearwright",
+    }
+    character.Progression = character.Progression or {}
+    character.Progression.Skills = character.Progression.Skills or {}
+    character.Progression.Skills.DwarfWorkshopCraft = {
+        Known = true,
+        PurchasedRank = 1,
+    }
+    character.Progression.Skills.DwarfBlueprintFoundation = {
+        Known = true,
+        PurchasedRank = 1,
+    }
+    character.Progression.Skills.DwarfCommonCraft = {
+        Known = true,
+        PurchasedRank = 1,
+    }
+    character.Progression.Skills.GearwrightBlueprintTraining = {
+        Known = true,
+        PurchasedRank = 2,
     }
     character.ClassAdvancement = {
         Version = 1,
@@ -112,7 +131,7 @@ local function main()
         "Gearwright selects one gathering profession")
     check(service:choose_profession(USER_ID, "Blacksmithing").ok,
         "Gearwright selects first crafting profession")
-    check(service:choose_profession(USER_ID, "Alchemy").ok,
+    check(service:choose_profession(USER_ID, "Enchanting").ok,
         "Gearwright selects second crafting profession")
 
     local character = assert(profiles:get_character(USER_ID, 1))
@@ -122,11 +141,11 @@ local function main()
     )
     check(
         character.ProfessionSlots.Creation == "Blacksmithing"
-            and character.ProfessionSlots.Creation2 == "Alchemy",
+            and character.ProfessionSlots.Creation2 == "Enchanting",
         "two crafting selections persist independently"
     )
     check(
-        not service:choose_profession(USER_ID, "Enchanting").ok,
+        not service:choose_profession(USER_ID, "Alchemy").ok,
         "third crafting profession is rejected"
     )
     check(
@@ -135,15 +154,39 @@ local function main()
     )
     check(service:can_use(USER_ID, "Blacksmithing"),
         "first crafting profession remains authorized")
-    check(service:can_use(USER_ID, "Alchemy"),
+    check(service:can_use(USER_ID, "Enchanting"),
         "second crafting profession is authorized")
-    check(not service:can_use(USER_ID, "Enchanting"),
+    check(not service:can_use(USER_ID, "Alchemy"),
         "unselected crafting profession remains unauthorized")
+    check(
+        ProfessionSkillRules.can_make_gearwright_blueprint(
+            character, "Blacksmithing", 1
+        ),
+        "rank-one blueprint works in first craft"
+    )
+    check(
+        ProfessionSkillRules.can_make_gearwright_blueprint(
+            character, "Enchanting", 2
+        ),
+        "rank-two blueprint works in second craft"
+    )
+    check(
+        not ProfessionSkillRules.can_make_gearwright_blueprint(
+            character, "Alchemy", 1
+        ),
+        "blueprint cannot bypass selected craft slots"
+    )
+    check(
+        ProfessionSkillRules.can_make_common(
+            character, "Blacksmithing"
+        ),
+        "inherited Dwarf common craft remains usable"
+    )
 
     local snapshot = service:build_snapshot(USER_ID)
     check(snapshot.ok, "profession snapshot builds")
     check(
-        snapshot.ProfessionSlots.Creation2 == "Alchemy",
+        snapshot.ProfessionSlots.Creation2 == "Enchanting",
         "snapshot exposes earned second crafting slot"
     )
 
