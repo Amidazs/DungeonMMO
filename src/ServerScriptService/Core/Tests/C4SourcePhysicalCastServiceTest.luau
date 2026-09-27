@@ -18,6 +18,24 @@ local PLANS = table.freeze({
         SourceSkillId = 29,
         ExecutionKind = "SingleTarget",
     }),
+    SpiritclawIronFist = table.freeze({
+        SourceSkillId = 29,
+        ExecutionKind = "SingleTarget",
+    }),
+    SpiritclawStunningFist = table.freeze({
+        SourceSkillId = 120,
+        ExecutionKind = "Stun",
+    }),
+    SpiritclawForceBurst = table.freeze({
+        SourceSkillId = 54,
+        ExecutionKind = "Charged",
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    SpiritclawCripplingPalm = table.freeze({
+        SourceSkillId = 95,
+        ExecutionKind = "Slow",
+    }),
     WarhowlCrushingBlow = table.freeze({
         SourceSkillId = 255,
         ExecutionKind = "SingleTarget",
@@ -81,8 +99,8 @@ function FakeScheduler:begin_cast(
         LaunchAt = now + 1,
         FinalizerAt = now + 1.1,
         ReuseReadyAt = now + 13,
-        SourceCastRange = 40,
-        SourceEffectRange = 400,
+        SourceCastRange = plan.CastRange or 40,
+        SourceEffectRange = plan.EffectRange or 400,
     }, nil
 end
 
@@ -248,7 +266,10 @@ function FakeExecutor:physical_stun_skill_npc(
 ): (any?, string?)
     if owner ~= OWNER
         or target ~= TARGET
-        or skill_id ~= "WarhowlSkullbreaker"
+        or (
+            skill_id ~= "WarhowlSkullbreaker"
+            and skill_id ~= "SpiritclawStunningFist"
+        )
         or rank ~= 1
     then
         return nil, "PhysicalTestStunExecutionInvalid"
@@ -315,6 +336,130 @@ function FakeExecutor:physical_area_skill_npc(
         TargetCount = 2,
         TotalHealthDamage = 34,
         SourceSkillRadius = source_radius,
+    }, nil
+end
+
+
+local fake_charge_count = 1
+local FakeCharges = {}
+
+--[[
+Consumes one deterministic source charge.
+
+Args:
+    owner (any): Expected charge owner.
+    required (number): Exact source charge requirement.
+
+Returns:
+    (any?, string?): Deterministic charge spend evidence.
+]]
+function FakeCharges:consume(
+    owner: any,
+    required: number
+): (any?, string?)
+    if owner ~= OWNER or required ~= 1 or fake_charge_count < required then
+        return nil, "C4SourceChargeInsufficient"
+    end
+
+    local before = fake_charge_count
+    fake_charge_count -= required
+    return {
+        ChargeBefore = before,
+        ChargeAfter = fake_charge_count,
+        ChargesConsumed = required,
+    }, nil
+end
+
+--[[
+Executes one deterministic charged physical hit.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    skill_id (string): Reviewed charged skill.
+    rank (number): Server-owned creative rank.
+    remaining_charges (number): Charges after exact source spend.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful charged application evidence.
+]]
+function FakeExecutor:charged_physical_skill_npc(
+    owner: any,
+    target: any,
+    skill_id: string,
+    rank: number,
+    remaining_charges: number,
+    sequence_id: number?
+): (any?, string?)
+    if owner ~= OWNER
+        or target ~= TARGET
+        or skill_id ~= "SpiritclawForceBurst"
+        or rank ~= 1
+        or remaining_charges ~= 0
+    then
+        return nil, "PhysicalTestChargedExecutionInvalid"
+    end
+
+    last_execution = {
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+        Kind = "Charged",
+    }
+
+    return {
+        Kind = "C4LiveNpcChargedPhysicalSkill",
+        Applied = true,
+        HealthDamage = 21,
+        RequiredCharges = 1,
+        RemainingCharges = 0,
+        SourceChargeDamageMultiplier = 0.8,
+    }, nil
+end
+
+--[[
+Executes one deterministic non-damaging physical slow.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    skill_id (string): Reviewed physical slow skill.
+    rank (number): Server-owned creative rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful slow application evidence.
+]]
+function FakeExecutor:physical_slow_skill_npc(
+    owner: any,
+    target: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    if owner ~= OWNER
+        or target ~= TARGET
+        or skill_id ~= "SpiritclawCripplingPalm"
+        or rank ~= 1
+    then
+        return nil, "PhysicalTestSlowExecutionInvalid"
+    end
+
+    last_execution = {
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+        Kind = "Slow",
+    }
+
+    return {
+        Kind = "C4LiveNpcPhysicalMovementSlow",
+        Applied = true,
+        SlowLanded = true,
+        SlowApplied = true,
+        SpeedMultiplier = 0.7,
+        DurationSeconds = 120,
     }, nil
 end
 
@@ -386,6 +531,10 @@ local function check_reviewed_skills(bridge: any)
     local skill_ids = {
         "OrcPowerStrike",
         "OrcIronPunch",
+        "SpiritclawIronFist",
+        "SpiritclawStunningFist",
+        "SpiritclawForceBurst",
+        "SpiritclawCripplingPalm",
         "WarhowlCrushingBlow",
         "WarhowlSkullbreaker",
         "WarhowlSweepingArc",
@@ -400,7 +549,8 @@ local function check_reviewed_skills(bridge: any)
         ))
         check(
             started.SourceSkillId == PLANS[skill_id].SourceSkillId
-                and last_preflight_range == 40,
+                and last_preflight_range
+                    == (PLANS[skill_id].CastRange or 40),
             skill_id .. " preserves exact source cast identity/range"
         )
 
@@ -413,7 +563,8 @@ local function check_reviewed_skills(bridge: any)
         local plan = PLANS[skill_id]
         check(
             launched.Applied
-                and last_preflight_range == 400
+                and last_preflight_range
+                    == (plan.EffectRange or 400)
                 and last_execution.SkillId == skill_id
                 and last_execution.SequenceId == 500 + index
                 and last_execution.Kind == plan.ExecutionKind,
@@ -424,7 +575,22 @@ local function check_reviewed_skills(bridge: any)
             check(
                 launched.Application.StunApplied
                     and launched.Application.DurationSeconds == 9,
-                "Skullbreaker preserves the stun-bearing executor route"
+                skill_id .. " preserves the stun-bearing executor route"
+            )
+        elseif plan.ExecutionKind == "Charged" then
+            check(
+                launched.Application.RequiredCharges == 1
+                    and launched.Application.RemainingCharges == 0
+                    and launched.Application.SourceChargeDamageMultiplier
+                        == 0.8,
+                "Force Burst consumes one charge before exact damage scaling"
+            )
+        elseif plan.ExecutionKind == "Slow" then
+            check(
+                launched.Application.SlowApplied
+                    and launched.Application.SpeedMultiplier == 0.7
+                    and launched.Application.DurationSeconds == 120,
+                "Crippling Palm preserves exact movement slow routing"
             )
         elseif plan.ExecutionKind == "Area" then
             check(
@@ -491,7 +657,11 @@ Returns:
     nil: Prints bounded bridge coverage after all assertions pass.
 ]]
 local function main()
-    local bridge = Service.new(FakeScheduler, FakeExecutor)
+    local bridge = Service.new(
+        FakeScheduler,
+        FakeExecutor,
+        FakeCharges
+    )
 
     check_gate(bridge)
     check_reviewed_skills(bridge)
@@ -499,18 +669,20 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedActiveSkillCount == 5
+        capability.ReviewedActiveSkillCount == 9
             and capability.SingleTargetPdam
             and capability.StunPdam
+            and capability.ChargedPdam
+            and capability.PhysicalMovementSlow
             and capability.TargetAreaPdam
             and not capability.StunPdamPending
             and not capability.TargetAreaPdamPending
             and not capability.ClientAuthority,
-        "capability reports all five reviewed Orc physical families"
+        "capability reports all nine reviewed Orc physical families"
     )
 
     print((
-        "[C4 Physical Cast] PASS: %d assertions reviewed=5"
+        "[C4 Physical Cast] PASS: %d assertions reviewed=9"
     ):format(checks))
 end
 
