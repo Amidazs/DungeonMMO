@@ -341,16 +341,41 @@ local function main()
         "Orc Shaman rank schedule maps only through earned Ashspeaker"
     )
 
+
+    local artisan = assert(Coverage.for_branch("DwarfArtisan"))
+    check(
+        artisan.SourceClass == "Artisan"
+            and artisan.CurrentCareerId == "Gearwright"
+            and artisan.SourceInventoryAuditedThroughCap
+            and artisan.SourceRankEntriesThroughCap == 50
+            and artisan.SourceRankEntriesByLevel[20] == 16
+            and artisan.SourceRankEntriesByLevel[24] == 15
+            and artisan.SourceRankEntriesByLevel[28] == 19
+            and #artisan.SourceBrackets == 3
+            and artisan.SourceBrackets[1] == 20
+            and artisan.SourceBrackets[2] == 24
+            and artisan.SourceBrackets[3] == 28,
+        "Artisan retains exact class-56 launch source inventory"
+    )
+    check(
+        artisan.TrainerMappedRankEntries == 50
+            and artisan.MissingRankScheduleEntries == 0
+            and artisan.SourceRankScheduleMapped
+            and artisan.Status
+                == "RankScheduleMappedEffectsPending",
+        "Gearwright maps all 50 Artisan rows without enabling Dwarf creation"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 16,
-        "Exactly sixteen first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 17,
+        "Exactly seventeen first-transfer branches have source inventories"
     )
     check(
-        report.RankSchedulesMappedBranches == 16,
-        "Sixteen implemented first-transfer branches map trainer ranks"
+        report.RankSchedulesMappedBranches == 17,
+        "Seventeen first-transfer branches map trainer ranks"
     )
     check(
         report.VerifiedCompleteBranches == 0,
