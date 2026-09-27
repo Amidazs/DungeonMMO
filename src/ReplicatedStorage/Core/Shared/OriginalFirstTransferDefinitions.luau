@@ -5,6 +5,17 @@ local Stages = require(script.Parent.C4OriginalFirstTransferQuestStages)
 local Definitions = {}
 
 local ENTRIES = table.freeze({
+    DarkElfAssassin = table.freeze({
+        BranchId = "DarkElfAssassin",
+        Id = "Veilblade",
+        DisplayName = "Veilblade",
+        RaceId = "DarkElf",
+        BaseClassId = "Fighter",
+        MentorId = "ShadeWardenLyss",
+        MentorName = "Shade Warden Lyss",
+        SkillId = "VeilbladeUmbralSiphon",
+        TrainerId = "VeilbladeTrainer",
+    }),
     PalusKnight = table.freeze({
         BranchId = "PalusKnight",
         Id = "Duskguard",
@@ -116,6 +127,7 @@ local ENTRIES = table.freeze({
     }),
 })
 local BY_ID = table.freeze({
+    Veilblade = ENTRIES.DarkElfAssassin,
     Duskguard = ENTRIES.PalusKnight,
     Oathguard = ENTRIES.HumanKnight,
     Ironvow = ENTRIES.HumanWarrior,
@@ -165,6 +177,7 @@ Returns:
 ]]
 function Definitions.all(): {any}
     return table.freeze({
+        ENTRIES.DarkElfAssassin,
         ENTRIES.PalusKnight,
         ENTRIES.HumanKnight, ENTRIES.HumanWarrior,
         ENTRIES.HumanRogue, ENTRIES.HumanWizard,
