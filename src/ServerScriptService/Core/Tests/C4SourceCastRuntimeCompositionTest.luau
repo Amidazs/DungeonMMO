@@ -62,6 +62,13 @@ function FakeExecutor:can_magic_skill_npc(
     return true, nil
 end
 
+function FakeExecutor:can_aura_skill_npc(
+    _attacker: any,
+    _source_radius: number
+): (boolean, string?)
+    return true, nil
+end
+
 --[[
 Reports one disposable physical target as ready.
 
@@ -121,6 +128,13 @@ function FakeExecutor:can_support_skill_player(
 end
 
 function FakeExecutor:can_party_heal_skill(
+    _caster: any,
+    _source_radius: number
+): (boolean, string?)
+    return true, nil
+end
+
+function FakeExecutor:can_party_support_skill(
     _caster: any,
     _source_radius: number
 ): (boolean, string?)
@@ -202,6 +216,44 @@ function FakeExecutor:party_heal_skill(
         Applied = true,
         AffectedPlayers = 2,
         EffectiveHeal = 50,
+    }, nil
+end
+
+function FakeExecutor:party_buff_skill(
+    _caster: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        AffectedPlayers = 2,
+        DurationSeconds = 1200,
+    }, nil
+end
+
+function FakeExecutor:party_regen_skill(
+    _caster: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        Scheduled = true,
+        AffectedPlayers = 2,
+        HealPerTick = 12,
+        TickCount = 15,
+    }, nil
+end
+
+function FakeExecutor:ally_buff_skill_self(
+    _caster: any,
+    _skill_id: string,
+    _rank: number
+): (any?, string?)
+    return {
+        Applied = true,
+        AffectedPlayers = 1,
+        ClanAllianceTargetsPending = true,
     }, nil
 end
 
@@ -313,6 +365,35 @@ function FakeExecutor:fear_skill_npc(
         rank,
         sequence_id
     )
+end
+
+function FakeExecutor:root_aura_skill_npc(
+    _attacker: any,
+    _skill_id: string,
+    _rank: number,
+    _source_radius: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        RootApplied = true,
+        TargetCount = 1,
+    }, nil
+end
+
+function FakeExecutor:accuracy_aura_skill_npc(
+    _attacker: any,
+    _skill_id: string,
+    _rank: number,
+    _source_radius: number,
+    _sequence_id: number?
+): (any?, string?)
+    return {
+        Applied = true,
+        AccuracyDebuffApplied = true,
+        AccuracyPenalty = 12,
+        TargetCount = 1,
+    }, nil
 end
 
 --[[
