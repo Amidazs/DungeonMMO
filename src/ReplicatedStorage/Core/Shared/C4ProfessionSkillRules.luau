@@ -43,7 +43,9 @@ function C4ProfessionSkillRules.can_read(
     character: any, profession_id: string
 ): boolean
     return ProfessionSelectionRules.can_use(
-        character and character.ProfessionSlots, profession_id
+        character and character.ProfessionSlots,
+        profession_id,
+        character
     ) and owns_rank(character, "C4RecipeReading")
 end
 
@@ -62,7 +64,8 @@ function C4ProfessionSkillRules.can_make_common(
 ): boolean
     if not ProfessionSelectionRules.can_use(
         character and character.ProfessionSlots,
-        profession_id
+        profession_id,
+        character
     ) then
         return false
     end
@@ -266,6 +269,62 @@ function C4ProfessionSkillRules.can_make_warden_common(
         and character.Progression.Skills
     local state = skills and skills.GreenwardWardenCommonItemCreation
     return type(state) == "table" and state.Known == true
+        and type(state.PurchasedRank) == "number"
+        and state.PurchasedRank >= required_rank
+        and state.PurchasedRank <= 2
+end
+
+
+--[[
+Authorizes one earned Gearwright blueprint tier.
+
+Create Item source ranks 2 and 3 become Gearwright blueprint ranks one and
+two. The class may use either of its two selected crafting professions, but
+this never authorizes a third crafting slot or an unselected profession.
+
+Args:
+    character (any): Authoritative earned Gearwright profile.
+    profession_id (string): One selected creation profession.
+    required_rank (number): Gearwright blueprint tier one or two.
+
+Returns:
+    boolean: True only for earned class, selected profession, level and rank.
+]]
+function C4ProfessionSkillRules.can_make_gearwright_blueprint(
+    character: any,
+    profession_id: string,
+    required_rank: number
+): boolean
+    if type(character) ~= "table"
+        or type(required_rank) ~= "number"
+        or required_rank % 1 ~= 0
+        or required_rank < 1
+        or required_rank > 2
+        or not ProfessionSelectionRules.can_use(
+            character.ProfessionSlots,
+            profession_id,
+            character
+        )
+    then
+        return false
+    end
+
+    local earned = FirstTransfers.awarded(character)
+    if not earned or earned.Id ~= "Gearwright" then
+        return false
+    end
+
+    local required_level = if required_rank == 1 then 20 else 28
+    if (tonumber(character.Level) or 0) < required_level then
+        return false
+    end
+
+    local skills = character.Progression
+        and character.Progression.Skills
+    local state = skills and skills.GearwrightBlueprintTraining
+
+    return type(state) == "table"
+        and state.Known == true
         and type(state.PurchasedRank) == "number"
         and state.PurchasedRank >= required_rank
         and state.PurchasedRank <= 2
