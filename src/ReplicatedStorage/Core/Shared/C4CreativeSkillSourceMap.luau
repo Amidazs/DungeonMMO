@@ -15,6 +15,33 @@ local MAPS = table.freeze({
         [1321] = table.freeze({SkillId = "DwarfWorkshopCraft"}),
         [1322] = table.freeze({SkillId = "DwarfCommonCraft"}),
     }),
+    DwarfScavenger = table.freeze({
+        [34] = table.freeze({SkillId = "DeepclaimerFieldBandage"}),
+        [100] = table.freeze({SkillId = "DeepclaimerHammerShock"}),
+        [148] = table.freeze({
+            SkillId = "DeepclaimerRestorativeDiscipline",
+        }),
+        [150] = table.freeze({
+            SkillId = "DeepclaimerPackTraining",
+            Offset = 1,
+        }),
+        [205] = table.freeze({SkillId = "DeepclaimerBluntTraining"}),
+        [211] = table.freeze({SkillId = "DeepclaimerFortitude"}),
+        [212] = table.freeze({SkillId = "DeepclaimerRecovery"}),
+        [216] = table.freeze({SkillId = "DeepclaimerPolearmTraining"}),
+        [227] = table.freeze({
+            SkillId = "DeepclaimerLightArmorTraining",
+        }),
+        [231] = table.freeze({
+            SkillId = "DeepclaimerHeavyArmorTraining",
+        }),
+        [245] = table.freeze({SkillId = "DeepclaimerWildSweep"}),
+        [254] = table.freeze({
+            SkillId = "DeepclaimerSalvageMark",
+            Offset = 1,
+        }),
+        [302] = table.freeze({SkillId = "DeepclaimerSalvageFestival"}),
+    }),
     DwarfArtisan = table.freeze({
         [25] = table.freeze({SkillId = "GearwrightClockworkGolem"}),
         [34] = table.freeze({SkillId = "GearwrightFieldBandage"}),
@@ -717,6 +744,7 @@ local MAPS = table.freeze({
 local GAPS = table.freeze({
     DwarvenFighter = table.freeze({}),
     DwarfArtisan = table.freeze({}),
+    DwarfScavenger = table.freeze({}),
     OrcMystic = table.freeze({
 
     }),
