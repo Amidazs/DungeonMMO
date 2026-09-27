@@ -114,13 +114,23 @@ local function main()
         ClassAdvancement = {},
     }
     local forged_capacity = SelectionRules.capacity(forged)
+    local forged_slots = SelectionRules.normalize({
+        Gathering = "Mining",
+        Creation = "Blacksmithing",
+        Creation2 = "Enchanting",
+    }, forged)
     check(
         forged_capacity.Gathering == 1
             and forged_capacity.Creation == 1,
         "forged Gearwright identity cannot gain extra crafting"
     )
+    check(
+        forged_slots.Creation2 == nil,
+        "forged persisted Creation2 slot is stripped"
+    )
 
-    local profiles = Profiles.new(ProfileAdapter.new())
+    local adapter = ProfileAdapter.new()
+    local profiles = Profiles.new(adapter)
     check(profiles:load(USER_ID), "disposable profile loads")
     check(profiles:mutate(USER_ID, function(profile: any)
         award_gearwright(profile.Characters.Slot1)
@@ -188,6 +198,22 @@ local function main()
     check(
         snapshot.ProfessionSlots.Creation2 == "Enchanting",
         "snapshot exposes earned second crafting slot"
+    )
+
+    check(profiles:save(USER_ID, "GearwrightProfessionTest"),
+        "earned Gearwright profession slots save")
+    local restored = Profiles.new(adapter)
+    check(restored:load(USER_ID), "earned Gearwright profile reloads")
+    local restored_character = assert(
+        restored:get_character(USER_ID, 1)
+    )
+    check(
+        restored_character.ProfessionSlots.Gathering == "Mining"
+            and restored_character.ProfessionSlots.Creation
+                == "Blacksmithing"
+            and restored_character.ProfessionSlots.Creation2
+                == "Enchanting",
+        "earned 1G+2C capacity survives profile reload"
     )
 
     print(
