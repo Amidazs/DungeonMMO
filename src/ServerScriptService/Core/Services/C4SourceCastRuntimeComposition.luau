@@ -16,6 +16,9 @@ local CastScheduler = require(
 local DirectMagic = require(
     Services.C4SourceDirectMagicCastService
 )
+local CastInterruption = require(
+    Services.C4SourceCastInterruptionService
+)
 local SupportMagic = require(
     Services.C4SourceSupportMagicCastService
 )
@@ -90,6 +93,7 @@ function C4SourceCastRuntimeComposition.new(
     local resources = CastResources.new()
     local timing = CastTiming.new(source_shots)
     local scheduler = CastScheduler.new(resources, timing)
+    local interruption = CastInterruption.new(scheduler)
     local direct_magic = DirectMagic.new(
         scheduler,
         source_executor
@@ -132,6 +136,7 @@ function C4SourceCastRuntimeComposition.new(
         Resources = resources,
         Timing = timing,
         Scheduler = scheduler,
+        Interruption = interruption,
         DirectMagic = direct_magic,
         SupportMagic = support_magic,
         PeriodicMagic = periodic_magic,
@@ -196,6 +201,9 @@ function C4SourceCastRuntimeComposition:capability(): any
         SourceCastResources = true,
         SourceCastTiming = true,
         SourceCastScheduler = true,
+        SourceCastInterruption = true,
+        SourceCastInterruptionCapability =
+            self.Interruption:capability(),
         DirectMagicBridge = true,
         DirectMagicDefaultEnabled =
             direct.DefaultEnabled == true,
