@@ -43,6 +43,8 @@ local function is_learnable(
             starter_prefix = "Human"
         elseif scope.RaceId == "Elf" then
             starter_prefix = "Elven"
+        elseif scope.RaceId == "Orc" then
+            starter_prefix = "Orc"
         end
 
         if starter_prefix then
@@ -51,6 +53,7 @@ local function is_learnable(
                 or scope.ClassId == "Ashenblade"
                 or scope.ClassId == "Ironvow"
                 or scope.ClassId == "Oathguard"
+                or scope.ClassId == "Warhowl"
                 then "Fighter"
                 else "Mystic"
             local starter = Tree.get(starter_prefix .. base)
