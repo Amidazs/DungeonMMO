@@ -1,3 +1,12 @@
+**v3.23 DWARF PROFESSION MODEL — ACCEPTED:** [roadmap](
+DungeonMMO_Roadmap_v3_23_Dwarf_Profession_Model_Accepted_20260928.md).
+The Dwarf economy rule is now locked: Dwarven Fighter stays at
+**1 gathering + 1 crafting**; Artisan advances to **1 gathering + 2 crafting**
+plus class-owned Dwarven Blueprints; Scavenger advances to
+**2 gathering + 1 crafting** plus class-owned Spoil/Sweep salvage.
+No blanket 2+2 Dwarf privilege. The next gameplay gate is the pinned
+Dwarven Fighter + Artisan source audit and implementation.
+
 **v3.22 DWARF PROFESSION DESIGN BOUNDARY — DISCUSSION:** [roadmap](
 DungeonMMO_Roadmap_v3_22_Dwarf_Profession_Design_Boundary_20260927.md).
 The level-30 C4 catalogue remains **16/18 first-transfer branches GREEN** at
