@@ -191,8 +191,7 @@ function C4SourceToggleService.new(options: any?): any
         config.ActiveEffects or ActiveEffects
 
     assert(
-        type(runtime.is_skill_usable) == "function"
-            and type(runtime.get_skill_rank) == "function"
+        type(runtime.get_skill_rank) == "function"
             and type(runtime.resolve_c4_active_source_effect)
                 == "function"
             and type(runtime.get_c4_source_vitals) == "function",
@@ -354,15 +353,6 @@ local function activation_plan(
     local review = REVIEWED[creative_skill_id]
     if not review then
         return nil, "C4SourceToggleSkillNotReviewed"
-    end
-
-    local usable, usable_reason =
-        self._runtime.is_skill_usable(
-            player.UserId,
-            creative_skill_id
-        )
-    if not usable then
-        return nil, usable_reason
     end
 
     local creative_rank =
@@ -569,13 +559,26 @@ local function still_authorized(
         return false
     end
 
-    local usable =
-        self._runtime.is_skill_usable(
+    local creative_rank =
+        self._runtime.get_skill_rank(
             player.UserId,
             skill_id
         )
+    if creative_rank ~= record.CreativeRank then
+        return false
+    end
 
-    if usable ~= true then
+    local source =
+        self._runtime.resolve_c4_active_source_effect(
+            player.UserId,
+            skill_id,
+            creative_rank
+        )
+    if not source
+        or source.SkillId ~= record.SourceSkillId
+        or source.Rank ~= record.SourceRank
+        or source.OperateType ~= "TOGGLE"
+    then
         return false
     end
 
@@ -742,6 +745,8 @@ function C4SourceToggleService:capability(): any
         ThreeSecondSourceUpkeep = true,
         ServerManaAuthority = true,
         ActiveSourceEffectAuthority = true,
+        OwnedSourceRankAuthority = true,
+        LegacyLoadoutIndependent = true,
         ClientAuthority = false,
     }
 end
