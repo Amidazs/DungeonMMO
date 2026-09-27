@@ -4,6 +4,75 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    OrcShaman = table.freeze({
+        [100] = table.freeze({SkillId = "AshspeakerSkullshock"}),
+        [146] = table.freeze({
+            SkillId = "AshspeakerArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "AshspeakerQuickPrayer"}),
+        [213] = table.freeze({SkillId = "AshspeakerManaReservoir"}),
+        [228] = table.freeze({SkillId = "AshspeakerFastCasting"}),
+        [229] = table.freeze({SkillId = "AshspeakerManaRecovery"}),
+        [250] = table.freeze({
+            SkillId = "AshspeakerWeaponTraining",
+            Offset = 2,
+        }),
+        [251] = table.freeze({
+            SkillId = "AshspeakerRobeTraining",
+            Offset = 4,
+        }),
+        [252] = table.freeze({
+            SkillId = "AshspeakerLightArmorTraining",
+            Offset = 4,
+        }),
+        [253] = table.freeze({
+            SkillId = "AshspeakerHeavyArmorTraining",
+            Offset = 2,
+        }),
+        [1001] = table.freeze({
+            SkillId = "AshspeakerSoulCry",
+            Offset = 2,
+        }),
+        [1002] = table.freeze({SkillId = "AshspeakerFlameChant"}),
+        [1003] = table.freeze({SkillId = "AshspeakerWarPower"}),
+        [1006] = table.freeze({SkillId = "AshspeakerFireChant"}),
+        [1007] = table.freeze({
+            SkillId = "AshspeakerBattleChant",
+            Offset = 1,
+        }),
+        [1009] = table.freeze({
+            SkillId = "AshspeakerShieldingChant",
+        }),
+        [1010] = table.freeze({
+            SkillId = "AshspeakerSoulShield",
+            Offset = 1,
+        }),
+        [1090] = table.freeze({
+            SkillId = "AshspeakerLifeDrain",
+            Offset = 2,
+        }),
+        [1092] = table.freeze({
+            SkillId = "AshspeakerFear",
+            Offset = 1,
+        }),
+        [1095] = table.freeze({
+            SkillId = "AshspeakerVenom",
+            Offset = 2,
+        }),
+        [1096] = table.freeze({SkillId = "AshspeakerChaosSeal"}),
+        [1097] = table.freeze({
+            SkillId = "AshspeakerDreamingSpirit",
+            Offset = 2,
+        }),
+        [1101] = table.freeze({SkillId = "AshspeakerBlazeQuake"}),
+        [1102] = table.freeze({SkillId = "AshspeakerAuraSink"}),
+        [1105] = table.freeze({SkillId = "AshspeakerMadness"}),
+        [1107] = table.freeze({SkillId = "AshspeakerFrostFlame"}),
+        [1208] = table.freeze({SkillId = "AshspeakerBindingSeal"}),
+        [1209] = table.freeze({SkillId = "AshspeakerPoisonSeal"}),
+        [1229] = table.freeze({SkillId = "AshspeakerLifeChant"}),
+    }),
     OrcMonk = table.freeze({
         [29] = table.freeze({
             SkillId = "SpiritclawIronFist",
