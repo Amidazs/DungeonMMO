@@ -49,6 +49,32 @@ C4SourceCastRuntimeComposition.__index =
     C4SourceCastRuntimeComposition
 
 --[[
+Cancels a pending cast through the bridge that owns its private receipt.
+
+Args:
+    bridges (any): Ordered source cast bridge collection.
+    player (any): Server-owned cast owner.
+    cast_id (number): Shared source scheduler receipt.
+
+Returns:
+    (boolean, string?): Success or stable no-owner reason.
+]]
+local function cancel_bridge_cast(
+    bridges: any,
+    player: any,
+    cast_id: number
+): (boolean, string?)
+    for _, bridge in ipairs(bridges) do
+        local cancelled = bridge:cancel_cast(player, cast_id)
+        if cancelled then
+            return true, nil
+        end
+    end
+
+    return false, "C4SourceCastInterruptBridgeReceiptInvalid"
+end
+
+--[[
 Builds the disabled-by-default Dungeon source cast service graph.
 
 Args:
@@ -141,27 +167,16 @@ function C4SourceCastRuntimeComposition.new(
         veilblade_cast,
     }
 
-    local function cancel_cast_bridge(
-        player: any,
-        cast_id: number
-    ): (boolean, string?)
-        for _, bridge in ipairs(cancellable_bridges) do
-            local cancelled = bridge:cancel_cast(
-                player,
-                cast_id
-            )
-            if cancelled then
-                return true, nil
-            end
-        end
-
-        return false, "C4SourceCastInterruptBridgeReceiptInvalid"
-    end
-
     local interruption = CastInterruption.new(
         scheduler,
         nil,
-        cancel_cast_bridge
+        function(player, cast_id)
+            return cancel_bridge_cast(
+                cancellable_bridges,
+                player,
+                cast_id
+            )
+        end
     )
 
     return setmetatable({
