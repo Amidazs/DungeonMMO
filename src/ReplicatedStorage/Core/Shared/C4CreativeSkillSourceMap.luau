@@ -4,6 +4,23 @@
 local C4CreativeSkillSourceMap = {}
 
 local MAPS = table.freeze({
+    OrcMonk = table.freeze({
+        [29] = table.freeze({
+            SkillId = "SpiritclawIronFist",
+            Offset = 9,
+        }),
+        [50] = table.freeze({SkillId = "SpiritclawForceFocus"}),
+        [54] = table.freeze({SkillId = "SpiritclawForceBurst"}),
+        [76] = table.freeze({SkillId = "SpiritclawBearAspect"}),
+        [83] = table.freeze({SkillId = "SpiritclawWolfAspect"}),
+        [95] = table.freeze({SkillId = "SpiritclawCripplingPalm"}),
+        [120] = table.freeze({SkillId = "SpiritclawStunningFist"}),
+        [210] = table.freeze({SkillId = "SpiritclawFistMastery"}),
+        [233] = table.freeze({
+            SkillId = "SpiritclawLightArmorTraining",
+        }),
+        [319] = table.freeze({SkillId = "SpiritclawAgileMovement"}),
+    }),
     OrcRaider = table.freeze({
         [34] = table.freeze({SkillId = "WarhowlWoundbind"}),
         [94] = table.freeze({SkillId = "WarhowlFury"}),
@@ -559,6 +576,9 @@ local MAPS = table.freeze({
 })
 
 local GAPS = table.freeze({
+    OrcMonk = table.freeze({
+
+    }),
     OrcRaider = table.freeze({
 
     }),
