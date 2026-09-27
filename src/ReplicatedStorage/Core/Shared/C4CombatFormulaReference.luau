@@ -698,7 +698,7 @@ formula multiplies that chance by 1 + (DEX - 20) / 100 and the final
 BLOW_RATE stat, then succeeds only when the result is greater than Rnd.get(100).
 
 Args:
-    position_relation (string): Front, Side or Behind server relation.
+    position_relation (string): Front, Side or Back server relation.
     dexterity (number): Authenticated source DEX.
     blow_rate_multiplier (number): Final source BLOW_RATE multiplier.
     roll (number): Server-owned integer roll from 0 through 99.
@@ -716,7 +716,7 @@ function C4CombatFormulaReference.resolve_blow(
         then 50
         elseif position_relation == "Side"
         then 60
-        elseif position_relation == "Behind"
+        elseif position_relation == "Back"
         then 70
         else nil
 
