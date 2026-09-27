@@ -28,6 +28,9 @@ local SOURCE_IDS = table.freeze({
     DawnkeeperGroupMend = 1027,
     DawnkeeperRevive = 1016,
     DawnkeeperMindWard = 1035,
+    EmberweaverConcentration = 1078,
+    MoonweaverConcentration = 1078,
+    NightweaverConcentration = 1078,
 })
 
 local FakeScheduler = {}
@@ -404,6 +407,38 @@ local function main()
         "Mind Ward reaches timed support authority at exact effect range"
     )
 
+    for index, skill_id in ipairs({
+        "EmberweaverConcentration",
+        "MoonweaverConcentration",
+        "NightweaverConcentration",
+    }) do
+        local concentration_start = assert(bridge:begin_cast(
+            caster,
+            target,
+            skill_id,
+            220 + index
+        ))
+        check(
+            concentration_start.SourceSkillId == 1078
+                and concentration_start.SourceRank == 1
+                and last_range == 400,
+            skill_id .. " binds exact Concentration source identity"
+        )
+
+        local concentrated = assert(bridge:launch_if_ready(
+            caster,
+            concentration_start.CastId,
+            230 + index
+        ))
+        check(
+            concentrated.Applied
+                and concentrated.Application.DurationSeconds == 1200
+                and last_execution == skill_id
+                and last_range == 900,
+            skill_id .. " reaches timed target-buff authority"
+        )
+    end
+
     local party_start = assert(bridge:begin_cast(
         caster,
         nil,
@@ -473,7 +508,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 28
+        capability.ReviewedSkillCount == 31
             and capability.TargetHeal
             and capability.TargetRecharge
             and capability.TargetBuff
