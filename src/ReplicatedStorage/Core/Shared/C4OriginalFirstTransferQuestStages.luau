@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    OrcMonk = table.freeze({
+        Id = "SpiritclawTrial",
+        BranchId = "OrcMonk",
+        SourceTitle = "The Spiritclaw Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "TotemKeeperRokka",
+        Recommendation = "SpiritclawTotemSeal",
+        Steps = table.freeze({
+            talk(
+                "TotemKeeperRokka",
+                "Accept the Spiritclaw proving rite."
+            ),
+            talk(
+                "PitSageMorga",
+                "Learn the old fist and totem forms."
+            ),
+            defeat(
+                "AshpeltBrawler",
+                4,
+                "Recover four personally earned spirit knots."
+            ),
+            talk(
+                "PitSageMorga",
+                "Return the four spirit knots."
+            ),
+            defeat(
+                "TotemfangChampion",
+                1,
+                "Recover the champion's personal totem seal."
+            ),
+            talk(
+                "TotemKeeperRokka",
+                "Present the seal and complete the Spiritclaw rite."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "SpiritKnots4",
+            "TotemfangSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     OrcRaider = table.freeze({
         Id = "WarhowlTrial",
         BranchId = "OrcRaider",
