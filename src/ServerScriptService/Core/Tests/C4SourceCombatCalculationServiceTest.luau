@@ -913,7 +913,10 @@ local function check_orc_physical_weapon_condition()
             and fist_result.SourceWeaponConditionRequired
             and fist_result.SourceUsingKind == "Fist, Dual Fist"
             and fist_result.SourceConditionWeaponId == 248
-            and fist_result.SourceConditionWeaponKind == "Fist",
+            and fist_result.SourceConditionWeaponKind == "Fist"
+            and fist_result.WeaponVulnerabilityStat
+                == "FIST_WPN_VULN"
+            and fist_result.WeaponVulnerabilityMultiplier == 1,
         "Orc Iron Punch accepts only the reviewed source fist family"
     )
 
