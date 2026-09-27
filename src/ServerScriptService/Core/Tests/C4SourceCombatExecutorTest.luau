@@ -133,6 +133,16 @@ function FakeCombat.physical_skill(
     assert(creative_rank == 1)
     last_spatial = spatial_context
 
+    if combat_mode == "BlowMiss" then
+        return {
+            Kind = "BlowDamage",
+            Amount = 0,
+            Blow = true,
+            BlowLanded = false,
+            BlowMiss = true,
+        }, nil
+    end
+
     return {
         Kind = "PhysicalDamage",
         Amount = 12,
@@ -867,6 +877,25 @@ local function main()
             and npc_physical.HealthAfter == 78,
         "live NPC PDAM applies accepted source damage directly to HP"
     )
+
+    combat_mode = "BlowMiss"
+    local blow_miss = assert(executor:physical_skill_npc(
+        attacker,
+        enemy,
+        "IronCleave",
+        1,
+        2021
+    ))
+    check(
+        blow_miss.Kind == "C4LiveNpcPhysicalSkill"
+            and not blow_miss.Applied
+            and blow_miss.Miss
+            and blow_miss.HealthDamage == 0
+            and blow_miss.RawDamage == 0
+            and enemy:FindFirstChildOfClass("Humanoid").Health == 78,
+        "failed C4 blow preserves a real miss without zero-damage mutation"
+    )
+    combat_mode = "Hit"
 
     local npc_magic = assert(executor:magic_skill_npc(
         attacker,
