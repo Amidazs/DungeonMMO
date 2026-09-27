@@ -225,6 +225,45 @@ local function main()
         "PDAM critical roll equal to calculated rate does not crit"
     )
 
+    local front_blow = Formula.resolve_blow(
+        "Front",
+        34,
+        1,
+        56
+    )
+    check(
+        front_blow.Landed
+            and front_blow.BaseChance == 50
+            and math.abs(front_blow.ChancePercent - 57) < 0.0001,
+        "C4 front blow uses 50 percent base and authenticated DEX"
+    )
+
+    local equal_blow = Formula.resolve_blow(
+        "Front",
+        34,
+        1,
+        57
+    )
+    check(
+        not equal_blow.Landed,
+        "C4 blow roll equal to calculated chance fails"
+    )
+
+    check_close(
+        Formula.blow_damage({
+            PAtk = 100,
+            PDef = 50,
+            SkillPower = 50,
+            CriticalPowerMultiplier = 1,
+            CriticalPowerAdd = 0,
+            DaggerVulnerabilityMultiplier = 0.8,
+            RandomDamageMultiplier = 1,
+            PvpMultiplier = 1,
+        }),
+        280,
+        "C4 blow damage uses critical-power and dagger-vulnerability order"
+    )
+
     check_close(
         Formula.shield_block_rate(20, 1.1, false),
         22,
