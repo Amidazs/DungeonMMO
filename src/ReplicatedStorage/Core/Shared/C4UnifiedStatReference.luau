@@ -127,6 +127,7 @@ local function source_stats(
         BOW_WPN_VULN = 1,
         BLUNT_WPN_VULN = 1,
         DAGGER_WPN_VULN = 1,
+        FIST_WPN_VULN = 1,
         POLE_WPN_VULN = 1,
         SWORD_WPN_VULN = 1,
         PHYSICAL_ATK_UNDEAD = 1,
