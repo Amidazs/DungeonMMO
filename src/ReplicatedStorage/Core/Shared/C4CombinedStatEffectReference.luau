@@ -10,6 +10,7 @@ local C4CombinedStatEffectReference = {}
 
 local NEUTRAL_STATS = table.freeze({
     BOW_WPN_VULN = 1,
+    FIST_WPN_VULN = 1,
     PHYSICAL_CRITICAL_POWER = 1,
     PHYSICAL_CRITICAL_POWER_ADD = 0,
     BLOW_RATE = 1,
@@ -324,8 +325,8 @@ end
 --[[
 Applies one ordered source operation to a mutable source stat dictionary.
 
-Only two missing source stats currently have proven C4 neutral bases:
-bow-weapon vulnerability starts at 1 and additive critical-power starts at 0.
+Missing source stats are seeded only when their C4 neutral base is proven:
+weapon vulnerability starts at 1 and additive critical-power starts at 0.
 
 Args:
     values (any): Mutable source stat values.
