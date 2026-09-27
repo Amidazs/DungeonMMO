@@ -466,6 +466,83 @@ local function check_duskseer_owned_passives()
 end
 
 --[[
+Checks Warhowl inherits exact Orc Fighter and Raider passive source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms class-44 and class-45 passives resolve together.
+]]
+local function check_warhowl_owned_passives()
+    local character = original_character(
+        "Orc",
+        "Warhowl",
+        30
+    )
+
+    own_passive(character, "OrcToughness", 1)
+    own_passive(character, "OrcLucky", 1)
+    own_passive(character, "OrcWeaponTraining", 3)
+    own_passive(character, "OrcArmorTraining", 5)
+    own_passive(character, "OrcIronBody", 1)
+
+    own_passive(character, "WarhowlEndurance", 1)
+    own_passive(character, "WarhowlBloodFortitude", 2)
+    own_passive(character, "WarhowlRecovery", 1)
+    own_passive(character, "WarhowlPolearmTraining", 4)
+    own_passive(character, "WarhowlLightArmorTraining", 7)
+    own_passive(character, "WarhowlHeavyArmorTraining", 7)
+    own_passive(character, "WarhowlSteelAndStoneTraining", 4)
+    own_passive(character, "WarhowlGreatWeaponTraining", 3)
+
+    local result = assert(Resolver.for_character(character))
+
+    local toughness = assert(find_source_rank(result, 134))
+    local starter_weapon = assert(find_source_rank(result, 141))
+    local starter_armor = assert(find_source_rank(result, 142))
+    local iron_body = assert(find_source_rank(result, 295))
+    local endurance = assert(find_source_rank(result, 148))
+    local boost_hp = assert(find_source_rank(result, 211))
+    local recovery = assert(find_source_rank(result, 212))
+    local polearm = assert(find_source_rank(result, 216))
+    local light = assert(find_source_rank(result, 227))
+    local heavy = assert(find_source_rank(result, 231))
+    local sword_blunt = assert(find_source_rank(result, 257))
+    local two_handed = assert(find_source_rank(result, 293))
+
+    check(
+        result.Ready
+            and result.ScopeId == "OrcRaider"
+            and #result.SourceRanks == 12
+            and #result.UnsupportedOwnedCreativePassives == 0
+            and #result.UnresolvedOwnedPassiveRanks == 0,
+        "all owned Warhowl source-stat passives resolve without gaps"
+    )
+    check(
+        toughness.Rank == 1
+            and starter_weapon.Rank == 3
+            and starter_armor.Rank == 5
+            and iron_body.Rank == 1,
+        "Warhowl inherits exact class-44 passive source ranks"
+    )
+    check(
+        endurance.Rank == 1
+            and boost_hp.Rank == 2
+            and recovery.Rank == 1
+            and polearm.Rank == 4,
+        "Warhowl preserves exact first Raider passive ranks"
+    )
+    check(
+        light.Rank == 7
+            and heavy.Rank == 7
+            and sword_blunt.Rank == 4
+            and two_handed.Rank == 3,
+        "Warhowl preserves exact armour and weapon mastery ranks"
+    )
+end
+
+--[[
 Checks Lifebinder owned passives resolve exact Elven Oracle source ranks.
 
 Args:
@@ -556,6 +633,7 @@ local function main()
     check_elven_wizard_owned_passives()
     check_nightweaver_owned_passives()
     check_duskseer_owned_passives()
+    check_warhowl_owned_passives()
     check_elven_oracle_owned_passives()
     check_fail_closed_owned_state()
 
