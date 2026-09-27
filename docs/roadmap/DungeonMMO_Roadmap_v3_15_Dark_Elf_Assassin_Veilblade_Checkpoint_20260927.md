@@ -7,11 +7,11 @@ DungeonMMO_Roadmap_v3_14_Palus_Knight_Duskguard_Level30_20260927.md).
 
 ## Status
 
-**BACKEND CHECKPOINT IMPLEMENTED — static validation green; final Studio/Play acceptance pending.**
+**GREEN — backend, focused Studio acceptance and unpublished Play rehearsal passed.**
 
 Checkpoint HEAD before documentation:
 
-`7b0f54d7f76cc056c4ca71d82d6347dbd50f774a`.
+`519185ca0c41d2969901d2454045d45ea3527315`.
 
 Checkpoint evidence:
 [Dark Elf Assassin / Veilblade v3.15](
@@ -108,7 +108,7 @@ A dedicated unpublished runner now exists:
 
 `scripts/studio/c4_dark_elf_assassin_backend_focus.luau`.
 
-It contains **28 suites** covering Veilblade foundation, active routing,
+It contains **29 suites** covering the C4 combat formula, Veilblade foundation, active routing,
 shared Scout/Rogue behavior, source tables, progression, primary stats,
 resource/cast timing, combat calculation/execution and Dungeon composition.
 
@@ -133,28 +133,30 @@ Fresh validation on checkpoint HEAD:
 - repository worktree clean except the existing quadruped Python
   `__pycache__` folders.
 
-## Remaining acceptance gate
+## Final acceptance
 
-The final fresh Studio run after the fixes did **not complete** because the
-local StudioMCP bridge became unstable: the Studio process remained open while
-the bridge intermittently returned no connected Studio and requests hung.
+Fresh acceptance on the completed v3.15 implementation:
 
-Therefore this checkpoint is intentionally **not marked green**.
+- `git diff --check`: PASS;
+- fresh Dungeon Rojo build: PASS;
+- focused Studio acceptance: **29 / 29 PASS**;
+- genuine unpublished Play rehearsal: **PASS**;
+- Scout Fleet Foot live movement multiplier: **1.06**;
+- Defense Aura source duration: **1200 seconds**;
+- Umbral Siphon: live NPC damage plus caster healing: PASS;
+- Venom Hex: live source poison application: PASS;
+- Wayfinder Cut / Mortal Blow: live C4 `BLOW` resolution: PASS,
+  observed **79.8%** rear-position chance from DEX 34 and **870.1875**
+  live damage on the accepted roll;
+- Crimson Sting: live physical damage plus bleed/status: PASS;
+- final `VERIFIED_PLAY_MODE_PASS`: PASS;
+- final project CreatorErrors in the accepted Play log: **0**.
 
-Tomorrow's first acceptance sequence is:
-
-1. rebuild a fresh unpublished Dungeon place;
-2. restart StudioMCP + Roblox Studio cleanly;
-3. run all 28 Veilblade backend suites;
-4. fix only genuine project regressions if any remain;
-5. run a genuine unpublished Play rehearsal through at least:
-   - Umbral Siphon;
-   - Venom Hex;
-   - Crimson Sting / physical status;
-   - one shared dagger/blow family;
-   - one shared toggle/passive path;
-6. confirm zero project CreatorErrors;
-7. then promote v3.15 from checkpoint to GREEN.
+The acceptance pass also closed a previously hidden source-combat gap. Mortal
+Blow was correctly mapped to source skill 16 but the live calculator only
+accepted `PDAM`. v3.15 now implements the pinned C4 BLOW success rule,
+separate blow-damage formula, real miss semantics, raw DEX propagation and
+neutral `BLOW_RATE` through the source stat pipeline.
 
 No `main` merge, Roblox publish, production DataStore mutation or animation
 work was performed.
