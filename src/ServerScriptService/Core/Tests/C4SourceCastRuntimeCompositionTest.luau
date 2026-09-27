@@ -737,7 +737,7 @@ local function main()
             and capability.SelfEffectBridge
             and capability.SelfEffectReviewedSkillCount == 3
             and capability.SourceToggleAuthority
-            and capability.SourceToggleReviewedSkillCount == 2
+            and capability.SourceToggleReviewedSkillCount == 3
             and capability.CorpseMagicBridge
             and capability.CompanionAuthority
             and capability.CompanionMagicBridge
