@@ -53,9 +53,9 @@ local function check_identity()
     check(
         class.FreshCreationAllowed == false
             and class.OriginalFirstTransferClass == true
-            and #class.TeachableSkills == 0
-            and #trainer.Skills == 0,
-        "Ashspeaker cannot bypass mentor or unmapped trainer gate"
+            and #class.TeachableSkills == 29
+            and #trainer.Skills == 29,
+        "Ashspeaker class and trainer expose exactly 29 source families"
     )
     check(
         quest.BranchId == "OrcShaman"
@@ -129,14 +129,14 @@ local function check_launch_gate()
 
     check(
         audit.SourceRankEntriesThroughCap == 77
-            and audit.TrainerMappedRankEntries == 0
-            and audit.MissingRankScheduleEntries == 77
-            and not audit.SourceRankScheduleMapped,
-        "Ashspeaker foundation does not claim any unmapped source rank"
+            and audit.TrainerMappedRankEntries == 77
+            and audit.MissingRankScheduleEntries == 0
+            and audit.SourceRankScheduleMapped,
+        "all 77 source rows have exact Ashspeaker training schedules"
     )
     check(
         audit.CurrentCareerId == "Ashspeaker"
-            and audit.Status == "SkillRankParityOutstanding"
+            and audit.Status == "RankScheduleMappedEffectsPending"
             and not audit.ExactSourceRankCoverageCertified
             and not audit.LaunchSkillCatalogueReady,
         "Ashspeaker remains explicitly outside the release gate"
@@ -158,7 +158,7 @@ local function main()
     check_launch_gate()
 
     print((
-        "[Ashspeaker Foundation] PASS: %d assertions rows=77 mapped=0"
+        "[Ashspeaker Foundation] PASS: %d assertions rows=77 mapped=77"
     ):format(checks))
 end
 
