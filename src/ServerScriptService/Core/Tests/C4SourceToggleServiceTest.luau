@@ -7,7 +7,25 @@ local Service = require(
 )
 
 local attributes = {}
+local humanoid = {
+    Health = 50,
+    MaxHealth = 100,
+    Sit = false,
+}
 local character = {}
+
+--[[
+Returns the disposable humanoid for source Relax tests.
+
+Args:
+    class_name (string): Expected Humanoid class request.
+
+Returns:
+    any?: Fake humanoid for Humanoid, otherwise nil.
+]]
+function character:FindFirstChildOfClass(class_name: string): any?
+    return if class_name == "Humanoid" then humanoid else nil
+end
 
 --[[
 Stores one disposable character attribute.
@@ -29,6 +47,7 @@ local OWNER = {
 }
 
 local skill_ranks = {
+    OrcRelax = 1,
     WarhowlPrecisionStance = 1,
     WarhowlPredatorStance = 3,
 }
@@ -86,6 +105,16 @@ function FakeRuntime.resolve_c4_active_source_effect(
     skill_id: string,
     creative_rank: number
 ): (any?, string?)
+    if skill_id == "OrcRelax"
+        and creative_rank == 1
+    then
+        return {
+            SkillId = 226,
+            Rank = 1,
+            OperateType = "TOGGLE",
+        }, nil
+    end
+
     if skill_id == "WarhowlPrecisionStance"
         and creative_rank == 1
     then
@@ -322,9 +351,62 @@ local function main()
         "Predator drops when current MP is below exact next upkeep"
     )
 
+    mana = 20
+    humanoid.Health = 50
+    humanoid.MaxHealth = 100
+    humanoid.Sit = false
+
+    local relax = assert(service:toggle(
+        OWNER,
+        "OrcRelax"
+    ))
+    check(
+        relax.Active
+            and relax.SourceSkillId == 226
+            and relax.SourceRank == 1
+            and relax.InitialMpSpent == 2
+            and relax.UpkeepKind == "Relax"
+            and humanoid.Sit
+            and mana == 18,
+        "Orc Relax spends two MP and forces sitting on activation"
+    )
+
+    service:step(1)
+    service:step(1)
+    check(
+        mana == 16
+            and service:is_active(OWNER, "OrcRelax"),
+        "Orc Relax consumes exact two MP every two seconds"
+    )
+
+    humanoid.Sit = false
+    service:step(1)
+    check(
+        not service:is_active(OWNER, "OrcRelax")
+            and deactivated.OrcRelax
+            and mana == 16,
+        "Orc Relax deactivates immediately after standing"
+    )
+
+    humanoid.Health = 100
+    humanoid.Sit = false
+    local before_full_hp_attempt = mana
+    local full_hp, full_hp_reason = service:toggle(
+        OWNER,
+        "OrcRelax"
+    )
+    check(
+        full_hp == nil
+            and full_hp_reason == "C4RelaxHpFull"
+            and mana == before_full_hp_attempt,
+        "Orc Relax cannot activate at full HP or spend MP"
+    )
+
     local capability = service:capability()
     check(
-        capability.ReviewedSkillCount == 2
+        capability.ReviewedSkillCount == 3
+            and capability.RelaxFixedTwoSecondUpkeep
+            and capability.RelaxRequiresSittingAndMissingHp
             and capability.MpConsumePerLevelFormula
             and capability.ThreeSecondSourceUpkeep
             and capability.ServerManaAuthority
@@ -334,7 +416,7 @@ local function main()
     )
 
     print((
-        "[C4 Warhowl Toggle] PASS: %d assertions reviewed=2"
+        "[C4 Warhowl Toggle] PASS: %d assertions reviewed=3"
     ):format(checks))
 end
 
