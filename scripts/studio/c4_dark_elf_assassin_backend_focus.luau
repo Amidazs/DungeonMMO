@@ -12,6 +12,7 @@ local core_tests = ServerScriptService.Core.Tests
 local FIXTURE_TIMEOUT_SECONDS = 12
 
 local FIXTURES = table.freeze({
+    {Folder = core_tests, Name = "C4CombatFormulaReferenceTest"},
     {Folder = core_tests, Name = "C4DarkElfAssassinFoundationTest"},
     {Folder = core_tests, Name = "C4VeilbladeCastServiceTest"},
     {Folder = core_tests, Name = "C4RogueBleedTest"},
