@@ -6,6 +6,24 @@ C4SourceSupportMagicCastService.__index =
     C4SourceSupportMagicCastService
 
 local REVIEWED = table.freeze({
+    EmberweaverConcentration = table.freeze({
+        SourceSkillId = 1078,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    MoonweaverConcentration = table.freeze({
+        SourceSkillId = 1078,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    NightweaverConcentration = table.freeze({
+        SourceSkillId = 1078,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
     MoonweaverTidalWard = table.freeze({
         SourceSkillId = 1182,
         Kind = "TargetBuff",
