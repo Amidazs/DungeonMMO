@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 17 and report.SourceLearningRows == 1089,
+assert(report.ClassPaths == 18 and report.SourceLearningRows == 1152,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 1077
+assert(report.CandidateRows == 1140
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 1089,
+assert(report.CandidateRows + report.ExplicitMissingRows == 1152,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -48,6 +48,9 @@ local dusk_blood = assert(Map.resolve("ShillienOracle", 1268, 1))
 local orc_punch = assert(Map.resolve("OrcFighter", 29, 9))
 local orc_toughness = assert(Map.resolve("OrcFighter", 134, 1))
 local orc_body = assert(Map.resolve("OrcFighter", 295, 1))
+local warhowl_stun = assert(Map.resolve("OrcRaider", 100, 9))
+local warhowl_rage = assert(Map.resolve("OrcRaider", 94, 1))
+local warhowl_great = assert(Map.resolve("OrcRaider", 293, 3))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -105,6 +108,16 @@ assert(dusk_heal.Status == "Candidate"
     and dusk_shackle.CreativeSkillId == "DuskseerWindShackle"
     and dusk_shackle.CreativeRank == 1,
     "Shillien Oracle inherited rank offsets map to Duskseer ranks")
+
+assert(warhowl_stun.Status == "Candidate"
+    and warhowl_stun.CreativeSkillId == "WarhowlSkullbreaker"
+    and warhowl_stun.CreativeRank == 9
+    and warhowl_rage.CreativeSkillId == "WarhowlFury"
+    and warhowl_rage.CreativeRank == 1
+    and warhowl_great.CreativeSkillId
+        == "WarhowlGreatWeaponTraining"
+    and warhowl_great.CreativeRank == 3,
+    "Orc Raider unique and shared source families map to Warhowl")
 
 assert(orc_punch.Status == "Candidate"
     and orc_punch.CreativeSkillId == "OrcIronPunch"
