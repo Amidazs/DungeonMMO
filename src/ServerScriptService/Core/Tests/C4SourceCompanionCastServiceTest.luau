@@ -18,6 +18,7 @@ local owner = {
 }
 
 local SOURCE_IDS = {
+    GearwrightClockworkGolem = 25,
     EmberweaverManaCompanion = 1111,
     EmberweaverCombatCompanion = 1225,
     EmberweaverServitorRecharge = 1126,
@@ -350,6 +351,24 @@ local function main()
         missing == nil
             and missing_reason == "C4OwnedCompanionUnavailable",
         "pet-target support fails closed without owned companion"
+    )
+
+    local golem_start = assert(bridge:begin_cast(
+        owner,
+        "GearwrightClockworkGolem",
+        600
+    ))
+    local golem = assert(bridge:launch_if_ready(
+        owner,
+        golem_start.CastId,
+        602
+    ))
+    check(
+        golem.Applied
+            and companion_active
+            and last_action == "GearwrightClockworkGolem"
+            and golem.Application.Role == "Combat",
+        "Gearwright Clockwork Golem reaches server companion authority"
     )
 
     print((
