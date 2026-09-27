@@ -49,6 +49,12 @@ local CompanionService = require(
 local CompanionMagic = require(
     Services.C4SourceCompanionCastService
 )
+local DwarfSalvage = require(
+    Services.C4DwarfSalvageService
+)
+local SalvageMagic = require(
+    Services.C4SourceSalvageCastService
+)
 local DuskguardCast = require(
     Services.C4SourceDuskguardCastService
 )
@@ -171,6 +177,12 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         companions
     )
+    local dwarf_salvage = DwarfSalvage.new(inventory)
+    local salvage_magic = SalvageMagic.new(
+        scheduler,
+        dwarf_salvage,
+        nil
+    )
     local duskguard_cast = DuskguardCast.new(
         scheduler,
         source_executor
@@ -189,6 +201,7 @@ function C4SourceCastRuntimeComposition.new(
         self_effect,
         corpse_magic,
         companion_magic,
+        salvage_magic,
         duskguard_cast,
         veilblade_cast,
     }
@@ -222,6 +235,8 @@ function C4SourceCastRuntimeComposition.new(
         CorpseMagic = corpse_magic,
         Companions = companions,
         CompanionMagic = companion_magic,
+        DwarfSalvage = dwarf_salvage,
+        SalvageMagic = salvage_magic,
         DuskguardCast = duskguard_cast,
         VeilbladeCast = veilblade_cast,
     }, C4SourceCastRuntimeComposition)
@@ -248,6 +263,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     self.SourceToggle:clear_owner(player)
     self.CorpseMagic:clear_owner(player)
     self.CompanionMagic:clear_owner(player)
+    self.SalvageMagic:clear_owner(player)
     self.DuskguardCast:clear_owner(player)
     self.VeilbladeCast:clear_owner(player)
     self.Charges:clear_owner(player)
@@ -277,6 +293,7 @@ function C4SourceCastRuntimeComposition:capability(): any
     local source_toggle = self.SourceToggle:capability()
     local corpse_magic = self.CorpseMagic:capability()
     local companion_magic = self.CompanionMagic:capability()
+    local salvage_magic = self.SalvageMagic:capability()
     local duskguard_cast = self.DuskguardCast:capability()
     local veilblade_cast = self.VeilbladeCast:capability()
 
@@ -339,6 +356,16 @@ function C4SourceCastRuntimeComposition:capability(): any
             corpse_magic.CurrentlyEnabled == true,
         CompanionAuthority = true,
         CompanionMagicBridge = true,
+        DwarfSalvageAuthority = true,
+        SourceSalvageBridge = true,
+        SourceSalvageDefaultEnabled =
+            salvage_magic.DefaultEnabled == true,
+        SourceSalvageCurrentlyEnabled =
+            salvage_magic.CurrentlyEnabled == true,
+        SourceSalvageReviewedSkillCount =
+            salvage_magic.ReviewedSkillCount,
+        SourceSalvageFestivalAreaBound =
+            salvage_magic.SpoilFestivalAreaResolverBound,
         CompanionMagicDefaultEnabled =
             companion_magic.DefaultEnabled == true,
         CompanionMagicCurrentlyEnabled =
