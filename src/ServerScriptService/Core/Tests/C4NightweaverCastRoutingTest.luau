@@ -744,7 +744,7 @@ Args:
     None.
 
 Returns:
-    nil: Prints exact reviewed active-family routing coverage.
+    nil: Prints exact reviewed non-support routing coverage.
 ]]
 local function main()
     check_direct_magic()
@@ -759,7 +759,8 @@ local function main()
 
     print((
         "[C4 Nightweaver Cast Routing] PASS: %d assertions "
-            .. "reviewed_active_families=16 venom_rend=live"
+            .. "non_support_active_families=16 "
+            .. "concentration=support_bridge venom_rend=live"
     ):format(checks))
 end
 
