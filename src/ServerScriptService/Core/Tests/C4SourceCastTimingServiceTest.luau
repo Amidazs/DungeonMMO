@@ -147,6 +147,59 @@ local function wizard_character(): any
 end
 
 --[[
+Builds an authentic level-30 Warhowl with inherited Orc Iron Punch.
+
+Args:
+    None.
+
+Returns:
+    any: Profile-shaped authenticated Orc Raider owner.
+]]
+local function warhowl_character(): any
+    local character =
+        ProfileSchema.create_default(USER_ID).Characters.Slot1
+    local quest = assert(QuestStages.get("OrcRaider"))
+    local proofs = {}
+
+    for _, proof_id in ipairs(quest.RequiredProofIds) do
+        proofs[proof_id] = true
+    end
+
+    character.Level = 30
+    character.Identity = {
+        Version = 1,
+        RaceId = "Orc",
+        BaseClassId = "Fighter",
+        ClassId = "Warhowl",
+        CreationStage = "Complete",
+    }
+    character.ClassAdvancement = {
+        Version = 1,
+        OriginalFirstTransferChoiceId = "OrcRaider",
+        OriginalFirstTransferClassId = "Warhowl",
+        OriginalFirstTransferReceiptId =
+            "TEMP_SourceTimingWarhowlReceipt",
+        OriginalFirstTransferQuest = {
+            QuestId = quest.Id,
+            BranchId = quest.BranchId,
+            Step = #quest.Steps + 1,
+            Count = 0,
+            Ready = true,
+            AppliedEvents = {},
+            Proofs = proofs,
+        },
+    }
+    character.Progression.Skills.OrcIronPunch = {
+        Known = true,
+        StarterGranted = false,
+        PurchasedRank = 9,
+        Proficiency = 0,
+    }
+
+    return character
+end
+
+--[[
 Creates the timing service around real cast mapping and isolated read state.
 
 Args:
@@ -184,6 +237,7 @@ function FakePhysicalContract.resolve(
     return {
         CreativeSkillId = creative_skill_id,
         CreativeRank = 1,
+        AuthenticatedScopeId = "HumanWizard",
         SourceScopeId = "HumanWizard",
         SourceSkillId = 9999,
         SourceRank = 1,
@@ -522,6 +576,39 @@ local function check_physical_skill_timing()
 end
 
 --[[
+Checks inherited Orc Fighter timing keeps separate current/source scopes.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms Warhowl can schedule an owned class-44 physical skill.
+]]
+local function check_inherited_orc_physical_timing()
+    Runtime.set_character(USER_ID, warhowl_character())
+
+    boundary_state.ScopeId = "OrcRaider"
+    boundary_state.SourceStatCandidateReady = true
+    boundary_state.SourceStatCandidate.PHYSICAL_ATTACK_SPEED = 318
+    boundary_state.SourceStatCandidate.PHYSICAL_SKILL_REUSE = 1
+    boundary_state.SourceStatCandidate.SKILL_MASTERY = 0
+
+    local result = assert(service():resolve(
+        USER_ID,
+        "OrcIronPunch"
+    ))
+
+    check(
+        result.AuthenticatedScopeId == "OrcRaider"
+            and result.SourceScopeId == "OrcFighter"
+            and result.SourceSkillId == 29
+            and result.SourceRank == 9
+            and result.SourcePhysicalAttackSpeed == 318,
+        "Warhowl timing accepts inherited class-44 Iron Punch"
+    )
+end
+
+--[[
 Runs Human Wizard source cast-time planning acceptance.
 
 Args:
@@ -559,6 +646,7 @@ local function main()
     check_boundary_rules()
     check_reuse_multiplier_and_mastery()
     check_physical_skill_timing()
+    check_inherited_orc_physical_timing()
 
     Runtime.clear_character(USER_ID)
 
