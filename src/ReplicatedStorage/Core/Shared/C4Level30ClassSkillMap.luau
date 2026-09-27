@@ -194,6 +194,19 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local ORC_MONK = table.freeze({
+    IronPunch = "SpiritclawIronFist",
+    FocusForce = "SpiritclawForceFocus",
+    ForceBlaster = "SpiritclawForceBurst",
+    BearTotem = "SpiritclawBearAspect",
+    WolfTotem = "SpiritclawWolfAspect",
+    Cripple = "SpiritclawCripplingPalm",
+    StunningFist = "SpiritclawStunningFist",
+    FistMastery = "SpiritclawFistMastery",
+    LightArmorMastery = "SpiritclawLightArmorTraining",
+    AgileMovement = "SpiritclawAgileMovement",
+})
+
 local ORC_RAIDER = table.freeze({
     Bandage = "WarhowlWoundbind",
     Rage = "WarhowlFury",
@@ -366,6 +379,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "OrcMonk" then
+        return ORC_MONK[source_category]
     end
     if branch_id == "OrcRaider" then
         return ORC_RAIDER[source_category]
