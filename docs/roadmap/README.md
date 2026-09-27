@@ -1,3 +1,15 @@
+**v3.24 DWARF ARTISAN / GEARWRIGHT — VALIDATION PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_24_Gearwright_Validation_Pending_20260928.md).
+Pinned Dwarven Fighter class 53 and Artisan class 56 are now audited and
+implemented as a backend candidate: **15 inherited starter rows + 50 Artisan
+rows / 14 Gearwright families**, exact level-30 **1161 HP / 327 MP / 921 CP**,
+and the accepted **1 gathering + 2 crafting** Gearwright profession rule with
+class-owned blueprint tiers. Tracked source coverage is now
+**23 paths / 1370 rows / 170 source IDs**, with **17/18** first-transfer source
+audits and schedules mapped. Fresh Base/Dungeon builds and diff check PASS.
+Studio focused regression and genuine unpublished Play are still pending, so
+this checkpoint is **not GREEN** and Scavenger remains untouched.
+
 **v3.23 DWARF PROFESSION MODEL — ACCEPTED:** [roadmap](
 DungeonMMO_Roadmap_v3_23_Dwarf_Profession_Model_Accepted_20260928.md).
 The Dwarf economy rule is now locked: Dwarven Fighter stays at
