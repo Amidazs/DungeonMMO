@@ -32,6 +32,7 @@ local FIGHTER_ID = 938181
 local MAGE_ID = 938182
 local WIZARD_ID = 938186
 local DUSKGUARD_ID = 938187
+local VEILBLADE_ID = 938188
 local TARGET_ID = 938183
 local SHIELD_TARGET_ID = 938184
 local BOW_ATTACKER_ID = 938185
@@ -116,6 +117,7 @@ local function empty_active_snapshot(user_id: number): any?
         and user_id ~= MAGE_ID
         and user_id ~= WIZARD_ID
         and user_id ~= DUSKGUARD_ID
+        and user_id ~= VEILBLADE_ID
         and user_id ~= TARGET_ID
         and user_id ~= SHIELD_TARGET_ID
         and user_id ~= BOW_ATTACKER_ID
@@ -325,6 +327,15 @@ local function seed_characters()
 
     Runtime.set_character(WIZARD_ID, wizard)
     Runtime.set_character(DUSKGUARD_ID, duskguard)
+
+    local veilblade = starter_character(
+        VEILBLADE_ID,
+        "Veilblade"
+    )
+    veilblade.Equipment.Weapon = "scout_dagger"
+    own_skill(veilblade, "WayfinderCut", 9)
+    Runtime.set_character(VEILBLADE_ID, veilblade)
+
     Runtime.set_character(
         TARGET_ID,
         starter_character(TARGET_ID, "Oathguard")
@@ -1726,6 +1737,89 @@ local function check_npc_targets()
 end
 
 --[[
+Checks Dark Elf Assassin Mortal Blow through source BLOW resolution.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms DEX/position success and exact blow-damage composition.
+]]
+local function check_veilblade_blow()
+    local result = nil
+
+    for _ = 1, 100 do
+        local attempt = assert(Combat.physical_skill(
+            VEILBLADE_ID,
+            TARGET_ID,
+            "WayfinderCut",
+            9,
+            FRONT_CONTEXT
+        ))
+
+        check(
+            attempt.Blow
+                and attempt.SourceSkillId == 16
+                and attempt.SourceRank == 18
+                and attempt.SourceDex == 34
+                and attempt.SourceBlowRate == 1
+                and attempt.BlowBaseChance == 50
+                and math.abs(
+                    attempt.BlowChancePercent - 57
+                ) < 0.0001
+                and attempt.BlowLanded
+                    == (attempt.BlowChancePercent > attempt.BlowRoll),
+            "Mortal Blow uses exact source DEX and positional success"
+        )
+
+        if attempt.BlowLanded then
+            result = attempt
+            break
+        end
+    end
+
+    local resolved = assert(result, "bounded Mortal Blow never landed")
+    local attacker = assert(
+        Runtime.get_c4_resource_migration_boundary(VEILBLADE_ID)
+    )
+    local defender = assert(
+        Runtime.get_c4_resource_migration_boundary(TARGET_ID)
+    )
+    local expected = Formula.blow_damage({
+        PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+        PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+        SkillPower = resolved.SourceSkillPower,
+        Soulshot = resolved.Soulshot,
+        Shield = resolved.ShieldBlocked,
+        PerfectShield = resolved.PerfectShield,
+        ShieldDefense = resolved.ShieldDefencePower,
+        CriticalPowerMultiplier = resolved.CriticalPowerMultiplier,
+        CriticalPowerAdd = resolved.CriticalPowerAdd,
+        DaggerVulnerabilityMultiplier =
+            resolved.WeaponVulnerabilityMultiplier,
+        RandomDamageMultiplier = resolved.RandomDamageMultiplier,
+        PvpMultiplier = resolved.PvpMultiplier,
+    })
+
+    if resolved.PhysicalSkillCritical then
+        expected *= 2
+    end
+
+    check_close(
+        resolved.Amount,
+        expected,
+        "landed Mortal Blow uses exact C4 blow-damage formula"
+    )
+    check(
+        resolved.Kind == "BlowDamage"
+            and resolved.WeaponKind == "Dagger"
+            and resolved.WeaponVulnerabilityStat
+                == "DAGGER_WPN_VULN",
+        "Mortal Blow uses reviewed dagger source vulnerability"
+    )
+end
+
+--[[
 Checks wrong skill families and unowned ranks fail closed.
 
 Args:
@@ -1790,6 +1884,7 @@ local function main()
     check_human_wizard_scorch_mark()
     check_human_wizard_withering_hex()
     check_duskguard_source_families()
+    check_veilblade_blow()
     check_heal()
     check_npc_targets()
     check_denials()
@@ -1800,6 +1895,7 @@ local function main()
     Runtime.clear_character(MAGE_ID)
     Runtime.clear_character(WIZARD_ID)
     Runtime.clear_character(DUSKGUARD_ID)
+    Runtime.clear_character(VEILBLADE_ID)
     Runtime.clear_character(TARGET_ID)
     Runtime.clear_character(SHIELD_TARGET_ID)
     Runtime.clear_character(BOW_ATTACKER_ID)
@@ -1811,7 +1907,7 @@ local function main()
         .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "status=true pdam=true mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
-        .. "patk_down=true duskguard=true heal=true npc=true live=false"
+        .. "patk_down=true duskguard=true blow=true heal=true npc=true live=false"
     ):format(checks))
 end
 
