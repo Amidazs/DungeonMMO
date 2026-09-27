@@ -52,6 +52,12 @@ local C4NpcElementalVulnerabilityService = require(
         "C4NpcElementalVulnerabilityService"
     )
 )
+local C4NpcAccuracyDebuffService = require(
+    script.Parent:WaitForChild("C4NpcAccuracyDebuffService")
+)
+local C4EnemyHitRules = require(
+    script.Parent:WaitForChild("C4EnemyHitRules")
+)
 local RangerSlowService = require(
     script.Parent:WaitForChild("RangerSlowService")
 )
@@ -609,6 +615,21 @@ local function resolve_strike(
                 .. attack_name
                 .. " "
                 .. tostring(rejection_reason),
+            nil
+        )
+        return
+    end
+
+    local hit = C4EnemyHitRules.resolve_normal_attack(
+        runtime.model,
+        player
+    )
+    if hit.Miss == true then
+        CombatValidationService.emit(
+            player,
+            "ENEMY_ATTACK",
+            "MISS",
+            runtime.model.Name .. " " .. attack_name,
             nil
         )
         return
