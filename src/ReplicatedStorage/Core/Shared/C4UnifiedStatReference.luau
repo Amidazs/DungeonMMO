@@ -148,6 +148,7 @@ local function source_stats(
         DARK_VULN = 1,
         BLEED_VULN = 1,
         POISON_VULN = 1,
+        DEBUFF_VULN = 1,
         ROOT_VULN = 1,
         SLEEP_VULN = 1,
         STUN_VULN = 1,
