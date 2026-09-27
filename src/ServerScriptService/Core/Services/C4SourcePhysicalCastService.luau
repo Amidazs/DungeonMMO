@@ -17,6 +17,31 @@ local REVIEWED = table.freeze({
         EffectRange = 400,
         ExecutionKind = "SingleTarget",
     }),
+    SpiritclawIronFist = table.freeze({
+        SourceSkillId = 29,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "SingleTarget",
+    }),
+    SpiritclawStunningFist = table.freeze({
+        SourceSkillId = 120,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "Stun",
+    }),
+    SpiritclawForceBurst = table.freeze({
+        SourceSkillId = 54,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "Charged",
+        RequiredCharges = 1,
+    }),
+    SpiritclawCripplingPalm = table.freeze({
+        SourceSkillId = 95,
+        CastRange = 40,
+        EffectRange = 400,
+        ExecutionKind = "Slow",
+    }),
     WarhowlCrushingBlow = table.freeze({
         SourceSkillId = 255,
         CastRange = 40,
@@ -68,7 +93,8 @@ Returns:
 ]]
 function C4SourcePhysicalCastService.new(
     scheduler: any,
-    executor: any
+    executor: any,
+    charges: any?
 ): any
     assert(
         scheduler
@@ -89,6 +115,7 @@ function C4SourcePhysicalCastService.new(
         _enabled = false,
         _scheduler = scheduler,
         _executor = executor,
+        _charges = charges,
         _pending_by_owner = {},
     }, C4SourcePhysicalCastService)
 end
@@ -215,6 +242,7 @@ function C4SourcePhysicalCastService:begin_cast(
         EffectRange = review.EffectRange,
         ExecutionKind = review.ExecutionKind,
         SourceRadius = review.SourceRadius,
+        RequiredCharges = review.RequiredCharges,
     }
 
     return {
@@ -281,6 +309,55 @@ local function execute_reviewed(
     launch: any,
     sequence_id: number?
 ): (any?, string?)
+    if record.ExecutionKind == "Charged" then
+        if not self._charges
+            or type(self._charges.consume) ~= "function"
+        then
+            return nil, "C4PhysicalChargeAuthorityUnavailable"
+        end
+        if type(
+            self._executor.charged_physical_skill_npc
+        ) ~= "function"
+        then
+            return nil, "C4ChargedPhysicalExecutorUnavailable"
+        end
+
+        local consumed, consume_reason =
+            self._charges:consume(
+                player,
+                record.RequiredCharges
+            )
+        if not consumed then
+            return nil, consume_reason
+        end
+
+        return self._executor:charged_physical_skill_npc(
+            player,
+            record.Target,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            consumed.ChargeAfter,
+            sequence_id
+        )
+    end
+
+    if record.ExecutionKind == "Slow" then
+        if type(
+            self._executor.physical_slow_skill_npc
+        ) ~= "function"
+        then
+            return nil, "C4PhysicalSlowExecutorUnavailable"
+        end
+
+        return self._executor:physical_slow_skill_npc(
+            player,
+            record.Target,
+            launch.CreativeSkillId,
+            launch.CreativeRank,
+            sequence_id
+        )
+    end
+
     if record.ExecutionKind == "Stun" then
         if type(self._executor.physical_stun_skill_npc) ~= "function" then
             return nil, "C4PhysicalStunExecutorUnavailable"
@@ -435,6 +512,8 @@ function C4SourcePhysicalCastService:capability(): any
         ReviewedActiveSkillCount = count,
         SingleTargetPdam = true,
         StunPdam = true,
+        ChargedPdam = true,
+        PhysicalMovementSlow = true,
         TargetAreaPdam = true,
         StunPdamPending = false,
         TargetAreaPdamPending = false,
