@@ -194,6 +194,25 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local ORC_RAIDER = table.freeze({
+    Bandage = "WarhowlWoundbind",
+    Rage = "WarhowlFury",
+    StunAttack = "WarhowlSkullbreaker",
+    BattleRoar = "WarhowlWarRoar",
+    VitalForce = "WarhowlEndurance",
+    BoostHP = "WarhowlBloodFortitude",
+    FastHPRecovery = "WarhowlRecovery",
+    PolearmMastery = "WarhowlPolearmTraining",
+    LightArmorMastery = "WarhowlLightArmorTraining",
+    HeavyArmorMastery = "WarhowlHeavyArmorTraining",
+    WildSweep = "WarhowlSweepingArc",
+    PowerSmash = "WarhowlCrushingBlow",
+    Accuracy = "WarhowlPrecisionStance",
+    SwordBluntMastery = "WarhowlSteelAndStoneTraining",
+    TwoHandedWeaponMastery = "WarhowlGreatWeaponTraining",
+    ViciousStance = "WarhowlPredatorStance",
+})
+
 local SHILLIEN_ORACLE = table.freeze({
     AntiMagic = "DuskseerArcaneResistance",
     QuickRecovery = "DuskseerQuickPrayer",
@@ -347,6 +366,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "OrcRaider" then
+        return ORC_RAIDER[source_category]
     end
     if branch_id == "ShillienOracle" then
         return SHILLIEN_ORACLE[source_category]
