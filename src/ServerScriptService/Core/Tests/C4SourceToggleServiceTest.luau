@@ -55,21 +55,22 @@ local skill_ranks = {
 local FakeRuntime = {}
 
 --[[
-Reports both reviewed toggles as currently usable.
+Fails if source toggles regress to the legacy loadout authority.
 
 Args:
-    _user_id (number): Expected owner.
-    skill_id (string): Reviewed stance.
+    _user_id (number): Disposable owner.
+    _skill_id (string): Reviewed stance.
 
 Returns:
-    (boolean, string?): Usability or unknown-skill denial.
+    never: Source toggles must use owned source-rank authority instead.
 ]]
 function FakeRuntime.is_skill_usable(
     _user_id: number,
-    skill_id: string
+    _skill_id: string
 ): (boolean, string?)
-    return skill_ranks[skill_id] ~= nil,
-        if skill_ranks[skill_id] then nil else "UnknownSkill"
+    error(
+        "C4 source toggles must not require legacy equipped-skill state"
+    )
 end
 
 --[[
@@ -411,6 +412,8 @@ local function main()
             and capability.ThreeSecondSourceUpkeep
             and capability.ServerManaAuthority
             and capability.ActiveSourceEffectAuthority
+            and capability.OwnedSourceRankAuthority
+            and capability.LegacyLoadoutIndependent
             and not capability.ClientAuthority,
         "capability reports both exact source toggle families"
     )
