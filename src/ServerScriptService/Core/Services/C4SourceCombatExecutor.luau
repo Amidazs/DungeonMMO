@@ -2903,11 +2903,6 @@ function C4SourceCombatExecutor:physical_skill(
         RawDamage = applied.RawDamage,
         HealthBefore = applied.HealthBefore,
         HealthAfter = applied.HealthAfter,
-        AbsorbDamagePercent = absorbed.AbsorbDamagePercent,
-        RequestedAbsorbHeal = absorbed.RequestedHeal,
-        EffectiveAbsorbHeal = absorbed.EffectiveHeal,
-        CasterHealthBefore = absorbed.CasterHealthBefore,
-        CasterHealthAfter = absorbed.CasterHealthAfter,
     }, nil
 end
 
