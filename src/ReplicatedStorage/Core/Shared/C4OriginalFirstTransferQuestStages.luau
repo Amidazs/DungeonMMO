@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    OrcShaman = table.freeze({
+        Id = "AshspeakerTrial",
+        BranchId = "OrcShaman",
+        SourceTitle = "The Ashspeaker Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "FlameSeerKharuk",
+        Recommendation = "AshspeakerEmberSeal",
+        Steps = table.freeze({
+            talk(
+                "FlameSeerKharuk",
+                "Accept the Ashspeaker spirit trial."
+            ),
+            talk(
+                "AncestorKeeperMogra",
+                "Learn the rites of flame, spirit and binding."
+            ),
+            defeat(
+                "AshenSpiritAcolyte",
+                4,
+                "Recover four personally earned ember fetishes."
+            ),
+            talk(
+                "AncestorKeeperMogra",
+                "Return the four ember fetishes."
+            ),
+            defeat(
+                "CinderTotemKeeper",
+                1,
+                "Recover the keeper's personal ancestor seal."
+            ),
+            talk(
+                "FlameSeerKharuk",
+                "Present the seal and complete the Ashspeaker trial."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "EmberFetishes4",
+            "AncestorSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     OrcMonk = table.freeze({
         Id = "SpiritclawTrial",
         BranchId = "OrcMonk",
