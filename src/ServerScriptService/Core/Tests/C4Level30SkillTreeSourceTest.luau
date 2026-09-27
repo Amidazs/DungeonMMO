@@ -69,6 +69,7 @@ local function main()
     check_scope("ElvenFighter", 43)
     check_scope("ElvenMystic", 42)
     check_scope("OrcFighter", 31)
+    check_scope("OrcRaider", 63)
     check_scope("ElvenWizard", 82)
     check_scope("ElvenOracle", 91)
     check_scope("PalusKnight", 50)
@@ -81,12 +82,12 @@ local function main()
     check_scope("ElvenScout", 77)
 
     local coverage = Source.coverage()
-    check(coverage.PathCount == 17
-        and coverage.RowCount == 1089
-        and coverage.UniqueSourceSkillIds == 127
+    check(coverage.PathCount == 18
+        and coverage.RowCount == 1152
+        and coverage.UniqueSourceSkillIds == 130
         and coverage.LevelCap == 30
         and not coverage.LiveTrainerIntegrated,
-        "All seventeen tracked original paths have exact source learning rows")
+        "All eighteen tracked original paths have exact source learning rows")
 
     local power_strike = Source.find_skill("HumanFighter", 3)
     check(#power_strike == 9
@@ -119,6 +120,29 @@ local function main()
             and orc_iron_body[1].SkillLevel == 1
             and orc_iron_body[1].MinLevel == 15,
         "Orc Fighter passive source entry levels remain exact"
+    )
+
+    local raider_stun = Source.find_skill("OrcRaider", 100)
+    check(
+        #raider_stun == 9
+            and raider_stun[1].SkillLevel == 1
+            and raider_stun[1].MinLevel == 20
+            and raider_stun[9].SkillLevel == 9
+            and raider_stun[9].MinLevel == 28,
+        "Orc Raider Stun Attack source ranks 1-9 preserve brackets"
+    )
+
+    local raider_rage = Source.find_skill("OrcRaider", 94)
+    local raider_great = Source.find_skill("OrcRaider", 293)
+    check(
+        #raider_rage == 1
+            and raider_rage[1].SkillLevel == 1
+            and raider_rage[1].MinLevel == 24
+            and #raider_great == 3
+            and raider_great[1].MinLevel == 20
+            and raider_great[2].MinLevel == 24
+            and raider_great[3].MinLevel == 28,
+        "Orc Raider unique Rage and great-weapon brackets stay exact"
     )
 
     local wizard_blaze = Source.find_skill("HumanWizard", 1220)
@@ -257,7 +281,7 @@ local function main()
         "Elven Knight Aggression ranks through level30")
 
     print(("[C4 Skill Tree] EXACT_SOURCE_PASS: %d assertions, "
-        .. "paths=17 rows=1089 uniqueSkillIds=127 live=false")
+        .. "paths=18 rows=1152 uniqueSkillIds=130 live=false")
         :format(checks))
 end
 
