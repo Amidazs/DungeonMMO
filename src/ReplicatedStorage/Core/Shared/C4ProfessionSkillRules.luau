@@ -76,6 +76,11 @@ function C4ProfessionSkillRules.can_make_common(
     then
         return owns_rank(character, "OrcCommonCraft")
     end
+    if identity.RaceId == "Dwarf"
+        and identity.BaseClassId == "Fighter"
+    then
+        return owns_rank(character, "DwarfCommonCraft")
+    end
 
     return C4ProfessionSkillRules.can_read(character, profession_id)
         and owns_rank(character, "C4CommonItemCreation")
@@ -321,6 +326,11 @@ function C4ProfessionSkillRules.can_make_gearwright_blueprint(
 
     local skills = character.Progression
         and character.Progression.Skills
+    if not owns_rank(character, "DwarfWorkshopCraft")
+        or not owns_rank(character, "DwarfBlueprintFoundation")
+    then
+        return false
+    end
     local state = skills and skills.GearwrightBlueprintTraining
 
     return type(state) == "table"
