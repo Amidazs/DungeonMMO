@@ -80,6 +80,34 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    DuskseerExorcism = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1031,
+        SourceRank = 1,
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerSlumber = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1069,
+        SourceRank = 1,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    DuskseerRootbind = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1201,
+        SourceRank = 1,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    DuskseerWindShackle = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1206,
+        SourceRank = 2,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
 })
 
 
@@ -1276,6 +1304,10 @@ local function check_reviewed_direct_families()
         "EmberweaverSlumberHex",
         "EmberweaverScorchMark",
         "EmberweaverWitheringHex",
+        "DuskseerExorcism",
+        "DuskseerSlumber",
+        "DuskseerRootbind",
+        "DuskseerWindShackle",
     }
 
     for index, skill_id in ipairs(skill_ids) do
