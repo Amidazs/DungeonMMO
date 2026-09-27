@@ -108,6 +108,7 @@ local function check_rank_six()
 
     check(
         resolved.CreativeRank == 6
+            and resolved.AuthenticatedScopeId == "HumanWizard"
             and resolved.SourceScopeId == "HumanWizard"
             and resolved.SourceSkillId == 1220
             and resolved.SourceRank == 6
@@ -328,6 +329,7 @@ local function main()
     check(
         capability.Available
             and capability.ServerOwnedPurchasedRank
+            and capability.AuthenticatedCharacterScopeBound
             and capability.ExactSourceMpFields
             and capability.ExactSourceTimingFields
             and capability.ExactSourceRangeMetadata
