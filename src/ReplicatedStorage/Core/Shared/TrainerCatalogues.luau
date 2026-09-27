@@ -24,7 +24,124 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Orc"}),
         AllowedBaseClasses = table.freeze({"Mage"}),
         AllowedClasses = table.freeze({"Ashspeaker"}),
-        Skills = table.freeze({}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "AshspeakerSkullshock",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerArcaneResistance",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerQuickPrayer",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerManaReservoir",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerFastCasting",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerManaRecovery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerWeaponTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerRobeTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerHeavyArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerSoulCry",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerFlameChant",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerWarPower",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerFireChant",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerBattleChant",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerShieldingChant",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerSoulShield",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerLifeDrain",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerFear",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerVenom",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerChaosSeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerDreamingSpirit",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerBlazeQuake",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerAuraSink",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerMadness",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerFrostFlame",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerBindingSeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerPoisonSeal",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "AshspeakerLifeChant",
+                Mode = "LearnOrRank",
+            }),
+        }),
     }),
     SpiritclawTrainer = table.freeze({
         Id = "SpiritclawTrainer",
