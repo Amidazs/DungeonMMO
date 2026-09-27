@@ -1346,6 +1346,15 @@ function C4SourceCombatCalculationService.normal_attack(
         return nil, shot_reason
     end
 
+    local absorb_damage_percent = tonumber(
+        attacker.SourceStatCandidate.ABSORB_DAMAGE_PERCENT
+    ) or 0
+    if absorb_damage_percent < 0
+        or absorb_damage_percent >= math.huge
+    then
+        return nil, "OriginalAbsorbDamagePercentInvalid"
+    end
+
     local amount = Formula.physical_damage({
         PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
         PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
@@ -1381,6 +1390,9 @@ function C4SourceCombatCalculationService.normal_attack(
         RandomDamageMultiplier = variance.Multiplier,
         SourceWeaponId = vulnerability.SourceWeaponId,
         WeaponKind = vulnerability.WeaponKind,
+        AbsorbDamagePercent = absorb_damage_percent,
+        AbsorbDamageEligible =
+            vulnerability.WeaponKind ~= "Bow",
         WeaponVulnerabilityStat = vulnerability.VulnerabilityStat,
         WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
         NpcRaceMultiplier = race.Multiplier,
