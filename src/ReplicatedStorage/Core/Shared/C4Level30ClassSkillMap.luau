@@ -194,6 +194,32 @@ local ELVEN_ORACLE = table.freeze({
     WindShackle = "LifebinderWindShackle",
 })
 
+local DARK_ELF_ASSASSIN = table.freeze({
+    Confusion = "VeilbladeMindRend",
+    MortalBlow = "WayfinderCut",
+    Unlock = "ScoutLockpicking",
+    PowerShot = "WayfinderArrow",
+    HealthDrain = "VeilbladeUmbralSiphon",
+    AttackAura = "VeilbladeAttackAura",
+    DefenseAura = "VeilbladeDefenseAura",
+    Bleed = "WayfinderWound",
+    UltimateEvasion = "ScoutEvasiveFocus",
+    BowRange = "RangerLongRange",
+    Poison = "VeilbladeVenomHex",
+    QuickStep = "ScoutFleetFoot",
+    FallResistance = "ScoutFallResistance",
+    CriticalPower = "VeilbladeCriticalPower",
+    LungCapacity = "ScoutLungCapacity",
+    Evasion = "ScoutEvasion",
+    BowMastery = "WayfinderBowMastery",
+    DaggerMastery = "WayfinderDaggerMastery",
+    Sting = "VeilbladeCrimsonSting",
+    AcrobaticMove = "ScoutRunningEvasion",
+    LightArmorMastery = "ScoutLightArmorMastery",
+    AccuracyToggle = "ScoutAccuracyToggle",
+    CriticalPowerToggle = "ScoutCriticalPowerToggle",
+})
+
 local PALUS_KNIGHT = table.freeze({
     HealthDrain = "DuskguardUmbralSiphon",
     DefenseAura = "DuskguardDefenseAura",
@@ -264,6 +290,9 @@ function SkillMap.get(
     end
     if branch_id == "PalusKnight" then
         return PALUS_KNIGHT[source_category]
+    end
+    if branch_id == "DarkElfAssassin" then
+        return DARK_ELF_ASSASSIN[source_category]
     end
     if branch_id ~= "HumanRogue" and branch_id ~= "ElvenScout"
     then
