@@ -139,9 +139,9 @@ local DEFINITIONS = table.freeze({
     ),
     MoonweaverConcentration = make_skill(
         "MoonweaverConcentration",
-        "Passive",
+        "Support",
         {{20, 1}, {30, 1}},
-        NO_WEAPON,
+        ARCANE_WAND,
         nil
     ),
     MoonweaverServitorRecharge = make_skill(
