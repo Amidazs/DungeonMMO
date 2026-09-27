@@ -1,0 +1,42 @@
+--!strict
+-- Exact pinned C4 class_id 49 learning rows through first transfer.
+
+local Rows = table.freeze({
+    {118, 1, "Magicians Movement", 0, 1, "PinnedC4SkillTree"},
+    {134, 1, "Toughness", 0, 1, "PinnedC4SkillTree"},
+    {146, 1, "Anti Magic", 260, 7, "PinnedC4SkillTree"},
+    {146, 2, "Anti Magic", 260, 7, "PinnedC4SkillTree"},
+    {146, 3, "Anti Magic", 880, 14, "PinnedC4SkillTree"},
+    {146, 4, "Anti Magic", 880, 14, "PinnedC4SkillTree"},
+    {163, 1, "Spellcraft", 0, 1, "PinnedC4SkillTree"},
+    {194, 1, "Lucky", 0, 1, "PinnedC4SkillTree"},
+    {214, 1, "Mana Recovery", 0, 1, "PinnedC4SkillTree"},
+    {250, 1, "Weapon Mastery", 520, 7, "PinnedC4SkillTree"},
+    {250, 2, "Weapon Mastery", 1800, 14, "PinnedC4SkillTree"},
+    {251, 1, "Robe Mastery", 260, 7, "PinnedC4SkillTree"},
+    {251, 2, "Robe Mastery", 260, 7, "PinnedC4SkillTree"},
+    {251, 3, "Robe Mastery", 880, 14, "PinnedC4SkillTree"},
+    {251, 4, "Robe Mastery", 880, 14, "PinnedC4SkillTree"},
+    {252, 1, "Light Armor Mastery", 260, 7, "PinnedC4SkillTree"},
+    {252, 2, "Light Armor Mastery", 260, 7, "PinnedC4SkillTree"},
+    {252, 3, "Light Armor Mastery", 880, 14, "PinnedC4SkillTree"},
+    {252, 4, "Light Armor Mastery", 880, 14, "PinnedC4SkillTree"},
+    {253, 1, "Heavy Armor Mastery", 880, 14, "PinnedC4SkillTree"},
+    {253, 2, "Heavy Armor Mastery", 880, 14, "PinnedC4SkillTree"},
+    {1001, 1, "Soul Cry", 0, 1, "PinnedC4SkillTree"},
+    {1001, 2, "Soul Cry", 1800, 14, "PinnedC4SkillTree"},
+    {1007, 1, "Chant of Battle", 1800, 14, "PinnedC4SkillTree"},
+    {1010, 1, "Soul Shield", 520, 7, "PinnedC4SkillTree"},
+    {1090, 1, "Life Drain", 520, 7, "PinnedC4SkillTree"},
+    {1090, 2, "Life Drain", 1800, 14, "PinnedC4SkillTree"},
+    {1092, 1, "Fear", 1800, 14, "PinnedC4SkillTree"},
+    {1095, 1, "Venom", 520, 7, "PinnedC4SkillTree"},
+    {1095, 2, "Venom", 1800, 14, "PinnedC4SkillTree"},
+    {1097, 1, "Dreaming Spirit", 520, 7, "PinnedC4SkillTree"},
+    {1097, 2, "Dreaming Spirit", 1800, 14, "PinnedC4SkillTree"},
+    {1100, 1, "Chill Flame", 520, 7, "PinnedC4SkillTree"},
+    {1100, 2, "Chill Flame", 1800, 14, "PinnedC4SkillTree"},
+    {1322, 1, "Common Craft", 0, 1, "PinnedC4SkillTree"},
+})
+
+return Rows
