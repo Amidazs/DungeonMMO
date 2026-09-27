@@ -1,3 +1,32 @@
+## 27 September 2026 — CURRENT v3.15 Veilblade checkpoint validation
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
+[evidence](
+../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
+
+Dark Elf Assassin / Veilblade now has a dedicated **28-suite** unpublished
+backend runner:
+`scripts/studio/c4_dark_elf_assassin_backend_focus.luau`.
+
+Pre-fix Studio evidence already passed the Veilblade cast bridge (8 assertions),
+source cast contract, physical/magic timing, scheduler, source combat
+calculation/executor and Dungeon composition. The same run exposed four
+failures in source-row count, primary-stat coverage and legacy Scout training;
+all four causes are now fixed.
+
+Post-fix static gate:
+- diff check: PASS;
+- Base build: PASS;
+- Dungeon build: PASS.
+
+Post-fix Studio gate: **PENDING** due StudioMCP transport instability.
+Unpublished Play gate: **PENDING**.
+
+Required tomorrow:
+28/28 backend suites -> live Veilblade drain/poison/physical-status/shared
+dagger-or-blow/toggle proof -> zero project CreatorErrors -> mark v3.15 green.
+
 ## 27 September 2026 — v3.14 Duskguard acceptance GREEN
 
 - Palus Knight source ranks: **50/50 mapped**.
