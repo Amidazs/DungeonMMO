@@ -29,6 +29,13 @@ local TARGETS = table.freeze({
                 [1] = 3, [5] = 9, [10] = 9, [15] = 10,
             }),
         }),
+        Mage = table.freeze({
+            SourceClass = "Orc Mystic",
+            SourceUrl = "Pinned C4 skill_trees.sql class_id 49",
+            Levels = table.freeze({
+                [1] = 7, [7] = 12, [14] = 16,
+            }),
+        }),
     }),
     Elf = table.freeze({
         Fighter = table.freeze({
