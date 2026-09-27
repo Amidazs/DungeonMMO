@@ -36,6 +36,12 @@ local SOURCE_IDS = table.freeze({
     DuskseerBloodRite = 1268,
     OrcMysticSoulShield = 1010,
     AshspeakerSoulShield = 1010,
+    AshspeakerFlameChant = 1002,
+    AshspeakerWarPower = 1003,
+    AshspeakerFireChant = 1006,
+    AshspeakerBattleChant = 1007,
+    AshspeakerShieldingChant = 1009,
+    AshspeakerLifeChant = 1229,
 })
 
 local FakeScheduler = {}
@@ -62,6 +68,11 @@ function FakeScheduler.begin_cast(
     pending_skill = skill_id
     local now = supplied_now or 100
     local party = skill_id == "DawnkeeperGroupMend"
+        or skill_id == "AshspeakerFlameChant"
+        or skill_id == "AshspeakerFireChant"
+        or skill_id == "AshspeakerBattleChant"
+        or skill_id == "AshspeakerShieldingChant"
+        or skill_id == "AshspeakerLifeChant"
 
     return {
         CastId = next_cast_id,
@@ -204,6 +215,31 @@ function FakeExecutor.can_party_heal_skill(
     return true, nil
 end
 
+--[[
+Preflights one fake TARGET_PARTY support cast.
+
+Args:
+    _self (any): Fake executor receiver.
+    _caster (any): Expected caster.
+    source_radius (number): Reviewed party support radius.
+
+Returns:
+    (boolean, string?): Configurable support target state.
+]]
+function FakeExecutor.can_party_support_skill(
+    _self: any,
+    _caster: any,
+    source_radius: number
+): (boolean, string?)
+    last_range = source_radius
+
+    if not party_ready then
+        return false, "C4LivePartySupportNoEligibleTargets"
+    end
+
+    return true, nil
+end
+
 function FakeExecutor.can_resurrection_skill_player(
     _self: any,
     _caster: any,
@@ -305,6 +341,92 @@ function FakeExecutor.party_heal_skill(
         Applied = true,
         AffectedPlayers = 2,
         EffectiveHeal = 80,
+    }, nil
+end
+
+--[[
+Applies one fake TARGET_PARTY timed buff.
+
+Args:
+    _self (any): Fake executor receiver.
+    _caster (any): Expected caster.
+    skill_id (string): Reviewed chant.
+    _rank (number): Creative rank.
+
+Returns:
+    (any?, string?): Fake party-buff evidence.
+]]
+function FakeExecutor.party_buff_skill(
+    _self: any,
+    _caster: any,
+    skill_id: string,
+    _rank: number
+): (any?, string?)
+    last_execution = skill_id
+
+    return {
+        Applied = true,
+        AffectedPlayers = 2,
+        DurationSeconds = 1200,
+    }, nil
+end
+
+--[[
+Applies one fake TARGET_PARTY regeneration buff.
+
+Args:
+    _self (any): Fake executor receiver.
+    _caster (any): Expected caster.
+    skill_id (string): Reviewed Life Chant.
+    _rank (number): Creative rank.
+
+Returns:
+    (any?, string?): Fake party-HoT evidence.
+]]
+function FakeExecutor.party_regen_skill(
+    _self: any,
+    _caster: any,
+    skill_id: string,
+    _rank: number
+): (any?, string?)
+    last_execution = skill_id
+
+    return {
+        Applied = true,
+        Scheduled = true,
+        AffectedPlayers = 2,
+        HealPerTick = 12,
+        TickCount = 15,
+        TickSeconds = 1,
+        DurationSeconds = 15,
+    }, nil
+end
+
+--[[
+Applies the currently supported TARGET_ALLY self subset.
+
+Args:
+    _self (any): Fake executor receiver.
+    _caster (any): Expected caster.
+    skill_id (string): Reviewed War Power.
+    _rank (number): Creative rank.
+
+Returns:
+    (any?, string?): Fake self-subset ally-buff evidence.
+]]
+function FakeExecutor.ally_buff_skill_self(
+    _self: any,
+    _caster: any,
+    skill_id: string,
+    _rank: number
+): (any?, string?)
+    last_execution = skill_id
+
+    return {
+        Applied = true,
+        AffectedPlayers = 1,
+        ClanAllianceTargetsPending = true,
+        DurationSeconds = 1200,
     }, nil
 end
 
@@ -507,6 +629,99 @@ local function main()
         )
     end
 
+    for index, skill_id in ipairs({
+        "AshspeakerFlameChant",
+        "AshspeakerFireChant",
+        "AshspeakerBattleChant",
+        "AshspeakerShieldingChant",
+    }) do
+        local chant_start = assert(bridge:begin_cast(
+            caster,
+            nil,
+            skill_id,
+            300 + index
+        ))
+        check(
+            chant_start.SourceSkillId == SOURCE_IDS[skill_id]
+                and chant_start.PartyRosterServerSide
+                and not chant_start.TargetBoundServerSide
+                and last_range == 1000,
+            skill_id .. " preflights exact TARGET_PARTY radius"
+        )
+
+        local chanted = assert(bridge:launch_if_ready(
+            caster,
+            chant_start.CastId,
+            310 + index
+        ))
+        check(
+            chanted.Applied
+                and chanted.Application.AffectedPlayers == 2
+                and chanted.Application.DurationSeconds == 1200
+                and last_execution == skill_id
+                and last_range == 1000,
+            skill_id .. " reaches server-owned party-buff authority"
+        )
+    end
+
+    local war_power_start = assert(bridge:begin_cast(
+        caster,
+        nil,
+        "AshspeakerWarPower",
+        320
+    ))
+    check(
+        war_power_start.SourceSkillId == 1003
+            and not war_power_start.TargetBoundServerSide
+            and not war_power_start.PartyRosterServerSide,
+        "War Power ignores client target and uses the exact ally-safe subset"
+    )
+
+    local war_power = assert(bridge:launch_if_ready(
+        caster,
+        war_power_start.CastId,
+        322
+    ))
+    check(
+        war_power.Applied
+            and war_power.Application.AffectedPlayers == 1
+            and war_power.Application.ClanAllianceTargetsPending
+            and war_power.Application.DurationSeconds == 1200
+            and last_execution == "AshspeakerWarPower",
+        "War Power applies only the supported caster subset"
+    )
+
+    local life_start = assert(bridge:begin_cast(
+        caster,
+        nil,
+        "AshspeakerLifeChant",
+        330
+    ))
+    check(
+        life_start.SourceSkillId == 1229
+            and life_start.PartyRosterServerSide
+            and not life_start.TargetBoundServerSide
+            and last_range == 1000,
+        "Life Chant binds no client target and uses source party radius"
+    )
+
+    local life = assert(bridge:launch_if_ready(
+        caster,
+        life_start.CastId,
+        332
+    ))
+    check(
+        life.Applied
+            and life.Application.Scheduled
+            and life.Application.AffectedPlayers == 2
+            and life.Application.HealPerTick == 12
+            and life.Application.TickCount == 15
+            and life.Application.TickSeconds == 1
+            and life.Application.DurationSeconds == 15
+            and last_execution == "AshspeakerLifeChant",
+        "Life Chant reaches exact party HealOverTime authority"
+    )
+
     local party_start = assert(bridge:begin_cast(
         caster,
         nil,
@@ -576,11 +791,15 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 47
+        capability.ReviewedSkillCount == 53
             and capability.TargetHeal
             and capability.TargetRecharge
             and capability.TargetBuff
             and capability.PartyHeal
+            and capability.PartyBuff
+            and capability.PartyRegen
+            and capability.AllyBuffSelfSubset
+            and capability.ClanAllianceAllyTargetsPending
             and capability.ResurrectionOffer
             and capability.ResurrectionTargetAcceptance
             and capability.ServerTargetAuthority
