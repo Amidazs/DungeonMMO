@@ -1372,8 +1372,8 @@ local function main()
             and capability.ReviewedUndeadOnlyMagic
             and capability.ReviewedRootControl
             and capability.ReviewedRootMovementOnly
-            and capability.ReviewedSkillCount == 32
-            and #capability.ReviewedSkills == 32
+            and capability.ReviewedSkillCount == 36
+            and #capability.ReviewedSkills == 36
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
