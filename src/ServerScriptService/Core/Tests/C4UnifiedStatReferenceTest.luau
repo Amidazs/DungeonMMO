@@ -498,7 +498,7 @@ local function check_dwarf_inherited_passives()
         ))
 
         check(
-            result.AppliedSourceModifiers == 2
+            result.AppliedSourceModifiers == 3
                 and result.PassiveStatSnapshot.PHYSICAL_ATTACK
                     > result.Naked.NakedPAtk,
             class_id
