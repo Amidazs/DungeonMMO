@@ -73,6 +73,22 @@ local TEMPLATES = table.freeze({
         CpBase = 242.2, CpAdd = 24.54, CpMod = 0.22,
         ConBonus = 1.77, MenBonus = 1.31,
     }),
+    OrcMonk = table.freeze({
+        SourceClassId = 47,
+        SourceClassName = "MONK",
+        ClassBaseLevel = 20,
+        STR = 40, DEX = 26, CON = 47,
+        INT = 18, WIT = 12, MEN = 27,
+        BasePAtk = 4, BasePDef = 80, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 31, BaseCritRate = 42,
+        BaseAccuracy = 31, BaseRunSpd = 117,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 346, HpAdd = 32.90, HpMod = 0.37,
+        MpBase = 144, MpAdd = 9.80, MpMod = 0.14,
+        CpBase = 173, CpAdd = 16.40, CpMod = 0.22,
+        ConBonus = 1.77, MenBonus = 1.31,
+    }),
     HumanFighter = table.freeze({
         SourceClassId = 0,
         SourceClassName = "HUMAN_FIGHTER",
@@ -362,6 +378,7 @@ local STARTERS = table.freeze({
 })
 
 local FIRST_TRANSFERS = table.freeze({
+    Spiritclaw = "OrcMonk",
     Warhowl = "OrcRaider",
     Ironvow = "HumanWarrior",
     Oathguard = "HumanKnight",
