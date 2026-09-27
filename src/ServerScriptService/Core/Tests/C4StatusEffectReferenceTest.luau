@@ -76,6 +76,57 @@ local function main()
         "Poison rank one keeps source 8 x 10 every three seconds"
     )
 
+    local chill = assert(Status.periodic_plan(1100, 2))
+    check(
+        chill.EffectType == "DMG_OVER_TIME"
+            and chill.SaveVs == "WIT"
+            and chill.VulnerabilityStat == "DEBUFF_VULN"
+            and chill.ResourceKind == "Health",
+        "Chill Flame rank two uses generic WIT debuff vulnerability"
+    )
+    check(
+        chill.TickDamage == 30
+            and chill.TickCount == 15
+            and chill.TickSeconds == 1
+            and chill.Nonlethal,
+        "Chill Flame rank two keeps exact nonlethal 30 x 15 HP ticks"
+    )
+
+    local frost_flame = assert(Status.periodic_plan(1107, 2))
+    check(
+        frost_flame.EffectType == "DMG_OVER_TIME"
+            and frost_flame.ResourceKind == "Health"
+            and frost_flame.TickDamage == 60
+            and frost_flame.TickCount == 15
+            and frost_flame.TickSeconds == 1
+            and frost_flame.Nonlethal,
+        "Frost Flame rank two keeps exact nonlethal 60 x 15 HP ticks"
+    )
+
+    local blaze = assert(Status.periodic_plan(1101, 1))
+    check(
+        blaze.EffectType == "DMG_OVER_TIME"
+            and blaze.ResourceKind == "Health"
+            and blaze.TickDamage == 44
+            and blaze.TickCount == 15
+            and blaze.TickSeconds == 1
+            and blaze.Nonlethal,
+        "Blaze Quake keeps exact nonlethal 44 x 15 HP aura ticks"
+    )
+
+    local aura_sink = assert(Status.periodic_plan(1102, 1))
+    check(
+        aura_sink.EffectType == "MANA_DMG_OVER_TIME"
+            and aura_sink.SaveVs == "WIT"
+            and aura_sink.VulnerabilityStat == "DEBUFF_VULN"
+            and aura_sink.ResourceKind == "Mana"
+            and aura_sink.TickDamage == 4
+            and aura_sink.TickCount == 15
+            and aura_sink.TickSeconds == 5
+            and not aura_sink.Nonlethal,
+        "Aura Sink keeps exact 4 MP x 15 every five seconds"
+    )
+
     local frost = assert(Status.movement_slow_plan(1184, 6))
     check(
         frost.SourceSkillId == 1184
