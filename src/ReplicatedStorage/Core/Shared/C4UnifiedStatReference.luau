@@ -2,6 +2,7 @@
 -- Read-only nine-class source-scaled stat snapshot before live migration.
 -- Equipment kind gates are C4 reference names, not untrusted item tags.
 local Shared = script.Parent
+local Careers = require(Shared.OriginalFirstTransferDefinitions)
 local Primary = require(Shared.C4PrimaryStatReference)
 local Derived = require(Shared.C4DerivedStatReference)
 local Passives = require(Shared.C4PassiveStatReference)
@@ -48,17 +49,19 @@ local function is_learnable(
         end
 
         if starter_prefix then
-            local base = if scope.ClassId == "GreenwardScout"
-                or scope.ClassId == "GreenwardWarden"
-                or scope.ClassId == "Ashenblade"
-                or scope.ClassId == "Ironvow"
-                or scope.ClassId == "Oathguard"
-                or scope.ClassId == "Warhowl"
+            local career = Careers.for_class(scope.ClassId)
+            local base_class_id = career and career.BaseClassId
+            local base = if base_class_id == "Fighter"
                 then "Fighter"
-                else "Mystic"
-            local starter = Tree.get(starter_prefix .. base)
-            if starter then
-                table.insert(paths, starter)
+                elseif base_class_id == "Mage"
+                then "Mystic"
+                else nil
+
+            if base then
+                local starter = Tree.get(starter_prefix .. base)
+                if starter then
+                    table.insert(paths, starter)
+                end
             end
         end
     end
