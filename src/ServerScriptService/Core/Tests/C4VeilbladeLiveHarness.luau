@@ -143,6 +143,22 @@ then
             )
         end
 
+        if action == "physical_skill" then
+            local result, reason =
+                runtime.C4SourceCombatExecutor:physical_skill_npc(
+                    player,
+                    payload.Target,
+                    payload.SkillId,
+                    payload.Rank,
+                    payload.SequenceId
+                )
+            return {
+                ok = result ~= nil,
+                reason = reason,
+                result = result,
+            }
+        end
+
         if action == "begin" then
             local result, reason =
                 cast_runtime.VeilbladeCast:begin_cast(
@@ -325,7 +341,10 @@ local function veilblade_character(user_id)
 
     own_skill(character, "VeilbladeDefenseAura", 1)
     own_skill(character, "VeilbladeUmbralSiphon", 8)
+    own_skill(character, "VeilbladeVenomHex", 1)
     own_skill(character, "VeilbladeCrimsonSting", 6)
+    own_skill(character, "WayfinderCut", 9)
+    own_skill(character, "ScoutFleetFoot", 1)
 
     return character
 end
@@ -547,6 +566,118 @@ local function cast_umbral_siphon(bridge, player, enemy)
 end
 
 --[[
+Casts Venom Hex through the live periodic-status authority.
+
+Args:
+    bridge (BindableFunction): Live cast bridge.
+    player (Player): Actual Veilblade.
+    enemy (Model): Reviewed NPC target.
+
+Returns:
+    nil: Confirms exact source poison identity and live scheduling.
+]]
+local function cast_venom_hex(bridge, player, enemy)
+    face_enemy(player, enemy)
+
+    local started = bridge:Invoke("begin", {
+        UserId = player.UserId,
+        Target = enemy,
+        SkillId = "VeilbladeVenomHex",
+    })
+    assert(started.ok, tostring(started.reason))
+    assert(
+        started.result.SourceSkillId == 129
+            and started.result.SourceRank == 1
+            and started.result.SourceCastRange == 600
+            and started.result.SourceEffectRange == 1100,
+        "Venom Hex source contract drifted"
+    )
+
+    wait_for_launch(started.result.LaunchAt)
+    local launched = bridge:Invoke("launch", {
+        UserId = player.UserId,
+        CastId = started.result.CastId,
+        SequenceId = 4503,
+    })
+    assert(launched.ok, tostring(launched.reason))
+
+    local application = launched.result.Application
+    assert(
+        application.Kind == "C4LiveNpcPeriodicStatus"
+            and application.SourceSkillId == 129
+            and application.SourceRank == 1,
+        "Venom Hex did not reach live periodic-status authority"
+    )
+
+    print(
+        "[Veilblade Live] VENOM_HEX_PASS landed="
+            .. tostring(application.Landed == true)
+    )
+end
+
+--[[
+Exercises one shared dagger/blow family through the live source executor.
+
+Args:
+    bridge (BindableFunction): Live source bridge.
+    player (Player): Actual Veilblade.
+    enemy (Model): Reviewed NPC target.
+
+Returns:
+    nil: Confirms Wayfinder Cut reaches live physical skill authority.
+]]
+local function cast_wayfinder_cut(bridge, player, enemy)
+    face_enemy(player, enemy)
+
+    local target_humanoid =
+        assert(enemy:FindFirstChildOfClass("Humanoid"))
+    local before = target_humanoid.Health
+    local result = bridge:Invoke("physical_skill", {
+        UserId = player.UserId,
+        Target = enemy,
+        SkillId = "WayfinderCut",
+        Rank = 9,
+        SequenceId = 4504,
+    })
+    assert(result.ok, tostring(result.reason))
+    assert(
+        result.result.Kind == "C4LiveNpcPhysicalSkill"
+            and result.result.Applied
+            and result.result.HealthDamage > 0
+            and target_humanoid.Health < before,
+        "Wayfinder Cut did not reach live physical skill authority"
+    )
+
+    print(
+        "[Veilblade Live] WAYFINDER_CUT_PASS damage="
+            .. tostring(result.result.HealthDamage)
+    )
+end
+
+--[[
+Confirms one shared purchased passive changes live runtime movement.
+
+Args:
+    player (Player): Actual Veilblade.
+
+Returns:
+    nil: Confirms Scout Fleet Foot is active in Play runtime state.
+]]
+local function verify_shared_passive(player)
+    local multiplier =
+        Runtime.get_movement_multiplier(player.UserId)
+    assert(
+        math.abs(multiplier - 1.06) < 0.0001,
+        "Scout Fleet Foot did not reach live runtime passive authority"
+    )
+
+    print(
+        "[Veilblade Live] SCOUT_FLEET_FOOT_PASS multiplier="
+            .. tostring(multiplier)
+    )
+end
+
+--[[
 Casts Crimson Sting through the real physical-damage and status path.
 
 Args:
@@ -665,8 +796,11 @@ local function run()
         Quantity = 6,
     }).ok)
 
+    verify_shared_passive(player)
     cast_defense_aura(bridge, player)
     cast_umbral_siphon(bridge, player, enemy)
+    cast_venom_hex(bridge, player, enemy)
+    cast_wayfinder_cut(bridge, player, enemy)
     cast_crimson_sting(bridge, player, enemy)
 
     bridge:Invoke("disable_casts")
@@ -687,7 +821,7 @@ local function run()
 
     print(
         "[Veilblade Live] "
-            .. "AURA_PLUS_DRAIN_PLUS_STING_PASS"
+            .. "AURA_DRAIN_VENOM_BLOW_STING_PASS"
     )
 end
 
