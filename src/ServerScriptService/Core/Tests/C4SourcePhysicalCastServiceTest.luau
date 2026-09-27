@@ -10,6 +10,15 @@ local OWNER = table.freeze({UserId = 938260})
 local TARGET = table.freeze({Name = "TEMP_PhysicalTarget"})
 
 local PLANS = table.freeze({
+    DeepclaimerHammerShock = table.freeze({
+        SourceSkillId = 100,
+        ExecutionKind = "Stun",
+    }),
+    DeepclaimerWildSweep = table.freeze({
+        SourceSkillId = 245,
+        ExecutionKind = "Area",
+        SourceRadius = 150,
+    }),
     GearwrightHammerShock = table.freeze({
         SourceSkillId = 100,
         ExecutionKind = "Stun",
@@ -283,6 +292,8 @@ function FakeExecutor:physical_stun_skill_npc(
             skill_id ~= "WarhowlSkullbreaker"
             and skill_id ~= "SpiritclawStunningFist"
             and skill_id ~= "AshspeakerSkullshock"
+            and skill_id ~= "GearwrightHammerShock"
+            and skill_id ~= "DeepclaimerHammerShock"
         )
         or rank ~= 1
     then
@@ -329,7 +340,11 @@ function FakeExecutor:physical_area_skill_npc(
 ): (any?, string?)
     if owner ~= OWNER
         or target ~= TARGET
-        or skill_id ~= "WarhowlSweepingArc"
+        or (
+            skill_id ~= "WarhowlSweepingArc"
+            and skill_id ~= "GearwrightWildSweep"
+            and skill_id ~= "DeepclaimerWildSweep"
+        )
         or rank ~= 1
         or source_radius ~= 150
     then
@@ -551,6 +566,8 @@ Returns:
 ]]
 local function check_reviewed_skills(bridge: any)
     local skill_ids = {
+        "DeepclaimerHammerShock",
+        "DeepclaimerWildSweep",
         "GearwrightHammerShock",
         "GearwrightWildSweep",
         "OrcPowerStrike",
@@ -723,7 +740,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedActiveSkillCount == 12
+        capability.ReviewedActiveSkillCount == 14
             and capability.SingleTargetPdam
             and capability.StunPdam
             and capability.ChargedPdam
@@ -732,11 +749,11 @@ local function main()
             and not capability.StunPdamPending
             and not capability.TargetAreaPdamPending
             and not capability.ClientAuthority,
-        "capability reports all twelve reviewed physical families"
+        "capability reports all fourteen reviewed physical families"
     )
 
     print((
-        "[C4 Physical Cast] PASS: %d assertions reviewed=12"
+        "[C4 Physical Cast] PASS: %d assertions reviewed=14"
     ):format(checks))
 end
 
