@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    DarkWizard = table.freeze({
+        Id = "NightweaverTrial",
+        BranchId = "DarkWizard",
+        SourceTitle = "The Nightweaver Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "UmbralScholarVeyra",
+        Recommendation = "NightweaverSigil",
+        Steps = table.freeze({
+            talk(
+                "UmbralScholarVeyra",
+                "Accept the Nightweaver trial."
+            ),
+            talk(
+                "ArchivistSelyn",
+                "Study the fractured shadow focus."
+            ),
+            defeat(
+                "HollowMistAdept",
+                4,
+                "Recover four personally earned shadow fragments."
+            ),
+            talk(
+                "ArchivistSelyn",
+                "Return the four shadow fragments."
+            ),
+            defeat(
+                "GloamRitualist",
+                1,
+                "Recover the ritualist's personal umbral sigil."
+            ),
+            talk(
+                "UmbralScholarVeyra",
+                "Present the sigil and complete the trial."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "ShadowFragments4",
+            "UmbralRitualSigil",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     DarkElfAssassin = table.freeze({
         Id = "VeilbladeTrial",
         BranchId = "DarkElfAssassin",
@@ -384,6 +426,7 @@ Returns:
 ]]
 function SourceQuests.inventoried(): {any}
     return table.freeze({
+        QUESTS.DarkWizard,
         QUESTS.DarkElfAssassin,
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.HumanWizard,
