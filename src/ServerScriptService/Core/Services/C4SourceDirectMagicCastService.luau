@@ -955,6 +955,7 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedUndeadOnlyMagic = true,
         ReviewedRootControl = true,
         ReviewedRootMovementOnly = true,
+        ReviewedConfusionControl = true,
         ReviewedSkillCount = #REVIEWED_SKILLS,
         ReviewedSkills = REVIEWED_SKILLS,
         TargetBoundAtCastStart = true,
