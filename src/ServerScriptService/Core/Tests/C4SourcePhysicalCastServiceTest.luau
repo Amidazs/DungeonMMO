@@ -1,0 +1,382 @@
+--!strict
+-- Scheduled source physical-cast bridge regression.
+
+local ServerScriptService = game:GetService("ServerScriptService")
+local Service = require(
+    ServerScriptService.Core.Services.C4SourcePhysicalCastService
+)
+
+local OWNER = table.freeze({UserId = 938260})
+local TARGET = table.freeze({Name = "TEMP_PhysicalTarget"})
+
+local PLANS = table.freeze({
+    OrcPowerStrike = table.freeze({SourceSkillId = 3}),
+    OrcIronPunch = table.freeze({SourceSkillId = 29}),
+    WarhowlCrushingBlow = table.freeze({SourceSkillId = 255}),
+})
+
+local checks = 0
+local next_cast_id = 400
+local pending = {}
+local cancelled_cast_id = nil
+local last_preflight_range = nil
+local last_execution = nil
+
+local FakeScheduler = {}
+
+--[[
+Begins one deterministic physical cast schedule.
+
+Args:
+    owner (any): Expected disposable cast owner.
+    skill_id (string): Reviewed physical skill.
+    supplied_now (number?): Optional deterministic start time.
+
+Returns:
+    (any?, string?): Source-shaped start evidence.
+]]
+function FakeScheduler:begin_cast(
+    owner: any,
+    skill_id: string,
+    supplied_now: number?
+): (any?, string?)
+    local plan = PLANS[skill_id]
+    if owner ~= OWNER or not plan then
+        return nil, "PhysicalTestPlanUnavailable"
+    end
+
+    next_cast_id += 1
+    local now = supplied_now or 100
+    pending[owner] = {
+        CastId = next_cast_id,
+        SkillId = skill_id,
+    }
+
+    return {
+        CastId = next_cast_id,
+        CreativeSkillId = skill_id,
+        CreativeRank = 1,
+        SourceSkillId = plan.SourceSkillId,
+        SourceRank = 1,
+        StartedAt = now,
+        InterruptAt = now + 0.5,
+        LaunchAt = now + 1,
+        FinalizerAt = now + 1.1,
+        ReuseReadyAt = now + 13,
+        SourceCastRange = 40,
+        SourceEffectRange = 400,
+    }, nil
+end
+
+--[[
+Cancels one deterministic physical cast.
+
+Args:
+    owner (any): Expected disposable cast owner.
+    cast_id (number): Private cast receipt.
+
+Returns:
+    (boolean, string?): Cancellation result.
+]]
+function FakeScheduler:cancel_cast(
+    owner: any,
+    cast_id: number
+): (boolean, string?)
+    local record = pending[owner]
+    if not record or record.CastId ~= cast_id then
+        return false, "PhysicalTestReceiptInvalid"
+    end
+
+    pending[owner] = nil
+    cancelled_cast_id = cast_id
+    return true, nil
+end
+
+--[[
+Launches one deterministic physical cast.
+
+Args:
+    owner (any): Expected disposable cast owner.
+    cast_id (number): Private cast receipt.
+    _supplied_now (number?): Optional deterministic launch time.
+
+Returns:
+    (any?, string?): Source-shaped launch evidence.
+]]
+function FakeScheduler:launch_if_ready(
+    owner: any,
+    cast_id: number,
+    _supplied_now: number?
+): (any?, string?)
+    local record = pending[owner]
+    if not record or record.CastId ~= cast_id then
+        return nil, "PhysicalTestReceiptInvalid"
+    end
+
+    pending[owner] = nil
+    local plan = assert(PLANS[record.SkillId])
+
+    return {
+        CastId = cast_id,
+        CreativeSkillId = record.SkillId,
+        CreativeRank = 1,
+        SourceSkillId = plan.SourceSkillId,
+        SourceRank = 1,
+        ReadyForSourceEffectExecution = true,
+    }, nil
+end
+
+--[[
+Clears one owner's deterministic scheduler state.
+
+Args:
+    owner (any): Departing disposable owner.
+
+Returns:
+    nil: Removes pending fake scheduler state.
+]]
+function FakeScheduler:clear_owner(owner: any)
+    pending[owner] = nil
+end
+
+local FakeExecutor = {}
+
+--[[
+Checks one deterministic physical target and captures source range.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    source_range (number?): Reviewed source range.
+
+Returns:
+    (boolean, string?): Ready result.
+]]
+function FakeExecutor:can_physical_skill_npc(
+    owner: any,
+    target: any,
+    source_range: number?
+): (boolean, string?)
+    last_preflight_range = source_range
+
+    if owner ~= OWNER or target ~= TARGET then
+        return false, "PhysicalTestTargetInvalid"
+    end
+
+    return true, nil
+end
+
+--[[
+Executes one deterministic physical hit.
+
+Args:
+    owner (any): Expected cast owner.
+    target (any): Expected private target.
+    skill_id (string): Reviewed creative skill.
+    rank (number): Server-owned creative rank.
+    sequence_id (number?): Trusted combat sequence.
+
+Returns:
+    (any?, string?): Successful live-shaped physical evidence.
+]]
+function FakeExecutor:physical_skill_npc(
+    owner: any,
+    target: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    if owner ~= OWNER
+        or target ~= TARGET
+        or not PLANS[skill_id]
+        or rank ~= 1
+    then
+        return nil, "PhysicalTestExecutionInvalid"
+    end
+
+    last_execution = {
+        SkillId = skill_id,
+        Rank = rank,
+        SequenceId = sequence_id,
+    }
+
+    return {
+        Kind = "C4LiveNpcPhysicalSkill",
+        Applied = true,
+        HealthDamage = 17,
+    }, nil
+end
+
+--[[
+Counts one physical bridge assertion.
+
+Args:
+    condition (boolean): Expected bridge condition.
+    label (string): Failure diagnosis.
+
+Returns:
+    nil: Raises on mismatch and increments the check count.
+]]
+local function check(condition: boolean, label: string)
+    checks += 1
+    assert(condition, "[C4 Physical Cast] " .. label)
+end
+
+--[[
+Checks default gating and unsupported-skill denial.
+
+Args:
+    bridge (any): Disabled physical bridge.
+
+Returns:
+    nil: Confirms fail-closed defaults.
+]]
+local function check_gate(bridge: any)
+    check(
+        not bridge:is_enabled(),
+        "physical bridge starts disabled"
+    )
+
+    local started, reason = bridge:begin_cast(
+        OWNER,
+        TARGET,
+        "UnknownPhysicalSkill",
+        100
+    )
+    check(
+        started == nil and reason == "C4PhysicalCastDisabled",
+        "disabled bridge rejects before skill disclosure"
+    )
+
+    bridge:set_enabled(true)
+    local unknown, unknown_reason = bridge:begin_cast(
+        OWNER,
+        TARGET,
+        "UnknownPhysicalSkill",
+        100
+    )
+    check(
+        unknown == nil
+            and unknown_reason == "C4PhysicalSkillNotReviewed",
+        "enabled bridge still rejects unreviewed physical skills"
+    )
+end
+
+--[[
+Checks all reviewed single-target physical families.
+
+Args:
+    bridge (any): Enabled physical bridge.
+
+Returns:
+    nil: Confirms cast range, launch and executor routing.
+]]
+local function check_reviewed_skills(bridge: any)
+    local skill_ids = {
+        "OrcPowerStrike",
+        "OrcIronPunch",
+        "WarhowlCrushingBlow",
+    }
+
+    for index, skill_id in ipairs(skill_ids) do
+        local started = assert(bridge:begin_cast(
+            OWNER,
+            TARGET,
+            skill_id,
+            110 + index
+        ))
+        check(
+            started.SourceSkillId == PLANS[skill_id].SourceSkillId
+                and last_preflight_range == 40,
+            skill_id .. " preserves exact source cast identity/range"
+        )
+
+        local launched = assert(bridge:launch_if_ready(
+            OWNER,
+            started.CastId,
+            120 + index,
+            500 + index
+        ))
+        check(
+            launched.Applied
+                and launched.Application.HealthDamage == 17
+                and last_preflight_range == 400
+                and last_execution.SkillId == skill_id
+                and last_execution.SequenceId == 500 + index,
+            skill_id .. " reaches live physical executor after effect range"
+        )
+    end
+end
+
+--[[
+Checks private receipts and cleanup cannot leak between owners.
+
+Args:
+    bridge (any): Enabled physical bridge.
+
+Returns:
+    nil: Confirms cancellation and teardown semantics.
+]]
+local function check_cancellation(bridge: any)
+    local started = assert(bridge:begin_cast(
+        OWNER,
+        TARGET,
+        "OrcPowerStrike",
+        200
+    ))
+
+    local cancelled = bridge:cancel_cast(
+        OWNER,
+        started.CastId
+    )
+    check(
+        cancelled and cancelled_cast_id == started.CastId,
+        "private physical receipt cancels through shared scheduler"
+    )
+
+    bridge:clear_owner(OWNER)
+    local result, reason = bridge:launch_if_ready(
+        OWNER,
+        started.CastId,
+        205,
+        999
+    )
+    check(
+        result == nil
+            and reason == "C4PhysicalCastReceiptInvalid",
+        "cleared physical receipt cannot be replayed"
+    )
+end
+
+--[[
+Runs the reviewed source physical-cast bridge regression.
+
+Args:
+    None.
+
+Returns:
+    nil: Prints bounded bridge coverage after all assertions pass.
+]]
+local function main()
+    local bridge = Service.new(FakeScheduler, FakeExecutor)
+
+    check_gate(bridge)
+    check_reviewed_skills(bridge)
+    check_cancellation(bridge)
+
+    local capability = bridge:capability()
+    check(
+        capability.ReviewedActiveSkillCount == 3
+            and capability.SingleTargetPdam
+            and capability.StunPdamPending
+            and capability.TargetAreaPdamPending
+            and not capability.ClientAuthority,
+        "capability reports only the three completed physical families"
+    )
+
+    print((
+        "[C4 Physical Cast] PASS: %d assertions reviewed=3"
+    ):format(checks))
+end
+
+main()
