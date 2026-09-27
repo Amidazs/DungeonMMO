@@ -177,6 +177,7 @@ local function check_reviewed_paths()
         {"DarkElf", "Duskseer", 732, 482, 368},
         {"Orc", "Fighter", 1075, 322, 562},
         {"Orc", "Warhowl", 1269, 327, 884},
+        {"Orc", "Spiritclaw", 1230, 327, 617},
     }
 
     for _, row in ipairs(vectors) do
@@ -606,6 +607,149 @@ local function check_warhowl_passive_boundary()
 end
 
 --[[
+Checks inherited Orc Fighter and Monk passives reach Spiritclaw cutover.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-44/class-47 source passives remain ready.
+]]
+local function check_spiritclaw_passive_boundary()
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local character = original_character("Orc", "Spiritclaw", 30)
+    character.Equipment.Weapon = "orc_training_fist"
+    character.Equipment.Body = "ironroot_light_vest"
+
+    own_skill(character, "OrcToughness", 1)
+    own_skill(character, "OrcWeaponTraining", 3)
+    own_skill(character, "OrcArmorTraining", 5)
+    own_skill(character, "OrcIronBody", 1)
+    own_skill(character, "SpiritclawFistMastery", 4)
+    own_skill(character, "SpiritclawLightArmorTraining", 6)
+    own_skill(character, "SpiritclawAgileMovement", 1)
+
+    Runtime.set_character(TEST_OWNER, character)
+
+    local plan = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    local stats = assert(plan.SourceStatCandidate)
+
+    check(
+        plan.ScopeId == "OrcMonk"
+            and plan.SourceBaseMaxHealth == 1230
+            and plan.SourceBaseMaxMana == 327
+            and plan.SourceBaseMaxCP == 617
+            and #plan.ReviewedOwnedSourcePassiveRanks == 7
+            and plan.OwnedPassiveSourceMappingReady
+            and plan.OriginalOwnedPassiveMappingIntegrated
+            and plan.PassiveSourceStatCandidateReady
+            and plan.CombinedSourceStatCandidateReady
+            and plan.CutoverPrerequisitesReady
+            and #plan.ActivationBlockers == 0,
+        "Spiritclaw inherited source passives cross the cutover boundary"
+    )
+    check(
+        stats.ROOT_VULN == 0.8
+            and stats.SLEEP_VULN == 0.8
+            and stats.POISON_VULN == 0.8
+            and stats.FALL == 0.6
+            and stats.ACCURACY_COMBAT > 61
+            and stats.RUN_SPEED > 124,
+        "Spiritclaw boundary preserves inherited and agile source effects"
+    )
+
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
+Checks Bear and Wolf aspects enter the authoritative active source candidate.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-47 possession modifiers cross the boundary.
+]]
+local function check_spiritclaw_aspect_boundary()
+    local character = original_character("Orc", "Spiritclaw", 30)
+    Runtime.set_character(TEST_OWNER, character)
+
+    active_snapshot = {
+        SourceRanks = {
+            {SkillId = 76, Rank = 1},
+        },
+        UnresolvedEffects = {},
+        ActiveCount = 1,
+        ResolvedCount = 1,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local bear = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        bear.ActiveEffectsIntegrated
+            and bear.SourceStatCandidateIncludesActiveEffects
+            and bear.ReviewedActiveSourceRanks[1].SkillId == 76
+            and math.abs(
+                bear.SourceStatCandidate.RUN_SPEED - 86.8
+            ) < 0.000001
+            and math.abs(
+                bear.SourceStatCandidate.PHYSICAL_ATTACK - 6
+            ) < 0.000001
+            and bear.CutoverPrerequisitesReady,
+        "Bear Aspect preserves exact 0.7 speed and 1.2 attack modifiers"
+    )
+
+    active_snapshot = {
+        SourceRanks = {
+            {SkillId = 83, Rank = 1},
+        },
+        UnresolvedEffects = {},
+        ActiveCount = 1,
+        ResolvedCount = 1,
+        Ready = true,
+        Authoritative = true,
+    }
+
+    local wolf = assert(
+        Runtime.get_c4_resource_migration_boundary(TEST_OWNER)
+    )
+    check(
+        wolf.ActiveEffectsIntegrated
+            and wolf.SourceStatCandidateIncludesActiveEffects
+            and wolf.ReviewedActiveSourceRanks[1].SkillId == 83
+            and math.abs(
+                wolf.SourceStatCandidate.RUN_SPEED - 142.6
+            ) < 0.000001
+            and wolf.SourceStatCandidate.PHYSICAL_ATTACK == 5
+            and wolf.CutoverPrerequisitesReady,
+        "Wolf Aspect preserves exact 1.15 movement modifier"
+    )
+
+    active_snapshot = {
+        SourceRanks = {},
+        UnresolvedEffects = {},
+        ActiveCount = 0,
+        ResolvedCount = 0,
+        Ready = true,
+        Authoritative = true,
+    }
+    Runtime.clear_character(TEST_OWNER)
+end
+
+--[[
 Checks active Concentration reaches the dynamic attack-cancel source offset.
 
 Args:
@@ -874,6 +1018,8 @@ local function main()
     check_duskseer_passive_boundary()
     check_duskseer_active_buff_boundary()
     check_warhowl_passive_boundary()
+    check_spiritclaw_passive_boundary()
+    check_spiritclaw_aspect_boundary()
     check_concentration_interrupt_boundary()
     check_owned_passive_boundary()
     check_active_effect_boundary()
@@ -881,7 +1027,7 @@ local function main()
 
     print((
         "[C4 Resource Boundary] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=19 prerequisites=true live_cutover=false blockers=0"
+        .. "paths=20 prerequisites=true live_cutover=false blockers=0"
     ):format(checks))
 end
 
