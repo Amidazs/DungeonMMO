@@ -61,6 +61,64 @@ local MAPS = table.freeze({
         [1216] = table.freeze({SkillId = "MageHeal"}),
         [1320] = table.freeze({SkillId = "C4CommonItemCreation"}),
     }),
+    ShillienOracle = table.freeze({
+        [146] = table.freeze({
+            SkillId = "DuskseerArcaneResistance",
+            Offset = 4,
+        }),
+        [164] = table.freeze({SkillId = "DuskseerQuickPrayer"}),
+        [213] = table.freeze({SkillId = "DuskseerManaReservoir"}),
+        [228] = table.freeze({SkillId = "DuskseerFastCasting"}),
+        [229] = table.freeze({SkillId = "DuskseerManaRecovery"}),
+        [235] = table.freeze({SkillId = "DuskseerRobeTraining"}),
+        [236] = table.freeze({
+            SkillId = "DuskseerLightArmorTraining",
+        }),
+        [249] = table.freeze({
+            SkillId = "DuskseerWeaponTraining",
+            Offset = 2,
+        }),
+        [1011] = table.freeze({
+            SkillId = "DuskseerHealingLight",
+            Offset = 6,
+        }),
+        [1013] = table.freeze({SkillId = "DuskseerManaRecharge"}),
+        [1015] = table.freeze({
+            SkillId = "DuskseerBattleMend",
+            Offset = 3,
+        }),
+        [1016] = table.freeze({SkillId = "DuskseerRevive"}),
+        [1027] = table.freeze({
+            SkillId = "DuskseerGroupMend",
+            Offset = 3,
+        }),
+        [1031] = table.freeze({SkillId = "DuskseerExorcism"}),
+        [1035] = table.freeze({SkillId = "DuskseerMindWard"}),
+        [1040] = table.freeze({
+            SkillId = "DuskseerStoneWard",
+            Offset = 1,
+        }),
+        [1059] = table.freeze({SkillId = "DuskseerEmpower"}),
+        [1068] = table.freeze({
+            SkillId = "DuskseerMight",
+            Offset = 1,
+        }),
+        [1069] = table.freeze({SkillId = "DuskseerSlumber"}),
+        [1073] = table.freeze({
+            SkillId = "DuskseerBreathBlessing",
+        }),
+        [1077] = table.freeze({SkillId = "DuskseerFocus"}),
+        [1078] = table.freeze({
+            SkillId = "DuskseerConcentration",
+        }),
+        [1201] = table.freeze({SkillId = "DuskseerRootbind"}),
+        [1204] = table.freeze({SkillId = "DuskseerWindstep"}),
+        [1206] = table.freeze({
+            SkillId = "DuskseerWindShackle",
+            Offset = 1,
+        }),
+        [1268] = table.freeze({SkillId = "DuskseerBloodRite"}),
+    }),
     DarkWizard = table.freeze({
         [146] = table.freeze({
             SkillId = "NightweaverArcaneResistance",
@@ -486,6 +544,9 @@ local GAPS = table.freeze({
 
 
         [1322] = "Common Craft is not the current recipe-reading passive",
+    }),
+    ShillienOracle = table.freeze({
+
     }),
     DarkWizard = table.freeze({
 
