@@ -23,6 +23,48 @@ local function defeat(
 end
 
 local QUESTS = table.freeze({
+    DarkElfAssassin = table.freeze({
+        Id = "VeilbladeTrial",
+        BranchId = "DarkElfAssassin",
+        SourceTitle = "The Veilblade Trial",
+        StartLevel = 18,
+        TransferLevel = 20,
+        TransferNpcId = "ShadeWardenLyss",
+        Recommendation = "VeilbladeShadowSeal",
+        Steps = table.freeze({
+            talk(
+                "ShadeWardenLyss",
+                "Accept the Veilblade trial."
+            ),
+            talk(
+                "ScoutVael",
+                "Learn where the shadow patrol vanished."
+            ),
+            defeat(
+                "NightglassStalker",
+                4,
+                "Recover four personally earned shadowglass marks."
+            ),
+            talk(
+                "ScoutVael",
+                "Return the recovered shadowglass marks."
+            ),
+            defeat(
+                "VeilbreakerCaptain",
+                1,
+                "Recover the captain's personal veil seal."
+            ),
+            talk(
+                "ShadeWardenLyss",
+                "Present the veil seal and complete the trial."
+            ),
+        }),
+        RequiredProofIds = table.freeze({
+            "ShadowglassMarks4",
+            "VeilbreakerSeal",
+        }),
+        WorldBindingStatus = "NotImplemented",
+    }),
     PalusKnight = table.freeze({
         Id = "DuskguardVigil",
         BranchId = "PalusKnight",
@@ -342,6 +384,7 @@ Returns:
 ]]
 function SourceQuests.inventoried(): {any}
     return table.freeze({
+        QUESTS.DarkElfAssassin,
         QUESTS.HumanKnight, QUESTS.HumanWarrior,
         QUESTS.HumanRogue, QUESTS.HumanWizard,
         QUESTS.HumanCleric, QUESTS.ElvenWizard,
