@@ -24,7 +24,48 @@ local DEFINITIONS = table.freeze({
         AllowedRaces = table.freeze({"Orc"}),
         AllowedBaseClasses = table.freeze({"Fighter"}),
         AllowedClasses = table.freeze({"Spiritclaw"}),
-        Skills = table.freeze({}),
+        Skills = table.freeze({
+            table.freeze({
+                SkillId = "SpiritclawIronFist",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawForceFocus",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawForceBurst",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawBearAspect",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawWolfAspect",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawCripplingPalm",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawStunningFist",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawFistMastery",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawLightArmorTraining",
+                Mode = "LearnOrRank",
+            }),
+            table.freeze({
+                SkillId = "SpiritclawAgileMovement",
+                Mode = "LearnOrRank",
+            }),
+        }),
     }),
     WarhowlTrainer = table.freeze({
         Id = "WarhowlTrainer",
