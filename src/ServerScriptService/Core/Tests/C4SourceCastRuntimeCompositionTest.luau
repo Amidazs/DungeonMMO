@@ -725,17 +725,20 @@ local function main()
             and capability.SourceCastResources
             and capability.SourceCastTiming
             and capability.SourceCastScheduler
+            and capability.SourceChargeAuthority
+            and capability.SourceChargeCapability.ServerOwned
+            and capability.SourceChargeCapability.ExactConsumption
             and capability.SourceCastInterruption
             and capability.SourceCastInterruptionCapability
                 .AttackCancelRateIntegrated
             and capability.DirectMagicBridge
             and capability.PhysicalCastBridge
-            and capability.PhysicalCastReviewedActiveSkillCount == 5
+            and capability.PhysicalCastReviewedActiveSkillCount == 9
             and capability.SupportMagicBridge
             and capability.PeriodicMagicBridge
             and capability.SelfMagicBridge
             and capability.SelfEffectBridge
-            and capability.SelfEffectReviewedSkillCount == 3
+            and capability.SelfEffectReviewedSkillCount == 6
             and capability.SourceToggleAuthority
             and capability.SourceToggleReviewedSkillCount == 3
             and capability.CorpseMagicBridge
@@ -769,10 +772,17 @@ local function main()
     local owner = {
         UserId = 938198,
     }
+    assert(runtime.Charges:add_one(owner, 1))
+    check(
+        assert(runtime.Charges:get(owner)) == 1,
+        "runtime owns private source charge state"
+    )
+
     runtime:clear_owner(owner)
     check(
-        removed_user_id == owner.UserId,
-        "owner teardown clears source shot state through composition"
+        removed_user_id == owner.UserId
+            and assert(runtime.Charges:get(owner)) == 0,
+        "owner teardown clears source shots and charges through composition"
     )
 
     print((
