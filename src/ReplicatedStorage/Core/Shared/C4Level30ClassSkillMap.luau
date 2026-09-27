@@ -209,7 +209,7 @@ local ORC_RAIDER = table.freeze({
     PowerSmash = "WarhowlCrushingBlow",
     Accuracy = "WarhowlPrecisionStance",
     SwordBluntMastery = "WarhowlSteelAndStoneTraining",
-    TwoHandedWeaponMastery = "WarhowlGreatWeaponTraining",
+    TwoHandedWeaponMaster = "WarhowlGreatWeaponTraining",
     ViciousStance = "WarhowlPredatorStance",
 })
 
