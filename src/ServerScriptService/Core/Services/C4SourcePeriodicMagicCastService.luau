@@ -19,6 +19,19 @@ local REVIEWED_PERIODIC_MAGIC = table.freeze({
         SourceRadius = 200,
         ExecutionKind = "TargetArea",
     }),
+    NightweaverVenomHex = table.freeze({
+        SourceSkillId = 1168,
+        CastRange = 600,
+        EffectRange = 1100,
+        ExecutionKind = "SingleTarget",
+    }),
+    NightweaverVenomCloud = table.freeze({
+        SourceSkillId = 1167,
+        CastRange = 500,
+        EffectRange = 1000,
+        SourceRadius = 200,
+        ExecutionKind = "TargetArea",
+    }),
 })
 
 --[[
