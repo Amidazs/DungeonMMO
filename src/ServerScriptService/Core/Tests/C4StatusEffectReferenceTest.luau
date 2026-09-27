@@ -176,6 +176,22 @@ local function main()
         "Surrender to Poison keeps exact 25 percent 15-second vulnerability"
     )
 
+    local dreaming = assert(
+        Status.sleep_plan(1097, 5)
+    )
+    check(
+        dreaming.SourceSkillId == 1097
+            and dreaming.SourceRank == 5
+            and dreaming.SaveVs == "WIT"
+            and dreaming.MagicLevel == 30
+            and dreaming.DurationSeconds == 30
+            and dreaming.BreaksOnDamage
+            and dreaming.StopsMovement
+            and dreaming.StopsAttacks
+            and dreaming.StopsCasting,
+        "Dreaming Spirit rank five shares exact C4 Sleep semantics"
+    )
+
     local attack_weakness = assert(
         Status.physical_attack_weakening_plan(1164, 4)
     )
