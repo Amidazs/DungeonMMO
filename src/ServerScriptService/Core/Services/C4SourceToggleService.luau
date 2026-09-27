@@ -23,6 +23,10 @@ local C4SourceToggleService = {}
 C4SourceToggleService.__index = C4SourceToggleService
 
 local REVIEWED = table.freeze({
+    OrcRelax = table.freeze({
+        SourceSkillId = 226,
+        UpkeepKind = "Relax",
+    }),
     WarhowlPrecisionStance = table.freeze({
         SourceSkillId = 256,
     }),
@@ -51,6 +55,49 @@ local function valid_owner(player: any): boolean
 end
 
 --[[
+Returns the current humanoid-like source resource owner for Relax.
+
+Production uses a Humanoid instance. Tests may provide a table-shaped
+character with FindFirstChildOfClass so no client state is trusted.
+
+Args:
+    player (any): Server-owned source toggle owner.
+
+Returns:
+    any?: Current humanoid-like object, otherwise nil.
+]]
+local function current_humanoid(player: any): any?
+    local character = player and player.Character
+    if not character
+        or type(character.FindFirstChildOfClass) ~= "function"
+    then
+        return nil
+    end
+
+    return character:FindFirstChildOfClass("Humanoid")
+end
+
+--[[
+Checks the exact C4 Relax continuation conditions.
+
+Args:
+    player (any): Server-owned Relax owner.
+
+Returns:
+    boolean: True only while alive, seated and below full HP.
+]]
+local function relax_can_continue(player: any): boolean
+    local humanoid = current_humanoid(player)
+
+    return humanoid ~= nil
+        and type(humanoid.Health) == "number"
+        and type(humanoid.MaxHealth) == "number"
+        and humanoid.Health > 0
+        and humanoid.Health < humanoid.MaxHealth
+        and humanoid.Sit == true
+end
+
+--[[
 Finds the source MpConsumePerLevel effect that powers one toggle.
 
 Args:
@@ -59,9 +106,18 @@ Args:
 Returns:
     any?: Upkeep effect with positive period and finite base value.
 ]]
-local function upkeep_effect(effect: any): any?
+local function upkeep_effect(
+    effect: any,
+    upkeep_kind: string?
+): any?
     for _, row in ipairs(effect.Effects or {}) do
-        if row.name == "MpConsumePerLevel"
+        local supported = row.name == "MpConsumePerLevel"
+            or (
+                upkeep_kind == "Relax"
+                and row.name == "Relax"
+            )
+
+        if supported
             and type(row.time) == "number"
             and row.time > 0
             and type(row.val) == "number"
@@ -343,7 +399,10 @@ local function activation_plan(
         return nil, "C4SourceToggleEffectUnavailable"
     end
 
-    local upkeep = upkeep_effect(effect)
+    local upkeep = upkeep_effect(
+        effect,
+        review.UpkeepKind
+    )
     if not upkeep then
         return nil, "C4SourceToggleUpkeepUnavailable"
     end
@@ -360,6 +419,7 @@ local function activation_plan(
         InitialMp = math.max(0, initial),
         UpkeepBase = upkeep.val,
         UpkeepPeriod = upkeep.time,
+        UpkeepKind = review.UpkeepKind or "PerLevel",
     }, nil
 end
 
@@ -406,6 +466,20 @@ function C4SourceToggleService:toggle(
         return nil, reason
     end
 
+    if plan.UpkeepKind == "Relax" then
+        local humanoid = current_humanoid(player)
+        if not humanoid
+            or type(humanoid.Health) ~= "number"
+            or type(humanoid.MaxHealth) ~= "number"
+            or humanoid.Health <= 0
+        then
+            return nil, "C4RelaxOwnerUnavailable"
+        end
+        if humanoid.Health >= humanoid.MaxHealth then
+            return nil, "C4RelaxHpFull"
+        end
+    end
+
     if not self._mana.try_spend(
         player,
         plan.InitialMp
@@ -438,8 +512,16 @@ function C4SourceToggleService:toggle(
         InitialMp = plan.InitialMp,
         UpkeepBase = plan.UpkeepBase,
         UpkeepPeriod = plan.UpkeepPeriod,
+        UpkeepKind = plan.UpkeepKind,
         Elapsed = 0,
     }
+
+    if plan.UpkeepKind == "Relax" then
+        local humanoid = current_humanoid(player)
+        if humanoid then
+            humanoid.Sit = true
+        end
+    end
 
     if type(player.Character.SetAttribute) == "function" then
         player.Character:SetAttribute(
@@ -458,6 +540,7 @@ function C4SourceToggleService:toggle(
         InitialMpSpent = plan.InitialMp,
         UpkeepBase = plan.UpkeepBase,
         UpkeepPeriod = plan.UpkeepPeriod,
+        UpkeepKind = plan.UpkeepKind,
         ClientAuthority = false,
     }, nil
 end
@@ -492,7 +575,15 @@ local function still_authorized(
             skill_id
         )
 
-    return usable == true
+    if usable ~= true then
+        return false
+    end
+
+    if record.UpkeepKind == "Relax" then
+        return relax_can_continue(player)
+    end
+
+    return true
 end
 
 --[[
@@ -551,11 +642,16 @@ function C4SourceToggleService:step(delta_time: number)
                     break
                 end
 
-                local cost = C4SourceToggleService.upkeep_cost(
-                    vitals.Level,
-                    record.UpkeepBase,
-                    record.UpkeepPeriod
-                )
+                local cost
+                if record.UpkeepKind == "Relax" then
+                    cost = record.UpkeepBase
+                else
+                    cost = C4SourceToggleService.upkeep_cost(
+                        vitals.Level,
+                        record.UpkeepBase,
+                        record.UpkeepPeriod
+                    )
+                end
 
                 if not self._mana.try_spend(
                     player,
@@ -636,7 +732,10 @@ function C4SourceToggleService:capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
-        ReviewedSkillCount = 2,
+        ReviewedSkillCount = 3,
+        OrcRelaxSourceSkillId = 226,
+        RelaxFixedTwoSecondUpkeep = true,
+        RelaxRequiresSittingAndMissingHp = true,
         PrecisionStanceSourceSkillId = 256,
         PredatorStanceSourceSkillId = 312,
         MpConsumePerLevelFormula = true,
