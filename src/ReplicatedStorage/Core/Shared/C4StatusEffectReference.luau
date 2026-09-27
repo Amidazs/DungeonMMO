@@ -533,6 +533,104 @@ function C4StatusEffectReference.elemental_vulnerability_plan(
 end
 
 --[[
+Builds the reviewed C4 poison-vulnerability debuff plan.
+
+Surrender to Poison is a magical MEN-resisted DEBUFF that temporarily
+multiplies POISON_VULN. It does not deal direct or periodic damage itself.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen poison-vulnerability plan or strict source reason.
+]]
+function C4StatusEffectReference.poison_vulnerability_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1224 then
+        return nil, "UnsupportedOriginalPoisonVulnerabilitySkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalPoisonVulnerabilitySkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "DEBUFF"
+        or sets.saveVs ~= "MEN"
+        or sets.isMagic ~= true
+        or sets.target ~= "TARGET_ONE"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower <= 0
+    then
+        return nil, "OriginalPoisonVulnerabilityContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Debuff" then
+            local multiplier = nil
+
+            for _, modifier in ipairs(effect.Modifiers or {}) do
+                if modifier.Operation == "mul"
+                    and modifier.stat == "POISON_VULN"
+                then
+                    multiplier = modifier.val
+                end
+            end
+
+            if multiplier then
+                if matched ~= nil then
+                    return nil,
+                        "DuplicateOriginalPoisonVulnerabilityEffect"
+                end
+                matched = {
+                    Multiplier = multiplier,
+                    Count = effect.count,
+                    DurationSeconds = effect.time,
+                }
+            end
+        end
+    end
+
+    if not matched
+        or matched.Count ~= 1
+        or type(matched.Multiplier) ~= "number"
+        or matched.Multiplier <= 0
+        or matched.Multiplier >= math.huge
+        or type(matched.DurationSeconds) ~= "number"
+        or matched.DurationSeconds <= 0
+    then
+        return nil, "OriginalPoisonVulnerabilityEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level < 0 or magic_level % 1 ~= 0 then
+        return nil, "OriginalPoisonVulnerabilityMagicLevelInvalid"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "DEBUFF",
+        SaveVs = "MEN",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        VulnerabilityStat = "POISON_VULN",
+        VulnerabilityMultiplier = matched.Multiplier,
+        DurationSeconds = matched.DurationSeconds,
+    }), nil
+end
+
+--[[
 Builds the reviewed C4 physical-attack weakening debuff plan.
 
 Curse: Weakness is a magical WIT-resisted DEBUFF that temporarily multiplies
