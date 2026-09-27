@@ -90,8 +90,8 @@ local function main()
     local source = Sources.get()
     check(
         source.SourceClassId == 35
-            and source_rank_count(source) == 70,
-        "class 35 preserves all 70 level-20/24/28 source rank rows"
+            and source_rank_count(source) == 71,
+        "class 35 preserves all 71 level-20/24/28 source rank rows"
     )
 
     local career = assert(Careers.for_branch("DarkElfAssassin"))
@@ -136,11 +136,11 @@ local function main()
     local coverage =
         assert(Coverage.for_branch("DarkElfAssassin"))
     check(
-        coverage.SourceRankEntriesThroughCap == 70
-            and coverage.TrainerMappedRankEntries == 70
+        coverage.SourceRankEntriesThroughCap == 71
+            and coverage.TrainerMappedRankEntries == 71
             and coverage.MissingRankScheduleEntries == 0
             and coverage.SourceRankScheduleMapped,
-        "all 70 source ranks are represented by the Veilblade schedule"
+        "all 71 source ranks are represented by the Veilblade schedule"
     )
 
     check(
@@ -150,7 +150,7 @@ local function main()
 
     print((
         "[C4 Dark Elf Assassin] PASS: %d assertions "
-            .. "source_ranks=70 families=23 gaps=0"
+            .. "source_ranks=71 families=23 gaps=0"
     ):format(checks))
 end
 
