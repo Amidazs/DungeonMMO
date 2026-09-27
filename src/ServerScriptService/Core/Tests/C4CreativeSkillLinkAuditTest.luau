@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 19 and report.SourceLearningRows == 1193,
+assert(report.ClassPaths == 21 and report.SourceLearningRows == 1305,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 1181
+assert(report.CandidateRows == 1293
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 1193,
+assert(report.CandidateRows + report.ExplicitMissingRows == 1305,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -55,6 +55,9 @@ local spirit_punch = assert(Map.resolve("OrcMonk", 29, 10))
 local spirit_force = assert(Map.resolve("OrcMonk", 54, 1))
 local spirit_stun = assert(Map.resolve("OrcMonk", 120, 9))
 local spirit_agile = assert(Map.resolve("OrcMonk", 319, 1))
+local mystic_drain = assert(Map.resolve("OrcMystic", 1090, 2))
+local shaman_weapon = assert(Map.resolve("OrcShaman", 250, 3))
+local shaman_life = assert(Map.resolve("OrcShaman", 1229, 3))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -140,6 +143,16 @@ assert(spirit_punch.Status == "Candidate"
     and spirit_agile.CreativeSkillId == "SpiritclawAgileMovement"
     and spirit_agile.CreativeRank == 1,
     "Orc Monk inherited offsets and unique families map to Spiritclaw")
+
+assert(mystic_drain.Status == "Candidate"
+    and mystic_drain.CreativeSkillId == "OrcMysticLifeDrain"
+    and mystic_drain.CreativeRank == 2
+    and shaman_weapon.CreativeSkillId
+        == "AshspeakerWeaponTraining"
+    and shaman_weapon.CreativeRank == 1
+    and shaman_life.CreativeSkillId == "AshspeakerLifeChant"
+    and shaman_life.CreativeRank == 3,
+    "Orc Mystic inheritance and Shaman offsets map independently")
 
 assert(dusk_empower.Status == "Candidate"
     and dusk_empower.CreativeSkillId == "DuskseerEmpower"
