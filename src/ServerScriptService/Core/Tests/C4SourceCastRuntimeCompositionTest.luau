@@ -299,6 +299,22 @@ function FakeExecutor:root_skill_npc(
     )
 end
 
+function FakeExecutor:fear_skill_npc(
+    attacker: any,
+    enemy: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    return self:sleep_skill_npc(
+        attacker,
+        enemy,
+        skill_id,
+        rank,
+        sequence_id
+    )
+end
+
 --[[
 Provides a minimal combined magic/slow executor contract.
 
@@ -740,7 +756,7 @@ local function main()
             and capability.SelfEffectBridge
             and capability.SelfEffectReviewedSkillCount == 6
             and capability.SourceToggleAuthority
-            and capability.SourceToggleReviewedSkillCount == 3
+            and capability.SourceToggleReviewedSkillCount == 5
             and capability.CorpseMagicBridge
             and capability.CompanionAuthority
             and capability.CompanionMagicBridge
