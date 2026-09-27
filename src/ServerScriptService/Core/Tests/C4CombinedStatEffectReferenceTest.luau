@@ -128,6 +128,7 @@ local function check_active_operations()
             {SkillId = 256, Rank = 1},
             {SkillId = 312, Rank = 3},
             {SkillId = 112, Rank = 1},
+            {SkillId = 1268, Rank = 1},
         }
     ))
 
@@ -147,6 +148,10 @@ local function check_active_operations()
     check(
         math.abs(result.Stats.BOW_WPN_VULN - 0.84) < 0.0001,
         "Deflect Arrow starts from neutral bow vulnerability one"
+    )
+    check(
+        result.Stats.ABSORB_DAMAGE_PERCENT == 6,
+        "Vampiric Rage starts from exact zero-percent absorb base"
     )
 end
 
