@@ -547,6 +547,113 @@ function C4StatusEffectReference.root_plan(
 end
 
 --[[
+Builds the reviewed C4 caster-aura accuracy weakening plan.
+
+Seal of Chaos is a magical WIT-resisted TARGET_AURA debuff. Its POISON
+effectType is historical metadata; the actual effect subtracts 12 source
+accuracy for 15 seconds and does not deal periodic poison damage.
+
+Args:
+    source_skill_id (number): Historical C4 skill identifier.
+    source_rank (number): Historical source skill level.
+
+Returns:
+    (any?, string?): Frozen accuracy-debuff plan or strict source-data reason.
+]]
+function C4StatusEffectReference.accuracy_aura_plan(
+    source_skill_id: number,
+    source_rank: number
+): (any?, string?)
+    if source_skill_id ~= 1096 then
+        return nil, "UnsupportedOriginalAccuracyAuraSkill"
+    end
+
+    local rank = SkillEffects.get_rank(
+        source_skill_id,
+        source_rank
+    )
+    if not rank then
+        return nil, "UnknownOriginalAccuracyAuraSkillRank"
+    end
+
+    local sets = rank.Sets
+    if sets.skillType ~= "DEBUFF"
+        or sets.effectType ~= "POISON"
+        or sets.saveVs ~= "WIT"
+        or sets.isMagic ~= true
+        or sets.target ~= "TARGET_AURA"
+        or type(sets.effectPower) ~= "number"
+        or sets.effectPower ~= 40
+        or type(sets.skillRadius) ~= "number"
+        or sets.skillRadius ~= 200
+    then
+        return nil, "OriginalAccuracyAuraContractMismatch"
+    end
+
+    local matched = nil
+    for _, effect in ipairs(rank.Effects) do
+        if effect.name == "Debuff" then
+            local penalty = nil
+
+            for _, modifier in ipairs(effect.Modifiers or {}) do
+                if modifier.Operation == "sub"
+                    and modifier.stat == "ACCURACY_COMBAT"
+                then
+                    penalty = modifier.val
+                end
+            end
+
+            if penalty then
+                if matched then
+                    return nil, "DuplicateOriginalAccuracyAuraEffect"
+                end
+
+                matched = {
+                    Penalty = penalty,
+                    Count = effect.count,
+                    DurationSeconds = effect.time,
+                    StackType = effect.stackType,
+                    StackOrder = effect.stackOrder,
+                }
+            end
+        end
+    end
+
+    if not matched
+        or matched.Count ~= 1
+        or matched.Penalty ~= 12
+        or matched.DurationSeconds ~= 15
+        or matched.StackType ~= "accuracyDown"
+        or matched.StackOrder ~= 12
+    then
+        return nil, "OriginalAccuracyAuraEffectUnavailable"
+    end
+
+    local magic_level = tonumber(sets.magicLvl) or 0
+    if magic_level ~= 30 then
+        return nil, "OriginalAccuracyAuraMagicLevelMismatch"
+    end
+
+    return table.freeze({
+        SourceSkillId = source_skill_id,
+        SourceRank = source_rank,
+        EffectType = "DEBUFF",
+        SourceEffectType = "POISON",
+        SaveVs = "WIT",
+        VulnerabilityStat = "DEBUFF_VULN",
+        EffectPower = sets.effectPower,
+        IsMagic = true,
+        MagicLevel = magic_level,
+        AccuracyPenalty = matched.Penalty,
+        DurationSeconds = matched.DurationSeconds,
+        SourceRadius = sets.skillRadius,
+        TargetMode = "TARGET_AURA",
+        StackType = matched.StackType,
+        StackOrder = matched.StackOrder,
+    }), nil
+end
+
+--[[
 Builds the reviewed C4 elemental-vulnerability debuff plan.
 
 Surrender-style effects are magical WIT-resisted DEBUFFs that temporarily
