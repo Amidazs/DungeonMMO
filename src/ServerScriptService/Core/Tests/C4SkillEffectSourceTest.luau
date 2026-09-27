@@ -283,6 +283,41 @@ local function check_known_vectors()
         "Orc Raider two-handed mastery rank three is source exact"
     )
 
+    local monk_force = assert(Effects.get_rank(54, 6))
+    check(
+        monk_force.Sets.mpConsume == 24
+            and monk_force.Sets.magicLvl == 28
+            and monk_force.Sets.power == 222
+            and monk_force.Sets.num_charges == 1
+            and monk_force.Sets.skillType == "CHARGEDAM"
+            and monk_force.Conditions[1].kind == "Fist, Dual Fist",
+        "Orc Monk Force Blaster rank six preserves exact source fields"
+    )
+
+    local monk_cripple = assert(Effects.get_rank(95, 3))
+    check(
+        monk_cripple.Sets.mpConsume == 25
+            and monk_cripple.Sets.magicLvl == 28
+            and monk_cripple.Sets.effectPower == 80
+            and monk_cripple.Sets.saveVs == "WIT"
+            and monk_cripple.Effects[1].time == 120
+            and monk_cripple.Effects[1].Modifiers[1].stat == "RUN_SPEED"
+            and monk_cripple.Effects[1].Modifiers[1].val == 0.7,
+        "Orc Monk Cripple rank three preserves exact slow contract"
+    )
+
+    local monk_stun = assert(Effects.get_rank(120, 9))
+    check(
+        monk_stun.Sets.mpConsume == 30
+            and monk_stun.Sets.magicLvl == 28
+            and monk_stun.Sets.power == 80
+            and monk_stun.Sets.effectPower == 50
+            and monk_stun.Sets.saveVs == "CON"
+            and monk_stun.Effects[1].abnormal == "STUN"
+            and monk_stun.Effects[1].time == 9,
+        "Orc Monk Stunning Fist rank nine preserves exact stun contract"
+    )
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -304,12 +339,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 130
-        and coverage.RequiredSkillRankPairs == 527
+    check(coverage.SkillCount == 138
+        and coverage.RequiredSkillRankPairs == 553
         and not coverage.LiveCombatIntegrated,
-        "All eighteen-path source skill/rank definitions are catalogued")
+        "All nineteen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=130 uniqueRankPairs=527 live=false")
+        .. "skills=138 uniqueRankPairs=553 live=false")
         :format(checks))
 end
 
