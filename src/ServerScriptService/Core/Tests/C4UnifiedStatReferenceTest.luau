@@ -237,6 +237,48 @@ local function check_nightweaver_passives()
 end
 
 --[[
+Checks Concentration contributes its dynamic attack-cancel offset.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms active source rank 1078:2 produces a signed -25 offset.
+]]
+local function check_concentration_attack_cancel_offset()
+    local result = assert(C4.get_with_source_effects(
+        "DarkElf",
+        "Nightweaver",
+        30,
+        {},
+        {
+            {SkillId = 146, Rank = 10},
+            {SkillId = 164, Rank = 2},
+            {SkillId = 213, Rank = 2},
+            {SkillId = 234, Rank = 6},
+            {SkillId = 249, Rank = 7},
+            {SkillId = 285, Rank = 6},
+            {SkillId = 228, Rank = 1},
+            {SkillId = 229, Rank = 1},
+        },
+        {
+            {SkillId = 1078, Rank = 2},
+        }
+    ))
+
+    local selected = assert(result.SelectedActiveEffects[1])
+    check(
+        result.EquippedStats.ATTACK_CANCEL_RATE == -25
+            and result.AppliedSourceModifiers == 11
+            and selected.SkillId == 1078
+            and selected.Rank == 2
+            and selected.StackType == "Concentration"
+            and selected.StackOrder == 25,
+        "Concentration rank two contributes exact -25 attack-cancel offset"
+    )
+end
+
+--[[
 Executes complete sixteen-class source-only stat and loadout acceptance.
 
 Args:
@@ -250,6 +292,7 @@ local function main()
     check_equipment_and_class_gates()
     check_human_wizard_reuse()
     check_nightweaver_passives()
+    check_concentration_attack_cancel_offset()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
         .. "paths=16 live=false"):format(checks))
 end
