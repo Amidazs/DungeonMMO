@@ -12,6 +12,10 @@ local OWNER = table.freeze({
 })
 
 local PLANS = table.freeze({
+    GearwrightFieldBandage = table.freeze({
+        SourceSkillId = 34,
+        SourceRank = 1,
+    }),
     SpiritclawForceFocus = table.freeze({
         SourceSkillId = 50,
         SourceRank = 1,
@@ -48,7 +52,7 @@ local bleeding = true
 local cured = 0
 local refreshes = 0
 local percent_heals = 0
-local rolls = {30, 31}
+local rolls = {30, 31, 30}
 
 local FakeScheduler = {}
 
@@ -442,6 +446,25 @@ local function check_woundbind(bridge: any)
             and bleeding,
         "Woundbind roll 31 fails exact effectPower 30"
     )
+
+    bleeding = true
+    local bandage_start = assert(bridge:begin_cast(
+        OWNER,
+        "GearwrightFieldBandage",
+        112
+    ))
+    local bandaged = assert(bridge:launch_if_ready(
+        OWNER,
+        bandage_start.CastId,
+        113
+    ))
+    check(
+        bandaged.Application.Roll == 30
+            and bandaged.Application.Landed
+            and bandaged.Application.Cured
+            and cured == 2,
+        "Gearwright Bandage reuses exact source negate bleed authority"
+    )
 end
 
 --[[
@@ -621,18 +644,18 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 6
+        capability.ReviewedSkillCount == 7
             and capability.SourceChargeBuilder
             and capability.SpiritclawTimedAspects
             and capability.BleedNegateEffectPowerRoll
             and capability.TimedSourceBuffs
             and capability.BattleRoarMaxHpThenPercentHeal
             and not capability.ClientAuthority,
-        "capability reports all six reviewed Orc self-effect families"
+        "capability reports all seven reviewed self-effect families"
     )
 
     print((
-        "[C4 Warhowl Self Effect] PASS: %d assertions reviewed=6"
+        "[C4 Self Effect] PASS: %d assertions reviewed=7"
     ):format(checks))
 end
 
