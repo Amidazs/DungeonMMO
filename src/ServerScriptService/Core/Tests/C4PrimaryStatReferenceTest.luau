@@ -301,7 +301,7 @@ local function check_scope_boundaries()
 end
 
 --[[
-Runs the exact C4 ten-template source regression.
+Runs the exact C4 sixteen-template source regression.
 
 Args:
     None.
@@ -314,7 +314,7 @@ local function main()
     check_growth_vectors()
     check_scope_boundaries()
     print(("[C4 Primary Stats] EXACT_SOURCE_PASS: %d assertions, "
-        .. "15 templates, 15 growth curves through level 30, live=false")
+        .. "16 templates, 16 growth curves through level 30, live=false")
         :format(checks))
 end
 
