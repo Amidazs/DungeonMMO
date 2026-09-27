@@ -7,12 +7,12 @@ local Audit = require(Shared.C4CreativeSkillLinkAudit)
 local Map = require(Shared.C4CreativeSkillSourceMap)
 
 local report = Audit.report()
-assert(report.ClassPaths == 18 and report.SourceLearningRows == 1152,
+assert(report.ClassPaths == 19 and report.SourceLearningRows == 1193,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 1140
+assert(report.CandidateRows == 1181
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
-assert(report.CandidateRows + report.ExplicitMissingRows == 1152,
+assert(report.CandidateRows + report.ExplicitMissingRows == 1193,
     "Every historical rank requires a candidate or an explicit gap")
 assert(report.UnexaminedOrBrokenRows == 0,
     "Every candidate must resolve to a real class skill and rank")
@@ -51,6 +51,10 @@ local orc_body = assert(Map.resolve("OrcFighter", 295, 1))
 local warhowl_stun = assert(Map.resolve("OrcRaider", 100, 9))
 local warhowl_rage = assert(Map.resolve("OrcRaider", 94, 1))
 local warhowl_great = assert(Map.resolve("OrcRaider", 293, 3))
+local spirit_punch = assert(Map.resolve("OrcMonk", 29, 10))
+local spirit_force = assert(Map.resolve("OrcMonk", 54, 1))
+local spirit_stun = assert(Map.resolve("OrcMonk", 120, 9))
+local spirit_agile = assert(Map.resolve("OrcMonk", 319, 1))
 assert(wind_one.CreativeSkillId == "WindStrike"
     and wind_one.CreativeRank == 1
     and wind_two.CreativeSkillId == "MysticWindBolt"
@@ -125,6 +129,17 @@ assert(orc_punch.Status == "Candidate"
     and orc_toughness.CreativeSkillId == "OrcToughness"
     and orc_body.CreativeSkillId == "OrcIronBody",
     "Orc Fighter unique source families map independently")
+
+assert(spirit_punch.Status == "Candidate"
+    and spirit_punch.CreativeSkillId == "SpiritclawIronFist"
+    and spirit_punch.CreativeRank == 1
+    and spirit_force.CreativeSkillId == "SpiritclawForceBurst"
+    and spirit_force.CreativeRank == 1
+    and spirit_stun.CreativeSkillId == "SpiritclawStunningFist"
+    and spirit_stun.CreativeRank == 9
+    and spirit_agile.CreativeSkillId == "SpiritclawAgileMovement"
+    and spirit_agile.CreativeRank == 1,
+    "Orc Monk inherited offsets and unique families map to Spiritclaw")
 
 assert(dusk_empower.Status == "Candidate"
     and dusk_empower.CreativeSkillId == "DuskseerEmpower"
