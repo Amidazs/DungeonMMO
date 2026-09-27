@@ -31,6 +31,9 @@ local PeriodicMagic = require(
 local SelfMagic = require(
     Services.C4SourceSelfMagicCastService
 )
+local SelfEffect = require(
+    Services.C4SourceSelfEffectCastService
+)
 local CorpseMagic = require(
     Services.C4SourceCorpseMagicCastService
 )
@@ -142,6 +145,7 @@ function C4SourceCastRuntimeComposition.new(
         scheduler,
         source_executor
     )
+    local self_effect = SelfEffect.new(scheduler)
     local corpse_magic = CorpseMagic.new(
         scheduler,
         source_executor
@@ -169,6 +173,7 @@ function C4SourceCastRuntimeComposition.new(
         support_magic,
         periodic_magic,
         self_magic,
+        self_effect,
         corpse_magic,
         companion_magic,
         duskguard_cast,
@@ -198,6 +203,7 @@ function C4SourceCastRuntimeComposition.new(
         SupportMagic = support_magic,
         PeriodicMagic = periodic_magic,
         SelfMagic = self_magic,
+        SelfEffect = self_effect,
         CorpseMagic = corpse_magic,
         Companions = companions,
         CompanionMagic = companion_magic,
@@ -223,6 +229,7 @@ function C4SourceCastRuntimeComposition:clear_owner(
     self.SupportMagic:clear_owner(player)
     self.PeriodicMagic:clear_owner(player)
     self.SelfMagic:clear_owner(player)
+    self.SelfEffect:clear_owner(player)
     self.CorpseMagic:clear_owner(player)
     self.CompanionMagic:clear_owner(player)
     self.DuskguardCast:clear_owner(player)
@@ -249,6 +256,7 @@ function C4SourceCastRuntimeComposition:capability(): any
     local support = self.SupportMagic:capability()
     local periodic = self.PeriodicMagic:capability()
     local self_magic = self.SelfMagic:capability()
+    local self_effect = self.SelfEffect:capability()
     local corpse_magic = self.CorpseMagic:capability()
     local companion_magic = self.CompanionMagic:capability()
     local duskguard_cast = self.DuskguardCast:capability()
@@ -290,6 +298,13 @@ function C4SourceCastRuntimeComposition:capability(): any
             self_magic.DefaultEnabled == true,
         SelfMagicCurrentlyEnabled =
             self_magic.CurrentlyEnabled == true,
+        SelfEffectBridge = true,
+        SelfEffectDefaultEnabled =
+            self_effect.DefaultEnabled == true,
+        SelfEffectCurrentlyEnabled =
+            self_effect.CurrentlyEnabled == true,
+        SelfEffectReviewedSkillCount =
+            self_effect.ReviewedSkillCount,
         CorpseMagicBridge = true,
         CorpseMagicDefaultEnabled =
             corpse_magic.DefaultEnabled == true,
