@@ -21,6 +21,15 @@ local TARGETS = table.freeze({
             }),
         }),
     }),
+    Orc = table.freeze({
+        Fighter = table.freeze({
+            SourceClass = "Orc Fighter",
+            SourceUrl = "Pinned C4 skill_trees.sql class_id 44",
+            Levels = table.freeze({
+                [1] = 3, [5] = 9, [10] = 9, [15] = 10,
+            }),
+        }),
+    }),
     Elf = table.freeze({
         Fighter = table.freeze({
             SourceClass = "Elven Fighter",
