@@ -1,89 +1,83 @@
-# Dark Elf Assassin / Veilblade v3.15 — Night Checkpoint
+# Dark Elf Assassin / Veilblade v3.15 — GREEN Acceptance
 
 Date: 27 September 2026.
 Branch: `wip/phase-4-test-hud-integration-v1`.
-Checkpoint HEAD before documentation:
-`7b0f54d7f76cc056c4ca71d82d6347dbd50f774a`.
+Accepted code/test HEAD before documentation:
+`519185ca0c41d2969901d2454045d45ea3527315`.
 
-## Completed tonight
+## Accepted backend scope
 
-The Dark Elf Assassin first-transfer backend now has an independent creative
-identity, **Veilblade**, with exact class-35 source mapping through level 30.
+Dark Elf Assassin source class 35 is represented by the independent creative
+first-transfer class **Veilblade** through level 30.
 
-Current coverage:
+Accepted coverage:
 
-- 72 source rank rows;
-- 23 creative families;
-- zero source-map gaps;
-- trainer/progression/advancement identity present;
-- exact Assassin primary stat template present;
-- six Veilblade-specific active families routed through the source scheduler;
-- shared Scout/Wayfinder passives, toggles, lockpicking, ranged and dagger
-  families authorized for the earned Veilblade path;
-- source DEX exposed for blow resolution;
-- runtime composition includes the Veilblade cast bridge.
+- **72 / 72** source rank rows;
+- **23** creative skill families;
+- **0** source-map gaps;
+- exact primary stats STR 41 / DEX 34 / CON 32 / INT 25 / WIT 12 / MEN 26;
+- exact level-30 resources HP 831 / MP 325 / CP 337;
+- six Veilblade-specific source-cast families;
+- shared Scout/Wayfinder passives, toggles, lockpicking, bow and dagger
+  families;
+- raw source DEX and neutral `BLOW_RATE` available to live combat;
+- C4 Mortal Blow / Wayfinder Cut `BLOW` success and damage resolution;
+- real blow misses preserved without mutating target HP.
 
-## Studio evidence gathered before the final fixes
+## Focused Studio acceptance
 
-The first bounded Studio pass proved several major subsystems already worked:
-
-- `C4VeilbladeCastServiceTest`: PASS, 8 assertions;
-- source cast contract: PASS;
-- physical/magical source timing: PASS;
-- scheduler: PASS;
-- source combat calculation: PASS;
-- live source combat executor: PASS;
-- Dungeon cast runtime composition: PASS.
-
-That same pass correctly exposed four regressions instead of being labelled
-green:
-
-- Assassin source-row count expectation;
-- primary-stat template coverage count;
-- legacy Scout light-armour training compatibility;
-- legacy Human Scout critical-power training compatibility.
-
-## Fixes applied after that Studio run
-
-The checkpoint now contains:
-
-- exact Assassin row count updated to 72;
-- Dark Elf Assassin launch coverage registered;
-- primary-stat test expanded to 15 templates and Veilblade level-30 vitals;
-- legacy Ranger/Rogue compatibility preserved while original Fighter/Mage
-  first transfers still require an earned transfer receipt;
-- executable focused-runner ModuleScript suffix fixed.
-
-## Static validation after fixes
+Fresh unpublished acceptance completed on the generated Dungeon place.
 
 - `git diff --check`: PASS;
-- Base build: PASS;
-- Dungeon build: PASS;
-- checkpoint HEAD:
-  `7b0f54d7f76cc056c4ca71d82d6347dbd50f774a`;
-- only pre-existing quadruped Python `__pycache__` folders remain untracked.
+- Dungeon Rojo build: PASS;
+- focused backend/formula set: **29 / 29 PASS**;
+- C4 combat formula regression: PASS;
+- source combat calculation regression: PASS;
+- live source combat executor regression: PASS;
+- Veilblade cast bridge and Dungeon cast composition: PASS.
 
-## Validation still pending
+The additional 29th focused suite was the common C4 combat-formula regression,
+added after Play exposed that Mortal Blow was still rejected as an unsupported
+physical skill type.
 
-A clean post-fix 28-suite Studio run and genuine unpublished Play rehearsal
-still need to be rerun.
+## Defects closed during acceptance
 
-The final attempts tonight were blocked by local StudioMCP instability:
-Roblox Studio remained open but the local bridge intermittently reported no
-connected Studio and execution requests stalled. This is an environment/test
-transport blocker, not evidence that the backend is green or red.
+The acceptance cycle found and fixed genuine project defects rather than
+weakening the test gate:
 
-Do not mark v3.15 green until tomorrow's fresh runner and Play rehearsal pass.
+1. Defense Aura live rehearsal expected source rank 1 instead of mapped rank 2.
+2. The live harness did not yet exercise poison, shared dagger/blow or a shared
+   passive path.
+3. Source combat accepted `PDAM` but not C4 `BLOW`.
+4. Raw DEX had been read from the derived naked record, which only exposes
+   `DEXBonus`; raw DEX now comes from retained primary stats.
+5. Staged unified-stat candidates did not retain `PrimaryStats`.
+6. The new formula used `Behind` while the existing authoritative spatial
+   vocabulary uses `Back`.
 
-## Tomorrow's first task
+## Unpublished Play acceptance
 
-Start from this branch/HEAD, rebuild an unpublished place, restart StudioMCP
-and Studio, then run:
+The genuine Play rehearsal passed through the live runtime.
 
-`scripts/studio/c4_dark_elf_assassin_backend_focus.luau`
+Observed accepted markers:
 
-Expected suite count: **28**.
+- `SCOUT_FLEET_FOOT_PASS multiplier=1.06`;
+- `DEFENSE_AURA_PASS duration=1200`;
+- `UMBRAL_SIPHON_PASS` with real NPC damage and caster healing;
+- `VENOM_HEX_PASS landed=true`;
+- `WAYFINDER_CUT_PASS damage=870.1875 chance=79.80000000000001`;
+- `CRIMSON_STING_PASS` with real damage and landed bleed;
+- `AURA_DRAIN_VENOM_BLOW_STING_PASS`;
+- `VERIFIED_PLAY_MODE_PASS`.
 
-After that, run the live Veilblade rehearsal and record exact output plus final
-project CreatorError count before advancing to the next C4 first-transfer
-career.
+Final accepted Play log: **0 project CreatorErrors**.
+
+The Wayfinder Cut chance is the expected C4 rear-position calculation for
+Veilblade DEX 34: base 70 multiplied by `1 + (34 - 20) / 100` = **79.8%**.
+The live implementation keeps the source server-owned random roll, so a miss is
+a valid result and does not deal zero-damage bookkeeping as a hit.
+
+## Boundaries
+
+No `main` merge, Roblox publish, production DataStore mutation or animation
+changes were performed.
