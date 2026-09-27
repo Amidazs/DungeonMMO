@@ -529,7 +529,7 @@ local function charge_soulshot(bridge, player)
         UserId = player.UserId,
         ShotKind = "Soulshot",
     })
-    assert(charged.ok, "Duskseer Soulshot charge failed")
+    assert(charged.ok, tostring(charged.reason))
 end
 
 --[[
@@ -864,6 +864,11 @@ local function run()
     assert(bridge:Invoke("add_item", {
         UserId = player.UserId,
         ItemId = "mystic_charge",
+        Quantity = 12,
+    }).ok)
+    assert(bridge:Invoke("add_item", {
+        UserId = player.UserId,
+        ItemId = "kinetic_charge",
         Quantity = 12,
     }).ok)
 
