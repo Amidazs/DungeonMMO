@@ -1908,6 +1908,42 @@ function C4SourceCombatExecutor:physical_status_skill_npc(
 end
 
 --[[
+Checks whether one player-to-NPC physical source launch is currently legal.
+
+This preflight validates only authoritative target identity and source range.
+Damage, Soulshot consumption and weapon conditions remain launch-time work.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (any): Current reviewed server NPC.
+    source_range (number?): Optional reviewed source-unit range.
+
+Returns:
+    (boolean, string?): Ready state or strict live/source denial reason.
+]]
+function C4SourceCombatExecutor:can_physical_skill_npc(
+    attacker: any,
+    enemy: any,
+    source_range: number?
+): (boolean, string?)
+    local boundary, reason =
+        self:_validate_npc_target(attacker, enemy)
+
+    if not boundary then
+        return false, reason
+    end
+    if source_range ~= nil then
+        return self:_validate_npc_source_range(
+            attacker,
+            enemy,
+            source_range
+        )
+    end
+
+    return true, nil
+end
+
+--[[
 Executes one live player-to-NPC source PDAM skill.
 
 Args:
@@ -3881,6 +3917,7 @@ function C4SourceCombatExecutor:capability(): any
         ClientCriticalAuthority = false,
         ClientShieldAuthority = false,
         ClientShotAuthority = false,
+        PhysicalSkillPreflight = true,
         NormalAttackLiveApplication = true,
         NormalAttackAbsorbDamageLiveApplication = true,
         NormalAttackAbsorbSkipsBow = true,
