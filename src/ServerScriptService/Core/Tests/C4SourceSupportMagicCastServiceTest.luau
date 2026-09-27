@@ -508,7 +508,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedSkillCount == 31
+        capability.ReviewedSkillCount == 45
             and capability.TargetHeal
             and capability.TargetRecharge
             and capability.TargetBuff
