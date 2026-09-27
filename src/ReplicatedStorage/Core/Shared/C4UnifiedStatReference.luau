@@ -112,6 +112,7 @@ local function source_stats(
         MAGICAL_CRITICAL_RATE = BASE_MAGICAL_CRITICAL_RATE,
         PHYSICAL_CRITICAL_POWER = 1,
         PHYSICAL_CRITICAL_POWER_ADD = 0,
+        BLOW_RATE = 1,
         FIRE_VULN = 1,
         WIND_VULN = 1,
         WATER_VULN = 1,
