@@ -21,13 +21,13 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all nineteen separate source templates at the level-30 launch cap.
+Checks all twenty separate source templates at the level-30 launch cap.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all nineteen paths.
+    nil: Confirms exact archived HP, MP and CP across all twenty paths.
 ]]
 local function check_all_class_vitals()
     local vectors = {
@@ -50,6 +50,7 @@ local function check_all_class_vitals()
         {"DarkElf", "Duskseer", 732, 482, 368},
         {"Orc", "Fighter", 1075, 322, 562},
         {"Orc", "Warhowl", 1269, 327, 884},
+        {"Orc", "Spiritclaw", 1230, 327, 617},
     }
     for _, vector in ipairs(vectors) do
         local result, issue = C4.get(
@@ -425,6 +426,52 @@ local function check_warhowl_inherited_passives()
 end
 
 --[[
+Checks Spiritclaw inherits Orc Fighter passives before Monk passives.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact class-44/class-47 passive stat composition.
+]]
+local function check_spiritclaw_inherited_passives()
+    local result = assert(C4.get(
+        "Orc",
+        "Spiritclaw",
+        30,
+        {Weapon = "Fist", Body = "Light", Legs = "Light"},
+        {
+            {SkillId = 134, Rank = 1},
+            {SkillId = 141, Rank = 3},
+            {SkillId = 142, Rank = 5},
+            {SkillId = 295, Rank = 1},
+            {SkillId = 210, Rank = 4},
+            {SkillId = 233, Rank = 6},
+            {SkillId = 319, Rank = 1},
+        }
+    ))
+
+    local stats = result.PassiveStatSnapshot
+    check(
+        result.ScopeId == "OrcMonk"
+            and result.AppliedSourceModifiers == 13
+            and math.abs(stats.PHYSICAL_ATTACK - 20.125) < 0.000001
+            and math.abs(stats.PHYSICAL_DEFENCE - 115.8) < 0.000001
+            and stats.ACCURACY_COMBAT == 63
+            and stats.EVASION_RATE == 71
+            and stats.RUN_SPEED == 129,
+        "Spiritclaw composes inherited Orc Fighter and Monk passives"
+    )
+    check(
+        stats.ROOT_VULN == 0.8
+            and stats.SLEEP_VULN == 0.8
+            and stats.POISON_VULN == 0.8
+            and stats.FALL == 0.6,
+        "Spiritclaw retains exact Toughness and Iron Body multipliers"
+    )
+end
+
+--[[
 Checks Concentration contributes its dynamic attack-cancel offset.
 
 Args:
@@ -467,7 +514,7 @@ local function check_concentration_attack_cancel_offset()
 end
 
 --[[
-Executes complete nineteen-class source-only stat and loadout acceptance.
+Executes complete twenty-class source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -484,9 +531,10 @@ local function main()
     check_duskseer_passives()
     check_duskseer_unique_active_buffs()
     check_warhowl_inherited_passives()
+    check_spiritclaw_inherited_passives()
     check_concentration_attack_cancel_offset()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=19 live=false"):format(checks))
+        .. "paths=20 live=false"):format(checks))
 end
 
 main()
