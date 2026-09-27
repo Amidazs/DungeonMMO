@@ -21,15 +21,15 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all ten separate source templates at the level-30 launch cap.
+Checks all sixteen separate source templates at the level-30 launch cap.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all ten paths.
+    nil: Confirms exact archived HP, MP and CP across all sixteen paths.
 ]]
-local function check_ten_class_vitals()
+local function check_all_class_vitals()
     local vectors = {
         {"Human", "Fighter", 922, 319, 418},
         {"Human", "Mage", 699, 466, 366},
@@ -39,8 +39,14 @@ local function check_ten_class_vitals()
         {"Human", "Oathguard", 1018, 320, 610},
         {"Human", "Ashenblade", 983, 320, 399},
         {"Human", "Emberweaver", 705, 492, 355},
+        {"Human", "Dawnkeeper", 770, 492, 387},
+        {"Elf", "Moonweaver", 682, 495, 343},
+        {"Elf", "Lifebinder", 744, 495, 374},
         {"Elf", "GreenwardWarden", 902, 325, 453},
         {"Elf", "GreenwardScout", 874, 325, 354},
+        {"DarkElf", "Duskguard", 856, 325, 430},
+        {"DarkElf", "Veilblade", 831, 325, 337},
+        {"DarkElf", "Nightweaver", 672, 482, 338},
     }
     for _, vector in ipairs(vectors) do
         local result, issue = C4.get(
@@ -185,7 +191,53 @@ local function check_human_wizard_reuse()
 end
 
 --[[
-Executes complete ten-class source-only stat and loadout acceptance.
+Checks all eight true Nightweaver passive families in calculator order.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms exact level-30 Dark Wizard passive stat output.
+]]
+local function check_nightweaver_passives()
+    local result = assert(C4.get(
+        "DarkElf",
+        "Nightweaver",
+        30,
+        {},
+        {
+            {SkillId = 146, Rank = 10},
+            {SkillId = 164, Rank = 2},
+            {SkillId = 213, Rank = 2},
+            {SkillId = 234, Rank = 6},
+            {SkillId = 249, Rank = 7},
+            {SkillId = 285, Rank = 6},
+            {SkillId = 228, Rank = 1},
+            {SkillId = 229, Rank = 1},
+        }
+    ))
+
+    local stats = result.PassiveStatSnapshot
+    check(
+        result.ScopeId == "DarkWizard"
+            and result.AppliedSourceModifiers == 10
+            and stats.MAGICAL_DEFENCE == 100
+            and stats.MAGICAL_SKILL_REUSE == 0.75
+            and stats.MAX_MP == 532
+            and stats.RECHARGE_MP_RATE == 33,
+        "Nightweaver passives preserve exact defence, reuse and mana effects"
+    )
+    check(
+        math.abs(stats.MAGICAL_ATTACK_SPEED - 331.8) < 0.000001
+            and math.abs(stats.REG_MP_RATE - 3.68825) < 0.000001
+            and stats.MAGICAL_ATTACK == 27.11
+            and stats.PHYSICAL_ATTACK == 12.4,
+        "Nightweaver casting, recovery and focus modifiers stay source exact"
+    )
+end
+
+--[[
+Executes complete sixteen-class source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -194,11 +246,12 @@ Returns:
     nil: Prints a bounded source-only check count upon success.
 ]]
 local function main()
-    check_ten_class_vitals()
+    check_all_class_vitals()
     check_equipment_and_class_gates()
     check_human_wizard_reuse()
+    check_nightweaver_passives()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=10 live=false"):format(checks))
+        .. "paths=16 live=false"):format(checks))
 end
 
 main()
