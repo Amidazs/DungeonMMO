@@ -258,7 +258,8 @@ local BRANCHES = table.freeze({
                 SourceTransferLevel = TRANSFER_LEVEL,
                 SourceIndexUrl = SOURCE_URL,
                 SourceQuestUrl = QUEST_URL,
-                GameplayStatus = "NotImplemented",
+                GameplayStatus = "BackendInProgress",
+                SourceSkillInventory = "C4DwarfArtisanLevel30Sources",
             }),
             table.freeze({
                 Id = "DwarfScavenger",
