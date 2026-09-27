@@ -143,7 +143,11 @@ local function main()
     end
     check(total == 18 and partial == 9,
         "Original C4 requires eighteen paths, nine currently partial")
-    for _, race_id in ipairs({"DarkElf", "Orc", "Dwarf"}) do
+    check(
+        RaceDefinitions.get("DarkElf") ~= nil,
+        "Implemented Dark Elf paths require the registered race"
+    )
+    for _, race_id in ipairs({"Orc", "Dwarf"}) do
         check(RaceDefinitions.get(race_id) == nil,
             "Source class registry cannot prematurely unlock a race")
     end
