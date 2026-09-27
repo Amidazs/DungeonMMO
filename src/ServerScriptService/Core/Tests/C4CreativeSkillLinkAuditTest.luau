@@ -9,7 +9,7 @@ local Map = require(Shared.C4CreativeSkillSourceMap)
 local report = Audit.report()
 assert(report.ClassPaths == 23 and report.SourceLearningRows == 1370,
     "All tracked level-30 classes and source ranks must be audited")
-assert(report.CandidateRows == 1293
+assert(report.CandidateRows == 1358
     and report.ExplicitMissingRows == 12,
     "Tracked source rows must preserve candidate and explicit-gap totals")
 assert(report.CandidateRows + report.ExplicitMissingRows == 1370,
