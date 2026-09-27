@@ -31,6 +31,9 @@ local SOURCE_IDS = table.freeze({
     EmberweaverConcentration = 1078,
     MoonweaverConcentration = 1078,
     NightweaverConcentration = 1078,
+    DuskseerConcentration = 1078,
+    DuskseerEmpower = 1059,
+    DuskseerBloodRite = 1268,
 })
 
 local FakeScheduler = {}
@@ -411,6 +414,7 @@ local function main()
         "EmberweaverConcentration",
         "MoonweaverConcentration",
         "NightweaverConcentration",
+        "DuskseerConcentration",
     }) do
         local concentration_start = assert(bridge:begin_cast(
             caster,
@@ -433,6 +437,37 @@ local function main()
         check(
             concentrated.Applied
                 and concentrated.Application.DurationSeconds == 1200
+                and last_execution == skill_id
+                and last_range == 900,
+            skill_id .. " reaches timed target-buff authority"
+        )
+    end
+
+    for index, skill_id in ipairs({
+        "DuskseerEmpower",
+        "DuskseerBloodRite",
+    }) do
+        local buff_start = assert(bridge:begin_cast(
+            caster,
+            target,
+            skill_id,
+            250 + index
+        ))
+        check(
+            buff_start.SourceSkillId == SOURCE_IDS[skill_id]
+                and buff_start.SourceRank == 1
+                and last_range == 400,
+            skill_id .. " binds exact Duskseer support source identity"
+        )
+
+        local buffed_result = assert(bridge:launch_if_ready(
+            caster,
+            buff_start.CastId,
+            260 + index
+        ))
+        check(
+            buffed_result.Applied
+                and buffed_result.Application.DurationSeconds == 1200
                 and last_execution == skill_id
                 and last_range == 900,
             skill_id .. " reaches timed target-buff authority"
