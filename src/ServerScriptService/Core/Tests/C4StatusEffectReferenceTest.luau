@@ -96,6 +96,26 @@ local function main()
         "Ice Bolt rank six keeps exact 30 percent 120-second source slow"
     )
 
+    local cripple = assert(Status.movement_slow_plan(95, 3))
+    check(
+        cripple.SourceSkillId == 95
+            and cripple.SourceRank == 3
+            and cripple.EffectType == "DEBUFF"
+            and cripple.SaveVs == "WIT"
+            and cripple.EffectPower == 80
+            and cripple.MagicLevel == 28
+            and not cripple.IsMagic,
+        "Cripple rank three keeps exact non-magical WIT slow inputs"
+    )
+    check(
+        cripple.SpeedMultiplier == 0.7
+            and math.abs(cripple.SlowFraction - 0.3) <= 0.00001
+            and cripple.DurationSeconds == 120
+            and cripple.StackType == "RunSpeedDown"
+            and cripple.StackOrder == 0.7,
+        "Cripple keeps exact 30 percent 120-second source slow"
+    )
+
     local sleep = assert(Status.sleep_plan(1069, 6))
     check(
         sleep.SourceSkillId == 1069
