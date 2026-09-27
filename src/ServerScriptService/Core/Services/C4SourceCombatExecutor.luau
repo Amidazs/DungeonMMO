@@ -25,6 +25,9 @@ local NpcSleep = require(
 local NpcElementalVulnerability = require(
     ServerScriptService.Combat.C4NpcElementalVulnerabilityService
 )
+local NpcAccuracyDebuff = require(
+    ServerScriptService.Combat.C4NpcAccuracyDebuffService
+)
 local EnemyWeakening = require(
     ServerScriptService.Combat.EnemyWeakeningService
 )
@@ -224,6 +227,9 @@ function C4SourceCombatExecutor.new(options: any?): any
         _npc_elemental_vulnerability =
             config.ElementalVulnerabilityProvider
             or NpcElementalVulnerability,
+        _npc_accuracy_debuff =
+            config.AccuracyDebuffProvider
+            or NpcAccuracyDebuff,
         _enemy_weakening =
             config.EnemyWeakeningProvider
             or EnemyWeakening,
@@ -1463,6 +1469,102 @@ function C4SourceCombatExecutor:can_status_skill_npc(
     end
 
     return true, nil
+end
+
+--[[
+Executes one caster-centred C4 accuracy-debuff aura against reviewed NPCs.
+
+The server discovers targets from the caster position. One source calculation
+owns the magical shot and individual land rolls; landed targets receive the
+timed non-stacking accuracy authority.
+
+Args:
+    attacker (any): Server-owned casting player.
+    creative_skill_id (string): Reviewed Chaos Seal creative skill.
+    creative_rank (number): Server-resolved purchased rank.
+    source_radius (number): Exact source aura radius.
+    sequence_id (number?): Existing authoritative cast sequence.
+
+Returns:
+    (any?, string?): Live accuracy-aura evidence or strict denial reason.
+]]
+function C4SourceCombatExecutor:accuracy_aura_skill_npc(
+    attacker: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    local targets, boundaries, collect_reason =
+        self:_collect_npc_caster_aura_targets(
+            attacker,
+            source_radius
+        )
+    if not targets or not boundaries then
+        return nil, collect_reason
+    end
+
+    local calculated, combat_reason =
+        self._combat.accuracy_aura_skill(
+            attacker.UserId,
+            boundaries,
+            creative_skill_id,
+            creative_rank
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.SourceRadius ~= source_radius
+        or #calculated.Results ~= #targets
+    then
+        return nil, "C4AccuracyAuraCalculationContractMismatch"
+    end
+
+    local authority = self._npc_accuracy_debuff
+    if not authority or type(authority.apply) ~= "function" then
+        return nil, "C4NpcAccuracyDebuffAuthorityUnavailable"
+    end
+
+    local applications = {}
+    local landed_count = 0
+
+    for index, target in ipairs(targets) do
+        local result = calculated.Results[index]
+        local applied = false
+
+        if result.Landed then
+            applied = authority.apply(
+                target,
+                result.AccuracyPenalty,
+                result.DurationSeconds
+            )
+            if applied ~= true then
+                return nil, "C4NpcAccuracyDebuffApplicationFailed"
+            end
+            landed_count += 1
+        end
+
+        applications[index] = {
+            Target = target,
+            Calculation = result,
+            Landed = result.Landed,
+            AccuracyDebuffApplied = applied,
+        }
+    end
+
+    return {
+        Kind = "C4LiveNpcAccuracyAura",
+        Calculation = calculated,
+        Applications = applications,
+        Applied = landed_count > 0,
+        AccuracyDebuffApplied = landed_count > 0,
+        TargetCount = #applications,
+        LandedCount = landed_count,
+        AccuracyPenalty = calculated.AccuracyPenalty,
+        DurationSeconds = calculated.DurationSeconds,
+        SourceRadius = source_radius,
+        SequenceId = sequence_id,
+    }, nil
 end
 
 --[[
@@ -5055,6 +5157,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcRootLiveApplication = true,
         NpcRootMovementOnly = true,
         NpcRootAuraLiveApplication = true,
+        NpcAccuracyAuraLiveApplication = true,
+        NpcAccuracyAuraFeedsNormalHitChance = true,
+        NpcAccuracyDebuffAuthorityConfigured =
+            type(self._npc_accuracy_debuff) == "table",
         NpcCasterAuraServerTargeting = true,
         NpcFearLiveApplication = true,
         NpcFearMovementAuthorityConfigured =
