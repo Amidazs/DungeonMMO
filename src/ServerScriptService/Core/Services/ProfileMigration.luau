@@ -1123,7 +1123,8 @@ function ProfileMigration.migrate(raw: any): any
     -- never silently grant both crafting careers to an old character.
     -- A legacy character must explicitly choose its two active slots.
     slot1.ProfessionSlots = ProfessionSelectionRules.normalize(
-        slot1.ProfessionSlots
+        slot1.ProfessionSlots,
+        slot1
     )
 
     return migrated
