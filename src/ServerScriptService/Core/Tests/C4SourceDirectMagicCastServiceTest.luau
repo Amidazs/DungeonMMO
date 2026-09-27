@@ -108,6 +108,41 @@ local REVIEWED_PLANS = table.freeze({
         CastRange = 600,
         EffectRange = 1100,
     }),
+    OrcMysticLifeDrain = table.freeze({
+        CreativeRank = 2,
+        SourceSkillId = 1090,
+        SourceRank = 2,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    OrcMysticDreamingSpirit = table.freeze({
+        CreativeRank = 2,
+        SourceSkillId = 1097,
+        SourceRank = 2,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    AshspeakerLifeDrain = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1090,
+        SourceRank = 3,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    AshspeakerDreamingSpirit = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1097,
+        SourceRank = 3,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    AshspeakerMadness = table.freeze({
+        CreativeRank = 1,
+        SourceSkillId = 1105,
+        SourceRank = 1,
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
 })
 
 
@@ -506,7 +541,11 @@ function FakeExecutor:magic_drain_skill_npc(
 
     assert(subject == player)
     assert(target == enemy)
-    assert(creative_skill_id == "EmberweaverLifeSiphon")
+    assert(
+        creative_skill_id == "EmberweaverLifeSiphon"
+            or creative_skill_id == "OrcMysticLifeDrain"
+            or creative_skill_id == "AshspeakerLifeDrain"
+    )
 
     return {
         Kind = "C4LiveNpcMagicDrain",
@@ -546,7 +585,11 @@ function FakeExecutor:sleep_skill_npc(
 
     assert(subject == player)
     assert(target == enemy)
-    assert(creative_skill_id == "EmberweaverSlumberHex")
+    assert(
+        creative_skill_id == "EmberweaverSlumberHex"
+            or creative_skill_id == "OrcMysticDreamingSpirit"
+            or creative_skill_id == "AshspeakerDreamingSpirit"
+    )
 
     return {
         Kind = "C4LiveNpcSleep",
@@ -1292,6 +1335,85 @@ local function check_withering_hex_launch()
 end
 
 --[[
+Checks inherited Orc Mystic and Ashspeaker hostile routes launch correctly.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms drain, Sleep and Confusion executor selection.
+]]
+local function check_orc_hostile_launches()
+    for index, skill_id in ipairs({
+        "OrcMysticLifeDrain",
+        "AshspeakerLifeDrain",
+    }) do
+        local bridge, started = started_bridge(
+            520 + index,
+            skill_id
+        )
+        local launched = assert(bridge:launch_if_ready(
+            player,
+            started.CastId,
+            530 + index,
+            950 + index
+        ))
+
+        check(
+            launched.Applied
+                and executor_state.DrainMagicCalls == 1
+                and executor_state.LastRank
+                    == REVIEWED_PLANS[skill_id].CreativeRank
+                and executor_state.LastSequence == 950 + index,
+            skill_id .. " reaches the shared source drain executor"
+        )
+    end
+
+    for index, skill_id in ipairs({
+        "OrcMysticDreamingSpirit",
+        "AshspeakerDreamingSpirit",
+    }) do
+        local bridge, started = started_bridge(
+            540 + index,
+            skill_id
+        )
+        local launched = assert(bridge:launch_if_ready(
+            player,
+            started.CastId,
+            550 + index,
+            960 + index
+        ))
+
+        check(
+            launched.Applied
+                and launched.Application.SleepApplied
+                and executor_state.SleepCalls == 1
+                and executor_state.LastRank
+                    == REVIEWED_PLANS[skill_id].CreativeRank,
+            skill_id .. " reaches the shared source Sleep executor"
+        )
+    end
+
+    local bridge, started = started_bridge(
+        560,
+        "AshspeakerMadness"
+    )
+    local launched = assert(bridge:launch_if_ready(
+        player,
+        started.CastId,
+        570,
+        970
+    ))
+    check(
+        launched.Applied
+            and launched.Application.Kind == "C4LiveNpcConfusion"
+            and launched.Application.RetargetCount == 5
+            and launched.Application.RetargetSeconds == 6,
+        "Ashspeaker Madness reaches the exact Confusion executor"
+    )
+end
+
+--[[
 Checks owner teardown clears both bridge and scheduler state.
 
 Args:
@@ -1344,6 +1466,11 @@ local function check_reviewed_direct_families()
         "DuskseerSlumber",
         "DuskseerRootbind",
         "DuskseerWindShackle",
+        "OrcMysticLifeDrain",
+        "OrcMysticDreamingSpirit",
+        "AshspeakerLifeDrain",
+        "AshspeakerDreamingSpirit",
+        "AshspeakerMadness",
     }
 
     for index, skill_id in ipairs(skill_ids) do
@@ -1468,6 +1595,7 @@ local function main()
     check_slumber_hex_launch()
     check_scorch_mark_launch()
     check_withering_hex_launch()
+    check_orc_hostile_launches()
     check_owner_cleanup()
 
     print((
