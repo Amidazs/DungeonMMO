@@ -44,6 +44,10 @@ local PLANS = table.freeze({
         SourceSkillId = 100,
         ExecutionKind = "Stun",
     }),
+    AshspeakerSkullshock = table.freeze({
+        SourceSkillId = 100,
+        ExecutionKind = "Stun",
+    }),
     WarhowlSweepingArc = table.freeze({
         SourceSkillId = 245,
         ExecutionKind = "Area",
@@ -269,6 +273,7 @@ function FakeExecutor:physical_stun_skill_npc(
         or (
             skill_id ~= "WarhowlSkullbreaker"
             and skill_id ~= "SpiritclawStunningFist"
+            and skill_id ~= "AshspeakerSkullshock"
         )
         or rank ~= 1
     then
@@ -545,6 +550,7 @@ local function check_reviewed_skills(bridge: any)
         "SpiritclawCripplingPalm",
         "WarhowlCrushingBlow",
         "WarhowlSkullbreaker",
+        "AshspeakerSkullshock",
         "WarhowlSweepingArc",
     }
 
@@ -706,7 +712,7 @@ local function main()
 
     local capability = bridge:capability()
     check(
-        capability.ReviewedActiveSkillCount == 9
+        capability.ReviewedActiveSkillCount == 10
             and capability.SingleTargetPdam
             and capability.StunPdam
             and capability.ChargedPdam
@@ -715,11 +721,11 @@ local function main()
             and not capability.StunPdamPending
             and not capability.TargetAreaPdamPending
             and not capability.ClientAuthority,
-        "capability reports all nine reviewed Orc physical families"
+        "capability reports all ten reviewed Orc physical families"
     )
 
     print((
-        "[C4 Physical Cast] PASS: %d assertions reviewed=9"
+        "[C4 Physical Cast] PASS: %d assertions reviewed=10"
     ):format(checks))
 end
 
