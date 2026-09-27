@@ -85,7 +85,7 @@ local SOURCES = table.freeze({
             Levels = table.freeze({
                 [1] = table.freeze({
                     Toughness = 1,
-                    NewbieProtection = 1,
+                    Lucky = 1,
                     CommonItemCreation = 1,
                 }),
                 [5] = table.freeze({
