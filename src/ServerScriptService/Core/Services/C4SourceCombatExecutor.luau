@@ -31,6 +31,9 @@ local EnemyWeakening = require(
 local ManaService = require(
     ServerScriptService.Combat.ManaService
 )
+local NpcManaService = require(
+    ServerScriptService.Core.Services.C4NpcManaService
+)
 local MageHealService = require(
     ServerScriptService.Combat.MageHealService
 )
@@ -222,6 +225,8 @@ function C4SourceCombatExecutor.new(options: any?): any
             config.EnemyWeakeningProvider
             or EnemyWeakening,
         _mana = config.ManaProvider or ManaService,
+        _npc_mana =
+            config.NpcManaProvider or NpcManaService,
         _player_heal = config.PlayerHealProvider or MageHealService,
         _party_heal = config.PartyHealProvider or PartyHealService,
         _player_resurrection =
@@ -1215,57 +1220,80 @@ function C4SourceCombatExecutor:_run_npc_status_tick(
         return
     end
 
-    local humanoid =
-        record.Target:FindFirstChildOfClass("Humanoid")
-    if not humanoid or humanoid.Health <= 0 then
-        self:_clear_npc_status(
-            record.Target,
-            record.SourceSkillId,
-            record.Serial
+    if record.ResourceKind == "Mana" then
+        local stats = boundary.SourceStatCandidate
+        local maximum = stats and stats.MAX_MP
+        if type(maximum) ~= "number"
+            or maximum ~= maximum
+            or maximum <= 0
+            or maximum >= math.huge
+            or type(self._npc_mana) ~= "table"
+            or type(self._npc_mana.ensure) ~= "function"
+            or type(self._npc_mana.drain) ~= "function"
+        then
+            self:_clear_npc_status(
+                record.Target,
+                record.SourceSkillId,
+                record.Serial
+            )
+            return
+        end
+
+        self._npc_mana.ensure(record.Target, maximum)
+        self._npc_mana.drain(record.Target, record.TickDamage)
+    else
+        local humanoid =
+            record.Target:FindFirstChildOfClass("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then
+            self:_clear_npc_status(
+                record.Target,
+                record.SourceSkillId,
+                record.Serial
+            )
+            return
+        end
+
+        local planned = StatusEffects.nonlethal_tick(
+            humanoid.Health,
+            record.TickDamage
         )
-        return
-    end
+        if not planned then
+            self:_clear_npc_status(
+                record.Target,
+                record.SourceSkillId,
+                record.Serial
+            )
+            return
+        end
 
-    local planned = StatusEffects.nonlethal_tick(
-        humanoid.Health,
-        record.TickDamage
-    )
-    if not planned then
-        self:_clear_npc_status(
-            record.Target,
-            record.SourceSkillId,
-            record.Serial
+        local health_before = humanoid.Health
+        if planned.AppliedDamage > 0 then
+            humanoid:TakeDamage(planned.AppliedDamage)
+        end
+        local health_after = humanoid.Health
+        local applied_damage = math.max(
+            0,
+            health_before - health_after
         )
-        return
-    end
 
-    local health_before = humanoid.Health
-    if planned.AppliedDamage > 0 then
-        humanoid:TakeDamage(planned.AppliedDamage)
-    end
-    local health_after = humanoid.Health
-    local applied_damage = math.max(
-        0,
-        health_before - health_after
-    )
-
-    if applied_damage > 0 then
-        self._npc_damage_observer({
-            attacker = record.Attacker,
-            attacker_character = combat_model(record.Attacker),
-            target = record.Target,
-            source_kind = record.SourceKind,
-            source_id = record.CreativeSkillId,
-            attack_id = record.CreativeSkillId,
-            base_damage = record.TickDamage,
-            multiplier = 1,
-            sequence_id = nil,
-            C4SourceResolved = true,
-            C4PeriodicStatus = true,
-            C4SourceSkillId = record.SourceSkillId,
-            C4SourceRank = record.SourceRank,
-            C4SourceCastSequenceId = record.SequenceId,
-        }, applied_damage, false)
+        if applied_damage > 0 then
+            self._npc_damage_observer({
+                attacker = record.Attacker,
+                attacker_character = combat_model(record.Attacker),
+                target = record.Target,
+                source_kind = record.SourceKind,
+                source_id = record.CreativeSkillId,
+                attack_id = record.CreativeSkillId,
+                base_damage = record.TickDamage,
+                multiplier = 1,
+                sequence_id = nil,
+                C4SourceResolved = true,
+                C4PeriodicStatus = true,
+                C4SourceSkillId = record.SourceSkillId,
+                C4SourceRank = record.SourceRank,
+                C4SourceCastSequenceId = record.SequenceId,
+            }, applied_damage, false)
+        end
     end
 
     record.Remaining -= 1
@@ -1280,7 +1308,6 @@ function C4SourceCombatExecutor:_run_npc_status_tick(
 
     self:_schedule_npc_status_tick(record)
 end
-
 --[[
 Checks whether one player-to-NPC source status launch is currently legal.
 
@@ -1372,10 +1399,18 @@ function C4SourceCombatExecutor:status_skill_npc(
     local source_kind
     if calculated.EffectType == "BLEED" then
         source_kind = "StatusPhysical"
-    elseif calculated.EffectType == "POISON" then
+    elseif calculated.EffectType == "POISON"
+        or calculated.EffectType == "DMG_OVER_TIME"
+        or calculated.EffectType == "MANA_DMG_OVER_TIME"
+    then
         source_kind = "StatusMagic"
     else
         return nil, "UnsupportedC4LivePeriodicStatusType"
+    end
+
+    local resource_kind = calculated.ResourceKind or "Health"
+    if resource_kind ~= "Health" and resource_kind ~= "Mana" then
+        return nil, "UnsupportedC4LivePeriodicResource"
     end
 
     self._next_status_serial += 1
@@ -1387,6 +1422,7 @@ function C4SourceCombatExecutor:status_skill_npc(
         SourceSkillId = calculated.SourceSkillId,
         SourceRank = calculated.SourceRank,
         SourceKind = source_kind,
+        ResourceKind = resource_kind,
         TickDamage = calculated.TickDamage,
         TickSeconds = calculated.TickSeconds,
         Remaining = calculated.TickCount,
@@ -1414,7 +1450,9 @@ function C4SourceCombatExecutor:status_skill_npc(
         TickDamage = calculated.TickDamage,
         TickCount = calculated.TickCount,
         TickSeconds = calculated.TickSeconds,
+        ResourceKind = resource_kind,
         HealthDamage = 0,
+        ManaDamage = 0,
     }, nil
 end
 
@@ -1490,13 +1528,22 @@ function C4SourceCombatExecutor:status_area_skill_npc(
             continue
         end
 
-        local source_kind = if result.EffectType == "POISON"
-            then "StatusMagic"
-            elseif result.EffectType == "BLEED"
+        local source_kind = if result.EffectType == "BLEED"
             then "StatusPhysical"
+            elseif result.EffectType == "POISON"
+                or result.EffectType == "DMG_OVER_TIME"
+                or result.EffectType == "MANA_DMG_OVER_TIME"
+            then "StatusMagic"
             else nil
         if not source_kind then
             return nil, "UnsupportedC4LivePeriodicStatusType"
+        end
+
+        local resource_kind = result.ResourceKind or "Health"
+        if resource_kind ~= "Health"
+            and resource_kind ~= "Mana"
+        then
+            return nil, "UnsupportedC4LivePeriodicResource"
         end
 
         self._next_status_serial += 1
@@ -1508,6 +1555,7 @@ function C4SourceCombatExecutor:status_area_skill_npc(
             SourceSkillId = result.SourceSkillId,
             SourceRank = result.SourceRank,
             SourceKind = source_kind,
+            ResourceKind = resource_kind,
             TickDamage = result.TickDamage,
             TickSeconds = result.TickSeconds,
             Remaining = result.TickCount,
@@ -4361,6 +4409,10 @@ function C4SourceCombatExecutor:capability(): any
         NpcPeriodicStatusAreaLiveApplication = true,
         NpcPeriodicStatusAreaSingleShotSnapshot = true,
         NpcPeriodicStatusNonlethal = true,
+        NpcPeriodicHealthDotLiveApplication = true,
+        NpcPeriodicManaDotLiveApplication = true,
+        NpcPeriodicManaAuthorityConfigured =
+            type(self._npc_mana) == "table",
         NpcPeriodicStatusRefreshBySourceSkill = true,
         NpcDamageBypassesCombatPoints = true,
         NpcDamageCallbackPreservation = true,
