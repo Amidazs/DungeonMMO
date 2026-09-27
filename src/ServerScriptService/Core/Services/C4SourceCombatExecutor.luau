@@ -40,6 +40,9 @@ local PartyHealService = require(
 local NpcRoot = require(
     ServerScriptService.Combat.C4NpcRootService
 )
+local NpcStun = require(
+    ServerScriptService.Combat.C4NpcStunService
+)
 local ActiveSourceEffects = require(
     ServerScriptService.Core.Services.C4ActiveSourceEffectState
 )
@@ -224,6 +227,7 @@ function C4SourceCombatExecutor.new(options: any?): any
         _player_resurrection =
             config.PlayerResurrectionProvider,
         _npc_root = config.RootProvider or NpcRoot,
+        _npc_stun = config.StunProvider or NpcStun,
         _active_source_effects =
             config.ActiveSourceEffectProvider
             or ActiveSourceEffects,
@@ -1941,6 +1945,217 @@ function C4SourceCombatExecutor:can_physical_skill_npc(
     end
 
     return true, nil
+end
+
+--[[
+Executes one exact C4 TARGET_AREA PDAM skill against reviewed server NPCs.
+
+The selected NPC and same-encounter reviewed NPCs inside the source radius are
+calculated with one shared Soulshot snapshot. Each target receives independent
+shield, critical, variance, vulnerability and damage resolution.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Reviewed selected NPC.
+    creative_skill_id (string): Reviewed TARGET_AREA physical skill.
+    creative_rank (number): Server-resolved purchased rank.
+    source_radius (number): Exact source skill radius.
+    sequence_id (number?): Existing authoritative combat sequence.
+
+Returns:
+    (any?, string?): Live ordered area-damage evidence.
+]]
+function C4SourceCombatExecutor:physical_area_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    source_radius: number,
+    sequence_id: number?
+): (any?, string?)
+    local primary_boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not primary_boundary then
+        return nil, boundary_reason
+    end
+
+    local targets, boundaries, area_reason =
+        self:_collect_npc_area_targets(
+            attacker,
+            enemy,
+            primary_boundary,
+            source_radius
+        )
+    if not targets or not boundaries then
+        return nil, area_reason
+    end
+
+    local spatial_contexts = {}
+    for index, target in ipairs(targets) do
+        local spatial, spatial_reason =
+            self._spatial_context_provider(
+                self,
+                attacker,
+                target
+            )
+        if not spatial then
+            return nil, spatial_reason
+        end
+        spatial_contexts[index] = spatial
+    end
+
+    local calculated, combat_reason =
+        self._combat.physical_area_skill(
+            attacker.UserId,
+            boundaries,
+            creative_skill_id,
+            creative_rank,
+            spatial_contexts
+        )
+    if not calculated then
+        return nil, combat_reason
+    end
+    if calculated.SourceSkillRadius ~= source_radius
+        or #calculated.Results ~= #targets
+    then
+        return nil, "C4PhysicalAreaCalculationContractMismatch"
+    end
+
+    local applications = {}
+    local total_damage = 0
+    for index, target in ipairs(targets) do
+        local result = calculated.Results[index]
+        local applied, apply_reason = self:_apply_npc_damage(
+            attacker,
+            target,
+            result.Amount,
+            "PhysicalArea",
+            creative_skill_id,
+            sequence_id
+        )
+        if not applied then
+            return nil, apply_reason
+        end
+
+        total_damage += applied.HealthDamage
+        applications[index] = {
+            Target = target,
+            Calculation = result,
+            HealthDamage = applied.HealthDamage,
+            RawDamage = applied.RawDamage,
+            HealthBefore = applied.HealthBefore,
+            HealthAfter = applied.HealthAfter,
+            Lethal = applied.Lethal,
+        }
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalArea",
+        Calculation = calculated,
+        Applications = applications,
+        Applied = #applications > 0,
+        TargetCount = #applications,
+        TotalHealthDamage = total_damage,
+        SourceSkillRadius = source_radius,
+        Soulshot = calculated.Soulshot,
+    }, nil
+end
+
+--[[
+Executes one PDAM skill and then its exact C4 Stun side effect.
+
+The direct hit owns Soulshot consumption. Stun is attempted only after
+positive nonlethal HP damage and reuses that captured Soulshot state.
+
+Args:
+    attacker (any): Server-owned attacking player.
+    enemy (Model): Reviewed NPC target.
+    creative_skill_id (string): Reviewed stun-bearing physical skill.
+    creative_rank (number): Server-resolved purchased rank.
+    sequence_id (number?): Existing authoritative combat sequence.
+
+Returns:
+    (any?, string?): Combined direct-damage and Stun evidence.
+]]
+function C4SourceCombatExecutor:physical_stun_skill_npc(
+    attacker: any,
+    enemy: Model,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    local damage, damage_reason = self:physical_skill_npc(
+        attacker,
+        enemy,
+        creative_skill_id,
+        creative_rank,
+        sequence_id
+    )
+    if not damage then
+        return nil, damage_reason
+    end
+
+    if damage.HealthDamage <= 0 or damage.Lethal then
+        return {
+            Kind = "C4LiveNpcPhysicalStunSkill",
+            Applied = true,
+            Damage = damage,
+            Stun = nil,
+            StunApplied = false,
+        }, nil
+    end
+
+    local boundary, boundary_reason =
+        self:_validate_npc_target(attacker, enemy)
+    if not boundary then
+        return nil, boundary_reason
+    end
+
+    local stun, stun_reason = self._combat.stun_skill(
+        attacker.UserId,
+        boundary,
+        creative_skill_id,
+        creative_rank,
+        damage.Calculation.Soulshot == true
+    )
+    if not stun then
+        return nil, stun_reason
+    end
+
+    if stun.Landed ~= true then
+        return {
+            Kind = "C4LiveNpcPhysicalStunSkill",
+            Applied = true,
+            Damage = damage,
+            Stun = stun,
+            StunApplied = false,
+            Landed = false,
+        }, nil
+    end
+
+    if not self._npc_stun
+        or type(self._npc_stun.apply) ~= "function"
+    then
+        return nil, "C4LiveStunAuthorityUnavailable"
+    end
+
+    local applied = self._npc_stun.apply(
+        enemy,
+        stun.DurationSeconds
+    )
+    if not applied then
+        return nil, "C4LiveStunApplicationFailed"
+    end
+
+    return {
+        Kind = "C4LiveNpcPhysicalStunSkill",
+        Applied = true,
+        Damage = damage,
+        Stun = stun,
+        StunApplied = true,
+        Landed = true,
+        DurationSeconds = stun.DurationSeconds,
+    }, nil
 end
 
 --[[
@@ -3918,6 +4133,10 @@ function C4SourceCombatExecutor:capability(): any
         ClientShieldAuthority = false,
         ClientShotAuthority = false,
         PhysicalSkillPreflight = true,
+        PhysicalAreaSkillLiveApplication = true,
+        PhysicalStunSkillLiveApplication = true,
+        NpcStunAuthorityConfigured =
+            type(self._npc_stun) == "table",
         NormalAttackLiveApplication = true,
         NormalAttackAbsorbDamageLiveApplication = true,
         NormalAttackAbsorbSkipsBow = true,
