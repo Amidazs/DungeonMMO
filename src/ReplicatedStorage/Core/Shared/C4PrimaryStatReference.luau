@@ -41,6 +41,38 @@ local SOURCE_URLS = table.freeze({
 })
 
 local TEMPLATES = table.freeze({
+    DwarvenFighter = table.freeze({
+        SourceClassId = 53,
+        SourceClassName = "DWARF_FIGHTER",
+        ClassBaseLevel = 1,
+        STR = 39, DEX = 29, CON = 45,
+        INT = 20, WIT = 10, MEN = 27,
+        BasePAtk = 4, BasePDef = 80, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 33, BaseCritRate = 43,
+        BaseAccuracy = 33, BaseRunSpd = 115,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 80, HpAdd = 12.64, HpMod = 0.37,
+        MpBase = 30, MpAdd = 5.36, MpMod = 0.14,
+        CpBase = 56, CpAdd = 8.82, CpMod = 0.22,
+        ConBonus = 1.67, MenBonus = 1.31,
+    }),
+    DwarfArtisan = table.freeze({
+        SourceClassId = 56,
+        SourceClassName = "ARTISAN",
+        ClassBaseLevel = 20,
+        STR = 39, DEX = 29, CON = 45,
+        INT = 20, WIT = 10, MEN = 27,
+        BasePAtk = 4, BasePDef = 80, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 33, BaseCritRate = 43,
+        BaseAccuracy = 33, BaseRunSpd = 115,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 346, HpAdd = 32.90, HpMod = 0.37,
+        MpBase = 144, MpAdd = 9.80, MpMod = 0.14,
+        CpBase = 276.8, CpAdd = 26.30, CpMod = 0.22,
+        ConBonus = 1.67, MenBonus = 1.31,
+    }),
     OrcFighter = table.freeze({
         SourceClassId = 44,
         SourceClassName = "ORC_FIGHTER",
@@ -408,9 +440,13 @@ local STARTERS = table.freeze({
         Fighter = "OrcFighter",
         Mage = "OrcMystic",
     }),
+    Dwarf = table.freeze({
+        Fighter = "DwarvenFighter",
+    }),
 })
 
 local FIRST_TRANSFERS = table.freeze({
+    Gearwright = "DwarfArtisan",
     Ashspeaker = "OrcShaman",
     Spiritclaw = "OrcMonk",
     Warhowl = "OrcRaider",
@@ -647,6 +683,7 @@ function C4PrimaryStatReference.coverage(): any
         {"Human", "Fighter"}, {"Human", "Mage"},
         {"Elf", "Fighter"}, {"Elf", "Mage"},
         {"Orc", "Fighter"}, {"Orc", "Mage"},
+        {"Dwarf", "Fighter"},
     }
     for _, career in ipairs(FirstTransfers.all()) do
         table.insert(paths, {career.RaceId, career.Id})
