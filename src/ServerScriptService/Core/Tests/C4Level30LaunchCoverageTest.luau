@@ -241,12 +241,37 @@ local function main()
         "Dark Wizard rank schedule maps only through earned Nightweaver"
     )
 
+    local shillien_oracle =
+        assert(Coverage.for_branch("ShillienOracle"))
+    check(
+        shillien_oracle.SourceClass == "Shillien Oracle"
+            and shillien_oracle.CurrentCareerId == nil
+            and shillien_oracle.SourceInventoryAuditedThroughCap
+            and shillien_oracle.SourceRankEntriesThroughCap == 92
+            and shillien_oracle.SourceRankEntriesByLevel[20] == 26
+            and shillien_oracle.SourceRankEntriesByLevel[25] == 32
+            and shillien_oracle.SourceRankEntriesByLevel[30] == 34
+            and #shillien_oracle.SourceBrackets == 3
+            and shillien_oracle.SourceBrackets[1] == 20
+            and shillien_oracle.SourceBrackets[2] == 25
+            and shillien_oracle.SourceBrackets[3] == 30,
+        "Shillien Oracle retains exact class-42 launch source inventory"
+    )
+    check(
+        shillien_oracle.TrainerMappedRankEntries == 0
+            and shillien_oracle.MissingRankScheduleEntries == 92
+            and not shillien_oracle.SourceRankScheduleMapped
+            and shillien_oracle.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Shillien Oracle source audit must not imply a playable career"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 12,
-        "Exactly twelve first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 13,
+        "Exactly thirteen first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 12,
