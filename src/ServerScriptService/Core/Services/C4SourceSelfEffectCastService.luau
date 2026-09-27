@@ -22,6 +22,18 @@ C4SourceSelfEffectCastService.__index =
     C4SourceSelfEffectCastService
 
 local REVIEWED = table.freeze({
+    SpiritclawForceFocus = table.freeze({
+        SourceSkillId = 50,
+        Kind = "Charge",
+    }),
+    SpiritclawBearAspect = table.freeze({
+        SourceSkillId = 76,
+        Kind = "TimedBuff",
+    }),
+    SpiritclawWolfAspect = table.freeze({
+        SourceSkillId = 83,
+        Kind = "TimedBuff",
+    }),
     WarhowlWoundbind = table.freeze({
         SourceSkillId = 34,
         Kind = "BleedCure",
@@ -124,6 +136,7 @@ function C4SourceSelfEffectCastService.new(
         config.ActiveEffects or ActiveEffects
     local bleed = config.Bleed or PlayerBleed
     local resources = config.Resources or ResourceCutover
+    local charges = config.Charges
     local random_roll = config.RandomRoll
     local delay = config.Delay or task.delay
 
@@ -158,6 +171,7 @@ function C4SourceSelfEffectCastService.new(
         _active_effects = active_effects,
         _bleed = bleed,
         _resources = resources,
+        _charges = charges,
         _random_roll = random_roll,
         _delay = delay,
         _pending_by_owner = {},
@@ -510,6 +524,52 @@ Args:
 Returns:
     (any?, string?): Live self-effect evidence or denial.
 ]]
+--[[
+Adds one exact C4 Force Focus charge.
+
+Args:
+    self (any): Self-effect bridge.
+    player (any): Server-owned caster.
+    effect (any): Exact source rank definition.
+
+Returns:
+    (any?, string?): Server-owned charge evidence or strict denial.
+]]
+local function apply_charge(
+    self: any,
+    player: any,
+    effect: any
+): (any?, string?)
+    if not self._charges
+        or type(self._charges.add_one) ~= "function"
+    then
+        return nil, "C4SelfEffectChargeAuthorityUnavailable"
+    end
+
+    local maximum = effect.Sets.maxCharges
+    if type(maximum) ~= "number"
+        or maximum % 1 ~= 0
+        or maximum < 1
+    then
+        return nil, "C4SelfEffectChargeMaximumInvalid"
+    end
+
+    local charged, reason =
+        self._charges:add_one(player, maximum)
+    if not charged then
+        return nil, reason
+    end
+
+    return {
+        Kind = "C4SourceCharge",
+        Applied = true,
+        ChargeBefore = charged.ChargeBefore,
+        ChargeAfter = charged.ChargeAfter,
+        MaximumCharges = charged.MaximumCharges,
+        Added = charged.Added,
+    }, nil
+end
+
 local function execute(
     self: any,
     player: any,
@@ -522,6 +582,14 @@ local function execute(
     )
     if not effect then
         return nil, "C4SelfEffectSourceRankUnavailable"
+    end
+
+    if record.Kind == "Charge" then
+        return apply_charge(
+            self,
+            player,
+            effect
+        )
     end
 
     if record.Kind == "BleedCure" then
@@ -645,7 +713,9 @@ function C4SourceSelfEffectCastService:capability(): any
         Available = true,
         DefaultEnabled = false,
         CurrentlyEnabled = self._enabled,
-        ReviewedSkillCount = 3,
+        ReviewedSkillCount = 6,
+        SourceChargeBuilder = true,
+        SpiritclawTimedAspects = true,
         BleedNegateEffectPowerRoll = true,
         TimedSourceBuffs = true,
         BattleRoarMaxHpThenPercentHeal = true,
