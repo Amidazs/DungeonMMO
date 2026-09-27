@@ -344,6 +344,7 @@ install_direct_method(
 )
 install_direct_method("magic_undead_skill_npc", "Undead")
 install_direct_method("root_skill_npc", "Root")
+install_direct_method("fear_skill_npc", "Fear")
 
 --[[
 Executes one fake single-target periodic status.
