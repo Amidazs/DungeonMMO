@@ -1,5 +1,5 @@
 --!strict
--- Verified functional coverage for the C4 Human/Elf starting classes.
+-- Verified functional coverage for implemented C4 starting classes.
 -- A rank counts only if its server-authored effect exists at that level.
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
@@ -10,6 +10,8 @@ local Combat = require(RS.Combat.Shared.SkillDefinitions)
 local Recipes = require(Shared.ProfessionRecipes)
 local Professions = require(Shared.ProfessionDefinitions)
 local C4Crafting = require(Shared.C4ProfessionSkillRules)
+local SourceMap = require(Shared.C4CreativeSkillSourceMap)
+local SourceEffects = require(Shared.C4SkillEffectSource)
 
 local C4BaseImplementationAudit = {}
 
@@ -220,6 +222,60 @@ local function executable_ranks_at_level(
 end
 
 --[[
+Counts source-backed creative ranks at one character level.
+
+This is used for Orc Fighter because its exact C4 starter implementation
+lives in the source-effect pipeline rather than the legacy creative combat
+table used by the older Human/Elf base-class audit.
+
+Args:
+    scope_id (string): Exact source-map scope.
+    skill_id (string): Creative skill identifier.
+    level (number): Character level for the audited source bracket.
+
+Returns:
+    number: Number of creative ranks with exact source-effect definitions.
+]]
+local function source_backed_ranks_at_level(
+    scope_id: string,
+    skill_id: string,
+    level: number
+): number
+    local definition = Progression.get(skill_id)
+    local scope = SourceMap.get_scope(scope_id)
+    if not definition or not scope then
+        return 0
+    end
+
+    local source_skill_id = nil
+    local offset = 0
+    for candidate_id, candidate in pairs(scope.Candidates) do
+        if candidate.SkillId == skill_id then
+            source_skill_id = candidate_id
+            offset = candidate.Offset or 0
+            break
+        end
+    end
+    if not source_skill_id then
+        return 0
+    end
+
+    local count = 0
+    for rank = 1, definition.MaxRank do
+        if definition.RankLevels[rank] == level
+            and SourceEffects.get_rank(
+                source_skill_id,
+                rank + offset
+            ) ~= nil
+        then
+            count += 1
+        end
+    end
+
+    return count
+end
+
+--[[
 Checks source-ranked recipe literacy or real common recipe execution.
 
 The recipe-reading rank must power actual blueprint authorization; the
@@ -305,7 +361,7 @@ A category is either fully matched in the requested bracket or
 remains missing. No family is credited for a partial rank count.
 
 Args:
-    race_id (string): Human or Elf.
+    race_id (string): Implemented source race identifier.
     class_id (string): Fighter or Mage.
 
 Returns:
@@ -337,10 +393,27 @@ function C4BaseImplementationAudit.audit(
             local skill_id = mapped[family] and mapped[family][level]
             local actual = 0
             if skill_id then
-                actual = if family == "RecipeReading"
+                if family == "RecipeReading"
                     or family == "CommonItemCreation"
-                    then crafting_ranks_at_level(skill_id, level)
-                    else executable_ranks_at_level(skill_id, level)
+                then
+                    actual = crafting_ranks_at_level(
+                        skill_id,
+                        level
+                    )
+                elseif race_id == "Orc"
+                    and class_id == "Fighter"
+                then
+                    actual = source_backed_ranks_at_level(
+                        "OrcFighter",
+                        skill_id,
+                        level
+                    )
+                else
+                    actual = executable_ranks_at_level(
+                        skill_id,
+                        level
+                    )
+                end
             end
             -- A single-target heal must never satisfy three source
             -- ranks of genuine, mana-costed multi-target party healing.
