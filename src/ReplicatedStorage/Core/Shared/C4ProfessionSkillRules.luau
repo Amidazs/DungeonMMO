@@ -60,6 +60,20 @@ Returns:
 function C4ProfessionSkillRules.can_make_common(
     character: any, profession_id: string
 ): boolean
+    if not ProfessionSelectionRules.can_use(
+        character and character.ProfessionSlots,
+        profession_id
+    ) then
+        return false
+    end
+
+    local identity = character and character.Identity or {}
+    if identity.RaceId == "Orc"
+        and identity.BaseClassId == "Fighter"
+    then
+        return owns_rank(character, "OrcCommonCraft")
+    end
+
     return C4ProfessionSkillRules.can_read(character, profession_id)
         and owns_rank(character, "C4CommonItemCreation")
 end
