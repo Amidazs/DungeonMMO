@@ -266,12 +266,37 @@ local function main()
         "Shillien Oracle rank schedule maps only through earned Duskseer"
     )
 
+    local orc_raider =
+        assert(Coverage.for_branch("OrcRaider"))
+    check(
+        orc_raider.SourceClass == "Orc Raider"
+            and orc_raider.CurrentCareerId == nil
+            and orc_raider.SourceInventoryAuditedThroughCap
+            and orc_raider.SourceRankEntriesThroughCap == 63
+            and orc_raider.SourceRankEntriesByLevel[20] == 19
+            and orc_raider.SourceRankEntriesByLevel[24] == 21
+            and orc_raider.SourceRankEntriesByLevel[28] == 23
+            and #orc_raider.SourceBrackets == 3
+            and orc_raider.SourceBrackets[1] == 20
+            and orc_raider.SourceBrackets[2] == 24
+            and orc_raider.SourceBrackets[3] == 28,
+        "Orc Raider retains exact class-45 launch source inventory"
+    )
+    check(
+        orc_raider.TrainerMappedRankEntries == 0
+            and orc_raider.MissingRankScheduleEntries == 63
+            and not orc_raider.SourceRankScheduleMapped
+            and orc_raider.Status
+                == "SourceRanksAuditedClassUnimplemented",
+        "Orc Raider audit must not unlock Orc or imply a playable career"
+    )
+
     local report = Coverage.report()
     check(report.FirstTransferBranches == 18,
         "All original first-transfer branches belong in launch audit")
     check(
-        report.SourceAuditedBranches == 13,
-        "Exactly thirteen first-transfer branches have source inventories"
+        report.SourceAuditedBranches == 14,
+        "Exactly fourteen first-transfer branches have source inventories"
     )
     check(
         report.RankSchedulesMappedBranches == 13,
