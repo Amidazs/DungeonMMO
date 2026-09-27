@@ -16,6 +16,9 @@ local EXPECTED = {
         Fighter = {Raw = 43, Functional = 43, Missing = 0},
         Mage = {Raw = 42, Functional = 42, Missing = 0},
     },
+    Orc = {
+        Fighter = {Raw = 31, Functional = 31, Missing = 0},
+    },
 }
 local assertions = 0
 
@@ -35,7 +38,7 @@ local function check(condition: boolean, description: string)
 end
 
 --[[
-Checks all Human and Elf starting classes against source level families.
+Checks all implemented starting classes against source level families.
 
 Args:
     None.
@@ -89,8 +92,6 @@ local function main()
     check(Combat.get_for_rank("MysticHealingPrayer", 6).TOTAL_HEAL
         > Combat.get_for_rank("MysticHealingPrayer", 1).TOTAL_HEAL,
         "Mystic healing ranks have no actual healing progression")
-    check(Audit.audit("Orc", "Fighter") == nil,
-        "Unmapped C4 races must not claim base-class completion")
     print(("[C4 Base Coverage] PASS: %d assertions.")
         :format(assertions))
 end
