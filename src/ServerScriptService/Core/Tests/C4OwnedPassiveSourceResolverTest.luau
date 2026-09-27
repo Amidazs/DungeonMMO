@@ -543,6 +543,69 @@ local function check_warhowl_owned_passives()
 end
 
 --[[
+Checks Spiritclaw inherits Orc Fighter and Orc Monk passive source ranks.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms class-44 and class-47 passives resolve together.
+]]
+local function check_spiritclaw_owned_passives()
+    local character = original_character(
+        "Orc",
+        "Spiritclaw",
+        30
+    )
+
+    own_passive(character, "OrcToughness", 1)
+    own_passive(character, "OrcWeaponTraining", 3)
+    own_passive(character, "OrcArmorTraining", 5)
+    own_passive(character, "OrcIronBody", 1)
+
+    own_passive(character, "SpiritclawFistMastery", 4)
+    own_passive(character, "SpiritclawLightArmorTraining", 6)
+    own_passive(character, "SpiritclawAgileMovement", 1)
+
+    local result = assert(Resolver.for_character(character))
+
+    local toughness = assert(find_source_rank(result, 134))
+    local starter_weapon = assert(find_source_rank(result, 141))
+    local starter_armor = assert(find_source_rank(result, 142))
+    local iron_body = assert(find_source_rank(result, 295))
+    local fist = assert(find_source_rank(result, 210))
+    local light = assert(find_source_rank(result, 233))
+    local agile = assert(find_source_rank(result, 319))
+
+    check(
+        result.Ready
+            and result.ScopeId == "OrcMonk"
+            and #result.SourceRanks == 7
+            and #result.UnsupportedOwnedCreativePassives == 0
+            and #result.UnresolvedOwnedPassiveRanks == 0,
+        "all owned Spiritclaw source-stat passives resolve without gaps"
+    )
+    check(
+        toughness.Rank == 1
+            and starter_weapon.Rank == 3
+            and starter_armor.Rank == 5
+            and iron_body.Rank == 1,
+        "Spiritclaw inherits exact class-44 passive source ranks"
+    )
+    check(
+        fist.Rank == 4
+            and fist.CreativeSkillId == "SpiritclawFistMastery"
+            and light.Rank == 6
+            and light.CreativeSkillId
+                == "SpiritclawLightArmorTraining"
+            and agile.Rank == 1
+            and agile.CreativeSkillId
+                == "SpiritclawAgileMovement",
+        "Spiritclaw preserves exact class-47 passive source ranks"
+    )
+end
+
+--[[
 Checks Lifebinder owned passives resolve exact Elven Oracle source ranks.
 
 Args:
@@ -634,6 +697,7 @@ local function main()
     check_nightweaver_owned_passives()
     check_duskseer_owned_passives()
     check_warhowl_owned_passives()
+    check_spiritclaw_owned_passives()
     check_elven_oracle_owned_passives()
     check_fail_closed_owned_state()
 
