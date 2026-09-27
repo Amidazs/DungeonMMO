@@ -1,36 +1,29 @@
-## 27 September 2026 — v3.15 Veilblade night handoff
+## 27 September 2026 — v3.15 Veilblade accepted GREEN
 
 [Roadmap](
 ../roadmap/DungeonMMO_Roadmap_v3_15_Dark_Elf_Assassin_Veilblade_Checkpoint_20260927.md);
-[checkpoint evidence](
+[green evidence](
 ../testing/c4-dark-elf-assassin-veilblade-v3-15-checkpoint-20260927.md).
 
-Resume from the Veilblade checkpoint. Source class 35 is represented by
-Veilblade at **72/72 rank rows**, **23 families**, zero creative gaps. Six
-Assassin-specific active families use the dedicated source cast bridge, while
-shared Scout/Wayfinder systems cover the common source families. Exact Assassin
-primary stats and source DEX/blow inputs are present.
+Dark Elf Assassin / Veilblade is accepted green through level 30:
+**72/72 source rank rows**, **23 creative families**, zero source-map gaps,
+exact class-35 stats, **29/29 focused Studio suites** and a genuine unpublished
+Play rehearsal with **0 project CreatorErrors**.
 
-Tonight's first Studio pass exposed four concrete failures and those causes were
-fixed. Static validation is clean. Do **not** call the class green yet: the
-post-fix 28-suite rerun and live Play rehearsal were blocked by StudioMCP
-connection instability.
+The final acceptance closed the previously missing live C4 dagger/blow path.
+Mortal Blow / Wayfinder Cut now uses the pinned C4 BLOW success rule with
+server-owned position + raw DEX + BLOW_RATE, its separate blow-damage formula,
+and real miss semantics. The accepted live rear-position attempt used DEX 34,
+resolved a 79.8% source chance and dealt 870.1875 damage.
 
-Tomorrow's sequence:
-1. `git pull --ff-only`;
-2. fresh Base + Dungeon build;
-3. restart StudioMCP and Studio;
-4. run
-   `scripts/studio/c4_dark_elf_assassin_backend_focus.luau`
-   (**28 suites**);
-5. fix remaining project failures only;
-6. run unpublished Veilblade Play proof for drain, poison, physical status,
-   shared dagger/blow and one toggle/passive path;
-7. scan final project CreatorErrors;
-8. record green evidence and advance roadmap.
+Play also proved Scout Fleet Foot, Defense Aura, Umbral Siphon, Venom Hex and
+Crimson Sting through the live authorities. Permanent edits remain GitHub-only;
+Desktop Commander remains for local pull/build/Studio/Play validation.
 
-Permanent source/document edits remain GitHub-only. Desktop Commander is for
-local build, Studio and Play validation.
+Next backend work can advance to the next still-unimplemented original C4
+first-transfer career in source/roadmap order. Preserve the same gate:
+exact catalogue -> creative mapping -> source mechanics -> focused Studio ->
+unpublished Play -> documentation.
 
 ## 27 September 2026 — v3.14 Duskguard accepted; move to Assassin
 
