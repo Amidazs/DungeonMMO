@@ -571,6 +571,45 @@ function FakeExecutor:elemental_vulnerability_skill_npc(
 end
 
 --[[
+Provides the new poison-vulnerability executor contract.
+
+Args:
+    subject (any): Expected cast owner.
+    target (any): Expected selected NPC.
+    creative_skill_id (string): Reviewed skill identifier.
+    creative_rank (number): Server-owned purchased rank.
+    sequence_id (number?): Existing trusted combat sequence.
+
+Returns:
+    (any?, string?): Fake poison-vulnerability result.
+]]
+function FakeExecutor:poison_vulnerability_skill_npc(
+    subject: any,
+    target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    sequence_id: number?
+): (any?, string?)
+    executor_state.LastEnemy = target
+    executor_state.LastRank = creative_rank
+    executor_state.LastSequence = sequence_id
+
+    assert(subject == player)
+    assert(target == enemy)
+
+    return {
+        Kind = "C4LiveNpcPoisonVulnerability",
+        Applied = true,
+        VulnerabilityApplied = true,
+        Landed = true,
+        VulnerabilityStat = "POISON_VULN",
+        VulnerabilityMultiplier = 1.25,
+        DurationSeconds = 15,
+        CreativeSkillId = creative_skill_id,
+    }, nil
+end
+
+--[[
 Applies one disposable source physical-attack weakening result.
 
 Args:
