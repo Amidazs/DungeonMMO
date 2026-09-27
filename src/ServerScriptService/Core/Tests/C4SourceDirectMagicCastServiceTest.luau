@@ -433,6 +433,22 @@ function FakeExecutor:root_skill_npc(
     )
 end
 
+function FakeExecutor:fear_skill_npc(
+    attacker: any,
+    enemy: any,
+    skill_id: string,
+    rank: number,
+    sequence_id: number?
+): (any?, string?)
+    return self:sleep_skill_npc(
+        attacker,
+        enemy,
+        skill_id,
+        rank,
+        sequence_id
+    )
+end
+
 --[[
 Applies one disposable direct MDAM plus movement-slow result.
 
@@ -1567,9 +1583,11 @@ local function main()
             and capability.ReviewedUndeadOnlyMagic
             and capability.ReviewedRootControl
             and capability.ReviewedRootMovementOnly
+            and capability.ReviewedFearControl
+            and capability.ReviewedFearMovementCadence
             and capability.ReviewedConfusionControl
-            and capability.ReviewedSkillCount == 41
-            and #capability.ReviewedSkills == 41
+            and capability.ReviewedSkillCount == 43
+            and #capability.ReviewedSkills == 43
             and capability.TargetBoundAtCastStart
             and capability.SourceCastRangeAtStart
             and capability.SourceEffectRangeAtLaunch
