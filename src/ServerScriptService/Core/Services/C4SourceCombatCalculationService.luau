@@ -1563,7 +1563,8 @@ function C4SourceCombatCalculationService.physical_skill(
     creative_skill_id: string,
     creative_rank: number,
     spatial_context: any?,
-    supplied_shot: any?
+    supplied_shot: any?,
+    allow_charged: boolean?
 ): (any?, string?)
     if not feature_enabled then
         return nil, "C4SourceCombatCalculationDisabled"
@@ -1598,7 +1599,15 @@ function C4SourceCombatCalculationService.physical_skill(
 
     local skill_type = effect.Sets.skillType
     local is_blow = skill_type == "BLOW"
-    if (skill_type ~= "PDAM" and not is_blow)
+    local is_charged = skill_type == "CHARGEDAM"
+    local charged_allowed =
+        is_charged and allow_charged == true
+
+    if (
+        skill_type ~= "PDAM"
+        and not is_blow
+        and not charged_allowed
+    )
         or type(effect.Sets.power) ~= "number"
     then
         return nil, "UnsupportedOriginalPhysicalSkillType"
@@ -1815,7 +1824,11 @@ function C4SourceCombatCalculationService.physical_skill(
     end
 
     return {
-        Kind = if is_blow then "BlowDamage" else "PhysicalDamage",
+        Kind = if is_blow
+            then "BlowDamage"
+            elseif is_charged
+            then "ChargedPhysicalDamage"
+            else "PhysicalDamage",
         Amount = amount,
         Blow = is_blow,
         BlowLanded = if blow then blow.Landed else nil,
@@ -1870,6 +1883,180 @@ function C4SourceCombatCalculationService.physical_skill(
         LiveApplied = false,
     }, nil
 end
+--[[
+Calculates one exact C4 charged physical skill after source charge spend.
+
+The pinned SkillChargeDmg handler removes num_charges before calculating its
+extra damage multiplier. The multiplier therefore uses the remaining charge
+count, matching the original implementation order.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_target (any): Reviewed source target boundary.
+    creative_skill_id (string): Server-selected charged skill.
+    creative_rank (number): Server-resolved purchased rank.
+    remaining_charges (number): Server-owned charges after source spend.
+    spatial_context (any?): Server-owned shield/spatial context.
+
+Returns:
+    (any?, string?): Charged physical result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.charged_physical_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number,
+    remaining_charges: number,
+    spatial_context: any?
+): (any?, string?)
+    if type(remaining_charges) ~= "number"
+        or remaining_charges % 1 ~= 0
+        or remaining_charges < 0
+    then
+        return nil, "InvalidOriginalRemainingChargeCount"
+    end
+
+    local source, effect, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source or not effect then
+        return nil, source_reason
+    end
+
+    local required = effect.Sets.num_charges
+    if effect.Sets.skillType ~= "CHARGEDAM"
+        or type(required) ~= "number"
+        or required % 1 ~= 0
+        or required < 1
+    then
+        return nil, "UnsupportedOriginalChargedPhysicalSkill"
+    end
+
+    local base, base_reason =
+        C4SourceCombatCalculationService.physical_skill(
+            attacker_user_id,
+            defender_target,
+            creative_skill_id,
+            creative_rank,
+            spatial_context,
+            nil,
+            true
+        )
+    if not base then
+        return nil, base_reason
+    end
+
+    local multiplier = 0.8 + (0.201 * remaining_charges)
+    local result = table.clone(base)
+    result.Kind = "ChargedPhysicalDamage"
+    result.Amount = base.Amount * multiplier
+    result.RequiredCharges = required
+    result.RemainingCharges = remaining_charges
+    result.SourceChargeDamageMultiplier = multiplier
+
+    return result, nil
+end
+
+--[[
+Resolves one non-magical WIT-resisted C4 movement slow.
+
+Orc Monk Cripple deals no direct damage and consumes no magical shot. It uses
+the same source hostile-effect success formula as other reviewed debuffs.
+
+Args:
+    attacker_user_id (number): Authenticated source-ready attacker.
+    defender_target (any): Reviewed source target boundary.
+    creative_skill_id (string): Server-selected Cripple skill.
+    creative_rank (number): Server-resolved purchased rank.
+
+Returns:
+    (any?, string?): Source movement-slow land result or strict denial reason.
+]]
+function C4SourceCombatCalculationService.physical_slow_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    if not feature_enabled then
+        return nil, "C4SourceCombatCalculationDisabled"
+    end
+
+    local attacker, attacker_reason =
+        source_boundary(attacker_user_id)
+    if not attacker then
+        return nil, attacker_reason
+    end
+
+    local defender, target_kind, defender_reason =
+        source_target_boundary(defender_target)
+    if not defender or not target_kind then
+        return nil, defender_reason
+    end
+
+    local source, _, source_reason = source_skill(
+        attacker_user_id,
+        creative_skill_id,
+        creative_rank
+    )
+    if not source then
+        return nil, source_reason
+    end
+
+    local plan, plan_reason = StatusEffects.movement_slow_plan(
+        source.SkillId,
+        source.Rank
+    )
+    if not plan then
+        return nil, plan_reason
+    end
+    if plan.IsMagic then
+        return nil, "OriginalPhysicalSlowMarkedMagic"
+    end
+
+    local target_wit_bonus = defender.SourceWitBonus
+    if type(target_wit_bonus) ~= "number"
+        or target_wit_bonus <= 0
+    then
+        return nil, "OriginalMovementSlowWitBonusUnavailable"
+    end
+
+    local roll = COMBAT_RANDOM:NextInteger(0, 99)
+    local resolved, resolve_reason =
+        StatusEffects.resolve_effect_success({
+            Power = plan.EffectPower,
+            TargetStatBonus = target_wit_bonus,
+            TargetVulnerability = 1,
+            IsMagic = false,
+            AttackerLevel = attacker.Level,
+            TargetLevel = defender.Level,
+            MagicLevel = plan.MagicLevel,
+        }, roll)
+    if not resolved then
+        return nil, resolve_reason
+    end
+
+    return {
+        Kind = "PhysicalMovementSlow",
+        SlowLanded = resolved.Landed,
+        SlowRate = resolved.Rate,
+        SlowRoll = resolved.Roll,
+        SpeedMultiplier = plan.SpeedMultiplier,
+        SlowFraction = plan.SlowFraction,
+        DurationSeconds = plan.DurationSeconds,
+        SaveVs = plan.SaveVs,
+        EffectPower = plan.EffectPower,
+        SourceSkillId = source.SkillId,
+        SourceRank = source.Rank,
+        TargetKind = target_kind,
+        SourceNpcId = defender.SourceNpcId,
+        SourceOnly = true,
+        LiveApplied = false,
+    }, nil
+end
+
 --[[
 Calculates one exact C4 TARGET_AREA PDAM cast.
 
