@@ -57,6 +57,22 @@ local TEMPLATES = table.freeze({
         CpBase = 56, CpAdd = 8.82, CpMod = 0.22,
         ConBonus = 1.67, MenBonus = 1.31,
     }),
+    DwarfScavenger = table.freeze({
+        SourceClassId = 54,
+        SourceClassName = "SCAVENGER",
+        ClassBaseLevel = 20,
+        STR = 39, DEX = 29, CON = 45,
+        INT = 20, WIT = 10, MEN = 27,
+        BasePAtk = 4, BasePDef = 80, BasePAtkSpd = 300,
+        BaseMAtk = 6, BaseMDef = 41, BaseMAtkSpd = 333,
+        BaseEvasion = 33, BaseCritRate = 43,
+        BaseAccuracy = 33, BaseRunSpd = 115,
+        BaseHpRegen = 1.5, BaseMpRegen = 0.9,
+        HpBase = 346, HpAdd = 35.10, HpMod = 0.37,
+        MpBase = 144, MpAdd = 9.80, MpMod = 0.14,
+        CpBase = 242.2, CpAdd = 24.54, CpMod = 0.22,
+        ConBonus = 1.67, MenBonus = 1.31,
+    }),
     DwarfArtisan = table.freeze({
         SourceClassId = 56,
         SourceClassName = "ARTISAN",
@@ -446,6 +462,7 @@ local STARTERS = table.freeze({
 })
 
 local FIRST_TRANSFERS = table.freeze({
+    Deepclaimer = "DwarfScavenger",
     Gearwright = "DwarfArtisan",
     Ashspeaker = "OrcShaman",
     Spiritclaw = "OrcMonk",
