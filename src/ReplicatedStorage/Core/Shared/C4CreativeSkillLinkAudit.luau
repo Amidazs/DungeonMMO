@@ -16,6 +16,7 @@ local Audit = {}
 local CAREERS = table.freeze({
     HumanFighter = "Fighter", ElvenFighter = "Fighter",
     OrcFighter = "Fighter",
+    OrcRaider = "Warhowl",
     HumanMystic = "Mage", ElvenMystic = "Mage",
     HumanWizard = "Emberweaver",
     HumanCleric = "Dawnkeeper",
