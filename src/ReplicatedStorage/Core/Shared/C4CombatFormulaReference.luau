@@ -750,6 +750,82 @@ function C4CombatFormulaReference.resolve_blow(
 end
 
 --[[
+Returns Chronicle 4's damage-based cast interruption chance.
+
+The reviewed calcAtkBreak branch starts at 15 while the target is casting,
+adds sqrt(13 * damage), subtracts the target MEN bonus above 1.0, then applies
+ATTACK_CANCEL_RATE calculator modifiers. The final chance is clamped to 1..99.
+
+Args:
+    damage (number): Positive damage that reached player resources.
+    men_bonus (number): Authenticated source MEN bonus multiplier.
+    attack_cancel_rate_offset (number): Final signed source modifier offset.
+
+Returns:
+    number: Final source interruption chance in percent.
+]]
+function C4CombatFormulaReference.attack_cancel_rate(
+    damage: number,
+    men_bonus: number,
+    attack_cancel_rate_offset: number
+): number
+    positive(damage, "Attack interruption damage")
+    positive(men_bonus, "MEN bonus")
+    assert(
+        type(attack_cancel_rate_offset) == "number"
+            and attack_cancel_rate_offset
+                == attack_cancel_rate_offset
+            and math.abs(attack_cancel_rate_offset) < math.huge,
+        "ATTACK_CANCEL_RATE offset must be finite"
+    )
+
+    local rate = 15 + math.sqrt(13 * damage)
+    rate -= (men_bonus * 100) - 100
+    rate += attack_cancel_rate_offset
+
+    return math.clamp(rate, 1, 99)
+end
+
+--[[
+Resolves one exact Chronicle 4 cast interruption roll.
+
+Args:
+    damage (number): Positive damage that reached player resources.
+    men_bonus (number): Authenticated source MEN bonus multiplier.
+    attack_cancel_rate_offset (number): Signed source calculator offset.
+    roll (number): Server-owned integer roll from 0 through 99.
+
+Returns:
+    any: Final chance, roll and interruption result.
+]]
+function C4CombatFormulaReference.resolve_attack_cancel(
+    damage: number,
+    men_bonus: number,
+    attack_cancel_rate_offset: number,
+    roll: number
+): any
+    assert(
+        type(roll) == "number"
+            and roll % 1 == 0
+            and roll >= 0
+            and roll <= 99,
+        "Attack interruption roll must be an integer from 0 through 99"
+    )
+
+    local rate = C4CombatFormulaReference.attack_cancel_rate(
+        damage,
+        men_bonus,
+        attack_cancel_rate_offset
+    )
+
+    return {
+        RatePercent = rate,
+        Roll = roll,
+        Interrupted = roll < rate,
+    }
+end
+
+--[[
 Returns the C4 pre-random magic success threshold.
 
 The source computes round(pow(1.3, levelDifference) * 100), where
