@@ -103,6 +103,10 @@ local function check_all_templates()
         STR = 41, DEX = 34, CON = 32,
         INT = 25, WIT = 12, MEN = 26,
     }
+    local dark_elf_mage = {
+        STR = 23, DEX = 23, CON = 24,
+        INT = 44, WIT = 19, MEN = 37,
+    }
     check_template("Human", "Fighter", 0, 1, human)
     check_template("Human", "Mage", 10, 1, human_mage)
     check_template("Elf", "Fighter", 18, 1, elf)
@@ -118,6 +122,7 @@ local function check_all_templates()
     check_template("Elf", "GreenwardScout", 22, 20, elf)
     check_template("DarkElf", "Duskguard", 32, 20, dark_elf)
     check_template("DarkElf", "Veilblade", 35, 20, dark_elf)
+    check_template("DarkElf", "Nightweaver", 39, 20, dark_elf_mage)
 end
 
 --[[
@@ -242,6 +247,11 @@ local function check_growth_vectors()
         RawHP = 831.459, RawMP = 325.91,
         RawCP = 337.098,
     })
+    check_vitals("DarkElf", "Nightweaver", 30, {
+        HP = 672, MP = 482, CP = 338,
+        RawHP = 672.615, RawMP = 482.415,
+        RawCP = 338.49,
+    })
 end
 
 --[[
@@ -255,12 +265,12 @@ Returns:
 ]]
 local function check_scope_boundaries()
     local coverage = Source.coverage()
-    check(coverage.PathCount == 15
-        and coverage.VerifiedPrimaryStatTemplates == 15
-        and coverage.VerifiedLevelGrowthTemplates == 15
+    check(coverage.PathCount == 16
+        and coverage.VerifiedPrimaryStatTemplates == 16
+        and coverage.VerifiedLevelGrowthTemplates == 16
         and coverage.VerifiedLevelCap == 30
         and not coverage.LiveCombatIntegrated,
-        "Fifteen exact templates do not imply live combat migration")
+        "Sixteen exact templates do not imply live combat migration")
     check(Source.get("Human", "Ranger") == nil
         and Source.get("Elf", "Rogue") == nil
         and Source.get("Elf", "Oathguard") == nil,
