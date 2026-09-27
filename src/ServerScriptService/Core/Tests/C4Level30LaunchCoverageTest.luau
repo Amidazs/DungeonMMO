@@ -295,7 +295,7 @@ local function main()
         assert(Coverage.for_branch("OrcMonk"))
     check(
         orc_monk.SourceClass == "Orc Monk"
-            and orc_monk.CurrentCareerId == nil
+            and orc_monk.CurrentCareerId == "Spiritclaw"
             and orc_monk.SourceInventoryAuditedThroughCap
             and orc_monk.SourceRankEntriesThroughCap == 41
             and orc_monk.SourceRankEntriesByLevel[20] == 12
@@ -312,8 +312,8 @@ local function main()
             and orc_monk.MissingRankScheduleEntries == 41
             and not orc_monk.SourceRankScheduleMapped
             and orc_monk.Status
-                == "SourceRanksAuditedClassUnimplemented",
-        "Orc Monk audit must not imply a playable career"
+                == "SkillRankParityOutstanding",
+        "Spiritclaw foundation must still fail closed on all 41 rank rows"
     )
 
     local report = Coverage.report()
