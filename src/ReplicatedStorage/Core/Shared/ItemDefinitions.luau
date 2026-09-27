@@ -9,8 +9,27 @@ local FIGHTER_RANGER = table.freeze({"Fighter", "Ranger"})
 local RANGER_ROGUE = table.freeze({"Ranger", "Rogue"})
 local ALL_CLASSES = table.freeze({"Fighter", "Mage", "Ranger", "Rogue"})
 local ELF = table.freeze({"Elf"})
+local ORC = table.freeze({"Orc"})
 
 local DEFINITIONS = table.freeze({
+    -- Backend-only Orc starter fist matching C4 source item 248.
+    -- Final art/animations remain creature/equipment-content work.
+    orc_training_fist = table.freeze({
+        Id = "orc_training_fist",
+        Name = "Orc Training Fist",
+        Kind = "Equipment",
+        Slot = "Weapon",
+        Category = "Fist",
+        AllowedRaces = ORC,
+        AllowedBaseClasses = FIGHTER,
+        Rarity = "Basic",
+        Stackable = false,
+        WeaponTags = table.freeze({"Fist"}),
+        CombatModifiers = table.freeze({
+            PhysicalDamageBonus = 0,
+        }),
+    }),
+
     marauder_sword = table.freeze({
         Id = "marauder_sword",
         Name = "Marauder Sword",
