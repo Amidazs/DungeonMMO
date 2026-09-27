@@ -262,6 +262,11 @@ local ALLOWED_DIRECT_MDAM = table.freeze({
         SourceRadius = 200,
         ExecutionKind = "RootAuraControl",
     }),
+    AshspeakerChaosSeal = table.freeze({
+        SourceSkillId = 1096,
+        SourceRadius = 200,
+        ExecutionKind = "AccuracyAuraControl",
+    }),
 })
 
 local REVIEWED_SKILLS = table.freeze({
@@ -309,6 +314,7 @@ local REVIEWED_SKILLS = table.freeze({
     "AshspeakerFear",
     "AshspeakerMadness",
     "AshspeakerBindingSeal",
+    "AshspeakerChaosSeal",
 })
 
 --[[
@@ -427,6 +433,9 @@ function C4SourceDirectMagicCastService.new(
             ) == "function"
             and type(executor.root_skill_npc) == "function"
             and type(executor.root_aura_skill_npc) == "function"
+            and type(
+                executor.accuracy_aura_skill_npc
+            ) == "function"
             and type(executor.fear_skill_npc) == "function"
             and type(executor.confusion_skill_npc) == "function",
         "Direct magic bridge requires source combat executor"
@@ -548,7 +557,9 @@ function C4SourceDirectMagicCastService:begin_cast(
 
     local target_ready
     local target_reason
-    if review.ExecutionKind == "RootAuraControl" then
+    if review.ExecutionKind == "RootAuraControl"
+        or review.ExecutionKind == "AccuracyAuraControl"
+    then
         target_ready, target_reason =
             self._executor:can_aura_skill_npc(
                 player,
@@ -633,7 +644,9 @@ local function revalidate_target(
     player: any,
     record: any
 ): (boolean, string?)
-    if record.ExecutionKind == "RootAuraControl" then
+    if record.ExecutionKind == "RootAuraControl"
+        or record.ExecutionKind == "AccuracyAuraControl"
+    then
         return self._executor:can_aura_skill_npc(
             player,
             record.SourceRadius
@@ -832,6 +845,15 @@ local function execute_launch(
                 review.SourceRadius,
                 sequence_id
             )
+    elseif review.ExecutionKind == "AccuracyAuraControl" then
+        applied, reason =
+            self._executor:accuracy_aura_skill_npc(
+                player,
+                launch.CreativeSkillId,
+                launch.CreativeRank,
+                review.SourceRadius,
+                sequence_id
+            )
     elseif review.ExecutionKind == "PhysicalAttackRateWeakening" then
         applied, reason =
             self._executor:physical_attack_rate_weakening_skill_npc(
@@ -1013,6 +1035,8 @@ function C4SourceDirectMagicCastService:capability(): any
         ReviewedRootControl = true,
         ReviewedRootMovementOnly = true,
         ReviewedRootAuraControl = true,
+        ReviewedAccuracyAuraControl = true,
+        ReviewedAccuracyAuraFeedsNpcNormalHits = true,
         ReviewedCasterAuraServerTargeting = true,
         ReviewedFearControl = true,
         ReviewedFearMovementCadence = true,
