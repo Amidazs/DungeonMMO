@@ -10,6 +10,13 @@ local SOURCE_ROOT = "https://github.com/Neco-spain/"
 local SOURCE_DATA = SOURCE_ROOT .. "/L2jAdmins_Data/"
 local ITEM_REFERENCES = table.freeze({
     -- SQL bodypart/weaponType and XML stat operations are both pinned.
+    [248] = table.freeze({
+        Id = 248, Slot = "Weapon", Kind = "Fist",
+        SoulShotCount = 0, SpiritShotCount = 0,
+        PhysicalAttack = 0, MagicalAttack = 0,
+        RandomDamage = 5,
+        PhysicalCriticalRate = 4, Accuracy = 4, AttackSpeed = 325,
+    }),
     [1] = table.freeze({
         Id = 1, Slot = "Weapon", Kind = "Sword",
         SoulShotCount = 1, SpiritShotCount = 1,
