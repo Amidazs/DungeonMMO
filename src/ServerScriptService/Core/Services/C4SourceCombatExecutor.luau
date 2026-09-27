@@ -3625,6 +3625,66 @@ Args:
 Returns:
     (any?, string?): Live NPC ordinary-attack evidence or denial reason.
 ]]
+--[[
+Applies exact C4 Vampiric Rage healing after one ordinary melee hit.
+
+The pinned source starts ABSORB_DAMAGE_PERCENT at zero, skips bows and
+truncates percentage healing to an integer before MaxHealth clamping.
+
+Args:
+    attacker (any): Server-owned player who landed the normal attack.
+    calculated (any): Source normal-attack calculation evidence.
+    applied_damage (number): Actual NPC HP removed by the accepted hit.
+
+Returns:
+    (any?, string?): Absorption evidence or strict heal-authority reason.
+]]
+function C4SourceCombatExecutor:_apply_normal_attack_absorb(
+    attacker: any,
+    calculated: any,
+    applied_damage: number
+): (any?, string?)
+    local percent = tonumber(calculated.AbsorbDamagePercent) or 0
+
+    if calculated.AbsorbDamageEligible ~= true
+        or percent <= 0
+        or applied_damage <= 0
+    then
+        return {
+            RequestedHeal = 0,
+            EffectiveHeal = 0,
+            AbsorbDamagePercent = math.max(percent, 0),
+        }, nil
+    end
+
+    local requested_heal = math.floor(
+        applied_damage * percent / 100
+    )
+    if requested_heal <= 0 then
+        return {
+            RequestedHeal = 0,
+            EffectiveHeal = 0,
+            AbsorbDamagePercent = percent,
+        }, nil
+    end
+
+    local healed, heal_reason = self:_apply_player_heal(
+        attacker,
+        requested_heal
+    )
+    if not healed then
+        return nil, heal_reason
+    end
+
+    return {
+        RequestedHeal = requested_heal,
+        EffectiveHeal = healed.EffectiveHeal,
+        CasterHealthBefore = healed.HealthBefore,
+        CasterHealthAfter = healed.HealthAfter,
+        AbsorbDamagePercent = percent,
+    }, nil
+end
+
 function C4SourceCombatExecutor:normal_attack_npc(
     attacker: any,
     enemy: Model,
@@ -3680,6 +3740,16 @@ function C4SourceCombatExecutor:normal_attack_npc(
         return nil, apply_reason
     end
 
+    local absorbed, absorb_reason =
+        self:_apply_normal_attack_absorb(
+            attacker,
+            calculated,
+            applied.HealthDamage
+        )
+    if not absorbed then
+        return nil, absorb_reason
+    end
+
     return {
         Kind = "C4LiveNpcNormalAttack",
         Hit = true,
@@ -3692,6 +3762,11 @@ function C4SourceCombatExecutor:normal_attack_npc(
         HealthBefore = applied.HealthBefore,
         HealthAfter = applied.HealthAfter,
         Lethal = applied.Lethal,
+        AbsorbDamagePercent = absorbed.AbsorbDamagePercent,
+        RequestedAbsorbHeal = absorbed.RequestedHeal,
+        EffectiveAbsorbHeal = absorbed.EffectiveHeal,
+        CasterHealthBefore = absorbed.CasterHealthBefore,
+        CasterHealthAfter = absorbed.CasterHealthAfter,
     }, nil
 end
 
