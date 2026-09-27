@@ -36,6 +36,12 @@ local C4NpcElementalVulnerabilityService = require(
         "C4NpcElementalVulnerabilityService"
     )
 )
+local C4NpcAccuracyDebuffService = require(
+    Combat:WaitForChild("C4NpcAccuracyDebuffService")
+)
+local C4EnemyHitRules = require(
+    Combat:WaitForChild("C4EnemyHitRules")
+)
 local RangerSlowService = require(Combat:WaitForChild("RangerSlowService"))
 local PresentationService = require(Combat:WaitForChild("MarauderPresentationService"))
 local Factory = require(Dungeon:WaitForChild("MarauderCaptainFactory"))
@@ -197,6 +203,16 @@ local function resolve_hit(runtime: Runtime, player: Player, character: Model, a
         if forward.Magnitude <= 0.01 or planar.Magnitude <= 0.01 then return end
         local angle = math.deg(math.acos(math.clamp(forward.Unit:Dot(planar.Unit), -1, 1)))
         if angle > definition.ATTACK_ARC_DEGREES / 2 then return end
+    end
+
+    if definition.RADIAL ~= true then
+        local hit = C4EnemyHitRules.resolve_normal_attack(
+            runtime.model,
+            player
+        )
+        if hit.Miss == true then
+            return
+        end
     end
 
     local defense = DefenseService.resolve({
@@ -373,6 +389,7 @@ local function attach(model: Instance)
         C4NpcRootService.clear(model)
         C4NpcFearService.clear(model)
         C4NpcElementalVulnerabilityService.clear_all(model)
+        C4NpcAccuracyDebuffService.clear(model)
         EnemyWeakeningService.clear(model)
         runtime.attackSequence += 1
         runtime.attacking = false
