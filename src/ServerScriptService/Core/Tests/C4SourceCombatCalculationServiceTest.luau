@@ -605,7 +605,7 @@ Returns:
 ]]
 local function check_physical_random_variance()
     local result = assert(Combat.physical_random_variance(
-        FIGHTER_ID
+        MAGE_ID
     ))
 
     check(
