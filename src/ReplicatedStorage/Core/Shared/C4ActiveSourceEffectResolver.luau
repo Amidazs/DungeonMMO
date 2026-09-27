@@ -64,6 +64,8 @@ local function source_scopes(
         race_prefix = "Elven"
     elseif identity.RaceId == "Orc" then
         race_prefix = "Orc"
+    elseif identity.RaceId == "Dwarf" then
+        race_prefix = "Dwarven"
     end
 
     if not race_prefix then
