@@ -300,7 +300,7 @@ function C4SourceCastTimingService:resolve(
     if not boundary then
         return nil, boundary_reason
     end
-    if boundary.ScopeId ~= contract.SourceScopeId then
+    if boundary.ScopeId ~= contract.AuthenticatedScopeId then
         return nil, "OriginalCastSourceScopeMismatch"
     end
 
@@ -331,6 +331,7 @@ function C4SourceCastTimingService:resolve(
     return table.freeze({
         CreativeSkillId = creative_skill_id,
         CreativeRank = contract.CreativeRank,
+        AuthenticatedScopeId = contract.AuthenticatedScopeId,
         SourceScopeId = contract.SourceScopeId,
         SourceSkillId = contract.SourceSkillId,
         SourceRank = contract.SourceRank,
