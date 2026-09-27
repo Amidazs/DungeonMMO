@@ -209,6 +209,23 @@ function C4SourcePhysicalCastService:begin_cast(
         return nil, "C4PhysicalSkillNotReviewed"
     end
 
+    if review.RequiredCharges ~= nil then
+        if not self._charges
+            or type(self._charges.get) ~= "function"
+        then
+            return nil, "C4PhysicalChargeAuthorityUnavailable"
+        end
+
+        local charge_count, charge_reason =
+            self._charges:get(player)
+        if charge_count == nil then
+            return nil, charge_reason
+        end
+        if charge_count < review.RequiredCharges then
+            return nil, "C4SourceChargeInsufficient"
+        end
+    end
+
     local ready, ready_reason = preflight(
         self,
         player,
