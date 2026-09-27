@@ -437,6 +437,14 @@ function Rules.advance(quest: any, current: any, event: any): any
             elseif step.TargetId == "WandererTorai" then
                 current.Proofs.WandererProofToken = true
             end
+        elseif quest.BranchId == "DwarfArtisan" then
+            if step.TargetId == "TunnelGnawer" then
+                current.Proofs.ForgeTestTeeth10 = true
+            elseif step.TargetId == "TunnelGnawerChief" then
+                current.Proofs.ForgeChiefTeeth2 = true
+            elseif step.TargetId == "AshclanForgeThief" then
+                current.Proofs.StolenComponentChest = true
+            end
         end
         current.Step += 1
         current.Count = 0
