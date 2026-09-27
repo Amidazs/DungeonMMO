@@ -113,6 +113,9 @@ local function source_stats(
         PHYSICAL_CRITICAL_POWER = 1,
         PHYSICAL_CRITICAL_POWER_ADD = 0,
         BLOW_RATE = 1,
+        -- Dynamic calcAtkBreak starts from its damage/MEN rate.
+        -- Active source funcs contribute a signed offset to that rate.
+        ATTACK_CANCEL_RATE = 0,
         FIRE_VULN = 1,
         WIND_VULN = 1,
         WATER_VULN = 1,
