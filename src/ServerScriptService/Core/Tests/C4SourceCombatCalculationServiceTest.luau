@@ -347,6 +347,11 @@ local function seed_characters()
         "NightweaverVenomRend",
         2
     )
+    own_skill(
+        nightweaver,
+        "NightweaverConcentration",
+        2
+    )
     Runtime.set_character(NIGHTWEAVER_ID, nightweaver)
 
     Runtime.set_character(
@@ -1370,6 +1375,46 @@ local function check_nightweaver_venom_rend()
 end
 
 --[[
+Checks Nightweaver Concentration preserves its active C4 buff semantics.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms source rank, duration, modifier and one magic shot.
+]]
+local function check_nightweaver_concentration()
+    shot_state.Spiritshot = true
+    shot_state.BlessedSpiritshot = false
+
+    local result = assert(Combat.support_buff_skill(
+        NIGHTWEAVER_ID,
+        "NightweaverConcentration",
+        2
+    ))
+    local modifier = assert(result.Modifiers[1])
+
+    check(
+        result.Kind == "SupportBuff"
+            and result.SourceSkillId == 1078
+            and result.SourceRank == 2
+            and result.DurationSeconds == 1200
+            and result.StackType == "Concentration"
+            and result.StackOrder == 25
+            and modifier.Operation == "sub"
+            and modifier.stat == "ATTACK_CANCEL_RATE"
+            and modifier.val == 25,
+        "Nightweaver Concentration rank two preserves exact source buff"
+    )
+    check(
+        result.Spiritshot
+            and not result.BlessedSpiritshot
+            and not shot_state.Spiritshot,
+        "Nightweaver Concentration consumes exactly one magical shot"
+    )
+end
+
+--[[
 Checks Withering Hex preserves exact C4 physical-attack weakening semantics.
 
 Args:
@@ -1945,6 +1990,7 @@ local function main()
     check_human_wizard_slumber_hex()
     check_human_wizard_scorch_mark()
     check_nightweaver_venom_rend()
+    check_nightweaver_concentration()
     check_human_wizard_withering_hex()
     check_duskguard_source_families()
     check_veilblade_blow()
@@ -1971,7 +2017,8 @@ local function main()
         .. "magiccrit=true magicfailure=true element=true shots=true "
         .. "status=true pdam=true mdam=true wizard=true frost=true "
         .. "area=true drain=true sleep=true fire_vuln=true "
-        .. "patk_down=true duskguard=true blow=true heal=true npc=true live=false"
+        .. "poison_vuln=true concentration=true patk_down=true "
+        .. "duskguard=true blow=true heal=true npc=true live=false"
     ):format(checks))
 end
 
