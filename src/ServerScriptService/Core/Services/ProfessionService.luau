@@ -90,7 +90,8 @@ local function validate_recipe_for_character(character: any, recipe: any): strin
     end
 
     if not ProfessionSelectionRules.can_use(
-        character.ProfessionSlots, recipe.ProfessionId
+        character.ProfessionSlots, recipe.ProfessionId,
+        character
     ) then
         return "ProfessionNotSelected"
     end
@@ -201,7 +202,8 @@ function ProfessionService:choose_profession(
             error(rejection)
         end
         local slots, reason = ProfessionSelectionRules.choose(
-            character.ProfessionSlots, profession_id
+            character.ProfessionSlots, profession_id,
+            character
         )
         if not slots then
             rejection = reason or "ProfessionSelectionRejected"
@@ -237,7 +239,8 @@ function ProfessionService:can_use(
 ): boolean
     local character = self._profiles:get_character(user_id, 1)
     return character ~= nil and ProfessionSelectionRules.can_use(
-        character.ProfessionSlots, profession_id
+        character.ProfessionSlots, profession_id,
+        character
     )
 end
 
@@ -249,7 +252,8 @@ function ProfessionService:build_snapshot(user_id: number): any
 
     local professions = {}
     local slots = ProfessionSelectionRules.normalize(
-        character.ProfessionSlots
+        character.ProfessionSlots,
+        character
     )
     local source = if type(character.Professions) == "table"
         then character.Professions
@@ -269,7 +273,8 @@ function ProfessionService:build_snapshot(user_id: number): any
             XPToNext = needed,
             CraftingMinigameId = crafting_minigame_id(profession_id),
             Selected = ProfessionSelectionRules.can_use(
-                slots, profession_id
+                slots, profession_id,
+                character
             ),
         }
     end
@@ -320,7 +325,8 @@ function ProfessionService:build_snapshot(user_id: number): any
                 and knight_skill_unlocked and warrior_skill_unlocked
                 and warden_skill_unlocked
                 and ProfessionSelectionRules.can_use(
-                    slots, recipe.ProfessionId
+                    slots, recipe.ProfessionId,
+                    character
                 ),
             Known = knowledge_rejection == nil,
             RequiredLevel = recipe.RequiredLevel,
@@ -374,7 +380,8 @@ function ProfessionService:gather(
         -- Recheck inside the same atomic profile mutation, in case
         -- the selected character changed after the preliminary read.
         if not ProfessionSelectionRules.can_use(
-            character.ProfessionSlots, profession_id
+            character.ProfessionSlots, profession_id,
+            character
         ) then
             error("ProfessionNotSelected")
         end
