@@ -1463,10 +1463,71 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, source_reason
     end
 
-    if effect.Sets.skillType ~= "PDAM"
+    local skill_type = effect.Sets.skillType
+    local is_blow = skill_type == "BLOW"
+    if (skill_type ~= "PDAM" and not is_blow)
         or type(effect.Sets.power) ~= "number"
     then
         return nil, "UnsupportedOriginalPhysicalSkillType"
+    end
+
+    local blow = nil
+    if is_blow then
+        if effect.Sets.blowDamageCondition ~= "CRIT" then
+            return nil, "UnsupportedOriginalBlowCondition"
+        end
+
+        local spatial, spatial_reason =
+            source_spatial_state(spatial_context)
+        if not spatial then
+            return nil, spatial_reason
+        end
+
+        local blow_rate = attacker.SourceStatCandidate.BLOW_RATE
+        local source_dex = attacker.SourceDex
+        if type(blow_rate) ~= "number"
+            or type(source_dex) ~= "number"
+        then
+            return nil, "OriginalBlowSourceStatsUnavailable"
+        end
+
+        blow = Formula.resolve_blow(
+            spatial.PositionRelation,
+            source_dex,
+            blow_rate,
+            COMBAT_RANDOM:NextInteger(0, 99)
+        )
+
+        if not blow.Landed then
+            local missed_shot, shot_reason =
+                consume_physical_shot(attacker_user_id)
+            if not missed_shot then
+                return nil, shot_reason
+            end
+
+            return {
+                Kind = "BlowDamage",
+                Amount = 0,
+                Blow = true,
+                BlowLanded = false,
+                BlowMiss = true,
+                BlowBaseChance = blow.BaseChance,
+                BlowChancePercent = blow.ChancePercent,
+                BlowRoll = blow.Roll,
+                SourceDex = source_dex,
+                SourceBlowRate = blow_rate,
+                Soulshot = missed_shot.Soulshot,
+                SourcePositionRelation = spatial.PositionRelation,
+                SourceSkillId = source.SkillId,
+                SourceRank = source.Rank,
+                SourceSkillPower = effect.Sets.power,
+                TargetKind = target_kind,
+                SourceNpcId = defender.SourceNpcId,
+                SourceNpcRace = defender.SourceNpcRace,
+                SourceOnly = true,
+                LiveApplied = false,
+            }, nil
+        end
     end
 
     local base_critical_rate =
@@ -1482,7 +1543,6 @@ function C4SourceCombatCalculationService.physical_skill(
         ChancePerThousand = 0,
         Roll = nil,
     }
-
     if base_critical_rate > 0 then
         local str_bonus = attacker.SourceStrBonus
         if type(str_bonus) ~= "number"
@@ -1493,12 +1553,11 @@ function C4SourceCombatCalculationService.physical_skill(
             return nil, "OriginalStrBonusUnavailable"
         end
 
-        skill_critical =
-            Formula.resolve_physical_skill_critical(
-                base_critical_rate,
-                str_bonus,
-                COMBAT_RANDOM:NextInteger(0, 999)
-            )
+        skill_critical = Formula.resolve_physical_skill_critical(
+            base_critical_rate,
+            str_bonus,
+            COMBAT_RANDOM:NextInteger(0, 999)
+        )
     end
 
     local variance, variance_reason =
@@ -1513,13 +1572,21 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, vulnerability_reason
     end
 
-    local race, race_reason = source_npc_race_multiplier(
-        attacker,
-        defender,
-        target_kind
-    )
-    if not race then
-        return nil, race_reason
+    local race = {
+        Multiplier = 1,
+        AppliedStats = {},
+    }
+    if not is_blow then
+        local race_result, race_reason =
+            source_npc_race_multiplier(
+                attacker,
+                defender,
+                target_kind
+            )
+        if not race_result then
+            return nil, race_reason
+        end
+        race = race_result
     end
 
     local pvp_multiplier, pvp_reason =
@@ -1567,27 +1634,66 @@ function C4SourceCombatCalculationService.physical_skill(
         return nil, shot_reason
     end
 
-    local amount = Formula.physical_damage({
-        PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
-        PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
-        SkillPower = effect.Sets.power,
-        Soulshot = shot.Soulshot,
-        Shield = shield.Blocked,
-        PerfectShield = shield.PerfectShield,
-        ShieldDefense = shield.ShieldDefencePower,
-        WeaponVulnerabilityMultiplier = vulnerability.Multiplier,
-        RandomDamageMultiplier = variance.Multiplier,
-        RaceMultiplier = race.Multiplier,
-        PvpMultiplier = pvp_multiplier,
-    })
+    local amount
+    local critical_power = nil
+    local critical_add = nil
+    if is_blow then
+        local power_reason
+        critical_power, critical_add, power_reason =
+            critical_power_inputs(attacker)
+        if critical_power == nil or critical_add == nil then
+            return nil, power_reason
+        end
+
+        amount = Formula.blow_damage({
+            PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+            PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+            SkillPower = effect.Sets.power,
+            Soulshot = shot.Soulshot,
+            Shield = shield.Blocked,
+            PerfectShield = shield.PerfectShield,
+            ShieldDefense = shield.ShieldDefencePower,
+            CriticalPowerMultiplier = critical_power,
+            CriticalPowerAdd = critical_add,
+            DaggerVulnerabilityMultiplier =
+                vulnerability.Multiplier,
+            RandomDamageMultiplier = variance.Multiplier,
+            PvpMultiplier = pvp_multiplier,
+        })
+    else
+        amount = Formula.physical_damage({
+            PAtk = attacker.SourceStatCandidate.PHYSICAL_ATTACK,
+            PDef = defender.SourceStatCandidate.PHYSICAL_DEFENCE,
+            SkillPower = effect.Sets.power,
+            Soulshot = shot.Soulshot,
+            Shield = shield.Blocked,
+            PerfectShield = shield.PerfectShield,
+            ShieldDefense = shield.ShieldDefencePower,
+            WeaponVulnerabilityMultiplier =
+                vulnerability.Multiplier,
+            RandomDamageMultiplier = variance.Multiplier,
+            RaceMultiplier = race.Multiplier,
+            PvpMultiplier = pvp_multiplier,
+        })
+    end
 
     if skill_critical.Critical then
         amount *= 2
     end
 
     return {
-        Kind = "PhysicalDamage",
+        Kind = if is_blow then "BlowDamage" else "PhysicalDamage",
         Amount = amount,
+        Blow = is_blow,
+        BlowLanded = if blow then blow.Landed else nil,
+        BlowMiss = false,
+        BlowBaseChance = if blow then blow.BaseChance else nil,
+        BlowChancePercent = if blow then blow.ChancePercent else nil,
+        BlowRoll = if blow then blow.Roll else nil,
+        SourceDex = if is_blow then attacker.SourceDex else nil,
+        SourceBlowRate = if is_blow
+            then attacker.SourceStatCandidate.BLOW_RATE
+            else nil,
         Soulshot = shot.Soulshot,
         RandomDamage = variance.RandomDamage,
         RandomDamageRoll = variance.Roll,
@@ -1611,6 +1717,8 @@ function C4SourceCombatCalculationService.physical_skill(
         PhysicalSkillCriticalRoll = skill_critical.Roll,
         SourceSkillBaseCriticalRate = base_critical_rate,
         SourceStrBonus = attacker.SourceStrBonus,
+        CriticalPowerMultiplier = critical_power,
+        CriticalPowerAdd = critical_add,
         ShieldEquipped = shield.ShieldEquipped,
         ShieldBlocked = shield.Blocked,
         PerfectShield = shield.PerfectShield,
@@ -1625,7 +1733,6 @@ function C4SourceCombatCalculationService.physical_skill(
         LiveApplied = false,
     }, nil
 end
-
 --[[
 Calculates C4 MDAM skill damage between source-ready players.
 
