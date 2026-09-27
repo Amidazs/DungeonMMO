@@ -331,6 +331,42 @@ function FakeCombat.elemental_vulnerability_skill(
 end
 
 --[[
+Returns one disposable source poison-vulnerability result.
+
+Args:
+    attacker_user_id (number): Expected fixture attacker.
+    defender_target (any): Expected reviewed NPC boundary.
+    creative_skill_id (string): Expected Venom Rend identifier.
+    creative_rank (number): Expected purchased rank.
+
+Returns:
+    (any?, string?): Fake source poison vulnerability result.
+]]
+function FakeCombat.poison_vulnerability_skill(
+    attacker_user_id: number,
+    defender_target: any,
+    creative_skill_id: string,
+    creative_rank: number
+): (any?, string?)
+    assert(attacker_user_id == ATTACKER_ID)
+    assert(defender_target == NPC_BOUNDARY)
+    assert(creative_skill_id == "NightweaverVenomRend")
+    assert(creative_rank == 2)
+
+    return {
+        Kind = "PoisonVulnerability",
+        Landed = true,
+        Rate = 80,
+        Roll = 0,
+        VulnerabilityStat = "POISON_VULN",
+        VulnerabilityMultiplier = 1.25,
+        DurationSeconds = 15,
+        SourceSkillId = 1224,
+        SourceRank = 2,
+    }, nil
+end
+
+--[[
 Returns one disposable source physical-attack weakening result.
 
 Args:
@@ -664,6 +700,9 @@ local function main()
             and capability.NpcElementalVulnerabilityLiveApplication
             and capability.NpcElementalVulnerabilityBoundaryDecoration
             and capability.NpcElementalVulnerabilityAuthorityConfigured
+            and capability.NpcPoisonVulnerabilityLiveApplication
+            and capability.NpcPoisonVulnerabilityBoundaryDecoration
+            and capability.NpcPoisonVulnerabilityAuthorityConfigured
             and capability.NpcPhysicalAttackWeakeningLiveApplication
             and capability.NpcPhysicalAttackWeakeningUsesOutgoingDamageRules
             and capability.NpcPhysicalAttackWeakeningLeavesAttackRateNeutral
@@ -951,6 +990,37 @@ local function main()
             ) == "number"
             and #npc_events == 0,
         "landed source fire vulnerability applies without dealing damage"
+    )
+
+    table.clear(npc_events)
+    local poison_vulnerability = assert(
+        executor:poison_vulnerability_skill_npc(
+            attacker,
+            enemy,
+            "NightweaverVenomRend",
+            2,
+            20551
+        )
+    )
+    check(
+        poison_vulnerability.Kind
+            == "C4LiveNpcPoisonVulnerability"
+            and poison_vulnerability.Applied
+            and poison_vulnerability.VulnerabilityApplied
+            and poison_vulnerability.Landed
+            and poison_vulnerability.VulnerabilityStat
+                == "POISON_VULN"
+            and poison_vulnerability.VulnerabilityMultiplier
+                == 1.25
+            and poison_vulnerability.DurationSeconds == 15
+            and enemy:GetAttribute(
+                "C4POISON_VULNMultiplier"
+            ) == 1.25
+            and type(
+                enemy:GetAttribute("C4POISON_VULNEndsAt")
+            ) == "number"
+            and #npc_events == 0,
+        "landed poison vulnerability applies without dealing damage"
     )
 
     table.clear(npc_events)
