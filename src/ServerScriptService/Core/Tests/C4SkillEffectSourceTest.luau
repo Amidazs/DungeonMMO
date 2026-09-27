@@ -248,6 +248,41 @@ local function check_known_vectors()
         "Orc Fighter Iron Body preserves exact fall modifier"
     )
 
+    local raider_bandage = assert(Effects.get_rank(34, 1))
+    check(
+        raider_bandage.Sets.mpConsume == 20
+            and raider_bandage.Sets.magicLvl == 20
+            and raider_bandage.Sets.effectPower == 30
+            and raider_bandage.Sets.negateStats == "BLEED"
+            and raider_bandage.Sets.reuseDelay == 3000
+            and raider_bandage.Effects[1].name == "NegateEffect",
+        "Orc Raider Bandage rank one preserves exact bleed cure fields"
+    )
+
+    local raider_rage = assert(Effects.get_rank(94, 1))
+    check(
+        raider_rage.Sets.mpConsume == 11
+            and raider_rage.Sets.reuseDelay == 300000
+            and raider_rage.Effects[1].time == 60
+            and raider_rage.Effects[1].stackType == "pAtks"
+            and raider_rage.Effects[1].Modifiers[1].val == 1.45
+            and raider_rage.Effects[1].Modifiers[2].val == 0.8
+            and raider_rage.Effects[1].Modifiers[3].val == 3,
+        "Orc Raider Rage rank one preserves exact source tradeoffs"
+    )
+
+    local raider_two_hand = assert(Effects.get_rank(293, 3))
+    check(
+        #raider_two_hand.Modifiers == 2
+            and raider_two_hand.Modifiers[1].stat == "PHYSICAL_ATTACK"
+            and raider_two_hand.Modifiers[1].val == 10.7
+            and raider_two_hand.Modifiers[1].UsingKind
+                == "Big Sword,Big Blunt"
+            and raider_two_hand.Modifiers[2].stat == "ACCURACY_COMBAT"
+            and raider_two_hand.Modifiers[2].val == 3,
+        "Orc Raider two-handed mastery rank three is source exact"
+    )
+
     local heal = assert(Effects.get_rank(58, 4))
     check(heal.Sets.mpInitialConsume == 11
         and heal.Sets.mpConsume == 42
@@ -269,12 +304,12 @@ local function main()
     check_all_tree_rows()
     check_known_vectors()
     local coverage = Effects.coverage()
-    check(coverage.SkillCount == 127
-        and coverage.RequiredSkillRankPairs == 502
+    check(coverage.SkillCount == 130
+        and coverage.RequiredSkillRankPairs == 527
         and not coverage.LiveCombatIntegrated,
         "All seventeen-path source skill/rank definitions are catalogued")
     print(("[C4 Skill Effects] EXACT_SOURCE_PASS: %d assertions, "
-        .. "skills=127 uniqueRankPairs=502 live=false")
+        .. "skills=130 uniqueRankPairs=527 live=false")
         :format(checks))
 end
 
