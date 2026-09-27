@@ -1,3 +1,55 @@
+**v3.22 DWARF PROFESSION DESIGN BOUNDARY — DISCUSSION:** [roadmap](
+DungeonMMO_Roadmap_v3_22_Dwarf_Profession_Design_Boundary_20260927.md).
+The level-30 C4 catalogue remains **16/18 first-transfer branches GREEN** at
+the v3.21 Ashspeaker gameplay checkpoint. This documentation checkpoint
+repairs the roadmap index and records the unresolved Dwarf economy decision
+before any Artisan/Scavenger audit or implementation. The leading design
+candidate is branch-specific extra capacity — Artisan at 1 gathering +
+2 crafting, Scavenger at 2 gathering + 1 crafting — plus class-owned
+blueprints/Spoil-Sweep, but this is explicitly **not yet accepted**.
+
+**v3.21 ORC SHAMAN / ASHSPEAKER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_21_Orc_Shaman_Ashspeaker_GREEN_20260927.md)
+and [evidence](
+../testing/c4-orc-shaman-ashspeaker-v3-21-green-20260927.md).
+Ashspeaker is complete through level 30 at **77/77 Orc Shaman rows** plus
+**35/35 inherited Orc Mystic rows**, **29 first-transfer families**,
+**21/21 focused backend suites** and a genuine unpublished Play pass with
+**0 CreatorErrors**. Aggregate coverage is now **21 paths / 1305 rows /
+162 unique source skill IDs**, leaving only Dwarf Artisan and Scavenger.
+
+**v3.20 ORC MONK / SPIRITCLAW — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_20_Orc_Monk_Spiritclaw_GREEN_20260927.md)
+and [evidence](
+../testing/c4-orc-monk-spiritclaw-v3-20-green-20260927.md).
+Spiritclaw is complete through level 30 at **41/41 Orc Monk rows** plus
+inherited Orc Fighter authority. Focus Force/Force Burst charge handling,
+aspects, control effects and unpublished Play acceptance are GREEN.
+
+**v3.19 ORC RAIDER / WARHOWL — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_19_Orc_Raider_Warhowl_GREEN_20260927.md)
+and [evidence](
+../testing/c4-orc-raider-warhowl-v3-19-green-20260927.md).
+Warhowl is complete through level 30 at **63/63 Orc Raider rows** plus
+inherited Orc Fighter authority, including weapon-gated physical routes,
+source toggles and unpublished Play acceptance.
+
+**v3.18 SHILLIEN ORACLE / DUSKSEER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_18_ShIllien_Oracle_Duskseer_GREEN_20260927.md)
+and [evidence](
+../testing/c4-shillien-oracle-duskseer-v3-18-green-20260927.md).
+Duskseer is complete through level 30 at **92/92 rows / 26 families** with
+source support/combat effects and unpublished Play acceptance.
+
+**v3.17 DARK WIZARD / NIGHTWEAVER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_17_Dark_Wizard_Nightweaver_GREEN_20260927.md)
+and [evidence](
+../testing/c4-dark-wizard-nightweaver-v3-17-green-20260927.md).
+Nightweaver is complete through level 30 at **86/86 rows / 25 families**,
+including source-faithful casting interruption. Final broad regression was
+**25/25 PASS** and unpublished Play ended with
+`VERIFIED_PLAY_MODE_PASS`.
+
 **v3.16 DARK WIZARD SOURCE AUDIT — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_16_Dark_Wizard_Source_Audit_20260927.md)
 and [evidence](
