@@ -123,6 +123,7 @@ local function check_all_templates()
     check_template("DarkElf", "Duskguard", 32, 20, dark_elf)
     check_template("DarkElf", "Veilblade", 35, 20, dark_elf)
     check_template("DarkElf", "Nightweaver", 39, 20, dark_elf_mage)
+    check_template("DarkElf", "Duskseer", 42, 20, dark_elf_mage)
 end
 
 --[[
@@ -252,6 +253,11 @@ local function check_growth_vectors()
         RawHP = 672.615, RawMP = 482.415,
         RawCP = 338.49,
     })
+    check_vitals("DarkElf", "Duskseer", 30, {
+        HP = 732, MP = 482, CP = 368,
+        RawHP = 732.015, RawMP = 482.415,
+        RawCP = 368.19,
+    })
 end
 
 --[[
@@ -265,12 +271,12 @@ Returns:
 ]]
 local function check_scope_boundaries()
     local coverage = Source.coverage()
-    check(coverage.PathCount == 16
-        and coverage.VerifiedPrimaryStatTemplates == 16
-        and coverage.VerifiedLevelGrowthTemplates == 16
+    check(coverage.PathCount == 17
+        and coverage.VerifiedPrimaryStatTemplates == 17
+        and coverage.VerifiedLevelGrowthTemplates == 17
         and coverage.VerifiedLevelCap == 30
         and not coverage.LiveCombatIntegrated,
-        "Sixteen exact templates do not imply live combat migration")
+        "Seventeen exact templates do not imply live combat migration")
     check(Source.get("Human", "Ranger") == nil
         and Source.get("Elf", "Rogue") == nil
         and Source.get("Elf", "Oathguard") == nil,
@@ -301,7 +307,7 @@ local function check_scope_boundaries()
 end
 
 --[[
-Runs the exact C4 sixteen-template source regression.
+Runs the exact C4 seventeen-template source regression.
 
 Args:
     None.
@@ -314,7 +320,7 @@ local function main()
     check_growth_vectors()
     check_scope_boundaries()
     print(("[C4 Primary Stats] EXACT_SOURCE_PASS: %d assertions, "
-        .. "16 templates, 16 growth curves through level 30, live=false")
+        .. "17 templates, 17 growth curves through level 30, live=false")
         :format(checks))
 end
 
