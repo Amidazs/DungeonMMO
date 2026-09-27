@@ -190,6 +190,89 @@ local REVIEWED = table.freeze({
         CastRange = 400,
         EffectRange = 900,
     }),
+    DuskseerHealingLight = table.freeze({
+        SourceSkillId = 1011,
+        Kind = "TargetHeal",
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    DuskseerManaRecharge = table.freeze({
+        SourceSkillId = 1013,
+        Kind = "TargetRecharge",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerBattleMend = table.freeze({
+        SourceSkillId = 1015,
+        Kind = "TargetHeal",
+        CastRange = 600,
+        EffectRange = 1100,
+    }),
+    DuskseerGroupMend = table.freeze({
+        SourceSkillId = 1027,
+        Kind = "PartyHeal",
+        SourceRadius = 1000,
+    }),
+    DuskseerRevive = table.freeze({
+        SourceSkillId = 1016,
+        Kind = "Resurrection",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerMindWard = table.freeze({
+        SourceSkillId = 1035,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerStoneWard = table.freeze({
+        SourceSkillId = 1040,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerEmpower = table.freeze({
+        SourceSkillId = 1059,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerMight = table.freeze({
+        SourceSkillId = 1068,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerBreathBlessing = table.freeze({
+        SourceSkillId = 1073,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerFocus = table.freeze({
+        SourceSkillId = 1077,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerConcentration = table.freeze({
+        SourceSkillId = 1078,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerWindstep = table.freeze({
+        SourceSkillId = 1204,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
+    DuskseerBloodRite = table.freeze({
+        SourceSkillId = 1268,
+        Kind = "TargetBuff",
+        CastRange = 400,
+        EffectRange = 900,
+    }),
 })
 
 --[[
