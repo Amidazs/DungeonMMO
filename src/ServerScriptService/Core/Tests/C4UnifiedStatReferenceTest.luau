@@ -21,13 +21,13 @@ local function check(condition: boolean, label: string)
 end
 
 --[[
-Checks all twenty separate source templates at the level-30 launch cap.
+Checks the tracked source templates at the level-30 launch cap.
 
 Args:
     None.
 
 Returns:
-    nil: Confirms exact archived HP, MP and CP across all twenty paths.
+    nil: Confirms exact archived HP, MP and CP across all tracked paths.
 ]]
 local function check_all_class_vitals()
     local vectors = {
@@ -51,6 +51,9 @@ local function check_all_class_vitals()
         {"Orc", "Fighter", 1075, 322, 562},
         {"Orc", "Warhowl", 1269, 327, 884},
         {"Orc", "Spiritclaw", 1230, 327, 617},
+        {"Dwarf", "Fighter", 1014, 322, 680},
+        {"Dwarf", "Gearwright", 1161, 327, 921},
+        {"Dwarf", "Deepclaimer", 1197, 327, 834},
     }
     for _, vector in ipairs(vectors) do
         local result, issue = C4.get(
@@ -471,6 +474,39 @@ local function check_spiritclaw_inherited_passives()
     )
 end
 
+
+--[[
+Checks both Dwarf careers inherit Dwarven Fighter weapon mastery.
+
+Args:
+    None.
+
+Returns:
+    nil: Confirms starter and first-transfer source passives compose together.
+]]
+local function check_dwarf_inherited_passives()
+    for _, class_id in ipairs({"Gearwright", "Deepclaimer"}) do
+        local result = assert(C4.get(
+            "Dwarf",
+            class_id,
+            30,
+            {Weapon = "Blunt"},
+            {
+                {SkillId = 141, Rank = 3},
+                {SkillId = 205, Rank = 4},
+            }
+        ))
+
+        check(
+            result.AppliedSourceModifiers == 2
+                and result.PassiveStatSnapshot.PHYSICAL_ATTACK
+                    > result.Naked.NakedPAtk,
+            class_id
+                .. " composes Dwarven Fighter and branch Blunt mastery"
+        )
+    end
+end
+
 --[[
 Checks Concentration contributes its dynamic attack-cancel offset.
 
@@ -514,7 +550,7 @@ local function check_concentration_attack_cancel_offset()
 end
 
 --[[
-Executes complete twenty-class source-only stat and loadout acceptance.
+Executes tracked source-only stat and loadout acceptance.
 
 Args:
     None.
@@ -532,9 +568,10 @@ local function main()
     check_duskseer_unique_active_buffs()
     check_warhowl_inherited_passives()
     check_spiritclaw_inherited_passives()
+    check_dwarf_inherited_passives()
     check_concentration_attack_cancel_offset()
     print(("[C4 Unified Stats] SOURCE_ONLY_PASS: %d assertions "
-        .. "paths=20 live=false"):format(checks))
+        .. "paths=23 live=false"):format(checks))
 end
 
 main()
