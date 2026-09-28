@@ -47,11 +47,35 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 3
+    #adventures == 4
         and adventures[1].Id == "WorldrootRelic"
-        and adventures[2].Id == "MineEchoes"
-        and adventures[3].Id == "ExpeditionProvisioning",
-    "Adventure catalogue must preserve the three-quest story order."
+        and adventures[2].Id == "ForestWolfBounty"
+        and adventures[3].Id == "MineEchoes"
+        and adventures[4].Id == "ExpeditionProvisioning",
+    "Adventure catalogue keeps the optional wolf bounty beside the story chain."
+)
+
+local wolf_bounty = assert(
+    QuestDefinitions.get("ForestWolfBounty")
+)
+check(
+    wolf_bounty.PrerequisiteQuestId == "WorldrootRelic"
+        and #wolf_bounty.Objectives == 1
+        and wolf_bounty.Objectives[1].Type == "EnemyDefeat"
+        and wolf_bounty.Objectives[1].TargetId == "forest_wolf"
+        and wolf_bounty.Objectives[1].Required == 2,
+    "Forest Wolf bounty requires two trusted wolf defeats after Worldroot."
+)
+check(
+    wolf_bounty.Reward.Gold == 40
+        and wolf_bounty.Reward.ItemId == nil
+        and wolf_bounty.Reward.Items == nil,
+    "Forest Wolf bounty is intentionally Gold-only."
+)
+check(
+    QuestDefinitions.get("MineEchoes").PrerequisiteQuestId
+        == "WorldrootRelic",
+    "Optional wolf bounty must not block the Mine story quest."
 )
 
 local provisioning = assert(
