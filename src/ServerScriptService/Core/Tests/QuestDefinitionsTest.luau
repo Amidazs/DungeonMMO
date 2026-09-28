@@ -47,14 +47,15 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 7
+    #adventures == 8
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
         and adventures[4].Id == "MineEchoes"
-        and adventures[5].Id == "CorruptedForemanBounty"
-        and adventures[6].Id == "DungeonBossHunt"
-        and adventures[7].Id == "ExpeditionProvisioning",
+        and adventures[5].Id == "RuinSurvey"
+        and adventures[6].Id == "CorruptedForemanBounty"
+        and adventures[7].Id == "DungeonBossHunt"
+        and adventures[8].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -95,6 +96,30 @@ check(
         and captain_bounty.Reward.ItemId == nil
         and captain_bounty.Reward.Items == nil,
     "Captain bounty is intentionally Gold-only."
+)
+
+local ruin_survey = assert(
+    QuestDefinitions.get("RuinSurvey")
+)
+check(
+    ruin_survey.MinimumLevel == 8
+        and ruin_survey.PrerequisiteQuestId == "MineEchoes"
+        and #ruin_survey.Objectives == 2
+        and ruin_survey.Objectives[1].Type
+            == "CheckpointReached"
+        and ruin_survey.Objectives[1].TargetId
+            == "TestDungeon:EncounterStart:CombatRoom2"
+        and ruin_survey.Objectives[2].Type
+            == "CheckpointReached"
+        and ruin_survey.Objectives[2].TargetId
+            == "AbandonedMine:EncounterStart:CombatRoom2",
+    "Ruin Survey uses two released trusted checkpoint objectives."
+)
+check(
+    ruin_survey.Reward.Gold == 60
+        and type(ruin_survey.Reward.Items) == "table"
+        and #ruin_survey.Reward.Items == 4,
+    "Ruin Survey pays Gold plus the reviewed component cache."
 )
 
 local foreman_bounty = assert(
