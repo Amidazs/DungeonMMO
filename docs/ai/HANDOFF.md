@@ -1,3 +1,44 @@
+## 28 September 2026 — v3.38 trusted checkpoint Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_38_Checkpoint_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/checkpoint-adventure-v3-38-green-20260928.md).
+
+Current accepted launch content now includes trusted exploration objectives in
+addition to DungeonClear/EnemyDefeat.
+
+New event authority:
+`CheckpointReached` from successful server CheckpointService activation.
+
+New optional Adventure:
+`RuinSurvey / Survey the Broken Ways`, level 8 after Mine Echoes.
+
+Objectives:
+- `TestDungeon:EncounterStart:CombatRoom2`;
+- `AbandonedMine:EncounterStart:CombatRoom2`.
+
+Reward:
+60 Gold + one Deep Iron Bar + one Moonpetal Extract + one Reinforced Leather
++ one Resonant Rune.
+
+Fresh markers:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 4`.
+
+Next gate:
+continue richer side/story content using trusted events; add presentation and
+dialogue around accepted quests; introduce a new objective type only after its
+server publisher/test exists; keep Depths 2-4 disabled.
+
+Do not confuse presentation placeholders with backend placeholders. The current
+quest/progression/economy contracts are real server-owned systems. Final NPC,
+monster, animation, VFX, dialogue and some environment presentation remain
+replaceable content work.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.37 level-fifteen dual-boss Adventure GREEN
 
 [Roadmap](
