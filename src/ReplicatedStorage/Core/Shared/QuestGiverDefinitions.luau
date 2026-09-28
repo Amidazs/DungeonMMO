@@ -52,6 +52,7 @@ local GIVERS = table.freeze({
             "CorruptedForemanBounty",
         }),
         AnchorId = "Base.DwarfQuestHub",
+        FallbackAnchorId = "Base.Travel.Dwarves",
         Offset = CFrame.new(9, 3, -5),
     }),
     ExpeditionPathfinder = table.freeze({
