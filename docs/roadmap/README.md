@@ -1,3 +1,19 @@
+**v3.40 QUEST VARIETY FOUNDATION — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_40_Quest_Variety_Foundation_GREEN_20260928.md),
+[evidence](
+../testing/quest-variety-v3-40-green-20260928.md) and [research](
+../design/Quest_Archetype_Research_20260928.md).
+Launch Adventures now include real hidden-room interaction/item collection and
+a server-owned escort: **Whispers Behind the Stone** at level 6 and **Guide the
+Lost Surveyor** at level 9. Trusted event types now include
+`WorldInteraction`, `ItemCollected` and `EscortCompleted`; quest item
+turn-ins are atomic. All 18 first-transfer branches are also exposed as exactly
+three player-facing quests over their existing trusted source stages. Fresh
+Play returned `VERIFIED_QUEST_VARIETY_FOCUS_PASS 6`,
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`, and both live physical
+presentation checks passed. Next gate: Defend/Survive, quest-item/puzzle
+objectives, dialogue and presentation.
+
 **v3.39 MIXED-OBJECTIVE ADVENTURE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_39_Mixed_Objective_Adventure_GREEN_20260928.md)
 and [evidence](
