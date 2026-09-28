@@ -15,6 +15,7 @@ local TESTS = table.freeze({
     "EncounterServiceTest",
     "ForestWolfBountyDungeonIntegrationTest",
     "MarauderCaptainBountyDungeonIntegrationTest",
+    "CorruptedForemanBountyDungeonIntegrationTest",
 })
 
 --[[
@@ -64,8 +65,8 @@ local function main()
         run_test(test_name)
     end
 
-    print("[Launch Bounty Dungeon] 5/5 PASS")
-    print("VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 5")
+    print("[Launch Bounty Dungeon] 6/6 PASS")
+    print("VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 6")
 end
 
 main()
