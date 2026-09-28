@@ -157,6 +157,47 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    HiddenWardDiscovery = table.freeze({
+        Id = "HiddenWardDiscovery",
+        DisplayName = "Whispers Behind the Stone",
+        Kind = "Adventure",
+        MinimumLevel = 6,
+        PrerequisiteQuestId = "WorldrootRelic",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ActivateHiddenPanel",
+                Type = "WorldInteraction",
+                TargetId = "TestDungeon:HiddenPanel:Room2",
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "CollectHiddenWardFragment",
+                Type = "ItemCollected",
+                TargetId = "hidden_ward_fragment",
+                Required = 1,
+            }),
+        }),
+        TurnInItems = table.freeze({
+            table.freeze({
+                ItemId = "hidden_ward_fragment",
+                Quantity = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 50,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "warding_essence",
+                    Quantity = 1,
+                }),
+            }),
+        }),
+    }),
+
     RuinSurvey = table.freeze({
         Id = "RuinSurvey",
         DisplayName = "Survey the Broken Ways",
@@ -417,6 +458,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.WorldrootRelic,
         DEFINITIONS.ForestWolfBounty,
         DEFINITIONS.MarauderCaptainBounty,
+        DEFINITIONS.HiddenWardDiscovery,
         DEFINITIONS.MineEchoes,
         DEFINITIONS.RuinSurvey,
         DEFINITIONS.CorruptedForemanBounty,
