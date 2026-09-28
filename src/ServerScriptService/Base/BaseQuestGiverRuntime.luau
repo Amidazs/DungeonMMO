@@ -315,7 +315,9 @@ local function create_humanoid_giver(
     facing_target: Vector3,
     source_anchor_id: string,
     definition: any,
-    path_waypoint_count: number
+    path_waypoint_count: number,
+    walkable: boolean,
+    approach_clear: boolean
 ): (Model, BasePart)
     local existing = folder:FindFirstChild(definition.Id)
     if existing then
@@ -353,7 +355,7 @@ local function create_humanoid_giver(
     )
     model:SetAttribute(
         "DungeonMMOQuestGiverWalkable",
-        true
+        walkable
     )
     model:SetAttribute(
         "DungeonMMOQuestGiverPathWaypoints",
@@ -641,8 +643,9 @@ local function resolve_placement(
     spawn_position: Vector3,
     source_anchor: BasePart,
     definition: any,
-    placed_positions: {Vector3}
-): (Vector3, number)
+    placed_positions: {Vector3},
+    require_walkable: boolean
+): (Vector3, number, boolean, boolean)
     local desired = source_anchor.Position + definition.Offset
 
     for _, search_offset in ipairs(
@@ -665,9 +668,17 @@ local function resolve_placement(
                 ground
             )
             if walkable then
-                return ground, waypoint_count
+                return ground, waypoint_count, true, true
+            elseif not require_walkable then
+                return ground, 0, false, true
             end
         end
+    end
+
+    if not require_walkable then
+        local fallback = source_anchor.Position
+            + definition.Offset
+        return fallback, 0, false, false
     end
 
     error(
@@ -819,6 +830,11 @@ function Runtime.attach(options: any): any
 
     local folder = ensure_folder(options.root)
     local placed_positions = {}
+    local environment_mode = options.root:GetAttribute(
+        "DungeonMMOResolvedEnvironmentMode"
+    )
+    local require_walkable =
+        environment_mode ~= "Synthetic"
 
     for _, definition in ipairs(
         QuestGiverDefinitions.all()
@@ -842,13 +858,16 @@ function Runtime.attach(options: any): any
                 .. tostring(definition.AnchorId)
         )
 
-        local ground_position, waypoint_count =
-            resolve_placement(
+        local ground_position,
+            waypoint_count,
+            walkable,
+            approach_clear = resolve_placement(
                 folder,
                 spawn_anchor.Position,
                 source_anchor,
                 definition,
-                placed_positions
+                placed_positions,
+                require_walkable
             )
 
         local model, interaction_root =
@@ -858,7 +877,9 @@ function Runtime.attach(options: any): any
                 source_anchor.Position,
                 source_anchor_id,
                 definition,
-                waypoint_count
+                waypoint_count,
+                walkable,
+                approach_clear
             )
 
         table.insert(
@@ -882,7 +903,7 @@ function Runtime.attach(options: any): any
 
         model:SetAttribute(
             "DungeonMMOQuestGiverApproachClear",
-            true
+            approach_clear
         )
     end
 
