@@ -326,6 +326,37 @@ local function main()
         "level-ten Dark Elf can start Foreman bounty after Mine Echoes"
     )
 
+    local resonance = assert(
+        QuestDefinitions.get("TempleResonancePuzzle")
+    )
+    local level_ten_resonance = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+    })
+    level_ten_resonance.Level = 10
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_ten_resonance,
+            resonance
+        ),
+        "level-ten Dark Elf cannot start Resonant Seal"
+    )
+
+    local level_eleven_resonance = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+    })
+    level_eleven_resonance.Level = 11
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_eleven_resonance,
+            resonance
+        ),
+        "level-eleven Dark Elf can start Resonant Seal after Ruin Survey"
+    )
+
     local fracture_trail = assert(
         QuestDefinitions.get("FractureTrail")
     )
