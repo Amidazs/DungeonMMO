@@ -120,6 +120,7 @@ Returns:
 local function create_giver(
     folder: Folder,
     source_anchor: BasePart,
+    source_anchor_id: string,
     definition: any
 ): BasePart
     local existing = folder:FindFirstChild(definition.Id)
@@ -136,7 +137,7 @@ local function create_giver(
     anchor.CFrame = source_anchor.CFrame * definition.Offset
     anchor:SetAttribute(
         "DungeonMMOQuestGiverSourceAnchor",
-        definition.AnchorId
+        source_anchor_id
     )
     anchor:SetAttribute(
         "DungeonMMOQuestGiverId",
@@ -294,14 +295,16 @@ function Runtime.attach(options: any): any
     for _, definition in ipairs(
         QuestGiverDefinitions.all()
     ) do
+        local source_anchor_id = definition.AnchorId
         local source_anchor =
-            options.environment:get(definition.AnchorId)
+            options.environment:get(source_anchor_id)
 
         if not source_anchor
             and type(definition.FallbackAnchorId) == "string"
         then
+            source_anchor_id = definition.FallbackAnchorId
             source_anchor = options.environment:get(
-                definition.FallbackAnchorId
+                source_anchor_id
             )
         end
 
@@ -313,6 +316,7 @@ function Runtime.attach(options: any): any
         local anchor = create_giver(
             folder,
             source_anchor,
+            source_anchor_id,
             definition
         )
         local prompt = assert(
