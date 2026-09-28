@@ -18,6 +18,8 @@ local TESTS = table.freeze({
     "ProfessionLeatherEnchantingDependencyTest",
     "ProfessionExclusiveChoiceTradeTest",
     "ProfessionLaunchEconomyTopologyTest",
+    "ProfessionLaunchEconomyIntegrationTest",
+    "GearwrightPremiumEconomyIntegrationTest",
     "ProfessionRuntimeRulesTest",
     "ProfessionResourceDistributionTest",
     "ProfessionCraftRequestGuardTest",
