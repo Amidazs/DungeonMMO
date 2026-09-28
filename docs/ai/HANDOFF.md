@@ -1,3 +1,33 @@
+## 28 September 2026 — v3.36 level-ten Corrupted Foreman bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_36_Corrupted_Foreman_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/corrupted-foreman-bounty-v3-36-green-20260928.md).
+
+The Foreman's Reckoning is fully accepted:
+
+- minimum level 10;
+- prerequisite Mine Echoes;
+- one trusted `corrupted_foreman` defeat;
+- 80 Gold only;
+- does not gate Expedition Provisioning.
+
+The integration uses real BossEncounterExecutor + MineForemanFactory +
+EncounterService + QuestService, so the v3.35 Foreman identity correction is
+exercised on the actual quest path.
+
+Fresh markers:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 6`.
+
+Next development gate: fill the level-10-to-20 launch content gap with released
+Depth-1 gameplay. Keep optional content from blocking the story, and do not
+expose Depths 2-4 until their physical layouts are release-ready.
+
+Permanent edits remain GitHub-only; Desktop Commander is for pull/build/Studio
+evidence.
+
 ## 28 September 2026 — v3.35 Corrupted Foreman identity GREEN
 
 [Roadmap](
