@@ -1,3 +1,44 @@
+## 28 September 2026 — CURRENT v3.43 Adventure dialogue GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_43_Adventure_Dialogue_GREEN_20260928.md);
+[evidence](
+../testing/adventure-dialogue-v3-43-green-20260928.md).
+
+DungeonMMO has entered the presentation-focused quest phase.
+
+All 13 current launch Adventures now have reusable player-facing narrative for
+Start, Progress, Ready and Complete states. The Adventure Board now opens a
+conversation before a player accepts or turns in a quest rather than firing the
+server request immediately.
+
+New shared presentation modules:
+
+- `QuestNarrativeDefinitions.luau`;
+- `QuestNarrativePresenter.luau`.
+
+The main Temple investigation now has deliberate continuity through the
+Worldroot disturbance, Mine echoes, Ruin Survey, Resonant Seal, Fracture Trail
+and Hold the Resonance. The Temple investigation uses a consistent Temple
+Archivist presentation voice.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 9`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_QUEST_CONVERSATION_UI_PASS 1`.
+
+The quest authority boundary is unchanged: dialogue can only lead to the
+existing server-validated Start/Claim actions. It cannot fabricate progress or
+rewards.
+
+First-transfer advancement remains **18 branches x exactly three player-facing
+quests** over branch-specific trusted source ledgers.
+
+Next gate: connect these reusable conversations to physical Base quest-giver
+NPCs and improve in-dungeon objective feedback. The Adventure Board should
+remain an overview rather than the only storyteller. Depths 2-4 remain
+release-disabled.
+
 ## 28 September 2026 — CURRENT v3.42 defend/survive Adventure GREEN
 
 [Roadmap](
