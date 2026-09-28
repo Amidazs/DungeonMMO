@@ -21,8 +21,10 @@ Runtime.__index = Runtime
 
 local FOLDER_NAME = "DungeonMMOQuestGivers"
 local MIN_GIVER_DISTANCE = 30
-local GROUND_RAY_HEIGHT = 70
-local GROUND_RAY_DEPTH = 180
+local GROUND_RAY_HEIGHT = 6
+local GROUND_RAY_DEPTH = 36
+local MAX_GROUND_VERTICAL_DELTA = 14
+local MIN_GROUND_NORMAL_Y = 0.72
 local APPROACH_WIDTH = 5
 local APPROACH_HEIGHT = 6
 local SKIN_COLOR = Color3.fromRGB(196, 157, 119)
@@ -484,7 +486,22 @@ local function project_to_ground(
         params
     )
 
-    return if result then result.Position else nil
+    if not result then
+        return nil
+    end
+
+    local vertical_delta = math.abs(
+        result.Position.Y - desired.Y
+    )
+    if vertical_delta > MAX_GROUND_VERTICAL_DELTA then
+        return nil
+    end
+
+    if result.Normal.Y < MIN_GROUND_NORMAL_Y then
+        return nil
+    end
+
+    return result.Position
 end
 
 --[[
