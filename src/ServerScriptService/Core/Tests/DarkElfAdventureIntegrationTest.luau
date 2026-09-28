@@ -168,6 +168,16 @@ local function main()
         "Dark Elf claims optional Gold-only wolf bounty"
     )
 
+    local captain_too_early = quests:start(
+        USER_ID,
+        "MarauderCaptainBounty"
+    )
+    check(
+        not captain_too_early.ok
+            and captain_too_early.reason == "QuestUnavailable",
+        "level-one Dark Elf cannot start level-five Captain bounty"
+    )
+
     check(
         quests:start(USER_ID, "MineEchoes").ok,
         "Dark Elf starts Mine Echoes"
