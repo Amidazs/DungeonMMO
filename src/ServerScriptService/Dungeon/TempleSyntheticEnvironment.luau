@@ -167,6 +167,24 @@ local function create_resonance_puzzle(root: Instance)
     end
 end
 
+local function create_resonance_defense(root: Instance)
+    local ward = make_part(
+        root,
+        "ResonanceDefenseWard",
+        Vector3.new(36, 0.4, 36),
+        CFrame.new(250, 0.25, -145)
+    )
+    ward.Material = Enum.Material.Neon
+    ward.Color = Color3.fromRGB(93, 162, 207)
+    ward.Transparency = 0.65
+    ward.CanCollide = false
+    ward.CanTouch = false
+    ward:SetAttribute(
+        "DungeonMMODefenseId",
+        "TempleResonanceWard"
+    )
+end
+
 local function create_route(parent: Instance)
     local existing = parent:FindFirstChild("DungeonMMOSyntheticTemple")
     if existing then
@@ -186,6 +204,7 @@ local function create_route(parent: Instance)
     make_part(root, "Corridor3", Vector3.new(18, 1, 94), CFrame.new(250, 0, -228))
     create_hidden_tutorial(root)
     create_resonance_puzzle(root)
+    create_resonance_defense(root)
 end
 
 function TempleSyntheticEnvironment.create(parent: Instance)
