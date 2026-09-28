@@ -54,8 +54,7 @@ Creates the scheduled Spoil/Sweep bridge.
 Args:
     scheduler (any): Existing source cast scheduler.
     salvage (any): Server-owned Dwarf salvage authority.
-    area_resolver ((any, any, number) -> {any})?: Optional server-only
-        area target resolver for Spoil Festival.
+    options (any): Read-only timing and server world resolvers.
 
 Returns:
     any: Disabled source salvage cast bridge.
@@ -63,7 +62,7 @@ Returns:
 function C4SourceSalvageCastService.new(
     scheduler: any,
     salvage: any,
-    area_resolver: ((any, any, number) -> {any})?
+    options: any
 ): any
     assert(
         scheduler
@@ -81,12 +80,29 @@ function C4SourceSalvageCastService.new(
             and type(salvage.claim) == "function",
         "Salvage cast bridge requires Dwarf salvage authority"
     )
+    assert(
+        type(options) == "table"
+            and options.Timing
+            and type(options.Timing.resolve) == "function",
+        "Salvage cast bridge requires read-only source timing"
+    )
+    assert(
+        type(options.TargetValidator) == "function",
+        "Salvage cast bridge requires server target range validation"
+    )
+    assert(
+        options.AreaResolver == nil
+            or type(options.AreaResolver) == "function",
+        "Salvage Festival area resolver must be a function or nil"
+    )
 
     return setmetatable({
         _enabled = false,
         _scheduler = scheduler,
         _salvage = salvage,
-        _area_resolver = area_resolver,
+        _timing = options.Timing,
+        _target_validator = options.TargetValidator,
+        _area_resolver = options.AreaResolver,
         _pending_by_owner = {},
     }, C4SourceSalvageCastService)
 end
@@ -119,13 +135,14 @@ function C4SourceSalvageCastService:is_enabled(): boolean
 end
 
 --[[
-Checks current target state before initial MP is spent.
+Checks current target and exact source cast range before MP is spent.
 
 Args:
     self (any): Source salvage bridge.
     owner (any): Server-owned caster.
     target (any): Server-bound creature target.
     review (any): Reviewed salvage family.
+    creative_skill_id (string): Authenticated creative salvage skill.
 
 Returns:
     (boolean, string?): Readiness or strict denial.
@@ -134,8 +151,35 @@ local function preflight(
     self: any,
     owner: any,
     target: any,
-    review: any
+    review: any,
+    creative_skill_id: string
 ): (boolean, string?)
+    local timing, timing_reason =
+        self._timing:resolve(owner.UserId, creative_skill_id)
+    if not timing then
+        return false, timing_reason
+    end
+    if timing.SourceSkillId ~= review.SourceSkillId then
+        return false, "C4SalvageReviewedSourceMismatch"
+    end
+
+    local source_range = timing.SourceCastRange
+    if type(source_range) ~= "number"
+        or source_range < 0
+    then
+        return false, "C4SalvageSourceRangeUnavailable"
+    end
+
+    local spatial_ready, spatial_reason =
+        self._target_validator(
+            owner,
+            target,
+            source_range
+        )
+    if not spatial_ready then
+        return false, spatial_reason
+    end
+
     if review.Kind == "Sweep" then
         return self._salvage:can_claim(owner, target)
     end
@@ -182,7 +226,8 @@ function C4SourceSalvageCastService:begin_cast(
         self,
         owner,
         target,
-        review
+        review,
+        creative_skill_id
     )
     if not ready then
         return nil, reason
@@ -279,13 +324,14 @@ local function apply_area_mark(
         return nil, "C4SalvageSourceRadiusUnavailable"
     end
 
-    local targets = self._area_resolver(
+    local targets, target_reason = self._area_resolver(
         owner,
         record.Target,
         radius
     )
     if type(targets) ~= "table" then
-        return nil, "C4SalvageAreaResolutionFailed"
+        return nil, target_reason
+            or "C4SalvageAreaResolutionFailed"
     end
 
     local marked = 0
@@ -378,7 +424,8 @@ function C4SourceSalvageCastService:launch_if_ready(
         self,
         owner,
         record.Target,
-        review
+        review,
+        record.CreativeSkillId
     )
     if not ready then
         self._pending_by_owner[owner] = nil
@@ -456,6 +503,10 @@ function C4SourceSalvageCastService:capability(): any
         SingleTargetSpoil = true,
         SweepOwnedCorpse = true,
         SpoilFestivalReviewed = true,
+        SourceTimingPreflightBound =
+            self._timing ~= nil,
+        SourceTargetRangeResolverBound =
+            self._target_validator ~= nil,
         SpoilFestivalAreaResolverBound =
             self._area_resolver ~= nil,
         ReviewedSkillCount = 4,
