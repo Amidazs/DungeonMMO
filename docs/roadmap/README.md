@@ -1,3 +1,16 @@
+**v3.48 TUTORIAL GUIDANCE + NPC PRESENTATION — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_48_Tutorial_Guidance_NPC_Presentation_GREEN_20260928.md)
+and [evidence](
+../testing/tutorial-guidance-npc-presentation-v3-48-green-20260928.md).
+The restricted TEST Base has been republished with a pathfinding-backed,
+iridescent floor trail and arrows for tutorial navigation, plus eight simple
+humanoid Adventure quest-giver placeholders distributed across genuinely
+separate hub regions. Authored-mode placement now rejects blocked or
+unreachable NPC positions; the published Base live check returned 8/8
+walkable, 8/8 approach-clear and a 35.44-stud minimum NPC separation. The
+Dungeon had no v3.48 source delta and remains verified current. **Section D
+remains on hold for the user's two-player friend test.**
+
 **v3.47 FRIEND TEST READY — SECTION D HOLD:** [roadmap](
 DungeonMMO_Roadmap_v3_47_Friend_Test_Ready_GREEN_20260928.md) and [evidence](
 ../testing/friend-test-v3-47-ready-20260928.md).
