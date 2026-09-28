@@ -146,4 +146,26 @@ function Definitions.all(): {any}
     return ORDER
 end
 
+
+--[[
+Returns the quest giver responsible for one Adventure quest.
+
+Args:
+    quest_id (string): Stable Adventure quest identifier.
+
+Returns:
+    any?: Frozen giver definition when that quest has a physical giver.
+]]
+function Definitions.for_quest(quest_id: string): any?
+    for _, definition in ipairs(ORDER) do
+        for _, candidate_id in ipairs(definition.QuestIds) do
+            if candidate_id == quest_id then
+                return definition
+            end
+        end
+    end
+
+    return nil
+end
+
 return table.freeze(Definitions)
