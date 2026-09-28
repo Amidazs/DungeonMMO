@@ -315,6 +315,70 @@ local function build_tutorial_hidden_room(
     )
 end
 
+-- Builds replaceable Temple parts for the ordered resonance puzzle.
+local function build_tutorial_resonance_puzzle(
+    root: Instance,
+    theme: any
+)
+    if theme.Prefix ~= "Temple" then
+        return
+    end
+
+    local puzzle = Instance.new("Folder")
+    puzzle.Name = "ResonancePuzzle"
+    puzzle:SetAttribute(
+        "DungeonMMOPuzzleId",
+        "TempleResonanceLock"
+    )
+    puzzle.Parent = root
+
+    local shard = part(
+        puzzle,
+        "TempleResonanceShard",
+        Vector3.new(2, 3, 2),
+        Vector3.new(theme.X + 20, 2, -60),
+        Color3.fromRGB(97, 181, 224),
+        Enum.Material.Neon
+    )
+    shard.CanCollide = false
+    shard:SetAttribute(
+        "DungeonMMOQuestCollectibleId",
+        "TempleResonanceShard"
+    )
+
+    local runes = {
+        {Name = "MoonRune", Position = Vector3.new(
+            theme.X - 30, 2, -145
+        )},
+        {Name = "RootRune", Position = Vector3.new(
+            theme.X, 2, -170
+        )},
+        {Name = "FlameRune", Position = Vector3.new(
+            theme.X + 30, 2, -145
+        )},
+    }
+
+    for _, definition in ipairs(runes) do
+        local rune = part(
+            puzzle,
+            definition.Name,
+            Vector3.new(4, 4, 4),
+            definition.Position,
+            theme.Accent,
+            Enum.Material.Neon
+        )
+        rune.CanCollide = false
+        rune:SetAttribute(
+            "DungeonMMOPuzzleId",
+            "TempleResonanceLock"
+        )
+        rune:SetAttribute(
+            "DungeonMMOPuzzleRuneId",
+            definition.Name
+        )
+    end
+end
+
 -- Depth preview corridors run along Z; their guardrails must run along
 -- the SIDE edges, not across the path as the optional X-axis bridges do.
 local function depth_corridor(
@@ -543,6 +607,7 @@ function Placeholder.create(
         late_depth ~= nil)
     build_optional(root, parent, theme)
     build_tutorial_hidden_room(root, theme)
+    build_tutorial_resonance_puzzle(root, theme)
     build_depth_previews(root, theme, optional_depth, late_depth)
     local test_dungeon = TestRelease.is_test_dungeon()
         and dungeon_id == "TestDungeon"
