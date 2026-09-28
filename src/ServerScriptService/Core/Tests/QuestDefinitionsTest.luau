@@ -47,7 +47,7 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 12
+    #adventures == 13
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
@@ -58,8 +58,9 @@ check(
         and adventures[8].Id == "CorruptedForemanBounty"
         and adventures[9].Id == "TempleResonancePuzzle"
         and adventures[10].Id == "FractureTrail"
-        and adventures[11].Id == "DungeonBossHunt"
-        and adventures[12].Id == "ExpeditionProvisioning",
+        and adventures[11].Id == "TempleWardDefense"
+        and adventures[12].Id == "DungeonBossHunt"
+        and adventures[13].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -245,6 +246,28 @@ check(
             == "warding_essence"
         and fracture_trail.Reward.Items[1].Quantity == 2,
     "Fracture Trail pays the reviewed Gold plus Warding Essence reward."
+)
+
+local ward_defense = assert(
+    QuestDefinitions.get("TempleWardDefense")
+)
+check(
+    ward_defense.MinimumLevel == 13
+        and ward_defense.PrerequisiteQuestId
+            == "TempleResonancePuzzle"
+        and #ward_defense.Objectives == 1
+        and ward_defense.Objectives[1].Type
+            == "DefenseCompleted"
+        and ward_defense.Objectives[1].TargetId
+            == "TestDungeon:ResonanceWard:Room2",
+    "Hold the Resonance is a level-thirteen trusted defense Adventure."
+)
+check(
+    ward_defense.Reward.Gold == 85
+        and ward_defense.Reward.Items[1].ItemId
+            == "warding_essence"
+        and ward_defense.Reward.Items[1].Quantity == 1,
+    "Hold the Resonance pays the reviewed ward-defense reward."
 )
 
 local boss_hunt = assert(
