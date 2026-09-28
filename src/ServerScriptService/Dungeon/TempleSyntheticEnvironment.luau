@@ -27,6 +27,90 @@ local function make_part(
     return part
 end
 
+local function create_hidden_tutorial(root: Instance)
+    local room = Instance.new("Folder")
+    room.Name = "TutorialHiddenAlcove"
+    room:SetAttribute("DungeonMMOQuestHiddenRoom", true)
+    room.Parent = root
+
+    local floor = make_part(
+        room,
+        "Floor",
+        Vector3.new(48, 1, 32),
+        CFrame.new(185, 0, -145)
+    )
+    floor.Color = Color3.fromRGB(67, 65, 82)
+
+    local passage = make_part(
+        room,
+        "HiddenPassageFloor",
+        Vector3.new(12, 1, 12),
+        CFrame.new(211, 0, -145)
+    )
+    passage.Color = Color3.fromRGB(78, 79, 84)
+    passage:SetAttribute("DungeonMMOQuestHiddenPassage", true)
+
+    local door = make_part(
+        room,
+        "HiddenDoor",
+        Vector3.new(2, 16, 12),
+        CFrame.new(214, 8, -145)
+    )
+    door:SetAttribute("DungeonMMOQuestHiddenDoor", true)
+
+    local panel = make_part(
+        room,
+        "HiddenPanel",
+        Vector3.new(2, 5, 5),
+        CFrame.new(217, 3, -133)
+    )
+    panel.Color = Color3.fromRGB(150, 117, 224)
+    panel:SetAttribute(
+        "DungeonMMOQuestInteractionId",
+        "TempleHiddenPanel"
+    )
+
+    local relic = make_part(
+        room,
+        "HiddenWardFragment",
+        Vector3.new(2, 3, 2),
+        CFrame.new(177, 2, -145)
+    )
+    relic.Color = Color3.fromRGB(150, 117, 224)
+    relic.Material = Enum.Material.Neon
+    relic.CanCollide = false
+    relic:SetAttribute(
+        "DungeonMMOQuestCollectibleId",
+        "TempleHiddenWardFragment"
+    )
+
+    for _, wall in ipairs({
+        {
+            "WestWall",
+            Vector3.new(2, 18, 32),
+            CFrame.new(161, 9, -145),
+        },
+        {
+            "NorthWall",
+            Vector3.new(48, 18, 2),
+            CFrame.new(185, 9, -129),
+        },
+        {
+            "SouthWall",
+            Vector3.new(48, 18, 2),
+            CFrame.new(185, 9, -161),
+        },
+    }) do
+        local part = make_part(
+            room,
+            wall[1] :: string,
+            wall[2] :: Vector3,
+            wall[3] :: CFrame
+        )
+        part.Color = Color3.fromRGB(67, 65, 82)
+    end
+end
+
 local function create_route(parent: Instance)
     local existing = parent:FindFirstChild("DungeonMMOSyntheticTemple")
     if existing then
@@ -44,6 +128,7 @@ local function create_route(parent: Instance)
     make_part(root, "Corridor1", Vector3.new(18, 1, 32), CFrame.new(250, 0, -2))
     make_part(root, "Corridor2", Vector3.new(18, 1, 40), CFrame.new(250, 0, -95))
     make_part(root, "Corridor3", Vector3.new(18, 1, 94), CFrame.new(250, 0, -228))
+    create_hidden_tutorial(root)
 end
 
 function TempleSyntheticEnvironment.create(parent: Instance)
