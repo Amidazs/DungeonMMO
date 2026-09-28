@@ -1,3 +1,27 @@
+## 28 September 2026 — CURRENT v3.35 Corrupted Foreman identity GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_35_Corrupted_Foreman_Identity_GREEN_20260928.md);
+[evidence](
+../testing/corrupted-foreman-identity-v3-35-green-20260928.md).
+
+The Abandoned Mine boss identity audit is closed.
+
+Accepted released identities:
+
+- Temple boss: `MarauderCaptain / marauder_captain`;
+- Mine boss: `CorruptedForeman / corrupted_foreman`.
+
+Foreman and Captain Bestiary progress are independent. The Mine executor path
+preserves the Foreman identity after reward scaling.
+
+Fresh validation:
+`VERIFIED_MINE_FOREMAN_IDENTITY_FOCUS_PASS 5`.
+
+Next: add a level-paced optional Corrupted Foreman Adventure using the existing
+trusted EnemyDefeat boundary. Keep it optional and keep Depths 2-4
+release-disabled.
+
 ## 28 September 2026 — CURRENT v3.34 level-five Captain bounty GREEN
 
 [Roadmap](
