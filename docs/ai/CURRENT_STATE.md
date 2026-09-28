@@ -1,3 +1,42 @@
+## 28 September 2026 — CURRENT v3.41 quest-item puzzle Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_41_Quest_Item_Puzzle_GREEN_20260928.md);
+[evidence](
+../testing/quest-item-puzzle-v3-41-green-20260928.md).
+
+The next quest-variety gate is accepted.
+
+New optional Adventure:
+**The Resonant Seal** (`TempleResonancePuzzle`).
+
+- minimum level 11;
+- prerequisite Ruin Survey;
+- personal bound Temple Resonance Shard after Room 1;
+- Room 2 must be clear before the puzzle becomes usable;
+- server-owned rune order: **Moon -> Root -> Flame**;
+- wrong rune resets saved sequence progress;
+- puzzle use requires possession of the quest shard;
+- shared puzzle completion does not fabricate another player's personal item;
+- reward: **75 Gold + 1 Resonant Rune**;
+- shard is consumed at quest turn-in.
+
+New trusted objective type:
+`PuzzleCompleted`.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 7`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_TEMPLE_RESONANCE_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+Current first-transfer rule remains unchanged from v3.40:
+all **18** mapped first-transfer branches expose exactly **three player-facing
+quests** over their branch-specific trusted source-stage ledgers.
+
+Next gate: server-owned **Defend/Survive** content plus stronger quest dialogue,
+narrative continuity and presentation. Depths 2-4 remain release-disabled.
+
 ## 28 September 2026 — CURRENT v3.40 quest variety foundation GREEN
 
 [Roadmap](
