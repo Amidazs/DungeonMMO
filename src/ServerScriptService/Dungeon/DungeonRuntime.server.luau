@@ -88,6 +88,9 @@ local DungeonSecretDiscoveryService = require(
 local DungeonQuestObjectService = require(
     Services:WaitForChild("DungeonQuestObjectService")
 )
+local DungeonQuestRuntime = require(
+    script.Parent:WaitForChild("DungeonQuestRuntime")
+)
 local DungeonEscortService = require(
     Services:WaitForChild("DungeonEscortService")
 )
@@ -318,6 +321,15 @@ if force_return_failure then
     warn("[TEST Failure Injection] Return-to-Base teleports are forced to fail.")
 end
 local loaded_users: {[number]: boolean} = {}
+
+DungeonQuestRuntime.attach({
+    remotes = remotes,
+    quests = quests,
+    is_ready = function(player: Player): boolean
+        return loaded_users[player.UserId] == true
+            and profiles:get_profile(player.UserId) ~= nil
+    end,
+})
 local bound_characters: {[Model]: boolean} = {}
 local completion_pending = false
 local completion_committed = false
