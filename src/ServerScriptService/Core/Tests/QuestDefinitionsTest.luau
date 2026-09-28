@@ -47,12 +47,13 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 4
+    #adventures == 5
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
-        and adventures[3].Id == "MineEchoes"
-        and adventures[4].Id == "ExpeditionProvisioning",
-    "Adventure catalogue keeps the optional wolf bounty beside the story chain."
+        and adventures[3].Id == "MarauderCaptainBounty"
+        and adventures[4].Id == "MineEchoes"
+        and adventures[5].Id == "ExpeditionProvisioning",
+    "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
 local wolf_bounty = assert(
@@ -71,6 +72,27 @@ check(
         and wolf_bounty.Reward.ItemId == nil
         and wolf_bounty.Reward.Items == nil,
     "Forest Wolf bounty is intentionally Gold-only."
+)
+
+local captain_bounty = assert(
+    QuestDefinitions.get("MarauderCaptainBounty")
+)
+check(
+    captain_bounty.MinimumLevel == 5
+        and captain_bounty.PrerequisiteQuestId
+            == "WorldrootRelic"
+        and #captain_bounty.Objectives == 1
+        and captain_bounty.Objectives[1].Type == "EnemyDefeat"
+        and captain_bounty.Objectives[1].TargetId
+            == "marauder_captain"
+        and captain_bounty.Objectives[1].Required == 1,
+    "Captain bounty is a level-five optional boss Adventure."
+)
+check(
+    captain_bounty.Reward.Gold == 60
+        and captain_bounty.Reward.ItemId == nil
+        and captain_bounty.Reward.Items == nil,
+    "Captain bounty is intentionally Gold-only."
 )
 check(
     QuestDefinitions.get("MineEchoes").PrerequisiteQuestId
