@@ -276,6 +276,47 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    TempleResonancePuzzle = table.freeze({
+        Id = "TempleResonancePuzzle",
+        DisplayName = "The Resonant Seal",
+        Kind = "Adventure",
+        MinimumLevel = 11,
+        PrerequisiteQuestId = "RuinSurvey",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "CollectResonanceShard",
+                Type = "ItemCollected",
+                TargetId = "temple_resonance_shard",
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "SolveResonanceLock",
+                Type = "PuzzleCompleted",
+                TargetId = "TestDungeon:ResonanceLock:Room2",
+                Required = 1,
+            }),
+        }),
+        TurnInItems = table.freeze({
+            table.freeze({
+                ItemId = "temple_resonance_shard",
+                Quantity = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 75,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "resonant_rune",
+                    Quantity = 1,
+                }),
+            }),
+        }),
+    }),
+
     CorruptedForemanBounty = table.freeze({
         Id = "CorruptedForemanBounty",
         DisplayName = "The Foreman's Reckoning",
@@ -492,6 +533,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.RuinSurvey,
         DEFINITIONS.MineSurveyorEscort,
         DEFINITIONS.CorruptedForemanBounty,
+        DEFINITIONS.TempleResonancePuzzle,
         DEFINITIONS.FractureTrail,
         DEFINITIONS.DungeonBossHunt,
         DEFINITIONS.ExpeditionProvisioning,
