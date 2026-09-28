@@ -319,7 +319,17 @@ function Service:start(
             then
                 return state, {
                     ok = true,
+                    already_started = true,
                     already_completed = true,
+                }
+            end
+            if type(saved) == "table"
+                and saved.Started == true
+            then
+                return state, {
+                    ok = true,
+                    already_started = true,
+                    already_completed = false,
                 }
             end
 
@@ -337,6 +347,7 @@ function Service:start(
 
             return state, {
                 ok = true,
+                already_started = false,
                 already_completed = false,
             }
         end
@@ -350,6 +361,8 @@ function Service:start(
     end
 
     return result(true, nil, {
+        already_started =
+            update.value.already_started == true,
         already_completed =
             update.value.already_completed == true,
     })
