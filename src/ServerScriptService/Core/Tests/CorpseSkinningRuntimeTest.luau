@@ -70,15 +70,39 @@ local fake_player = ({
     Character = character,
 } :: any)
 local grant_calls = 0
+local skinning_level = 1
 local professions = {
+    get_profession_level = function(
+        _self: any,
+        user_id: number,
+        profession_id: string
+    ): (number?, string?)
+        check(
+            user_id == fake_player.UserId
+                and profession_id == "Skinning",
+            "skinning tier lookup uses the authenticated owner"
+        )
+        return skinning_level, nil
+    end,
     gather = function(_self: any, user_id: number, node: any): any
         grant_calls += 1
-        check(user_id == fake_player.UserId
-            and node.ProfessionId == "Skinning"
-            and node.ItemId == "raw_hide"
-            and node.Quantity == 1,
-            "skin grant must use existing service and fixed server resource")
-        return {ok = true, item_id = "raw_hide", quantity = 1}
+        local expected_item = if skinning_level >= 3
+            then "thick_hide"
+            else "raw_hide"
+        local expected_xp = if skinning_level >= 3 then 18 else 8
+        check(
+            user_id == fake_player.UserId
+                and node.ProfessionId == "Skinning"
+                and node.ItemId == expected_item
+                and node.Quantity == 1
+                and node.XP == expected_xp,
+            "skin grant uses the level-appropriate server resource"
+        )
+        return {
+            ok = true,
+            item_id = expected_item,
+            quantity = 1,
+        }
     end,
 }
 
@@ -127,8 +151,12 @@ local bear = create_creature("cave_bear", "Beast", true)
 local bear_humanoid = assert(bear:FindFirstChildOfClass("Humanoid"))
 bear_humanoid.Health = 0
 bear:SetAttribute("LootComplete", true)
+skinning_level = 3
 
 local missing_profile = {
+    get_profession_level = function(): (number?, string?)
+        return 3, nil
+    end,
     gather = function(): any
         return {ok = false, reason = "ProfileNotLoaded"}
     end,
@@ -139,8 +167,12 @@ check(not rejected.ok and rejected.reason == "ProfileNotLoaded",
 check(bear:GetAttribute("SkinningClaimed") == false,
     "failed grant releases the pending corpse claim for retry")
 local retried = Runtime.try_skin(fake_player, bear, professions)
-check(retried.ok and grant_calls == 2,
-    "successful retry grants one hide after profile recovery")
+check(
+    retried.ok
+        and retried.item_id == "thick_hide"
+        and grant_calls == 2,
+    "level-three Skinning extracts one Thick Hide after recovery"
+)
 
 local root = Instance.new("Folder")
 root.Parent = workspace
