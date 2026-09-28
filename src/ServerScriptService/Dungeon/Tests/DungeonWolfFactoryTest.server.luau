@@ -1,6 +1,6 @@
 --!strict
--- Opt-in dungeon wolf factory contract. The default dungeon packs still
--- contain Marauders only; this test does not make them skinnable.
+-- Dungeon wolf factory contract plus the accepted Temple Room 1 binding.
+-- Only the explicit Forest Wolf archetype is enrolled for skinning.
 local CollectionService = game:GetService("CollectionService")
 local RS = game:GetService("ReplicatedStorage")
 local SSS = game:GetService("ServerScriptService")
@@ -28,11 +28,25 @@ end
 local registered = SpawnCatalog.get_enemy_archetype("Wolf")
 check(registered ~= nil and registered.FactoryId == "ForestWolf",
     "wolf must have its own registered enemy factory")
-local unchanged = SpawnCatalog.get_pack(
-    "TestDungeon", "StandardRoom1")
-check(unchanged ~= nil
-    and unchanged.Entries[1].EnemyArchetypeId == "Marauder",
-    "existing dungeon packs must retain their default enemies")
+local room1_pack = SpawnCatalog.get_pack(
+    "TestDungeon",
+    "StandardRoom1"
+)
+local room1_entries = assert(room1_pack)
+check(
+    SpawnCatalog.resolve_pack_count(room1_entries, {}) == 2,
+    "Temple Room1 total enemy count must remain two"
+)
+check(
+    #room1_entries.Entries == 2
+        and room1_entries.Entries[1].EnemyArchetypeId
+            == "Marauder"
+        and room1_entries.Entries[1].BaseCount == 1
+        and room1_entries.Entries[2].EnemyArchetypeId
+            == "Wolf"
+        and room1_entries.Entries[2].BaseCount == 1,
+    "Temple Room1 must bind one Marauder and one Forest Wolf"
+)
 
 local holder = Instance.new("Folder")
 holder.Name = "WolfFactoryTest_TEMP"
