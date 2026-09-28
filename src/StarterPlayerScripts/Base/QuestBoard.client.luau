@@ -256,10 +256,16 @@ local function objective_label(objective: any): string
     elseif objective.Type == "ItemCollected" then
         if objective.TargetId == "hidden_ward_fragment" then
             return "Collect the Hidden Ward Fragment"
+        elseif objective.TargetId == "temple_resonance_shard" then
+            return "Collect the Temple Resonance Shard"
         end
     elseif objective.Type == "EscortCompleted" then
         if objective.TargetId == "AbandonedMine:MineSurveyor" then
             return "Guide the Lost Surveyor through the Mine"
+        end
+    elseif objective.Type == "PuzzleCompleted" then
+        if objective.TargetId == "TestDungeon:ResonanceLock:Room2" then
+            return "Attune the Moon, Root and Flame runes in order"
         end
     end
 
