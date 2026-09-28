@@ -14,6 +14,7 @@ local TESTS = table.freeze({
     "AdventureEligibilityTest",
     "HiddenRoomQuestIntegrationTest",
     "LostSurveyorEscortIntegrationTest",
+    "TempleResonancePuzzleIntegrationTest",
     "C4OriginalFirstTransferQuestArcsTest",
     "C4OriginalFirstTransferQuestStagesTest",
 })
