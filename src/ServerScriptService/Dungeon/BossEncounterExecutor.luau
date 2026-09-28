@@ -113,10 +113,20 @@ local function scaled_reward(
         return nil
     end
 
-    return DungeonDifficultyTuning.scale_monster_reward(
-        reward,
-        context.Tuning
-    )
+    local scaled =
+        DungeonDifficultyTuning.scale_monster_reward(
+            reward,
+            context.Tuning
+        )
+
+    if type(spec.BestiaryCreatureId) == "string"
+        and spec.BestiaryCreatureId ~= ""
+    then
+        scaled.BestiaryCreatureId =
+            spec.BestiaryCreatureId
+    end
+
+    return scaled
 end
 
 -- Spawns one registered boss and returns its presentation handles.
