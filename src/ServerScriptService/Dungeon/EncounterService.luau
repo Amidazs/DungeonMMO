@@ -49,7 +49,10 @@ local function reward_from_model(model: Model, modifier_id: string?): any
     }
 end
 
-local function transaction_id(session_id: string, model: Model): string
+local function transaction_id(
+    session_id: string,
+    model: Model
+): string
     return string.format(
         "%s:%s:Life%d",
         session_id,
@@ -58,10 +61,34 @@ local function transaction_id(session_id: string, model: Model): string
     )
 end
 
+--[[
+Returns the stable quest-facing identity for one rewarded enemy.
+
+Args:
+    model (Model): Server-registered encounter enemy.
+
+Returns:
+    string?: Bestiary identity first, then boss identity when available.
+]]
+local function quest_target_id(model: Model): string?
+    local bestiary_id = model:GetAttribute("BestiaryCreatureId")
+    if type(bestiary_id) == "string" and bestiary_id ~= "" then
+        return bestiary_id
+    end
+
+    local boss_id = model:GetAttribute("BossId")
+    if type(boss_id) == "string" and boss_id ~= "" then
+        return boss_id
+    end
+
+    return nil
+end
+
 function EncounterService.new(
     reward_service: any,
     session_id: string,
-    modifier_id: string?
+    modifier_id: string?,
+    quest_service: any?
 ): any
     assert(reward_service ~= nil, "EncounterService requires RewardService")
     assert(type(session_id) == "string" and session_id ~= "", "EncounterService requires SessionId")
@@ -69,6 +96,7 @@ function EncounterService.new(
     self._rewards = reward_service
     self._session_id = session_id
     self._modifier_id = modifier_id
+    self._quests = quest_service
     self._encounters = {}
     self._current_id = nil
     return self
@@ -197,14 +225,61 @@ function EncounterService:on_enemy_died(enemy_model: Model): any
     if reward_result.ok ~= true then
         enemy.Dead = false
         encounter.DeadEnemies -= 1
-        return operation(false, reward_result.reason or "RewardFailed", {reward_result = reward_result})
+        return operation(
+            false,
+            reward_result.reason or "RewardFailed",
+            {reward_result = reward_result}
+        )
     end
 
-    encounter.Clear = encounter.DeadEnemies >= encounter.TotalEnemies
+    local quest_progress = {}
+    local quest_target = quest_target_id(enemy_model)
+
+    if self._quests and quest_target then
+        local event_id = transaction_id(
+            self._session_id,
+            enemy_model
+        ) .. ":EnemyDefeat"
+
+        for _, user_id in ipairs(eligible) do
+            local quest_result = self._quests:record_event(
+                user_id,
+                {
+                    EventId = event_id,
+                    Type = "EnemyDefeat",
+                    TargetId = quest_target,
+                    Amount = 1,
+                }
+            )
+
+            if not quest_result or quest_result.ok ~= true then
+                enemy.Dead = false
+                encounter.DeadEnemies -= 1
+                return operation(
+                    false,
+                    if quest_result
+                            and quest_result.reason
+                        then quest_result.reason
+                        else "QuestProgressFailed",
+                    {
+                        reward_result = reward_result,
+                        quest_progress = quest_progress,
+                    }
+                )
+            end
+
+            quest_progress[tostring(user_id)] =
+                quest_result
+        end
+    end
+
+    encounter.Clear =
+        encounter.DeadEnemies >= encounter.TotalEnemies
     return operation(true, nil, {
         already_processed = false,
         cleared = encounter.Clear,
         reward_result = reward_result,
+        quest_progress = quest_progress,
         eligible_members = eligible,
     })
 end
