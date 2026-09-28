@@ -51,6 +51,12 @@ local function ensure_state(character: any): any
         quests.Completed = {}
     end
 
+    if quests.TrackedQuestId ~= nil
+        and type(quests.TrackedQuestId) ~= "string"
+    then
+        quests.TrackedQuestId = nil
+    end
+
     return quests
 end
 
@@ -320,6 +326,7 @@ function QuestService:start(user_id: number, quest_id: string): any
             end
 
             live_quests.Active[quest_id] = initial_state(definition)
+            live_quests.TrackedQuestId = quest_id
         end
     )
 
@@ -332,6 +339,65 @@ function QuestService:start(user_id: number, quest_id: string): any
 
     return result(true, nil, {
         quest_id = quest_id,
+    })
+end
+
+--[[
+Sets the single Adventure quest selected for HUD tracking.
+
+Args:
+    user_id (number): Authenticated loaded character owner.
+    quest_id (string): Active Adventure quest to track.
+
+Returns:
+    any: Success result with tracked quest id, or a fail-closed reason.
+]]
+function QuestService:set_tracked(
+    user_id: number,
+    quest_id: string
+): any
+    local definition = QuestDefinitions.get(quest_id)
+    if not definition or definition.Kind ~= "Adventure" then
+        return result(false, "QuestNotTrackable")
+    end
+
+    local character = self._profiles:get_character(user_id)
+    if not character then
+        return result(false, "ProfileNotLoaded")
+    end
+
+    local quests = ensure_state(character)
+    if type(quests.Active[quest_id]) ~= "table" then
+        return result(false, "QuestNotActive")
+    end
+
+    local mutation_ok, mutation_error = self._profiles:mutate(
+        user_id,
+        function(profile: any)
+            local live_character = selected_character(profile)
+            if not live_character then
+                error("CharacterUnavailable")
+            end
+
+            local live_quests = ensure_state(live_character)
+            if type(live_quests.Active[quest_id]) ~= "table" then
+                error("QuestNotActive")
+            end
+
+            live_quests.TrackedQuestId = quest_id
+        end
+    )
+
+    if not mutation_ok then
+        if mutation_error == "ProfileNotLoaded" then
+            return result(false, "ProfileNotLoaded")
+        end
+        return result(false, "QuestMutationFailed")
+    end
+
+    return result(true, nil, {
+        quest_id = quest_id,
+        tracked_quest_id = quest_id,
     })
 end
 
@@ -557,6 +623,7 @@ function QuestService:build_snapshot(user_id: number): any
         Version = quests.Version,
         Active = ProfileSchema.deep_clone(quests.Active),
         Completed = ProfileSchema.deep_clone(quests.Completed),
+        TrackedQuestId = quests.TrackedQuestId,
     })
 end
 
@@ -602,6 +669,10 @@ function QuestService.complete_ready_character_quest(
 
     quests.Active[quest_id] = nil
     quests.Completed[quest_id] = true
+
+    if quests.TrackedQuestId == quest_id then
+        quests.TrackedQuestId = nil
+    end
 
     return true, nil
 end
