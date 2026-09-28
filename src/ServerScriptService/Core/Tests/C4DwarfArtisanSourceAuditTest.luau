@@ -86,10 +86,10 @@ local function main()
     end
 
     local coverage = SkillTree.coverage()
-    check(coverage.PathCount == 23, "coverage expands to 23 paths")
-    check(coverage.RowCount == 1370, "coverage expands to 1370 rows")
-    check(coverage.UniqueSourceSkillIds == 170,
-        "coverage expands to 170 unique source skill ids")
+    check(coverage.PathCount == 24, "coverage expands to 24 paths")
+    check(coverage.RowCount == 1419, "coverage expands to 1419 rows")
+    check(coverage.UniqueSourceSkillIds == 171,
+        "coverage expands to 171 unique source skill ids")
 
     print(
         ("[Dwarf Artisan Source Audit] PASS: %d assertions rows=65")
