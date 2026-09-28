@@ -1,5 +1,5 @@
 --!strict
--- Local-only tutorial route with fluid player-relative floor guidance.
+-- Fluid client-only tutorial guidance with a looping objective-ward flow.
 
 local PathfindingService = game:GetService("PathfindingService")
 local RunService = game:GetService("RunService")
@@ -10,40 +10,48 @@ Guide.__index = Guide
 
 local FOLDER_NAME = "DungeonMMOTutorialGroundGuide"
 
-local MARKER_WIDTH = 0.34
-local MARKER_LENGTH = 1.05
-local MARKER_HEIGHT = 0.05
-local MARKER_SPACING = 2.75
-local MARKER_LEAD_DISTANCE = 1.25
+local MARKER_WIDTH = 0.28
+local MARKER_LENGTH = 0.82
+local MARKER_HEIGHT = 0.045
+local MARKER_SPACING = 3.4
+local MARKER_TRANSPARENCY = 0.62
 
-local ARROW_SPACING = 12
-local ARROW_LEAD_DISTANCE = 4.5
+local ARROW_SPACING = 9
+local ARROW_SPEED = 8.5
+local ARROW_TRANSPARENCY = 0.16
+local ARROW_START_GAP = 1.5
 
-local ROUTE_SAMPLE_SPACING = 0.75
 local FLOOR_LIFT = 0.09
 local PLAYER_FLOOR_OFFSET = 3
+local ROUTE_SAMPLE_SPACING = 0.8
+local LEAD_SAMPLE_SPACING = 0.8
+local JOIN_AHEAD_DISTANCE = 3.5
+
 local PATH_REFRESH_SECONDS = 0.35
 local TARGET_REFRESH_DISTANCE = 1
 local REROUTE_DISTANCE = 7
+local REROUTE_COOLDOWN = 0.65
+local JOIN_SMOOTH_SPEED = 14
+local ROUTE_BLEND_SPEED = 6
 
-local PROGRESS_SMOOTH_SPEED = 18
-local FADE_SMOOTH_SPEED = 12
-local VISIBLE_TRANSPARENCY = 0.28
+local FADE_SMOOTH_SPEED = 14
 local HIDDEN_TRANSPARENCY = 1
-
 local HUE_SPEED = 0.025
-local HUE_SPREAD = 0.06
+local HUE_SPREAD = 0.055
+
+local MAX_MARKERS = 32
+local MAX_ARROWS = 14
 
 --[[
-Creates one reusable client-only visual part.
+Creates one pooled local visual part.
 
 Args:
-    parent (Instance): Folder receiving the visual.
+    parent (Instance): Folder receiving the part.
     name (string): Stable visual name.
-    size (Vector3): Visual dimensions.
+    size (Vector3): Part dimensions.
 
 Returns:
-    Part: Hidden non-colliding Neon part ready for pooling.
+    Part: Hidden, non-colliding Neon visual.
 ]]
 local function create_visual_part(
     parent: Instance,
@@ -66,13 +74,13 @@ local function create_visual_part(
 end
 
 --[[
-Returns the current local character root when available.
+Returns the local player's current HumanoidRootPart.
 
 Args:
     player (Player): Local player.
 
 Returns:
-    BasePart?: Current HumanoidRootPart.
+    BasePart?: Current root part when available.
 ]]
 local function character_root(player: Player): BasePart?
     local character = player.Character
@@ -85,15 +93,34 @@ local function character_root(player: Player): BasePart?
 end
 
 --[[
-Projects one route position onto real collidable floor geometry.
+Returns a frame-rate-independent exponential smoothing alpha.
 
 Args:
-    position (Vector3): Route-space position.
-    character (Model?): Character to exclude from the ray.
-    folder (Folder): Guide folder to exclude.
+    speed (number): Smoothing response speed.
+    delta_time (number): Seconds since the previous update.
 
 Returns:
-    Vector3: Floor-adjusted route position.
+    number: Interpolation alpha in the range 0-1.
+]]
+local function smoothing_alpha(
+    speed: number,
+    delta_time: number
+): number
+    return 1 - math.exp(
+        -speed * math.max(delta_time, 0)
+    )
+end
+
+--[[
+Projects one visual position onto real collidable floor geometry.
+
+Args:
+    position (Vector3): World position to project.
+    character (Model?): Character excluded from raycasts.
+    folder (Folder): Guide visuals excluded from raycasts.
+
+Returns:
+    Vector3: Position resting just above collidable floor.
 ]]
 local function floor_position(
     position: Vector3,
@@ -112,8 +139,8 @@ local function floor_position(
     params.RespectCanCollide = true
 
     local result = Workspace:Raycast(
-        position + Vector3.new(0, 6, 0),
-        Vector3.new(0, -18, 0),
+        position + Vector3.new(0, 7, 0),
+        Vector3.new(0, -22, 0),
         params
     )
 
@@ -129,14 +156,14 @@ local function floor_position(
 end
 
 --[[
-Computes a walkable path from the player to the current tutorial target.
+Computes a structural pathfinding corridor to the tutorial target.
 
 Args:
     start_position (Vector3): Current player position.
-    target_position (Vector3): Static tutorial destination.
+    target_position (Vector3): Tutorial target position.
 
 Returns:
-    {PathWaypoint}?: Complete path when pathfinding succeeds.
+    {PathWaypoint}?: Successful pathfinding waypoints.
 ]]
 local function compute_path(
     start_position: Vector3,
@@ -168,25 +195,74 @@ local function compute_path(
 end
 
 --[[
-Builds dense floor-conforming samples from pathfinding waypoints.
-
-Dense samples let visuals move every frame without running floor raycasts
-every frame or bridging several studs of uneven terrain.
+Builds cumulative distances for ordered route positions.
 
 Args:
-    waypoints ({PathWaypoint}): Structural pathfinding route.
+    positions ({Vector3}): Ordered route positions.
+
+Returns:
+    {number}: Cumulative distance at each position.
+    number: Total route length.
+]]
+local function build_distances(
+    positions: {Vector3}
+): ({number}, number)
+    local distances = {0}
+    local total = 0
+
+    for index = 2, #positions do
+        total += (
+            positions[index] - positions[index - 1]
+        ).Magnitude
+        table.insert(distances, total)
+    end
+
+    return distances, total
+end
+
+--[[
+Creates one route-data table from ordered positions.
+
+Args:
+    positions ({Vector3}): Ordered floor-conforming positions.
+
+Returns:
+    any: Route with Positions, Distances and Length fields.
+]]
+local function create_route(
+    positions: {Vector3}
+): any
+    if #positions < 2 then
+        return nil
+    end
+
+    local distances, total_length =
+        build_distances(positions)
+
+    return {
+        Positions = positions,
+        Distances = distances,
+        Length = total_length,
+    }
+end
+
+--[[
+Converts structural path waypoints into a dense floor-conforming route.
+
+Args:
+    waypoints ({PathWaypoint}): Successful pathfinding route.
     character (Model?): Character excluded from floor projection.
     folder (Folder): Guide folder excluded from floor projection.
 
 Returns:
-    {Vector3}: Dense floor-conforming route positions.
+    any: Dense structural route data.
 ]]
-local function build_route_samples(
+local function build_structural_route(
     waypoints: {PathWaypoint},
     character: Model?,
     folder: Folder
-): {Vector3}
-    local samples = {}
+): any
+    local positions = {}
 
     for index = 1, #waypoints - 1 do
         local start_position = waypoints[index].Position
@@ -204,8 +280,9 @@ local function build_route_samples(
                 end_position,
                 alpha
             )
+
             table.insert(
-                samples,
+                positions,
                 floor_position(
                     raw_position,
                     character,
@@ -215,58 +292,106 @@ local function build_route_samples(
         end
     end
 
-    return samples
+    return create_route(positions)
 end
 
 --[[
-Builds cumulative route distances for efficient progress sampling.
+Finds the route segment containing one distance value.
 
 Args:
-    positions ({Vector3}): Ordered dense route positions.
+    route (any): Route-data table.
+    route_distance (number): Requested distance along the route.
 
 Returns:
-    {number}: Cumulative distance at each route position.
-    number: Total route length.
+    number: Segment start index.
 ]]
-local function build_route_distances(
-    positions: {Vector3}
-): ({number}, number)
-    local distances = {0}
-    local total = 0
+local function route_segment_index(
+    route: any,
+    route_distance: number
+): number
+    local distances = route.Distances
+    local low = 1
+    local high = math.max(1, #distances - 1)
 
-    for index = 2, #positions do
-        total += (
-            positions[index] - positions[index - 1]
-        ).Magnitude
-        table.insert(distances, total)
+    while low < high do
+        local middle = math.floor((low + high + 1) / 2)
+
+        if distances[middle] <= route_distance then
+            low = middle
+        else
+            high = middle - 1
+        end
     end
 
-    return distances, total
+    return math.min(low, #distances - 1)
 end
 
 --[[
-Returns the closest route progress and distance from one world point.
+Samples a route position and forward direction at one route distance.
 
 Args:
-    point (Vector3): Player floor position.
-    positions ({Vector3}): Dense route positions.
-    distances ({number}): Cumulative route distances.
+    route (any): Route-data table.
+    route_distance (number): Distance along the route.
 
 Returns:
-    number: Distance along the route at the closest point.
-    number: Distance from the player to that route point.
+    Vector3: Interpolated route position.
+    Vector3: Forward route direction.
+]]
+local function sample_route(
+    route: any,
+    route_distance: number
+): (Vector3, Vector3)
+    local clamped = math.clamp(
+        route_distance,
+        0,
+        route.Length
+    )
+    local index = route_segment_index(
+        route,
+        clamped
+    )
+
+    local start_position = route.Positions[index]
+    local end_position = route.Positions[index + 1]
+    local start_distance = route.Distances[index]
+    local end_distance = route.Distances[index + 1]
+    local segment_length = math.max(
+        end_distance - start_distance,
+        0.001
+    )
+    local alpha = math.clamp(
+        (clamped - start_distance) / segment_length,
+        0,
+        1
+    )
+
+    return start_position:Lerp(
+        end_position,
+        alpha
+    ), end_position - start_position
+end
+
+--[[
+Finds the closest progress along a route to one world point.
+
+Args:
+    point (Vector3): World point to compare.
+    route (any): Route-data table.
+
+Returns:
+    number: Closest distance along the route.
+    number: World distance to that closest point.
 ]]
 local function closest_route_progress(
     point: Vector3,
-    positions: {Vector3},
-    distances: {number}
+    route: any
 ): (number, number)
     local best_progress = 0
     local best_distance = math.huge
 
-    for index = 1, #positions - 1 do
-        local start_position = positions[index]
-        local end_position = positions[index + 1]
+    for index = 1, #route.Positions - 1 do
+        local start_position = route.Positions[index]
+        local end_position = route.Positions[index + 1]
         local segment = end_position - start_position
         local length_squared = segment:Dot(segment)
 
@@ -281,10 +406,9 @@ local function closest_route_progress(
             local distance = (point - closest).Magnitude
 
             if distance < best_distance then
-                local segment_length = segment.Magnitude
                 best_distance = distance
-                best_progress = distances[index]
-                    + segment_length * alpha
+                best_progress = route.Distances[index]
+                    + segment.Magnitude * alpha
             end
         end
     end
@@ -293,115 +417,136 @@ local function closest_route_progress(
 end
 
 --[[
-Finds the dense route segment containing one distance value.
+Appends a floor-conforming lead-in from the player to the route join.
 
 Args:
-    distances ({number}): Cumulative route distances.
-    route_distance (number): Distance along the route.
+    positions ({Vector3}): Destination position array.
+    start_position (Vector3): Current player floor position.
+    end_position (Vector3): Current structural-route join.
+    character (Model?): Character excluded from floor projection.
+    folder (Folder): Guide folder excluded from floor projection.
 
 Returns:
-    number: Segment start index.
+    nil: Appends dense lead-in positions in place.
 ]]
-local function route_segment_index(
-    distances: {number},
-    route_distance: number
-): number
-    local low = 1
-    local high = math.max(1, #distances - 1)
+local function append_lead_positions(
+    positions: {Vector3},
+    start_position: Vector3,
+    end_position: Vector3,
+    character: Model?,
+    folder: Folder
+)
+    local length = (end_position - start_position).Magnitude
+    local steps = math.max(
+        1,
+        math.ceil(length / LEAD_SAMPLE_SPACING)
+    )
 
-    while low < high do
-        local mid = math.floor((low + high + 1) / 2)
+    for step = 0, steps - 1 do
+        local alpha = step / steps
+        local raw_position = start_position:Lerp(
+            end_position,
+            alpha
+        )
 
-        if distances[mid] <= route_distance then
-            low = mid
-        else
-            high = mid - 1
+        table.insert(
+            positions,
+            floor_position(
+                raw_position,
+                character,
+                folder
+            )
+        )
+    end
+end
+
+--[[
+Appends the structural route tail after a join distance.
+
+Args:
+    positions ({Vector3}): Destination position array.
+    route (any): Structural route.
+    join_distance (number): Distance along structural route to join.
+
+Returns:
+    nil: Appends the route tail in place.
+]]
+local function append_route_tail(
+    positions: {Vector3},
+    route: any,
+    join_distance: number
+)
+    local join_position = sample_route(
+        route,
+        join_distance
+    )
+    table.insert(positions, join_position)
+
+    for index, distance in ipairs(route.Distances) do
+        if distance > join_distance + 0.05 then
+            table.insert(
+                positions,
+                route.Positions[index]
+            )
         end
     end
-
-    return math.min(low, #distances - 1)
 end
 
 --[[
-Samples a position and forward direction at one route distance.
+Builds the live route whose source is always the current player position.
 
 Args:
-    positions ({Vector3}): Dense route positions.
-    distances ({number}): Cumulative route distances.
-    total_length (number): Total route length.
-    route_distance (number): Requested distance along the route.
+    player_floor (Vector3): Current player floor position.
+    structural_route (any): Stable pathfinding corridor.
+    join_progress (number): Smoothed route join progress.
+    character (Model?): Character excluded from floor projection.
+    folder (Folder): Guide folder excluded from floor projection.
 
 Returns:
-    Vector3: Interpolated floor position.
-    Vector3: Forward direction along the route.
+    any: Live player-to-target route data.
 ]]
-local function sample_route(
-    positions: {Vector3},
-    distances: {number},
-    total_length: number,
-    route_distance: number
-): (Vector3, Vector3)
-    local clamped = math.clamp(
-        route_distance,
-        0,
-        total_length
+local function build_live_route(
+    player_floor: Vector3,
+    structural_route: any,
+    join_progress: number,
+    character: Model?,
+    folder: Folder
+): any
+    local join_distance = math.min(
+        join_progress + JOIN_AHEAD_DISTANCE,
+        structural_route.Length
     )
-    local index = route_segment_index(
-        distances,
-        clamped
+    local join_position = sample_route(
+        structural_route,
+        join_distance
+    )
+    local positions = {}
+
+    append_lead_positions(
+        positions,
+        player_floor,
+        join_position,
+        character,
+        folder
+    )
+    append_route_tail(
+        positions,
+        structural_route,
+        join_distance
     )
 
-    local start_position = positions[index]
-    local end_position = positions[index + 1]
-    local start_distance = distances[index]
-    local end_distance = distances[index + 1]
-    local segment_length = math.max(
-        end_distance - start_distance,
-        0.001
-    )
-    local alpha = math.clamp(
-        (clamped - start_distance) / segment_length,
-        0,
-        1
-    )
-
-    local position = start_position:Lerp(
-        end_position,
-        alpha
-    )
-    local direction = end_position - start_position
-
-    return position, direction
+    return create_route(positions)
 end
 
 --[[
-Returns a frame-rate-independent smoothing alpha.
+Creates one pooled three-piece directional arrow.
 
 Args:
-    speed (number): Exponential smoothing speed.
-    delta_time (number): Seconds since the previous frame.
+    parent (Instance): Guide folder.
+    index (number): Stable pool index.
 
 Returns:
-    number: Interpolation alpha in the range 0-1.
-]]
-local function smoothing_alpha(
-    speed: number,
-    delta_time: number
-): number
-    return 1 - math.exp(
-        -speed * math.max(delta_time, 0)
-    )
-end
-
---[[
-Creates one pooled three-piece floor arrow.
-
-Args:
-    parent (Instance): Guide folder receiving arrow pieces.
-    index (number): Stable arrow pool index.
-
-Returns:
-    any: Arrow pool entry containing shaft and wings.
+    any: Arrow entry with Shaft, Left and Right parts.
 ]]
 local function create_arrow_entry(
     parent: Instance,
@@ -410,33 +555,33 @@ local function create_arrow_entry(
     return {
         Shaft = create_visual_part(
             parent,
-            "ArrowShaft" .. tostring(index),
-            Vector3.new(0.3, MARKER_HEIGHT, 1.55)
+            "FlowArrowShaft" .. tostring(index),
+            Vector3.new(0.32, MARKER_HEIGHT, 1.65)
         ),
         Left = create_visual_part(
             parent,
-            "ArrowWing" .. tostring(index) .. "_Left",
-            Vector3.new(0.26, MARKER_HEIGHT, 1.05)
+            "FlowArrowLeft" .. tostring(index),
+            Vector3.new(0.28, MARKER_HEIGHT, 1.08)
         ),
         Right = create_visual_part(
             parent,
-            "ArrowWing" .. tostring(index) .. "_Right",
-            Vector3.new(0.26, MARKER_HEIGHT, 1.05)
+            "FlowArrowRight" .. tostring(index),
+            Vector3.new(0.28, MARKER_HEIGHT, 1.08)
         ),
     }
 end
 
 --[[
-Returns target transforms for one pooled floor arrow.
+Returns the three transforms for one floor arrow.
 
 Args:
     position (Vector3): Arrow centre.
     direction (Vector3): Route-forward direction.
 
 Returns:
-    CFrame?: Shaft target transform.
-    CFrame?: Left-wing target transform.
-    CFrame?: Right-wing target transform.
+    CFrame?: Shaft transform.
+    CFrame?: Left-wing transform.
+    CFrame?: Right-wing transform.
 ]]
 local function arrow_cframes(
     position: Vector3,
@@ -456,34 +601,33 @@ local function arrow_cframes(
         position,
         position + flat_direction
     )
-    local tip = facing * CFrame.new(0, 0, -0.75)
+    local tip = facing * CFrame.new(0, 0, -0.78)
 
-    local left = tip
-        * CFrame.Angles(0, math.rad(-38), 0)
-        * CFrame.new(0, 0, 0.36)
-    local right = tip
-        * CFrame.Angles(0, math.rad(38), 0)
-        * CFrame.new(0, 0, 0.36)
-
-    return facing, left, right
+    return facing,
+        tip
+            * CFrame.Angles(0, math.rad(-38), 0)
+            * CFrame.new(0, 0, 0.36),
+        tip
+            * CFrame.Angles(0, math.rad(38), 0)
+            * CFrame.new(0, 0, 0.36)
 end
 
 --[[
-Moves and fades one pooled part toward its current visual target.
+Moves one pooled visual to a target or fades it out.
 
 Args:
     part (BasePart): Pooled visual part.
-    target_cframe (CFrame?): Desired transform when visible.
-    visible (boolean): Whether the part should currently be visible.
-    delta_time (number): Frame delta used for smoothing.
+    target_cframe (CFrame?): Visible target transform.
+    visible_transparency (number): Transparency while visible.
+    delta_time (number): Render-frame delta.
 
 Returns:
-    nil: Updates the local visual part in place.
+    nil: Updates the visual in place without recreating it.
 ]]
-local function update_visual_part(
+local function update_part(
     part: BasePart,
     target_cframe: CFrame?,
-    visible: boolean,
+    visible_transparency: number,
     delta_time: number
 )
     local fade_alpha = smoothing_alpha(
@@ -491,10 +635,10 @@ local function update_visual_part(
         delta_time
     )
 
-    if visible and target_cframe then
+    if target_cframe then
         part.CFrame = target_cframe
         part.Transparency += (
-            VISIBLE_TRANSPARENCY - part.Transparency
+            visible_transparency - part.Transparency
         ) * fade_alpha
     else
         part.Transparency += (
@@ -504,7 +648,57 @@ local function update_visual_part(
 end
 
 --[[
-Ensures enough pooled marker parts exist for the current visible route.
+Blends a sample between old and new live routes during rerouting.
+
+Args:
+    old_route (any?): Previous live route.
+    new_route (any): Current live route.
+    new_distance (number): Distance along the current live route.
+    blend (number): Route transition amount from 0-1.
+
+Returns:
+    Vector3: Blended position.
+    Vector3: Blended forward direction.
+]]
+local function blended_sample(
+    old_route: any?,
+    new_route: any,
+    new_distance: number,
+    blend: number
+): (Vector3, Vector3)
+    local new_position, new_direction = sample_route(
+        new_route,
+        new_distance
+    )
+
+    if not old_route or blend >= 0.999 then
+        return new_position, new_direction
+    end
+
+    local ratio = if new_route.Length > 0.001
+        then new_distance / new_route.Length
+        else 0
+    local old_distance = math.clamp(
+        ratio,
+        0,
+        1
+    ) * old_route.Length
+    local old_position, old_direction = sample_route(
+        old_route,
+        old_distance
+    )
+
+    return old_position:Lerp(
+        new_position,
+        blend
+    ), old_direction:Lerp(
+        new_direction,
+        blend
+    )
+end
+
+--[[
+Ensures the reusable marker pool can cover the current route.
 
 Args:
     self (any): Tutorial guide instance.
@@ -532,7 +726,7 @@ function Guide:_ensure_marker_pool(count: number)
 end
 
 --[[
-Ensures enough pooled arrow entries exist for the current visible route.
+Ensures the reusable arrow pool can cover the current route.
 
 Args:
     self (any): Tutorial guide instance.
@@ -544,37 +738,37 @@ Returns:
 function Guide:_ensure_arrow_pool(count: number)
     while #self._arrow_pool < count do
         local index = #self._arrow_pool + 1
-        local entry = create_arrow_entry(
+        local arrow = create_arrow_entry(
             self._folder,
             index
         )
 
-        table.insert(self._arrow_pool, entry)
-        table.insert(self._visual_parts, entry.Shaft)
-        table.insert(self._visual_parts, entry.Left)
-        table.insert(self._visual_parts, entry.Right)
+        table.insert(self._arrow_pool, arrow)
+        table.insert(self._visual_parts, arrow.Shaft)
+        table.insert(self._visual_parts, arrow.Left)
+        table.insert(self._visual_parts, arrow.Right)
     end
 end
 
 --[[
-Hides all pooled visuals without destroying them.
+Hides all pooled guide visuals without destroying them.
 
 Args:
     self (any): Tutorial guide instance.
-    immediate (boolean): Whether to hide without a fade.
+    immediate (boolean): Whether to hide instantly.
 
 Returns:
-    nil: Preserves pool instances for later reuse.
+    nil: Preserves every pool instance for later reuse.
 ]]
 function Guide:_hide_visuals(immediate: boolean)
     for _, part in ipairs(self._visual_parts) do
         if immediate then
             part.Transparency = HIDDEN_TRANSPARENCY
         else
-            update_visual_part(
+            update_part(
                 part,
                 nil,
-                false,
+                MARKER_TRANSPARENCY,
                 1 / 60
             )
         end
@@ -582,125 +776,195 @@ function Guide:_hide_visuals(immediate: boolean)
 end
 
 --[[
-Replaces the structural route while keeping visual instances pooled.
+Installs a new structural corridor and starts a soft route transition.
 
 Args:
     self (any): Tutorial guide instance.
-    waypoints ({PathWaypoint}): Newly calculated structural route.
+    route (any): Newly calculated structural route.
 
 Returns:
-    nil: Stores a dense floor-conforming route for fluid sampling.
+    nil: Updates structural route state without touching visual instances.
 ]]
-function Guide:_set_route(waypoints: {PathWaypoint})
-    local positions = build_route_samples(
-        waypoints,
-        self._player.Character,
-        self._folder
-    )
-
-    if #positions < 2 then
-        return
+function Guide:_install_route(route: any)
+    if self._structural_route then
+        self._previous_structural_route =
+            self._structural_route
+        self._route_blend = 0
+    else
+        self._previous_structural_route = nil
+        self._route_blend = 1
     end
 
-    local distances, total_length =
-        build_route_distances(positions)
-
-    self._path_positions = positions
-    self._path_distances = distances
-    self._path_length = total_length
-    self._route_deviation = 0
-    self._display_progress = nil
+    self._structural_route = route
+    self._join_progress = nil
+    self._last_reroute_time = os.clock()
 end
 
 --[[
-Clears structural route state while preserving pooled visual instances.
+Clears structural route state and hides visuals.
 
 Args:
     self (any): Tutorial guide instance.
 
 Returns:
-    nil: Resets route data and hides current visuals.
+    nil: Resets route state while retaining visual pools.
 ]]
 function Guide:_clear_route()
-    self._path_positions = {}
-    self._path_distances = {}
-    self._path_length = 0
+    self._structural_route = nil
+    self._previous_structural_route = nil
+    self._join_progress = nil
     self._route_deviation = math.huge
-    self._display_progress = nil
+    self._route_blend = 1
     self:_hide_visuals(true)
 end
 
 --[[
-Updates pooled trail markers from the player's live route progress.
+Updates the smoothed join point between the moving player and route corridor.
 
 Args:
     self (any): Tutorial guide instance.
-    progress (number): Player distance along the route.
-    delta_time (number): Frame delta.
+    player_floor (Vector3): Current player floor position.
+    delta_time (number): Render-frame delta.
 
 Returns:
-    nil: Smoothly advances markers from the moving source.
+    number: Smoothed join progress.
+]]
+function Guide:_update_join_progress(
+    player_floor: Vector3,
+    delta_time: number
+): number
+    local progress, deviation = closest_route_progress(
+        player_floor,
+        self._structural_route
+    )
+    self._route_deviation = deviation
+
+    if self._join_progress == nil then
+        self._join_progress = progress
+        return progress
+    end
+
+    local alpha = smoothing_alpha(
+        JOIN_SMOOTH_SPEED,
+        delta_time
+    )
+    self._join_progress += (
+        progress - self._join_progress
+    ) * alpha
+
+    return self._join_progress
+end
+
+--[[
+Builds live current and previous routes from the moving player source.
+
+Args:
+    self (any): Tutorial guide instance.
+    player_floor (Vector3): Current player floor position.
+    join_progress (number): Current smoothed join progress.
+
+Returns:
+    any: Current live route.
+    any?: Previous live route used only during route blending.
+]]
+function Guide:_build_live_routes(
+    player_floor: Vector3,
+    join_progress: number
+): (any, any?)
+    local character = self._player.Character
+    local current = build_live_route(
+        player_floor,
+        self._structural_route,
+        join_progress,
+        character,
+        self._folder
+    )
+    local previous = nil
+
+    if self._previous_structural_route
+        and self._route_blend < 0.999
+    then
+        local previous_progress = closest_route_progress(
+            player_floor,
+            self._previous_structural_route
+        )
+        previous = build_live_route(
+            player_floor,
+            self._previous_structural_route,
+            previous_progress,
+            character,
+            self._folder
+        )
+    end
+
+    return current, previous
+end
+
+--[[
+Updates the faint route underlay from the moving player source.
+
+Args:
+    self (any): Tutorial guide instance.
+    current_route (any): Current live route.
+    previous_route (any?): Previous live route during rerouting.
+    delta_time (number): Render-frame delta.
+
+Returns:
+    nil: Reuses pooled marker parts.
 ]]
 function Guide:_update_markers(
-    progress: number,
+    current_route: any,
+    previous_route: any?,
     delta_time: number
 )
-    local start_distance = math.min(
-        progress + MARKER_LEAD_DISTANCE,
-        self._path_length
+    local count = math.min(
+        MAX_MARKERS,
+        math.floor(
+            current_route.Length / MARKER_SPACING
+        )
     )
-    local remaining = math.max(
-        self._path_length - start_distance,
-        0
-    )
-    local count = if remaining > 0.1
-        then math.floor(remaining / MARKER_SPACING) + 1
-        else 0
-
     self:_ensure_marker_pool(count)
 
     for index, marker in ipairs(self._marker_pool) do
         if index <= count then
-            local route_distance = math.min(
-                start_distance
-                    + (index - 1) * MARKER_SPACING,
-                self._path_length
+            local distance = index * MARKER_SPACING
+            local position, direction = blended_sample(
+                previous_route,
+                current_route,
+                distance,
+                self._route_blend
             )
-            local sampled_position, direction = sample_route(
-                self._path_positions,
-                self._path_distances,
-                self._path_length,
-                route_distance
-            )
-            local position = floor_position(
-                sampled_position,
+            position = floor_position(
+                position,
                 self._player.Character,
                 self._folder
             )
+
             local flat_direction = Vector3.new(
                 direction.X,
                 0,
                 direction.Z
             )
+            local target = nil
 
-            local target_cframe = if flat_direction.Magnitude >= 0.1
-                then CFrame.lookAt(
+            if flat_direction.Magnitude >= 0.1 then
+                target = CFrame.lookAt(
                     position,
                     position + flat_direction
                 )
-                else marker.CFrame
+            end
 
-            update_visual_part(
+            update_part(
                 marker,
-                target_cframe,
-                true,
+                target,
+                MARKER_TRANSPARENCY,
                 delta_time
             )
         else
-            update_visual_part(
+            update_part(
                 marker,
                 nil,
-                false,
+                MARKER_TRANSPARENCY,
                 delta_time
             )
         end
@@ -708,93 +972,100 @@ function Guide:_update_markers(
 end
 
 --[[
-Updates pooled directional arrows from the player's live route progress.
+Updates looping arrows that constantly travel toward the objective.
+
+The flow phase is independent of player progress. Moving sideways or away from
+the target changes the live route shape, but never reverses or resets the flow.
 
 Args:
     self (any): Tutorial guide instance.
-    progress (number): Player distance along the route.
-    delta_time (number): Frame delta.
+    current_route (any): Current live route.
+    previous_route (any?): Previous live route during rerouting.
+    delta_time (number): Render-frame delta.
 
 Returns:
-    nil: Smoothly advances arrows without recreating instances.
+    nil: Reuses arrow instances while advancing their flow phase.
 ]]
-function Guide:_update_arrows(
-    progress: number,
+function Guide:_update_flow_arrows(
+    current_route: any,
+    previous_route: any?,
     delta_time: number
 )
-    local start_distance = math.min(
-        progress + ARROW_LEAD_DISTANCE,
-        self._path_length
-    )
-    local remaining = math.max(
-        self._path_length - start_distance,
+    self._flow_phase = (
+        self._flow_phase + ARROW_SPEED * delta_time
+    ) % ARROW_SPACING
+
+    local useful_length = math.max(
+        current_route.Length - ARROW_START_GAP,
         0
     )
-    local count = if remaining > 0.75
-        then math.floor(remaining / ARROW_SPACING) + 1
-        else 0
-
+    local count = math.min(
+        MAX_ARROWS,
+        math.ceil(
+            useful_length / ARROW_SPACING
+        ) + 1
+    )
     self:_ensure_arrow_pool(count)
 
-    for index, entry in ipairs(self._arrow_pool) do
-        if index <= count then
-            local route_distance = math.min(
-                start_distance
-                    + (index - 1) * ARROW_SPACING,
-                self._path_length
+    for index, arrow in ipairs(self._arrow_pool) do
+        local distance = ARROW_START_GAP
+            + self._flow_phase
+            + (index - 1) * ARROW_SPACING
+        local visible = index <= count
+            and distance <= current_route.Length
+
+        if visible then
+            local position, direction = blended_sample(
+                previous_route,
+                current_route,
+                distance,
+                self._route_blend
             )
-            local sampled_position, direction = sample_route(
-                self._path_positions,
-                self._path_distances,
-                self._path_length,
-                route_distance
-            )
-            local position = floor_position(
-                sampled_position,
+            position = floor_position(
+                position,
                 self._player.Character,
                 self._folder
             )
+
             local shaft, left, right = arrow_cframes(
                 position,
                 direction
             )
-            local visible = shaft ~= nil
-
-            update_visual_part(
-                entry.Shaft,
+            update_part(
+                arrow.Shaft,
                 shaft,
-                visible,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
-            update_visual_part(
-                entry.Left,
+            update_part(
+                arrow.Left,
                 left,
-                visible,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
-            update_visual_part(
-                entry.Right,
+            update_part(
+                arrow.Right,
                 right,
-                visible,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
         else
-            update_visual_part(
-                entry.Shaft,
+            update_part(
+                arrow.Shaft,
                 nil,
-                false,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
-            update_visual_part(
-                entry.Left,
+            update_part(
+                arrow.Left,
                 nil,
-                false,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
-            update_visual_part(
-                entry.Right,
+            update_part(
+                arrow.Right,
                 nil,
-                false,
+                ARROW_TRANSPARENCY,
                 delta_time
             )
         end
@@ -802,28 +1073,28 @@ function Guide:_update_arrows(
 end
 
 --[[
-Updates the subtle iridescent colour flow across visible pooled parts.
+Updates the subtle iridescent colour phase across visible guide parts.
 
 Args:
     self (any): Tutorial guide instance.
 
 Returns:
-    nil: Changes colour only; geometry remains stable.
+    nil: Changes colour without moving or recreating geometry.
 ]]
 function Guide:_update_colors()
     local base_hue = (
         os.clock() * HUE_SPEED
     ) % 1
-    local visual_count = math.max(
+    local count = math.max(
         #self._visual_parts,
         1
     )
 
     for index, part in ipairs(self._visual_parts) do
-        if part.Parent and part.Transparency < 0.99 then
+        if part.Transparency < 0.99 then
             local hue = (
                 base_hue
-                + index / visual_count * HUE_SPREAD
+                + index / count * HUE_SPREAD
             ) % 1
 
             part.Color = Color3.fromHSV(
@@ -836,70 +1107,83 @@ function Guide:_update_colors()
 end
 
 --[[
-Updates player-relative guide visuals on the client render loop.
+Updates the client-only visual route before each rendered frame.
 
 Args:
     self (any): Tutorial guide instance.
-    delta_time (number): Frame delta.
+    delta_time (number): Render-frame delta.
 
 Returns:
-    nil: Advances the visible route source fluently with the player.
+    nil: Moves the live source and advances the looping objective-ward flow.
 ]]
 function Guide:_update_visuals(delta_time: number)
     local root = character_root(self._player)
 
-    if not self._target
-        or not root
-        or #self._path_positions < 2
-    then
+    if not root or not self._structural_route then
         self:_hide_visuals(false)
         return
     end
 
-    local player_floor = root.Position - Vector3.new(
-        0,
-        PLAYER_FLOOR_OFFSET,
-        0
+    local player_floor = floor_position(
+        root.Position - Vector3.new(
+            0,
+            PLAYER_FLOOR_OFFSET,
+            0
+        ),
+        self._player.Character,
+        self._folder
     )
-    local progress, deviation = closest_route_progress(
+    local join_progress = self:_update_join_progress(
         player_floor,
-        self._path_positions,
-        self._path_distances
+        delta_time
     )
-
-    self._route_deviation = deviation
-
-    if self._display_progress == nil then
-        self._display_progress = progress
-    else
-        local progress_alpha = smoothing_alpha(
-            PROGRESS_SMOOTH_SPEED,
-            delta_time
+    local current_route, previous_route =
+        self:_build_live_routes(
+            player_floor,
+            join_progress
         )
-        self._display_progress += (
-            progress - self._display_progress
-        ) * progress_alpha
+
+    if not current_route then
+        self:_hide_visuals(false)
+        return
     end
 
-    local display_progress = self._display_progress
-        or progress
+    if self._route_blend < 1 then
+        self._route_blend = math.min(
+            1,
+            self._route_blend
+                + ROUTE_BLEND_SPEED * delta_time
+        )
 
-    self:_update_markers(display_progress, delta_time)
-    self:_update_arrows(display_progress, delta_time)
+        if self._route_blend >= 1 then
+            self._previous_structural_route = nil
+        end
+    end
+
+    self:_update_markers(
+        current_route,
+        previous_route,
+        delta_time
+    )
+    self:_update_flow_arrows(
+        current_route,
+        previous_route,
+        delta_time
+    )
     self:_update_colors()
 end
 
 --[[
-Refreshes structural pathfinding only when the corridor truly changes.
+Recalculates the structural path only when genuinely necessary.
 
-Normal forward movement does not rebuild the route. The live render loop
-advances the source smoothly along the existing corridor.
+Normal forward, sideways and backward movement is handled by the live source
+and does not itself rebuild the route until route deviation becomes material.
 
 Args:
     self (any): Tutorial guide instance.
 
 Returns:
-    nil: Recalculates only for target changes, respawn or route deviation.
+    nil: Installs a new structural route only when required.
 ]]
 function Guide:_refresh()
     local target = self._target
@@ -917,14 +1201,16 @@ function Guide:_refresh()
         ).Magnitude >= TARGET_REFRESH_DISTANCE
     local character_changed =
         self._path_character ~= self._player.Character
-    local needs_route = #self._path_positions < 2
-    local off_route =
-        self._route_deviation >= REROUTE_DISTANCE
+    local needs_route = self._structural_route == nil
+    local reroute_due = self._route_deviation
+        >= REROUTE_DISTANCE
+        and os.clock() - self._last_reroute_time
+            >= REROUTE_COOLDOWN
 
     if not target_moved
         and not character_changed
         and not needs_route
-        and not off_route
+        and not reroute_due
     then
         return
     end
@@ -933,26 +1219,35 @@ function Guide:_refresh()
         root.Position,
         target_position
     )
-
-    if waypoints then
-        self._last_target_position = target_position
-        self._path_character = self._player.Character
-        self:_set_route(waypoints)
-    elseif needs_route then
-        self._last_target_position = nil
-        self._path_character = nil
-        self:_clear_route()
+    if not waypoints then
+        if needs_route then
+            self:_clear_route()
+        end
+        return
     end
+
+    local route = build_structural_route(
+        waypoints,
+        self._player.Character,
+        self._folder
+    )
+    if not route then
+        return
+    end
+
+    self._last_target_position = target_position
+    self._path_character = self._player.Character
+    self:_install_route(route)
 end
 
 --[[
-Sets the active destination for the tutorial guide.
+Sets the active tutorial destination.
 
 Args:
-    target (BasePart?): Physical tutorial destination.
+    target (BasePart?): Physical tutorial target.
 
 Returns:
-    nil: Rebuilds structural route state for a new destination.
+    nil: Starts a fresh route when the objective changes.
 ]]
 function Guide:set_target(target: BasePart?)
     if self._target == target and target ~= nil then
@@ -976,20 +1271,20 @@ Args:
     None.
 
 Returns:
-    nil: Hides pooled visuals and clears route state.
+    nil: Hides the guide while retaining pooled visual instances.
 ]]
 function Guide:clear()
     self:set_target(nil)
 end
 
 --[[
-Destroys the local guide and disconnects its render update.
+Destroys the local guide and disconnects render updates.
 
 Args:
     None.
 
 Returns:
-    nil: Releases all local presentation resources.
+    nil: Releases all presentation resources.
 ]]
 function Guide:destroy()
     self._alive = false
@@ -1003,13 +1298,13 @@ function Guide:destroy()
 end
 
 --[[
-Creates a fluid tutorial path guide for one local player.
+Creates a looping player-relative tutorial guide.
 
 Args:
-    player (Player): Local player whose position advances the route source.
+    player (Player): Local player whose position forms the live route source.
 
 Returns:
-    any: New guide instance.
+    any: New tutorial guide instance.
 ]]
 function Guide.new(player: Player): any
     local existing = Workspace:FindFirstChild(FOLDER_NAME)
@@ -1028,13 +1323,15 @@ function Guide.new(player: Player): any
         _visual_parts = {},
         _marker_pool = {},
         _arrow_pool = {},
-        _path_positions = {},
-        _path_distances = {},
-        _path_length = 0,
+        _structural_route = nil,
+        _previous_structural_route = nil,
         _last_target_position = nil,
         _path_character = nil,
+        _join_progress = nil,
         _route_deviation = math.huge,
-        _display_progress = nil,
+        _route_blend = 1,
+        _last_reroute_time = -math.huge,
+        _flow_phase = 0,
         _render_connection = nil,
         _alive = true,
     }, Guide)
