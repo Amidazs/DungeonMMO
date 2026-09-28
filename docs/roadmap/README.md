@@ -1,3 +1,16 @@
+**v3.35 CORRUPTED FOREMAN IDENTITY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_35_Corrupted_Foreman_Identity_GREEN_20260928.md)
+and [evidence](
+../testing/corrupted-foreman-identity-v3-35-green-20260928.md).
+The released Abandoned Mine boss now has its own explicit
+`BestiaryCreatureId = "corrupted_foreman"`, independent from the Temple
+Marauder Captain. Bestiary milestones and kill counts stay separate, and the
+boss executor reapplies the released boss-specific identity after reward
+scaling. Fresh Play returned
+`VERIFIED_MINE_FOREMAN_IDENTITY_FOCUS_PASS 5`. The Mine boss is now safe to
+use as a trusted EnemyDefeat target; next gate is the optional Corrupted
+Foreman Adventure.
+
 **v3.34 LEVEL-FIVE MARAUDER CAPTAIN BOUNTY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_34_Marauder_Captain_Bounty_GREEN_20260928.md)
 and [evidence](
