@@ -249,6 +249,14 @@ local function objective_label(objective: any): string
         elseif objective.TargetId == "corrupted_foreman" then
             return "Defeat the Corrupted Foreman"
         end
+    elseif objective.Type == "WorldInteraction" then
+        if objective.TargetId == "TestDungeon:HiddenPanel:Room2" then
+            return "Activate the faded Temple panel"
+        end
+    elseif objective.Type == "ItemCollected" then
+        if objective.TargetId == "hidden_ward_fragment" then
+            return "Collect the Hidden Ward Fragment"
+        end
     end
 
     return tostring(
