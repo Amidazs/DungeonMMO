@@ -30,7 +30,7 @@ TutorialDefinitions.BASE_STEPS = table.freeze({
     table.freeze({
         Id = "PartyAndPortal",
         Title = "Party up, then enter the Temple",
-        Text = "At the Temple entrance choose Create Party, invite your "
+        Text = "Follow the shimmering trail to the Temple entrance. Choose Create Party, invite your "
             .. "friend, and have them Accept. Both players should press Ready. "
             .. "The party leader selects Depth 1 and starts the dungeon. "
             .. "You can also enter solo.",
