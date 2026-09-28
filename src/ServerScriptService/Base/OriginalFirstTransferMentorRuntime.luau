@@ -22,6 +22,13 @@ local OFFSETS = table.freeze({
     HumanWizard = Vector3.new(-51, 2.5, 31),
     ElvenScout = Vector3.new(31, 2.5, 17),
     ElvenKnight = Vector3.new(53, 2.5, -15),
+    DwarfArtisan = Vector3.new(-18, 2.5, -12),
+    DwarfScavenger = Vector3.new(18, 2.5, -12),
+})
+
+local BRANCH_ANCHORS = table.freeze({
+    DwarfArtisan = "Base.DwarfQuestHub",
+    DwarfScavenger = "Base.DwarfQuestHub",
 })
 
 --[[
@@ -97,13 +104,13 @@ Creates separate mentor parts without touching existing original NPCs.
 Args:
     self (any): Attached Base-only original mentor runtime.
     definition (any): Exact registered new first-transfer career.
-    spawn (BasePart): Existing authenticated Base player-spawn anchor.
+    anchor (BasePart): Authenticated hub anchor for this branch.
 
 Returns:
     BasePart: Real server-owned advancement mentor and separate trainer.
 ]]
 local function make_mentor(
-    self: any, definition: any, spawn: BasePart
+    self: any, definition: any, anchor: BasePart
 ): BasePart
     local part = Instance.new("Part")
     part.Name = definition.MentorId
@@ -114,8 +121,12 @@ local function make_mentor(
         then Color3.fromRGB(131, 92, 59)
         else Color3.fromRGB(70, 140, 119)
     part.Material = Enum.Material.Wood
-    part.CFrame = spawn.CFrame * CFrame.new(
-        OFFSETS[definition.BranchId]
+    part.CFrame = anchor.CFrame * CFrame.new(
+        assert(
+            OFFSETS[definition.BranchId],
+            "First-transfer mentor layout missing for "
+                .. tostring(definition.BranchId)
+        )
     )
     local prompt = Instance.new("ProximityPrompt")
     prompt.Name = "FirstTransferMentorPrompt"
@@ -166,9 +177,21 @@ function Runtime.attach(options: any): any
     self._folder = folder
     self._service = TransferService.new(options.profiles, "Base", self)
     for _, definition in ipairs(FirstTransfers.all()) do
-        self._parts[definition.BranchId] = make_mentor(
-            self, definition, spawn
-        )
+        local offset = OFFSETS[definition.BranchId]
+        if offset then
+            local anchor_key = BRANCH_ANCHORS[definition.BranchId]
+            local anchor = if anchor_key
+                then options.environment:get(anchor_key)
+                else spawn
+
+            if anchor then
+                self._parts[definition.BranchId] = make_mentor(
+                    self,
+                    definition,
+                    anchor
+                )
+            end
+        end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
         self._pending[player.UserId] = nil
