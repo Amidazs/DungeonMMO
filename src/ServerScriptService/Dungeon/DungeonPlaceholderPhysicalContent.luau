@@ -379,6 +379,32 @@ local function build_tutorial_resonance_puzzle(
     end
 end
 
+-- Builds the replaceable Room-2 defend/survive ward presentation.
+local function build_tutorial_resonance_defense(
+    root: Instance,
+    theme: any
+)
+    if theme.Prefix ~= "Temple" then
+        return
+    end
+
+    local ward = part(
+        root,
+        "ResonanceDefenseWard",
+        Vector3.new(36, 0.4, 36),
+        Vector3.new(theme.X, 0.25, -145),
+        Color3.fromRGB(93, 162, 207),
+        Enum.Material.Neon,
+        0.65
+    )
+    ward.CanCollide = false
+    ward.CanTouch = false
+    ward:SetAttribute(
+        "DungeonMMODefenseId",
+        "TempleResonanceWard"
+    )
+end
+
 -- Depth preview corridors run along Z; their guardrails must run along
 -- the SIDE edges, not across the path as the optional X-axis bridges do.
 local function depth_corridor(
@@ -608,6 +634,7 @@ function Placeholder.create(
     build_optional(root, parent, theme)
     build_tutorial_hidden_room(root, theme)
     build_tutorial_resonance_puzzle(root, theme)
+    build_tutorial_resonance_defense(root, theme)
     build_depth_previews(root, theme, optional_depth, late_depth)
     local test_dungeon = TestRelease.is_test_dungeon()
         and dungeon_id == "TestDungeon"
