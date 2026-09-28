@@ -152,6 +152,10 @@ function Runtime.attach(config: any): any
     local root = config.workspace:FindFirstChild(
         "DungeonMMOPlaceholderPhysicalContent"
     )
+        or config.workspace:FindFirstChild(
+            "DungeonMMOSyntheticTemple"
+        )
+
     if not root then
         return {
             ok = true,
