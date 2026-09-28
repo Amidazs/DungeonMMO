@@ -1,3 +1,17 @@
+**v3.36 LEVEL-TEN CORRUPTED FOREMAN BOUNTY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_36_Corrupted_Foreman_Bounty_GREEN_20260928.md)
+and [evidence](
+../testing/corrupted-foreman-bounty-v3-36-green-20260928.md).
+**The Foreman's Reckoning** is now accepted as a level-10 optional Adventure.
+It unlocks after Mine Echoes, requires one trusted
+`corrupted_foreman` defeat and pays **80 Gold only**. The real
+BossEncounterExecutor, MineForemanFactory, EncounterService and QuestService
+were exercised end-to-end. Fresh Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 6`. Next gate: fill the launch content
+gap between this level-10 bounty and level-20 first-transfer progression using
+released Depth-1 content only.
+
 **v3.35 CORRUPTED FOREMAN IDENTITY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_35_Corrupted_Foreman_Identity_GREEN_20260928.md)
 and [evidence](
