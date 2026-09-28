@@ -188,6 +188,47 @@ local function main()
         "Dark Elf Fighter can continue to Mine Echoes"
     )
 
+    local foreman = assert(
+        QuestDefinitions.get("CorruptedForemanBounty")
+    )
+    local level_nine = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_nine.Level = 9
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_nine,
+            foreman
+        ),
+        "level-nine Dark Elf cannot start Foreman bounty"
+    )
+
+    local missing_mine = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    missing_mine.Level = 10
+    check(
+        not QuestDefinitions.is_character_eligible(
+            missing_mine,
+            foreman
+        ),
+        "level-ten Foreman bounty still requires Mine Echoes"
+    )
+
+    local level_ten = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_ten.Level = 10
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_ten,
+            foreman
+        ),
+        "level-ten Dark Elf can start Foreman bounty after Mine Echoes"
+    )
+
     local provisioning = assert(
         QuestDefinitions.get(
             "ExpeditionProvisioning"
