@@ -101,6 +101,7 @@ function ProfileSchema.create_default(_user_id: number): any
                     Version = 1,
                     Active = {},
                     Completed = {},
+                    TrackedQuestId = nil,
                 },
                 ClassAdvancement = {
                     Version = 1,
