@@ -238,6 +238,10 @@
       "ClassName": "RemoteEvent"
     },
     {
+      "Name": "QuestDialogueOpen",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "RaceChangeActionResult",
       "ClassName": "RemoteEvent"
     }
