@@ -223,6 +223,34 @@ BaseCandidateAnchorProfile.Entries = table.freeze({
         }),
     }),
     table.freeze({
+        AnchorId = "Base.DwarfQuestHub",
+        Role = "QuestHub",
+        DynamicRule = table.freeze({
+            PreferredNames = table.freeze({
+                "Anchor_DwarfQuestHub",
+                "Anchor_DwarvenQuestHub",
+                "Anchor_FastTravel_Dwarf_Mine",
+                "Anchor_FastTravel_Dwarven_Mine",
+                "Anchor_FastTravel_Dwarves_Mine",
+                "DwarfMine",
+                "Dwarf Mine",
+                "Dwarven Mine",
+                "Dwarf_Mine",
+            }),
+            PreferredPrefix = "Anchor_",
+            AreaFragments = table.freeze({
+                "Dwarf",
+                "Dwarven",
+                "Mine",
+            }),
+        }),
+        DynamicSelector = table.freeze({
+            UseBounds = true,
+            HeightFraction = 0.1,
+            Offset = CFrame.new(),
+        }),
+    }),
+    table.freeze({
         AnchorId = "Base.Travel.Portals",
         Role = "TravelDestination",
         Selectors = table.freeze({
