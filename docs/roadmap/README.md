@@ -1,3 +1,17 @@
+**v3.29 PROFESSION BLUEPRINT ACQUISITION — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_29_Profession_Blueprint_Acquisition_GREEN_20260928.md)
+and [evidence](
+../testing/profession-blueprint-acquisition-v3-29-green-20260928.md).
+Profession blueprints now have persistent independent boss/completion drop
+authority, real market resale, profession/level/Recipe Reading learning gates,
+and an end-to-end drop -> trade -> learn -> craft path. Four optional
+level-5 batch blueprints preserve exact 2x materials / 2x output / 2x XP, so
+normal level-5 recipes remain baseline and RNG is never mandatory. Fresh Play
+returned `VERIFIED_PROFESSION_BLUEPRINT_ACQUISITION_PASS 12`; the complete
+v3.28 economy regression also remained **22/22 GREEN**. Higher-depth/optional
+boss drops remain subject to their existing release gates. Next gate is a
+real accepted animal-like Dungeon source for Skinning.
+
 **v3.28 LAUNCH PROFESSION ECONOMY BACKBONE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_28_Profession_Economy_Backbone_GREEN_20260928.md)
 and [evidence](
