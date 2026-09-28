@@ -1,3 +1,17 @@
+**v3.37 LEVEL-FIFTEEN DUAL-BOSS ADVENTURE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_37_Level15_Boss_Hunt_GREEN_20260928.md)
+and [evidence](
+../testing/level15-boss-hunt-v3-37-green-20260928.md).
+**Break the Chain** is now accepted as a level-15 optional Adventure after
+Mine Echoes. It requires one trusted Marauder Captain defeat and one trusted
+Corrupted Foreman defeat, then pays **120 Gold only**. The integration uses
+the real Captain factory and the real Mine boss executor/factory path.
+Fresh Play returned `VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`
+and `VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 7`. The launch pacing spine now
+has optional content around levels 1, 5, 10 and 15 leading into the existing
+level-20 first-transfer milestone. Next gate: richer side/story objectives and
+content density, not another repetitive Gold bounty.
+
 **v3.36 LEVEL-TEN CORRUPTED FOREMAN BOUNTY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_36_Corrupted_Foreman_Bounty_GREEN_20260928.md)
 and [evidence](
