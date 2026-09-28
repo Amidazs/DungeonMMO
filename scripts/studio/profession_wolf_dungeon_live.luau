@@ -1,6 +1,6 @@
 --!strict
--- TEMP unpublished Dungeon test: opt in wolves for Temple Room1 only.
--- The authored default dungeon still spawns the original Marauders.
+-- Unpublished Dungeon acceptance for the real Temple Room1 Forest Wolf.
+-- Exercises the authored mixed pack and level-three Skinning end to end.
 assert(game.PlaceId == 0 and game.GameId == 0,
     "Wolf dungeon fixture requires an unpublished local Studio place")
 
@@ -26,26 +26,7 @@ local function replace_once(script_object, old_text, new_text)
         .. new_text .. string.sub(source, position + #old_text)
 end
 
--- Only the TEMP Studio content catalogue receives the alternate wolf pack.
-local catalog = RS.Core.Shared.DungeonRuntimeContentCatalog
--- Include the empty BonusRules of Temple Room1: Mine Room1 also uses
--- two Marauders but has nonempty rules and must not be changed.
-local original_pack = 'StandardRoom1 = table.freeze({\n'
-    .. '            Entries = table.freeze({\n'
-    .. '                pack_entry(\n'
-    .. '                    "Marauders",\n'
-    .. '                    "Marauder",\n'
-    .. '                    2,\n'
-    .. '                    "Room1_Marauder_",\n'
-    .. '                    100\n'
-    .. '                ),\n'
-    .. '            }),\n'
-    .. '            BonusRules = table.freeze({}),'
-local wolf_pack = original_pack
-    :gsub('"Marauders"', '"Beasts"')
-    :gsub('"Marauder"', '"Wolf"')
-    :gsub('"Room1_Marauder_"', '"Room1_Wolf_"')
-replace_once(catalog, original_pack, wolf_pack)
+-- Expose only the local runtime service bundle to the test driver.
 replace_once(SSS.Dungeon.DungeonRuntime,
     'local runtime = RuntimeServices.new("Dungeon")',
     'local runtime = RuntimeServices.new("Dungeon")\n'
@@ -56,8 +37,8 @@ W:SetAttribute("DungeonMMOEnvironmentMode", "Synthetic")
 W:SetAttribute("DungeonMMOPlaceholderPhysicalContentEnabled", true)
 W:SetAttribute("DungeonMMOPlaceholderPlayableEnabled", true)
 
--- Disable only autorun unit-test scripts incompatible with intentional
--- disposable pack override. The normal Dungeon runtime stays enabled.
+-- Disable autorun unit tests while this fixture drives the real runtime.
+-- The normal Dungeon runtime and authored content catalogue stay enabled.
 for _, group in ipairs({SSS.Core.Tests, SSS.Dungeon.Tests}) do
     for _, test in ipairs(group:GetDescendants()) do
         if test:IsA("Script") then
@@ -187,6 +168,60 @@ local function anchor(identifier)
     end, identifier, 15)
 end
 
+--[[
+Selects Skinning and advances the disposable Studio profile to level three.
+
+Args:
+    runtime (any): Real Dungeon RuntimeServices bundle.
+    user_id (number): Current Studio player's profile owner.
+
+Returns:
+    nil: Mutates only the unpublished Studio profile used by this fixture.
+]]
+local function prepare_level_three_skinning(runtime, user_id)
+    if not runtime.ProfessionService:can_use(
+        user_id,
+        "Skinning"
+    ) then
+        local selected = runtime.ProfessionService:choose_profession(
+            user_id,
+            "Skinning"
+        )
+        assert(
+            selected.ok == true,
+            "failed to select Skinning: "
+                .. tostring(selected.reason)
+        )
+    end
+
+    local mutated, reason = runtime.ProfileService:mutate(
+        user_id,
+        function(profile)
+            local slot = profile.Account.SelectedCharacterSlot
+            local character =
+                profile.Characters["Slot" .. tostring(slot)]
+            assert(character, "selected character missing")
+            local state = character.Professions.Skinning
+            state.XP = 90
+            state.Level = 3
+        end
+    )
+    assert(
+        mutated,
+        "failed to advance Skinning: " .. tostring(reason)
+    )
+
+    local level, level_reason =
+        runtime.ProfessionService:get_profession_level(
+            user_id,
+            "Skinning"
+        )
+    assert(
+        level == 3 and level_reason == nil,
+        "Skinning did not reach level three"
+    )
+end
+
 -- Args: None.
 -- Returns: nil; verifies the real encounter and a real client skin grant.
 local function run()
@@ -204,6 +239,7 @@ local function run()
         return current and current.InstanceState
             and current.InstanceState.EncounterPlan and current
     end, "admitted Dungeon encounter plan", 40)
+    prepare_level_three_skinning(runtime, player.UserId)
     local encounter_id = "CombatRoom1"
     local enemies = wait_for(function()
         local folder = W:FindFirstChild("DungeonGameplayRuntime")
@@ -238,32 +274,44 @@ local function run()
         return encounter_state() == "Active"
     end, "Room1 physical trigger activation", 12)
 
-    local wolves = wait_for(function()
-        local matches = {}
-        for _, enemy in ipairs(enemies:GetChildren()) do
-            if enemy:IsA("Model")
-                and enemy.Name:find("Room1_Wolf_", 1, true)
-            then
-                table.insert(matches, enemy)
-            end
-        end
-        return if #matches == 2 then matches else nil
-    end, "two real encounter wolves", 12)
-    for _, wolf in ipairs(wolves) do
-        assert(wolf:GetAttribute("CreatureSpeciesId") == "forest_wolf"
+    local wolf = wait_for(function()
+        return enemies:FindFirstChild("Room1_Wolf_1")
+    end, "real Room1 Forest Wolf", 12)
+    local marauder = wait_for(function()
+        return enemies:FindFirstChild("Room1_Marauder_1")
+    end, "real Room1 Marauder", 12)
+
+    assert(
+        wolf:GetAttribute("CreatureSpeciesId") == "forest_wolf"
             and wolf:GetAttribute("CreatureFamily") == "Beast"
-            and Tags:HasTag(wolf, "DungeonMMOSkinnableBeast"),
-            "the combat-pack executor did not use the animal factory")
-        assert(wolf.Humanoid.Health > 0
+            and Tags:HasTag(
+                wolf,
+                "DungeonMMOSkinnableBeast"
+            ),
+        "combat-pack executor did not use ForestWolf factory"
+    )
+    assert(
+        marauder:GetAttribute("CreatureSpeciesId") == nil
+            and not Tags:HasTag(
+                marauder,
+                "DungeonMMOSkinnableBeast"
+            ),
+        "Marauder inherited animal identity"
+    )
+    assert(
+        wolf.Humanoid.Health > 0
             and not wolf.HumanoidRootPart:FindFirstChild(
-                "BeastSkinningPrompt"),
-            "living wolf exposed Skinning")
-        wolf.Humanoid.Health = 0
-    end
+                "BeastSkinningPrompt"
+            ),
+        "living wolf exposed Skinning"
+    )
+
+    wolf.Humanoid.Health = 0
+    marauder.Humanoid.Health = 0
     wait_for(function()
         return encounter_state() == "Cleared"
     end, "real encounter rewards and Room1 clear", 16)
-    local wolf = wait_for(function()
+    wolf = wait_for(function()
         local model = enemies:FindFirstChild("Room1_Wolf_1")
         if model and model:GetAttribute("LootComplete") == true
             and model.HumanoidRootPart:FindFirstChild(
@@ -281,9 +329,13 @@ local function run()
     local result = wait_for(function()
         return table.remove(results, 1)
     end, "client hide grant after real encounter", 14)
-    assert(prompt_visible and result.ok == true
-        and result.item_id == "raw_hide" and result.quantity == 1,
-        "real encounter corpse did not grant one hide via client prompt")
+    assert(
+        prompt_visible
+            and result.ok == true
+            and result.item_id == "thick_hide"
+            and result.quantity == 1,
+        "level-three Skinning did not grant one Thick Hide"
+    )
     assert(wolf:GetAttribute("SkinningClaimed") == true,
         "one-time corpse claim did not persist")
     channel:FireClient(player, "Skin")
@@ -292,6 +344,7 @@ local function run()
     end, "second client skin prompt correctly disabled", 8)
     assert(#results == 0,
         "same real wolf corpse granted hide more than once")
+    print("[Wolf Dungeon Live] LEVEL3_THICK_HIDE_PASS")
     print("[Wolf Dungeon Live] CLIENT_ONCE_ONLY_HIDE_PASS")
 end
 
