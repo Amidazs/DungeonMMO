@@ -210,6 +210,111 @@ local function build_optional(root: Instance, parent: Instance, theme: any)
         theme.X + 51, -165, 38, 40)
 end
 
+-- Builds a deterministic early-game secret-room tutorial beside Temple Room 2.
+-- The door is opened only by server runtime after a trusted panel interaction.
+local function build_tutorial_hidden_room(
+    root: Instance,
+    theme: any
+)
+    if theme.Prefix ~= "Temple" then
+        return
+    end
+
+    local model = room_model(
+        root,
+        "TutorialHiddenAlcove",
+        theme
+    )
+    model:SetAttribute("DungeonMMOQuestHiddenRoom", true)
+
+    local room_x = theme.X - 75
+    local room_z = -145
+
+    part(
+        model,
+        "Floor",
+        Vector3.new(48, 1, 32),
+        Vector3.new(room_x, -0.5, room_z),
+        theme.Floor,
+        theme.Material
+    )
+    part(
+        model,
+        "Roof_PLACEHOLDER",
+        Vector3.new(50, 2, 34),
+        Vector3.new(room_x, 18, room_z),
+        theme.Wall,
+        theme.Material,
+        0.3
+    )
+    part(
+        model,
+        "WestWall",
+        Vector3.new(2, 18, 32),
+        Vector3.new(room_x - 24, 9, room_z),
+        theme.Wall,
+        theme.Material
+    )
+    for _, offset in ipairs({-1, 1}) do
+        part(
+            model,
+            if offset < 0 then "SouthWall" else "NorthWall",
+            Vector3.new(48, 18, 2),
+            Vector3.new(room_x, 9, room_z + offset * 16),
+            theme.Wall,
+            theme.Material
+        )
+    end
+
+    local corridor = part(
+        model,
+        "HiddenPassageFloor",
+        Vector3.new(26, 1, 12),
+        Vector3.new(theme.X - 39, -0.5, room_z),
+        theme.Floor,
+        theme.Material
+    )
+    corridor:SetAttribute("DungeonMMOQuestHiddenPassage", true)
+
+    local door = part(
+        model,
+        "HiddenDoor",
+        Vector3.new(2, 16, 12),
+        Vector3.new(theme.X - 36, 8, room_z),
+        theme.Wall,
+        theme.Material
+    )
+    door.CanCollide = true
+    door:SetAttribute("DungeonMMOQuestHiddenDoor", true)
+
+    local panel = part(
+        model,
+        "HiddenPanel",
+        Vector3.new(2, 5, 5),
+        Vector3.new(theme.X - 30, 3, room_z + 12),
+        theme.Accent,
+        Enum.Material.Slate
+    )
+    panel:SetAttribute(
+        "DungeonMMOQuestInteractionId",
+        "TempleHiddenPanel"
+    )
+
+    local relic = part(
+        model,
+        "HiddenWardFragment",
+        Vector3.new(2, 3, 2),
+        Vector3.new(room_x - 8, 2, room_z),
+        theme.Accent,
+        Enum.Material.Neon
+    )
+    relic.CanCollide = false
+    relic:SetAttribute(
+        "DungeonMMOQuestCollectibleId",
+        "TempleHiddenWardFragment"
+    )
+end
+
 -- Depth preview corridors run along Z; their guardrails must run along
 -- the SIDE edges, not across the path as the optional X-axis bridges do.
 local function depth_corridor(
@@ -437,6 +542,7 @@ function Placeholder.create(
     root:SetAttribute("DungeonMMOPlaceholderLateEventRoute",
         late_depth ~= nil)
     build_optional(root, parent, theme)
+    build_tutorial_hidden_room(root, theme)
     build_depth_previews(root, theme, optional_depth, late_depth)
     local test_dungeon = TestRelease.is_test_dungeon()
         and dungeon_id == "TestDungeon"
