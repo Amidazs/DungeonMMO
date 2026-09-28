@@ -1,3 +1,16 @@
+**v3.47 FRIEND TEST READY — SECTION D HOLD:** [roadmap](
+DungeonMMO_Roadmap_v3_47_Friend_Test_Ready_GREEN_20260928.md) and [evidence](
+../testing/friend-test-v3-47-ready-20260928.md).
+The current pre-D slice is now published to the restricted TEST universe:
+Base `134132328219009` and Dungeon `117293035754309`, both verified from
+fresh cloud reloads at schema 15. Audience remains **Limited**, with
+**Friends** and **Playtesters** enabled and **Public** disabled. A guided
+new-player Base tutorial and first-expedition Dungeon tutorial are live, the
+eight placeholder quest givers are distributed around semantic hub areas, and
+published Base composition now includes the Combat runtime dependencies used by
+current progression code. The next action is the user's real two-player manual
+test. **Section D remains on hold.**
+
 **v3.46 SECTION D READY — USER TEST HOLD:** [roadmap](
 DungeonMMO_Roadmap_v3_46_SECTION_D_READY_USER_TEST_HOLD_20260928.md) and
 [manual checklist](
