@@ -31,7 +31,7 @@ end
 --
 -- Args:
 --   player (Player): Caller whose profile is being modified.
---   action (any): Snapshot, Start or Claim.
+--   action (any): Snapshot, Start, Claim or Track.
 --   quest_id (any): Server-defined adventure quest identifier.
 -- Returns:
 --   nil: Sends an operation result and updated quest state.
@@ -55,7 +55,11 @@ function BaseQuestRuntime:handle_action(
     local definition = if type(quest_id) == "string"
         then QuestDefinitions.get(quest_id)
         else nil
-    if (action ~= "Start" and action ~= "Claim")
+    if (
+        action ~= "Start"
+        and action ~= "Claim"
+        and action ~= "Track"
+    )
         or not definition
         or definition.Kind ~= "Adventure"
     then
@@ -75,9 +79,20 @@ function BaseQuestRuntime:handle_action(
     end
     self._last_request[player.UserId] = now
 
-    local result = if action == "Start"
-        then self._quests:start(player.UserId, quest_id)
-        else self._quests:claim_reward(player.UserId, quest_id)
+    local result
+    if action == "Start" then
+        result = self._quests:start(player.UserId, quest_id)
+    elseif action == "Claim" then
+        result = self._quests:claim_reward(
+            player.UserId,
+            quest_id
+        )
+    else
+        result = self._quests:set_tracked(
+            player.UserId,
+            quest_id
+        )
+    end
     self._result:FireClient(player, result)
     self:send_snapshot(player)
 end
