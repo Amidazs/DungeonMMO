@@ -1,3 +1,54 @@
+## 28 September 2026 — CURRENT v3.48 TUTORIAL GUIDANCE + NPC PRESENTATION GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_48_Tutorial_Guidance_NPC_Presentation_GREEN_20260928.md);
+[evidence](
+../testing/tutorial-guidance-npc-presentation-v3-48-green-20260928.md).
+
+The friend-test build has received one more pre-Section-D presentation pass.
+
+Base tutorial navigation now uses a local, non-colliding iridescent floor trail
+with directional arrows. The route is generated from Roblox pathfinding and
+floor raycasts rather than drawing a straight line through scenery. The guide
+retries until navigation is ready and updates as the player moves.
+
+The eight Adventure quest givers are now simple humanoid placeholders rather
+than solid blocks. They have heads, torsos, arms, legs, Humanoids, role colours,
+simple silhouette accessories, visible role labels and trusted Talk prompts.
+
+The authored lobby is now a strict accessibility gate for NPC placement:
+positions must project onto real ground, have a collision-clear approach area,
+and have a successful path from the player-spawn area. This validation caught
+and rejected an inaccessible Dwarf travel-pad placement; Mine Warden and Survey
+Corps were moved to reachable Dwarf-side paths instead.
+
+Published TEST Base `134132328219009` was republished and independently
+verified from a fresh cloud-loaded copy. A live run of that published copy
+returned:
+
+- 8/8 quest-giver models;
+- 8/8 walkable;
+- 8/8 approach-clear;
+- 8/8 Humanoids;
+- closest NPC pair 35.44 studs.
+
+The Worldroot tutorial route produced 26 guide pieces including 15 arrow pieces,
+all non-colliding. The Temple route produced 41 guide pieces including 24 arrow
+pieces, also all non-colliding.
+
+TEST Dungeon `117293035754309` had no source delta in this pass and remains
+current at schema 15 with tutorial definitions, quest feedback and the
+first-expedition tutorial client present.
+
+Source checkpoint before v3.48 documentation:
+`e5517431dafdc12f30c3d37fed408929e214450c`.
+
+Fresh `git diff --check`, published Base, published Dungeon and TEST lobby
+sync builds all pass.
+
+**HOLD remains active:** do not begin Section D until the user completes the
+two-player friend test and explicitly releases the hold.
+
 ## 28 September 2026 — CURRENT v3.47 FRIEND TEST READY
 
 [Roadmap](
