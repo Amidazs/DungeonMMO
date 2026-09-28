@@ -55,6 +55,9 @@ local DwarfSalvage = require(
 local SalvageMagic = require(
     Services.C4SourceSalvageCastService
 )
+local DwarfSalvageWorld = require(
+    Services.C4DwarfSalvageWorldResolver
+)
 local DuskguardCast = require(
     Services.C4SourceDuskguardCastService
 )
@@ -118,7 +121,9 @@ function C4SourceCastRuntimeComposition.new(
     )
     assert(
         source_executor
-            and type(source_executor.magic_skill_npc) == "function",
+            and type(source_executor.magic_skill_npc) == "function"
+            and type(source_executor.source_units_per_stud)
+                == "function",
         "Source cast runtime requires source combat executor"
     )
     assert(
@@ -178,10 +183,39 @@ function C4SourceCastRuntimeComposition.new(
         companions
     )
     local dwarf_salvage = DwarfSalvage.new(inventory)
+    local dwarf_salvage_world = DwarfSalvageWorld.new(
+        function(): number?
+            return source_executor:source_units_per_stud()
+        end
+    )
     local salvage_magic = SalvageMagic.new(
         scheduler,
         dwarf_salvage,
-        nil
+        {
+            Timing = timing,
+            TargetValidator = function(
+                owner: any,
+                target: any,
+                source_range: number
+            ): (boolean, string?)
+                return dwarf_salvage_world:validate_target(
+                    owner,
+                    target,
+                    source_range
+                )
+            end,
+            AreaResolver = function(
+                owner: any,
+                target: any,
+                source_radius: number
+            ): ({Model}?, string?)
+                return dwarf_salvage_world:area_targets(
+                    owner,
+                    target,
+                    source_radius
+                )
+            end,
+        }
     )
     local duskguard_cast = DuskguardCast.new(
         scheduler,
@@ -236,6 +270,7 @@ function C4SourceCastRuntimeComposition.new(
         Companions = companions,
         CompanionMagic = companion_magic,
         DwarfSalvage = dwarf_salvage,
+        DwarfSalvageWorld = dwarf_salvage_world,
         SalvageMagic = salvage_magic,
         DuskguardCast = duskguard_cast,
         VeilbladeCast = veilblade_cast,
@@ -364,8 +399,14 @@ function C4SourceCastRuntimeComposition:capability(): any
             salvage_magic.CurrentlyEnabled == true,
         SourceSalvageReviewedSkillCount =
             salvage_magic.ReviewedSkillCount,
+        SourceSalvageTimingPreflightBound =
+            salvage_magic.SourceTimingPreflightBound,
+        SourceSalvageTargetRangeBound =
+            salvage_magic.SourceTargetRangeResolverBound,
         SourceSalvageFestivalAreaBound =
             salvage_magic.SpoilFestivalAreaResolverBound,
+        SourceSalvageWorldCapability =
+            self.DwarfSalvageWorld:capability(),
         CompanionMagicDefaultEnabled =
             companion_magic.DefaultEnabled == true,
         CompanionMagicCurrentlyEnabled =
