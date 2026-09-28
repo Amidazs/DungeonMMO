@@ -1,3 +1,41 @@
+## 28 September 2026 — v3.41 quest-item puzzle Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_41_Quest_Item_Puzzle_GREEN_20260928.md);
+[evidence](
+../testing/quest-item-puzzle-v3-41-green-20260928.md).
+
+Accepted quest-item/puzzle expansion:
+
+- new trusted `PuzzleCompleted` objective;
+- personal bound `temple_resonance_shard` collection;
+- server-owned ordered rune state;
+- wrong-order reset and persisted reset count;
+- puzzle interaction requires the quest item;
+- shared party puzzle completion without fabricating personal item progress;
+- atomic shard turn-in at reward claim.
+
+New launch Adventure:
+`TempleResonancePuzzle / The Resonant Seal`, level 11 after Ruin Survey.
+
+The current Temple sequence is **Moon -> Root -> Flame**. It becomes usable
+only after CombatRoom2 is server-confirmed clear. The shard itself is available
+only after CombatRoom1 is clear.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 7`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_TEMPLE_RESONANCE_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+First-transfer advancement remains **18 branches x exactly three player-facing
+quests** over the branch-specific source ledgers.
+
+Next: build a server-owned Defend/Survive objective and begin stronger
+dialogue/narrative presentation around the accepted launch quest cluster.
+Depths 2-4 stay release-disabled. Permanent source/document edits stay
+GitHub-only; Desktop Commander remains for pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.40 quest variety foundation GREEN
 
 [Roadmap](
