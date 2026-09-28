@@ -175,6 +175,33 @@ local function main()
         "level-five Dark Elf can start Captain bounty"
     )
 
+    local hidden_ward = assert(
+        QuestDefinitions.get("HiddenWardDiscovery")
+    )
+    local level_five_hidden = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    level_five_hidden.Level = 5
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_five_hidden,
+            hidden_ward
+        ),
+        "level-five Dark Elf cannot start hidden-room Adventure"
+    )
+
+    local level_six_hidden = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    level_six_hidden.Level = 6
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_six_hidden,
+            hidden_ward
+        ),
+        "level-six Dark Elf can start hidden-room Adventure"
+    )
+
     local mine = assert(
         QuestDefinitions.get("MineEchoes")
     )
