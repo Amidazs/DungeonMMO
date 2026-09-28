@@ -79,6 +79,9 @@ local DungeonEncounterRuntimeController = require(
 local DungeonSecretDiscoveryService = require(
     Services:WaitForChild("DungeonSecretDiscoveryService")
 )
+local DungeonQuestObjectService = require(
+    Services:WaitForChild("DungeonQuestObjectService")
+)
 local DungeonOptionalBossPolicy = require(
     Dungeon:WaitForChild("DungeonOptionalBossPolicy")
 )
@@ -149,6 +152,9 @@ local DungeonEncounterEnvironmentRuntime = require(
 local DungeonOptionalEntranceGates = require(
     Dungeon:WaitForChild("DungeonOptionalEntranceGates")
 )
+local DungeonQuestObjectRuntime = require(
+    Dungeon:WaitForChild("DungeonQuestObjectRuntime")
+)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -216,6 +222,11 @@ local identity = runtime.IdentityService
 local equipment = runtime.EquipmentService
 local professions = runtime.ProfessionService
 local quests = runtime.QuestService
+local quest_objects = DungeonQuestObjectService.new(
+    sessions,
+    profiles,
+    quests
+)
 
 local active_dungeon_id, active_dungeon_error = DungeonRuntimeSelection.resolve(Players, Workspace, RunService, DungeonDefinitions, 15)
 assert(active_dungeon_id ~= nil, "Dungeon selection failed: " .. tostring(active_dungeon_error))
@@ -1771,6 +1782,26 @@ local function initialize_session_services(session: any): (any?, boolean)
     register_encounter_checkpoints()
     register_scout_lock_caches(session)
     bind_encounter_triggers()
+
+    local quest_object_binding = DungeonQuestObjectRuntime.attach({
+        dungeon_id = active_definition.Id,
+        difficulty_id = session.Difficulty
+            and session.Difficulty.Id,
+        workspace = Workspace,
+        quest_objects = quest_objects,
+        get_session = current_session,
+        get_session_id = function(): string?
+            return active_session_id
+        end,
+        on_profile_changed = send_profile,
+    })
+    if quest_object_binding.ok ~= true then
+        error(
+            "Dungeon quest-object runtime failed: "
+                .. tostring(quest_object_binding.reason)
+        )
+    end
+
     if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
     local completion_reward=active_definition.CompletionReward
     if active_definition.Id=="AbandonedMine" and type(session.InstanceState)=="table" then
