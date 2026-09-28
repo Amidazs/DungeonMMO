@@ -5,6 +5,8 @@ local Spawns = require(SSS.Dungeon.C4QuestEncounterSpawns)
 local Ledger = require(SSS.Dungeon.C4QuestMonsterCombatLedger)
 local Careers = require(game:GetService("ReplicatedStorage")
     .Core.Shared.OriginalFirstTransferDefinitions)
+local Quests = require(game:GetService("ReplicatedStorage")
+    .Core.Shared.C4OriginalFirstTransferQuestStages)
 local checks = 0
 
 --[[
@@ -47,6 +49,9 @@ local function mock_create(options: any): Model
     root.Parent = enemy
     enemy.PrimaryPart = root
     local humanoid = Instance.new("Humanoid")
+    local max_health = tonumber(options.BaseMaxHealth) or 100
+    humanoid.MaxHealth = max_health
+    humanoid.Health = max_health
     humanoid.Parent = enemy
     enemy.Parent = options.Parent
     return enemy
@@ -61,10 +66,14 @@ Args:
 Returns:
     any: Profile character with an uncompleted real stage-three quest.
 ]]
-local function character_for(branch_id: string): any
+local function character_for(
+    branch_id: string,
+    step_index: number?
+): any
     local career = assert(Careers.for_branch(branch_id))
+    local quest = assert(Quests.get(branch_id))
     return {
-        Level = 18,
+        Level = quest.StartLevel,
         Identity = {
             ClassId = "Fighter",
             BaseClassId = career.BaseClassId,
@@ -74,11 +83,120 @@ local function character_for(branch_id: string): any
             OriginalFirstTransferChoiceId = branch_id,
             OriginalFirstTransferQuest = {
                 BranchId = branch_id,
-                Step = 3,
+                Step = step_index or 3,
                 Ready = false,
             },
         },
     }
+end
+
+--[[
+Checks one pair of Dwarf quest-combat stages through the real spawn binder.
+
+Args:
+    characters (any): Mutable disposable owner profiles by UserId.
+    profiles (any): Profile adapter consumed by the spawn module.
+    execution (any): Existing room execution owning all spawned enemies.
+    folder (Folder): Disposable room enemy folder.
+    ledger (any): Physical quest-monster receipt authority.
+    artisan_step (number): Current Gearwright ordered quest step.
+    scavenger_step (number): Current Deepclaimer ordered quest step.
+    expected (any): Expected source IDs with branch, step and count.
+
+Returns:
+    nil: Verifies physical spawn, inherited health and exact ledger binding.
+]]
+local function check_dwarf_stage_pack(
+    characters: any,
+    profiles: any,
+    execution: any,
+    folder: Folder,
+    ledger: any,
+    artisan_step: number,
+    scavenger_step: number,
+    expected: any
+)
+    characters[103] = character_for(
+        "DwarfArtisan",
+        artisan_step
+    )
+    characters[104] = character_for(
+        "DwarfScavenger",
+        scavenger_step
+    )
+
+    local spawned = Spawns.augment({
+        profiles = profiles,
+        user_ids = {103, 104},
+        execution = execution,
+        encounter_id = "QuestRoom1",
+        folder = folder,
+    }, {create = mock_create})
+
+    local expected_total = 0
+    for _, record in pairs(expected) do
+        expected_total += record.Count
+    end
+
+    check(
+        spawned.ok
+            and #spawned.registrations == expected_total,
+        "Dwarf room pack has only current ordered quest targets"
+    )
+
+    local room_humanoid = assert(
+        execution.Enemies[1]:FindFirstChildOfClass("Humanoid")
+    )
+    local seen = {}
+
+    for _, registration in ipairs(spawned.registrations) do
+        local enemy = registration.enemy
+        local source_id = enemy:GetAttribute(
+            "SourceQuestMonsterId"
+        )
+        local contract = assert(
+            expected[source_id],
+            "Unexpected Dwarf quest target: " .. tostring(source_id)
+        )
+        local humanoid = assert(
+            enemy:FindFirstChildOfClass("Humanoid")
+        )
+
+        check(
+            registration.branch_id == contract.BranchId
+                and registration.step_index == contract.Step,
+            "Dwarf target binds to exact branch and ordered step"
+        )
+        check(
+            humanoid.MaxHealth == room_humanoid.MaxHealth,
+            "Dwarf temporary rig inherits reviewed room health"
+        )
+        check(
+            ledger:register_enemy(
+                enemy,
+                registration.branch_id,
+                "QuestRoom1",
+                registration.step_index
+            ),
+            "Dwarf physical quest target registers in server ledger"
+        )
+
+        seen[source_id] = (seen[source_id] or 0) + 1
+    end
+
+    for source_id, contract in pairs(expected) do
+        check(
+            seen[source_id] == contract.Count,
+            source_id .. " exact room-pack count"
+        )
+        check(
+            ledger:available(
+                assert(Quests.get(contract.BranchId)),
+                contract.Step
+            ),
+            source_id .. " becomes world-available only after spawn"
+        )
+    end
 end
 
 --[[
@@ -190,6 +308,66 @@ local function main()
             .Core.Shared.C4OriginalFirstTransferQuestStages
         ).get("HumanRogue"), 6),
         "Ledger exposes stage-six monster only when physically registered")
+
+    check_dwarf_stage_pack(
+        characters,
+        profiles,
+        execution,
+        folder,
+        ledger,
+        2,
+        4,
+        {
+            TunnelGnawer = {
+                BranchId = "DwarfArtisan",
+                Step = 2,
+                Count = 2,
+            },
+            HoneybackBear = {
+                BranchId = "DwarfScavenger",
+                Step = 4,
+                Count = 2,
+            },
+        }
+    )
+    check_dwarf_stage_pack(
+        characters,
+        profiles,
+        execution,
+        folder,
+        ledger,
+        3,
+        6,
+        {
+            TunnelGnawerChief = {
+                BranchId = "DwarfArtisan",
+                Step = 3,
+                Count = 2,
+            },
+            TunnelTarantula = {
+                BranchId = "DwarfScavenger",
+                Step = 6,
+                Count = 2,
+            },
+        }
+    )
+    check_dwarf_stage_pack(
+        characters,
+        profiles,
+        execution,
+        folder,
+        ledger,
+        7,
+        5,
+        {
+            AshclanForgeThief = {
+                BranchId = "DwarfArtisan",
+                Step = 7,
+                Count = 1,
+            },
+        }
+    )
+
     ledger:clear()
     folder:Destroy()
     print(("[C4 Source Pack] PASS: %d assertions"):format(checks))
