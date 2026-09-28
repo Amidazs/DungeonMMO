@@ -9,14 +9,15 @@ local Guide = {}
 Guide.__index = Guide
 
 local FOLDER_NAME = "DungeonMMOTutorialGroundGuide"
-local SEGMENT_WIDTH = 0.72
-local SEGMENT_HEIGHT = 0.08
+local SEGMENT_WIDTH = 0.56
+local SEGMENT_HEIGHT = 0.06
+local SEGMENT_OVERLAP = 0.35
 local FLOOR_LIFT = 0.09
-local ARROW_SPACING = 12
-local PATH_REFRESH_SECONDS = 0.75
-local REROUTE_DISTANCE = 9
+local ARROW_SPACING = 14
+local PATH_REFRESH_SECONDS = 1
 local TARGET_REFRESH_DISTANCE = 1
-local HUE_SPEED = 0.065
+local HUE_SPEED = 0.025
+local HUE_SPREAD = 0.06
 
 --[[
 Creates one client-only visual part used by the tutorial trail.
@@ -46,7 +47,7 @@ local function create_visual_part(
     part.CanQuery = false
     part.CastShadow = false
     part.Material = Enum.Material.Neon
-    part.Transparency = 0.18
+    part.Transparency = 0.28
     part.Parent = parent
     return part
 end
@@ -218,73 +219,6 @@ local function compute_path(
 end
 
 --[[
-Returns the shortest distance from one point to one route segment.
-
-Args:
-    point (Vector3): Player world position.
-    segment_start (Vector3): Route segment start.
-    segment_end (Vector3): Route segment end.
-
-Returns:
-    number: Distance in studs to the closest point on the segment.
-]]
-local function distance_to_segment(
-    point: Vector3,
-    segment_start: Vector3,
-    segment_end: Vector3
-): number
-    local segment = segment_end - segment_start
-    local length_squared = segment:Dot(segment)
-
-    if length_squared <= 0.001 then
-        return (point - segment_start).Magnitude
-    end
-
-    local alpha = math.clamp(
-        (point - segment_start):Dot(segment)
-            / length_squared,
-        0,
-        1
-    )
-    local closest = segment_start + segment * alpha
-    return (point - closest).Magnitude
-end
-
---[[
-Returns how far the player is from the currently rendered route.
-
-Args:
-    point (Vector3): Player world position.
-    positions ({Vector3}): Current floor-projected route points.
-
-Returns:
-    number: Shortest distance to any route segment.
-]]
-local function distance_to_route(
-    point: Vector3,
-    positions: {Vector3}
-): number
-    if #positions < 2 then
-        return math.huge
-    end
-
-    local closest = math.huge
-
-    for index = 1, #positions - 1 do
-        closest = math.min(
-            closest,
-            distance_to_segment(
-                point,
-                positions[index],
-                positions[index + 1]
-            )
-        )
-    end
-
-    return closest
-end
-
---[[
 Clears all rendered trail geometry.
 
 Args:
@@ -347,7 +281,7 @@ function Guide:_render(waypoints: {PathWaypoint})
                 Vector3.new(
                     SEGMENT_WIDTH,
                     SEGMENT_HEIGHT,
-                    length
+                    length + SEGMENT_OVERLAP
                 ),
                 CFrame.lookAt(
                     midpoint,
@@ -412,16 +346,14 @@ function Guide:_refresh()
         or (
             target_position - self._last_target_position
         ).Magnitude >= TARGET_REFRESH_DISTANCE
+    local character_changed =
+        self._path_character ~= self._player.Character
     local needs_retry = #self._visual_parts == 0
         or #self._path_positions < 2
-    local off_route = distance_to_route(
-        root.Position,
-        self._path_positions
-    ) >= REROUTE_DISTANCE
 
     if not target_moved
+        and not character_changed
         and not needs_retry
-        and not off_route
     then
         return
     end
@@ -433,9 +365,11 @@ function Guide:_refresh()
 
     if waypoints then
         self._last_target_position = target_position
+        self._path_character = self._player.Character
         self:_render(waypoints)
     elseif needs_retry then
         self._last_target_position = nil
+        self._path_character = nil
         self._path_positions = {}
         self:_clear_visuals()
     end
@@ -453,6 +387,7 @@ Returns:
 function Guide:set_target(target: BasePart?)
     self._target = target
     self._last_target_position = nil
+    self._path_character = nil
     self._path_positions = {}
     self:_clear_visuals()
 
@@ -517,6 +452,7 @@ function Guide.new(player: Player): any
         _visual_parts = {},
         _path_positions = {},
         _last_target_position = nil,
+        _path_character = nil,
         _alive = true,
     }, Guide)
 
@@ -547,7 +483,7 @@ function Guide.new(player: Player): any
                             #self._visual_parts,
                             1
                         )
-                        * 0.28
+                        * HUE_SPREAD
                 ) % 1
                 part.Color = Color3.fromHSV(
                     hue,
