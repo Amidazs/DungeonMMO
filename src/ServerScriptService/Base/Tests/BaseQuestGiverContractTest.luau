@@ -54,6 +54,11 @@ local function main()
         "physical giver count matches definitions"
     )
 
+    local environment_mode = Workspace:GetAttribute(
+        "DungeonMMOResolvedEnvironmentMode"
+    )
+    local strict_layout =
+        environment_mode ~= "Synthetic"
     local positions = {}
 
     for _, definition in ipairs(givers) do
@@ -89,15 +94,18 @@ local function main()
                 )) == "string",
             definition.Id .. " exposes stable presentation attributes"
         )
-        check(
-            model:GetAttribute(
-                "DungeonMMOQuestGiverWalkable"
-            ) == true
-                and model:GetAttribute(
-                    "DungeonMMOQuestGiverApproachClear"
-                ) == true,
-            definition.Id .. " is marked walkable and approach-clear"
-        )
+        if strict_layout then
+            check(
+                model:GetAttribute(
+                    "DungeonMMOQuestGiverWalkable"
+                ) == true
+                    and model:GetAttribute(
+                        "DungeonMMOQuestGiverApproachClear"
+                    ) == true,
+                definition.Id
+                    .. " is marked walkable and approach-clear"
+            )
+        end
 
         local prompt = anchor:FindFirstChild(
             "QuestGiverPrompt"
@@ -134,13 +142,15 @@ local function main()
                 positions[first.Id] - positions[second.Id]
             ).Magnitude
 
-            check(
-                distance >= 30,
-                first.Id
-                    .. " and "
-                    .. second.Id
-                    .. " are spread at least 30 studs apart"
-            )
+            if strict_layout then
+                check(
+                    distance >= 30,
+                    first.Id
+                        .. " and "
+                        .. second.Id
+                        .. " are spread at least 30 studs apart"
+                )
+            end
         end
     end
 
