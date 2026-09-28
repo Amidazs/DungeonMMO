@@ -844,7 +844,9 @@ dialogue_open.OnClientEvent:Connect(function(payload: any)
     end
 
     local anchor = payload.Anchor
-    if anchor ~= nil and anchor:IsA("BasePart") then
+    if typeof(anchor) == "Instance"
+        and anchor:IsA("BasePart")
+    then
         active_context_anchor = anchor
     else
         active_context_anchor = board_anchor
