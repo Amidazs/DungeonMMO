@@ -1,3 +1,46 @@
+## 28 September 2026 — v3.47 FRIEND TEST READY / SECTION D HOLD
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_47_Friend_Test_Ready_GREEN_20260928.md);
+[evidence](
+../testing/friend-test-v3-47-ready-20260928.md).
+
+The user's requested friend-test setup is complete.
+
+TEST universe `10765241947` now has:
+
+- Base `134132328219009` published at schema 15;
+- Dungeon `117293035754309` published at schema 15;
+- Limited audience;
+- Friends ON;
+- Playtesters ON;
+- Public OFF.
+
+Both published places were independently reopened from Roblox cloud and checked
+for current source markers.
+
+New presentation:
+
+- guided Base new-player tutorial;
+- first-expedition Dungeon tutorial;
+- eight physical Adventure quest-giver roles spread across semantic hub areas;
+- Dwarf giver fallback for the authored lobby;
+- TEST friend-build banner.
+
+Important release fix discovered during deployment:
+
+`published-base.project.json` and `test-lobby-sync.project.json` previously
+omitted current `ServerScriptService.Combat` runtime dependencies. They now
+match the Base project's required Combat composition.
+
+The user's friend should open the TEST experience while they are Roblox
+friends with the owner. If matchmaking places them in different Base servers,
+use Roblox's Join Friend flow so both are in the same Base server before using
+the in-game party invite.
+
+**DO NOT START SECTION D** until the user reports the two-player test and
+explicitly releases the hold.
+
 ## 28 September 2026 — v3.46 SECTION D READY / USER TEST HOLD
 
 [Roadmap](
