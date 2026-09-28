@@ -473,6 +473,7 @@ local function project_to_ground(
     params.FilterType = Enum.RaycastFilterType.Exclude
     params.FilterDescendantsInstances = {folder}
     params.IgnoreWater = false
+    params.RespectCanCollide = true
 
     local origin = desired + Vector3.new(
         0,
