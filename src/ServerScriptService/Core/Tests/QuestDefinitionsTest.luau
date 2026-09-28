@@ -47,15 +47,16 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 8
+    #adventures == 9
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
         and adventures[4].Id == "MineEchoes"
         and adventures[5].Id == "RuinSurvey"
         and adventures[6].Id == "CorruptedForemanBounty"
-        and adventures[7].Id == "DungeonBossHunt"
-        and adventures[8].Id == "ExpeditionProvisioning",
+        and adventures[7].Id == "FractureTrail"
+        and adventures[8].Id == "DungeonBossHunt"
+        and adventures[9].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -140,6 +141,32 @@ check(
         and foreman_bounty.Reward.ItemId == nil
         and foreman_bounty.Reward.Items == nil,
     "Foreman bounty is intentionally Gold-only."
+)
+
+local fracture_trail = assert(
+    QuestDefinitions.get("FractureTrail")
+)
+check(
+    fracture_trail.MinimumLevel == 12
+        and fracture_trail.PrerequisiteQuestId == "RuinSurvey"
+        and #fracture_trail.Objectives == 2
+        and fracture_trail.Objectives[1].Type
+            == "CheckpointReached"
+        and fracture_trail.Objectives[1].TargetId
+            == "TestDungeon:EncounterStart:CombatRoom2"
+        and fracture_trail.Objectives[2].Type == "DungeonClear"
+        and fracture_trail.Objectives[2].TargetId
+            == "AbandonedMine",
+    "Fracture Trail mixes a trusted checkpoint with a fresh Mine clear."
+)
+check(
+    fracture_trail.Reward.Gold == 90
+        and type(fracture_trail.Reward.Items) == "table"
+        and #fracture_trail.Reward.Items == 1
+        and fracture_trail.Reward.Items[1].ItemId
+            == "warding_essence"
+        and fracture_trail.Reward.Items[1].Quantity == 2,
+    "Fracture Trail pays the reviewed Gold plus Warding Essence reward."
 )
 
 local boss_hunt = assert(
