@@ -1,7 +1,9 @@
 --!strict
 -- Physical Base quest-giver placeholders bound to trusted Adventure state.
 
+local PathfindingService = game:GetService("PathfindingService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
 local Shared = ReplicatedStorage
     :WaitForChild("Core")
@@ -18,6 +20,19 @@ local Runtime = {}
 Runtime.__index = Runtime
 
 local FOLDER_NAME = "DungeonMMOQuestGivers"
+local MIN_GIVER_DISTANCE = 30
+local GROUND_RAY_HEIGHT = 70
+local GROUND_RAY_DEPTH = 180
+local APPROACH_WIDTH = 5
+local APPROACH_HEIGHT = 6
+local SKIN_COLOR = Color3.fromRGB(196, 157, 119)
+
+local SEARCH_RADII = table.freeze({
+    0,
+    12,
+    24,
+    36,
+})
 
 --[[
 Creates or returns the generated quest-giver presentation folder.
@@ -43,29 +58,29 @@ local function ensure_folder(root: Instance): Folder
 end
 
 --[[
-Adds a readable world-space label to one placeholder giver.
+Adds a readable world-space label to one humanoid placeholder.
 
 Args:
-    anchor (BasePart): Physical quest-giver placeholder.
+    head (BasePart): Humanoid head carrying the label.
     speaker (string): Player-facing role name.
 
 Returns:
     nil: Creates the label when one is not already present.
 ]]
 local function ensure_label(
-    anchor: BasePart,
+    head: BasePart,
     speaker: string
 )
-    if anchor:FindFirstChild("QuestGiverLabel") then
+    if head:FindFirstChild("QuestGiverLabel") then
         return
     end
 
     local billboard = Instance.new("BillboardGui")
     billboard.Name = "QuestGiverLabel"
     billboard.Size = UDim2.fromOffset(220, 44)
-    billboard.StudsOffset = Vector3.new(0, 4.5, 0)
+    billboard.StudsOffset = Vector3.new(0, 2.1, 0)
     billboard.AlwaysOnTop = true
-    billboard.Parent = anchor
+    billboard.Parent = head
 
     local label = Instance.new("TextLabel")
     label.Size = UDim2.fromScale(1, 1)
@@ -80,17 +95,17 @@ end
 Creates or returns the interaction prompt for one quest giver.
 
 Args:
-    anchor (BasePart): Physical giver placeholder.
+    root_part (BasePart): Invisible humanoid interaction root.
     speaker (string): Player-facing role name.
 
 Returns:
     ProximityPrompt: Stable talk prompt.
 ]]
 local function ensure_prompt(
-    anchor: BasePart,
+    root_part: BasePart,
     speaker: string
 ): ProximityPrompt
-    local existing = anchor:FindFirstChild("QuestGiverPrompt")
+    local existing = root_part:FindFirstChild("QuestGiverPrompt")
     if existing and existing:IsA("ProximityPrompt") then
         return existing
     end
@@ -102,56 +117,563 @@ local function ensure_prompt(
     prompt.HoldDuration = 0.1
     prompt.MaxActivationDistance = 12
     prompt.RequiresLineOfSight = false
-    prompt.Parent = anchor
+    prompt.Parent = root_part
     return prompt
 end
 
 --[[
-Creates or refreshes one replaceable physical quest-giver placeholder.
+Creates one anchored decorative part for a placeholder NPC.
+
+Args:
+    model (Model): NPC model receiving the part.
+    name (string): Stable part name.
+    size (Vector3): Unscaled part size.
+    color (Color3): Part color.
+    base_cframe (CFrame): NPC floor/orientation transform.
+    local_cframe (CFrame): Local unscaled transform.
+    scale (number): NPC scale multiplier.
+    shape (Enum.PartType?): Optional primitive shape.
+
+Returns:
+    BasePart: Created decorative body part.
+]]
+local function create_part(
+    model: Model,
+    name: string,
+    size: Vector3,
+    color: Color3,
+    base_cframe: CFrame,
+    local_cframe: CFrame,
+    scale: number,
+    shape: Enum.PartType?
+): BasePart
+    local part = Instance.new("Part")
+    part.Name = name
+    part.Size = size * scale
+    part.Color = color
+    part.Material = Enum.Material.SmoothPlastic
+    part.Anchored = true
+    part.CanCollide = false
+    part.CanTouch = false
+    part.CanQuery = false
+    part.CastShadow = true
+    part.Shape = shape or Enum.PartType.Block
+
+    local position = local_cframe.Position * scale
+    local rotation = local_cframe - local_cframe.Position
+    part.CFrame = base_cframe
+        * CFrame.new(position)
+        * rotation
+    part.Parent = model
+    return part
+end
+
+--[[
+Adds simple role-specific silhouette details to one humanoid placeholder.
+
+Args:
+    model (Model): NPC receiving decorative role details.
+    definition (any): Quest-giver appearance definition.
+    base_cframe (CFrame): NPC floor/orientation transform.
+    scale (number): NPC scale multiplier.
+
+Returns:
+    nil: Adds non-colliding placeholder accessories.
+]]
+local function add_role_details(
+    model: Model,
+    definition: any,
+    base_cframe: CFrame,
+    scale: number
+)
+    local accent = definition.AccentColor
+    local clothing = definition.ClothingColor
+    local style = definition.Style
+
+    if style == "Keeper" then
+        create_part(
+            model,
+            "Staff",
+            Vector3.new(0.28, 5.5, 0.28),
+            Color3.fromRGB(103, 73, 46),
+            base_cframe,
+            CFrame.new(2.0, 2.75, 0),
+            scale,
+            nil
+        )
+        create_part(
+            model,
+            "StaffGem",
+            Vector3.new(0.65, 0.65, 0.65),
+            accent,
+            base_cframe,
+            CFrame.new(2.0, 5.65, 0),
+            scale,
+            Enum.PartType.Ball
+        )
+    elseif style == "Hunter" then
+        create_part(
+            model,
+            "Quiver",
+            Vector3.new(1.0, 2.6, 0.55),
+            clothing,
+            base_cframe,
+            CFrame.new(0.7, 3.6, 0.78)
+                * CFrame.Angles(0, 0, math.rad(-18)),
+            scale,
+            nil
+        )
+    elseif style == "Captain" then
+        for _, side in ipairs({-1, 1}) do
+            create_part(
+                model,
+                "ShoulderGuard" .. tostring(side),
+                Vector3.new(0.95, 0.45, 1.35),
+                accent,
+                base_cframe,
+                CFrame.new(side * 1.5, 4.25, 0),
+                scale,
+                nil
+            )
+        end
+    elseif style == "Archivist" then
+        create_part(
+            model,
+            "Robe",
+            Vector3.new(2.35, 2.7, 1.35),
+            clothing,
+            base_cframe,
+            CFrame.new(0, 1.45, 0),
+            scale,
+            nil
+        )
+    elseif style == "Warden" then
+        create_part(
+            model,
+            "Helmet",
+            Vector3.new(2.05, 0.6, 2.05),
+            accent,
+            base_cframe,
+            CFrame.new(0, 6.25, 0),
+            scale,
+            nil
+        )
+    elseif style == "Pathfinder" then
+        create_part(
+            model,
+            "Backpack",
+            Vector3.new(1.8, 2.3, 0.75),
+            clothing,
+            base_cframe,
+            CFrame.new(0, 3.6, 0.88),
+            scale,
+            nil
+        )
+    elseif style == "Surveyor" then
+        create_part(
+            model,
+            "SurveyPack",
+            Vector3.new(1.7, 2.0, 0.7),
+            accent,
+            base_cframe,
+            CFrame.new(0, 3.5, 0.88),
+            scale,
+            nil
+        )
+    elseif style == "Quartermaster" then
+        create_part(
+            model,
+            "Apron",
+            Vector3.new(1.65, 2.25, 0.18),
+            accent,
+            base_cframe,
+            CFrame.new(0, 3.1, -0.68),
+            scale,
+            nil
+        )
+    end
+end
+
+--[[
+Builds a recognizable humanoid placeholder rather than one solid block.
 
 Args:
     folder (Folder): Generated quest-giver parent.
-    source_anchor (BasePart): Semantic hub anchor for this giver.
-    definition (any): Quest-giver presentation definition.
+    ground_position (Vector3): Walkable floor point for the NPC.
+    facing_target (Vector3): Point the NPC should face.
+    source_anchor_id (string): Resolved semantic anchor identifier.
+    definition (any): Quest-giver definition.
+    path_waypoint_count (number): Validated path waypoint count.
 
 Returns:
-    BasePart: Physical giver anchor.
+    Model: Created humanoid placeholder model.
+    BasePart: Invisible interaction root.
 ]]
-local function create_giver(
+local function create_humanoid_giver(
     folder: Folder,
-    source_anchor: BasePart,
+    ground_position: Vector3,
+    facing_target: Vector3,
     source_anchor_id: string,
-    definition: any
-): BasePart
+    definition: any,
+    path_waypoint_count: number
+): (Model, BasePart)
     local existing = folder:FindFirstChild(definition.Id)
     if existing then
         existing:Destroy()
     end
 
-    local anchor = Instance.new("Part")
-    anchor.Name = definition.Id
-    anchor.Size = Vector3.new(4, 6, 4)
-    anchor.Anchored = true
-    anchor.CanCollide = false
-    anchor.Material = Enum.Material.Slate
-    anchor.CFrame = source_anchor.CFrame * definition.Offset
-    anchor:SetAttribute(
+    local scale = tonumber(definition.Scale) or 1
+    local look_target = Vector3.new(
+        facing_target.X,
+        ground_position.Y,
+        facing_target.Z
+    )
+    if (look_target - ground_position).Magnitude < 0.5 then
+        look_target = ground_position + Vector3.new(0, 0, -1)
+    end
+
+    local base_cframe = CFrame.lookAt(
+        ground_position,
+        look_target
+    )
+
+    local model = Instance.new("Model")
+    model.Name = definition.Id
+    model:SetAttribute(
         "DungeonMMOQuestGiverSourceAnchor",
         source_anchor_id
     )
-    anchor:SetAttribute(
+    model:SetAttribute(
         "DungeonMMOQuestGiverId",
         definition.Id
     )
-    anchor:SetAttribute(
+    model:SetAttribute(
         "DungeonMMOQuestSpeaker",
         definition.Speaker
     )
-    anchor.Parent = folder
+    model:SetAttribute(
+        "DungeonMMOQuestGiverWalkable",
+        true
+    )
+    model:SetAttribute(
+        "DungeonMMOQuestGiverPathWaypoints",
+        path_waypoint_count
+    )
+    model.Parent = folder
 
-    ensure_label(anchor, definition.Speaker)
-    ensure_prompt(anchor, definition.Speaker)
-    return anchor
+    local root_part = create_part(
+        model,
+        "HumanoidRootPart",
+        Vector3.new(2, 2, 1),
+        Color3.new(1, 1, 1),
+        base_cframe,
+        CFrame.new(0, 3, 0),
+        scale,
+        nil
+    )
+    root_part.Transparency = 1
+    root_part.CanQuery = true
+    model.PrimaryPart = root_part
+
+    create_part(
+        model,
+        "Torso",
+        Vector3.new(2.35, 2.5, 1.2),
+        definition.ClothingColor,
+        base_cframe,
+        CFrame.new(0, 3.45, 0),
+        scale,
+        nil
+    )
+
+    local head = create_part(
+        model,
+        "Head",
+        Vector3.new(1.85, 1.85, 1.85),
+        SKIN_COLOR,
+        base_cframe,
+        CFrame.new(0, 5.65, 0),
+        scale,
+        Enum.PartType.Ball
+    )
+
+    for _, side in ipairs({-1, 1}) do
+        create_part(
+            model,
+            "Arm" .. tostring(side),
+            Vector3.new(0.75, 2.45, 0.75),
+            SKIN_COLOR,
+            base_cframe,
+            CFrame.new(side * 1.55, 3.4, 0),
+            scale,
+            nil
+        )
+        create_part(
+            model,
+            "Leg" .. tostring(side),
+            Vector3.new(0.95, 2.55, 0.95),
+            definition.ClothingColor,
+            base_cframe,
+            CFrame.new(side * 0.62, 1.28, 0),
+            scale,
+            nil
+        )
+    end
+
+    create_part(
+        model,
+        "Belt",
+        Vector3.new(2.45, 0.32, 1.3),
+        definition.AccentColor,
+        base_cframe,
+        CFrame.new(0, 2.55, 0),
+        scale,
+        nil
+    )
+
+    add_role_details(
+        model,
+        definition,
+        base_cframe,
+        scale
+    )
+
+    local humanoid = Instance.new("Humanoid")
+    humanoid.Name = "Humanoid"
+    humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+    humanoid.HealthDisplayDistance = 0
+    humanoid.NameDisplayDistance = 0
+    humanoid.AutoRotate = false
+    humanoid.Parent = model
+
+    ensure_label(head, definition.Speaker)
+    ensure_prompt(root_part, definition.Speaker)
+
+    return model, root_part
+end
+
+--[[
+Projects a desired X/Z position onto the first solid ground surface.
+
+Args:
+    folder (Folder): Generated NPC folder to ignore.
+    desired (Vector3): Desired world-space position.
+
+Returns:
+    Vector3?: Ground surface position when found.
+]]
+local function project_to_ground(
+    folder: Folder,
+    desired: Vector3
+): Vector3?
+    local params = RaycastParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {folder}
+    params.IgnoreWater = false
+
+    local origin = desired + Vector3.new(
+        0,
+        GROUND_RAY_HEIGHT,
+        0
+    )
+    local result = Workspace:Raycast(
+        origin,
+        Vector3.new(0, -GROUND_RAY_DEPTH, 0),
+        params
+    )
+
+    return if result then result.Position else nil
+end
+
+--[[
+Checks that the standing/interaction volume is not occupied by a wall.
+
+Args:
+    folder (Folder): Generated NPC folder to ignore.
+    ground_position (Vector3): Candidate floor point.
+
+Returns:
+    boolean: True when no collidable geometry occupies the body volume.
+]]
+local function approach_space_clear(
+    folder: Folder,
+    ground_position: Vector3
+): boolean
+    local params = OverlapParams.new()
+    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.FilterDescendantsInstances = {folder}
+
+    local parts = Workspace:GetPartBoundsInBox(
+        CFrame.new(
+            ground_position
+                + Vector3.new(0, APPROACH_HEIGHT / 2, 0)
+        ),
+        Vector3.new(
+            APPROACH_WIDTH,
+            APPROACH_HEIGHT,
+            APPROACH_WIDTH
+        ),
+        params
+    )
+
+    for _, part in ipairs(parts) do
+        if part.CanCollide then
+            local top = part.Position.Y + part.Size.Y / 2
+            if top > ground_position.Y + 0.6 then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+--[[
+Validates Roblox navigation from the spawn area to one NPC position.
+
+Args:
+    start_position (Vector3): Player-spawn navigation origin.
+    target_position (Vector3): Candidate NPC floor point.
+
+Returns:
+    boolean: True when Roblox computes a complete walkable path.
+    number: Number of waypoints in the successful path.
+]]
+local function validate_path(
+    start_position: Vector3,
+    target_position: Vector3
+): (boolean, number)
+    local path = PathfindingService:CreatePath({
+        AgentRadius = 2,
+        AgentHeight = 5,
+        AgentCanJump = true,
+        AgentCanClimb = true,
+        WaypointSpacing = 6,
+    })
+
+    local ok = pcall(function()
+        path:ComputeAsync(
+            start_position,
+            target_position
+        )
+    end)
+
+    if not ok or path.Status ~= Enum.PathStatus.Success then
+        return false, 0
+    end
+
+    local waypoints = path:GetWaypoints()
+    return #waypoints >= 2, #waypoints
+end
+
+--[[
+Returns whether one candidate stays well clear of already placed givers.
+
+Args:
+    placed_positions ({Vector3}): Existing giver floor positions.
+    candidate (Vector3): Candidate floor position.
+
+Returns:
+    boolean: True when the minimum giver spacing is preserved.
+]]
+local function giver_spacing_valid(
+    placed_positions: {Vector3},
+    candidate: Vector3
+): boolean
+    for _, position in ipairs(placed_positions) do
+        if (position - candidate).Magnitude < MIN_GIVER_DISTANCE then
+            return false
+        end
+    end
+
+    return true
+end
+
+--[[
+Builds deterministic search offsets around a desired role location.
+
+Args:
+    None.
+
+Returns:
+    {Vector3}: Horizontal offsets in nearest-first search order.
+]]
+local function placement_search_offsets(): {Vector3}
+    local offsets = {}
+
+    for _, radius in ipairs(SEARCH_RADII) do
+        if radius == 0 then
+            table.insert(offsets, Vector3.zero)
+        else
+            for angle = 0, 315, 45 do
+                local radians = math.rad(angle)
+                table.insert(
+                    offsets,
+                    Vector3.new(
+                        math.cos(radians) * radius,
+                        0,
+                        math.sin(radians) * radius
+                    )
+                )
+            end
+        end
+    end
+
+    return offsets
+end
+
+--[[
+Finds a spaced, obstacle-free and navigable NPC placement.
+
+Args:
+    folder (Folder): Generated NPC folder.
+    spawn_position (Vector3): Player-spawn navigation origin.
+    source_anchor (BasePart): Semantic role anchor.
+    definition (any): Quest-giver definition.
+    placed_positions ({Vector3}): Already accepted giver positions.
+
+Returns:
+    Vector3: Walkable NPC floor position.
+    number: Successful path waypoint count.
+]]
+local function resolve_placement(
+    folder: Folder,
+    spawn_position: Vector3,
+    source_anchor: BasePart,
+    definition: any,
+    placed_positions: {Vector3}
+): (Vector3, number)
+    local desired = source_anchor.Position + definition.Offset
+
+    for _, search_offset in ipairs(
+        placement_search_offsets()
+    ) do
+        local ground = project_to_ground(
+            folder,
+            desired + search_offset
+        )
+
+        if ground
+            and giver_spacing_valid(
+                placed_positions,
+                ground
+            )
+            and approach_space_clear(folder, ground)
+        then
+            local walkable, waypoint_count = validate_path(
+                spawn_position,
+                ground
+            )
+            if walkable then
+                return ground, waypoint_count
+            end
+        end
+    end
+
+    error(
+        "No walkable quest-giver placement for "
+            .. tostring(definition.Id)
+    )
 end
 
 --[[
@@ -283,6 +805,11 @@ function Runtime.attach(options: any): any
     assert(options.remote ~= nil)
     assert(type(options.is_ready) == "function")
 
+    local spawn_anchor = assert(
+        options.environment:get("Base.PlayerSpawn"),
+        "Quest giver runtime requires Base.PlayerSpawn"
+    )
+
     local self = setmetatable({
         _profiles = options.profiles,
         _quests = options.quests,
@@ -291,6 +818,7 @@ function Runtime.attach(options: any): any
     }, Runtime)
 
     local folder = ensure_folder(options.root)
+    local placed_positions = {}
 
     for _, definition in ipairs(
         QuestGiverDefinitions.all()
@@ -313,19 +841,49 @@ function Runtime.attach(options: any): any
             "Quest giver anchor missing: "
                 .. tostring(definition.AnchorId)
         )
-        local anchor = create_giver(
-            folder,
-            source_anchor,
-            source_anchor_id,
-            definition
+
+        local ground_position, waypoint_count =
+            resolve_placement(
+                folder,
+                spawn_anchor.Position,
+                source_anchor,
+                definition,
+                placed_positions
+            )
+
+        local model, interaction_root =
+            create_humanoid_giver(
+                folder,
+                ground_position,
+                source_anchor.Position,
+                source_anchor_id,
+                definition,
+                waypoint_count
+            )
+
+        table.insert(
+            placed_positions,
+            ground_position
         )
+
         local prompt = assert(
-            anchor:FindFirstChild("QuestGiverPrompt")
+            interaction_root:FindFirstChild(
+                "QuestGiverPrompt"
+            )
         ) :: ProximityPrompt
 
         prompt.Triggered:Connect(function(player: Player)
-            self:open(player, definition, anchor)
+            self:open(
+                player,
+                definition,
+                interaction_root
+            )
         end)
+
+        model:SetAttribute(
+            "DungeonMMOQuestGiverApproachClear",
+            true
+        )
     end
 
     return self
