@@ -1211,6 +1211,127 @@ local RECIPES = table.freeze({
         }),
         XP = 95,
     }),
+    forge_masterwork_frame_batch = table.freeze({
+        Id = "forge_masterwork_frame_batch",
+        Name = "Forge Masterwork Frame Batch",
+        ProfessionId = "Blacksmithing",
+        StationId = "Blacksmithing",
+        RequiredLevel = 5,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "blacksmith_masterwork_batch_blueprint",
+        }),
+        Inputs = table.freeze({
+            table.freeze({
+                ItemId = "hardened_fittings",
+                Quantity = 4,
+            }),
+            table.freeze({
+                ItemId = "rune_binding",
+                Quantity = 2,
+            }),
+            table.freeze({
+                ItemId = "prismatic_catalyst",
+                Quantity = 2,
+            }),
+        }),
+        Output = table.freeze({
+            ItemId = "masterwork_frame",
+            Quantity = 2,
+        }),
+        XP = 190,
+    }),
+    distill_aetheric_catalyst_batch = table.freeze({
+        Id = "distill_aetheric_catalyst_batch",
+        Name = "Distill Aetheric Catalyst Batch",
+        ProfessionId = "Alchemy",
+        StationId = "Alchemy",
+        RequiredLevel = 5,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "alchemy_aetheric_batch_recipe",
+        }),
+        Inputs = table.freeze({
+            table.freeze({
+                ItemId = "prismatic_catalyst",
+                Quantity = 4,
+            }),
+            table.freeze({
+                ItemId = "prismatic_seal",
+                Quantity = 2,
+            }),
+            table.freeze({
+                ItemId = "reinforced_leather",
+                Quantity = 2,
+            }),
+        }),
+        Output = table.freeze({
+            ItemId = "aetheric_catalyst",
+            Quantity = 2,
+        }),
+        XP = 190,
+    }),
+    stitch_masterwork_lining_batch = table.freeze({
+        Id = "stitch_masterwork_lining_batch",
+        Name = "Stitch Masterwork Lining Batch",
+        ProfessionId = "Leatherworking",
+        StationId = "Leatherworking",
+        RequiredLevel = 5,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "leatherworking_masterwork_batch_pattern",
+        }),
+        Inputs = table.freeze({
+            table.freeze({
+                ItemId = "rune_binding",
+                Quantity = 4,
+            }),
+            table.freeze({
+                ItemId = "hardened_fittings",
+                Quantity = 2,
+            }),
+            table.freeze({
+                ItemId = "moonpetal_extract",
+                Quantity = 2,
+            }),
+        }),
+        Output = table.freeze({
+            ItemId = "masterwork_lining",
+            Quantity = 2,
+        }),
+        XP = 190,
+    }),
+    inscribe_arcane_matrix_batch = table.freeze({
+        Id = "inscribe_arcane_matrix_batch",
+        Name = "Inscribe Arcane Matrix Batch",
+        ProfessionId = "Enchanting",
+        StationId = "Enchanting",
+        RequiredLevel = 5,
+        Knowledge = table.freeze({
+            Mode = "Learned",
+            RecipeId = "enchanting_arcane_batch_inscription",
+        }),
+        Inputs = table.freeze({
+            table.freeze({
+                ItemId = "prismatic_seal",
+                Quantity = 4,
+            }),
+            table.freeze({
+                ItemId = "masterwork_frame",
+                Quantity = 2,
+            }),
+            table.freeze({
+                ItemId = "aetheric_catalyst",
+                Quantity = 2,
+            }),
+        }),
+        Output = table.freeze({
+            ItemId = "arcane_matrix",
+            Quantity = 2,
+        }),
+        XP = 190,
+    }),
+
     gearwright_precision_assembly = table.freeze({
         Id = "gearwright_precision_assembly",
         Name = "Gearwright Precision Assembly",
@@ -1321,6 +1442,7 @@ local STATION_ORDER = table.freeze({
         "smelt_deep_iron_bar",
         "forge_hardened_fittings",
         "forge_masterwork_frame",
+        "forge_masterwork_frame_batch",
         "gearwright_precision_assembly",
     }),
     Alchemy = table.freeze({
@@ -1339,6 +1461,7 @@ local STATION_ORDER = table.freeze({
         "distill_moonpetal_extract",
         "distill_prismatic_catalyst",
         "distill_aetheric_catalyst",
+        "distill_aetheric_catalyst_batch",
         "gearwright_stabilizing_compound",
     }),
     Leatherworking = table.freeze({
@@ -1356,6 +1479,7 @@ local STATION_ORDER = table.freeze({
         "cure_thick_hide",
         "stitch_rune_binding",
         "stitch_masterwork_lining",
+        "stitch_masterwork_lining_batch",
         "gearwright_articulated_binding",
     }),
     Enchanting = table.freeze({
@@ -1373,6 +1497,7 @@ local STATION_ORDER = table.freeze({
         "inscribe_resonant_rune",
         "inscribe_prismatic_seal",
         "inscribe_arcane_matrix",
+        "inscribe_arcane_matrix_batch",
         "gearwright_runic_matrix",
     }),
 })
