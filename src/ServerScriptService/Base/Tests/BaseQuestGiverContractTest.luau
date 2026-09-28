@@ -54,6 +54,8 @@ local function main()
         "physical giver count matches definitions"
     )
 
+    local positions = {}
+
     for _, definition in ipairs(givers) do
         local anchor = folder:FindFirstChild(definition.Id)
         check(
@@ -94,6 +96,26 @@ local function main()
                 and label:IsA("BillboardGui"),
             definition.Id .. " has a visible role label"
         )
+
+        positions[definition.Id] = anchor.Position
+    end
+
+    for first_index = 1, #givers do
+        for second_index = first_index + 1, #givers do
+            local first = givers[first_index]
+            local second = givers[second_index]
+            local distance = (
+                positions[first.Id] - positions[second.Id]
+            ).Magnitude
+
+            check(
+                distance >= 10,
+                first.Id
+                    .. " and "
+                    .. second.Id
+                    .. " are spread at least 10 studs apart"
+            )
+        end
     end
 
     local remote = ReplicatedStorage.Core.Remotes:
