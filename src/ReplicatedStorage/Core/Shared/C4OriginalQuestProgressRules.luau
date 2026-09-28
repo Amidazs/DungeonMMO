@@ -428,13 +428,13 @@ function Rules.advance(quest: any, current: any, event: any): any
     end
     if current.Count >= step.Required then
         if quest.BranchId == "DwarfScavenger" then
-            if step.TargetId == "QuartermasterMion" then
+            if step.TargetId == "QuartermasterBrel" then
                 current.Proofs.QuartermasterErrands = true
             elseif step.TargetId == "HoneybackBear" then
                 current.Proofs.SpoiledHoneyJars5 = true
             elseif step.TargetId == "TunnelTarantula" then
                 current.Proofs.SpoiledSalvageBeads20 = true
-            elseif step.TargetId == "WandererTorai" then
+            elseif step.TargetId == "WandererKest" then
                 current.Proofs.WandererProofToken = true
             end
         elseif quest.BranchId == "DwarfArtisan" then
