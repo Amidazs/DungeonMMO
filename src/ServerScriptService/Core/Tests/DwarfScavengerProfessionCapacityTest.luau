@@ -69,6 +69,8 @@ local function award_deepclaimer(character: any)
             BranchId = "DwarfScavenger",
             Ready = true,
             Step = #quest.Steps + 1,
+            Count = 0,
+            AppliedEvents = {},
             Proofs = proofs,
         },
     }
