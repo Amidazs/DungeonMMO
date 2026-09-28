@@ -1,3 +1,35 @@
+## 28 September 2026 — v3.31 profession-aware Adventure content GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_31_Profession_Aware_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/profession-quest-content-v3-31-green-20260928.md).
+
+The first post-profession launch quest/content tranche is accepted.
+
+Provisioning follows Mine Echoes, asks for one fresh Temple + Mine clear and
+rewards 75 Gold plus two each of Deep Iron Ore, Moonpetal and Thick Hide.
+Completion requires no profession; the real integration proves an ordinary
+adventurer can sell the reward into the player economy.
+
+Fresh current-head acceptance:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 8`,
+`VERIFIED_ADVENTURE_BOARD_V2_INITIAL_RENDER_PASS`,
+`VERIFIED_ADVENTURE_BOARD_V2_READY_RENDER_PASS`,
+`VERIFIED_ADVENTURE_BOARD_V2_DISTANCE_CLOSE_PASS`.
+
+The latest QuestBoard refactor is therefore accepted. Physical prompt behavior
+is separately locked by BaseQuestBoardContractTest.
+
+Next development gate:
+audit launch Adventure eligibility/content against the races/classes that are
+actually creation-enabled, then expand level-range quest content. Keep
+profession materials optional rewards/trade pressure, never mandatory
+profession ownership for core quest progression.
+
+Permanent source/document edits remain GitHub-only; use Desktop Commander for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.30 live Dungeon Skinning GREEN
 
 [Roadmap](
