@@ -168,6 +168,14 @@ local function exercise(
         "Actual quest steps cannot progress before source quest starts")
     check(service:start(user_id).ok,
         "Selected original Fighter can start separately bound source quest")
+    local opening_snapshot = service:build_snapshot(user_id)
+    check(
+        opening_snapshot.ok == true
+            and opening_snapshot.CurrentQuestIndex == 1
+            and opening_snapshot.CurrentQuestCount == 3
+            and type(opening_snapshot.CurrentQuestTitle) == "string",
+        "First-transfer progression starts at Quest 1 of 3"
+    )
     check(service:start(user_id).reason == "OriginalQuestAlreadyStarted",
         "Authenticated original quest start cannot be repeated")
     check(service:record_world_event(user_id, {
@@ -374,8 +382,10 @@ local function exercise(
     local persisted = service:build_snapshot(user_id)
     check(persisted.ok and persisted.Ready == true
         and persisted.Step == #quest.Steps + 1
-        and persisted.ClassAwarded == false,
-        "Source-specific quest completion must survive genuine save/reload")
+        and persisted.ClassAwarded == false
+        and persisted.CurrentQuestIndex == 3
+        and persisted.CurrentQuestCount == 3,
+        "Source completion persists as the final quest in a three-quest arc")
     if branch_id == "HumanRogue" then
         local reloaded = assert(profiles:get_character(user_id, 1))
         check(Inventory.count_item(reloaded, "neti_trial_dagger") == 1
