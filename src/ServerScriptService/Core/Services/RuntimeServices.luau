@@ -26,21 +26,6 @@ local InventoryService = require(Services:WaitForChild("InventoryService"))
 local C4SourceShotService = require(
     Services:WaitForChild("C4SourceShotService")
 )
-local C4SourceCombatCalculationService = require(
-    Services:WaitForChild("C4SourceCombatCalculationService")
-)
-local C4SourceCombatExecutor = require(
-    Services:WaitForChild("C4SourceCombatExecutor")
-)
-local C4CombatDispatchAdapter = require(
-    Services:WaitForChild("C4CombatDispatchAdapter")
-)
-local C4CombatCutoverCoordinator = require(
-    Services:WaitForChild("C4CombatCutoverCoordinator")
-)
-local C4SourceCastRuntimeComposition = require(
-    Services:WaitForChild("C4SourceCastRuntimeComposition")
-)
 local RewardService = require(Services:WaitForChild("RewardService"))
 local WeeklyWorldBossService = require(
     Services:WaitForChild("WeeklyWorldBossService")
@@ -127,43 +112,54 @@ function RuntimeServices.new(place_kind: string): any
     local c4_source_shots = C4SourceShotService.new(inventory)
 
     local c4_resource_cutover = nil
+    local c4_source_combat_executor = nil
+    local c4_combat_cutover_coordinator = nil
+    local c4_source_cast_runtime = nil
+
     if place_kind == "Dungeon" then
+        local source_combat = require(
+            Services:WaitForChild(
+                "C4SourceCombatCalculationService"
+            )
+        )
+        local source_executor = require(
+            Services:WaitForChild("C4SourceCombatExecutor")
+        )
+        local dispatch = require(
+            Services:WaitForChild("C4CombatDispatchAdapter")
+        )
+        local cutover_coordinator = require(
+            Services:WaitForChild("C4CombatCutoverCoordinator")
+        )
+        local cast_composition = require(
+            Services:WaitForChild("C4SourceCastRuntimeComposition")
+        )
+
         c4_resource_cutover = require(
             Services:WaitForChild("C4ResourceCutoverService")
         )
-        C4CombatDispatchAdapter.bind_participant_provider(
+        dispatch.bind_participant_provider(
             function(attacker: any): boolean
                 return c4_resource_cutover.is_active(attacker)
             end
         )
-    end
 
-    local c4_source_combat_executor =
-        C4SourceCombatExecutor.new({
+        c4_source_combat_executor = source_executor.new({
             ResourceAuthority = c4_resource_cutover,
         })
-
-    local c4_combat_cutover_coordinator = nil
-    if place_kind == "Dungeon" then
         c4_combat_cutover_coordinator =
-            C4CombatCutoverCoordinator.new({
+            cutover_coordinator.new({
                 ResourceAuthority = c4_resource_cutover,
-                CombatProvider =
-                    C4SourceCombatCalculationService,
+                CombatProvider = source_combat,
                 Executor = c4_source_combat_executor,
-                Dispatch = C4CombatDispatchAdapter,
+                Dispatch = dispatch,
             })
-    end
-
-    local c4_source_cast_runtime = nil
-    if place_kind == "Dungeon" then
-        c4_source_cast_runtime =
-            C4SourceCastRuntimeComposition.new(
-                c4_source_shots,
-                c4_source_combat_executor,
-                inventory,
-                C4SourceCombatCalculationService
-            )
+        c4_source_cast_runtime = cast_composition.new(
+            c4_source_shots,
+            c4_source_combat_executor,
+            inventory,
+            source_combat
+        )
     end
 
     local recipe_knowledge = RecipeKnowledgeService.new(
