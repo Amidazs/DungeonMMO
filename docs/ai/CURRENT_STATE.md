@@ -1,3 +1,47 @@
+## 28 September 2026 — CURRENT v3.42 defend/survive Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_42_Defend_Survive_GREEN_20260928.md);
+[evidence](
+../testing/defend-survive-v3-42-green-20260928.md).
+
+The first server-owned Defend/Survive Adventure is accepted.
+
+New optional Adventure:
+**Hold the Resonance** (`TempleWardDefense`).
+
+- minimum level 13;
+- prerequisite The Resonant Seal;
+- Room 1 must be clear before the ward can be started;
+- real ward prompt with server-validated start distance;
+- 18-stud defense zone measured from server player positions;
+- 3-second absence grace window;
+- leaving beyond grace resets the objective but allows a restart;
+- genuine Room-2 clear completes the held defense;
+- trusted objective type: `DefenseCompleted`;
+- reward: 85 Gold + 1 Warding Essence.
+
+A live validation run also exposed a Luau local-register overflow in
+`DungeonRuntime.server.luau`. The new defense runtime dependency was moved to
+lazy loading and the exact compile probe now returns `compileOk=true`.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 8`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_TEMPLE_WARD_DEFENSE_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+Launch quest mechanics now include defeat, clear, checkpoint, interaction,
+personal collection/turn-in, escort, ordered puzzle and defend/survive
+objectives. All **18** mapped first-transfer branches still expose exactly
+**three player-facing advancement quests** over their branch-specific trusted
+source ledgers.
+
+Next gate: shift the main effort toward **dialogue, narrative continuity, quest
+presentation and placeholder replacement**, using these accepted mechanics
+rather than adding objective types by default. Depths 2-4 remain
+release-disabled until their physical content is accepted.
+
 ## 28 September 2026 — CURRENT v3.41 quest-item puzzle Adventure GREEN
 
 [Roadmap](
