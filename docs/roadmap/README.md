@@ -1,3 +1,19 @@
+**v3.27 DWARF SOURCE SPATIAL BINDING — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_27_Dwarf_Spatial_GREEN_20260928.md)
+and [evidence](
+../testing/c4-dwarf-spatial-v3-27-green-20260928.md).
+The reviewed launch world mapping is now **14 C4 source units per Roblox
+stud**. Spoil keeps exact source castRange **40**, Sweep **20**, and Spoil
+Festival keeps exact radius **200** -> **14.29 studs**, with C4-style caster
+and target collision radii applied separately to cast-range checks. Invalid
+range is rejected before scheduler/MP start. Festival is caster-centred,
+same-encounter and source-boundary-only. Quest-pack enemies now receive their
+temporary reviewed Marauder source boundary. Fresh Play returned
+`VERIFIED_C4_QUEST_PACK_SOURCE_BOUNDARY_PASS`,
+`VERIFIED_DWARF_SPATIAL_V2_PASS 4`, and
+`VERIFIED_DWARF_BACKEND_SPATIAL_V2_PASS 27`. The bridge remains
+default-off. Next gate is professions/economy content.
+
 **v3.26 DWARF WORLD INFRASTRUCTURE — GREEN / CREATION DISABLED:** [roadmap](
 DungeonMMO_Roadmap_v3_26_Dwarf_World_Infrastructure_GREEN_20260928.md)
 and [evidence](
