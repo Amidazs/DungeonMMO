@@ -44,19 +44,19 @@ local QUESTS = table.freeze({
         SourceTitle = "The Deepclaimer Trial",
         StartLevel = 19,
         TransferLevel = 20,
-        TransferNpcId = "SalvageMasterRuna",
+        TransferNpcId = "SalvageMasterVeyda",
         Recommendation = "DeepclaimerRavenSeal",
         Steps = table.freeze({
             talk(
-                "SalvageMasterRuna",
+                "SalvageMasterVeyda",
                 "Accept the Deepclaimer salvage trial."
             ),
             talk(
-                "QuartermasterMion",
+                "QuartermasterBrel",
                 "Complete the quartermaster's rotating supply errands."
             ),
             talk(
-                "ProspectorToma",
+                "ProspectorNessa",
                 "Begin the field salvage examination."
             ),
             spoiled_defeat(
@@ -65,7 +65,7 @@ local QUESTS = table.freeze({
                 "Spoil five honeyback bears and recover five honey jars."
             ),
             talk(
-                "ProspectorToma",
+                "ProspectorNessa",
                 "Present the five spoiled honey jars."
             ),
             spoiled_defeat(
@@ -74,23 +74,23 @@ local QUESTS = table.freeze({
                 "Spoil tunnel tarantulas and recover twenty salvage beads."
             ),
             talk(
-                "ProspectorToma",
+                "ProspectorNessa",
                 "Present the twenty spoiled salvage beads."
             ),
             talk(
-                "GatekeeperRaut",
+                "GatewardenHarl",
                 "Deliver the sealed salvage parcel."
             ),
             talk(
-                "WandererTorai",
+                "WandererKest",
                 "Recover the wanderer's proof token."
             ),
             talk(
-                "GatekeeperRaut",
+                "GatewardenHarl",
                 "Return the proof token and receive the raven seal."
             ),
             talk(
-                "SalvageMasterRuna",
+                "SalvageMasterVeyda",
                 "Present the raven seal and become a Deepclaimer."
             ),
         }),
@@ -109,11 +109,11 @@ local QUESTS = table.freeze({
         SourceTitle = "The Gearwright Trials",
         StartLevel = 19,
         TransferLevel = 20,
-        TransferNpcId = "ForgekeeperBrunna",
+        TransferNpcId = "ForgekeeperOrda",
         Recommendation = "GearwrightPassCertificate",
         Steps = table.freeze({
             talk(
-                "ForgekeeperBrunna",
+                "ForgekeeperOrda",
                 "Accept the three smiths' Gearwright trials."
             ),
             defeat(
@@ -127,15 +127,15 @@ local QUESTS = table.freeze({
                 "Recover two personally earned chief teeth."
             ),
             talk(
-                "ForgekeeperBrunna",
+                "ForgekeeperOrda",
                 "Present the mine trophies for the first smith test."
             ),
             talk(
-                "MasterSmithKelda",
+                "MasterSmithVarka",
                 "Begin the second smith's test."
             ),
             talk(
-                "SmithPerrik",
+                "SmithDorrin",
                 "Trace the component chest stolen from the forge."
             ),
             defeat(
@@ -144,15 +144,15 @@ local QUESTS = table.freeze({
                 "Recover the personally earned stolen component chest."
             ),
             talk(
-                "SmithPerrik",
+                "SmithDorrin",
                 "Return the recovered component chest."
             ),
             talk(
-                "MasterSmithKelda",
+                "MasterSmithVarka",
                 "Complete the second smith's examination."
             ),
             talk(
-                "ForgekeeperBrunna",
+                "ForgekeeperOrda",
                 "Present the final certificate and become a Gearwright."
             ),
         }),
