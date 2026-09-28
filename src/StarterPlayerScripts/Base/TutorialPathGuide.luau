@@ -19,7 +19,7 @@ local MARKER_LEAD_DISTANCE = 1.25
 local ARROW_SPACING = 12
 local ARROW_LEAD_DISTANCE = 4.5
 
-local ROUTE_SAMPLE_SPACING = 0.35
+local ROUTE_SAMPLE_SPACING = 0.75
 local FLOOR_LIFT = 0.09
 local PLAYER_FLOOR_OFFSET = 3
 local PATH_REFRESH_SECONDS = 0.35
@@ -666,11 +666,16 @@ function Guide:_update_markers(
                     + (index - 1) * MARKER_SPACING,
                 self._path_length
             )
-            local position, direction = sample_route(
+            local sampled_position, direction = sample_route(
                 self._path_positions,
                 self._path_distances,
                 self._path_length,
                 route_distance
+            )
+            local position = floor_position(
+                sampled_position,
+                self._player.Character,
+                self._folder
             )
             local flat_direction = Vector3.new(
                 direction.X,
@@ -738,11 +743,16 @@ function Guide:_update_arrows(
                     + (index - 1) * ARROW_SPACING,
                 self._path_length
             )
-            local position, direction = sample_route(
+            local sampled_position, direction = sample_route(
                 self._path_positions,
                 self._path_distances,
                 self._path_length,
                 route_distance
+            )
+            local position = floor_position(
+                sampled_position,
+                self._player.Character,
+                self._folder
             )
             local shaft, left, right = arrow_cframes(
                 position,
