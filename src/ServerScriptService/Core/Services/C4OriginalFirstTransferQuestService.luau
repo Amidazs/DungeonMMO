@@ -5,6 +5,7 @@
 local RS = game:GetService("ReplicatedStorage")
 local Shared = RS.Core.Shared
 local Source = require(Shared.C4OriginalFirstTransferQuestStages)
+local QuestArcs = require(Shared.C4OriginalFirstTransferQuestArcs)
 local Rules = require(Shared.C4OriginalQuestProgressRules)
 local FirstTransfers = require(Shared.OriginalFirstTransferDefinitions)
 local Inventory = require(script.Parent.InventoryService)
@@ -78,10 +79,25 @@ function Service:build_snapshot(user_id: number): any
         and self._world:available(quest, 1) == true
     local world_ready = self._world ~= nil
         and self._world:available(quest, stage_index) == true
+    local arc = QuestArcs.for_branch(branch_id)
+    local current_arc_quest = QuestArcs.current(
+        branch_id,
+        stage_index,
+        type(state) == "table" and state.Ready == true
+    )
     return result(true, nil, {
         BranchId = branch_id,
         QuestId = quest.Id,
         QuestTitle = quest.SourceTitle,
+        QuestArcId = arc and arc.Id or nil,
+        QuestArcQuests = arc and arc.Quests or {},
+        CurrentQuestId = current_arc_quest
+            and current_arc_quest.Id or nil,
+        CurrentQuestTitle = current_arc_quest
+            and current_arc_quest.DisplayName or nil,
+        CurrentQuestIndex = current_arc_quest
+            and current_arc_quest.Index or nil,
+        CurrentQuestCount = arc and arc.QuestCount or 0,
         SourceUrl = quest.SourceUrl,
         WorldReady = world_ready,
         FirstNpcReady = first_npc_ready,
@@ -138,8 +154,24 @@ function Service:start(user_id: number): any
             }
         end
     )
-    if not ok then return result(false, reason or "QuestMutationFailed") end
-    return result(true, nil, {quest_id = quest.Id, branch_id = branch_id})
+    if not ok then
+        return result(false, reason or "QuestMutationFailed")
+    end
+
+    local arc = QuestArcs.for_branch(branch_id)
+    local first_quest = arc and arc.Quests[1]
+
+    return result(true, nil, {
+        quest_id = quest.Id,
+        branch_id = branch_id,
+        quest_arc_id = arc and arc.Id or nil,
+        current_quest_id = first_quest
+            and first_quest.Id or nil,
+        current_quest_title = first_quest
+            and first_quest.DisplayName or nil,
+        current_quest_index = 1,
+        current_quest_count = arc and arc.QuestCount or 0,
+    })
 end
 
 --[[
