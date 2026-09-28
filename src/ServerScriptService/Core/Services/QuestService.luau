@@ -88,6 +88,70 @@ local function state_is_ready(definition: any, state: any): boolean
     return true
 end
 
+--[[
+Normalizes legacy and multi-item Adventure reward definitions.
+
+Args:
+    reward (any): Server-owned quest reward definition.
+
+Returns:
+    {any}: New dense array of item grants.
+]]
+local function reward_items(reward: any): {any}
+    local items = {}
+
+    if type(reward) ~= "table" then
+        return items
+    end
+
+    if type(reward.Items) == "table" then
+        for _, item in ipairs(reward.Items) do
+            if type(item) == "table" then
+                table.insert(items, {
+                    ItemId = item.ItemId,
+                    Quantity = item.Quantity,
+                })
+            end
+        end
+        return items
+    end
+
+    if type(reward.ItemId) == "string" then
+        table.insert(items, {
+            ItemId = reward.ItemId,
+            Quantity = reward.Quantity,
+        })
+    end
+
+    return items
+end
+
+--[[
+Applies every quest item inside the caller's existing profile mutation.
+
+Args:
+    character (any): Selected live character being mutated.
+    items ({any}): Normalized server-owned item grants.
+
+Returns:
+    nil: Raises when any grant is invalid so the mutation rolls back.
+]]
+local function apply_reward_items(
+    character: any,
+    items: {any}
+)
+    for _, item in ipairs(items) do
+        local applied = InventoryService.apply_item_to_character(
+            character,
+            item.ItemId,
+            item.Quantity
+        )
+        if not applied.ok then
+            error(applied.reason or "QuestItemGrantFailed")
+        end
+    end
+end
+
 local function valid_event(event: any): boolean
     if type(event) ~= "table"
         or type(event.EventId) ~= "string"
@@ -322,7 +386,17 @@ function QuestService:claim_reward(
     end
 
     local reward = definition.Reward
-    if type(reward) ~= "table" then
+    local items = reward_items(reward)
+    local gold = type(reward) == "table"
+        and tonumber(reward.Gold)
+        or nil
+
+    if not gold
+        or gold ~= gold
+        or gold < 0
+        or gold >= math.huge
+        or #items == 0
+    then
         return result(false, "QuestRewardUnavailable")
     end
 
@@ -341,25 +415,20 @@ function QuestService:claim_reward(
             error(reason or "QuestNotReady")
         end
 
-        local item = InventoryService.apply_item_to_character(
-            live_character,
-            reward.ItemId,
-            reward.Quantity
-        )
-        if not item.ok then
-            error(item.reason or "QuestItemGrantFailed")
-        end
-        live_character.Gold += reward.Gold
+        apply_reward_items(live_character, items)
+        live_character.Gold += gold
     end)
 
     if not mutated then
         return result(false, "QuestRewardFailed")
     end
+    local first_item = items[1]
     return result(true, nil, {
         quest_id = quest_id,
-        gold_granted = reward.Gold,
-        item_id = reward.ItemId,
-        quantity = reward.Quantity,
+        gold_granted = gold,
+        item_id = first_item and first_item.ItemId or nil,
+        quantity = first_item and first_item.Quantity or nil,
+        items_granted = ProfileSchema.deep_clone(items),
     })
 end
 
