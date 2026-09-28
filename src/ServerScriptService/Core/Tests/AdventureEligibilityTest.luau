@@ -270,6 +270,50 @@ local function main()
         "level-ten Dark Elf can start Foreman bounty after Mine Echoes"
     )
 
+    local fracture_trail = assert(
+        QuestDefinitions.get("FractureTrail")
+    )
+    local level_eleven_fracture = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+    })
+    level_eleven_fracture.Level = 11
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_eleven_fracture,
+            fracture_trail
+        ),
+        "level-eleven Dark Elf cannot start Fracture Trail"
+    )
+
+    local missing_survey = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    missing_survey.Level = 12
+    check(
+        not QuestDefinitions.is_character_eligible(
+            missing_survey,
+            fracture_trail
+        ),
+        "level-twelve Fracture Trail still requires Ruin Survey"
+    )
+
+    local level_twelve_fracture = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+    })
+    level_twelve_fracture.Level = 12
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_twelve_fracture,
+            fracture_trail
+        ),
+        "level-twelve Dark Elf can start Fracture Trail after Ruin Survey"
+    )
+
     local boss_hunt = assert(
         QuestDefinitions.get("DungeonBossHunt")
     )
