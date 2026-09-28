@@ -157,6 +157,55 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    RuinSurvey = table.freeze({
+        Id = "RuinSurvey",
+        DisplayName = "Survey the Broken Ways",
+        Kind = "Adventure",
+        MinimumLevel = 8,
+        PrerequisiteQuestId = "MineEchoes",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ReachTempleInnerApproach",
+                Type = "CheckpointReached",
+                TargetId =
+                    "TestDungeon:EncounterStart:CombatRoom2",
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "ReachMineLowerWorks",
+                Type = "CheckpointReached",
+                TargetId =
+                    "AbandonedMine:EncounterStart:CombatRoom2",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 60,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "deep_iron_bar",
+                    Quantity = 1,
+                }),
+                table.freeze({
+                    ItemId = "moonpetal_extract",
+                    Quantity = 1,
+                }),
+                table.freeze({
+                    ItemId = "reinforced_leather",
+                    Quantity = 1,
+                }),
+                table.freeze({
+                    ItemId = "resonant_rune",
+                    Quantity = 1,
+                }),
+            }),
+        }),
+    }),
+
     CorruptedForemanBounty = table.freeze({
         Id = "CorruptedForemanBounty",
         DisplayName = "The Foreman's Reckoning",
@@ -333,6 +382,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.ForestWolfBounty,
         DEFINITIONS.MarauderCaptainBounty,
         DEFINITIONS.MineEchoes,
+        DEFINITIONS.RuinSurvey,
         DEFINITIONS.CorruptedForemanBounty,
         DEFINITIONS.DungeonBossHunt,
         DEFINITIONS.ExpeditionProvisioning,
