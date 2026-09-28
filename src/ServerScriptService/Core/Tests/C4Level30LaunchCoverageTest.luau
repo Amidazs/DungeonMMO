@@ -373,9 +373,9 @@ local function main()
             and scavenger.CurrentCareerId == "Deepclaimer"
             and scavenger.SourceInventoryAuditedThroughCap
             and scavenger.SourceRankEntriesThroughCap == 49
-            and scavenger.SourceRankEntriesByLevel[20] == 14
-            and scavenger.SourceRankEntriesByLevel[24] == 12
-            and scavenger.SourceRankEntriesByLevel[28] == 23
+            and scavenger.SourceRankEntriesByLevel[20] == 15
+            and scavenger.SourceRankEntriesByLevel[24] == 15
+            and scavenger.SourceRankEntriesByLevel[28] == 19
             and #scavenger.SourceBrackets == 3
             and scavenger.SourceBrackets[1] == 20
             and scavenger.SourceBrackets[2] == 24
