@@ -1,3 +1,16 @@
+**v3.34 LEVEL-FIVE MARAUDER CAPTAIN BOUNTY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_34_Marauder_Captain_Bounty_GREEN_20260928.md)
+and [evidence](
+../testing/marauder-captain-bounty-v3-34-green-20260928.md).
+The first level-paced optional Adventure is now accepted. **The Captain's
+Price** unlocks at level 5 after Worldroot Relic, requires one trusted
+`marauder_captain` defeat and pays **60 Gold only**. It does not gate Mine
+Echoes. The real released Marauder Captain factory, EncounterService and
+QuestService were exercised end-to-end. Fresh Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 5`. Next gate: audit the released Mine
+boss identity before adding Mine-boss Adventure content.
+
 **v3.33 OPTIONAL FOREST WOLF BOUNTY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_33_Forest_Wolf_Bounty_GREEN_20260928.md)
 and [evidence](
