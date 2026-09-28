@@ -1,3 +1,27 @@
+## 28 September 2026 — CURRENT v3.34 level-five Captain bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_34_Marauder_Captain_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/marauder-captain-bounty-v3-34-green-20260928.md).
+
+Launch Adventure content now includes two optional combat bounties beside the
+story chain:
+
+- Forest Wolf bounty: level 1, two `forest_wolf` defeats, 40 Gold;
+- The Captain's Price: level 5, one `marauder_captain` defeat, 60 Gold.
+
+Both require Worldroot Relic but neither blocks Mine Echoes.
+
+The Captain bounty uses the real released `MarauderCaptainFactory`, real
+EncounterService and real QuestService. Fresh current-head validation returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 5`.
+
+Next: audit the released Abandoned Mine boss identity before authoring a Mine
+boss bounty. Do not reuse the generic captain Bestiary identity if the Mine boss
+is meant to be a distinct creature.
+
 ## 28 September 2026 — CURRENT v3.33 Forest Wolf bounty GREEN
 
 [Roadmap](
