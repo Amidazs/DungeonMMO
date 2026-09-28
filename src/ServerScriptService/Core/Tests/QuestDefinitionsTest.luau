@@ -47,13 +47,14 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 6
+    #adventures == 7
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
         and adventures[4].Id == "MineEchoes"
         and adventures[5].Id == "CorruptedForemanBounty"
-        and adventures[6].Id == "ExpeditionProvisioning",
+        and adventures[6].Id == "DungeonBossHunt"
+        and adventures[7].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -114,6 +115,24 @@ check(
         and foreman_bounty.Reward.ItemId == nil
         and foreman_bounty.Reward.Items == nil,
     "Foreman bounty is intentionally Gold-only."
+)
+
+local boss_hunt = assert(
+    QuestDefinitions.get("DungeonBossHunt")
+)
+check(
+    boss_hunt.MinimumLevel == 15
+        and boss_hunt.PrerequisiteQuestId == "MineEchoes"
+        and #boss_hunt.Objectives == 2
+        and boss_hunt.Objectives[1].TargetId == "marauder_captain"
+        and boss_hunt.Objectives[2].TargetId == "corrupted_foreman",
+    "Break the Chain is a level-fifteen released dual-boss Adventure."
+)
+check(
+    boss_hunt.Reward.Gold == 120
+        and boss_hunt.Reward.ItemId == nil
+        and boss_hunt.Reward.Items == nil,
+    "Break the Chain is intentionally Gold-only."
 )
 check(
     QuestDefinitions.get("MineEchoes").PrerequisiteQuestId
