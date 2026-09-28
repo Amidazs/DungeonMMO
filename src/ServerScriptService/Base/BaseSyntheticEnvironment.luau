@@ -47,6 +47,7 @@ function BaseSyntheticEnvironment.create(parent: Instance)
         {"Base.Service.Travel", CFrame.new(8, 2.5, 8), "Service", Vector3.new(4, 5, 4)},
         {"Base.Travel.Market", CFrame.new(-8, 1, -4), "TravelDestination", Vector3.new(5, 2, 5)},
         {"Base.Travel.Dwarves", CFrame.new(-36, 1, 28), "TravelDestination", Vector3.new(5, 2, 5)},
+        {"Base.DwarfQuestHub", CFrame.new(-36, 1, 44), "QuestHub", Vector3.new(6, 2, 6)},
         {"Base.Travel.Portals", CFrame.new(0, 1, -16), "TravelDestination", Vector3.new(5, 2, 5)},
         {"Base.Travel.Orcs", CFrame.new(36, 1, 28), "TravelDestination", Vector3.new(5, 2, 5)},
         {"Base.Profession.BlacksmithingPlaceholder", CFrame.new(-30, 3.5, 18), "Placeholder", Vector3.new(5, 7, 4)},
