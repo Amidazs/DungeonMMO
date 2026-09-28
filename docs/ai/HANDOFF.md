@@ -1,3 +1,30 @@
+## 28 September 2026 — v3.32 creation-enabled Adventure coverage GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_32_Adventure_Race_Coverage_GREEN_20260928.md);
+[evidence](
+../testing/adventure-race-coverage-v3-32-green-20260928.md).
+
+All races a player can currently create now have access to the launch Adventure
+chain: Human, Elf and Dark Elf. Orc and Dwarf remain creation-disabled and are
+not pre-exposed.
+
+A real Dark Elf Fighter completed Worldroot Relic, Mine Echoes and Expedition
+Provisioning through QuestService, received the exact advanced material bundle
+without choosing professions, and retained completion/rewards after reload.
+
+Fresh package:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`.
+
+Continue launch-level quest/content expansion. Generic Adventure progression
+currently receives trusted DungeonClear events from CompletionService. Higher
+Depths remain release-disabled; do not make unreleased content a quest
+requirement. Add new trusted server event boundaries before authoring richer
+objective types.
+
+Permanent edits remain GitHub-only; Desktop Commander is for pull/build/Studio
+evidence.
+
 ## 28 September 2026 — v3.31 profession-aware Adventure content GREEN
 
 [Roadmap](
