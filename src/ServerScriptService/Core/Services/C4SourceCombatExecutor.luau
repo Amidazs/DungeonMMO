@@ -293,6 +293,19 @@ function C4SourceCombatExecutor:configure_spatial_rules(
 end
 
 --[[
+Returns the currently configured server source-distance scale.
+
+Args:
+    None.
+
+Returns:
+    number?: Positive source units per Roblox stud, or nil before cutover.
+]]
+function C4SourceCombatExecutor:source_units_per_stud(): number?
+    return self._source_units_per_stud
+end
+
+--[[
 Installs the trusted post-application NPC damage observer.
 
 The observer is how a later combat adapter preserves contribution, quest and
