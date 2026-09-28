@@ -172,6 +172,11 @@ local function check_dwarf_stage_pack(
             "Dwarf temporary rig inherits reviewed room health"
         )
         check(
+            enemy:GetAttribute("DungeonEnemyArchetypeId")
+                == "Marauder",
+            "Dwarf quest pack receives reviewed Marauder source boundary"
+        )
+        check(
             ledger:register_enemy(
                 enemy,
                 registration.branch_id,
@@ -261,8 +266,10 @@ local function main()
         check(enemy:GetAttribute("DungeonRewardXP") == 1
             and enemy:GetAttribute("DungeonRewardGoldMin") == 0
             and enemy:GetAttribute("DungeonRewardGoldMax") == 0
-            and enemy:GetAttribute("BestiaryCreatureId") == "marauder",
-            "Source enemy has a valid minimal normal reward for room clear")
+            and enemy:GetAttribute("BestiaryCreatureId") == "marauder"
+            and enemy:GetAttribute("DungeonEnemyArchetypeId")
+                == "Marauder",
+            "Source enemy has reward and reviewed combat boundary")
         check(ledger:register_enemy(
             enemy, registration.branch_id, "QuestRoom1"
         ), "One distinct real source enemy can register for combat")
@@ -296,8 +303,11 @@ local function main()
             "Original Cinder monster is bound to exactly Rogue stage six")
         check(registration.enemy:GetAttribute("DungeonRewardXP") == 1
             and registration.enemy:GetAttribute("BestiaryCreatureId")
-                == "marauder",
-            "Cinder enemy death must preserve ordinary encounter clear")
+                == "marauder"
+            and registration.enemy:GetAttribute(
+                "DungeonEnemyArchetypeId"
+            ) == "Marauder",
+            "Cinder enemy keeps room clear and source combat boundary")
         check(ledger:register_enemy(
             registration.enemy, registration.branch_id,
             "QuestRoom1", registration.step_index
