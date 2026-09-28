@@ -12,6 +12,7 @@ local Tests = ServerScriptService.Dungeon.Tests
 local TESTS = table.freeze({
     "DungeonWolfFactoryTest",
     "EncounterServiceTest",
+    "ForestWolfBountyDungeonIntegrationTest",
 })
 
 --[[
@@ -61,8 +62,8 @@ local function main()
         run_test(test_name)
     end
 
-    print("[Forest Wolf Bounty Dungeon] 2/2 PASS")
-    print("VERIFIED_FOREST_WOLF_BOUNTY_DUNGEON_PASS 2")
+    print("[Forest Wolf Bounty Dungeon] 3/3 PASS")
+    print("VERIFIED_FOREST_WOLF_BOUNTY_DUNGEON_PASS 3")
 end
 
 main()
