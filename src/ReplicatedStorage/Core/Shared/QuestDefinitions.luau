@@ -130,6 +130,49 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    ExpeditionProvisioning = table.freeze({
+        Id = "ExpeditionProvisioning",
+        DisplayName = "Provisions for the Next Expedition",
+        Kind = "Adventure",
+        MinimumLevel = 1,
+        PrerequisiteQuestId = "MineEchoes",
+        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "ClearTemple",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "ClearAbandonedMine",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 75,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "deep_iron_ore",
+                    Quantity = 2,
+                }),
+                table.freeze({
+                    ItemId = "moonpetal",
+                    Quantity = 2,
+                }),
+                table.freeze({
+                    ItemId = "thick_hide",
+                    Quantity = 2,
+                }),
+            }),
+        }),
+    }),
+
     RogueAdvancementTrial = table.freeze({
         Id = "RogueAdvancementTrial",
         DisplayName = "Rogue Advancement Trial",
@@ -184,6 +227,7 @@ function QuestDefinitions.adventures(): {any}
     return table.freeze({
         DEFINITIONS.WorldrootRelic,
         DEFINITIONS.MineEchoes,
+        DEFINITIONS.ExpeditionProvisioning,
     })
 end
 
