@@ -1,3 +1,15 @@
+**v3.49 FRIEND-TEST NPC + GUIDE STABILITY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_49_Friend_Test_NPC_Guide_Stability_GREEN_20260928.md)
+and [evidence](
+../testing/friend-test-npc-guide-stability-v3-49-green-20260928.md).
+The restricted TEST Base has been republished after the reported friend-test
+polish regressions. Quest-giver navigation now rejects climb-only paths, the
+fresh published cloud run returns 8/8 spawned, walkable, physically supported
+Humanoid NPCs, and tutorial guidance no longer destroys/recreates the route for
+ordinary movement along the active path. A 6.00-stud movement test retained
+26/26 original guide pieces with 0 replacements. **Section D remains on hold
+for the user's two-player friend test.**
+
 **v3.48 TUTORIAL GUIDANCE + NPC PRESENTATION — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_48_Tutorial_Guidance_NPC_Presentation_GREEN_20260928.md)
 and [evidence](
