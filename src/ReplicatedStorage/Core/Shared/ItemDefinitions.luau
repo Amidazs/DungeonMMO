@@ -635,6 +635,17 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    hidden_ward_fragment = table.freeze({
+        Id = "hidden_ward_fragment",
+        Name = "Hidden Ward Fragment",
+        Kind = "Material",
+        InventoryCategory = "Quest",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     -- Creative name for C4 source reagent item 1458 (Spirit Ore).
     -- Summon skill source metadata retains the historical numeric ID while
     -- production inventory uses this stable DungeonMMO item identifier.
