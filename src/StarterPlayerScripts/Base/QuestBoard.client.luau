@@ -231,9 +231,15 @@ local function objective_label(objective: any): string
         elseif objective.TargetId == "AbandonedMine" then
             return "Clear the Abandoned Mine"
         end
+    elseif objective.Type == "EnemyDefeat" then
+        if objective.TargetId == "forest_wolf" then
+            return "Defeat Forest Wolves"
+        end
     end
 
-    return tostring(objective.Id or objective.Type or "Objective")
+    return tostring(
+        objective.Id or objective.Type or "Objective"
+    )
 end
 
 --[[
