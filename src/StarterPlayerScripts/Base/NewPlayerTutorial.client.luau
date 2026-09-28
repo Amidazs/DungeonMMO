@@ -16,6 +16,9 @@ local TutorialDefinitions = require(
     shared:WaitForChild("TutorialDefinitions")
 )
 local UiTheme = require(shared:WaitForChild("UiTheme"))
+local TutorialPathGuide = require(
+    script.Parent:WaitForChild("TutorialPathGuide")
+)
 
 local quest_action_request = remotes:WaitForChild(
     "QuestActionRequest"
@@ -110,9 +113,10 @@ local current_step = 1
 local started = false
 local dismissed = false
 local latest_state: any = nil
-local waypoint_target: Instance? = nil
+local waypoint_target: BasePart? = nil
 local waypoint_highlight: Highlight? = nil
 local waypoint_billboard: BillboardGui? = nil
+local ground_guide = TutorialPathGuide.new(player)
 
 --[[
 Returns whether mandatory identity selection is currently blocking the screen.
@@ -175,6 +179,13 @@ local function find_quest_giver(
     )
     local giver = folder and folder:FindFirstChild(giver_id)
 
+    if giver and giver:IsA("Model") then
+        local root = giver:FindFirstChild("HumanoidRootPart")
+        if root and root:IsA("BasePart") then
+            return root
+        end
+    end
+
     return if giver and giver:IsA("BasePart")
         then giver
         else nil
@@ -201,6 +212,7 @@ local function clear_waypoint()
     end
 
     waypoint_target = nil
+    ground_guide:clear()
 end
 
 --[[
@@ -224,6 +236,7 @@ local function set_waypoint(
     end
 
     waypoint_target = target
+    ground_guide:set_target(target)
 
     local highlight = Instance.new("Highlight")
     highlight.Name = WAYPOINT_NAME
