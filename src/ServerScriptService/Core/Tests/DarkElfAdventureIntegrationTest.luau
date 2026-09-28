@@ -101,7 +101,7 @@ local function quantity(
 end
 
 --[[
-Runs the complete current Dark Elf launch Adventure catalogue.
+Runs the core Dark Elf story/provisioning path plus the wolf side quest.
 
 Args:
     None.
@@ -244,7 +244,7 @@ local function main()
             and character.Quests.Completed.ForestWolfBounty == true
             and character.Quests.Completed.MineEchoes == true
             and character.Quests.Completed.ExpeditionProvisioning == true,
-        "all current Dark Elf Adventures complete once"
+        "core Dark Elf story/provisioning Adventures complete once"
     )
 
     check(
