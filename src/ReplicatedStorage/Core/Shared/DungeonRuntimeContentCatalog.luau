@@ -29,7 +29,6 @@ local BOSS_FACTORY_IDS = table.freeze({
 
 local ENEMY_FACTORY_IDS = table.freeze({
     "Marauder",
-    -- Registered but not inserted into any default dungeon pack.
     "ForestWolf",
 })
 
@@ -217,9 +216,16 @@ local PACKS = table.freeze({
                 pack_entry(
                     "Marauders",
                     "Marauder",
-                    2,
+                    1,
                     "Room1_Marauder_",
                     100
+                ),
+                pack_entry(
+                    "Wolves",
+                    "Wolf",
+                    1,
+                    "Room1_Wolf_",
+                    150
                 ),
             }),
             BonusRules = table.freeze({}),
