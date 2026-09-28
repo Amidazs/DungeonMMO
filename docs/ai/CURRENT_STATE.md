@@ -1,3 +1,39 @@
+## 28 September 2026 — CURRENT v3.29 profession blueprint acquisition GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_29_Profession_Blueprint_Acquisition_GREEN_20260928.md);
+[evidence](
+../testing/profession-blueprint-acquisition-v3-29-green-20260928.md).
+
+Profession blueprint acquisition is now green on top of the v3.28 economy.
+
+Accepted:
+
+- any reward recipient may receive and trade a valid blueprint;
+- learning still requires the matching selected craft, profession level and
+  Recipe Reading;
+- Depth-1 bosses/completions use the foundation blueprint pool;
+- registered higher-depth/optional bosses use a four-profession level-5 pool;
+- every rare level-5 batch recipe uses exactly **2x materials, 2x output and
+  2x XP** versus its normal recipe;
+- normal level-5 recipes remain default-known, so rare drops are never required;
+- reward replay is idempotent across runtime and profile reload;
+- the real market path proves off-profession drop -> sale -> purchase -> learn
+  -> two-output craft.
+
+Fresh unpublished Play:
+
+- `VERIFIED_PROFESSION_BLUEPRINT_ACQUISITION_PASS 12`;
+- `VERIFIED_PROFESSION_ECONOMY_REGRESSION_PASS 22`;
+- Blueprint Config **44**, Reward **14**, Acquisition **33** assertions.
+
+Higher-depth/optional boss physical release remains governed by its existing
+layout/release gates; the drop registry does not make those sources currently
+farmable.
+
+Next gate: bind and validate a **real animal-like Dungeon enemy** as live
+Skinning supply while preserving the animal-only corpse rules.
+
 ## 28 September 2026 — CURRENT v3.28 profession economy backbone GREEN
 
 [Roadmap](
