@@ -3,6 +3,10 @@
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local TestRelease = require(
+    script.Parent:WaitForChild("DungeonTestPlaceholderRelease")
+)
+
 local EnvironmentConfig = {}
 
 local PROFILE_STORES: {[string]: string} = table.freeze({
@@ -39,11 +43,17 @@ function EnvironmentConfig.get_environment(): string
     local configured = ServerScriptService:GetAttribute(
         "DungeonMMOEnvironment"
     )
-    assert(
-        configured == "TEST" or configured == "PROD",
+    if configured == "TEST" or configured == "PROD" then
+        return configured
+    end
+
+    if TestRelease.is_test_temple_context() then
+        return "TEST"
+    end
+
+    error(
         "Set ServerScriptService.DungeonMMOEnvironment to TEST or PROD"
     )
-    return configured
 end
 
 function EnvironmentConfig.get_profile_store_name_for(
