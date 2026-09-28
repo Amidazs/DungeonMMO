@@ -14,6 +14,7 @@ local TESTS = table.freeze({
     "CompletionQuestBridgeTest",
     "DungeonCheckpointQuestBridgeTest",
     "RuinSurveyCheckpointIntegrationTest",
+    "FractureTrailMixedIntegrationTest",
 })
 
 --[[
@@ -50,7 +51,7 @@ local function run_test(test_name: string)
 end
 
 --[[
-Runs the checkpoint service, bridge and Ruin Survey integration package.
+Runs trusted checkpoint and mixed-objective Adventure acceptance.
 
 Args:
     None.
@@ -63,8 +64,8 @@ local function main()
         run_test(test_name)
     end
 
-    print("[Checkpoint Adventure Focus] 4/4 PASS")
-    print("VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 4")
+    print("[Checkpoint Adventure Focus] 5/5 PASS")
+    print("VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5")
 end
 
 main()
