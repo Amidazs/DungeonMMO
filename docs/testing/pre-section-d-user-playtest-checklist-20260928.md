@@ -1,6 +1,39 @@
 # DungeonMMO Pre-Section-D User Playtest Checklist
 **Date:** 28 September 2026
 
+## Friend test setup
+
+The TEST experience is published and intentionally non-public.
+
+- TEST Base/start place: `134132328219009`;
+- TEST Dungeon place: `117293035754309`;
+- audience: **Limited**;
+- **Friends**: enabled;
+- **Playtesters**: enabled;
+- **Public**: disabled.
+
+Start-place link:
+
+`https://www.roblox.com/games/134132328219009`
+
+For the cleanest two-player test:
+
+1. make sure both Roblox accounts are friends with the TEST experience owner;
+2. both players open the TEST Base;
+3. if Roblox places you in different Base servers, one player should use the
+   normal Roblox **Join Friend** flow;
+4. at the Temple entrance, one player chooses **Create Party**;
+5. the leader invites the other player;
+6. the second player accepts;
+7. both players set **Ready**;
+8. the leader selects **Depth 1** and starts the dungeon;
+9. confirm both players arrive in the same reserved Dungeon session;
+10. after completion or wipe, confirm both can return to Base.
+
+A fresh account should also exercise the guided tutorial from the beginning.
+The owner may already have test progression that causes some first-time
+tutorial gates to be skipped.
+
 This is the manual hold point before world-boss/raid/PvP work.
 
 The purpose is not to re-prove every backend unit test. It is to confirm that
