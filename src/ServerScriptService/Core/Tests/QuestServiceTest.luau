@@ -167,6 +167,16 @@ check(
     quests:start(5103, "WorldrootRelic").ok,
     "Fighter must be able to start the first cross-class story quest."
 )
+local tracked_snapshot = quests:build_snapshot(5103)
+check(
+    tracked_snapshot.TrackedQuestId == "WorldrootRelic",
+    "Starting an Adventure must automatically track that quest."
+)
+check(
+    quests:set_tracked(5103, "MineEchoes").reason
+        == "QuestNotActive",
+    "Tracking must reject a quest that is not active."
+)
 check(
     quests:claim_reward(5103, "WorldrootRelic").reason == "QuestNotReady",
     "Starting a quest must never immediately grant its reward."
@@ -194,6 +204,11 @@ local temple_story_clear = quests:record_event(5103, {
 })
 check(temple_story_clear.ok, "Temple clear must ready the relic quest.")
 local relic_claim = quests:claim_reward(5103, "WorldrootRelic")
+check(
+    relic_claim.ok
+        and quests:build_snapshot(5103).TrackedQuestId == nil,
+    "Turning in the tracked quest must clear the tracked selection."
+)
 check(
     relic_claim.ok and relic_claim.gold_granted == 25
         and relic_claim.item_id == "worldroot_relic",
@@ -312,6 +327,14 @@ check(
 check(
     quests:start(5103, "MineEchoes").ok,
     "Optional wolf bounty does not block the Mine story follow-up."
+)
+check(
+    quests:build_snapshot(5103).TrackedQuestId == "MineEchoes",
+    "Newly accepted follow-up becomes the tracked quest."
+)
+check(
+    quests:set_tracked(5103, "MineEchoes").ok,
+    "Active Adventure quest can be selected for tracking."
 )
 check(
     quests:claim_reward(5103, "MineEchoes").reason == "QuestNotReady",
