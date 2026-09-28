@@ -26,7 +26,7 @@ local TEST_NAMES = table.freeze({
     "C4OwnedPassiveSourceResolverTest",
     "C4DwarfSourceInheritanceTest",
     "C4UnifiedStatReferenceTest",
-    "C4ActiveSourceEffectResolverTest",
+    "C4ActiveSourceEffectStateTest",
     "C4SourcePhysicalCastServiceTest",
     "C4SourceSelfEffectCastServiceTest",
     "C4SourceCastRuntimeCompositionTest",
