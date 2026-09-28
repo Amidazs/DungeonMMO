@@ -94,9 +94,15 @@ local function main()
         "combat tutorial explains dodge and view lock"
     )
     check(
-        steps[4].Text:find("Create Party", 1, true) ~= nil
+        steps[2].Text:find("shimmering", 1, true) ~= nil
+            and steps[2].Text:find("arrows", 1, true) ~= nil,
+        "quest tutorial explains the floor guidance"
+    )
+    check(
+        steps[4].Text:find("shimmering", 1, true) ~= nil
+            and steps[4].Text:find("Create Party", 1, true) ~= nil
             and steps[4].Text:find("Ready", 1, true) ~= nil,
-        "party tutorial explains the two-player entry flow"
+        "party tutorial explains trail and two-player entry"
     )
     check(
         TutorialDefinitions.DUNGEON_TEXT:
