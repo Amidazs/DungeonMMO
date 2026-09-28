@@ -47,17 +47,18 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 10
+    #adventures == 11
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
         and adventures[4].Id == "HiddenWardDiscovery"
         and adventures[5].Id == "MineEchoes"
         and adventures[6].Id == "RuinSurvey"
-        and adventures[7].Id == "CorruptedForemanBounty"
-        and adventures[8].Id == "FractureTrail"
-        and adventures[9].Id == "DungeonBossHunt"
-        and adventures[10].Id == "ExpeditionProvisioning",
+        and adventures[7].Id == "MineSurveyorEscort"
+        and adventures[8].Id == "CorruptedForemanBounty"
+        and adventures[9].Id == "FractureTrail"
+        and adventures[10].Id == "DungeonBossHunt"
+        and adventures[11].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -148,6 +149,29 @@ check(
         and type(ruin_survey.Reward.Items) == "table"
         and #ruin_survey.Reward.Items == 4,
     "Ruin Survey pays Gold plus the reviewed component cache."
+)
+
+local surveyor_escort = assert(
+    QuestDefinitions.get("MineSurveyorEscort")
+)
+check(
+    surveyor_escort.MinimumLevel == 9
+        and surveyor_escort.PrerequisiteQuestId == "MineEchoes"
+        and #surveyor_escort.Objectives == 1
+        and surveyor_escort.Objectives[1].Type
+            == "EscortCompleted"
+        and surveyor_escort.Objectives[1].TargetId
+            == "AbandonedMine:MineSurveyor",
+    "Lost Surveyor is a level-nine trusted escort Adventure."
+)
+check(
+    surveyor_escort.Reward.Gold == 70
+        and type(surveyor_escort.Reward.Items) == "table"
+        and #surveyor_escort.Reward.Items == 1
+        and surveyor_escort.Reward.Items[1].ItemId
+            == "deep_iron_ore"
+        and surveyor_escort.Reward.Items[1].Quantity == 2,
+    "Lost Surveyor pays Gold plus two tradeable Deep Iron Ore."
 )
 
 local foreman_bounty = assert(
