@@ -19,7 +19,9 @@ EnvironmentAnchorDefinitions.BASE = table.freeze({
         "Base.Travel.Orcs",
         "Base.Profession.AlchemyPlaceholder", "Base.TrainingArea",
     }),
-    Optional = table.freeze({}),
+    Optional = table.freeze({
+        "Base.DwarfQuestHub",
+    }),
     Groups = table.freeze({}),
 })
 
