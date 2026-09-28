@@ -83,6 +83,117 @@ Args:
 Returns:
     nil: Covers both races, the original branch and all denial gates.
 ]]
+--[[
+Checks every Dwarf combat quest stage can bind a real enemy model.
+
+Args:
+    ledger (any): Disposable physical quest ledger.
+
+Returns:
+    {Model}: Created enemies for caller cleanup.
+]]
+local function check_dwarf_combat_registration(ledger: any): {Model}
+    local enemies = {}
+    local cases = {
+        {"DwarfArtisan", 2, "TunnelGnawer"},
+        {"DwarfArtisan", 3, "TunnelGnawerChief"},
+        {"DwarfArtisan", 7, "AshclanForgeThief"},
+        {"DwarfScavenger", 4, "HoneybackBear"},
+        {"DwarfScavenger", 6, "TunnelTarantula"},
+    }
+
+    for index, entry in ipairs(cases) do
+        local branch_id = entry[1]
+        local step_index = entry[2]
+        local target_id = entry[3]
+        local enemy = make_enemy(target_id)
+        enemy:SetAttribute(
+            "DungeonEnemyId",
+            "DwarfTrialEnemy" .. tostring(index)
+        )
+        table.insert(enemies, enemy)
+
+        check(
+            ledger:register_enemy(
+                enemy,
+                branch_id,
+                "TrialRoomA",
+                step_index
+            ),
+            branch_id
+                .. " step "
+                .. tostring(step_index)
+                .. " accepts its real quest monster"
+        )
+        check(
+            ledger:available(
+                assert(Quests.get(branch_id)),
+                step_index
+            ),
+            branch_id
+                .. " step "
+                .. tostring(step_index)
+                .. " becomes world-available"
+        )
+    end
+
+    return enemies
+end
+
+--[[
+Checks Deepclaimer Spoil evidence is owner-bound and source-authored.
+
+Args:
+    None.
+
+Returns:
+    nil: Rejects absent, foreign, claimed and invented salvage marks.
+]]
+local function check_spoil_ownership()
+    local enemy = make_enemy("HoneybackBear")
+    local owner_user_id = 956260
+
+    check(
+        not Ledger.is_spoil_verified(enemy, owner_user_id),
+        "unspoiled monster cannot satisfy Deepclaimer proof"
+    )
+
+    enemy:SetAttribute("C4SalvageOwnerUserId", owner_user_id + 1)
+    enemy:SetAttribute("C4SalvageSourceSkillId", 254)
+    enemy:SetAttribute("C4SalvageClaimed", false)
+    check(
+        not Ledger.is_spoil_verified(enemy, owner_user_id),
+        "another player's Spoil cannot satisfy Deepclaimer proof"
+    )
+
+    enemy:SetAttribute("C4SalvageOwnerUserId", owner_user_id)
+    check(
+        Ledger.is_spoil_verified(enemy, owner_user_id),
+        "owner-bound source Spoil satisfies Deepclaimer proof"
+    )
+
+    enemy:SetAttribute("C4SalvageSourceSkillId", 302)
+    check(
+        Ledger.is_spoil_verified(enemy, owner_user_id),
+        "owner-bound Spoil Festival also satisfies Deepclaimer proof"
+    )
+
+    enemy:SetAttribute("C4SalvageSourceSkillId", 999999)
+    check(
+        not Ledger.is_spoil_verified(enemy, owner_user_id),
+        "invented salvage source skill cannot satisfy quest proof"
+    )
+
+    enemy:SetAttribute("C4SalvageSourceSkillId", 254)
+    enemy:SetAttribute("C4SalvageClaimed", true)
+    check(
+        not Ledger.is_spoil_verified(enemy, owner_user_id),
+        "already claimed salvage cannot mint fresh quest Spoil proof"
+    )
+
+    enemy:Destroy()
+end
+
 local function check_original_owner_isolation()
     for _, entry in ipairs({
         {"HumanRogue", 3},
@@ -91,6 +202,11 @@ local function check_original_owner_isolation()
         {"ElvenScout", 3},
         {"ElvenKnight", 3},
         {"ElvenKnight", 5},
+        {"DwarfArtisan", 2},
+        {"DwarfArtisan", 3},
+        {"DwarfArtisan", 7},
+        {"DwarfScavenger", 4},
+        {"DwarfScavenger", 6},
     }) do
         local branch_id, stage = entry[1], entry[2]
         local original = original_owner(branch_id, stage)
@@ -147,6 +263,7 @@ Returns:
 ]]
 local function main()
     check_original_owner_isolation()
+    check_spoil_ownership()
     local profiles = {get_character = function(): any
         return nil
     end}
@@ -191,10 +308,16 @@ local function main()
         TargetId = "CryptSentinel",
     }, rogue, {Step = 3}),
         "World verifier must reject events it never minted")
+
+    local dwarf_enemies = check_dwarf_combat_registration(ledger)
+
     ledger:clear()
     check(not ledger:available(rogue, 3),
         "Wipe clears pending world availability, not saved owner progress")
     enemy:Destroy()
+    for _, dwarf_enemy in ipairs(dwarf_enemies) do
+        dwarf_enemy:Destroy()
+    end
     print(("[C4 Quest Combat Ledger] PASS: %d assertions")
         :format(assertions))
 end
