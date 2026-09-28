@@ -157,6 +157,29 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    CorruptedForemanBounty = table.freeze({
+        Id = "CorruptedForemanBounty",
+        DisplayName = "The Foreman's Reckoning",
+        Kind = "Adventure",
+        MinimumLevel = 10,
+        PrerequisiteQuestId = "MineEchoes",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "DefeatCorruptedForeman",
+                Type = "EnemyDefeat",
+                TargetId = "corrupted_foreman",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 80,
+        }),
+    }),
+
     MineEchoes = table.freeze({
         Id = "MineEchoes",
         DisplayName = "Echoes from the Abandoned Mine",
@@ -281,6 +304,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.ForestWolfBounty,
         DEFINITIONS.MarauderCaptainBounty,
         DEFINITIONS.MineEchoes,
+        DEFINITIONS.CorruptedForemanBounty,
         DEFINITIONS.ExpeditionProvisioning,
     })
 end
