@@ -325,24 +325,6 @@ local function main()
         )
     end
 
-    local listing_serial = 0
-    local function transfer(
-        seller_id: number,
-        buyer_id: number,
-        item_id: string,
-        amount: number
-    )
-        listing_serial += 1
-        trade(
-            assert(market),
-            seller_id,
-            buyer_id,
-            item_id,
-            amount,
-            listing_serial
-        )
-    end
-
     local listing_counter = 0
     local market = Market.new(
         EntityAdapter.new(),
@@ -357,14 +339,41 @@ local function main()
         end
     )
 
-    transfer(SMITH_ID, ENCHANTER_ID, "deep_iron_bar", 4)
-    transfer(SMITH_ID, ALCHEMIST_ID, "deep_iron_bar", 2)
-    transfer(SMITH_ID, LEATHERWORKER_ID, "deep_iron_bar", 1)
-    transfer(
+    local trade_serial = 1
+    trade(
+        market,
+        SMITH_ID,
+        ENCHANTER_ID,
+        "deep_iron_bar",
+        4,
+        trade_serial
+    )
+    trade_serial += 1
+    trade(
+        market,
+        SMITH_ID,
+        ALCHEMIST_ID,
+        "deep_iron_bar",
+        2,
+        trade_serial
+    )
+    trade_serial += 1
+    trade(
+        market,
+        SMITH_ID,
+        LEATHERWORKER_ID,
+        "deep_iron_bar",
+        1,
+        trade_serial
+    )
+    trade_serial += 1
+    trade(
+        market,
         ALCHEMIST_ID,
         LEATHERWORKER_ID,
         "moonpetal_extract",
-        8
+        8,
+        trade_serial
     )
 
     for _ = 1, 8 do
@@ -375,17 +384,23 @@ local function main()
         )
     end
 
-    transfer(
+    trade_serial += 1
+    trade(
+        market,
         LEATHERWORKER_ID,
         SMITH_ID,
         "reinforced_leather",
-        2
+        2,
+        trade_serial
     )
-    transfer(
+    trade_serial += 1
+    trade(
+        market,
         LEATHERWORKER_ID,
         ENCHANTER_ID,
         "reinforced_leather",
-        4
+        4,
+        trade_serial
     )
 
     for _ = 1, 4 do
@@ -396,8 +411,24 @@ local function main()
         )
     end
 
-    transfer(ENCHANTER_ID, SMITH_ID, "resonant_rune", 2)
-    transfer(ENCHANTER_ID, ALCHEMIST_ID, "resonant_rune", 2)
+    trade_serial += 1
+    trade(
+        market,
+        ENCHANTER_ID,
+        SMITH_ID,
+        "resonant_rune",
+        2,
+        trade_serial
+    )
+    trade_serial += 1
+    trade(
+        market,
+        ENCHANTER_ID,
+        ALCHEMIST_ID,
+        "resonant_rune",
+        2,
+        trade_serial
+    )
 
     for _ = 1, 2 do
         craft(
@@ -412,17 +443,23 @@ local function main()
         )
     end
 
-    transfer(
+    trade_serial += 1
+    trade(
+        market,
         ALCHEMIST_ID,
         LEATHERWORKER_ID,
         "prismatic_catalyst",
-        1
+        1,
+        trade_serial
     )
-    transfer(
+    trade_serial += 1
+    trade(
+        market,
         ALCHEMIST_ID,
         SMITH_ID,
         "prismatic_catalyst",
-        1
+        1,
+        trade_serial
     )
 
     craft(
@@ -430,11 +467,14 @@ local function main()
         LEATHERWORKER_ID,
         "stitch_rune_binding"
     )
-    transfer(
+    trade_serial += 1
+    trade(
+        market,
         LEATHERWORKER_ID,
         SMITH_ID,
         "rune_binding",
-        1
+        1,
+        trade_serial
     )
 
     local masterwork = craft(
