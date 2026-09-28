@@ -38,6 +38,26 @@ function MineSyntheticEnvironment.create(parent: Instance)
         make_part(root, "SupportB_" .. tostring(z), Vector3.new(2,10,2), CFrame.new(480,5,z), Enum.Material.WoodPlanks, timber)
     end
 
+    local escort_markers = {
+        {"MineSurveyorStart", CFrame.new(466, 2.5, -70)},
+        {"MineSurveyorWait", CFrame.new(450, 2.5, -110)},
+        {"MineSurveyorFinish", CFrame.new(450, 2.5, -188)},
+    }
+    for _, marker_definition in ipairs(escort_markers) do
+        local marker = make_part(
+            root,
+            marker_definition[1] :: string,
+            Vector3.new(2, 2, 2),
+            marker_definition[2] :: CFrame,
+            Enum.Material.SmoothPlastic,
+            timber
+        )
+        marker.Transparency = 1
+        marker.CanCollide = false
+        marker.CanTouch = false
+        marker:SetAttribute("DungeonMMOEscortMarker", true)
+    end
+
     local entries = {
         {"Mine.EntrySpawn", CFrame.new(450,1,53), "Spawn", Vector3.new(6,2,6), false, false},
         {"Mine.Room1.Checkpoint", CFrame.new(450,1,-18), "Checkpoint", Vector3.new(6,2,6), false, false},
