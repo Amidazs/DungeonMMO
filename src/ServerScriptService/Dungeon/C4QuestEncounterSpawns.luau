@@ -28,6 +28,7 @@ local CHALLENGES = table.freeze({
         SourceId = "GloamBulwark",
         BranchId = "HumanKnight",
         Step = 5,
+        Count = 1,
         Health = 135,
     }),
     ElvenKnight = table.freeze({
@@ -40,6 +41,7 @@ local CHALLENGES = table.freeze({
         SourceId = "ThornboundColossus",
         BranchId = "ElvenKnight",
         Step = 5,
+        Count = 1,
         Health = 142,
     }),
     HumanWarrior = table.freeze({
@@ -52,6 +54,7 @@ local CHALLENGES = table.freeze({
         SourceId = "Ridgebreaker",
         BranchId = "HumanWarrior",
         Step = 5,
+        Count = 1,
         Health = 118,
     }),
     HumanRogue = table.freeze({
@@ -69,6 +72,7 @@ local CHALLENGES = table.freeze({
         SourceId = "CinderBrigand",
         BranchId = "HumanRogue",
         Step = 6,
+        Count = 1,
         Health = 95,
     }),
     ElvenScoutSix = table.freeze({
@@ -76,9 +80,89 @@ local CHALLENGES = table.freeze({
         SourceId = "BrackenWarden",
         BranchId = "ElvenScout",
         Step = 6,
+        Count = 1,
         Health = 105,
     }),
+    DwarfArtisanTwo = table.freeze({
+        Name = "Tunnel Gnawer",
+        SourceId = "TunnelGnawer",
+        BranchId = "DwarfArtisan",
+        Step = 2,
+    }),
+    DwarfArtisanThree = table.freeze({
+        Name = "Tunnel Gnawer Chief",
+        SourceId = "TunnelGnawerChief",
+        BranchId = "DwarfArtisan",
+        Step = 3,
+    }),
+    DwarfArtisanSeven = table.freeze({
+        Name = "Ashclan Forge Thief",
+        SourceId = "AshclanForgeThief",
+        BranchId = "DwarfArtisan",
+        Step = 7,
+        Count = 1,
+    }),
+    DwarfScavengerFour = table.freeze({
+        Name = "Honeyback Bear",
+        SourceId = "HoneybackBear",
+        BranchId = "DwarfScavenger",
+        Step = 4,
+    }),
+    DwarfScavengerSix = table.freeze({
+        Name = "Tunnel Tarantula",
+        SourceId = "TunnelTarantula",
+        BranchId = "DwarfScavenger",
+        Step = 6,
+    }),
 })
+
+local SPECIAL_CHALLENGE_IDS = table.freeze({
+    HumanKnight = table.freeze({
+        [5] = "HumanKnightFive",
+    }),
+    ElvenKnight = table.freeze({
+        [5] = "ElvenKnightFive",
+    }),
+    HumanWarrior = table.freeze({
+        [5] = "HumanWarriorFive",
+    }),
+    HumanRogue = table.freeze({
+        [6] = "HumanRogueSix",
+    }),
+    ElvenScout = table.freeze({
+        [5] = "ElvenScoutSix",
+        [6] = "ElvenScoutSix",
+    }),
+    DwarfArtisan = table.freeze({
+        [2] = "DwarfArtisanTwo",
+        [3] = "DwarfArtisanThree",
+        [7] = "DwarfArtisanSeven",
+    }),
+    DwarfScavenger = table.freeze({
+        [4] = "DwarfScavengerFour",
+        [6] = "DwarfScavengerSix",
+    }),
+})
+
+--[[
+Resolves the physical challenge definition for one exact saved quest step.
+
+Args:
+    branch_id (string): Selected first-transfer source branch.
+    step_index (number): Current ordered quest step.
+
+Returns:
+    string: Challenge key for this branch/step.
+]]
+local function challenge_id_for(
+    branch_id: string,
+    step_index: number
+): string
+    local special = SPECIAL_CHALLENGE_IDS[branch_id]
+    return if special and special[step_index]
+        then special[step_index]
+        else branch_id
+end
 
 --[[
 Finds source challenge branches selected by participating loaded characters.
@@ -103,26 +187,12 @@ function Spawns.eligible_branches(
         local quest = branch and Source.get(branch)
         local career = branch and Careers.for_branch(branch)
         local identity = character and character.Identity
-        local challenge_id = if state and state.Step == 5
-            and branch == "ElvenKnight"
-            then "ElvenKnightFive"
-            elseif state and state.Step == 5
-                and branch == "HumanKnight"
-            then "HumanKnightFive"
-            elseif state and state.Step == 5
-                and branch == "HumanWarrior"
-            then "HumanWarriorFive"
-            elseif state and state.Step == 6
-                and branch == "HumanRogue"
-            then "HumanRogueSix"
-            elseif state and (state.Step == 5 or state.Step == 6)
-                and branch == "ElvenScout"
-            then "ElvenScoutSix" else branch
-        local challenge = CHALLENGES[challenge_id]
-        local step = quest and quest.Steps[
-            if challenge_id == "ElvenScoutSix"
-                then 6 else state.Step
-        ]
+        local challenge_id = if state and branch
+            then challenge_id_for(branch, state.Step)
+            else nil
+        local challenge = challenge_id and CHALLENGES[challenge_id]
+        local step = quest and challenge and state
+            and quest.Steps[challenge.Step or state.Step]
         if quest and career and challenge and state.Ready ~= true
             and identity and identity.RaceId == career.RaceId
             and identity.BaseClassId == career.BaseClassId
@@ -196,20 +266,31 @@ function Spawns.augment(options: any, factory: any?): any
     then
         return {ok = false, reason = "QuestSpawnAnchorUnavailable"}
     end
+    local room_humanoid = base:FindFirstChildOfClass("Humanoid")
     local registrations = {}
     for branch_index, branch in ipairs(branches) do
         local challenge = CHALLENGES[branch]
-        local count = if branch == "ElvenScoutSix"
-            or branch == "ElvenKnightFive"
-            or branch == "HumanKnightFive"
-            or branch == "HumanWarriorFive"
-            or branch == "HumanRogueSix"
-            then 1 else PER_BRANCH_PER_ROOM
+        local count = tonumber(challenge.Count)
+            or PER_BRANCH_PER_ROOM
         for index = 1, count do
             local name = challenge.SourceId
                 .. tostring(branch_index) .. "_" .. tostring(index)
             local spawn_at = base.PrimaryPart.CFrame
                 * CFrame.new(5 * index, 0, 5 * branch_index)
+            local base_max_health = challenge.Health
+                or (room_humanoid and room_humanoid.MaxHealth)
+            if type(base_max_health) ~= "number"
+                or base_max_health <= 0
+            then
+                for _, registration in ipairs(registrations) do
+                    registration.enemy:Destroy()
+                end
+                return {
+                    ok = false,
+                    reason = "QuestSpawnHealthUnavailable",
+                }
+            end
+
             local created, enemy = pcall(create_challenge, {
                 Parent = options.folder,
                 Name = name,
@@ -230,7 +311,7 @@ function Spawns.augment(options: any, factory: any?): any
                 -- Temporary combat rig is a Marauder; register a valid
                 -- known bestiary key until unique quest models exist.
                 BestiaryCreatureId = "marauder",
-                BaseMaxHealth = challenge.Health,
+                BaseMaxHealth = base_max_health,
                 HealthMultiplier = options.health_multiplier or 1,
                 DamageMultiplier = options.damage_multiplier or 1,
             }, factory or DungeonMarauderFactory)
