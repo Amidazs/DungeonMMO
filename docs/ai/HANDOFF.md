@@ -1,3 +1,41 @@
+## 28 September 2026 — v3.48 PRESENTATION POLISH GREEN / FRIEND TEST HOLD
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_48_Tutorial_Guidance_NPC_Presentation_GREEN_20260928.md);
+[evidence](
+../testing/tutorial-guidance-npc-presentation-v3-48-green-20260928.md).
+
+The latest TEST Base is republished and cloud-verified.
+
+New in v3.48:
+
+- iridescent, directional, non-colliding tutorial floor trail;
+- pathfinding-backed route generation to current tutorial destinations;
+- retry behavior when client navigation is not ready;
+- eight simple humanoid quest-giver placeholders;
+- much wider NPC distribution across the authored lobby;
+- strict authored-world path/clearance validation.
+
+Important authored-lobby finding: the original Dwarf travel-pad placement was
+not continuously walkable from spawn. The runtime now rejects such placements
+instead of silently spawning inaccessible quest givers. Mine Warden and Survey
+Corps were remapped to reachable Dwarf-side routes.
+
+Published Base live verification:
+
+- 8 giver models;
+- 8 walkable;
+- 8 approach-clear;
+- 8 Humanoids;
+- closest pair 35.44 studs;
+- normal Base startup.
+
+Dungeon source did not change in this pass; the published TEST Dungeon remains
+verified at schema 15 with its tutorial and quest-feedback runtime intact.
+
+**DO NOT START SECTION D** until the user completes the real two-player friend
+test and explicitly releases the hold.
+
 ## 28 September 2026 — v3.47 FRIEND TEST READY / SECTION D HOLD
 
 [Roadmap](
