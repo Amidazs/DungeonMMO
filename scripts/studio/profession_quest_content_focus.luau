@@ -49,6 +49,14 @@ local TESTS = table.freeze({
         Parent = ServerScriptService.Base.Tests,
         Name = "BaseQuestBoardContractTest",
     }),
+    table.freeze({
+        Parent = ServerScriptService.Base.Tests,
+        Name = "BaseQuestGiverContractTest",
+    }),
+    table.freeze({
+        Parent = ServerScriptService.Core.Tests,
+        Name = "FriendTestTutorialContractTest",
+    }),
 })
 
 --[[
