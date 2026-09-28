@@ -1,3 +1,37 @@
+## 28 September 2026 — v3.33 Forest Wolf bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_33_Forest_Wolf_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/forest-wolf-bounty-v3-33-green-20260928.md).
+
+The optional Forest Wolf bounty is fully accepted.
+
+Current launch Adventure order:
+Worldroot Relic -> optional Wolf bounty alongside the story ->
+Mine Echoes -> Expedition Provisioning.
+
+The bounty requires two trusted `forest_wolf` defeats and grants exactly
+40 Gold, no items. Mine Echoes still requires only Worldroot Relic.
+
+Critical live-path fix: the Forest Wolf intentionally remains outside Bestiary
+progress, so its `BestiaryCreatureId` is nil. EncounterService now falls back
+to the server-authored `CreatureSpeciesId` for quest identity. Do not undo
+that by assigning a fake Bestiary ID just to make quests work.
+
+Fresh acceptance:
+`VERIFIED_FOREST_WOLF_BOUNTY_BASE_PASS 5`;
+`VERIFIED_FOREST_WOLF_BOUNTY_DUNGEON_PASS 3`.
+The real Dungeon integration uses EncounterService + QuestService and proves
+two wolf deaths unlock the one-time 40-Gold claim.
+
+Next: broader launch-level quest/content expansion. Prefer existing trusted
+DungeonClear / EnemyDefeat events. If a richer objective needs a new event,
+build and validate that server-owned boundary first.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.32 creation-enabled Adventure coverage GREEN
 
 [Roadmap](
