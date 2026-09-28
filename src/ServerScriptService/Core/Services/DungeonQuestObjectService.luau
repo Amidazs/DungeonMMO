@@ -90,6 +90,43 @@ local function valid_distance(distance: number, maximum: number): boolean
         and distance <= maximum
 end
 
+--[[
+Checks whether a collectible's trusted unlock condition has been met.
+
+Args:
+    session (any): Current authoritative dungeon session.
+    definition (any): Server-owned collectible definition.
+
+Returns:
+    (boolean, string?): Unlock state and an explicit denial reason.
+]]
+local function collectible_unlocked(
+    session: any,
+    definition: any
+): (boolean, string?)
+    local interaction_id = definition.InteractionId
+    if type(interaction_id) == "string"
+        and interaction_id ~= ""
+    then
+        local interactions = session.InstanceState
+            and session.InstanceState.QuestInteractions
+
+        if type(interactions) ~= "table"
+            or interactions[interaction_id] ~= true
+        then
+            return false, "QuestInteractionRequired"
+        end
+
+        return true, nil
+    end
+
+    if not prerequisite_met(session, definition) then
+        return false, "QuestCollectiblePrerequisiteIncomplete"
+    end
+
+    return true, nil
+end
+
 local function matching_active_objective(
     quests: any,
     user_id: number,
@@ -306,12 +343,13 @@ function Service:collect(
         return result(false, "QuestCollectibleUnavailable")
     end
 
-    local interactions = session.InstanceState
-        and session.InstanceState.QuestInteractions
-    if type(interactions) ~= "table"
-        or interactions[definition.InteractionId] ~= true
-    then
-        return result(false, "QuestInteractionRequired")
+    local unlocked, unlock_reason =
+        collectible_unlocked(session, definition)
+    if not unlocked then
+        return result(
+            false,
+            unlock_reason or "QuestCollectibleUnavailable"
+        )
     end
 
     if not matching_active_objective(
