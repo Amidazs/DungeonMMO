@@ -248,8 +248,13 @@ Args:
 Returns:
     boolean: True only for an owner-bound source Spoil or Spoil Festival mark.
 ]]
-local function spoil_verified(enemy: any, user_id: number): boolean
-    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model") then
+function Ledger.is_spoil_verified(
+    enemy: any,
+    user_id: number
+): boolean
+    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model")
+        or type(user_id) ~= "number" or user_id % 1 ~= 0
+    then
         return false
     end
 
@@ -316,7 +321,7 @@ local function event_for_owner(
         VerifiedProofIds = proof_ids,
         TrialWeaponVerified = record.Hits[user_id] == true,
         SpoilVerified = record.BranchId == "DwarfScavenger"
-            and spoil_verified(record.Enemy, user_id),
+            and Ledger.is_spoil_verified(record.Enemy, user_id),
     }
 end
 
