@@ -387,15 +387,22 @@ function QuestService:claim_reward(
 
     local reward = definition.Reward
     local items = reward_items(reward)
-    local gold = type(reward) == "table"
-        and tonumber(reward.Gold)
+    local raw_gold = type(reward) == "table"
+        and reward.Gold
         or nil
+    local gold = tonumber(raw_gold) or 0
 
-    if not gold
-        or gold ~= gold
+    if gold ~= gold
         or gold < 0
         or gold >= math.huge
-        or #items == 0
+        or (
+            raw_gold ~= nil
+            and tonumber(raw_gold) == nil
+        )
+        or (
+            gold <= 0
+            and #items == 0
+        )
     then
         return result(false, "QuestRewardUnavailable")
     end
