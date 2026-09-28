@@ -1,3 +1,34 @@
+## 28 September 2026 — v3.37 level-fifteen dual-boss Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_37_Level15_Boss_Hunt_GREEN_20260928.md);
+[evidence](
+../testing/level15-boss-hunt-v3-37-green-20260928.md).
+
+**Break the Chain** is fully accepted:
+
+- minimum level 15;
+- prerequisite Mine Echoes;
+- one trusted Marauder Captain defeat;
+- one trusted Corrupted Foreman defeat;
+- 120 Gold only;
+- optional and independent from Provisioning/first-transfer progression.
+
+The real Captain factory, Mine boss executor/factory, EncounterService and
+QuestService are covered end-to-end.
+
+Fresh markers:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 7`.
+
+The launch progression spine now has enough basic kill/clear contracts. The
+next development gate is richer quest/content density and presentation. Audit
+existing server-authored event publishers first; do not add client-trusted
+quest objectives or expose Depths 2-4.
+
+Permanent edits remain GitHub-only; Desktop Commander is for pull/build/Studio
+evidence.
+
 ## 28 September 2026 — v3.36 level-ten Corrupted Foreman bounty GREEN
 
 [Roadmap](
