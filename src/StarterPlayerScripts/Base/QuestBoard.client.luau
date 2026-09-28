@@ -234,6 +234,8 @@ local function objective_label(objective: any): string
     elseif objective.Type == "EnemyDefeat" then
         if objective.TargetId == "forest_wolf" then
             return "Defeat Forest Wolves"
+        elseif objective.TargetId == "marauder_captain" then
+            return "Defeat the Marauder Captain"
         end
     end
 
