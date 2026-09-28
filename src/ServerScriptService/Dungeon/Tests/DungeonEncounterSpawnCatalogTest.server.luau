@@ -128,11 +128,19 @@ check(
     captain.RewardKey == "MarauderCaptainReward",
     "Temple boss reward key mismatch."
 )
+check(
+    captain.BestiaryCreatureId == "marauder_captain",
+    "Temple Captain must own its explicit bestiary identity."
+)
 
 local foreman = assert(Catalog.get_boss("CorruptedForeman"))
 check(
     foreman.FactoryId == "CorruptedForeman",
     "Mine Depth1 boss factory ID mismatch."
+)
+check(
+    foreman.BestiaryCreatureId == "corrupted_foreman",
+    "Mine Foreman must own a distinct bestiary identity."
 )
 
 local temple_depth2 = assert(
