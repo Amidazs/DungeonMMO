@@ -80,7 +80,7 @@ local GIVERS = table.freeze({
             "ExpeditionProvisioning",
         }),
         AnchorId = "Base.Travel.Market",
-        Offset = CFrame.new(-10, 3, -7),
+        Offset = CFrame.new(-18, 3, -12),
     }),
 })
 
