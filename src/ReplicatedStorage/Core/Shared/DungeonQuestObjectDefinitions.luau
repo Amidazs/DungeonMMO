@@ -25,6 +25,15 @@ local BY_COLLECTIBLE_ID = table.freeze({
         EventTargetId = "hidden_ward_fragment",
         MaxDistance = 10,
     }),
+    TempleResonanceShard = table.freeze({
+        Id = "TempleResonanceShard",
+        DungeonId = "TestDungeon",
+        DifficultyId = "Depth1",
+        PrerequisiteEncounterId = "CombatRoom1",
+        ItemId = "temple_resonance_shard",
+        EventTargetId = "temple_resonance_shard",
+        MaxDistance = 10,
+    }),
 })
 
 --[[
