@@ -26,7 +26,7 @@ local PATH_REFRESH_SECONDS = 0.35
 local TARGET_REFRESH_DISTANCE = 1
 local REROUTE_DISTANCE = 7
 
-local POSITION_SMOOTH_SPEED = 15
+local PROGRESS_SMOOTH_SPEED = 18
 local FADE_SMOOTH_SPEED = 12
 local VISIBLE_TRANSPARENCY = 0.28
 local HIDDEN_TRANSPARENCY = 1
@@ -486,25 +486,13 @@ local function update_visual_part(
     visible: boolean,
     delta_time: number
 )
-    local position_alpha = smoothing_alpha(
-        POSITION_SMOOTH_SPEED,
-        delta_time
-    )
     local fade_alpha = smoothing_alpha(
         FADE_SMOOTH_SPEED,
         delta_time
     )
 
     if visible and target_cframe then
-        if part.Transparency > 0.95 then
-            part.CFrame = target_cframe
-        else
-            part.CFrame = part.CFrame:Lerp(
-                target_cframe,
-                position_alpha
-            )
-        end
-
+        part.CFrame = target_cframe
         part.Transparency += (
             VISIBLE_TRANSPARENCY - part.Transparency
         ) * fade_alpha
@@ -621,6 +609,7 @@ function Guide:_set_route(waypoints: {PathWaypoint})
     self._path_distances = distances
     self._path_length = total_length
     self._route_deviation = 0
+    self._display_progress = nil
 end
 
 --[[
@@ -637,6 +626,7 @@ function Guide:_clear_route()
     self._path_distances = {}
     self._path_length = 0
     self._route_deviation = math.huge
+    self._display_progress = nil
     self:_hide_visuals(true)
 end
 
@@ -868,8 +858,24 @@ function Guide:_update_visuals(delta_time: number)
     )
 
     self._route_deviation = deviation
-    self:_update_markers(progress, delta_time)
-    self:_update_arrows(progress, delta_time)
+
+    if self._display_progress == nil then
+        self._display_progress = progress
+    else
+        local progress_alpha = smoothing_alpha(
+            PROGRESS_SMOOTH_SPEED,
+            delta_time
+        )
+        self._display_progress += (
+            progress - self._display_progress
+        ) * progress_alpha
+    end
+
+    local display_progress = self._display_progress
+        or progress
+
+    self:_update_markers(display_progress, delta_time)
+    self:_update_arrows(display_progress, delta_time)
     self:_update_colors()
 end
 
@@ -1018,6 +1024,7 @@ function Guide.new(player: Player): any
         _last_target_position = nil,
         _path_character = nil,
         _route_deviation = math.huge,
+        _display_progress = nil,
         _render_connection = nil,
         _alive = true,
     }, Guide)
