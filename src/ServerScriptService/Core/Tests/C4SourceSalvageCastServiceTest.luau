@@ -16,18 +16,22 @@ local PLANS = table.freeze({
     DwarfSalvageMark = table.freeze({
         SourceSkillId = 254,
         SourceRank = 1,
+        SourceCastRange = 40,
     }),
     DeepclaimerSalvageMark = table.freeze({
         SourceSkillId = 254,
         SourceRank = 2,
+        SourceCastRange = 40,
     }),
     DeepclaimerSalvageFestival = table.freeze({
         SourceSkillId = 302,
         SourceRank = 1,
+        SourceCastRange = 40,
     }),
     DwarfSalvageClaim = table.freeze({
         SourceSkillId = 42,
         SourceRank = 1,
+        SourceCastRange = 20,
     }),
 })
 
@@ -38,6 +42,9 @@ local target_dead = false
 local marks = {}
 local claims = 0
 local last_area_radius = nil
+local last_target_range = nil
+local target_in_range = true
+local scheduler_begins = 0
 
 local FakeScheduler = {}
 
@@ -62,6 +69,7 @@ function FakeScheduler:begin_cast(
         return nil, "SalvageTestPlanUnavailable"
     end
 
+    scheduler_begins += 1
     next_cast_id += 1
     pending[owner] = {
         CastId = next_cast_id,
@@ -151,6 +159,63 @@ Returns:
 ]]
 function FakeScheduler:clear_owner(owner: any)
     pending[owner] = nil
+end
+
+
+local FakeTiming = {}
+
+--[[
+Resolves one read-only source salvage plan before scheduler MP spend.
+
+Args:
+    _self (any): Fake receiver.
+    user_id (number): Expected owner UserId.
+    skill_id (string): Reviewed creative salvage skill.
+
+Returns:
+    (any?, string?): Exact source identity/range plan or denial.
+]]
+function FakeTiming.resolve(
+    _self: any,
+    user_id: number,
+    skill_id: string
+): (any?, string?)
+    local plan = PLANS[skill_id]
+    if user_id ~= OWNER.UserId or not plan then
+        return nil, "SalvageTestTimingUnavailable"
+    end
+
+    return {
+        SourceSkillId = plan.SourceSkillId,
+        SourceRank = plan.SourceRank,
+        SourceCastRange = plan.SourceCastRange,
+    }, nil
+end
+
+--[[
+Checks deterministic pre-MP world range for one salvage target.
+
+Args:
+    owner (any): Expected disposable owner.
+    target (any): Expected bound target.
+    source_range (number): Exact source castRange.
+
+Returns:
+    (boolean, string?): Configured range eligibility.
+]]
+local function target_validator(
+    owner: any,
+    target: any,
+    source_range: number
+): (boolean, string?)
+    assert(owner == OWNER and target == TARGET)
+    last_target_range = source_range
+
+    if not target_in_range then
+        return false, "C4SalvageTargetOutOfRange"
+    end
+
+    return true, nil
 end
 
 local FakeSalvage = {}
@@ -266,9 +331,9 @@ local function area_resolver(
     _owner: any,
     _target: any,
     source_radius: number
-): {any}
+): ({any}?, string?)
     last_area_radius = source_radius
-    return {AREA_A, AREA_B}
+    return {AREA_A, AREA_B}, nil
 end
 
 --[[
@@ -299,7 +364,11 @@ local function main()
     local bridge = Service.new(
         FakeScheduler,
         FakeSalvage,
-        area_resolver
+        {
+            Timing = FakeTiming,
+            TargetValidator = target_validator,
+            AreaResolver = area_resolver,
+        }
     )
 
     local disabled, disabled_reason = bridge:begin_cast(
@@ -316,6 +385,22 @@ local function main()
 
     bridge:set_enabled(true)
 
+    target_in_range = false
+    local begins_before_range_denial = scheduler_begins
+    local denied, denied_reason = bridge:begin_cast(
+        OWNER,
+        TARGET,
+        "DeepclaimerSalvageMark",
+        105
+    )
+    check(
+        denied == nil
+            and denied_reason == "C4SalvageTargetOutOfRange"
+            and scheduler_begins == begins_before_range_denial,
+        "out-of-range Spoil fails before scheduler or MP start"
+    )
+    target_in_range = true
+
     local mark_start = assert(bridge:begin_cast(
         OWNER,
         TARGET,
@@ -330,8 +415,9 @@ local function main()
     check(
         marked.Applied
             and marks[1].SourceSkillId == 254
-            and marks[1].SourceRank == 2,
-        "Deepclaimer Spoil rank continues exact source rank 2"
+            and marks[1].SourceRank == 2
+            and last_target_range == 40,
+        "Deepclaimer Spoil keeps exact rank 2 and castRange 40"
     )
 
     local festival_start = assert(bridge:begin_cast(
@@ -349,8 +435,9 @@ local function main()
         festival.Applied
             and festival.Application.MarkedCount == 2
             and festival.Application.SourceRadius == 200
-            and last_area_radius == 200,
-        "Spoil Festival preserves exact source radius 200"
+            and last_area_radius == 200
+            and last_target_range == 40,
+        "Spoil Festival preserves castRange 40 and radius 200"
     )
 
     target_dead = true
@@ -368,8 +455,9 @@ local function main()
     check(
         swept.Applied
             and claims == 1
-            and swept.Application.ItemId == "dense_mineral_shard",
-        "inherited Sweep reaches server salvage claim authority"
+            and swept.Application.ItemId == "dense_mineral_shard"
+            and last_target_range == 20,
+        "Sweep keeps castRange 20 and reaches claim authority"
     )
 
     local capability = bridge:capability()
@@ -378,6 +466,8 @@ local function main()
             and capability.SingleTargetSpoil
             and capability.SweepOwnedCorpse
             and capability.SpoilFestivalReviewed
+            and capability.SourceTimingPreflightBound
+            and capability.SourceTargetRangeResolverBound
             and capability.SpoilFestivalAreaResolverBound
             and not capability.ClientAuthority,
         "capability reports all reviewed Dwarf salvage families"
