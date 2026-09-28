@@ -1902,6 +1902,22 @@ local function initialize_session_services(session: any): (any?, boolean)
         )
     end
 
+    local feedback_binding = require(
+        Dungeon:WaitForChild("DungeonQuestFeedbackRuntime")
+    ).attach({
+        dungeon_id = active_definition.Id,
+        difficulty_id = session.Difficulty
+            and session.Difficulty.Id,
+        workspace = Workspace,
+        get_session = current_session,
+    })
+    if feedback_binding.ok ~= true then
+        error(
+            "Dungeon quest feedback runtime failed: "
+                .. tostring(feedback_binding.reason)
+        )
+    end
+
     if type(environment.apply_instance_state)=="function" then environment:apply_instance_state(session.InstanceState) end
     local completion_reward=active_definition.CompletionReward
     if active_definition.Id=="AbandonedMine" and type(session.InstanceState)=="table" then
