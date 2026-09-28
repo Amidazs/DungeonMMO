@@ -1,3 +1,34 @@
+## 28 September 2026 — CURRENT v3.37 level-fifteen dual-boss Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_37_Level15_Boss_Hunt_GREEN_20260928.md);
+[evidence](
+../testing/level15-boss-hunt-v3-37-green-20260928.md).
+
+The launch content pacing spine now reaches the level-20 first-transfer
+milestone without exposing unreleased higher Depths.
+
+Current optional combat pacing:
+
+- level 1: Wolves at the Worldroot;
+- level 5: The Captain's Price;
+- level 10: The Foreman's Reckoning;
+- level 15: Break the Chain;
+- level 20: existing first-transfer progression milestone.
+
+Break the Chain requires one real `marauder_captain` and one real
+`corrupted_foreman` defeat, then grants 120 Gold. It remains optional and
+does not gate Provisioning or class advancement.
+
+Fresh validation:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 7`.
+
+Next: stop adding repetitive Gold bounties. Audit existing server-owned gameplay
+events and add richer launch side/story objectives only where the event
+authority is trustworthy. If a richer objective needs a new event type, build
+and validate that server boundary before authoring the quest.
+
 ## 28 September 2026 — CURRENT v3.36 level-ten Foreman bounty GREEN
 
 [Roadmap](
