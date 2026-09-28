@@ -213,6 +213,54 @@ local NODE_DEFINITIONS = table.freeze({
                 ),
             }),
         }),
+        table.freeze({
+            Id = "Temple.Room3.DeepIronVein",
+            Name = "Deep Iron Vein",
+            FallbackOffset = CFrame.new(-14, -3, -10),
+            ProfessionId = "Mining",
+            ItemId = "deep_iron_ore",
+            Quantity = 1,
+            XP = 18,
+            RequiredLevel = 3,
+            AnchorId = "Temple.Room3.Checkpoint",
+            PlacementGroup = "Temple.Room3",
+            MinSpacing = MIN_DUNGEON_RESOURCE_SPACING,
+            ActionText = "Mine",
+            VisualKind = "Ore",
+            EmbedDepth = 0.8,
+            Probes = table.freeze({
+                wall_probe(
+                    Vector3.new(-15, 3, -8),
+                    Vector3.new(-1, 0, 0)
+                ),
+                floor_probe(Vector3.new(-13, 10, -10)),
+                wall_probe(
+                    Vector3.new(-14, 3, -4),
+                    Vector3.new(-1, 0, 0)
+                ),
+            }),
+        }),
+        table.freeze({
+            Id = "Temple.Room3.MoonpetalPatch",
+            Name = "Moonpetal Patch",
+            FallbackOffset = CFrame.new(14, -3, -10),
+            ProfessionId = "Herbalism",
+            ItemId = "moonpetal",
+            Quantity = 1,
+            XP = 18,
+            RequiredLevel = 3,
+            AnchorId = "Temple.Room3.Checkpoint",
+            PlacementGroup = "Temple.Room3",
+            MinSpacing = MIN_DUNGEON_RESOURCE_SPACING,
+            ActionText = "Gather",
+            VisualKind = "Herb",
+            EmbedDepth = 0.16,
+            Probes = table.freeze({
+                floor_probe(Vector3.new(14, 10, -10)),
+                floor_probe(Vector3.new(11, 10, -14)),
+                floor_probe(Vector3.new(16, 10, -6)),
+            }),
+        }),
     }),
 })
 
