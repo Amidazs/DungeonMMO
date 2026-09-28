@@ -1,3 +1,18 @@
+**v3.31 PROFESSION-AWARE ADVENTURE CONTENT — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_31_Profession_Aware_Adventure_GREEN_20260928.md)
+and [evidence](
+../testing/profession-quest-content-v3-31-green-20260928.md).
+The Base Adventure chain now adds **Provisions for the Next Expedition**
+after Mine Echoes. It requires one fresh Temple and Mine clear but no selected
+profession, then atomically grants **75 Gold + 2 Deep Iron Ore + 2 Moonpetal
++ 2 Thick Hide**. A real integration proves those materials can enter the
+player market and feed another player's profession. The physical Adventure
+Board and contextual card UI are current-head validated; focused Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 8` plus current-head initial,
+ready-to-claim and distance-close renderer markers. Next gate is auditing and
+expanding launch quest eligibility/content across the races/classes that are
+actually creation-enabled.
+
 **v3.30 LIVE DUNGEON SKINNING SUPPLY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_30_Live_Dungeon_Skinning_GREEN_20260928.md)
 and [evidence](
