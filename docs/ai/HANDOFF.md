@@ -1,3 +1,31 @@
+## 28 September 2026 — v3.34 level-five Marauder Captain bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_34_Marauder_Captain_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/marauder-captain-bounty-v3-34-green-20260928.md).
+
+**The Captain's Price** is fully accepted as the first level-paced optional
+Adventure:
+
+- minimum level 5;
+- prerequisite Worldroot Relic;
+- one trusted `marauder_captain` defeat;
+- 60 Gold only;
+- does not gate Mine Echoes.
+
+Real factory/service integration is green:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 5`.
+
+The next content gate is specifically the Abandoned Mine boss identity audit.
+`MineForemanFactory` uses BossId `CorruptedForeman`, while shared Mine
+reward metadata appears to reuse `marauder_captain` as Bestiary identity.
+Resolve that mismatch before adding a Mine boss Adventure.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.33 Forest Wolf bounty GREEN
 
 [Roadmap](
