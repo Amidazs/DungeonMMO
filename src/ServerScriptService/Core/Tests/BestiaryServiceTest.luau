@@ -62,6 +62,37 @@ check(#captain2.newly_unlocked == 0, "Captain second kill must not unlock.")
 local captain3 = BestiaryService.apply_kill_to_character(character, "marauder_captain")
 check(captain3.newly_unlocked[1].id == "captain_studied", "Captain third milestone mismatch.")
 
+local foreman1 = BestiaryService.apply_kill_to_character(
+    character,
+    "corrupted_foreman"
+)
+check(
+    foreman1.kill_count == 1
+        and foreman1.newly_unlocked[1].id == "foreman_defeated",
+    "Foreman first kill uses its own bestiary entry."
+)
+local foreman2 = BestiaryService.apply_kill_to_character(
+    character,
+    "corrupted_foreman"
+)
+check(
+    #foreman2.newly_unlocked == 0,
+    "Foreman second kill does not unlock early."
+)
+local foreman3 = BestiaryService.apply_kill_to_character(
+    character,
+    "corrupted_foreman"
+)
+check(
+    foreman3.kill_count == 3
+        and foreman3.newly_unlocked[1].id == "foreman_studied",
+    "Foreman third kill unlocks its own study milestone."
+)
+check(
+    character.Bestiary.Entries.marauder_captain.Kills == 3,
+    "Foreman progress does not rewrite historical Captain progress."
+)
+
 local before_count = 0
 for _ in pairs(character.Bestiary.Entries) do
     before_count += 1
