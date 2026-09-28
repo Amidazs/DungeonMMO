@@ -383,24 +383,19 @@ local function request_action(definition: any)
 end
 
 --[[
-Creates one themed Adventure quest card.
+Creates the styled shell for one Adventure quest card.
 
 Args:
     definition (any): Public quest definition.
     order (number): Stable catalogue order.
 
 Returns:
-    None.
+    Frame: Card container ready for labels and controls.
 ]]
-local function add_quest_row(
+local function create_quest_card(
     definition: any,
     order: number
-)
-    local state = latest and latest.State
-    local active = state
-        and type(state.Active) == "table"
-        and state.Active[definition.Id]
-
+): Frame
     local row = Instance.new("Frame")
     row.Name = tostring(definition.Id)
     row.LayoutOrder = order
@@ -415,7 +410,23 @@ local function add_quest_row(
         0.52
     )
     row.Parent = list
+    return row
+end
 
+--[[
+Adds quest title and minimum-level labels to a card.
+
+Args:
+    row (Frame): Quest card container.
+    definition (any): Public quest definition.
+
+Returns:
+    None.
+]]
+local function add_quest_header(
+    row: Frame,
+    definition: any
+)
     local name = UiComponents.label(
         row,
         "QuestName",
@@ -441,7 +452,24 @@ local function add_quest_row(
     level.Position = UDim2.new(1, -14, 0, 10)
     level.Size = UDim2.fromOffset(120, 22)
     level.TextXAlignment = Enum.TextXAlignment.Right
+end
 
+--[[
+Adds objective and reward text to a quest card.
+
+Args:
+    row (Frame): Quest card container.
+    definition (any): Public quest definition.
+    active (any): Persisted active quest state, if any.
+
+Returns:
+    None.
+]]
+local function add_quest_details(
+    row: Frame,
+    definition: any,
+    active: any
+)
     local objective = UiComponents.label(
         row,
         "Objective",
@@ -463,7 +491,22 @@ local function add_quest_row(
     reward.Size = UDim2.new(1, -170, 0, 40)
     reward.TextWrapped = true
     reward.TextYAlignment = Enum.TextYAlignment.Top
+end
 
+--[[
+Adds the current server-state action control to a quest card.
+
+Args:
+    row (Frame): Quest card container.
+    definition (any): Public quest definition.
+
+Returns:
+    None.
+]]
+local function add_quest_action(
+    row: Frame,
+    definition: any
+)
     local button_text, enabled = action_state(definition)
     local action = UiComponents.button(
         row,
@@ -482,6 +525,31 @@ local function add_quest_row(
             request_action(definition)
         end)
     end
+end
+
+--[[
+Creates one complete Adventure quest card.
+
+Args:
+    definition (any): Public quest definition.
+    order (number): Stable catalogue order.
+
+Returns:
+    None.
+]]
+local function add_quest_row(
+    definition: any,
+    order: number
+)
+    local state = latest and latest.State
+    local active = state
+        and type(state.Active) == "table"
+        and state.Active[definition.Id]
+    local row = create_quest_card(definition, order)
+
+    add_quest_header(row, definition)
+    add_quest_details(row, definition, active)
+    add_quest_action(row, definition)
 end
 
 --[[
