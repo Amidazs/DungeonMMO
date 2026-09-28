@@ -1,3 +1,16 @@
+**v3.39 MIXED-OBJECTIVE ADVENTURE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_39_Mixed_Objective_Adventure_GREEN_20260928.md)
+and [evidence](
+../testing/mixed-objective-adventure-v3-39-green-20260928.md).
+**Follow the Fracture** is now accepted as a level-12 optional Adventure after
+Ruin Survey. It combines the real Temple CombatRoom2 `CheckpointReached`
+signal with a fresh Abandoned Mine `DungeonClear`, then grants **90 Gold + 2
+Warding Essence**. Fresh unpublished Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`. The next gate is stronger
+dialogue, narrative continuity and presentation around the accepted launch
+quests, not another repetitive bounty. Depths 2-4 remain release-disabled.
+
 **v3.38 TRUSTED CHECKPOINT ADVENTURE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_38_Checkpoint_Adventure_GREEN_20260928.md)
 and [evidence](
