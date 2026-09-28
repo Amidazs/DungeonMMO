@@ -1,3 +1,17 @@
+**v3.43 ADVENTURE DIALOGUE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_43_Adventure_Dialogue_GREEN_20260928.md) and [evidence](
+../testing/adventure-dialogue-v3-43-green-20260928.md).
+All 13 current launch Adventures now have reusable Start, Progress, Ready and
+Complete narrative. The Adventure Board opens a conversation before Start or
+Claim, active quests can be reviewed, and successful turn-in shows closure
+dialogue. Narrative content and presentation rules live in separate shared
+modules, while the existing server-owned quest runtime remains authoritative.
+Fresh Play returned `VERIFIED_QUEST_VARIETY_FOCUS_PASS 9`,
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_QUEST_CONVERSATION_UI_PASS 1`. First-transfer advancement remains
+18 branches x three player-facing quests. Next gate: physical quest-giver NPCs
+and stronger in-dungeon quest feedback.
+
 **v3.42 DEFEND / SURVIVE ADVENTURE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_42_Defend_Survive_GREEN_20260928.md) and [evidence](
 ../testing/defend-survive-v3-42-green-20260928.md).
