@@ -1,3 +1,54 @@
+## 28 September 2026 — CURRENT v3.46 SECTION D READY — USER TEST HOLD
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_46_SECTION_D_READY_USER_TEST_HOLD_20260928.md);
+[manual checklist](
+../testing/pre-section-d-user-playtest-checklist-20260928.md).
+
+The project is now parked immediately before consolidated roadmap **Section D**.
+
+Final pre-D gates are accepted:
+
+- v3.44 physical Adventure quest givers;
+- v3.45 visible Dungeon quest feedback.
+
+Physical quest-giver roles now cover all 13 current Adventures and reuse the
+v3.43 dialogue system. The Adventure Board remains an overview.
+
+Temple/Mine feedback now exposes readable state for:
+
+- hidden-room tutorial;
+- Lost Surveyor escort;
+- Resonant Seal puzzle;
+- Resonance Ward defense.
+
+Final pre-D validation:
+
+- BaseRuntime compile PASS;
+- DungeonRuntime compile PASS;
+- `VERIFIED_QUEST_VARIETY_FOCUS_PASS 10`;
+- `VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 11`;
+- `VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 6`;
+- `VERIFIED_PHYSICAL_QUEST_GIVER_DIALOGUE_PASS 1`;
+- `VERIFIED_LIVE_TEMPLE_QUEST_FEEDBACK_PASS 3`;
+- Base/Dungeon Rojo builds PASS;
+- git diff check PASS.
+
+Sections A/B are accepted for the initial launch slice. Section C has an
+end-to-end green launch economy loop: exclusive profession capacity, gathering
+tiers, level 3-5 cross-profession recipes, four-player market dependency,
+blueprint drop/trade/learn/craft, live animal-only Skinning and
+quest->market->profession use. Final minigames/art/tuning remain backlog rather
+than missing authority.
+
+**HOLD:** do not implement Section D world-boss, raid, guild-competition,
+territory or castle/PvP work until the user completes the manual checklist and
+explicitly releases the hold.
+
+When released, Section D begins with the existing default-off weekly world-boss
+foundation and the representative real four-player encounter gate. It does not
+begin with castle PvP.
+
 ## 28 September 2026 — CURRENT v3.43 Adventure dialogue GREEN
 
 [Roadmap](
