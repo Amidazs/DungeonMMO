@@ -1,6 +1,10 @@
 --!strict
 -- Independent optional profession-blueprint reward distribution.
 
+local ItemDefinitions = require(
+    script.Parent:WaitForChild("ItemDefinitions")
+)
+
 local ProfessionBlueprintDropConfig = {}
 
 local FOUNDATION_POOL = table.freeze({
@@ -14,23 +18,26 @@ local FOUNDATION_POOL = table.freeze({
     }),
 })
 
+local ADVANCED_POOL = table.freeze({
+    table.freeze({
+        Weight = 1,
+        ItemId = "blacksmith_masterwork_batch_blueprint",
+    }),
+    table.freeze({
+        Weight = 1,
+        ItemId = "alchemy_aetheric_batch_recipe",
+    }),
+    table.freeze({
+        Weight = 1,
+        ItemId = "leatherworking_masterwork_batch_pattern",
+    }),
+    table.freeze({
+        Weight = 1,
+        ItemId = "enchanting_arcane_batch_inscription",
+    }),
+})
+
 local BOSS = table.freeze({
-    TempleEventBoss = table.freeze({
-        Chance = 0.02,
-        Pool = FOUNDATION_POOL,
-    }),
-    TempleSecretBoss = table.freeze({
-        Chance = 0.02,
-        Pool = FOUNDATION_POOL,
-    }),
-    AbandonedMineEventBoss = table.freeze({
-        Chance = 0.02,
-        Pool = FOUNDATION_POOL,
-    }),
-    AbandonedMineSecretBoss = table.freeze({
-        Chance = 0.02,
-        Pool = FOUNDATION_POOL,
-    }),
     MarauderCaptain = table.freeze({
         Chance = 0.02,
         Pool = FOUNDATION_POOL,
@@ -38,6 +45,46 @@ local BOSS = table.freeze({
     CorruptedForeman = table.freeze({
         Chance = 0.02,
         Pool = FOUNDATION_POOL,
+    }),
+    TempleDepth2Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    AbandonedMineDepth2Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    TempleDepth3Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    AbandonedMineDepth3Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    TempleDepth4Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    AbandonedMineDepth4Boss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    TempleEventBoss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    TempleSecretBoss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    AbandonedMineEventBoss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
+    }),
+    AbandonedMineSecretBoss = table.freeze({
+        Chance = 0.02,
+        Pool = ADVANCED_POOL,
     }),
 })
 
@@ -171,6 +218,87 @@ function ProfessionBlueprintDropConfig.roll(
     end
 
     return fallback
+end
+
+--[[
+Validates one blueprint drop definition and every referenced blueprint item.
+
+Args:
+    definition (any): Candidate chance and weighted item pool.
+
+Returns:
+    (boolean, string?): Whether the definition is safe to use.
+]]
+local function validate_definition(
+    definition: any
+): (boolean, string?)
+    if type(definition) ~= "table"
+        or type(definition.Chance) ~= "number"
+        or definition.Chance ~= definition.Chance
+        or definition.Chance <= 0
+        or definition.Chance > 1
+        or definition.Chance >= math.huge
+        or type(definition.Pool) ~= "table"
+        or #definition.Pool == 0
+    then
+        return false, "InvalidBlueprintDropDefinition"
+    end
+
+    for _, entry in ipairs(definition.Pool) do
+        if type(entry) ~= "table"
+            or type(entry.Weight) ~= "number"
+            or entry.Weight ~= entry.Weight
+            or entry.Weight <= 0
+            or entry.Weight >= math.huge
+            or type(entry.ItemId) ~= "string"
+            or entry.ItemId == ""
+        then
+            return false, "InvalidBlueprintDropEntry"
+        end
+
+        local item = ItemDefinitions.get(entry.ItemId)
+        if not item
+            or item.Kind ~= "RecipeBlueprint"
+            or item.Tradeable ~= true
+            or item.Bound == true
+            or item.TestOnly == true
+            or type(item.RecipeLearning) ~= "table"
+        then
+            return false,
+                "InvalidBlueprintDropItem:" .. tostring(entry.ItemId)
+        end
+    end
+
+    return true, nil
+end
+
+--[[
+Validates every boss and completion blueprint-drop definition.
+
+Args:
+    None.
+
+Returns:
+    (boolean, string?): True when every configured source is valid.
+]]
+function ProfessionBlueprintDropConfig.validate(): (boolean, string?)
+    for source_id, definition in pairs(BOSS) do
+        local ok, reason = validate_definition(definition)
+        if not ok then
+            return false,
+                "Boss:" .. source_id .. ":" .. tostring(reason)
+        end
+    end
+
+    for source_id, definition in pairs(COMPLETION) do
+        local ok, reason = validate_definition(definition)
+        if not ok then
+            return false,
+                "Completion:" .. source_id .. ":" .. tostring(reason)
+        end
+    end
+
+    return true, nil
 end
 
 return table.freeze(ProfessionBlueprintDropConfig)
