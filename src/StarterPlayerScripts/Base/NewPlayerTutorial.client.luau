@@ -116,7 +116,10 @@ local latest_state: any = nil
 local waypoint_target: BasePart? = nil
 local waypoint_highlight: Highlight? = nil
 local waypoint_billboard: BillboardGui? = nil
-local ground_guide = TutorialPathGuide.new(player)
+local ground_guide = TutorialPathGuide.new(
+    player,
+    "DungeonMMONewPlayerTutorialGuide"
+)
 
 --[[
 Returns whether mandatory identity selection is currently blocking the screen.
