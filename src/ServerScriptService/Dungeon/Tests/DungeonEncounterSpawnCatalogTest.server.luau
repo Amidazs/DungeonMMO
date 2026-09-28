@@ -33,10 +33,18 @@ check(
     Catalog.resolve_pack_count(temple_room1, {}) == 2,
     "Temple Room1 pack count must remain 2."
 )
+local temple_room1_entries =
+    Catalog.resolve_pack_entries(temple_room1, {})
 check(
-    #temple_room1.Entries == 1
-        and temple_room1.Entries[1].EnemyArchetypeId == "Marauder",
-    "Temple Room1 must remain one Marauder pack entry."
+    #temple_room1.Entries == 2
+        and #temple_room1_entries == 2
+        and temple_room1_entries[1].Entry.EnemyArchetypeId
+            == "Marauder"
+        and temple_room1_entries[1].Count == 1
+        and temple_room1_entries[2].Entry.EnemyArchetypeId
+            == "Wolf"
+        and temple_room1_entries[2].Count == 1,
+    "Temple Room1 must contain one Marauder and one Forest Wolf."
 )
 
 local temple_room2 = assert(
@@ -93,6 +101,13 @@ local marauder = assert(
 check(
     marauder.FactoryId == "Marauder",
     "Marauder archetype factory ID mismatch."
+)
+local wolf = assert(
+    Catalog.get_enemy_archetype("Wolf")
+)
+check(
+    wolf.FactoryId == "ForestWolf",
+    "Wolf archetype must route through the ForestWolf factory."
 )
 check(
     Catalog.get_enemy_archetype("Unknown") == nil,
