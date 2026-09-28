@@ -47,16 +47,17 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 9
+    #adventures == 10
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
-        and adventures[4].Id == "MineEchoes"
-        and adventures[5].Id == "RuinSurvey"
-        and adventures[6].Id == "CorruptedForemanBounty"
-        and adventures[7].Id == "FractureTrail"
-        and adventures[8].Id == "DungeonBossHunt"
-        and adventures[9].Id == "ExpeditionProvisioning",
+        and adventures[4].Id == "HiddenWardDiscovery"
+        and adventures[5].Id == "MineEchoes"
+        and adventures[6].Id == "RuinSurvey"
+        and adventures[7].Id == "CorruptedForemanBounty"
+        and adventures[8].Id == "FractureTrail"
+        and adventures[9].Id == "DungeonBossHunt"
+        and adventures[10].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -97,6 +98,32 @@ check(
         and captain_bounty.Reward.ItemId == nil
         and captain_bounty.Reward.Items == nil,
     "Captain bounty is intentionally Gold-only."
+)
+
+local hidden_ward = assert(
+    QuestDefinitions.get("HiddenWardDiscovery")
+)
+check(
+    hidden_ward.MinimumLevel == 6
+        and hidden_ward.PrerequisiteQuestId == "WorldrootRelic"
+        and #hidden_ward.Objectives == 2
+        and hidden_ward.Objectives[1].Type == "WorldInteraction"
+        and hidden_ward.Objectives[1].TargetId
+            == "TestDungeon:HiddenPanel:Room2"
+        and hidden_ward.Objectives[2].Type == "ItemCollected"
+        and hidden_ward.Objectives[2].TargetId
+            == "hidden_ward_fragment",
+    "Hidden Ward Adventure combines interaction and item collection."
+)
+check(
+    type(hidden_ward.TurnInItems) == "table"
+        and #hidden_ward.TurnInItems == 1
+        and hidden_ward.TurnInItems[1].ItemId
+            == "hidden_ward_fragment"
+        and hidden_ward.Reward.Gold == 50
+        and hidden_ward.Reward.Items[1].ItemId
+            == "warding_essence",
+    "Hidden Ward Adventure turns in its quest fragment for a mixed reward."
 )
 
 local ruin_survey = assert(
