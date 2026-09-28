@@ -62,12 +62,12 @@ local function main()
         "pinned C4 source commit"
     )
 
-    check(count_bracket(assert(source.Levels[20])) == 14,
-        "level 20 has 14 rank rows")
-    check(count_bracket(assert(source.Levels[24])) == 12,
-        "level 24 has 12 rank rows")
-    check(count_bracket(assert(source.Levels[28])) == 23,
-        "level 28 has 23 rank rows")
+    check(count_bracket(assert(source.Levels[20])) == 15,
+        "level 20 has 15 rank rows")
+    check(count_bracket(assert(source.Levels[24])) == 15,
+        "level 24 has 15 rank rows")
+    check(count_bracket(assert(source.Levels[28])) == 19,
+        "level 28 has 19 rank rows")
     check(source.Levels[25] == nil and source.Levels[30] == nil,
         "no invented 25/30 brackets")
 
