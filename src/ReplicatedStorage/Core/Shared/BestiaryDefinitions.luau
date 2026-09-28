@@ -58,6 +58,28 @@ local DEFINITIONS = table.freeze({
             }),
         }),
     }),
+    corrupted_foreman = table.freeze({
+        Id = "corrupted_foreman",
+        DisplayName = "Corrupted Foreman",
+        Milestones = table.freeze({
+            table.freeze({
+                Id = "foreman_defeated",
+                RequiredKills = 1,
+                Reputation = table.freeze({
+                    FactionId = "Scholars",
+                    Points = 15,
+                }),
+            }),
+            table.freeze({
+                Id = "foreman_studied",
+                RequiredKills = 3,
+                Reputation = table.freeze({
+                    FactionId = "Scholars",
+                    Points = 25,
+                }),
+            }),
+        }),
+    }),
 })
 
 function BestiaryDefinitions.get(creature_id: string): any?
