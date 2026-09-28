@@ -401,6 +401,39 @@ local function main()
         "level-twelve Dark Elf can start Fracture Trail after Ruin Survey"
     )
 
+    local ward_defense = assert(
+        QuestDefinitions.get("TempleWardDefense")
+    )
+    local level_twelve_defense = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+        TempleResonancePuzzle = true,
+    })
+    level_twelve_defense.Level = 12
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_twelve_defense,
+            ward_defense
+        ),
+        "level-twelve Dark Elf cannot start Hold the Resonance"
+    )
+
+    local level_thirteen_defense = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+        RuinSurvey = true,
+        TempleResonancePuzzle = true,
+    })
+    level_thirteen_defense.Level = 13
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_thirteen_defense,
+            ward_defense
+        ),
+        "level-thirteen Dark Elf can start Hold the Resonance"
+    )
+
     local boss_hunt = assert(
         QuestDefinitions.get("DungeonBossHunt")
     )
