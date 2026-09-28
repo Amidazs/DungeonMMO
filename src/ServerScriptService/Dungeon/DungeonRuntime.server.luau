@@ -35,9 +35,6 @@ local DungeonEscortDefinitions = require(
 local DungeonPuzzleDefinitions = require(
     SharedCore:WaitForChild("DungeonPuzzleDefinitions")
 )
-local DungeonDefenseDefinitions = require(
-    SharedCore:WaitForChild("DungeonDefenseDefinitions")
-)
 local CharacterIdentityRules = require(
     SharedCore:WaitForChild("CharacterIdentityRules")
 )
@@ -96,9 +93,6 @@ local DungeonEscortService = require(
 )
 local DungeonPuzzleService = require(
     Services:WaitForChild("DungeonPuzzleService")
-)
-local DungeonDefenseService = require(
-    Services:WaitForChild("DungeonDefenseService")
 )
 local DungeonOptionalBossPolicy = require(
     Dungeon:WaitForChild("DungeonOptionalBossPolicy")
@@ -179,9 +173,6 @@ local DungeonEscortRuntime = require(
 local DungeonPuzzleRuntime = require(
     Dungeon:WaitForChild("DungeonPuzzleRuntime")
 )
-local DungeonDefenseRuntime = require(
-    Dungeon:WaitForChild("DungeonDefenseRuntime")
-)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -261,10 +252,6 @@ local escorts = DungeonEscortService.new(
 local puzzles = DungeonPuzzleService.new(
     sessions,
     profiles,
-    quests
-)
-local defenses = DungeonDefenseService.new(
-    sessions,
     quests
 )
 
@@ -1889,16 +1876,19 @@ local function initialize_session_services(session: any): (any?, boolean)
         )
     end
 
-    local defense_definition = DungeonDefenseDefinitions.get(
-        "TempleResonanceWard"
-    )
-    local defense_binding = DungeonDefenseRuntime.attach({
+    local defense_binding = require(
+        Dungeon:WaitForChild("DungeonDefenseRuntime")
+    ).attach({
         dungeon_id = active_definition.Id,
         difficulty_id = session.Difficulty
             and session.Difficulty.Id,
         workspace = Workspace,
-        definition = defense_definition,
-        defense_service = defenses,
+        definition = require(
+            SharedCore:WaitForChild("DungeonDefenseDefinitions")
+        ).get("TempleResonanceWard"),
+        defense_service = require(
+            Services:WaitForChild("DungeonDefenseService")
+        ).new(sessions, quests),
         get_session = current_session,
         get_session_id = function(): string?
             return active_session_id
