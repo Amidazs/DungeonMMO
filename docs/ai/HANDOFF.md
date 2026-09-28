@@ -1,3 +1,38 @@
+## 28 September 2026 — v3.39 mixed-objective Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_39_Mixed_Objective_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/mixed-objective-adventure-v3-39-green-20260928.md).
+
+**Follow the Fracture** is fully accepted:
+
+- quest ID `FractureTrail`;
+- minimum level 12;
+- prerequisite `RuinSurvey`;
+- Temple CombatRoom2 `CheckpointReached`;
+- Abandoned Mine `DungeonClear`;
+- 90 Gold + 2 Warding Essence;
+- optional and profession-independent.
+
+Fresh unpublished Play markers:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+The mixed-objective integration proves that a Mine clear alone is insufficient,
+the Temple checkpoint plus Mine clear completes the quest, replay stays
+idempotent, reward claiming is one-time, and completion/reward persist after
+save/reload.
+
+Next gate:
+move toward quest presentation and narrative continuity around the accepted
+launch catalogue. Add further quest content only when it creates a genuinely
+different play pattern. Keep Depths 2-4 disabled until their physical layouts
+exist.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.38 trusted checkpoint Adventure GREEN
 
 [Roadmap](
