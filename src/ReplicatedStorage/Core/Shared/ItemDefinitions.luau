@@ -646,6 +646,17 @@ local DEFINITIONS = table.freeze({
         Tradeable = false,
     }),
 
+    temple_resonance_shard = table.freeze({
+        Id = "temple_resonance_shard",
+        Name = "Temple Resonance Shard",
+        Kind = "Material",
+        InventoryCategory = "Quest",
+        Rarity = "Quest",
+        Stackable = false,
+        Bound = true,
+        Tradeable = false,
+    }),
+
     -- Creative name for C4 source reagent item 1458 (Spirit Ore).
     -- Summon skill source metadata retains the historical numeric ID while
     -- production inventory uses this stable DungeonMMO item identifier.
