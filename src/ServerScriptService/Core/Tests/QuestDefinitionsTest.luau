@@ -47,12 +47,13 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 5
+    #adventures == 6
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
         and adventures[4].Id == "MineEchoes"
-        and adventures[5].Id == "ExpeditionProvisioning",
+        and adventures[5].Id == "CorruptedForemanBounty"
+        and adventures[6].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -93,6 +94,26 @@ check(
         and captain_bounty.Reward.ItemId == nil
         and captain_bounty.Reward.Items == nil,
     "Captain bounty is intentionally Gold-only."
+)
+
+local foreman_bounty = assert(
+    QuestDefinitions.get("CorruptedForemanBounty")
+)
+check(
+    foreman_bounty.MinimumLevel == 10
+        and foreman_bounty.PrerequisiteQuestId == "MineEchoes"
+        and #foreman_bounty.Objectives == 1
+        and foreman_bounty.Objectives[1].Type == "EnemyDefeat"
+        and foreman_bounty.Objectives[1].TargetId
+            == "corrupted_foreman"
+        and foreman_bounty.Objectives[1].Required == 1,
+    "Foreman bounty is a level-ten optional Mine boss Adventure."
+)
+check(
+    foreman_bounty.Reward.Gold == 80
+        and foreman_bounty.Reward.ItemId == nil
+        and foreman_bounty.Reward.Items == nil,
+    "Foreman bounty is intentionally Gold-only."
 )
 check(
     QuestDefinitions.get("MineEchoes").PrerequisiteQuestId
