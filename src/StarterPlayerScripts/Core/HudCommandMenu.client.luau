@@ -45,13 +45,18 @@ local buttons: {[string]: TextButton} = {}
 local actions = {
     {name = "Inventory", text = "BAG\nI"},
     {name = "Skills", text = "SKILLS\nK"},
+    {name = "Quests", text = "QUESTS\nL"},
 }
 
 -- Guild is only loaded in the Base place.
 if script.Parent.Parent:FindFirstChild("Base") then
     table.insert(actions, {name = "Guild", text = "GUILD\nJ"})
-    frame.Size = UDim2.fromOffset(228, 76)
 end
+
+frame.Size = UDim2.fromOffset(
+    24 + #actions * 72,
+    76
+)
 
 -- Creates one icon-ready command button with a working destination.
 for index, action in ipairs(actions) do
