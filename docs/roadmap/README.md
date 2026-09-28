@@ -1,3 +1,19 @@
+**v3.41 QUEST-ITEM PUZZLE ADVENTURE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_41_Quest_Item_Puzzle_GREEN_20260928.md) and [evidence](
+../testing/quest-item-puzzle-v3-41-green-20260928.md).
+**The Resonant Seal** is now accepted as a level-11 optional Adventure after
+Ruin Survey. A personal bound Temple Resonance Shard is collected after Room 1;
+after Room 2 clears, the player uses it to solve the server-owned
+**Moon -> Root -> Flame** rune sequence. Wrong input resets the persisted
+sequence. Shared puzzle completion does not fabricate another party member's
+personal shard objective. Reward is **75 Gold + 1 Resonant Rune**, with the
+shard consumed at turn-in. Fresh Play returned
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 7`,
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`,
+`VERIFIED_TEMPLE_RESONANCE_PRESENTATION_PASS 1` and
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`. Next gate: a trusted
+Defend/Survive objective plus stronger dialogue and narrative presentation.
+
 **v3.40 QUEST VARIETY FOUNDATION — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_40_Quest_Variety_Foundation_GREEN_20260928.md),
 [evidence](
