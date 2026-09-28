@@ -1,3 +1,20 @@
+**v3.28 LAUNCH PROFESSION ECONOMY BACKBONE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_28_Profession_Economy_Backbone_GREEN_20260928.md)
+and [evidence](
+../testing/profession-economy-v3-28-green-20260928.md).
+Gathering now has authoritative profession-level gates; Room 3 physically
+hosts level-3 **Deep Iron** and **Moonpetal** resources; Skinning level 3+
+produces **Thick Hide** while retaining the animal-only corpse rule. All four
+crafting professions now have a normal cross-profession component ladder
+through level 5. A real four-player market chain reaches **Masterwork Frame**,
+while a separate earned Gearwright buys normal profession components plus
+tradeable specialist salvage to create a premium assembly. Ordinary
+progression never requires Deepclaimer salvage. Fresh Play returned
+`VERIFIED_PROFESSION_LAUNCH_ECONOMY_FOCUS_PASS 22` and
+`VERIFIED_PROFESSION_ROOM3_ADVANCED_NODES_PASS`. Remaining profession work
+is blueprint acquisition/drop distribution, live advanced Skinning supply,
+final presentation and real crafting minigames.
+
 **v3.27 DWARF SOURCE SPATIAL BINDING — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_27_Dwarf_Spatial_GREEN_20260928.md)
 and [evidence](
