@@ -203,6 +203,17 @@ local function render(snapshot: any)
         status.Text = "Existing class progression is preserved; migration is pending."
     elseif state.SelectedClassId then
         if quest and quest.ok and quest.Started then
+            local quest_prefix = if quest.CurrentQuestIndex
+                    and quest.CurrentQuestTitle
+                then "Quest "
+                    .. tostring(quest.CurrentQuestIndex)
+                    .. "/"
+                    .. tostring(quest.CurrentQuestCount or 3)
+                    .. " — "
+                    .. tostring(quest.CurrentQuestTitle)
+                    .. ". "
+                else ""
+
             if quest.ClassAwarded and transfer and transfer.ok then
                 status.Text = "First class: "
                     .. tostring(transfer.DisplayName)
@@ -291,13 +302,16 @@ local function render(snapshot: any)
                     .. "four field-report fragments. "
                     .. "Later trial stages remain in development."
             else
-                status.Text = "Advancement trial stage "
+                status.Text = quest_prefix
+                    .. "Follow your current advancement objective "
+                    .. "(stage "
                     .. tostring(quest.Step)
-                    .. " reached. Follow your current quest objective."
+                    .. ")."
             end
         elseif quest and quest.ok and quest.WorldReady then
             status.Text = "Visit your quest mentor near the hub "
-                .. "arrival point to begin your selected class trial."
+                .. "arrival point to begin Quest 1/3 of your "
+                .. "selected advancement path."
         else
             status.Text = "Your chosen path is saved. Its original "
                 .. "advancement quest is still in development."
