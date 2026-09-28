@@ -247,6 +247,35 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    MineSurveyorEscort = table.freeze({
+        Id = "MineSurveyorEscort",
+        DisplayName = "Guide the Lost Surveyor",
+        Kind = "Adventure",
+        MinimumLevel = 9,
+        PrerequisiteQuestId = "MineEchoes",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "EscortMineSurveyor",
+                Type = "EscortCompleted",
+                TargetId = "AbandonedMine:MineSurveyor",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 70,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "deep_iron_ore",
+                    Quantity = 2,
+                }),
+            }),
+        }),
+    }),
+
     CorruptedForemanBounty = table.freeze({
         Id = "CorruptedForemanBounty",
         DisplayName = "The Foreman's Reckoning",
@@ -461,6 +490,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.HiddenWardDiscovery,
         DEFINITIONS.MineEchoes,
         DEFINITIONS.RuinSurvey,
+        DEFINITIONS.MineSurveyorEscort,
         DEFINITIONS.CorruptedForemanBounty,
         DEFINITIONS.FractureTrail,
         DEFINITIONS.DungeonBossHunt,
