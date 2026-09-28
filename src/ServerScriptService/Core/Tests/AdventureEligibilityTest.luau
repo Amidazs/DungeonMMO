@@ -256,6 +256,35 @@ local function main()
         "level-eight Dark Elf can start Ruin Survey after Mine Echoes"
     )
 
+    local surveyor = assert(
+        QuestDefinitions.get("MineSurveyorEscort")
+    )
+    local level_eight_surveyor = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_eight_surveyor.Level = 8
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_eight_surveyor,
+            surveyor
+        ),
+        "level-eight Dark Elf cannot start Lost Surveyor escort"
+    )
+
+    local level_nine_surveyor = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_nine_surveyor.Level = 9
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_nine_surveyor,
+            surveyor
+        ),
+        "level-nine Dark Elf can start Lost Surveyor escort"
+    )
+
     local foreman = assert(
         QuestDefinitions.get("CorruptedForemanBounty")
     )
