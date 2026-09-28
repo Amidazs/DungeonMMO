@@ -45,6 +45,13 @@ local function main()
 
     local seen = {}
     local quest_count = 0
+    local mine_warden = QuestGiverDefinitions.get("MineWarden")
+    check(
+        mine_warden ~= nil
+            and mine_warden.FallbackAnchorId
+                == "Base.Travel.Dwarves",
+        "Mine Warden can fall back to the authored Dwarf travel anchor"
+    )
 
     for _, giver in ipairs(givers) do
         check(
