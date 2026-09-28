@@ -1,3 +1,43 @@
+## 28 September 2026 — v3.42 defend/survive Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_42_Defend_Survive_GREEN_20260928.md);
+[evidence](
+../testing/defend-survive-v3-42-green-20260928.md).
+
+Accepted:
+`TempleWardDefense / Hold the Resonance`, level 13 after
+`TempleResonancePuzzle`.
+
+The trusted defense contract is:
+
+- Room 1 clear gates the start;
+- start requires the physical ward prompt and server-validated proximity;
+- active party members are measured server-side inside an 18-stud zone;
+- absence has a 3-second grace period;
+- exceeding grace resets the defense and permits restart;
+- ordinary Room-2 encounter authority remains the completion condition;
+- `DefenseCompleted` is emitted only after that genuine clear;
+- reward is 85 Gold + 1 Warding Essence.
+
+The first live defense build revealed
+`DungeonRuntime.server.luau` had exceeded Luau's 200-local-register limit.
+Defense runtime loading was moved out of the crowded top-level allocation
+surface. The direct compile probe is now green.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 8`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_TEMPLE_WARD_DEFENSE_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+First-transfer advancement remains **18 branches x three player-facing quests**.
+Do not replace those chains with a generic one-clear trial.
+
+Next: dialogue/narrative continuity, quest feedback and final presentation.
+Permanent source/document edits remain GitHub-only; Desktop Commander remains
+for pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.41 quest-item puzzle Adventure GREEN
 
 [Roadmap](
