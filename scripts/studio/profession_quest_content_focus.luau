@@ -19,6 +19,10 @@ local TESTS = table.freeze({
     }),
     table.freeze({
         Parent = ServerScriptService.Core.Tests,
+        Name = "DarkElfAdventureIntegrationTest",
+    }),
+    table.freeze({
+        Parent = ServerScriptService.Core.Tests,
         Name = "QuestServiceTest",
     }),
     table.freeze({
