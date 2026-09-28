@@ -1,3 +1,31 @@
+## 28 September 2026 — CURRENT v3.32 creation-enabled Adventure coverage GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_32_Adventure_Race_Coverage_GREEN_20260928.md);
+[evidence](
+../testing/adventure-race-coverage-v3-32-green-20260928.md).
+
+The Adventure eligibility gap is closed.
+
+Currently creation-enabled launch identities are Human Fighter/Mage, Elf
+Fighter/Mage and Dark Elf Fighter. All three launch Adventures now include
+Human, Elf and Dark Elf. Orc/Dwarf remain excluded because their race creation
+gates remain intentionally disabled.
+
+Fresh real-service proof:
+
+- `VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+- Adventure Eligibility **17 assertions**;
+- Dark Elf Adventure **18 assertions**.
+
+The Dark Elf integration completes all three Adventures, receives the exact
+Provisioning bundle with no profession selected, then save/reloads with quest
+completion and materials intact.
+
+Next: broaden launch-level Adventure/side-quest content using released trusted
+server events. Depths 2-4 are still runtime-release-disabled, so do not create
+visible quests that depend on them.
+
 ## 28 September 2026 — CURRENT v3.31 profession-aware Adventure content GREEN
 
 [Roadmap](
