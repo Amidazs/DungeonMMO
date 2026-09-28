@@ -401,6 +401,35 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    TempleWardDefense = table.freeze({
+        Id = "TempleWardDefense",
+        DisplayName = "Hold the Resonance",
+        Kind = "Adventure",
+        MinimumLevel = 13,
+        PrerequisiteQuestId = "TempleResonancePuzzle",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "DefendResonanceWard",
+                Type = "DefenseCompleted",
+                TargetId = "TestDungeon:ResonanceWard:Room2",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 85,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "warding_essence",
+                    Quantity = 1,
+                }),
+            }),
+        }),
+    }),
+
     DungeonBossHunt = table.freeze({
         Id = "DungeonBossHunt",
         DisplayName = "Break the Chain",
@@ -535,6 +564,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.CorruptedForemanBounty,
         DEFINITIONS.TempleResonancePuzzle,
         DEFINITIONS.FractureTrail,
+        DEFINITIONS.TempleWardDefense,
         DEFINITIONS.DungeonBossHunt,
         DEFINITIONS.ExpeditionProvisioning,
     })
