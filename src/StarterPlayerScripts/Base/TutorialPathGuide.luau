@@ -260,7 +260,7 @@ function Guide:_render(waypoints: {PathWaypoint})
         )
     end
 
-    local arrow_distance = 0
+    local distance_to_next_arrow = 4
     local arrow_index = 0
 
     for index = 1, #positions - 1 do
@@ -286,41 +286,35 @@ function Guide:_render(waypoints: {PathWaypoint})
             )
             table.insert(self._visual_parts, segment)
 
-            local travelled = 0
-            while arrow_distance + travelled <= length do
-                local local_distance =
-                    arrow_distance + travelled
-
-                if local_distance >= 2
-                    and local_distance <= length - 1
-                then
-                    arrow_index += 1
-                    local alpha = local_distance / length
-                    local arrow_position = start_position:Lerp(
-                        end_position,
-                        alpha
+            local local_distance = distance_to_next_arrow
+            while local_distance <= length - 0.75 do
+                arrow_index += 1
+                local alpha = local_distance / length
+                local arrow_position = start_position:Lerp(
+                    end_position,
+                    alpha
+                )
+                local arrow_parts = create_arrow(
+                    self._folder,
+                    arrow_position,
+                    end_position,
+                    arrow_index
+                )
+                for _, part in ipairs(arrow_parts) do
+                    table.insert(
+                        self._visual_parts,
+                        part
                     )
-                    local arrow_parts = create_arrow(
-                        self._folder,
-                        arrow_position,
-                        end_position,
-                        arrow_index
-                    )
-                    for _, part in ipairs(arrow_parts) do
-                        table.insert(
-                            self._visual_parts,
-                            part
-                        )
-                    end
                 end
 
-                travelled += ARROW_SPACING
+                local_distance += ARROW_SPACING
             end
 
-            arrow_distance = (
-                ARROW_SPACING
-                - (length % ARROW_SPACING)
-            ) % ARROW_SPACING
+            distance_to_next_arrow = local_distance - length
+
+            if distance_to_next_arrow < 0.75 then
+                distance_to_next_arrow += ARROW_SPACING
+            end
         end
     end
 end
