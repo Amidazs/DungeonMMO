@@ -229,6 +229,35 @@ local function main()
         "level-ten Dark Elf can start Foreman bounty after Mine Echoes"
     )
 
+    local boss_hunt = assert(
+        QuestDefinitions.get("DungeonBossHunt")
+    )
+    local level_fourteen = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_fourteen.Level = 14
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_fourteen,
+            boss_hunt
+        ),
+        "level-fourteen Dark Elf cannot start dual boss Adventure"
+    )
+
+    local level_fifteen = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_fifteen.Level = 15
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_fifteen,
+            boss_hunt
+        ),
+        "level-fifteen Dark Elf can start dual boss Adventure"
+    )
+
     local provisioning = assert(
         QuestDefinitions.get(
             "ExpeditionProvisioning"
