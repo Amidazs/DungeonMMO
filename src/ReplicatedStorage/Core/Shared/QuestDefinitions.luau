@@ -111,6 +111,29 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    ForestWolfBounty = table.freeze({
+        Id = "ForestWolfBounty",
+        DisplayName = "Wolves at the Worldroot",
+        Kind = "Adventure",
+        MinimumLevel = 1,
+        PrerequisiteQuestId = "WorldrootRelic",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "DefeatForestWolves",
+                Type = "EnemyDefeat",
+                TargetId = "forest_wolf",
+                Required = 2,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 40,
+        }),
+    }),
+
     MineEchoes = table.freeze({
         Id = "MineEchoes",
         DisplayName = "Echoes from the Abandoned Mine",
@@ -232,6 +255,7 @@ end
 function QuestDefinitions.adventures(): {any}
     return table.freeze({
         DEFINITIONS.WorldrootRelic,
+        DEFINITIONS.ForestWolfBounty,
         DEFINITIONS.MineEchoes,
         DEFINITIONS.ExpeditionProvisioning,
     })
