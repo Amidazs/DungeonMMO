@@ -10,14 +10,14 @@ Guide.__index = Guide
 
 local FOLDER_NAME = "DungeonMMOTutorialGroundGuide"
 
-local MARKER_WIDTH = 0.28
-local MARKER_LENGTH = 0.82
+local MARKER_WIDTH = 0.3
+local MARKER_LENGTH = 0.3
 local MARKER_HEIGHT = 0.045
-local MARKER_SPACING = 3.4
-local MARKER_TRANSPARENCY = 0.62
+local MARKER_SPACING = 3
+local MARKER_TRANSPARENCY = 0.74
 
-local ARROW_SPACING = 9
-local ARROW_SPEED = 8.5
+local ARROW_SPACING = 7.5
+local ARROW_SPEED = 6.5
 local ARROW_TRANSPARENCY = 0.16
 local ARROW_START_GAP = 1.5
 
@@ -29,10 +29,10 @@ local JOIN_AHEAD_DISTANCE = 3.5
 
 local PATH_REFRESH_SECONDS = 0.35
 local TARGET_REFRESH_DISTANCE = 1
-local REROUTE_DISTANCE = 7
-local REROUTE_COOLDOWN = 0.65
-local JOIN_SMOOTH_SPEED = 14
-local ROUTE_BLEND_SPEED = 6
+local REROUTE_DISTANCE = 6
+local REROUTE_COOLDOWN = 0.45
+local JOIN_SMOOTH_SPEED = 12
+local ROUTE_BLEND_SPEED = 3.2
 
 local FADE_SMOOTH_SPEED = 14
 local HIDDEN_TRANSPARENCY = 1
@@ -940,19 +940,12 @@ function Guide:_update_markers(
                 self._folder
             )
 
-            local flat_direction = Vector3.new(
-                direction.X,
-                0,
-                direction.Z
-            )
-            local target = nil
-
-            if flat_direction.Magnitude >= 0.1 then
-                target = CFrame.lookAt(
-                    position,
-                    position + flat_direction
+            local target = CFrame.new(position)
+                * CFrame.Angles(
+                    0,
+                    math.rad(45),
+                    0
                 )
-            end
 
             update_part(
                 marker,
