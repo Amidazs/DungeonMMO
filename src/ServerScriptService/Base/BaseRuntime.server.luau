@@ -46,6 +46,9 @@ local BankRuntime = require(Base:WaitForChild("BankRuntime"))
 local BaseTravelRuntime = require(Base:WaitForChild("BaseTravelRuntime"))
 local GuildRuntime = require(Base:WaitForChild("GuildRuntime"))
 local BaseQuestRuntime = require(Base:WaitForChild("BaseQuestRuntime"))
+local BaseQuestGiverRuntime = require(
+    Base:WaitForChild("BaseQuestGiverRuntime")
+)
 local BaseClassAdvancementRuntime = require(
     Base:WaitForChild("BaseClassAdvancementRuntime")
 )
@@ -89,6 +92,9 @@ local market_create_request = remotes:WaitForChild("MarketCreateRequest") :: Rem
 local market_buy_request = remotes:WaitForChild("MarketBuyRequest") :: RemoteEvent
 local market_cancel_request = remotes:WaitForChild("MarketCancelRequest") :: RemoteEvent
 local market_action_result = remotes:WaitForChild("MarketActionResult") :: RemoteEvent
+local quest_dialogue_open = remotes:WaitForChild(
+    "QuestDialogueOpen"
+) :: RemoteEvent
 
 local runtime = RuntimeServices.new("Base")
 ProgressionService.bind_default(runtime.ProgressionService)
@@ -439,6 +445,19 @@ GuildRuntime.attach({
 BaseQuestRuntime.attach({
     remotes = remotes,
     quests = runtime.QuestService,
+    is_ready = function(player: Player): boolean
+        return loaded_users[player.UserId] == true
+            and profiles:get_profile(player.UserId) ~= nil
+            and not coordinator:is_pending(player.UserId)
+    end,
+})
+
+BaseQuestGiverRuntime.attach({
+    root = Workspace,
+    environment = base_environment,
+    profiles = profiles,
+    quests = runtime.QuestService,
+    remote = quest_dialogue_open,
     is_ready = function(player: Player): boolean
         return loaded_users[player.UserId] == true
             and profiles:get_profile(player.UserId) ~= nil
