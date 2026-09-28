@@ -58,10 +58,11 @@ promising that every secret route appears every run.
 
 #### 2. Escort / protection
 
-Build next as a dedicated server-owned escort authority rather than a client
-movement counter.
+The first escort implementation is now **Guide the Lost Surveyor** in the
+Abandoned Mine. It uses dedicated server-owned escort authority rather than a
+client movement counter.
 
-DungeonMMO escort rules should be:
+DungeonMMO escort rules are:
 
 - the escort NPC moves at or near player running speed;
 - it pauses at safe scripted points, not because the player must slow-walk;
@@ -72,8 +73,11 @@ DungeonMMO escort rules should be:
 - failure/retry rules are explicit;
 - completion publishes a trusted `EscortCompleted` event.
 
-A good first use would be rescuing an NPC from a dungeon side route and
-escorting them to a checkpoint or exit.
+The first implementation follows those rules: the Lost Surveyor starts after
+Room 1 is safe, travels at a player-like running speed, pauses outside Room 2
+instead of walking into combat, and resumes only after the authoritative
+Room-2 encounter state is Cleared. The server then publishes
+`EscortCompleted`.
 
 #### 3. Defend / survive
 
@@ -156,3 +160,20 @@ combat mechanics the player already knows.
 Hidden/interactable objectives are particularly useful early because a quest
 can teach a persistent game rule: walls, mechanisms and side spaces are worth
 examining even when no quest marker later points directly at them.
+
+
+### Research sources
+
+- Game Developer, **7 MMO Quest Types and How to Use Them**:
+  https://www.gamedeveloper.com/design/7-mmo-quest-types-and-how-to-use-them
+- Game Developer, **Can we Fix Escort Mission Game Design?**:
+  https://www.gamedeveloper.com/design/can-we-fix-escort-mission-game-design-
+- Game Developer, **Mission and Quest Design Series**:
+  https://www.gamedeveloper.com/design/mission-and-quest-design-series
+- Game Developer, **The Quest for the custom quest system**:
+  https://www.gamedeveloper.com/design/the-quest-for-the-custom-quest-system
+- Warcraft Wiki, **Quest**:
+  https://warcraft.wiki.gg/wiki/Quest
+
+These sources are design references rather than balance authorities. DungeonMMO
+keeps its own server-authority, party, progression and release-gating rules.
