@@ -27,8 +27,8 @@ local MIN_GROUND_NORMAL_Y = 0.72
 local MAX_GROUND_SURFACES = 12
 local GROUND_STEP_EPSILON = 0.1
 local PATH_TARGET_LIFT = 0.5
-local APPROACH_WIDTH = 5
 local APPROACH_HEIGHT = 6
+local APPROACH_RAY_LIFT = 0.25
 local SKIN_COLOR = Color3.fromRGB(196, 157, 119)
 
 local SEARCH_RADII = table.freeze({
@@ -518,46 +518,45 @@ local function ground_candidates(
 end
 
 --[[
-Checks that the standing/interaction volume is not occupied by a wall.
+Checks precise vertical headroom above one candidate floor point.
+
+Pathfinding already validates horizontal agent clearance using the configured
+radius and height. A bounding-box overlap test is deliberately avoided here
+because large irregular lobby collision meshes have bounding boxes that cover
+open walkable space.
 
 Args:
     folder (Folder): Generated NPC folder to ignore.
     ground_position (Vector3): Candidate floor point.
 
 Returns:
-    boolean: True when no collidable geometry occupies the body volume.
+    boolean: True when the candidate has clear vertical headroom.
 ]]
 local function approach_space_clear(
     folder: Folder,
     ground_position: Vector3
 ): boolean
-    local params = OverlapParams.new()
+    local params = RaycastParams.new()
     params.FilterType = Enum.RaycastFilterType.Exclude
     params.FilterDescendantsInstances = {folder}
+    params.RespectCanCollide = true
 
-    local parts = Workspace:GetPartBoundsInBox(
-        CFrame.new(
-            ground_position
-                + Vector3.new(0, APPROACH_HEIGHT / 2, 0)
-        ),
+    local origin = ground_position + Vector3.new(
+        0,
+        APPROACH_RAY_LIFT,
+        0
+    )
+    local result = Workspace:Raycast(
+        origin,
         Vector3.new(
-            APPROACH_WIDTH,
-            APPROACH_HEIGHT,
-            APPROACH_WIDTH
+            0,
+            APPROACH_HEIGHT - APPROACH_RAY_LIFT,
+            0
         ),
         params
     )
 
-    for _, part in ipairs(parts) do
-        if part.CanCollide then
-            local top = part.Position.Y + part.Size.Y / 2
-            if top > ground_position.Y + 0.6 then
-                return false
-            end
-        end
-    end
-
-    return true
+    return result == nil
 end
 
 --[[
