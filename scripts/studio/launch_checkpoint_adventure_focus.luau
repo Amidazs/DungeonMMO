@@ -15,6 +15,7 @@ local TESTS = table.freeze({
     "DungeonCheckpointQuestBridgeTest",
     "RuinSurveyCheckpointIntegrationTest",
     "FractureTrailMixedIntegrationTest",
+    "DungeonQuestFeedbackRuntimeTest",
 })
 
 --[[
@@ -64,8 +65,8 @@ local function main()
         run_test(test_name)
     end
 
-    print("[Checkpoint Adventure Focus] 5/5 PASS")
-    print("VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5")
+    print("[Checkpoint Adventure Focus] 6/6 PASS")
+    print("VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 6")
 end
 
 main()
