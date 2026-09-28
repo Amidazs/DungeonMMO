@@ -1,3 +1,18 @@
+**v3.50 COLLISION-GROUNDED NPCs + TERRAIN-FOLLOWING TRACKER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_50_Collision_Grounded_NPCs_Tracker_GREEN_20260928.md)
+and [evidence](
+../testing/collision-grounded-npcs-tracker-v3-50-green-20260928.md).
+The restricted TEST Base has been republished after correcting the two
+remaining friend-test presentation defects. Quest-giver placement now ignores
+non-colliding decorative scenery, evaluates real collision-floor candidates,
+and uses precise headroom plus player pathfinding rather than coarse mesh
+bounding boxes. The tutorial tracker is now a fixed terrain-following chain of
+short floor markers and arrows rather than long interpolated ribbon segments.
+Fresh published-cloud validation returned 8/8 walkable NPCs with zero bad
+collidable support, and the Worldroot tracker retained 33/33 pieces after
+13.41 studs of movement with zero replacements and a maximum measured floor
+offset of 0.183 stud. **Section D remains on hold for the user's friend test.**
+
 **v3.49 FRIEND-TEST NPC + GUIDE STABILITY — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_49_Friend_Test_NPC_Guide_Stability_GREEN_20260928.md)
 and [evidence](
