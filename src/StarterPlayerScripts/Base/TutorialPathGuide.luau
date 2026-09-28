@@ -9,11 +9,12 @@ local Guide = {}
 Guide.__index = Guide
 
 local FOLDER_NAME = "DungeonMMOTutorialGroundGuide"
-local SEGMENT_WIDTH = 0.56
-local SEGMENT_HEIGHT = 0.06
-local SEGMENT_OVERLAP = 0.35
+local MARKER_WIDTH = 0.34
+local MARKER_LENGTH = 1.05
+local MARKER_HEIGHT = 0.05
+local MARKER_SPACING = 3.25
 local FLOOR_LIFT = 0.09
-local ARROW_SPACING = 14
+local ARROW_SPACING = 13
 local PATH_REFRESH_SECONDS = 1
 local TARGET_REFRESH_DISTANCE = 1
 local HUE_SPEED = 0.025
@@ -149,7 +150,7 @@ local function create_arrow(
         create_visual_part(
             parent,
             "ArrowShaft" .. tostring(index),
-            Vector3.new(0.3, SEGMENT_HEIGHT, 1.55),
+            Vector3.new(0.3, MARKER_HEIGHT, 1.55),
             facing
         )
     )
@@ -165,7 +166,7 @@ local function create_arrow(
                     .. tostring(index)
                     .. "_"
                     .. tostring(angle),
-                Vector3.new(0.26, SEGMENT_HEIGHT, 1.05),
+                Vector3.new(0.26, MARKER_HEIGHT, 1.05),
                 tip
                     * CFrame.Angles(
                         0,
@@ -250,11 +251,13 @@ function Guide:_render(waypoints: {PathWaypoint})
     self:_clear_visuals()
 
     local character = self._player.Character
-    local positions = {}
+    local raw_positions = {}
+    local floor_positions = {}
 
     for _, waypoint in ipairs(waypoints) do
+        table.insert(raw_positions, waypoint.Position)
         table.insert(
-            positions,
+            floor_positions,
             floor_position(
                 waypoint.Position,
                 character,
@@ -263,41 +266,80 @@ function Guide:_render(waypoints: {PathWaypoint})
         )
     end
 
-    self._path_positions = positions
+    self._path_positions = floor_positions
 
-    local distance_to_next_arrow = 4
+    local distance_to_next_marker = 1.5
+    local distance_to_next_arrow = 5
+    local marker_index = 0
     local arrow_index = 0
 
-    for index = 1, #positions - 1 do
-        local start_position = positions[index]
-        local end_position = positions[index + 1]
+    for index = 1, #raw_positions - 1 do
+        local start_position = raw_positions[index]
+        local end_position = raw_positions[index + 1]
         local delta = end_position - start_position
         local length = delta.Magnitude
 
         if length > 0.2 then
-            local midpoint = start_position + delta / 2
-            local segment = create_visual_part(
-                self._folder,
-                "TrailSegment" .. tostring(index),
-                Vector3.new(
-                    SEGMENT_WIDTH,
-                    SEGMENT_HEIGHT,
-                    length + SEGMENT_OVERLAP
-                ),
-                CFrame.lookAt(
-                    midpoint,
-                    end_position
-                )
-            )
-            table.insert(self._visual_parts, segment)
+            local marker_distance = distance_to_next_marker
 
-            local local_distance = distance_to_next_arrow
-            while local_distance <= length - 0.75 do
-                arrow_index += 1
-                local alpha = local_distance / length
-                local arrow_position = start_position:Lerp(
+            while marker_distance <= length do
+                marker_index += 1
+
+                local alpha = marker_distance / length
+                local raw_marker = start_position:Lerp(
                     end_position,
                     alpha
+                )
+                local marker_position = floor_position(
+                    raw_marker,
+                    character,
+                    self._folder
+                )
+                local flat_target = Vector3.new(
+                    end_position.X,
+                    marker_position.Y,
+                    end_position.Z
+                )
+
+                if (
+                    flat_target - marker_position
+                ).Magnitude >= 0.1
+                then
+                    local marker = create_visual_part(
+                        self._folder,
+                        "TrailMarker" .. tostring(marker_index),
+                        Vector3.new(
+                            MARKER_WIDTH,
+                            MARKER_HEIGHT,
+                            MARKER_LENGTH
+                        ),
+                        CFrame.lookAt(
+                            marker_position,
+                            flat_target
+                        )
+                    )
+                    table.insert(self._visual_parts, marker)
+                end
+
+                marker_distance += MARKER_SPACING
+            end
+
+            distance_to_next_marker =
+                marker_distance - length
+
+            local arrow_distance = distance_to_next_arrow
+            while arrow_distance <= length - 0.75 do
+                arrow_index += 1
+
+                local alpha = arrow_distance / length
+                local raw_arrow = start_position:Lerp(
+                    end_position,
+                    alpha
+                )
+                local arrow_position = floor_position(
+                    raw_arrow,
+                    character,
+                    self._folder
                 )
                 local arrow_parts = create_arrow(
                     self._folder,
@@ -305,21 +347,16 @@ function Guide:_render(waypoints: {PathWaypoint})
                     end_position,
                     arrow_index
                 )
+
                 for _, part in ipairs(arrow_parts) do
-                    table.insert(
-                        self._visual_parts,
-                        part
-                    )
+                    table.insert(self._visual_parts, part)
                 end
 
-                local_distance += ARROW_SPACING
+                arrow_distance += ARROW_SPACING
             end
 
-            distance_to_next_arrow = local_distance - length
-
-            if distance_to_next_arrow < 0.75 then
-                distance_to_next_arrow += ARROW_SPACING
-            end
+            distance_to_next_arrow =
+                arrow_distance - length
         end
     end
 end
