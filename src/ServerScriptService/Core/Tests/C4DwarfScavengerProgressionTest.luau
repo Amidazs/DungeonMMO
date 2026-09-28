@@ -71,10 +71,10 @@ local function main()
         "Scavenger has 49 source rank rows"
     )
     check(
-        coverage.SourceRankEntriesByLevel[20] == 14
-            and coverage.SourceRankEntriesByLevel[24] == 12
-            and coverage.SourceRankEntriesByLevel[28] == 23,
-        "Scavenger keeps exact 14/12/23 source brackets"
+        coverage.SourceRankEntriesByLevel[20] == 15
+            and coverage.SourceRankEntriesByLevel[24] == 15
+            and coverage.SourceRankEntriesByLevel[28] == 19,
+        "Scavenger keeps exact 15/15/19 source brackets"
     )
     check(
         coverage.TrainerMappedRankEntries == 49,
