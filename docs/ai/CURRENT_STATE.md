@@ -1,3 +1,37 @@
+## 28 September 2026 — CURRENT v3.31 profession-aware Adventure content GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_31_Profession_Aware_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/profession-quest-content-v3-31-green-20260928.md).
+
+The first profession-aware launch Adventure is green.
+
+Accepted:
+
+- ordered Adventure chain:
+  Worldroot Relic -> Mine Echoes -> Provisions for the Next Expedition;
+- Provisioning requires one fresh clear of both launch dungeons;
+- no gathering/crafting profession is required to complete it;
+- atomic reward:
+  **75 Gold + 2 Deep Iron Ore + 2 Moonpetal + 2 Thick Hide**;
+- off-profession quest rewards can enter the real market and feed another
+  player's crafting progression;
+- physical Base Adventure Board prompt contract is green;
+- current-head contextual UI renders Start / Locked / In Progress /
+  Claim Reward states and closes outside board range.
+
+Fresh markers:
+
+- `VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 8`;
+- `VERIFIED_ADVENTURE_BOARD_V2_INITIAL_RENDER_PASS`;
+- `VERIFIED_ADVENTURE_BOARD_V2_READY_RENDER_PASS`;
+- `VERIFIED_ADVENTURE_BOARD_V2_DISTANCE_CLOSE_PASS`.
+
+Next: audit Adventure eligibility against every currently creation-enabled
+race/class, then continue launch-level quest/content expansion. Profession
+participation must remain optional for core progression.
+
 ## 28 September 2026 — CURRENT v3.30 live Dungeon Skinning GREEN
 
 [Roadmap](
