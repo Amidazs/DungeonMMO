@@ -23,6 +23,12 @@ local ReputationService = require(script.Parent:WaitForChild("ReputationService"
 local SkillBookDropConfig = require(
     ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared"):WaitForChild("SkillBookDropConfig")
 )
+local ProfessionBlueprintDropConfig = require(
+    ReplicatedStorage
+        :WaitForChild("Core")
+        :WaitForChild("Shared")
+        :WaitForChild("ProfessionBlueprintDropConfig")
+)
 
 local function roll_skill_book(definition: any, rng: any): string?
     if not definition then
@@ -39,6 +45,42 @@ local function roll_skill_book(definition: any, rng: any): string?
     end
 
     return SkillBookDropConfig.roll(definition, rng)
+end
+
+--[[
+Rolls one optional profession blueprint independently of normal loot.
+
+Args:
+    definition (any): Optional boss/completion blueprint definition.
+    rng (any): Server-owned random provider.
+
+Returns:
+    string?: Blueprint item identifier or nil when the roll misses.
+]]
+local function roll_profession_blueprint(
+    definition: any,
+    rng: any
+): string?
+    if not definition then
+        return nil
+    end
+
+    if RunService:IsStudio() then
+        if Workspace:GetAttribute(
+            "TEST_BlockProfessionBlueprintDrop"
+        ) == true then
+            return nil
+        end
+        if Workspace:GetAttribute(
+            "TEST_ForceProfessionBlueprintDrop"
+        ) == true then
+            return ProfessionBlueprintDropConfig.first_item(
+                definition
+            )
+        end
+    end
+
+    return ProfessionBlueprintDropConfig.roll(definition, rng)
 end
 
 local RewardService = {}
@@ -82,6 +124,8 @@ local function result_from_completion_record(transaction_id: string, record: any
         gold_granted = record.GoldGranted or 0,
         item_id = record.ItemId,
         skill_book_item_id = record.SkillBookItemId,
+        profession_blueprint_item_id =
+            record.ProfessionBlueprintItemId,
         applied_at = record.AppliedAt,
     }
 end
@@ -263,6 +307,8 @@ function RewardService:grant_monster_reward(
                 xp_granted = existing_history.XPGranted or 0,
                 gold_granted = existing_history.GoldGranted or 0,
                 skill_book_item_id = existing_history.SkillBookItemId,
+                profession_blueprint_item_id =
+                    existing_history.ProfessionBlueprintItemId,
                 levels_gained = existing_history.LevelsGained or 0,
                 new_level = existing_history.NewLevel or existing_character.Level,
                 carried_xp = existing_history.CarriedXP or existing_character.XP,
@@ -302,6 +348,8 @@ function RewardService:grant_monster_reward(
                         xp_granted = already.XPGranted or 0,
                         gold_granted = already.GoldGranted or 0,
                         skill_book_item_id = already.SkillBookItemId,
+                        profession_blueprint_item_id =
+                            already.ProfessionBlueprintItemId,
                         levels_gained = already.LevelsGained or 0,
                         new_level = already.NewLevel or character.Level,
                         carried_xp = already.CarriedXP or character.XP,
@@ -392,12 +440,52 @@ function RewardService:grant_monster_reward(
                     end
                 end
 
+                local profession_blueprint_item_id: string? = nil
+                if type(monster_reward.BossId) == "string"
+                    and monster_reward.BossId ~= ""
+                then
+                    local blueprint_definition =
+                        ProfessionBlueprintDropConfig.get_boss(
+                            monster_reward.BossId
+                        )
+                    profession_blueprint_item_id =
+                        roll_profession_blueprint(
+                            blueprint_definition,
+                            self._rng
+                        )
+
+                    if profession_blueprint_item_id then
+                        local blueprint_result =
+                            InventoryService.apply_item_to_character(
+                                character,
+                                profession_blueprint_item_id,
+                                1
+                            )
+                        if blueprint_result.ok ~= true then
+                            error(
+                                blueprint_result.reason
+                                    or "BossProfessionBlueprintApplyFailed"
+                            )
+                        end
+
+                        print(string.format(
+                            "[Profession Blueprint Drop] "
+                                .. "Source=Boss:%s UserId=%d Item=%s",
+                            monster_reward.BossId,
+                            user_id,
+                            profession_blueprint_item_id
+                        ))
+                    end
+                end
+
                 local record = {
                     SessionId = session_id,
                     AppliedAt = self._clock(),
                     XPGranted = monster_reward.XP,
                     GoldGranted = gold_roll,
                     SkillBookItemId = skill_book_item_id,
+                    ProfessionBlueprintItemId =
+                        profession_blueprint_item_id,
                     LevelsGained = xp_result.levels_gained,
                     NewLevel = xp_result.new_level,
                     CarriedXP = xp_result.carried_xp,
@@ -421,6 +509,8 @@ function RewardService:grant_monster_reward(
                     xp_granted = record.XPGranted,
                     gold_granted = record.GoldGranted,
                     skill_book_item_id = record.SkillBookItemId,
+                    profession_blueprint_item_id =
+                        record.ProfessionBlueprintItemId,
                     levels_gained = record.LevelsGained,
                     new_level = record.NewLevel,
                     carried_xp = record.CarriedXP,
@@ -594,6 +684,7 @@ function RewardService:grant_completion(
     local roll_rng = rng or self._rng
     local item_id = roll_loot(reward_definition.LootTable, roll_rng)
     local skill_book_item_id: string? = nil
+    local profession_blueprint_item_id: string? = nil
     if type(skill_book_source_id) == "string"
         and skill_book_source_id ~= ""
     then
@@ -601,6 +692,16 @@ function RewardService:grant_completion(
             SkillBookDropConfig.get_completion(skill_book_source_id)
         skill_book_item_id =
             roll_skill_book(drop_definition, roll_rng)
+
+        local blueprint_definition =
+            ProfessionBlueprintDropConfig.get_completion(
+                skill_book_source_id
+            )
+        profession_blueprint_item_id =
+            roll_profession_blueprint(
+                blueprint_definition,
+                roll_rng
+            )
     end
     local applied_result: any = nil
     local mutated, mutate_error = self._profiles:mutate(user_id, function(profile: any)
@@ -643,6 +744,29 @@ function RewardService:grant_completion(
             ))
         end
 
+        if profession_blueprint_item_id then
+            local blueprint_result =
+                InventoryService.apply_item_to_character(
+                    character,
+                    profession_blueprint_item_id,
+                    1
+                )
+            if blueprint_result.ok ~= true then
+                error(
+                    blueprint_result.reason
+                        or "CompletionProfessionBlueprintApplyFailed"
+                )
+            end
+
+            print(string.format(
+                "[Profession Blueprint Drop] "
+                    .. "Source=Completion:%s UserId=%d Item=%s",
+                skill_book_source_id,
+                user_id,
+                profession_blueprint_item_id
+            ))
+        end
+
         local record = {
             SessionId = session_id,
             Slot = slot,
@@ -650,6 +774,8 @@ function RewardService:grant_completion(
             GoldGranted = reward_definition.Gold,
             ItemId = item_id,
             SkillBookItemId = skill_book_item_id,
+            ProfessionBlueprintItemId =
+                profession_blueprint_item_id,
         }
         history[transaction_id] = record
         applied_result = result_from_completion_record(transaction_id, record, false)
