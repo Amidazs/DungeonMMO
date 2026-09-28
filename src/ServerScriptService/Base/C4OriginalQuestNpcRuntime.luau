@@ -97,6 +97,63 @@ local NPCS = table.freeze({
             Color = Color3.fromRGB(75, 110, 130),
         }),
     }),
+    DwarfArtisan = table.freeze({
+        table.freeze({
+            TargetId = "ForgekeeperOrda",
+            Name = "Forgekeeper Orda",
+            Offset = Vector3.new(-10, 2.5, 0),
+            Color = Color3.fromRGB(133, 94, 56),
+        }),
+        table.freeze({
+            TargetId = "MasterSmithVarka",
+            Name = "Master Smith Varka",
+            Offset = Vector3.new(0, 2.5, -8),
+            Color = Color3.fromRGB(104, 92, 72),
+        }),
+        table.freeze({
+            TargetId = "SmithDorrin",
+            Name = "Smith Dorrin",
+            Offset = Vector3.new(10, 2.5, 0),
+            Color = Color3.fromRGB(117, 82, 52),
+        }),
+    }),
+    DwarfScavenger = table.freeze({
+        table.freeze({
+            TargetId = "SalvageMasterVeyda",
+            Name = "Salvage Master Veyda",
+            Offset = Vector3.new(-12, 2.5, 9),
+            Color = Color3.fromRGB(112, 86, 62),
+        }),
+        table.freeze({
+            TargetId = "QuartermasterBrel",
+            Name = "Quartermaster Brel",
+            Offset = Vector3.new(-6, 2.5, 17),
+            Color = Color3.fromRGB(125, 103, 71),
+        }),
+        table.freeze({
+            TargetId = "ProspectorNessa",
+            Name = "Prospector Nessa",
+            Offset = Vector3.new(2, 2.5, 17),
+            Color = Color3.fromRGB(96, 104, 91),
+        }),
+        table.freeze({
+            TargetId = "GatewardenHarl",
+            Name = "Gatewarden Harl",
+            Offset = Vector3.new(10, 2.5, 17),
+            Color = Color3.fromRGB(89, 94, 105),
+        }),
+        table.freeze({
+            TargetId = "WandererKest",
+            Name = "Wanderer Kest",
+            Offset = Vector3.new(14, 2.5, 9),
+            Color = Color3.fromRGB(93, 82, 73),
+        }),
+    }),
+})
+
+local BRANCH_ANCHORS = table.freeze({
+    DwarfArtisan = "Base.DwarfQuestHub",
+    DwarfScavenger = "Base.DwarfQuestHub",
 })
 
 local function response(ok: boolean, reason: string?): any
@@ -148,6 +205,7 @@ function Runtime.attach(options: any): any
         _on_progress = options.on_progress,
         _parts = {},
         _step_parts = {},
+        _sources_by_target = {},
         _pending = {},
         _last_action = {},
         _event_counter = 0,
@@ -160,7 +218,21 @@ function Runtime.attach(options: any): any
     self._folder = folder
     for branch_id, source_npcs in pairs(NPCS) do
         self._step_parts[branch_id] = {}
-        for step_index, source in ipairs(source_npcs) do
+        self._sources_by_target[branch_id] = {}
+
+        local anchor_key = BRANCH_ANCHORS[branch_id]
+        local anchor = if anchor_key
+            then options.environment:get(anchor_key)
+            else spawn
+
+        if not anchor then
+            continue
+        end
+
+        local quest = Stages.get(branch_id)
+        for _, source in ipairs(source_npcs) do
+            self._sources_by_target[branch_id][source.TargetId] = source
+
             local part = Instance.new("Part")
             part.Name = source.TargetId
             part.Size = Vector3.new(3, 5, 3)
@@ -168,7 +240,7 @@ function Runtime.attach(options: any): any
             part.CanCollide = false
             part.Color = source.Color
             part.Material = Enum.Material.Wood
-            part.CFrame = spawn.CFrame * CFrame.new(source.Offset)
+            part.CFrame = anchor.CFrame * CFrame.new(source.Offset)
             part.Parent = folder
 
             local prompt = Instance.new("ProximityPrompt")
@@ -184,37 +256,23 @@ function Runtime.attach(options: any): any
                 branch_id ~= "HumanWarrior"
                 and branch_id ~= "HumanKnight"
             prompt.Parent = part
-            self._step_parts[branch_id][step_index] = part
-            if step_index == 1 then
-                self._parts[branch_id] = part
+
+            if quest then
+                for step_index, step in ipairs(quest.Steps) do
+                    if step.Kind == "NpcTalk"
+                        and step.TargetId == source.TargetId
+                    then
+                        self._step_parts[branch_id][step_index] = part
+                        if step_index == 1 then
+                            self._parts[branch_id] = part
+                        end
+                    end
+                end
             end
+
             prompt.Triggered:Connect(function(player: Player)
-                self:_talk(player, branch_id, step_index)
+                self:_talk(player, branch_id, source.TargetId)
             end)
-        end
-        -- The same physical mentor accepts a later return only when
-        -- this character has actually earned its ordered stage-four proof.
-        self._step_parts[branch_id][4] =
-            self._step_parts[branch_id][2]
-        if branch_id == "HumanWarrior"
-            or branch_id == "HumanKnight"
-            or branch_id == "HumanWizard"
-            or branch_id == "ElvenKnight"
-        then
-            self._step_parts[branch_id][6] =
-                self._step_parts[branch_id][1]
-        elseif branch_id == "HumanRogue" then
-            -- Stage five is a new ordered report to the real captain,
-            -- not a replay of the stage-one quest-start interaction.
-            self._step_parts[branch_id][5] =
-                self._step_parts[branch_id][1]
-            self._step_parts[branch_id][7] =
-                self._step_parts[branch_id][1]
-        elseif branch_id == "ElvenScout" then
-            self._step_parts[branch_id][8] =
-                self._step_parts[branch_id][2]
-            self._step_parts[branch_id][9] =
-                self._step_parts[branch_id][1]
         end
     end
     Players.PlayerRemoving:Connect(function(player: Player)
@@ -293,94 +351,109 @@ Returns:
     any: Server-validated quest stage or a safe explicit refusal.
 ]]
 function Runtime:_talk(
-    player: Player, branch_id: string, step_index: number?
+    player: Player,
+    branch_id: string,
+    target_id: string
 ): any
-    local index = step_index or 1
     local character = self._profiles:get_character(player.UserId)
     local advancement = character and character.ClassAdvancement
     local current = advancement
         and advancement.OriginalFirstTransferQuest
-    if current and index == 2
-        and (current.Step == 4
-            or branch_id == "ElvenScout" and current.Step == 8)
-    then
-        index = current.Step
-    elseif current and index == 1
-        and (branch_id == "HumanRogue"
-            and (current.Step == 5 or current.Step == 7)
-            or branch_id == "ElvenScout" and current.Step == 9
-            or (branch_id == "HumanWarrior"
-                or branch_id == "HumanKnight"
-                or branch_id == "HumanWizard"
-                or branch_id == "ElvenKnight") and current.Step == 6)
-    then
-        index = current.Step
+    local quest = Stages.get(branch_id)
+
+    if not quest then
+        return response(false, "OriginalQuestWorldNotReady")
     end
-    local source_index = if index == 4 or index == 8
-        then 2 elseif index == 5 or index == 7 or index == 9
-            or (branch_id == "HumanWarrior"
-                or branch_id == "HumanKnight"
-                or branch_id == "HumanWizard"
-                or branch_id == "ElvenKnight") and index == 6
-        then 1 else index
-    local source = NPCS[branch_id] and NPCS[branch_id][source_index]
+
+    local index = if type(current) == "table"
+        then current.Step
+        else 1
+    local step = quest.Steps[index]
+    local source = self._sources_by_target[branch_id]
+        and self._sources_by_target[branch_id][target_id]
     local part = self._step_parts[branch_id]
         and self._step_parts[branch_id][index]
-    if not source or not part or not nearby(player, part)
+
+    if not step
+        or step.Kind ~= "NpcTalk"
+        or step.TargetId ~= target_id
+        or not source
+        or not part
+        or part.Name ~= target_id
+        or not nearby(player, part)
         or not self._is_ready(player)
     then
         return response(false, "OriginalNpcUnavailable")
     end
+
     local now = os.clock()
     if now - (self._last_action[player.UserId] or -math.huge) < 0.65 then
         return response(false, "OriginalNpcInteractionCooldown")
     end
     self._last_action[player.UserId] = now
+
     if not advancement
         or advancement.OriginalFirstTransferChoiceId ~= branch_id
     then
         return response(false, "OriginalClassChoiceRequired")
     end
-    local quest = Stages.get(branch_id)
-    if not quest or not self:available(quest) then
+
+    if not self:available(quest, 1) then
         return response(false, "OriginalQuestWorldNotReady")
     end
+
     if index == 1
         and type(advancement.OriginalFirstTransferQuest) ~= "table"
     then
         local started = self._quest_service:start(player.UserId)
-        if not started.ok then return started end
+        if not started.ok then
+            return started
+        end
     end
+
     local state = self._quest_service:build_snapshot(player.UserId)
-    if not state.ok or not state.Started or state.Step ~= index
+    if not state.ok
+        or not state.Started
+        or state.Step ~= index
         or not self:available(quest, index)
     then
         return response(false, "OriginalQuestNextWorldStagePending")
     end
+
     self._event_counter += 1
-    local event_id = "BaseSourceNPC:" .. tostring(self._event_counter)
-        .. ":" .. tostring(player.UserId)
+    local event_id = "BaseSourceNPC:"
+        .. tostring(self._event_counter)
+        .. ":"
+        .. tostring(player.UserId)
     local event = {
         Kind = "NpcTalk",
-        TargetId = source.TargetId,
+        TargetId = target_id,
         ActorUserId = player.UserId,
         EventId = event_id,
         -- Only the real ordered Vela stage may enter the transaction that
         -- atomically mints both owner-bound quest trial weapons.
-        TrialWeaponsGranted = branch_id == "HumanRogue" and index == 2,
+        TrialWeaponsGranted =
+            branch_id == "HumanRogue" and index == 2,
     }
+
     self._pending[player.UserId] = {
-        Event = event, EventId = event_id,
-        BranchId = branch_id, Step = index,
-        TargetId = source.TargetId,
+        Event = event,
+        EventId = event_id,
+        BranchId = branch_id,
+        Step = index,
+        TargetId = target_id,
     }
+
     local progress = self._quest_service:record_world_event(
-        player.UserId, event
+        player.UserId,
+        event
     )
     self._pending[player.UserId] = nil
+
     if progress.ok then
         self._on_progress(player)
     end
+
     return progress
 end
 
