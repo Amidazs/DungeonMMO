@@ -42,18 +42,45 @@ local MAX_TRACKER_HEIGHT = 360
 local TRACKER_WIDTH = 330
 local JOURNAL_ROW_HEIGHT = 168
 
-local starter_scripts = script.Parent.Parent
-local base_folder = starter_scripts:FindFirstChild("Base")
+local player_scripts = player:WaitForChild("PlayerScripts")
 local ground_guide: any = nil
 
-if base_folder then
-    local TutorialPathGuide = require(
-        base_folder:WaitForChild("TutorialPathGuide")
+--[[
+Creates the Base-only floor guide once the Base client folder is replicated.
+
+Core scripts can start before the sibling Base folder is copied into
+PlayerScripts, so this is intentionally lazy instead of checking only once
+during module startup.
+
+Args:
+    None.
+
+Returns:
+    any?: Quest tracking guide in Base, or nil in Dungeon.
+]]
+local function ensure_ground_guide(): any?
+    if ground_guide then
+        return ground_guide
+    end
+
+    local base_folder = player_scripts:FindFirstChild("Base")
+    if not base_folder then
+        return nil
+    end
+
+    local guide_module = base_folder:FindFirstChild(
+        "TutorialPathGuide"
     )
+    if not guide_module or not guide_module:IsA("ModuleScript") then
+        return nil
+    end
+
+    local TutorialPathGuide = require(guide_module)
     ground_guide = TutorialPathGuide.new(
         player,
         "DungeonMMOQuestTrackingGuide"
     )
+    return ground_guide
 end
 
 local previous = player_gui:FindFirstChild(GUI_NAME)
@@ -365,12 +392,13 @@ Returns:
     nil: Clears guidance in Dungeon or when no valid tracked target exists.
 ]]
 local function update_base_guidance()
-    if not ground_guide then
+    local guide = ensure_ground_guide()
+    if not guide then
         return
     end
 
     if tutorial_owns_guidance() then
-        ground_guide:clear()
+        guide:clear()
         return
     end
 
@@ -391,7 +419,7 @@ local function update_base_guidance()
     end
 
     if not definition or not state then
-        ground_guide:clear()
+        guide:clear()
         return
     end
 
@@ -402,7 +430,7 @@ local function update_base_guidance()
         )
 
     if not navigation then
-        ground_guide:clear()
+        guide:clear()
         return
     end
 
@@ -411,9 +439,9 @@ local function update_base_guidance()
         else find_environment_anchor(navigation.Id)
 
     if target then
-        ground_guide:set_target(target)
+        guide:set_target(target)
     else
-        ground_guide:clear()
+        guide:clear()
     end
 end
 
