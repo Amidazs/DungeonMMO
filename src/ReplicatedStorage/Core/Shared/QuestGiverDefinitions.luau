@@ -10,7 +10,8 @@ local GIVERS = table.freeze({
         QuestIds = table.freeze({
             "WorldrootRelic",
         }),
-        Offset = CFrame.new(-18, 3, 6),
+        AnchorId = "Base.Service.Travel",
+        Offset = CFrame.new(-10, 3, 10),
     }),
     Huntmaster = table.freeze({
         Id = "Huntmaster",
@@ -18,7 +19,8 @@ local GIVERS = table.freeze({
         QuestIds = table.freeze({
             "ForestWolfBounty",
         }),
-        Offset = CFrame.new(-9, 3, 12),
+        AnchorId = "Base.TrainingArea",
+        Offset = CFrame.new(-8, 3, -2),
     }),
     VillageCaptain = table.freeze({
         Id = "VillageCaptain",
@@ -27,7 +29,8 @@ local GIVERS = table.freeze({
             "MarauderCaptainBounty",
             "DungeonBossHunt",
         }),
-        Offset = CFrame.new(0, 3, 14),
+        AnchorId = "Base.PlayerSpawn",
+        Offset = CFrame.new(10, 3, -6),
     }),
     TempleArchivist = table.freeze({
         Id = "TempleArchivist",
@@ -38,7 +41,8 @@ local GIVERS = table.freeze({
             "FractureTrail",
             "TempleWardDefense",
         }),
-        Offset = CFrame.new(10, 3, 12),
+        AnchorId = "Base.TemplePortal",
+        Offset = CFrame.new(12, 3, 7),
     }),
     MineWarden = table.freeze({
         Id = "MineWarden",
@@ -47,7 +51,8 @@ local GIVERS = table.freeze({
             "MineEchoes",
             "CorruptedForemanBounty",
         }),
-        Offset = CFrame.new(18, 3, 6),
+        AnchorId = "Base.DwarfQuestHub",
+        Offset = CFrame.new(9, 3, -5),
     }),
     ExpeditionPathfinder = table.freeze({
         Id = "ExpeditionPathfinder",
@@ -55,7 +60,8 @@ local GIVERS = table.freeze({
         QuestIds = table.freeze({
             "RuinSurvey",
         }),
-        Offset = CFrame.new(18, 3, -6),
+        AnchorId = "Base.DungeonBoard",
+        Offset = CFrame.new(-10, 3, 7),
     }),
     SurveyCorps = table.freeze({
         Id = "SurveyCorps",
@@ -63,7 +69,8 @@ local GIVERS = table.freeze({
         QuestIds = table.freeze({
             "MineSurveyorEscort",
         }),
-        Offset = CFrame.new(9, 3, -12),
+        AnchorId = "Base.Travel.Dwarves",
+        Offset = CFrame.new(-9, 3, 8),
     }),
     ExpeditionQuartermaster = table.freeze({
         Id = "ExpeditionQuartermaster",
@@ -71,7 +78,8 @@ local GIVERS = table.freeze({
         QuestIds = table.freeze({
             "ExpeditionProvisioning",
         }),
-        Offset = CFrame.new(-10, 3, -12),
+        AnchorId = "Base.Travel.Market",
+        Offset = CFrame.new(-10, 3, -7),
     }),
 })
 
