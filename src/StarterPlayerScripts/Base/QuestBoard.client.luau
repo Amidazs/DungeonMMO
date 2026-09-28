@@ -4,6 +4,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
 local core = ReplicatedStorage:WaitForChild("Core")
@@ -18,6 +19,9 @@ local ItemDefinitions = require(
 )
 local QuestNarrativePresenter = require(
     shared:WaitForChild("QuestNarrativePresenter")
+)
+local QuestDefinitions = require(
+    shared:WaitForChild("QuestDefinitions")
 )
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
@@ -38,6 +42,9 @@ local action_result = remotes:WaitForChild(
 ) :: RemoteEvent
 local snapshot_remote = remotes:WaitForChild(
     "QuestSnapshot"
+) :: RemoteEvent
+local dialogue_open = remotes:WaitForChild(
+    "QuestDialogueOpen"
 ) :: RemoteEvent
 
 local WINDOW_NAME = "QuestBoard"
@@ -170,6 +177,7 @@ conversation_confirm.ZIndex = 21
 
 local latest: any = nil
 local board_anchor: BasePart? = nil
+local active_context_anchor: BasePart? = nil
 local distance_elapsed = 0
 local pending_quest_id: string? = nil
 local pending_action: string? = nil
@@ -724,10 +732,14 @@ local function set_visible(visible: boolean)
     panel.Visible = visible
 
     if visible then
+        if not active_context_anchor then
+            active_context_anchor = board_anchor
+        end
         request_snapshot()
     else
         pending_quest_id = nil
         pending_action = nil
+        active_context_anchor = nil
         close_conversation()
     end
 end
@@ -755,6 +767,7 @@ local function connect_board_prompt()
     local prompt = board_anchor:FindFirstChild("QuestBoardPrompt")
     if prompt and prompt:IsA("ProximityPrompt") then
         prompt.Triggered:Connect(function()
+            active_context_anchor = board_anchor
             WindowController.set_visible(WINDOW_NAME, true)
         end)
     end
@@ -770,7 +783,8 @@ Returns:
     None.
 ]]
 local function update_distance(delta: number)
-    if not panel.Visible or not board_anchor then
+    local context_anchor = active_context_anchor or board_anchor
+    if not panel.Visible or not context_anchor then
         return
     end
 
@@ -790,7 +804,7 @@ local function update_distance(delta: number)
     end
 
     if (
-        root.Position - board_anchor.Position
+        root.Position - context_anchor.Position
     ).Magnitude > ACCESS_DISTANCE then
         status.Text = "Moved away from Adventure Board."
         WindowController.set_visible(WINDOW_NAME, false)
@@ -822,6 +836,46 @@ conversation_confirm.Activated:Connect(function()
             conversation_mode
         )
     end
+end)
+
+dialogue_open.OnClientEvent:Connect(function(payload: any)
+    if type(payload) ~= "table" then
+        return
+    end
+
+    local anchor = payload.Anchor
+    if anchor ~= nil and anchor:IsA("BasePart") then
+        active_context_anchor = anchor
+    else
+        active_context_anchor = board_anchor
+    end
+
+    WindowController.set_visible(WINDOW_NAME, true)
+
+    if payload.ok ~= true then
+        close_conversation()
+        status.Text = "This quest giver has nothing new for you yet."
+        return
+    end
+
+    local quest_id = payload.QuestId
+    local mode = payload.Mode
+    local definition = type(quest_id) == "string"
+        and QuestDefinitions.get(quest_id)
+        or nil
+
+    if not definition
+        or type(mode) ~= "string"
+    then
+        close_conversation()
+        status.Text = "Quest dialogue is unavailable."
+        return
+    end
+
+    open_conversation(definition, mode)
+    status.Text = "Talking with "
+        .. QuestNarrativePresenter.speaker(definition.Id)
+        .. "."
 end)
 
 snapshot_remote.OnClientEvent:Connect(function(payload: any)
