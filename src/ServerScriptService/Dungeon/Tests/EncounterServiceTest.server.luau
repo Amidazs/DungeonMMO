@@ -102,4 +102,83 @@ check(boss_reward.XP == 40 and boss_reward.GoldMin == 15 and boss_reward.GoldMax
 check(boss_reward.BestiaryCreatureId == "marauder_captain", "Captain bestiary identity must reach RewardService.")
 boss:Destroy()
 
+-- Adventure enemy-defeat credit uses the server-authored creature species
+-- when an animal intentionally has no Bestiary identity.
+local quest_events = {}
+local fake_quests: any = {}
+
+function fake_quests:record_event(
+    user_id: number,
+    event: any
+): any
+    table.insert(quest_events, {
+        UserId = user_id,
+        Event = event,
+    })
+    return {ok = true}
+end
+
+local wolf = Instance.new("Model")
+wolf.Name = "ForestWolfQuestTest"
+wolf:SetAttribute("DungeonEnemyId", "WolfQuest1")
+wolf:SetAttribute("DungeonLifeIndex", 1)
+wolf:SetAttribute("DungeonRewardXP", 12)
+wolf:SetAttribute("DungeonRewardGoldMin", 4)
+wolf:SetAttribute("DungeonRewardGoldMax", 7)
+wolf:SetAttribute("CreatureSpeciesId", "forest_wolf")
+wolf:SetAttribute("BestiaryCreatureId", nil)
+
+local wolf_encounters = EncounterService.new(
+    fake_rewards,
+    "session-wolf-quest",
+    nil,
+    fake_quests
+)
+check(
+    wolf_encounters:start(
+        "WolfQuestEncounter",
+        {201, 202},
+        {wolf}
+    ).ok,
+    "Forest Wolf quest encounter must start."
+)
+wolf_encounters:mark_member_mode(202, "Spectating")
+
+local wolf_result = wolf_encounters:on_enemy_died(wolf)
+check(
+    wolf_result.ok == true
+        and wolf_result.cleared == true,
+    "Rewarded Forest Wolf death must clear its encounter."
+)
+check(
+    wolf:GetAttribute("BestiaryCreatureId") == nil,
+    "Adventure quest credit must not require Bestiary enrollment."
+)
+check(
+    #quest_events == 1
+        and quest_events[1].UserId == 201,
+    "Only active eligible member receives trusted wolf quest credit."
+)
+check(
+    quest_events[1].Event.Type == "EnemyDefeat"
+        and quest_events[1].Event.TargetId == "forest_wolf"
+        and quest_events[1].Event.Amount == 1,
+    "Species-only wolf death emits exact Forest Wolf quest identity."
+)
+check(
+    quest_events[1].Event.EventId
+        == "session-wolf-quest:WolfQuest1:Life1:EnemyDefeat",
+    "Wolf quest event uses the stable rewarded-life transaction ID."
+)
+
+local wolf_duplicate = wolf_encounters:on_enemy_died(wolf)
+check(
+    wolf_duplicate.ok == true
+        and wolf_duplicate.already_processed == true
+        and #quest_events == 1,
+    "Duplicate wolf death callback cannot emit duplicate quest credit."
+)
+
+wolf:Destroy()
+
 print(string.format("[Encounter Service Tests] PASS: %d assertions.", assertions))
