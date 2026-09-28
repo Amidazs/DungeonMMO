@@ -24,6 +24,8 @@ local MIN_GIVER_DISTANCE = 30
 local GROUND_RAY_HEIGHT = 70
 local GROUND_RAY_DEPTH = 180
 local MIN_GROUND_NORMAL_Y = 0.72
+local MAX_GROUND_SURFACES = 12
+local GROUND_STEP_EPSILON = 0.1
 local APPROACH_WIDTH = 5
 local APPROACH_HEIGHT = 6
 local SKIN_COLOR = Color3.fromRGB(196, 157, 119)
@@ -456,45 +458,62 @@ local function create_humanoid_giver(
 end
 
 --[[
-Projects a desired X/Z position onto the first solid ground surface.
+Finds collidable floor candidates beneath a desired X/Z position.
+
+The authored lobby contains decorative non-colliding meshes above its real
+collision floor. Candidates are therefore restricted to collidable surfaces
+and sorted by vertical proximity to the semantic anchor height.
 
 Args:
     folder (Folder): Generated NPC folder to ignore.
     desired (Vector3): Desired world-space position.
 
 Returns:
-    Vector3?: Ground surface position when found.
+    {Vector3}: Nearest-height walkable-looking floor candidates.
 ]]
-local function project_to_ground(
+local function ground_candidates(
     folder: Folder,
     desired: Vector3
-): Vector3?
+): {Vector3}
     local params = RaycastParams.new()
     params.FilterType = Enum.RaycastFilterType.Exclude
     params.FilterDescendantsInstances = {folder}
     params.IgnoreWater = false
     params.RespectCanCollide = true
 
-    local origin = desired + Vector3.new(
-        0,
-        GROUND_RAY_HEIGHT,
-        0
-    )
-    local result = Workspace:Raycast(
-        origin,
-        Vector3.new(0, -GROUND_RAY_DEPTH, 0),
-        params
-    )
+    local top_y = desired.Y + GROUND_RAY_HEIGHT
+    local bottom_y = top_y - GROUND_RAY_DEPTH
+    local ray_y = top_y
+    local candidates = {}
 
-    if not result then
-        return nil
+    for _ = 1, MAX_GROUND_SURFACES do
+        local remaining_depth = ray_y - bottom_y
+        if remaining_depth <= 0 then
+            break
+        end
+
+        local result = Workspace:Raycast(
+            Vector3.new(desired.X, ray_y, desired.Z),
+            Vector3.new(0, -remaining_depth, 0),
+            params
+        )
+        if not result then
+            break
+        end
+
+        if result.Normal.Y >= MIN_GROUND_NORMAL_Y then
+            table.insert(candidates, result.Position)
+        end
+
+        ray_y = result.Position.Y - GROUND_STEP_EPSILON
     end
 
-    if result.Normal.Y < MIN_GROUND_NORMAL_Y then
-        return nil
-    end
+    table.sort(candidates, function(a: Vector3, b: Vector3)
+        return math.abs(a.Y - desired.Y)
+            < math.abs(b.Y - desired.Y)
+    end)
 
-    return result.Position
+    return candidates
 end
 
 --[[
@@ -661,26 +680,28 @@ local function resolve_placement(
     for _, search_offset in ipairs(
         placement_search_offsets()
     ) do
-        local ground = project_to_ground(
-            folder,
+        local candidate_position =
             desired + search_offset
+        local grounds = ground_candidates(
+            folder,
+            candidate_position
         )
 
-        if ground
-            and giver_spacing_valid(
+        for _, ground in ipairs(grounds) do
+            if giver_spacing_valid(
                 placed_positions,
                 ground
-            )
-            and approach_space_clear(folder, ground)
-        then
-            local walkable, waypoint_count = validate_path(
-                spawn_position,
-                ground
-            )
-            if walkable then
-                return ground, waypoint_count, true, true
-            elseif not require_walkable then
-                return ground, 0, false, true
+            ) and approach_space_clear(folder, ground)
+            then
+                local walkable, waypoint_count = validate_path(
+                    spawn_position,
+                    ground
+                )
+                if walkable then
+                    return ground, waypoint_count, true, true
+                elseif not require_walkable then
+                    return ground, 0, false, true
+                end
             end
         end
     end
