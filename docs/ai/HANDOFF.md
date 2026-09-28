@@ -1,3 +1,46 @@
+## 28 September 2026 — v3.46 SECTION D READY / USER TEST HOLD
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_46_SECTION_D_READY_USER_TEST_HOLD_20260928.md);
+[manual checklist](
+../testing/pre-section-d-user-playtest-checklist-20260928.md).
+
+STOP POINT REQUESTED BY USER.
+
+The remaining pre-D presentation work is complete:
+
+- v3.44: eight physical Adventure quest-giver roles, all 13 Adventures mapped,
+  shared dialogue UI, server-selected Start/Review/Claim/Complete mode;
+- v3.45: world-space feedback for hidden panel, Resonant Seal puzzle,
+  Resonance Ward defense and Lost Surveyor escort.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 10`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 11`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 6`;
+`VERIFIED_PHYSICAL_QUEST_GIVER_DIALOGUE_PASS 1`;
+`VERIFIED_LIVE_TEMPLE_QUEST_FEEDBACK_PASS 3`.
+
+BaseRuntime and DungeonRuntime compile probes are green. Current Rojo Base and
+Dungeon builds are green.
+
+The v3.45 live run caught and fixed one feedback-only mismatch:
+`Moon` was corrected to the real physical ID `MoonRune`. Underlying puzzle
+authority was never broken.
+
+Section C's launch economy loop is sufficiently accepted to move to D; final
+crafting minigames, art and tuning remain later presentation/content work.
+
+**DO NOT START SECTION D** until the user reports their manual pre-D playtest
+and explicitly says to continue.
+
+Once released, first D work is the existing world-boss foundation's real
+four-player encounter gate, then raid mechanics/content, then guild
+competition/castle PvP rules.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+build/play evidence.
+
 ## 28 September 2026 — v3.43 Adventure dialogue GREEN
 
 [Roadmap](
