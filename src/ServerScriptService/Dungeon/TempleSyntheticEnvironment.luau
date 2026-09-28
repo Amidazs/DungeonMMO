@@ -111,6 +111,62 @@ local function create_hidden_tutorial(root: Instance)
     end
 end
 
+local function create_resonance_puzzle(root: Instance)
+    local puzzle = Instance.new("Folder")
+    puzzle.Name = "ResonancePuzzle"
+    puzzle:SetAttribute("DungeonMMOPuzzleId", "TempleResonanceLock")
+    puzzle.Parent = root
+
+    local shard = make_part(
+        puzzle,
+        "TempleResonanceShard",
+        Vector3.new(2, 3, 2),
+        CFrame.new(270, 2, -60)
+    )
+    shard.Material = Enum.Material.Neon
+    shard.Color = Color3.fromRGB(97, 181, 224)
+    shard.CanCollide = false
+    shard:SetAttribute(
+        "DungeonMMOQuestCollectibleId",
+        "TempleResonanceShard"
+    )
+
+    local runes = {
+        {
+            Name = "MoonRune",
+            CFrame = CFrame.new(220, 2, -145),
+        },
+        {
+            Name = "RootRune",
+            CFrame = CFrame.new(250, 2, -170),
+        },
+        {
+            Name = "FlameRune",
+            CFrame = CFrame.new(280, 2, -145),
+        },
+    }
+
+    for _, definition in ipairs(runes) do
+        local rune = make_part(
+            puzzle,
+            definition.Name,
+            Vector3.new(4, 4, 4),
+            definition.CFrame
+        )
+        rune.Material = Enum.Material.Neon
+        rune.Color = Color3.fromRGB(150, 117, 224)
+        rune.CanCollide = false
+        rune:SetAttribute(
+            "DungeonMMOPuzzleId",
+            "TempleResonanceLock"
+        )
+        rune:SetAttribute(
+            "DungeonMMOPuzzleRuneId",
+            definition.Name
+        )
+    end
+end
+
 local function create_route(parent: Instance)
     local existing = parent:FindFirstChild("DungeonMMOSyntheticTemple")
     if existing then
@@ -129,6 +185,7 @@ local function create_route(parent: Instance)
     make_part(root, "Corridor2", Vector3.new(18, 1, 40), CFrame.new(250, 0, -95))
     make_part(root, "Corridor3", Vector3.new(18, 1, 94), CFrame.new(250, 0, -228))
     create_hidden_tutorial(root)
+    create_resonance_puzzle(root)
 end
 
 function TempleSyntheticEnvironment.create(parent: Instance)
