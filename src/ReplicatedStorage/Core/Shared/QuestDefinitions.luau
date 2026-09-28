@@ -229,6 +229,42 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    FractureTrail = table.freeze({
+        Id = "FractureTrail",
+        DisplayName = "Follow the Fracture",
+        Kind = "Adventure",
+        MinimumLevel = 12,
+        PrerequisiteQuestId = "RuinSurvey",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "TraceTempleFracture",
+                Type = "CheckpointReached",
+                TargetId =
+                    "TestDungeon:EncounterStart:CombatRoom2",
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "PurgeMineSource",
+                Type = "DungeonClear",
+                TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 90,
+            Items = table.freeze({
+                table.freeze({
+                    ItemId = "warding_essence",
+                    Quantity = 2,
+                }),
+            }),
+        }),
+    }),
+
     MineEchoes = table.freeze({
         Id = "MineEchoes",
         DisplayName = "Echoes from the Abandoned Mine",
@@ -384,6 +420,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.MineEchoes,
         DEFINITIONS.RuinSurvey,
         DEFINITIONS.CorruptedForemanBounty,
+        DEFINITIONS.FractureTrail,
         DEFINITIONS.DungeonBossHunt,
         DEFINITIONS.ExpeditionProvisioning,
     })
