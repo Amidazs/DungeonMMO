@@ -1,3 +1,22 @@
+**v3.46 SECTION D READY — USER TEST HOLD:** [roadmap](
+DungeonMMO_Roadmap_v3_46_SECTION_D_READY_USER_TEST_HOLD_20260928.md) and
+[manual checklist](
+../testing/pre-section-d-user-playtest-checklist-20260928.md).
+The final pre-D presentation gates are green: [v3.44 physical quest givers](
+DungeonMMO_Roadmap_v3_44_Physical_Quest_Givers_GREEN_20260928.md) and
+[v3.45 Dungeon quest feedback](
+DungeonMMO_Roadmap_v3_45_Dungeon_Quest_Feedback_GREEN_20260928.md).
+All 13 Adventures now map to physical quest-giver roles using the shared
+dialogue system, and the hidden-room, escort, puzzle and defense mechanics have
+visible in-world state feedback. Fresh markers are
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 10`,
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 11`,
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 6`,
+`VERIFIED_PHYSICAL_QUEST_GIVER_DIALOGUE_PASS 1` and
+`VERIFIED_LIVE_TEMPLE_QUEST_FEEDBACK_PASS 3`.
+**Do not begin Section D until the user's manual playtest is complete and the
+hold is explicitly released.**
+
 **v3.43 ADVENTURE DIALOGUE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_43_Adventure_Dialogue_GREEN_20260928.md) and [evidence](
 ../testing/adventure-dialogue-v3-43-green-20260928.md).
