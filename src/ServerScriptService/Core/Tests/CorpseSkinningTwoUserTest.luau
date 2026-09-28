@@ -80,6 +80,14 @@ check(profiles:load(second.UserId) ~= nil,
     "second player must receive an independent in-memory profile")
 local inventory = Inventory.new(profiles)
 local professions = Professions.new(profiles, inventory)
+check(
+    professions:choose_profession(first.UserId, "Skinning").ok,
+    "first player explicitly selects Skinning"
+)
+check(
+    professions:choose_profession(second.UserId, "Skinning").ok,
+    "second player explicitly selects Skinning"
+)
 local corpse = create_corpse(Vector3.new(0, 5, 0))
 
 local first_result: any = nil
