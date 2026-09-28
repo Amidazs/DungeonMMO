@@ -1,3 +1,19 @@
+**v3.38 TRUSTED CHECKPOINT ADVENTURE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_38_Checkpoint_Adventure_GREEN_20260928.md)
+and [evidence](
+../testing/checkpoint-adventure-v3-38-green-20260928.md).
+Dungeon runtime now publishes server-owned `CheckpointReached` quest events
+after successful checkpoint activation. The first exploration Adventure,
+**Survey the Broken Ways**, is level 8 after Mine Echoes and requires the real
+Temple/Mine CombatRoom2 checkpoints. It rewards **60 Gold + one each of Deep
+Iron Bar, Moonpetal Extract, Reinforced Leather and Resonant Rune** without
+requiring a profession. Fresh Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 4`. The launch roadmap remains
+backend/content-first; final creature/NPC/animation/dialogue presentation still
+contains placeholders and should be replaced without rewriting these accepted
+server contracts.
+
 **v3.37 LEVEL-FIFTEEN DUAL-BOSS ADVENTURE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_37_Level15_Boss_Hunt_GREEN_20260928.md)
 and [evidence](
