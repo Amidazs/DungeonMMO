@@ -1,3 +1,19 @@
+**v3.33 OPTIONAL FOREST WOLF BOUNTY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_33_Forest_Wolf_Bounty_GREEN_20260928.md)
+and [evidence](
+../testing/forest-wolf-bounty-v3-33-green-20260928.md).
+The launch Adventure catalogue now includes the optional
+**Wolves at the Worldroot** side quest after Worldroot Relic. It requires two
+trusted `forest_wolf` defeats and pays **40 Gold only**; Mine Echoes remains
+independent, so the bounty cannot block the story chain. Validation found and
+fixed a real live-path defect: Forest Wolves intentionally have no Bestiary ID,
+so EncounterService now accepts the server-authored
+`CreatureSpeciesId = "forest_wolf"` as quest identity without enrolling the
+wolf in Bestiary progress. Fresh Play returned
+`VERIFIED_FOREST_WOLF_BOUNTY_BASE_PASS 5` and
+`VERIFIED_FOREST_WOLF_BOUNTY_DUNGEON_PASS 3`. Next gate is broader
+launch-level quest/content expansion using trusted server-owned events.
+
 **v3.32 CREATION-ENABLED ADVENTURE COVERAGE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_32_Adventure_Race_Coverage_GREEN_20260928.md)
 and [evidence](
