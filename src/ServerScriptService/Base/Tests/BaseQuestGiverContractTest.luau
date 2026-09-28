@@ -64,7 +64,10 @@ local function main()
             anchor:GetAttribute("DungeonMMOQuestGiverId")
                 == definition.Id
                 and anchor:GetAttribute("DungeonMMOQuestSpeaker")
-                    == definition.Speaker,
+                    == definition.Speaker
+                and anchor:GetAttribute(
+                    "DungeonMMOQuestGiverSourceAnchor"
+                ) == definition.AnchorId,
             definition.Id .. " exposes stable presentation attributes"
         )
 
