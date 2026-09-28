@@ -231,6 +231,16 @@ local function objective_label(objective: any): string
         elseif objective.TargetId == "AbandonedMine" then
             return "Clear the Abandoned Mine"
         end
+    elseif objective.Type == "CheckpointReached" then
+        if objective.TargetId
+            == "TestDungeon:EncounterStart:CombatRoom2"
+        then
+            return "Reach the Temple's inner approach"
+        elseif objective.TargetId
+            == "AbandonedMine:EncounterStart:CombatRoom2"
+        then
+            return "Reach the Mine's lower works"
+        end
     elseif objective.Type == "EnemyDefeat" then
         if objective.TargetId == "forest_wolf" then
             return "Defeat Forest Wolves"
