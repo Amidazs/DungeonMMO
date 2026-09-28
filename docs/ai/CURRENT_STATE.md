@@ -1,3 +1,40 @@
+## 28 September 2026 — CURRENT v3.27 Dwarf spatial binding GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_27_Dwarf_Spatial_GREEN_20260928.md);
+[evidence](
+../testing/c4-dwarf-spatial-v3-27-green-20260928.md).
+
+The Dwarf backend, world infrastructure and source spatial boundary are now
+green.
+
+Reviewed launch mapping: **14 source units / Roblox stud**. Exact source
+metadata remains unchanged. C4-style collision radii are added separately to
+castRange, matching the pinned CharacterAI source behavior.
+
+Accepted Dwarf salvage geometry:
+
+- Spoil castRange 40;
+- Spoil Festival castRange 40 + radius 200 = 14.29 studs;
+- Sweep castRange 20;
+- collision-adjusted horizontal target validation;
+- caster-centred same-encounter Festival selection;
+- source-reviewed Dungeon NPC/corpse boundary required;
+- range rejection occurs before scheduler/initial MP;
+- launch revalidates the target;
+- quest-pack enemies now receive the temporary Marauder source boundary.
+
+Fresh markers:
+`VERIFIED_C4_QUEST_PACK_SOURCE_BOUNDARY_PASS`,
+`VERIFIED_DWARF_SPATIAL_V2_PASS 4`,
+`VERIFIED_DWARF_BACKEND_SPATIAL_V2_PASS 27`.
+
+Source salvage remains disabled by default. Fresh Dwarf creation remains
+disabled. Final bespoke Dwarf NPC/monster art is content work.
+
+Next gate: audit and expand **professions/economy content** while preserving
+normal 1G+1C, Gearwright 1G+2C and Deepclaimer 2G+1C authority.
+
 ## 28 September 2026 — CURRENT v3.26 Dwarf world infrastructure GREEN
 
 [Roadmap](
