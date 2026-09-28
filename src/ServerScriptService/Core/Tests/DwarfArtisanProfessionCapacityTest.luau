@@ -88,6 +88,8 @@ local function award_gearwright(character: any)
             BranchId = "DwarfArtisan",
             Ready = true,
             Step = #quest.Steps + 1,
+            Count = 0,
+            AppliedEvents = {},
             Proofs = proofs,
         },
     }
