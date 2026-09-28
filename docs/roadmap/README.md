@@ -1,3 +1,18 @@
+**v3.52 LOOPING OBJECTIVE-WARD TUTORIAL FLOW — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_52_Looping_Objective_Flow_GREEN_20260929.md)
+and [evidence](
+../testing/looping-objective-flow-v3-52-green-20260929.md).
+The TEST Base tutorial guide now behaves as a continuously flowing navigation
+effect rather than a route that merely shortens behind the player. A stable
+pathfinding corridor is combined with a softly smoothed live player source,
+neutral dotted underlay, pooled directional arrows, an independent looping
+flow phase that always travels toward the objective, seam fade at the source
+and target, and delayed structural rerouting for local detours. Fresh
+published-cloud acceptance returned a 0.293-stud peak during a 5-stud sideways
+strafe and a 0.528-stud peak while walking 12 studs away, with 74/74 pooled
+guide parts surviving, 0 replacements and 0 floor misses. NPC grounding
+remains accepted. **Section D remains on hold for the user's friend test.**
+
 **v3.51 FLUID PLAYER-RELATIVE TUTORIAL TRACKER — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_51_Fluid_Player_Relative_Tracker_GREEN_20260929.md)
 and [evidence](
