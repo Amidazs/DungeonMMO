@@ -565,11 +565,13 @@ local BOSSES = table.freeze({
     MarauderCaptain = table.freeze({
         FactoryId = "MarauderCaptain",
         RewardKey = "MarauderCaptainReward",
+        BestiaryCreatureId = "marauder_captain",
         DisplayName = "Marauder Captain",
     }),
     CorruptedForeman = table.freeze({
         FactoryId = "CorruptedForeman",
         RewardKey = "MarauderCaptainReward",
+        BestiaryCreatureId = "corrupted_foreman",
         DisplayName = "Corrupted Foreman",
     }),
     TempleDepth2Boss = table.freeze({
