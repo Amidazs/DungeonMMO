@@ -254,6 +254,84 @@ check(
     "A second Mine reward request must not double-pay the quest."
 )
 
+check(
+    quests:start(5103, "ExpeditionProvisioning").ok,
+    "Completing Mine Echoes unlocks Expedition Provisioning."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ExpeditionProvisioning"
+    ).reason == "QuestNotReady",
+    "Provisioning cannot pay before both new clears."
+)
+
+local provisioning_temple = quests:record_event(5103, {
+    EventId = "story:provisioning-temple",
+    Type = "DungeonClear",
+    TargetId = DungeonDefinitions.TEST_DUNGEON.Id,
+    Amount = 1,
+})
+check(
+    provisioning_temple.ok,
+    "Provisioning accepts its fresh Temple clear."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ExpeditionProvisioning"
+    ).reason == "QuestNotReady",
+    "One of two Provisioning clears cannot ready the quest."
+)
+
+local provisioning_mine = quests:record_event(5103, {
+    EventId = "story:provisioning-mine",
+    Type = "DungeonClear",
+    TargetId = DungeonDefinitions.ABANDONED_MINE.Id,
+    Amount = 1,
+})
+check(
+    provisioning_mine.ok,
+    "Provisioning accepts its fresh Mine clear."
+)
+
+local provisioning_claim = quests:claim_reward(
+    5103,
+    "ExpeditionProvisioning"
+)
+check(
+    provisioning_claim.ok
+        and provisioning_claim.gold_granted == 75
+        and type(provisioning_claim.items_granted) == "table"
+        and #provisioning_claim.items_granted == 3,
+    "Provisioning atomically grants Gold and three trade materials."
+)
+
+rewarded = profiles:get_character(5103)
+check(
+    rewarded.Gold == 150
+        and InventoryService.count_item(
+            rewarded,
+            "deep_iron_ore"
+        ) == 2
+        and InventoryService.count_item(
+            rewarded,
+            "moonpetal"
+        ) == 2
+        and InventoryService.count_item(
+            rewarded,
+            "thick_hide"
+        ) == 2,
+    "Provisioning grants the exact advanced material bundle once."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ExpeditionProvisioning"
+    ).reason == "QuestAlreadyCompleted",
+    "Provisioning cannot be claimed twice."
+)
+
 local saved, save_error = profiles:save(5103, "StoryQuestTest")
 check(saved, "Story quest rewards must save: " .. tostring(save_error))
 local released, release_error = profiles:release(
@@ -268,18 +346,37 @@ local restored = profiles:get_character(5103)
 check(
     restored.Quests.Completed.WorldrootRelic == true
         and restored.Quests.Completed.MineEchoes == true
-        and restored.Gold == 75
+        and restored.Quests.Completed.ExpeditionProvisioning
+            == true
+        and restored.Gold == 150
         and InventoryService.count_item(
-            restored, "worldroot_relic"
-        ) == 1,
-    "Both story completions and the relic must persist after reload."
+            restored,
+            "worldroot_relic"
+        ) == 1
+        and InventoryService.count_item(
+            restored,
+            "deep_iron_ore"
+        ) == 2
+        and InventoryService.count_item(
+            restored,
+            "moonpetal"
+        ) == 2
+        and InventoryService.count_item(
+            restored,
+            "thick_hide"
+        ) == 2,
+    "All Adventure completions and Provisioning rewards persist."
 )
 check(
     quests:claim_reward(5103, "WorldrootRelic").reason
         == "QuestAlreadyCompleted"
         and quests:claim_reward(5103, "MineEchoes").reason
-            == "QuestAlreadyCompleted",
-    "Reloading a profile must never reset either claimed reward."
+            == "QuestAlreadyCompleted"
+        and quests:claim_reward(
+            5103,
+            "ExpeditionProvisioning"
+        ).reason == "QuestAlreadyCompleted",
+    "Reloading a profile never resets any claimed Adventure reward."
 )
 check(
     profiles:get_character(5102).Quests.Completed.MineEchoes ~= true,
