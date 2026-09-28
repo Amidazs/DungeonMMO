@@ -134,6 +134,29 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    MarauderCaptainBounty = table.freeze({
+        Id = "MarauderCaptainBounty",
+        DisplayName = "The Captain's Price",
+        Kind = "Adventure",
+        MinimumLevel = 5,
+        PrerequisiteQuestId = "WorldrootRelic",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "DefeatMarauderCaptain",
+                Type = "EnemyDefeat",
+                TargetId = "marauder_captain",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 60,
+        }),
+    }),
+
     MineEchoes = table.freeze({
         Id = "MineEchoes",
         DisplayName = "Echoes from the Abandoned Mine",
@@ -256,6 +279,7 @@ function QuestDefinitions.adventures(): {any}
     return table.freeze({
         DEFINITIONS.WorldrootRelic,
         DEFINITIONS.ForestWolfBounty,
+        DEFINITIONS.MarauderCaptainBounty,
         DEFINITIONS.MineEchoes,
         DEFINITIONS.ExpeditionProvisioning,
     })
