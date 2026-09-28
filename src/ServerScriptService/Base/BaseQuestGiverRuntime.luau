@@ -294,8 +294,19 @@ function Runtime.attach(options: any): any
     for _, definition in ipairs(
         QuestGiverDefinitions.all()
     ) do
-        local source_anchor = assert(
-            options.environment:get(definition.AnchorId),
+        local source_anchor =
+            options.environment:get(definition.AnchorId)
+
+        if not source_anchor
+            and type(definition.FallbackAnchorId) == "string"
+        then
+            source_anchor = options.environment:get(
+                definition.FallbackAnchorId
+            )
+        end
+
+        assert(
+            source_anchor ~= nil,
             "Quest giver anchor missing: "
                 .. tostring(definition.AnchorId)
         )
