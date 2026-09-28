@@ -95,6 +95,7 @@ local function floor_position(
         table.insert(excluded, character)
     end
     params.FilterDescendantsInstances = excluded
+    params.RespectCanCollide = true
 
     local result = Workspace:Raycast(
         position + Vector3.new(0, 6, 0),
