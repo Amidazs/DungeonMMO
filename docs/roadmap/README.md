@@ -1,3 +1,18 @@
+**v3.30 LIVE DUNGEON SKINNING SUPPLY — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_30_Live_Dungeon_Skinning_GREEN_20260928.md)
+and [evidence](
+../testing/profession-live-skinning-v3-30-green-20260928.md).
+Temple Depth-1 Room 1 now uses a real heterogeneous pack with **1 Marauder +
+1 Forest Wolf**. The wolf is explicitly server-authored as
+`forest_wolf / Beast`, passes the existing animal-only Skinning boundary,
+and survives normal kill -> reward -> loot -> corpse-retention flow.
+Level-3 Skinning on the real retained corpse grants exactly **1 Thick Hide**
+and the same corpse cannot be claimed twice. Fresh current-head Play returned
+`VERIFIED_LIVE_SKINNING_BACKEND_FOCUS_PASS 14`; the full client-facing wolf
+rehearsal also returned `VERIFIED_PLAY_MODE_PASS`. Final wolf
+mesh/animation/AI remain presentation work. Next gate is profession-aware
+launch quest/content integration.
+
 **v3.29 PROFESSION BLUEPRINT ACQUISITION — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_29_Profession_Blueprint_Acquisition_GREEN_20260928.md)
 and [evidence](
