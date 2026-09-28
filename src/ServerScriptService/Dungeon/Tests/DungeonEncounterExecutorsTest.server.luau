@@ -33,6 +33,7 @@ end
 
 local parent = Instance.new("Folder")
 local pack_calls = {}
+local pack_factory_ids = {}
 local fake_marauder_factory = {}
 
 function fake_marauder_factory.create(options: any): Model
@@ -42,6 +43,20 @@ function fake_marauder_factory.create(options: any): Model
     model:SetAttribute("RewardXP", options.RewardXP)
     model.Parent = options.Parent
     table.insert(pack_calls, options)
+    table.insert(pack_factory_ids, "Marauder")
+    return model
+end
+
+local fake_wolf_factory = {}
+
+function fake_wolf_factory.create(options: any): Model
+    local model = Instance.new("Model")
+    model.Name = options.Name
+    model:SetAttribute("SpawnIndex", options.SpawnIndex)
+    model:SetAttribute("RewardXP", options.RewardXP)
+    model.Parent = options.Parent
+    table.insert(pack_calls, options)
+    table.insert(pack_factory_ids, "ForestWolf")
     return model
 end
 
@@ -107,6 +122,9 @@ function fake_enemy_registry:get(factory_id: string): any?
     if factory_id == "Marauder" then
         return fake_marauder_factory
     end
+    if factory_id == "ForestWolf" then
+        return fake_wolf_factory
+    end
     return nil
 end
 
@@ -141,15 +159,23 @@ local pack_result = pack_executor:execute(
 )
 check(pack_result.ok == true, "Known pack must execute.")
 check(#pack_result.Enemies == 2, "Pack must spawn two enemies.")
-check(#pack_calls == 2, "Factory must be called twice.")
+check(#pack_calls == 2, "Mixed pack must call two factories.")
 check(
-    pack_calls[1].RewardXP == 15,
-    "Pack reward must use difficulty scaling."
+    pack_factory_ids[1] == "Marauder"
+        and pack_factory_ids[2] == "ForestWolf",
+    "Mixed pack must route each entry to its authored factory."
+)
+check(
+    pack_calls[1].RewardXP == 15
+        and pack_calls[2].RewardXP == 15,
+    "Both pack rewards must use difficulty scaling."
 )
 check(
     pack_calls[1].HealthMultiplier == 1.5
-        and pack_calls[1].DamageMultiplier == 1.2,
-    "Pack must forward difficulty combat scaling."
+        and pack_calls[1].DamageMultiplier == 1.2
+        and pack_calls[2].HealthMultiplier == 1.5
+        and pack_calls[2].DamageMultiplier == 1.2,
+    "Mixed pack must forward difficulty combat scaling."
 )
 
 local partial_parent = Instance.new("Folder")
@@ -167,7 +193,9 @@ end
 
 local failing_enemy_registry = {}
 function failing_enemy_registry:get(factory_id: string): any?
-    if factory_id == "Marauder" then
+    if factory_id == "Marauder"
+        or factory_id == "ForestWolf"
+    then
         return failing_factory
     end
     return nil
