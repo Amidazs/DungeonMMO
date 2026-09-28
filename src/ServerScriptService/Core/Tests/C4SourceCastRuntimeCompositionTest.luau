@@ -42,6 +42,10 @@ function FakeShots:remove_player(user_id: number)
 end
 
 local FakeExecutor = {}
+function FakeExecutor:source_units_per_stud(): number?
+    return nil
+end
+
 
 --[[
 Reports one disposable direct-magic target as ready.
@@ -865,7 +869,12 @@ local function main()
             and capability.SourceSalvageReviewedSkillCount == 4
             and not capability.SourceSalvageDefaultEnabled
             and not capability.SourceSalvageCurrentlyEnabled
-            and not capability.SourceSalvageFestivalAreaBound
+            and capability.SourceSalvageTimingPreflightBound
+            and capability.SourceSalvageTargetRangeBound
+            and capability.SourceSalvageFestivalAreaBound
+            and capability.SourceSalvageWorldCapability.Available
+            and not capability.SourceSalvageWorldCapability
+                .SpatialScaleConfigured
             and capability.DuskguardCastBridge
             and not capability.DirectMagicDefaultEnabled
             and not capability.DirectMagicCurrentlyEnabled
