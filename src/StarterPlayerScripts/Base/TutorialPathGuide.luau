@@ -1347,18 +1347,25 @@ Creates a looping player-relative tutorial guide.
 
 Args:
     player (Player): Local player whose position forms the live route source.
+    folder_name (string?): Optional unique Workspace folder for this guide.
 
 Returns:
     any: New tutorial guide instance.
 ]]
-function Guide.new(player: Player): any
-    local existing = Workspace:FindFirstChild(FOLDER_NAME)
+function Guide.new(
+    player: Player,
+    folder_name: string?
+): any
+    local resolved_folder_name = folder_name or FOLDER_NAME
+    local existing = Workspace:FindFirstChild(
+        resolved_folder_name
+    )
     if existing then
         existing:Destroy()
     end
 
     local folder = Instance.new("Folder")
-    folder.Name = FOLDER_NAME
+    folder.Name = resolved_folder_name
     folder.Parent = Workspace
 
     local self = setmetatable({
