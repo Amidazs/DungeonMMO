@@ -1670,7 +1670,8 @@ local function initialize_session_services(session: any): (any?, boolean)
     encounter_service = EncounterService.new(
         rewards,
         session.SessionId,
-        session.Modifier and session.Modifier.Id or nil
+        session.Modifier and session.Modifier.Id or nil,
+        quests
     )
     -- This reserved run owns all one-use combat and physical rescue
     -- receipts; no client can submit a fabricated quest proof.
