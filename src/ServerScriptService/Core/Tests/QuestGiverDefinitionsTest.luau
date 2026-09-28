@@ -70,8 +70,18 @@ local function main()
             giver.Id .. " has a semantic Base anchor"
         )
         check(
-            typeof(giver.Offset) == "CFrame",
+            typeof(giver.Offset) == "Vector3",
             giver.Id .. " has a physical hub offset"
+        )
+        check(
+            type(giver.Style) == "string"
+                and giver.Style ~= "",
+            giver.Id .. " has a humanoid placeholder style"
+        )
+        check(
+            typeof(giver.ClothingColor) == "Color3"
+                and typeof(giver.AccentColor) == "Color3",
+            giver.Id .. " has readable role colours"
         )
         check(
             type(giver.QuestIds) == "table"
