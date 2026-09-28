@@ -1,3 +1,41 @@
+## 28 September 2026 — CURRENT v3.38 trusted checkpoint Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_38_Checkpoint_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/checkpoint-adventure-v3-38-green-20260928.md).
+
+The launch quest/content roadmap has moved beyond repetitive kill/clear
+bounties.
+
+Accepted new server boundary:
+`CheckpointReached`, emitted only after real Dungeon checkpoint activation.
+
+Accepted new Adventure:
+**Survey the Broken Ways** (`RuinSurvey`).
+
+- minimum level 8;
+- prerequisite Mine Echoes;
+- optional;
+- Temple CombatRoom2 checkpoint;
+- Abandoned Mine CombatRoom2 checkpoint;
+- reward: 60 Gold plus Deep Iron Bar, Moonpetal Extract, Reinforced Leather
+  and Resonant Rune.
+
+Fresh validation:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 4`.
+
+The roadmap is still authoritative. Next work is richer launch content and
+presentation built only on trusted server events. Depths 2-4 remain
+release-disabled.
+
+Placeholder status: server progression/economy/quest authority is real; final
+presentation is not uniformly final. Remaining placeholder/presentation work
+includes several NPC/monster models and animations, final quest dialogue,
+Forest Wolf final presentation, Dwarf cavern/NPC art and some crafting/dungeon
+presentation.
+
 ## 28 September 2026 — CURRENT v3.37 level-fifteen dual-boss Adventure GREEN
 
 [Roadmap](
