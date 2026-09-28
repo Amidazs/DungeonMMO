@@ -188,6 +188,47 @@ local function main()
         "Dark Elf Fighter can continue to Mine Echoes"
     )
 
+    local survey = assert(
+        QuestDefinitions.get("RuinSurvey")
+    )
+    local level_seven_survey = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_seven_survey.Level = 7
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_seven_survey,
+            survey
+        ),
+        "level-seven Dark Elf cannot start Ruin Survey"
+    )
+
+    local missing_survey_mine = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    missing_survey_mine.Level = 8
+    check(
+        not QuestDefinitions.is_character_eligible(
+            missing_survey_mine,
+            survey
+        ),
+        "level-eight Ruin Survey still requires Mine Echoes"
+    )
+
+    local level_eight_survey = dark_elf_fighter({
+        WorldrootRelic = true,
+        MineEchoes = true,
+    })
+    level_eight_survey.Level = 8
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_eight_survey,
+            survey
+        ),
+        "level-eight Dark Elf can start Ruin Survey after Mine Echoes"
+    )
+
     local foreman = assert(
         QuestDefinitions.get("CorruptedForemanBounty")
     )
