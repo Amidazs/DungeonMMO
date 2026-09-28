@@ -13,8 +13,9 @@ local SEGMENT_WIDTH = 0.72
 local SEGMENT_HEIGHT = 0.08
 local FLOOR_LIFT = 0.09
 local ARROW_SPACING = 12
-local PATH_REFRESH_SECONDS = 0.65
-local PATH_REFRESH_DISTANCE = 5
+local PATH_REFRESH_SECONDS = 0.75
+local REROUTE_DISTANCE = 9
+local TARGET_REFRESH_DISTANCE = 1
 local HUE_SPEED = 0.065
 
 --[[
@@ -217,6 +218,73 @@ local function compute_path(
 end
 
 --[[
+Returns the shortest distance from one point to one route segment.
+
+Args:
+    point (Vector3): Player world position.
+    segment_start (Vector3): Route segment start.
+    segment_end (Vector3): Route segment end.
+
+Returns:
+    number: Distance in studs to the closest point on the segment.
+]]
+local function distance_to_segment(
+    point: Vector3,
+    segment_start: Vector3,
+    segment_end: Vector3
+): number
+    local segment = segment_end - segment_start
+    local length_squared = segment:Dot(segment)
+
+    if length_squared <= 0.001 then
+        return (point - segment_start).Magnitude
+    end
+
+    local alpha = math.clamp(
+        (point - segment_start):Dot(segment)
+            / length_squared,
+        0,
+        1
+    )
+    local closest = segment_start + segment * alpha
+    return (point - closest).Magnitude
+end
+
+--[[
+Returns how far the player is from the currently rendered route.
+
+Args:
+    point (Vector3): Player world position.
+    positions ({Vector3}): Current floor-projected route points.
+
+Returns:
+    number: Shortest distance to any route segment.
+]]
+local function distance_to_route(
+    point: Vector3,
+    positions: {Vector3}
+): number
+    if #positions < 2 then
+        return math.huge
+    end
+
+    local closest = math.huge
+
+    for index = 1, #positions - 1 do
+        closest = math.min(
+            closest,
+            distance_to_segment(
+                point,
+                positions[index],
+                positions[index + 1]
+            )
+        )
+    end
+
+    return closest
+end
+
+--[[
 Clears all rendered trail geometry.
 
 Args:
@@ -259,6 +327,8 @@ function Guide:_render(waypoints: {PathWaypoint})
             )
         )
     end
+
+    self._path_positions = positions
 
     local distance_to_next_arrow = 4
     local arrow_index = 0
@@ -338,20 +408,20 @@ function Guide:_refresh()
     end
 
     local target_position = target.Position
-    local moved = self._last_root_position == nil
-        or (
-            root.Position - self._last_root_position
-        ).Magnitude >= PATH_REFRESH_DISTANCE
     local target_moved = self._last_target_position == nil
         or (
             target_position - self._last_target_position
-        ).Magnitude >= 1
-
+        ).Magnitude >= TARGET_REFRESH_DISTANCE
     local needs_retry = #self._visual_parts == 0
+        or #self._path_positions < 2
+    local off_route = distance_to_route(
+        root.Position,
+        self._path_positions
+    ) >= REROUTE_DISTANCE
 
-    if not moved
-        and not target_moved
+    if not target_moved
         and not needs_retry
+        and not off_route
     then
         return
     end
@@ -362,12 +432,11 @@ function Guide:_refresh()
     )
 
     if waypoints then
-        self._last_root_position = root.Position
         self._last_target_position = target_position
         self:_render(waypoints)
-    else
-        self._last_root_position = nil
+    elseif needs_retry then
         self._last_target_position = nil
+        self._path_positions = {}
         self:_clear_visuals()
     end
 end
@@ -383,8 +452,9 @@ Returns:
 ]]
 function Guide:set_target(target: BasePart?)
     self._target = target
-    self._last_root_position = nil
     self._last_target_position = nil
+    self._path_positions = {}
+    self:_clear_visuals()
 
     if target then
         self:_refresh()
@@ -445,7 +515,7 @@ function Guide.new(player: Player): any
         _folder = folder,
         _target = nil,
         _visual_parts = {},
-        _last_root_position = nil,
+        _path_positions = {},
         _last_target_position = nil,
         _alive = true,
     }, Guide)
