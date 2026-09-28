@@ -1,3 +1,32 @@
+## 28 September 2026 — v3.30 live Dungeon Skinning GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_30_Live_Dungeon_Skinning_GREEN_20260928.md);
+[evidence](
+../testing/profession-live-skinning-v3-30-green-20260928.md).
+
+The live profession-supply gap is closed.
+
+Temple Room 1 now physically executes a mixed Marauder + Forest Wolf pack.
+The wolf uses the normal encounter executor, normal reward/loot boundary and
+existing corpse-retention path. Its explicit Beast identity makes it eligible
+for the accepted Skinning authority; the adjacent Marauder remains ineligible.
+
+Fresh current-head backend package:
+`VERIFIED_LIVE_SKINNING_BACKEND_FOCUS_PASS 14`.
+
+Live client rehearsal:
+encounter/loot corpse PASS, level-3 Thick Hide PASS, duplicate claim denial
+PASS, final `VERIFIED_PLAY_MODE_PASS`.
+
+Remaining profession work is mainly presentation/minigames rather than missing
+backend economy authority. Continue with profession-aware launch quest/content
+integration. Keep profession participation optional for core quest completion
+and preserve tradeable reward pressure.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio/Play evidence.
+
 ## 28 September 2026 — v3.29 profession blueprint acquisition GREEN
 
 [Roadmap](
