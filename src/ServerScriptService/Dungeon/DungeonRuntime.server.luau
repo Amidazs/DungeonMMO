@@ -88,9 +88,6 @@ local DungeonSecretDiscoveryService = require(
 local DungeonQuestObjectService = require(
     Services:WaitForChild("DungeonQuestObjectService")
 )
-local DungeonQuestRuntime = require(
-    script.Parent:WaitForChild("DungeonQuestRuntime")
-)
 local DungeonEscortService = require(
     Services:WaitForChild("DungeonEscortService")
 )
@@ -322,7 +319,9 @@ if force_return_failure then
 end
 local loaded_users: {[number]: boolean} = {}
 
-DungeonQuestRuntime.attach({
+require(
+    script.Parent:WaitForChild("DungeonQuestRuntime")
+).attach({
     remotes = remotes,
     quests = quests,
     is_ready = function(player: Player): boolean
