@@ -1,3 +1,16 @@
+**v3.32 CREATION-ENABLED ADVENTURE COVERAGE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_32_Adventure_Race_Coverage_GREEN_20260928.md)
+and [evidence](
+../testing/adventure-race-coverage-v3-32-green-20260928.md).
+The launch Adventure chain now covers every race a new player can currently
+create: Human, Elf and Dark Elf. Orc/Dwarf remain excluded because their race
+creation gates remain disabled. A real Dark Elf Fighter completed and persisted
+the full three-Adventure chain, including the Provisioning trade-material
+bundle. Fresh Play returned
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`. Next gate is broader
+launch quest/content expansion using only released, server-authored gameplay
+signals.
+
 **v3.31 PROFESSION-AWARE ADVENTURE CONTENT — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_31_Profession_Aware_Adventure_GREEN_20260928.md)
 and [evidence](
