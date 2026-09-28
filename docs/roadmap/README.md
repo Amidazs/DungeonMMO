@@ -1,3 +1,19 @@
+**v3.42 DEFEND / SURVIVE ADVENTURE — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_42_Defend_Survive_GREEN_20260928.md) and [evidence](
+../testing/defend-survive-v3-42-green-20260928.md).
+**Hold the Resonance** is now accepted as a level-13 optional Adventure after
+The Resonant Seal. Players defend a real Temple ward while the normal Room-2
+encounter remains authoritative: server-measured holders must remain inside an
+18-stud zone, with a 3-second absence grace period, and the objective completes
+only after Room 2 genuinely clears. Reward is **85 Gold + 1 Warding Essence**.
+A Luau 200-local-register overflow discovered during live validation was also
+fixed; the current `DungeonRuntime` compile probe is green. Fresh Play returned
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 8`,
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`,
+`VERIFIED_TEMPLE_WARD_DEFENSE_PRESENTATION_PASS 1` and
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`. Next gate: dialogue, narrative
+continuity and presentation rather than more objective types by default.
+
 **v3.41 QUEST-ITEM PUZZLE ADVENTURE — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_41_Quest_Item_Puzzle_GREEN_20260928.md) and [evidence](
 ../testing/quest-item-puzzle-v3-41-green-20260928.md).
