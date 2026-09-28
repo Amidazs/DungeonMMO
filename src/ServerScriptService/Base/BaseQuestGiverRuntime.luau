@@ -111,7 +111,7 @@ Creates or refreshes one replaceable physical quest-giver placeholder.
 
 Args:
     folder (Folder): Generated quest-giver parent.
-    board_anchor (BasePart): Stable hub reference point.
+    source_anchor (BasePart): Semantic hub anchor for this giver.
     definition (any): Quest-giver presentation definition.
 
 Returns:
@@ -119,7 +119,7 @@ Returns:
 ]]
 local function create_giver(
     folder: Folder,
-    board_anchor: BasePart,
+    source_anchor: BasePart,
     definition: any
 ): BasePart
     local existing = folder:FindFirstChild(definition.Id)
@@ -133,7 +133,11 @@ local function create_giver(
     anchor.Anchored = true
     anchor.CanCollide = false
     anchor.Material = Enum.Material.Slate
-    anchor.CFrame = board_anchor.CFrame * definition.Offset
+    anchor.CFrame = source_anchor.CFrame * definition.Offset
+    anchor:SetAttribute(
+        "DungeonMMOQuestGiverSourceAnchor",
+        definition.AnchorId
+    )
     anchor:SetAttribute(
         "DungeonMMOQuestGiverId",
         definition.Id
@@ -278,11 +282,6 @@ function Runtime.attach(options: any): any
     assert(options.remote ~= nil)
     assert(type(options.is_ready) == "function")
 
-    local board_anchor = assert(
-        options.environment:get("Base.DungeonBoard"),
-        "Quest giver runtime requires Base.DungeonBoard"
-    )
-
     local self = setmetatable({
         _profiles = options.profiles,
         _quests = options.quests,
@@ -295,9 +294,14 @@ function Runtime.attach(options: any): any
     for _, definition in ipairs(
         QuestGiverDefinitions.all()
     ) do
+        local source_anchor = assert(
+            options.environment:get(definition.AnchorId),
+            "Quest giver anchor missing: "
+                .. tostring(definition.AnchorId)
+        )
         local anchor = create_giver(
             folder,
-            board_anchor,
+            source_anchor,
             definition
         )
         local prompt = assert(
