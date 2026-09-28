@@ -1,3 +1,43 @@
+## 28 September 2026 — v3.25 Dwarf backend GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_25_Dwarf_Backend_GREEN_20260928.md);
+[evidence](
+../testing/c4-dwarf-backend-v3-25-green-20260928.md).
+
+Both Dwarf first-transfer backends are validated.
+
+Current accepted facts:
+
+- source launch catalogue: **18 / 18** first-transfer branches audited and
+  rank-mapped;
+- tracked source totals: **24 paths / 1419 rows / 171 source IDs**;
+- Gearwright: 50 Artisan rows, 1G+2C, Q418-shaped proof flow;
+- Deepclaimer: 49 Scavenger rows at **15/15/19**, 2G+1C, Q417-shaped
+  Spoil-dependent proof flow;
+- Dwarven Fighter starter inheritance resolves into both careers;
+- profile migration preserves legitimate extra slots and strips forged ones;
+- actual Dungeon cleanup retains spoiled unclaimed corpses for 45 seconds;
+- one live Workspace Spoil -> death -> loot boundary -> Sweep cycle passed and
+  duplicate Sweep was rejected.
+
+Final validation markers:
+`VERIFIED_DWARF_BACKEND_FOCUS_PASS 25`,
+`VERIFIED_DWARF_CORPSE_RETENTION_PASS`,
+`VERIFIED_DWARF_LIVE_SPOIL_SWEEP_LIFECYCLE_PASS`.
+
+Do not overstate this checkpoint. Fresh Dwarf creation is still disabled,
+Q417/Q418 world actors are not bound, and Spoil Festival has no reviewed
+source-unit-to-stud resolver. The source salvage bridge remains default-off.
+
+Next development order:
+Dwarf world binding -> reviewed Spoil Festival spatial resolver ->
+professions/economy content -> launch-level quests/content -> later
+guild/raid and PvP/castle work.
+
+Permanent script/document edits remain GitHub-only; use Desktop Commander only
+for pull/build/Studio/Play evidence.
+
 ## 28 September 2026 — v3.24 Gearwright validation pending
 
 [Roadmap](
