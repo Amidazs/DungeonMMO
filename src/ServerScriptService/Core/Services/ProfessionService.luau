@@ -52,6 +52,31 @@ local function ensure_professions(character: any): any
     return character.Professions
 end
 
+--[[
+Returns the authoritative level for one profession on a character.
+
+Args:
+    character (any): Server-owned or detached character profile.
+    profession_id (string): Registered profession identifier.
+
+Returns:
+    number: Derived level from persisted profession XP, minimum one.
+]]
+local function profession_level(
+    character: any,
+    profession_id: string
+): number
+    local professions = type(character) == "table"
+        and character.Professions
+    local state = type(professions) == "table"
+        and professions[profession_id]
+    local xp = if type(state) == "table"
+        then math.max(0, math.floor(tonumber(state.XP) or 0))
+        else 0
+
+    return ProfessionDefinitions.level_from_xp(xp)
+end
+
 local function add_xp(state: any, amount: number): (number, number)
     local before_level = math.max(1, math.floor(tonumber(state.Level) or 1))
     local xp = math.max(0, math.floor(tonumber(state.XP) or 0))
@@ -357,6 +382,32 @@ function ProfessionService:build_snapshot(user_id: number): any
     }
 end
 
+--[[
+Reads one selected character's current profession level.
+
+Args:
+    user_id (number): Loaded profile owner.
+    profession_id (string): Registered profession identifier.
+
+Returns:
+    (number?, string?): Derived level or stable refusal reason.
+]]
+function ProfessionService:get_profession_level(
+    user_id: number,
+    profession_id: string
+): (number?, string?)
+    if not ProfessionDefinitions.get(profession_id) then
+        return nil, "UnknownProfession"
+    end
+
+    local character = self._profiles:get_character(user_id, 1)
+    if not character then
+        return nil, "ProfileNotLoaded"
+    end
+
+    return profession_level(character, profession_id), nil
+end
+
 function ProfessionService:gather(
     user_id: number,
     node: any,
@@ -372,6 +423,9 @@ function ProfessionService:gather(
     local bonus = math.max(0, math.floor(tonumber(quantity_bonus) or 0))
     local awarded_quantity = quantity + bonus
     local xp = math.floor(tonumber(node.XP) or 0)
+    local required_level = math.floor(
+        tonumber(node.RequiredLevel) or 1
+    )
 
     local definition = ProfessionDefinitions.get(profession_id)
     if not definition or definition.Kind ~= "Gathering" then
@@ -380,8 +434,21 @@ function ProfessionService:gather(
     if not self:can_use(user_id, profession_id) then
         return {ok = false, reason = "ProfessionNotSelected"}
     end
-    if not ItemDefinitions.get(item_id) or quantity < 1 or xp < 0 then
+    if not ItemDefinitions.get(item_id)
+        or quantity < 1
+        or xp < 0
+        or required_level < 1
+        or required_level > ProfessionDefinitions.MAX_LEVEL
+    then
         return {ok = false, reason = "InvalidNodeDefinition"}
+    end
+
+    local character = self._profiles:get_character(user_id, 1)
+    if not character then
+        return {ok = false, reason = "ProfileNotLoaded"}
+    end
+    if profession_level(character, profession_id) < required_level then
+        return {ok = false, reason = "ProfessionLevelTooLow"}
     end
 
     local result: any = nil
@@ -401,6 +468,9 @@ function ProfessionService:gather(
         end
         local professions = ensure_professions(character)
         local state = professions[profession_id]
+        if profession_level(character, profession_id) < required_level then
+            error("ProfessionLevelTooLow")
+        end
         local before_level, after_level = add_xp(state, xp)
         local added = InventoryService.apply_item_to_character(
             character,
@@ -419,6 +489,7 @@ function ProfessionService:gather(
             base_quantity = quantity,
             quantity_bonus = bonus,
             xp = xp,
+            required_level = required_level,
             level_before = before_level,
             level_after = after_level,
             total_quantity = added.total_quantity,
