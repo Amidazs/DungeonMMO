@@ -1,3 +1,36 @@
+## 28 September 2026 — CURRENT v3.33 Forest Wolf bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_33_Forest_Wolf_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/forest-wolf-bounty-v3-33-green-20260928.md).
+
+Launch Adventure content now has four entries for creation-enabled Human, Elf
+and Dark Elf characters:
+
+1. Worldroot Relic;
+2. optional Forest Wolf bounty;
+3. Mine Echoes;
+4. Expedition Provisioning.
+
+The bounty requires two real `forest_wolf` enemy defeats and pays 40 Gold
+with no item/material reward. It does not gate Mine Echoes.
+
+Important accepted fix: Forest Wolves keep
+`BestiaryCreatureId = nil` but have
+`CreatureSpeciesId = "forest_wolf"`. EncounterService now uses authored
+species identity as the Adventure quest fallback, so a real rewarded wolf death
+can progress the bounty without changing Bestiary behavior.
+
+Fresh markers:
+`VERIFIED_FOREST_WOLF_BOUNTY_BASE_PASS 5` and
+`VERIFIED_FOREST_WOLF_BOUNTY_DUNGEON_PASS 3`.
+
+Continue launch-level quest/content expansion. Reuse trusted DungeonClear and
+EnemyDefeat signals where they fit; add a new server event boundary before
+authoring any new objective type. Professions remain optional for core story
+completion.
+
 ## 28 September 2026 — CURRENT v3.32 creation-enabled Adventure coverage GREEN
 
 [Roadmap](
