@@ -1,3 +1,44 @@
+## 28 September 2026 — CURRENT v3.26 Dwarf world infrastructure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_26_Dwarf_World_Infrastructure_GREEN_20260928.md);
+[green acceptance evidence](
+../testing/c4-dwarf-world-v3-26-green-20260928.md).
+
+The Dwarf first-transfer backend and its world infrastructure are now green.
+
+Base:
+
+- optional dedicated `Base.DwarfQuestHub`;
+- **8** Dwarf quest actors;
+- **2** physical transfer mentors;
+- **2** physical class trainers;
+- no fallback to `Base.PlayerSpawn`;
+- fresh Base Play boots normally with no duplicate-anchor contamination.
+
+Dungeon:
+
+- Gearwright physical targets: Tunnel Gnawer, Tunnel Gnawer Chief and
+  Ashclan Forge Thief;
+- Deepclaimer physical targets: Honeyback Bear and Tunnel Tarantula;
+- the shared source-pack augmenter binds them to exact quest steps;
+- temporary rigs inherit reviewed room MaxHealth rather than invented balance;
+- Deepclaimer proof requires same-owner source Spoil/Spoil Festival state.
+
+Fresh acceptance:
+**46** NPC-binding assertions, **21** mentor-binding assertions,
+**5** hub-contract assertions, **61** source-pack assertions,
+**114** quest-ledger assertions, plus
+`VERIFIED_DWARF_WORLD_V6_BACKEND_PASS 25`.
+
+Dwarf creation is still intentionally disabled, so do not describe this as a
+normal-player end-to-end Dwarf quest playthrough. Final bespoke monster
+art/AI is also separate content work.
+
+Next gate: review the existing source-range/spatial conventions and bind exact
+Spoil Festival radius **200** to one documented server-owned Roblox area
+resolver. Do not invent a scale.
+
 ## 28 September 2026 — CURRENT v3.25 Dwarf backend GREEN
 
 [Roadmap](
