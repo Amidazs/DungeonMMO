@@ -64,16 +64,25 @@ end
 --[[
 Returns the stable quest-facing identity for one rewarded enemy.
 
+Quest identity is intentionally broader than Bestiary identity. An authored
+animal may participate in Adventure objectives without being enrolled in
+Bestiary progress.
+
 Args:
     model (Model): Server-registered encounter enemy.
 
 Returns:
-    string?: Bestiary identity first, then boss identity when available.
+    string?: Bestiary, species, or boss identity when server-authored.
 ]]
 local function quest_target_id(model: Model): string?
     local bestiary_id = model:GetAttribute("BestiaryCreatureId")
     if type(bestiary_id) == "string" and bestiary_id ~= "" then
         return bestiary_id
+    end
+
+    local species_id = model:GetAttribute("CreatureSpeciesId")
+    if type(species_id) == "string" and species_id ~= "" then
+        return species_id
     end
 
     local boss_id = model:GetAttribute("BossId")
