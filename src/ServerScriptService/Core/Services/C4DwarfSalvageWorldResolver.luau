@@ -1,7 +1,6 @@
 --!strict
 -- Server-only Roblox world resolver for Dwarf Spoil/Sweep source skills.
 
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
@@ -284,9 +283,9 @@ function C4DwarfSalvageWorldResolver:area_targets(
         return nil, "C4SalvageTargetUnavailable"
     end
 
-    local primary_boundary, primary_reason =
+    local reviewed_primary, primary_reason =
         NpcBoundaries.for_model(primary)
-    if not primary_boundary then
+    if not reviewed_primary then
         return nil, primary_reason
             or "C4SalvageTargetSourceBoundaryUnavailable"
     end
