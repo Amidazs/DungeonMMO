@@ -1,3 +1,47 @@
+## 28 September 2026 — v3.40 quest variety foundation GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_40_Quest_Variety_Foundation_GREEN_20260928.md);
+[evidence](
+../testing/quest-variety-v3-40-green-20260928.md);
+[research](
+../design/Quest_Archetype_Research_20260928.md).
+
+Accepted quest variety expansion:
+
+- `WorldInteraction`: trusted physical-object interaction;
+- `ItemCollected`: trusted personal quest-item acquisition;
+- `EscortCompleted`: trusted server-owned escort completion;
+- atomic required-item turn-in in QuestService.
+
+New launch Adventures:
+
+- `HiddenWardDiscovery / Whispers Behind the Stone`, level 6 after Worldroot;
+- `MineSurveyorEscort / Guide the Lost Surveyor`, level 9 after Mine Echoes.
+
+The Temple hidden-room tutorial and Mine escort both have current synthetic
+physical presentation. Their art remains replaceable.
+
+First-transfer advancement must be treated as a **three-quest chain**, not one
+generic trial. All 18 branch ledgers now map to Quest 1/3 The Call, Quest 2/3
+Field Trial and Quest 3/3 Final Proof. The underlying source-specific steps and
+final mentor award remain authoritative.
+
+Legacy one-clear advancement trials are grandfather-only. Fresh original
+Fighter/Mage starters are blocked from beginning them and must choose an
+original branch.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 6`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_HIDDEN_ROOM_PRESENTATION_PASS 1`;
+`VERIFIED_LOST_SURVEYOR_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+Next: Defend/Survive and quest-item/puzzle objective families plus stronger
+quest dialogue/presentation. Permanent source/document edits stay GitHub-only;
+Desktop Commander remains for pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.39 mixed-objective Adventure GREEN
 
 [Roadmap](
