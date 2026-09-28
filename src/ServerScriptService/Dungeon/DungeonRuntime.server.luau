@@ -66,6 +66,9 @@ local DungeonAdmissionRules = require(Dungeon:WaitForChild("DungeonAdmissionRule
 local StudioSessionFactory = require(Dungeon:WaitForChild("StudioSessionFactory"))
 local EncounterService = require(Dungeon:WaitForChild("EncounterService"))
 local CheckpointService = require(Dungeon:WaitForChild("CheckpointService"))
+local DungeonCheckpointQuestBridge = require(
+    Dungeon:WaitForChild("DungeonCheckpointQuestBridge")
+)
 local DungeonRecoveryRules = require(Dungeon:WaitForChild("DungeonRecoveryRules"))
 local DungeonEncounterRuntimeState = require(
     Dungeon:WaitForChild("DungeonEncounterRuntimeState")
@@ -847,6 +850,7 @@ local function advance_checkpoint(checkpoint_id: string): boolean
     if not checkpoint_service or not active_session_id then
         return false
     end
+
     local advanced = checkpoint_service:activate(checkpoint_id)
     if not advanced.ok then
         warn(
@@ -855,6 +859,21 @@ local function advance_checkpoint(checkpoint_id: string): boolean
         )
         return false
     end
+
+    local quest_progress = DungeonCheckpointQuestBridge.record(
+        quests,
+        active_definition.Id,
+        active_session_id,
+        connected_member_user_ids(),
+        checkpoint_id
+    )
+    if quest_progress.ok ~= true then
+        warn(
+            "[Dungeon Runtime] Checkpoint quest progress failed: "
+                .. tostring(quest_progress.reason)
+        )
+    end
+
     return true
 end
 
