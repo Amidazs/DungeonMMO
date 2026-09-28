@@ -16,6 +16,9 @@ local EnvironmentAnchorClient = require(
 local ItemDefinitions = require(
     shared:WaitForChild("ItemDefinitions")
 )
+local QuestNarratives = require(
+    shared:WaitForChild("QuestNarrativeDefinitions")
+)
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
 )
@@ -100,10 +103,78 @@ status.Position = UDim2.new(0, 0, 1, 0)
 status.Size = UDim2.new(1, 0, 0, 44)
 status.TextWrapped = true
 
+local conversation = Instance.new("Frame")
+conversation.Name = "QuestConversation"
+conversation.Size = UDim2.fromScale(1, 1)
+conversation.BackgroundColor3 = UiTheme.PALETTE.Surface
+conversation.BackgroundTransparency = 0
+conversation.BorderSizePixel = 0
+conversation.Visible = false
+conversation.ZIndex = 20
+UiTheme.add_corner(conversation, 8)
+conversation.Parent = modal.Body
+
+local conversation_speaker = UiComponents.label(
+    conversation,
+    "Speaker",
+    "",
+    "Muted"
+)
+conversation_speaker.Position = UDim2.fromOffset(20, 18)
+conversation_speaker.Size = UDim2.new(1, -40, 0, 22)
+conversation_speaker.ZIndex = 21
+
+local conversation_title = UiComponents.label(
+    conversation,
+    "QuestTitle",
+    "",
+    "Heading"
+)
+conversation_title.Position = UDim2.fromOffset(20, 48)
+conversation_title.Size = UDim2.new(1, -40, 0, 34)
+conversation_title.ZIndex = 21
+
+local conversation_text = UiComponents.label(
+    conversation,
+    "Dialogue",
+    "",
+    "Body"
+)
+conversation_text.Position = UDim2.fromOffset(20, 94)
+conversation_text.Size = UDim2.new(1, -40, 1, -174)
+conversation_text.TextWrapped = true
+conversation_text.TextYAlignment = Enum.TextYAlignment.Top
+conversation_text.ZIndex = 21
+
+local conversation_back = UiComponents.button(
+    conversation,
+    "Back",
+    "Back",
+    "Ghost"
+)
+conversation_back.AnchorPoint = Vector2.new(0, 1)
+conversation_back.Position = UDim2.new(0, 20, 1, -20)
+conversation_back.Size = UDim2.fromOffset(126, 42)
+conversation_back.ZIndex = 21
+
+local conversation_confirm = UiComponents.button(
+    conversation,
+    "Confirm",
+    "Accept Quest",
+    "Primary"
+)
+conversation_confirm.AnchorPoint = Vector2.new(1, 1)
+conversation_confirm.Position = UDim2.new(1, -20, 1, -20)
+conversation_confirm.Size = UDim2.fromOffset(156, 42)
+conversation_confirm.ZIndex = 21
+
 local latest: any = nil
 local board_anchor: BasePart? = nil
 local distance_elapsed = 0
 local pending_quest_id: string? = nil
+local pending_action: string? = nil
+local conversation_definition: any = nil
+local conversation_mode: string? = nil
 
 --[[
 Returns a readable item name from the shared item catalogue.
@@ -358,14 +429,14 @@ Returns:
 ]]
 local function action_state(
     definition: any
-): (string, boolean)
+): (string, boolean, string?)
     local state = latest and latest.State
     local completed = state
         and type(state.Completed) == "table"
         and state.Completed[definition.Id] == true
 
     if completed then
-        return "Completed", false
+        return "Completed", false, nil
     end
 
     local active = state
@@ -374,9 +445,9 @@ local function action_state(
 
     if type(active) == "table" then
         if active.Ready == true then
-            return "Claim Reward", true
+            return "Claim Reward", true, "Claim"
         end
-        return "In Progress", false
+        return "Review", true, "Review"
     end
 
     local prerequisite = definition.PrerequisiteQuestId
@@ -387,10 +458,10 @@ local function action_state(
             or state.Completed[prerequisite] ~= true
         )
     then
-        return "Locked", false
+        return "Locked", false, nil
     end
 
-    return "Start Quest", true
+    return "Start Quest", true, "Start"
 end
 
 --[[
@@ -402,26 +473,133 @@ Args:
 Returns:
     None.
 ]]
-local function request_action(definition: any)
-    if pending_quest_id then
+local function request_action(
+    definition: any,
+    action: string
+)
+    if pending_quest_id
+        or (action ~= "Start" and action ~= "Claim")
+    then
         return
     end
 
-    local state = latest and latest.State
-    local active = state
-        and type(state.Active) == "table"
-        and state.Active[definition.Id]
-    local action = if type(active) == "table"
-            and active.Ready == true
-        then "Claim"
-        else "Start"
-
     pending_quest_id = definition.Id
+    pending_action = action
     status.Text = action
         .. " request sent for "
         .. tostring(definition.DisplayName or definition.Id)
         .. "..."
     action_request:FireServer(action, definition.Id)
+end
+
+--[[
+Returns the narrative lines for one conversation mode.
+
+Args:
+    definition (any): Public Adventure quest definition.
+    mode (string): Start, Review, Claim or Complete.
+
+Returns:
+    {string}: Ordered presentation lines.
+]]
+local function narrative_lines(
+    definition: any,
+    mode: string
+): {string}
+    local narrative = QuestNarratives.get(definition.Id)
+    if not narrative then
+        return {}
+    end
+
+    if mode == "Start" then
+        return narrative.Start or {}
+    elseif mode == "Review" then
+        return narrative.Progress or {}
+    elseif mode == "Claim" then
+        return narrative.Ready or {}
+    elseif mode == "Complete" then
+        return narrative.Complete or {}
+    end
+
+    return {}
+end
+
+--[[
+Returns readable dialogue text for one conversation mode.
+
+Args:
+    definition (any): Public Adventure quest definition.
+    mode (string): Start, Review, Claim or Complete.
+
+Returns:
+    string: Paragraph-form narrative text.
+]]
+local function narrative_text(
+    definition: any,
+    mode: string
+): string
+    local lines = narrative_lines(definition, mode)
+    if #lines == 0 then
+        return "No additional dialogue is available for this Adventure."
+    end
+
+    return table.concat(lines, "\n\n")
+end
+
+--[[
+Closes the in-board quest conversation.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function close_conversation()
+    conversation.Visible = false
+    conversation_definition = nil
+    conversation_mode = nil
+end
+
+--[[
+Shows one reusable quest conversation before an action or review.
+
+Args:
+    definition (any): Public Adventure quest definition.
+    mode (string): Start, Review, Claim or Complete.
+
+Returns:
+    None.
+]]
+local function open_conversation(
+    definition: any,
+    mode: string
+)
+    local narrative = QuestNarratives.get(definition.Id)
+
+    conversation_definition = definition
+    conversation_mode = mode
+    conversation_speaker.Text = tostring(
+        narrative and narrative.Speaker
+            or "Adventure Board"
+    )
+    conversation_title.Text = tostring(
+        definition.DisplayName or definition.Id
+    )
+    conversation_text.Text = narrative_text(
+        definition,
+        mode
+    )
+
+    local actionable = mode == "Start" or mode == "Claim"
+    conversation_confirm.Visible = actionable
+    conversation_confirm.Active = actionable
+    conversation_confirm.AutoButtonColor = actionable
+    conversation_confirm.Text = if mode == "Claim"
+        then "Complete Quest"
+        else "Accept Quest"
+
+    conversation.Visible = true
 end
 
 --[[
@@ -549,7 +727,7 @@ local function add_quest_action(
     row: Frame,
     definition: any
 )
-    local button_text, enabled = action_state(definition)
+    local button_text, enabled, mode = action_state(definition)
     local action = UiComponents.button(
         row,
         "Action",
@@ -562,9 +740,9 @@ local function add_quest_action(
     action.Active = enabled
     action.AutoButtonColor = enabled
 
-    if enabled then
+    if enabled and mode then
         action.Activated:Connect(function()
-            request_action(definition)
+            open_conversation(definition, mode)
         end)
     end
 end
@@ -648,6 +826,8 @@ local function set_visible(visible: boolean)
         request_snapshot()
     else
         pending_quest_id = nil
+        pending_action = nil
+        close_conversation()
     end
 end
 
@@ -722,6 +902,27 @@ modal.Close.Activated:Connect(function()
     WindowController.set_visible(WINDOW_NAME, false)
 end)
 
+conversation_back.Activated:Connect(function()
+    close_conversation()
+end)
+
+conversation_confirm.Activated:Connect(function()
+    if not conversation_definition
+        or not conversation_mode
+    then
+        return
+    end
+
+    if conversation_mode == "Start"
+        or conversation_mode == "Claim"
+    then
+        request_action(
+            conversation_definition,
+            conversation_mode
+        )
+    end
+end)
+
 snapshot_remote.OnClientEvent:Connect(function(payload: any)
     if type(payload) ~= "table"
         or type(payload.State) ~= "table"
@@ -732,9 +933,11 @@ snapshot_remote.OnClientEvent:Connect(function(payload: any)
     end
 
     latest = payload
-    pending_quest_id = nil
     render()
-    status.Text = "Choose an Adventure or claim a completed reward."
+
+    if pending_quest_id == nil then
+        status.Text = "Choose an Adventure or claim a completed reward."
+    end
 end)
 
 action_result.OnClientEvent:Connect(function(response: any)
@@ -742,12 +945,30 @@ action_result.OnClientEvent:Connect(function(response: any)
         return
     end
 
+    local completed_quest_id = pending_quest_id
+    local completed_action = pending_action
     pending_quest_id = nil
+    pending_action = nil
 
     if response.ok == true then
-        status.Text = "Adventure updated."
+        if completed_action == "Claim"
+            and conversation_definition
+            and conversation_definition.Id
+                == completed_quest_id
+        then
+            open_conversation(
+                conversation_definition,
+                "Complete"
+            )
+            status.Text = "Adventure completed."
+        else
+            close_conversation()
+            status.Text = "Adventure started."
+        end
         return
     end
+
+    close_conversation()
 
     local reason = tostring(response.reason or "QuestRejected")
     if reason == "QuestUnavailable" then
