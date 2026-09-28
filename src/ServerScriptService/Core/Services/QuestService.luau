@@ -152,6 +152,92 @@ local function apply_reward_items(
     end
 end
 
+--[[
+Returns normalized quest turn-in items.
+
+Args:
+    definition (any): Server-owned quest definition.
+
+Returns:
+    {any}: Dense turn-in item collection.
+]]
+local function turn_in_items(definition: any): {any}
+    local items = {}
+    if type(definition) ~= "table"
+        or type(definition.TurnInItems) ~= "table"
+    then
+        return items
+    end
+
+    for _, item in ipairs(definition.TurnInItems) do
+        if type(item) == "table"
+            and type(item.ItemId) == "string"
+        then
+            table.insert(items, {
+                ItemId = item.ItemId,
+                Quantity = math.max(
+                    1,
+                    math.floor(tonumber(item.Quantity) or 1)
+                ),
+            })
+        end
+    end
+
+    return items
+end
+
+--[[
+Checks whether all required turn-in items are still owned.
+
+Args:
+    character (any): Selected character inventory owner.
+    items ({any}): Normalized required turn-in items.
+
+Returns:
+    boolean: True only when every required quantity is present.
+]]
+local function has_turn_in_items(
+    character: any,
+    items: {any}
+): boolean
+    for _, item in ipairs(items) do
+        if InventoryService.count_item(
+            character,
+            item.ItemId
+        ) < item.Quantity then
+            return false
+        end
+    end
+
+    return true
+end
+
+--[[
+Consumes every required turn-in item inside an existing profile mutation.
+
+Args:
+    character (any): Selected live character.
+    items ({any}): Normalized required turn-in items.
+
+Returns:
+    nil: Raises if any required item cannot be consumed.
+]]
+local function consume_turn_in_items(
+    character: any,
+    items: {any}
+)
+    for _, item in ipairs(items) do
+        local removed = InventoryService.apply_remove_from_character(
+            character,
+            item.ItemId,
+            item.Quantity
+        )
+        if not removed.ok then
+            error(removed.reason or "QuestTurnInItemMissing")
+        end
+    end
+end
+
 local function valid_event(event: any): boolean
     if type(event) ~= "table"
         or type(event.EventId) ~= "string"
@@ -387,10 +473,15 @@ function QuestService:claim_reward(
 
     local reward = definition.Reward
     local items = reward_items(reward)
+    local required_items = turn_in_items(definition)
     local raw_gold = type(reward) == "table"
         and reward.Gold
         or nil
     local gold = tonumber(raw_gold) or 0
+
+    if not has_turn_in_items(character, required_items) then
+        return result(false, "QuestTurnInItemsMissing")
+    end
 
     if gold ~= gold
         or gold < 0
@@ -414,6 +505,13 @@ function QuestService:claim_reward(
         end
 
         -- A second request cannot spend or complete the same quest twice.
+        if not has_turn_in_items(
+            live_character,
+            required_items
+        ) then
+            error("QuestTurnInItemsMissing")
+        end
+
         local completed, reason =
             QuestService.complete_ready_character_quest(
                 live_character, quest_id
@@ -422,6 +520,10 @@ function QuestService:claim_reward(
             error(reason or "QuestNotReady")
         end
 
+        consume_turn_in_items(
+            live_character,
+            required_items
+        )
         apply_reward_items(live_character, items)
         live_character.Gold += gold
     end)
