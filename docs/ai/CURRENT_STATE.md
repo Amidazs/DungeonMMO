@@ -1,3 +1,38 @@
+## 28 September 2026 — CURRENT v3.30 live Dungeon Skinning GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_30_Live_Dungeon_Skinning_GREEN_20260928.md);
+[evidence](
+../testing/profession-live-skinning-v3-30-green-20260928.md).
+
+The remaining v3.28 live-Skinning supply gap is closed.
+
+Accepted:
+
+- Temple Room 1 mixed pack: **1 Marauder + 1 Forest Wolf**;
+- Forest Wolf is server-authored as `forest_wolf / Beast` and carries the
+  approved skinnable-beast tag;
+- Marauder remains non-skinnable;
+- real encounter kill/reward/clear flow remains intact;
+- dead looted wolf is retained for Skinning;
+- level-3 Skinning grants exactly **1 Thick Hide**;
+- one corpse can be skinned once;
+- contested/two-user Skinning remains green.
+
+Fresh markers:
+
+- `VERIFIED_LIVE_SKINNING_BACKEND_FOCUS_PASS 14`;
+- `[Wolf Dungeon Live] ENCOUNTER_LOOT_CORPSE_PASS`;
+- `[Wolf Dungeon Live] LEVEL3_THICK_HIDE_PASS`;
+- `[Wolf Dungeon Live] CLIENT_ONCE_ONLY_HIDE_PASS`;
+- `[Wolf Dungeon Live] VERIFIED_PLAY_MODE_PASS`.
+
+The current Forest Wolf combat presentation is temporary and still reuses the
+shared combat skeleton. Do not describe it as final quadruped art/AI.
+
+Next gate: launch-level quest/content integration using the now-green
+profession materials, blueprints and market authorities.
+
 ## 28 September 2026 — CURRENT v3.29 profession blueprint acquisition GREEN
 
 [Roadmap](
