@@ -29,6 +29,9 @@ local DungeonDifficultyDefinitions = require(
 local DungeonModifierDefinitions = require(
     SharedCore:WaitForChild("DungeonModifierDefinitions")
 )
+local DungeonEscortDefinitions = require(
+    SharedCore:WaitForChild("DungeonEscortDefinitions")
+)
 local CharacterIdentityRules = require(
     SharedCore:WaitForChild("CharacterIdentityRules")
 )
@@ -81,6 +84,9 @@ local DungeonSecretDiscoveryService = require(
 )
 local DungeonQuestObjectService = require(
     Services:WaitForChild("DungeonQuestObjectService")
+)
+local DungeonEscortService = require(
+    Services:WaitForChild("DungeonEscortService")
 )
 local DungeonOptionalBossPolicy = require(
     Dungeon:WaitForChild("DungeonOptionalBossPolicy")
@@ -155,6 +161,9 @@ local DungeonOptionalEntranceGates = require(
 local DungeonQuestObjectRuntime = require(
     Dungeon:WaitForChild("DungeonQuestObjectRuntime")
 )
+local DungeonEscortRuntime = require(
+    Dungeon:WaitForChild("DungeonEscortRuntime")
+)
 
 local remotes = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Remotes")
 local dungeon_state = remotes:WaitForChild("DungeonStateChanged") :: RemoteEvent
@@ -225,6 +234,10 @@ local quests = runtime.QuestService
 local quest_objects = DungeonQuestObjectService.new(
     sessions,
     profiles,
+    quests
+)
+local escorts = DungeonEscortService.new(
+    sessions,
     quests
 )
 
@@ -1799,6 +1812,29 @@ local function initialize_session_services(session: any): (any?, boolean)
         error(
             "Dungeon quest-object runtime failed: "
                 .. tostring(quest_object_binding.reason)
+        )
+    end
+
+    local escort_definition = DungeonEscortDefinitions.get(
+        "MineSurveyor"
+    )
+    local escort_binding = DungeonEscortRuntime.attach({
+        dungeon_id = active_definition.Id,
+        difficulty_id = session.Difficulty
+            and session.Difficulty.Id,
+        workspace = Workspace,
+        definition = escort_definition,
+        escort_service = escorts,
+        get_session = current_session,
+        get_session_id = function(): string?
+            return active_session_id
+        end,
+        on_profile_changed = send_profile,
+    })
+    if escort_binding.ok ~= true then
+        error(
+            "Dungeon escort runtime failed: "
+                .. tostring(escort_binding.reason)
         )
     end
 
