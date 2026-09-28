@@ -32,6 +32,22 @@ local captain = assert(BestiaryDefinitions.get("marauder_captain"))
 check(#captain.Milestones == 2, "Captain must have two proof milestones.")
 check(captain.Milestones[1].RequiredKills == 1, "Captain first threshold must be 1.")
 check(captain.Milestones[2].RequiredKills == 3, "Captain second threshold must be 3.")
+local foreman = assert(
+    BestiaryDefinitions.get("corrupted_foreman")
+)
+check(
+    foreman.DisplayName == "Corrupted Foreman",
+    "Foreman display name mismatch."
+)
+check(
+    #foreman.Milestones == 2
+        and foreman.Milestones[1].Id == "foreman_defeated"
+        and foreman.Milestones[1].RequiredKills == 1
+        and foreman.Milestones[2].Id == "foreman_studied"
+        and foreman.Milestones[2].RequiredKills == 3,
+    "Foreman keeps its independent 1/3 proof milestones."
+)
+
 check(BestiaryDefinitions.get("unknown") == nil, "Unknown creature must not resolve.")
 
 print(string.format("[Bestiary Definitions Tests] PASS: %d assertions.", assertions))
