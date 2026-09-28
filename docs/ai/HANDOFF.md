@@ -1,3 +1,44 @@
+## 28 September 2026 — v3.28 profession economy backbone GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_28_Profession_Economy_Backbone_GREEN_20260928.md);
+[evidence](
+../testing/profession-economy-v3-28-green-20260928.md).
+
+Profession authority now reaches a tested launch-level economy backbone.
+
+Accepted:
+
+- gathering `RequiredLevel` is server-enforced and rechecked atomically;
+- Deep Iron Ore / Moonpetal are level-3 Room 3 resources;
+- Skinning level 3+ -> Thick Hide, with animal-only one-corpse semantics;
+- Blacksmithing, Alchemy, Leatherworking and Enchanting have ordinary
+  cross-profession component ladders through level 5;
+- ordinary progression never consumes Deepclaimer salvage;
+- four-player real-market progression completes a Masterwork Frame;
+- Gearwright premium level-5 recipes require its earned class/rank, selected
+  profession, ordinary economy components and one tradeable specialist salvage
+  item;
+- the extra Gearwright slot still cannot authorize a third crafting career.
+
+Fresh markers:
+`VERIFIED_PROFESSION_LAUNCH_ECONOMY_FOCUS_PASS 22` and
+`VERIFIED_PROFESSION_ROOM3_ADVANCED_NODES_PASS`.
+The two advanced Room 3 prompt roots were 27.00145 studs apart.
+
+Open before calling professions/content fully finished:
+
+1. high-tier blueprint acquisition/drop distribution;
+2. accepted live beast supply for advanced Skinning;
+3. final station/resource art and profession presentation;
+4. real crafting minigames behind the existing transaction authority.
+
+After those, continue launch-level quest/content expansion. Do not return to
+class/source catalogue work unless an actual source-audit defect appears.
+
+Permanent source/document edits remain GitHub-only; Desktop Commander is for
+pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.27 Dwarf spatial binding GREEN
 
 [Roadmap](
