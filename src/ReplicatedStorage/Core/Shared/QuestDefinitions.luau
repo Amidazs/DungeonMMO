@@ -5,6 +5,12 @@ local SkillUnlockRules = require(script.Parent.SkillUnlockRules)
 
 local QuestDefinitions = {}
 
+local ADVENTURE_RACES = table.freeze({
+    "Human",
+    "Elf",
+    "DarkElf",
+})
+
 local DEFINITIONS = table.freeze({
     FighterAdvancementTrial = table.freeze({
         Id = "FighterAdvancementTrial",
@@ -86,7 +92,7 @@ local DEFINITIONS = table.freeze({
         DisplayName = "A Relic Beneath the World Tree",
         Kind = "Adventure",
         MinimumLevel = 1,
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = ADVENTURE_RACES,
         AllowedBaseClasses = table.freeze({
             "Fighter", "Mage", "Ranger", "Rogue",
         }),
@@ -111,7 +117,7 @@ local DEFINITIONS = table.freeze({
         Kind = "Adventure",
         MinimumLevel = 1,
         PrerequisiteQuestId = "WorldrootRelic",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = ADVENTURE_RACES,
         AllowedBaseClasses = table.freeze({
             "Fighter", "Mage", "Ranger", "Rogue",
         }),
@@ -136,7 +142,7 @@ local DEFINITIONS = table.freeze({
         Kind = "Adventure",
         MinimumLevel = 1,
         PrerequisiteQuestId = "MineEchoes",
-        AllowedRaces = table.freeze({"Human", "Elf"}),
+        AllowedRaces = ADVENTURE_RACES,
         AllowedBaseClasses = table.freeze({
             "Fighter", "Mage", "Ranger", "Rogue",
         }),
