@@ -1,3 +1,35 @@
+## 28 September 2026 — v3.43 Adventure dialogue GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_43_Adventure_Dialogue_GREEN_20260928.md);
+[evidence](
+../testing/adventure-dialogue-v3-43-green-20260928.md).
+
+Accepted presentation layer:
+
+- all 13 launch Adventures have Start/Progress/Ready/Complete narrative;
+- shared `QuestNarrativeDefinitions` owns content;
+- shared `QuestNarrativePresenter` owns action-state/dialogue selection;
+- Adventure Board Start now opens dialogue before **Accept Quest**;
+- active unfinished quests use **Review**;
+- ready quests open turn-in dialogue before **Complete Quest**;
+- successful turn-in shows completion dialogue;
+- locked/completed states remain non-actionable.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 9`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_QUEST_CONVERSATION_UI_PASS 1`.
+
+Server authority is unchanged. Dialogue never publishes gameplay progress.
+
+The first-transfer rule also remains unchanged:
+**18 mapped branches x The Call / Field Trial / Final Proof**.
+
+Next: physical quest-giver NPC bindings and clearer in-dungeon quest feedback.
+Permanent source/document edits remain GitHub-only; Desktop Commander remains
+for pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.42 defend/survive Adventure GREEN
 
 [Roadmap](
