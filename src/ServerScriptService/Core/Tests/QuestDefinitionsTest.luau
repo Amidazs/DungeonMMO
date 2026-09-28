@@ -47,7 +47,7 @@ check(
 )
 local adventures = QuestDefinitions.adventures()
 check(
-    #adventures == 11
+    #adventures == 12
         and adventures[1].Id == "WorldrootRelic"
         and adventures[2].Id == "ForestWolfBounty"
         and adventures[3].Id == "MarauderCaptainBounty"
@@ -56,9 +56,10 @@ check(
         and adventures[6].Id == "RuinSurvey"
         and adventures[7].Id == "MineSurveyorEscort"
         and adventures[8].Id == "CorruptedForemanBounty"
-        and adventures[9].Id == "FractureTrail"
-        and adventures[10].Id == "DungeonBossHunt"
-        and adventures[11].Id == "ExpeditionProvisioning",
+        and adventures[9].Id == "TempleResonancePuzzle"
+        and adventures[10].Id == "FractureTrail"
+        and adventures[11].Id == "DungeonBossHunt"
+        and adventures[12].Id == "ExpeditionProvisioning",
     "Adventure catalogue keeps optional bounties beside the story chain."
 )
 
@@ -192,6 +193,32 @@ check(
         and foreman_bounty.Reward.ItemId == nil
         and foreman_bounty.Reward.Items == nil,
     "Foreman bounty is intentionally Gold-only."
+)
+
+local resonance_puzzle = assert(
+    QuestDefinitions.get("TempleResonancePuzzle")
+)
+check(
+    resonance_puzzle.MinimumLevel == 11
+        and resonance_puzzle.PrerequisiteQuestId == "RuinSurvey"
+        and #resonance_puzzle.Objectives == 2
+        and resonance_puzzle.Objectives[1].Type == "ItemCollected"
+        and resonance_puzzle.Objectives[1].TargetId
+            == "temple_resonance_shard"
+        and resonance_puzzle.Objectives[2].Type
+            == "PuzzleCompleted"
+        and resonance_puzzle.Objectives[2].TargetId
+            == "TestDungeon:ResonanceLock:Room2",
+    "Resonant Seal combines trusted item collection and ordered puzzle."
+)
+check(
+    type(resonance_puzzle.TurnInItems) == "table"
+        and resonance_puzzle.TurnInItems[1].ItemId
+            == "temple_resonance_shard"
+        and resonance_puzzle.Reward.Gold == 75
+        and resonance_puzzle.Reward.Items[1].ItemId
+            == "resonant_rune",
+    "Resonant Seal turns in its bound shard for a mixed reward."
 )
 
 local fracture_trail = assert(
