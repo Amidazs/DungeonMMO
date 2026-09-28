@@ -121,13 +121,12 @@ local function make_mentor(
         then Color3.fromRGB(131, 92, 59)
         else Color3.fromRGB(70, 140, 119)
     part.Material = Enum.Material.Wood
-    part.CFrame = anchor.CFrame * CFrame.new(
-        assert(
-            OFFSETS[definition.BranchId],
-            "First-transfer mentor layout missing for "
-                .. tostring(definition.BranchId)
-        )
+    local offset = assert(
+        OFFSETS[definition.BranchId],
+        "First-transfer mentor layout missing for "
+            .. tostring(definition.BranchId)
     )
+    part.CFrame = anchor.CFrame * CFrame.new(offset)
     local prompt = Instance.new("ProximityPrompt")
     prompt.Name = "FirstTransferMentorPrompt"
     prompt.ObjectText = definition.MentorName
