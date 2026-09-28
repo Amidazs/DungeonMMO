@@ -47,6 +47,13 @@ for _, item_id in ipairs({
     "iron_ore", "iron_bar", "silverleaf", "raw_hide",
     "cured_leather", "tempering_oil", "forging_flux",
     "warding_essence", "warding_rune",
+    "deep_iron_ore", "moonpetal", "thick_hide",
+    "deep_iron_bar", "moonpetal_extract",
+    "reinforced_leather", "resonant_rune",
+    "hardened_fittings", "prismatic_catalyst",
+    "rune_binding", "prismatic_seal",
+    "masterwork_frame", "aetheric_catalyst",
+    "masterwork_lining", "arcane_matrix",
 }) do
     local definition = ItemDefinitions.get(item_id)
     check(definition ~= nil, item_id .. " missing.")
@@ -102,16 +109,66 @@ check(leather_recipe.RequiredLevel == 1
 check(enchant_recipe.RequiredLevel == 2
     and enchant_recipe.StationId == "Enchanting",
     "Advanced enchant must demonstrate Enchanting progression.")
+--[[
+Returns the one-based position of a recipe in a station list.
+
+Args:
+    recipes (any): Ordered station recipe collection.
+    recipe_id (string): Stable recipe identifier to locate.
+
+Returns:
+    number?: One-based recipe position, or nil when absent.
+]]
+local function station_index(
+    recipes: any,
+    recipe_id: string
+): number?
+    for index, recipe in ipairs(recipes) do
+        if recipe.Id == recipe_id then
+            return index
+        end
+    end
+
+    return nil
+end
+
 local leather_station = ProfessionRecipes.for_station("Leatherworking")
 local enchanting_station = ProfessionRecipes.for_station("Enchanting")
-check(#leather_station == 2
-    and leather_station[1].Id == "cure_raw_hide"
-    and leather_station[2].Id == "stitch_leatherbound_gloves",
-    "Leatherworking station must expose its two registered recipes in order.")
-check(#enchanting_station == 2
-    and enchanting_station[1].Id == "inscribe_warding_rune"
-    and enchanting_station[2].Id == "enchant_leatherbound_gloves",
-    "Enchanting station must expose its two registered recipes in order.")
+local cure_index = station_index(leather_station, "cure_raw_hide")
+local stitch_index =
+    station_index(leather_station, "stitch_leatherbound_gloves")
+local thick_index = station_index(leather_station, "cure_thick_hide")
+local master_lining_index =
+    station_index(leather_station, "stitch_masterwork_lining")
+check(
+    cure_index ~= nil
+        and stitch_index ~= nil
+        and thick_index ~= nil
+        and master_lining_index ~= nil
+        and cure_index < stitch_index
+        and stitch_index < thick_index
+        and thick_index < master_lining_index,
+    "Leatherworking station preserves foundation then advanced progression."
+)
+
+local rune_index =
+    station_index(enchanting_station, "inscribe_warding_rune")
+local gloves_index =
+    station_index(enchanting_station, "enchant_leatherbound_gloves")
+local resonant_index =
+    station_index(enchanting_station, "inscribe_resonant_rune")
+local matrix_index =
+    station_index(enchanting_station, "inscribe_arcane_matrix")
+check(
+    rune_index ~= nil
+        and gloves_index ~= nil
+        and resonant_index ~= nil
+        and matrix_index ~= nil
+        and rune_index < gloves_index
+        and gloves_index < resonant_index
+        and resonant_index < matrix_index,
+    "Enchanting station preserves foundation then advanced progression."
+)
 
 local needs_oil = false
 for _, input in ipairs(tempered_recipe.Inputs) do
