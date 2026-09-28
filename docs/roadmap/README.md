@@ -1,3 +1,17 @@
+**v3.51 FLUID PLAYER-RELATIVE TUTORIAL TRACKER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_51_Fluid_Player_Relative_Tracker_GREEN_20260929.md)
+and [evidence](
+../testing/fluid-player-relative-tracker-v3-51-green-20260929.md).
+The TEST Base tutorial guide now treats pathfinding as the stable route corridor
+while the visible source advances continuously with the moving player. Marker
+and arrow instances are pooled rather than destroyed/recreated, route progress
+is updated on the client render loop, and each moving visual is projected back
+onto real collidable floor every frame. Fresh published-cloud acceptance
+returned 12.24 studs of player movement -> 12.24 studs of source advance,
+42/42 visual instances surviving with 0 replacements, 0 floor misses and a
+0.09-stud maximum floor offset. Quest-giver grounding remains 8/8 walkable
+with 0 bad supports. **Section D remains on hold for the user's friend test.**
+
 **v3.50 COLLISION-GROUNDED NPCs + TERRAIN-FOLLOWING TRACKER — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_50_Collision_Grounded_NPCs_Tracker_GREEN_20260928.md)
 and [evidence](
