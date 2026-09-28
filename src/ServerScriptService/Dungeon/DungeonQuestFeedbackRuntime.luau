@@ -212,13 +212,22 @@ local function puzzle_feedback(
         return nil
     end
 
-    local anchor = puzzle:FindFirstChild("Moon")
+    local anchor = puzzle:FindFirstChild("MoonRune")
     if not anchor or not anchor:IsA("BasePart") then
         return nil
     end
 
     local label = ensure_label(anchor)
-    local sequence = {"Moon", "Root", "Flame"}
+    local sequence = {
+        "MoonRune",
+        "RootRune",
+        "FlameRune",
+    }
+    local display_names = {
+        MoonRune = "Moon",
+        RootRune = "Root",
+        FlameRune = "Flame",
+    }
 
     return function()
         local session = get_session()
@@ -261,7 +270,9 @@ local function puzzle_feedback(
                 "Resonant Seal\n"
                     .. "Order: Moon → Root → Flame\n"
                     .. "Next: "
-                    .. sequence[next_index],
+                    .. display_names[
+                        sequence[next_index]
+                    ],
                 true
             )
         elseif room_one_clear then
