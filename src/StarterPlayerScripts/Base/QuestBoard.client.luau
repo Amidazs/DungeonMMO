@@ -267,6 +267,10 @@ local function objective_label(objective: any): string
         if objective.TargetId == "TestDungeon:ResonanceLock:Room2" then
             return "Attune the Moon, Root and Flame runes in order"
         end
+    elseif objective.Type == "DefenseCompleted" then
+        if objective.TargetId == "TestDungeon:ResonanceWard:Room2" then
+            return "Hold the Resonance Ward until Room 2 is secure"
+        end
     end
 
     return tostring(
