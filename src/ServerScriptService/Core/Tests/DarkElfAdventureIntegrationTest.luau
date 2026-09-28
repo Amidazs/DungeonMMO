@@ -101,7 +101,7 @@ local function quantity(
 end
 
 --[[
-Runs the complete three-Adventure Dark Elf launch chain.
+Runs the complete current Dark Elf launch Adventure catalogue.
 
 Args:
     None.
@@ -133,6 +133,39 @@ local function main()
             "WorldrootRelic"
         ).ok,
         "Dark Elf claims Worldroot Relic"
+    )
+
+    check(
+        quests:start(USER_ID, "ForestWolfBounty").ok,
+        "Dark Elf starts optional Forest Wolf bounty"
+    )
+    check(
+        quests:record_event(USER_ID, {
+            EventId = "dark-elf:wolf-1",
+            Type = "EnemyDefeat",
+            TargetId = "forest_wolf",
+            Amount = 1,
+        }).ok,
+        "Dark Elf receives first trusted wolf defeat"
+    )
+    check(
+        quests:record_event(USER_ID, {
+            EventId = "dark-elf:wolf-2",
+            Type = "EnemyDefeat",
+            TargetId = "forest_wolf",
+            Amount = 1,
+        }).ok,
+        "Dark Elf receives second trusted wolf defeat"
+    )
+    local wolf_claim = quests:claim_reward(
+        USER_ID,
+        "ForestWolfBounty"
+    )
+    check(
+        wolf_claim.ok
+            and wolf_claim.gold_granted == 40
+            and #wolf_claim.items_granted == 0,
+        "Dark Elf claims optional Gold-only wolf bounty"
     )
 
     check(
@@ -198,9 +231,10 @@ local function main()
     )
     check(
         character.Quests.Completed.WorldrootRelic == true
+            and character.Quests.Completed.ForestWolfBounty == true
             and character.Quests.Completed.MineEchoes == true
             and character.Quests.Completed.ExpeditionProvisioning == true,
-        "all three Dark Elf Adventures complete once"
+        "all current Dark Elf Adventures complete once"
     )
 
     check(
@@ -217,8 +251,9 @@ local function main()
         restored:get_character(USER_ID, 1)
     )
     check(
-        restored_character.Quests.Completed
-            .ExpeditionProvisioning == true
+        restored_character.Quests.Completed.ForestWolfBounty == true
+            and restored_character.Quests.Completed
+                .ExpeditionProvisioning == true
             and Inventory.count_item(
                 restored_character,
                 "deep_iron_ore"
