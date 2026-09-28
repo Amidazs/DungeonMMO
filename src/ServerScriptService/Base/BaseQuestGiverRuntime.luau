@@ -26,6 +26,7 @@ local GROUND_RAY_DEPTH = 180
 local MIN_GROUND_NORMAL_Y = 0.72
 local MAX_GROUND_SURFACES = 12
 local GROUND_STEP_EPSILON = 0.1
+local PATH_TARGET_LIFT = 0.5
 local APPROACH_WIDTH = 5
 local APPROACH_HEIGHT = 6
 local SKIN_COLOR = Color3.fromRGB(196, 157, 119)
@@ -585,7 +586,11 @@ local function validate_path(
     local ok = pcall(function()
         path:ComputeAsync(
             start_position,
-            target_position
+            target_position + Vector3.new(
+                0,
+                PATH_TARGET_LIFT,
+                0
+            )
         )
     end)
 
