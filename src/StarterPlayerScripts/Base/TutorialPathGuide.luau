@@ -347,12 +347,14 @@ function Guide:_refresh()
             target_position - self._last_target_position
         ).Magnitude >= 1
 
-    if not moved and not target_moved then
+    local needs_retry = #self._visual_parts == 0
+
+    if not moved
+        and not target_moved
+        and not needs_retry
+    then
         return
     end
-
-    self._last_root_position = root.Position
-    self._last_target_position = target_position
 
     local waypoints = compute_path(
         root.Position,
@@ -360,8 +362,12 @@ function Guide:_refresh()
     )
 
     if waypoints then
+        self._last_root_position = root.Position
+        self._last_target_position = target_position
         self:_render(waypoints)
     else
+        self._last_root_position = nil
+        self._last_target_position = nil
         self:_clear_visuals()
     end
 end
