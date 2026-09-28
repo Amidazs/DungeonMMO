@@ -257,6 +257,10 @@ local function objective_label(objective: any): string
         if objective.TargetId == "hidden_ward_fragment" then
             return "Collect the Hidden Ward Fragment"
         end
+    elseif objective.Type == "EscortCompleted" then
+        if objective.TargetId == "AbandonedMine:MineSurveyor" then
+            return "Guide the Lost Surveyor through the Mine"
+        end
     end
 
     return tostring(
