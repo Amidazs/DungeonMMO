@@ -14,12 +14,13 @@ local MARKER_WIDTH = 0.3
 local MARKER_LENGTH = 0.3
 local MARKER_HEIGHT = 0.045
 local MARKER_SPACING = 3
-local MARKER_TRANSPARENCY = 0.74
+local MARKER_TRANSPARENCY = 0.82
 
 local ARROW_SPACING = 7.5
 local ARROW_SPEED = 6.5
 local ARROW_TRANSPARENCY = 0.16
-local ARROW_START_GAP = 1.5
+local ARROW_START_GAP = 1.25
+local ARROW_EDGE_FADE_DISTANCE = 4
 
 local FLOOR_LIFT = 0.09
 local PLAYER_FLOOR_OFFSET = 3
@@ -37,7 +38,7 @@ local ROUTE_BLEND_SPEED = 3.2
 local FADE_SMOOTH_SPEED = 14
 local HIDDEN_TRANSPARENCY = 1
 local HUE_SPEED = 0.025
-local HUE_SPREAD = 0.055
+local MARKER_HUE_OFFSET = 0.035
 
 local MAX_MARKERS = 32
 local MAX_ARROWS = 14
@@ -1027,22 +1028,44 @@ function Guide:_update_flow_arrows(
                 position,
                 direction
             )
+            local source_fade = math.clamp(
+                (
+                    distance - ARROW_START_GAP
+                ) / ARROW_EDGE_FADE_DISTANCE,
+                0,
+                1
+            )
+            local target_fade = math.clamp(
+                (
+                    current_route.Length - distance
+                ) / ARROW_EDGE_FADE_DISTANCE,
+                0,
+                1
+            )
+            local visibility = math.min(
+                source_fade,
+                target_fade
+            )
+            local transparency = 1
+                - visibility
+                    * (1 - ARROW_TRANSPARENCY)
+
             update_part(
                 arrow.Shaft,
                 shaft,
-                ARROW_TRANSPARENCY,
+                transparency,
                 delta_time
             )
             update_part(
                 arrow.Left,
                 left,
-                ARROW_TRANSPARENCY,
+                transparency,
                 delta_time
             )
             update_part(
                 arrow.Right,
                 right,
-                ARROW_TRANSPARENCY,
+                transparency,
                 delta_time
             )
         else
@@ -1081,16 +1104,20 @@ function Guide:_update_colors()
     local base_hue = (
         os.clock() * HUE_SPEED
     ) % 1
-    local count = math.max(
-        #self._visual_parts,
-        1
-    )
 
-    for index, part in ipairs(self._visual_parts) do
+    for _, part in ipairs(self._visual_parts) do
         if part.Transparency < 0.99 then
+            local is_marker = string.find(
+                part.Name,
+                "TrailMarker",
+                1,
+                true
+            ) ~= nil
             local hue = (
                 base_hue
-                + index / count * HUE_SPREAD
+                + if is_marker
+                    then MARKER_HUE_OFFSET
+                    else 0
             ) % 1
 
             part.Color = Color3.fromHSV(
