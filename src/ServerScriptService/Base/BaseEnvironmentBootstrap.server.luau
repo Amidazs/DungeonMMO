@@ -353,11 +353,11 @@ ensure_label(travel_service, "TRAVEL GEM")
 local board = resolved.by_id["Base.DungeonBoard"]
 ensure_prompt(
     board,
-    "DungeonBoardPrompt",
-    "Inspect",
-    "Temple Dungeon Board"
+    "QuestBoardPrompt",
+    "Browse",
+    "Adventure Board"
 )
-ensure_label(board, "TEMPLE DUNGEON")
+ensure_label(board, "ADVENTURE BOARD")
 
 local portal = resolved.by_id["Base.TemplePortal"]
 portal:SetAttribute("DungeonId", "TestDungeon")
