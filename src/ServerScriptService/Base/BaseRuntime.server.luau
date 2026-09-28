@@ -28,6 +28,9 @@ local BaseEnvironmentAdapter = require(
     Base:WaitForChild("BaseEnvironmentAdapter")
 )
 local SharedCore = ReplicatedStorage:WaitForChild("Core"):WaitForChild("Shared")
+local TestRelease = require(
+    SharedCore:WaitForChild("DungeonTestPlaceholderRelease")
+)
 local DungeonDefinitions = require(SharedCore:WaitForChild("DungeonDefinitions"))
 local DungeonDifficultyDefinitions = require(
     SharedCore:WaitForChild("DungeonDifficultyDefinitions")
@@ -395,11 +398,21 @@ local function configured_dungeon_place_id(): (number?, string?)
         return nil, "PublishedTeleportRequired"
     end
 
-    local place_id = ServerScriptService:GetAttribute("DungeonMMODungeonPlaceId")
-    if type(place_id) ~= "number" or place_id <= 0 or place_id % 1 ~= 0 then
-        return nil, "DungeonPlaceIdNotConfigured"
+    local place_id = ServerScriptService:GetAttribute(
+        "DungeonMMODungeonPlaceId"
+    )
+    if type(place_id) == "number"
+        and place_id > 0
+        and place_id % 1 == 0
+    then
+        return place_id, nil
     end
-    return place_id, nil
+
+    if TestRelease.is_test_lobby() then
+        return TestRelease.test_dungeon_place_id(), nil
+    end
+
+    return nil, "DungeonPlaceIdNotConfigured"
 end
 
 local function current_session_for(user_id: number): any?
