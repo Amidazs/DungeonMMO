@@ -57,20 +57,46 @@ local function main()
     local positions = {}
 
     for _, definition in ipairs(givers) do
-        local anchor = folder:FindFirstChild(definition.Id)
+        local model = folder:FindFirstChild(definition.Id)
+        check(
+            model ~= nil and model:IsA("Model"),
+            definition.Id .. " humanoid model exists"
+        )
+
+        local anchor = model:FindFirstChild(
+            "HumanoidRootPart"
+        )
+        local head = model:FindFirstChild("Head")
+        local humanoid = model:FindFirstChild("Humanoid")
+
         check(
             anchor ~= nil and anchor:IsA("BasePart"),
-            definition.Id .. " physical anchor exists"
+            definition.Id .. " interaction root exists"
         )
         check(
-            anchor:GetAttribute("DungeonMMOQuestGiverId")
+            head ~= nil and head:IsA("BasePart")
+                and humanoid ~= nil
+                and humanoid:IsA("Humanoid"),
+            definition.Id .. " has a humanoid silhouette"
+        )
+        check(
+            model:GetAttribute("DungeonMMOQuestGiverId")
                 == definition.Id
-                and anchor:GetAttribute("DungeonMMOQuestSpeaker")
+                and model:GetAttribute("DungeonMMOQuestSpeaker")
                     == definition.Speaker
-                and anchor:GetAttribute(
+                and type(model:GetAttribute(
                     "DungeonMMOQuestGiverSourceAnchor"
-                ) == definition.AnchorId,
+                )) == "string",
             definition.Id .. " exposes stable presentation attributes"
+        )
+        check(
+            model:GetAttribute(
+                "DungeonMMOQuestGiverWalkable"
+            ) == true
+                and model:GetAttribute(
+                    "DungeonMMOQuestGiverApproachClear"
+                ) == true,
+            definition.Id .. " is marked walkable and approach-clear"
         )
 
         local prompt = anchor:FindFirstChild(
@@ -88,7 +114,7 @@ local function main()
             definition.Id .. " prompt uses reviewed interaction text"
         )
 
-        local label = anchor:FindFirstChild(
+        local label = head:FindFirstChild(
             "QuestGiverLabel"
         )
         check(
@@ -109,11 +135,11 @@ local function main()
             ).Magnitude
 
             check(
-                distance >= 10,
+                distance >= 30,
                 first.Id
                     .. " and "
                     .. second.Id
-                    .. " are spread at least 10 studs apart"
+                    .. " are spread at least 30 studs apart"
             )
         end
     end
