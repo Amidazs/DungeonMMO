@@ -1069,6 +1069,70 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    blacksmith_masterwork_batch_blueprint = table.freeze({
+        Id = "blacksmith_masterwork_batch_blueprint",
+        Name = "Masterwork Frame Batch Blueprint",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "blacksmith_masterwork_batch_blueprint",
+            ProfessionId = "Blacksmithing",
+            RequiredProfessionLevel = 5,
+        }),
+    }),
+
+    alchemy_aetheric_batch_recipe = table.freeze({
+        Id = "alchemy_aetheric_batch_recipe",
+        Name = "Aetheric Catalyst Batch Recipe",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "alchemy_aetheric_batch_recipe",
+            ProfessionId = "Alchemy",
+            RequiredProfessionLevel = 5,
+        }),
+    }),
+
+    leatherworking_masterwork_batch_pattern = table.freeze({
+        Id = "leatherworking_masterwork_batch_pattern",
+        Name = "Masterwork Lining Batch Pattern",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "leatherworking_masterwork_batch_pattern",
+            ProfessionId = "Leatherworking",
+            RequiredProfessionLevel = 5,
+        }),
+    }),
+
+    enchanting_arcane_batch_inscription = table.freeze({
+        Id = "enchanting_arcane_batch_inscription",
+        Name = "Arcane Matrix Batch Inscription",
+        Kind = "RecipeBlueprint",
+        InventoryCategory = "Recipes",
+        Rarity = "Rare",
+        Stackable = true,
+        Bound = false,
+        Tradeable = true,
+        RecipeLearning = table.freeze({
+            RecipeId = "enchanting_arcane_batch_inscription",
+            ProfessionId = "Enchanting",
+            RequiredProfessionLevel = 5,
+        }),
+    }),
+
     recipe_blueprint_invalid_test = table.freeze({
         Id = "recipe_blueprint_invalid_test",
         Name = "TEST Invalid Recipe Blueprint",
