@@ -1,3 +1,41 @@
+## 28 September 2026 — CURRENT v3.40 quest variety foundation GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_40_Quest_Variety_Foundation_GREEN_20260928.md);
+[evidence](
+../testing/quest-variety-v3-40-green-20260928.md);
+[research](
+../design/Quest_Archetype_Research_20260928.md).
+
+Launch quests now support trusted interaction, personal item collection/turn-in
+and escort objectives in addition to defeat, clear and checkpoint objectives.
+
+Accepted new Adventures:
+
+- level 6: **Whispers Behind the Stone** — activate a Temple hidden panel,
+  reveal an alcove, collect/turn in a Hidden Ward Fragment;
+- level 9: **Guide the Lost Surveyor** — server-owned Mine escort that moves at
+  running pace, waits safely before Room 2 and resumes after the room is clear.
+
+New trusted event types:
+`WorldInteraction`, `ItemCollected`, `EscortCompleted`.
+
+First-transfer advancement is also formally multi-quest. All 18 mapped branches
+now expose exactly **three player-facing quests** — The Call, Field Trial and
+Final Proof — over their existing branch-specific trusted source stages. A
+13/18 enumeration defect in the source quest inventory was found and repaired.
+
+Fresh markers:
+`VERIFIED_QUEST_VARIETY_FOCUS_PASS 6`;
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_HIDDEN_ROOM_PRESENTATION_PASS 1`;
+`VERIFIED_LOST_SURVEYOR_PRESENTATION_PASS 1`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+Next gate: continue varied content with Defend/Survive and quest-item/puzzle
+interactions while starting stronger dialogue, narrative continuity and final
+presentation. Depths 2-4 remain release-disabled.
+
 ## 28 September 2026 — CURRENT v3.39 mixed-objective Adventure GREEN
 
 [Roadmap](
