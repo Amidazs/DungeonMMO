@@ -205,6 +205,35 @@ local DEFINITIONS = table.freeze({
         }),
     }),
 
+    DungeonBossHunt = table.freeze({
+        Id = "DungeonBossHunt",
+        DisplayName = "Break the Chain",
+        Kind = "Adventure",
+        MinimumLevel = 15,
+        PrerequisiteQuestId = "MineEchoes",
+        AllowedRaces = ADVENTURE_RACES,
+        AllowedBaseClasses = table.freeze({
+            "Fighter", "Mage", "Ranger", "Rogue",
+        }),
+        Objectives = table.freeze({
+            table.freeze({
+                Id = "DefeatMarauderCaptain",
+                Type = "EnemyDefeat",
+                TargetId = "marauder_captain",
+                Required = 1,
+            }),
+            table.freeze({
+                Id = "DefeatCorruptedForeman",
+                Type = "EnemyDefeat",
+                TargetId = "corrupted_foreman",
+                Required = 1,
+            }),
+        }),
+        Reward = table.freeze({
+            Gold = 120,
+        }),
+    }),
+
     ExpeditionProvisioning = table.freeze({
         Id = "ExpeditionProvisioning",
         DisplayName = "Provisions for the Next Expedition",
@@ -305,6 +334,7 @@ function QuestDefinitions.adventures(): {any}
         DEFINITIONS.MarauderCaptainBounty,
         DEFINITIONS.MineEchoes,
         DEFINITIONS.CorruptedForemanBounty,
+        DEFINITIONS.DungeonBossHunt,
         DEFINITIONS.ExpeditionProvisioning,
     })
 end
