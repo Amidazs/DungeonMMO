@@ -1,3 +1,37 @@
+## 28 September 2026 — CURRENT v3.39 mixed-objective Adventure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_39_Mixed_Objective_Adventure_GREEN_20260928.md);
+[evidence](
+../testing/mixed-objective-adventure-v3-39-green-20260928.md).
+
+The next richer launch-content gate is accepted.
+
+New optional Adventure:
+**Follow the Fracture** (`FractureTrail`).
+
+- minimum level 12;
+- prerequisite Ruin Survey;
+- trusted Temple CombatRoom2 checkpoint;
+- trusted fresh Abandoned Mine clear;
+- reward: 90 Gold + 2 Warding Essence;
+- no profession requirement.
+
+This is the first accepted Adventure that deliberately combines
+`CheckpointReached` and `DungeonClear` in one quest. No new objective type
+or client-trusted event was introduced.
+
+Fresh validation:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10`;
+`VERIFIED_CHECKPOINT_ADVENTURE_FOCUS_PASS 5`.
+
+The launch pacing now includes meaningful beats around levels 1, 5, 8, 10, 12,
+15 and the level-20 first-transfer milestone.
+
+Next work should start pairing accepted quests with stronger dialogue,
+narrative continuity and presentation instead of simply increasing quest count.
+Depths 2-4 remain release-disabled until their physical content is ready.
+
 ## 28 September 2026 — CURRENT v3.38 trusted checkpoint Adventure GREEN
 
 [Roadmap](
