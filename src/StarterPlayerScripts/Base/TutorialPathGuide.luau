@@ -32,6 +32,7 @@ local PATH_REFRESH_SECONDS = 0.35
 local TARGET_REFRESH_DISTANCE = 1
 local REROUTE_DISTANCE = 14
 local REROUTE_COOLDOWN = 0.45
+local SOURCE_SMOOTH_SPEED = 12
 local JOIN_SMOOTH_SPEED = 12
 local ROUTE_BLEND_SPEED = 3.2
 
@@ -819,6 +820,7 @@ function Guide:_clear_route()
     self._join_progress = nil
     self._route_deviation = math.huge
     self._route_blend = 1
+    self._source_position = nil
     self:_hide_visuals(true)
 end
 
@@ -1147,7 +1149,7 @@ function Guide:_update_visuals(delta_time: number)
         return
     end
 
-    local player_floor = floor_position(
+    local raw_player_floor = floor_position(
         root.Position - Vector3.new(
             0,
             PLAYER_FLOOR_OFFSET,
@@ -1156,6 +1158,26 @@ function Guide:_update_visuals(delta_time: number)
         self._player.Character,
         self._folder
     )
+
+    if self._source_position == nil then
+        self._source_position = raw_player_floor
+    else
+        local source_alpha = smoothing_alpha(
+            SOURCE_SMOOTH_SPEED,
+            delta_time
+        )
+        self._source_position = floor_position(
+            self._source_position:Lerp(
+                raw_player_floor,
+                source_alpha
+            ),
+            self._player.Character,
+            self._folder
+        )
+    end
+
+    local player_floor = self._source_position
+        or raw_player_floor
     local join_progress = self:_update_join_progress(
         player_floor,
         delta_time
@@ -1353,6 +1375,7 @@ function Guide.new(player: Player): any
         _join_progress = nil,
         _route_deviation = math.huge,
         _route_blend = 1,
+        _source_position = nil,
         _last_reroute_time = -math.huge,
         _flow_phase = 0,
         _render_connection = nil,
