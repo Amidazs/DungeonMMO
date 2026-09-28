@@ -1,3 +1,26 @@
+## 28 September 2026 — v3.35 Corrupted Foreman identity GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_35_Corrupted_Foreman_Identity_GREEN_20260928.md);
+[evidence](
+../testing/corrupted-foreman-identity-v3-35-green-20260928.md).
+
+The Mine boss identity mismatch is fixed and Studio-validated.
+
+Current authoritative Mine boss identity:
+`BossId = CorruptedForeman`,
+`BestiaryCreatureId = corrupted_foreman`.
+
+Captain and Foreman Bestiary progress remain separate, and the executor cannot
+fall back to the Captain identity after scaling.
+
+Fresh marker:
+`VERIFIED_MINE_FOREMAN_IDENTITY_FOCUS_PASS 5`.
+
+Next development task: author and validate the optional Corrupted Foreman
+Adventure on the trusted EnemyDefeat boundary. Permanent edits remain
+GitHub-only; Desktop Commander is for pull/build/Studio evidence.
+
 ## 28 September 2026 — v3.34 level-five Marauder Captain bounty GREEN
 
 [Roadmap](
