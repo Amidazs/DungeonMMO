@@ -148,6 +148,33 @@ local function main()
         "Dark Elf Fighter can start Worldroot Relic"
     )
 
+    local captain = assert(
+        QuestDefinitions.get("MarauderCaptainBounty")
+    )
+    local level_four = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    level_four.Level = 4
+    check(
+        not QuestDefinitions.is_character_eligible(
+            level_four,
+            captain
+        ),
+        "level-four Dark Elf cannot start Captain bounty"
+    )
+
+    local level_five = dark_elf_fighter({
+        WorldrootRelic = true,
+    })
+    level_five.Level = 5
+    check(
+        QuestDefinitions.is_character_eligible(
+            level_five,
+            captain
+        ),
+        "level-five Dark Elf can start Captain bounty"
+    )
+
     local mine = assert(
         QuestDefinitions.get("MineEchoes")
     )
