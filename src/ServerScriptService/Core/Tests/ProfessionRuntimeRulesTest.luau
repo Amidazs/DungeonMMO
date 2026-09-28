@@ -25,6 +25,8 @@ check(#dungeon_nodes >= 6, "Temple must support multiple independent resource no
 
 local room1_count = 0
 local room2_count = 0
+local room3_count = 0
+local advanced_nodes = {}
 local seen_ids: {[string]: boolean} = {}
 local has_wall_probe = false
 local has_floor_probe = false
@@ -40,6 +42,9 @@ for _, node in ipairs(dungeon_nodes) do
         room1_count += 1
     elseif node.AnchorId == "Temple.Room2.Checkpoint" then
         room2_count += 1
+    elseif node.AnchorId == "Temple.Room3.Checkpoint" then
+        room3_count += 1
+        advanced_nodes[node.Id] = node
     end
 
     for _, probe in ipairs(node.Probes) do
@@ -48,7 +53,30 @@ for _, node in ipairs(dungeon_nodes) do
     end
 end
 
-check(room1_count >= 2 and room2_count >= 2, "Each Temple gathering room must be able to contain multiple nodes.")
+check(
+    room1_count >= 2 and room2_count >= 2,
+    "Foundation Temple gathering rooms contain multiple nodes."
+)
+check(
+    room3_count == 2,
+    "Room 3 contains exactly the two advanced launch gather nodes."
+)
+local deep_iron = advanced_nodes["Temple.Room3.DeepIronVein"]
+local moonpetal = advanced_nodes["Temple.Room3.MoonpetalPatch"]
+check(
+    deep_iron
+        and deep_iron.ProfessionId == "Mining"
+        and deep_iron.ItemId == "deep_iron_ore"
+        and deep_iron.RequiredLevel == 3,
+    "Deep Iron is a level-three Mining node."
+)
+check(
+    moonpetal
+        and moonpetal.ProfessionId == "Herbalism"
+        and moonpetal.ItemId == "moonpetal"
+        and moonpetal.RequiredLevel == 3,
+    "Moonpetal is a level-three Herbalism node."
+)
 check(has_wall_probe, "At least one Temple node must exercise reachable wall placement.")
 check(has_floor_probe, "Temple nodes must support embedded floor placement.")
 
