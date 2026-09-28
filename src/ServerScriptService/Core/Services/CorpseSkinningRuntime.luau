@@ -13,12 +13,59 @@ local CorpseSkinningRuntime = {}
 
 local BEAST_TAG = "DungeonMMOSkinnableBeast"
 local SKINNING_RANGE = 12
-local HIDE_NODE = table.freeze({
-    ProfessionId = "Skinning",
-    ItemId = "raw_hide",
-    Quantity = 1,
-    XP = 8,
+local ADVANCED_SKINNING_LEVEL = 3
+
+local HIDE_NODES = table.freeze({
+    Basic = table.freeze({
+        ProfessionId = "Skinning",
+        ItemId = "raw_hide",
+        Quantity = 1,
+        XP = 8,
+        RequiredLevel = 1,
+    }),
+    Advanced = table.freeze({
+        ProfessionId = "Skinning",
+        ItemId = "thick_hide",
+        Quantity = 1,
+        XP = 18,
+        RequiredLevel = ADVANCED_SKINNING_LEVEL,
+    }),
 })
+
+--[[
+Selects the server-authored hide yield for the owner's Skinning level.
+
+Args:
+    professions (any): Authoritative profession service.
+    user_id (number): Loaded player profile owner.
+
+Returns:
+    (any?, string?): Gather node or stable refusal reason.
+]]
+local function skinning_node(
+    professions: any,
+    user_id: number
+): (any?, string?)
+    if not professions
+        or type(professions.get_profession_level) ~= "function"
+    then
+        return nil, "SkinningProfessionUnavailable"
+    end
+
+    local level, reason = professions:get_profession_level(
+        user_id,
+        "Skinning"
+    )
+    if not level then
+        return nil, reason or "SkinningProfessionUnavailable"
+    end
+
+    if level >= ADVANCED_SKINNING_LEVEL then
+        return HIDE_NODES.Advanced, nil
+    end
+
+    return HIDE_NODES.Basic, nil
+end
 
 -- Args:
 --   model: any; the server-owned creature model to check.
@@ -73,10 +120,21 @@ function CorpseSkinningRuntime.try_skin(
         return {ok = false, reason = "NotAtSkinnableCreature"}
     end
 
+    local node, node_reason = skinning_node(
+        professions,
+        player.UserId
+    )
+    if not node then
+        return {
+            ok = false,
+            reason = node_reason or "SkinningProfessionUnavailable",
+        }
+    end
+
     -- This is synchronous: a second request cannot enter before the claim.
     model:SetAttribute("SkinningClaimed", true)
     local ok, result = pcall(function()
-        return professions:gather(player.UserId, HIDE_NODE)
+        return professions:gather(player.UserId, node)
     end)
     if not ok or type(result) ~= "table" or result.ok ~= true then
         model:SetAttribute("SkinningClaimed", false)
