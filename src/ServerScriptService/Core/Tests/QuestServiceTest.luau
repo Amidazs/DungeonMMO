@@ -217,9 +217,101 @@ check(
         == "QuestAlreadyCompleted",
     "The one-time relic quest cannot be restarted for extra rewards."
 )
+
+check(
+    quests:start(5103, "ForestWolfBounty").ok,
+    "Worldroot completion unlocks the optional Forest Wolf bounty."
+)
+local marauder_defeat = quests:record_event(5103, {
+    EventId = "story:wolf-bounty-marauder",
+    Type = "EnemyDefeat",
+    TargetId = "marauder",
+    Amount = 1,
+})
+check(
+    marauder_defeat.ok,
+    "Unrelated trusted enemy defeats remain harmless."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ForestWolfBounty"
+    ).reason == "QuestNotReady",
+    "Marauder defeat cannot satisfy the Forest Wolf bounty."
+)
+
+local wolf_defeat_one = quests:record_event(5103, {
+    EventId = "story:wolf-bounty-1",
+    Type = "EnemyDefeat",
+    TargetId = "forest_wolf",
+    Amount = 1,
+})
+check(
+    wolf_defeat_one.ok,
+    "First trusted Forest Wolf defeat progresses the bounty."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ForestWolfBounty"
+    ).reason == "QuestNotReady",
+    "One Forest Wolf is not enough for the two-kill bounty."
+)
+
+local duplicate_wolf = quests:record_event(5103, {
+    EventId = "story:wolf-bounty-1",
+    Type = "EnemyDefeat",
+    TargetId = "forest_wolf",
+    Amount = 1,
+})
+check(
+    duplicate_wolf.ok,
+    "Duplicate trusted event is accepted idempotently."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ForestWolfBounty"
+    ).reason == "QuestNotReady",
+    "Duplicate event cannot count the same wolf twice."
+)
+
+local wolf_defeat_two = quests:record_event(5103, {
+    EventId = "story:wolf-bounty-2",
+    Type = "EnemyDefeat",
+    TargetId = "forest_wolf",
+    Amount = 1,
+})
+check(
+    wolf_defeat_two.ok,
+    "Second unique Forest Wolf defeat readies the bounty."
+)
+local wolf_claim = quests:claim_reward(
+    5103,
+    "ForestWolfBounty"
+)
+check(
+    wolf_claim.ok
+        and wolf_claim.gold_granted == 40
+        and type(wolf_claim.items_granted) == "table"
+        and #wolf_claim.items_granted == 0,
+    "Forest Wolf bounty pays its server-owned Gold-only reward."
+)
+check(
+    profiles:get_character(5103).Gold == 65,
+    "Gold-only bounty adds no hidden item grant."
+)
+check(
+    quests:claim_reward(
+        5103,
+        "ForestWolfBounty"
+    ).reason == "QuestAlreadyCompleted",
+    "Forest Wolf bounty cannot be claimed twice."
+)
+
 check(
     quests:start(5103, "MineEchoes").ok,
-    "Completing the first quest must unlock its follow-up."
+    "Optional wolf bounty does not block the Mine story follow-up."
 )
 check(
     quests:claim_reward(5103, "MineEchoes").reason == "QuestNotReady",
@@ -241,7 +333,7 @@ check(
 )
 rewarded = profiles:get_character(5103)
 check(
-    rewarded.Gold == 75
+    rewarded.Gold == 115
         and InventoryService.count_item(rewarded, "iron_ore") == 5
         and InventoryService.count_item(
             rewarded, "worldroot_relic"
@@ -309,7 +401,7 @@ check(
 
 rewarded = profiles:get_character(5103)
 check(
-    rewarded.Gold == 150
+    rewarded.Gold == 190
         and InventoryService.count_item(
             rewarded,
             "deep_iron_ore"
@@ -345,10 +437,11 @@ check(profiles:load(5103) ~= nil, "Claimed quest profile must reload.")
 local restored = profiles:get_character(5103)
 check(
     restored.Quests.Completed.WorldrootRelic == true
+        and restored.Quests.Completed.ForestWolfBounty == true
         and restored.Quests.Completed.MineEchoes == true
         and restored.Quests.Completed.ExpeditionProvisioning
             == true
-        and restored.Gold == 150
+        and restored.Gold == 190
         and InventoryService.count_item(
             restored,
             "worldroot_relic"
@@ -370,6 +463,8 @@ check(
 check(
     quests:claim_reward(5103, "WorldrootRelic").reason
         == "QuestAlreadyCompleted"
+        and quests:claim_reward(5103, "ForestWolfBounty").reason
+            == "QuestAlreadyCompleted"
         and quests:claim_reward(5103, "MineEchoes").reason
             == "QuestAlreadyCompleted"
         and quests:claim_reward(
