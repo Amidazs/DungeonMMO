@@ -1,3 +1,26 @@
+## 28 September 2026 — CURRENT v3.36 level-ten Foreman bounty GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_36_Corrupted_Foreman_Bounty_GREEN_20260928.md);
+[evidence](
+../testing/corrupted-foreman-bounty-v3-36-green-20260928.md).
+
+Launch Adventure content now includes two optional boss bounties:
+
+- level 5: The Captain's Price -> one `marauder_captain` -> 60 Gold;
+- level 10: The Foreman's Reckoning -> one `corrupted_foreman` -> 80 Gold.
+
+The Foreman bounty requires Mine Echoes but remains optional; Expedition
+Provisioning still requires only Mine Echoes.
+
+Fresh current-head validation returned:
+`VERIFIED_PROFESSION_QUEST_CONTENT_FOCUS_PASS 10` and
+`VERIFIED_LAUNCH_BOUNTY_DUNGEON_PASS 6`.
+
+Next: add launch-level content between level 10 and the level-20 first-transfer
+milestone. Use only released Depth-1 encounters and existing trusted server
+events unless a new event boundary is explicitly implemented and tested.
+
 ## 28 September 2026 — CURRENT v3.35 Corrupted Foreman identity GREEN
 
 [Roadmap](
