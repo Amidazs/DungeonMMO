@@ -21,8 +21,8 @@ Runtime.__index = Runtime
 
 local FOLDER_NAME = "DungeonMMOQuestGivers"
 local MIN_GIVER_DISTANCE = 30
-local GROUND_RAY_HEIGHT = 6
-local GROUND_RAY_DEPTH = 36
+local GROUND_RAY_HEIGHT = 70
+local GROUND_RAY_DEPTH = 180
 local MIN_GROUND_NORMAL_Y = 0.72
 local APPROACH_WIDTH = 5
 local APPROACH_HEIGHT = 6
@@ -558,7 +558,7 @@ local function validate_path(
         AgentRadius = 2,
         AgentHeight = 5,
         AgentCanJump = true,
-        AgentCanClimb = true,
+        AgentCanClimb = false,
         WaypointSpacing = 6,
     })
 
