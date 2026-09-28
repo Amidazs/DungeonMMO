@@ -29,7 +29,7 @@ local JOIN_AHEAD_DISTANCE = 3.5
 
 local PATH_REFRESH_SECONDS = 0.35
 local TARGET_REFRESH_DISTANCE = 1
-local REROUTE_DISTANCE = 6
+local REROUTE_DISTANCE = 14
 local REROUTE_COOLDOWN = 0.45
 local JOIN_SMOOTH_SPEED = 12
 local ROUTE_BLEND_SPEED = 3.2
@@ -798,6 +798,9 @@ function Guide:_install_route(route: any)
     self._structural_route = route
     self._join_progress = nil
     self._last_reroute_time = os.clock()
+
+    self:_ensure_marker_pool(MAX_MARKERS)
+    self:_ensure_arrow_pool(MAX_ARROWS)
 end
 
 --[[
