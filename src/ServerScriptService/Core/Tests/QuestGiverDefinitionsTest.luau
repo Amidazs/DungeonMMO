@@ -58,6 +58,11 @@ local function main()
             giver.Id .. " has a readable speaker role"
         )
         check(
+            type(giver.AnchorId) == "string"
+                and giver.AnchorId:sub(1, 5) == "Base.",
+            giver.Id .. " has a semantic Base anchor"
+        )
+        check(
             typeof(giver.Offset) == "CFrame",
             giver.Id .. " has a physical hub offset"
         )
