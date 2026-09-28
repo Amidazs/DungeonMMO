@@ -1,3 +1,35 @@
+## 28 September 2026 — v3.29 profession blueprint acquisition GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_29_Profession_Blueprint_Acquisition_GREEN_20260928.md);
+[evidence](
+../testing/profession-blueprint-acquisition-v3-29-green-20260928.md).
+
+The first v3.28 profession-content gap is closed.
+
+Blueprint acquisition now uses independent persistent RewardService rolls.
+Foundation blueprints can drop from current Depth-1 boss/completion sources;
+the advanced four-profession pool is registered on higher-depth and optional
+boss identities without changing their existing release gates.
+
+Rare level-5 blueprints teach balanced batch recipes only: exactly double
+normal materials, output and XP. The ordinary level-5 recipe stays
+default-known. A blueprint can drop to an off-profession player, be sold
+through MarketService, bought by the appropriate crafter, consumed by
+RecipeKnowledgeService and then used successfully.
+
+Fresh markers:
+`VERIFIED_PROFESSION_BLUEPRINT_ACQUISITION_PASS 12` and
+`VERIFIED_PROFESSION_ECONOMY_REGRESSION_PASS 22`.
+
+Next: close the **live Skinning supply** gap. Audit the already registered
+Forest Wolf factory/archetype, bind an actual animal-like Dungeon encounter,
+and prove real death -> loot complete -> one-claim/contested Skinning without
+weakening the animal-only rules or accidental release boundaries.
+
+Permanent source/document edits remain GitHub-only; use Desktop Commander for
+pull/build/Studio/Play evidence.
+
 ## 28 September 2026 — v3.28 profession economy backbone GREEN
 
 [Roadmap](
