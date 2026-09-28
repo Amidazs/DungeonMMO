@@ -1,3 +1,37 @@
+## 28 September 2026 — CURRENT v3.25 Dwarf backend GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_25_Dwarf_Backend_GREEN_20260928.md);
+[green acceptance evidence](
+../testing/c4-dwarf-backend-v3-25-green-20260928.md).
+
+The level-30 first-transfer source/backend catalogue is now closed at
+**18 / 18 audited and rank-mapped branches**.
+
+Current aggregate source coverage is **24 paths / 1419 learning rows /
+171 unique source skill IDs**. Dwarf details are now validated in real Studio
+Play:
+
+- Dwarven Fighter: 15 inherited starter rows;
+- Gearwright / Artisan: 50 rows at 16/15/19, 1 gathering + 2 crafting;
+- Deepclaimer / Scavenger: 49 rows at **15/15/19**, 2 gathering + 1 crafting;
+- Gearwright source resources: 1161 HP / 327 MP / 921 CP at level 30;
+- Deepclaimer source resources: 1197 HP / 327 MP / 834 CP at level 30.
+
+Accepted Play markers:
+
+- `VERIFIED_DWARF_BACKEND_FOCUS_PASS 25`
+- `VERIFIED_DWARF_CORPSE_RETENTION_PASS`
+- `VERIFIED_DWARF_LIVE_SPOIL_SWEEP_LIFECYCLE_PASS`
+
+Spoil/Sweep ownership, duplicate-claim rejection, tradeable specialist salvage
+and actual Dungeon corpse retention are green. Dwarf creation remains disabled,
+Q417/Q418 NPC/world binding is still absent, and Spoil Festival's source radius
+200 has not been converted to Roblox studs. Do not guess that conversion.
+
+Next: bind the Dwarf world/quest layer, then move into the broader
+professions/economy and launch-level quest/content work.
+
 ## 28 September 2026 — CURRENT v3.24 Gearwright validation pending
 
 [Roadmap](
