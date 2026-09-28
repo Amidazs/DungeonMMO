@@ -1,3 +1,45 @@
+## 28 September 2026 — CURRENT v3.28 profession economy backbone GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_28_Profession_Economy_Backbone_GREEN_20260928.md);
+[evidence](
+../testing/profession-economy-v3-28-green-20260928.md).
+
+The first launch profession/economy backbone is green without changing the
+accepted slot model:
+
+- normal: **1 gathering + 1 crafting**;
+- Gearwright: **1 gathering + 2 crafting**;
+- Deepclaimer: **2 gathering + 1 crafting**.
+
+Gathering now enforces authored profession levels before item/XP mutation.
+Level-3 launch raw materials are Deep Iron Ore, Moonpetal and Thick Hide.
+Deep Iron and Moonpetal physically spawn around the accepted Room 3 checkpoint;
+Skinning level 3+ yields Thick Hide from the existing animal-only corpse
+authority.
+
+Every crafting profession now has normal tradeable component progression
+through levels 3, 4 and 5. The ordinary ladder never requires Deepclaimer
+salvage. Gearwright adds optional level-5 premium recipes that mix ordinary
+high-tier components with one tradeable specialist salvage item.
+
+Fresh unpublished Play:
+
+- `VERIFIED_PROFESSION_LAUNCH_ECONOMY_FOCUS_PASS 22`;
+- four-player level-5 market chain: **214 assertions**;
+- Gearwright premium market chain: **24 assertions**;
+- `VERIFIED_PROFESSION_ROOM3_ADVANCED_NODES_PASS`;
+- physical advanced nodes resolved to real floor geometry **27.00 studs**
+  apart.
+
+Do not overstate this as final profession content. High-tier blueprint
+acquisition/drop distribution, a confirmed live advanced Skinning beast
+source, final station/resource presentation and real crafting minigames remain
+open.
+
+Next gate: close those profession-content acquisition/presentation gaps, then
+continue launch-level quest/content expansion.
+
 ## 28 September 2026 — CURRENT v3.27 Dwarf spatial binding GREEN
 
 [Roadmap](
