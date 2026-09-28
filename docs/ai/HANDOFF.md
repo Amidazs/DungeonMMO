@@ -1,3 +1,38 @@
+## 28 September 2026 — v3.27 Dwarf spatial binding GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_27_Dwarf_Spatial_GREEN_20260928.md);
+[evidence](
+../testing/c4-dwarf-spatial-v3-27-green-20260928.md).
+
+The previously open Spoil Festival spatial gate is closed.
+
+Use **14 C4 source units per Roblox stud** as the reviewed launch world mapping.
+Do not replace it with the old Studio-only 1:1 harness convenience. Exact
+skill metadata stays in source units and converts only at the server world
+boundary.
+
+C4 castRange behavior is collision-adjusted. DungeonMMO mirrors that with
+HumanoidRootPart horizontal half-extents before distance denial.
+
+Accepted:
+Spoil 40, Sweep 20, Festival 40 + radius 200; pre-MP range rejection;
+same-encounter Festival target collection; reviewed NPC/corpse boundaries;
+source-certified quest packs; default-off runtime composition.
+
+Fresh Play markers:
+`VERIFIED_C4_QUEST_PACK_SOURCE_BOUNDARY_PASS`,
+`VERIFIED_DWARF_SPATIAL_V2_PASS 4`,
+`VERIFIED_DWARF_BACKEND_SPATIAL_V2_PASS 27`.
+
+Next development is no longer class/source work. Audit professions/economy:
+gathering nodes, materials, recipes, blueprints, progression and cross-player
+dependencies. Preserve the accepted slot rules and avoid making Dwarves
+self-sufficient enough to erase trading pressure.
+
+Permanent edits stay GitHub-only; use Desktop Commander for pull/build/Studio
+evidence.
+
 ## 28 September 2026 — v3.26 Dwarf world infrastructure GREEN
 
 [Roadmap](
