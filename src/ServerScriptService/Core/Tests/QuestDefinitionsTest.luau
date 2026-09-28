@@ -45,6 +45,35 @@ check(
         == "ElfWindrunner",
     "Elf Ranger must resolve to its approved Windrunner class."
 )
+local adventures = QuestDefinitions.adventures()
+check(
+    #adventures == 3
+        and adventures[1].Id == "WorldrootRelic"
+        and adventures[2].Id == "MineEchoes"
+        and adventures[3].Id == "ExpeditionProvisioning",
+    "Adventure catalogue must preserve the three-quest story order."
+)
+
+local provisioning = assert(
+    QuestDefinitions.get("ExpeditionProvisioning")
+)
+check(
+    provisioning.PrerequisiteQuestId == "MineEchoes",
+    "Provisioning must follow the existing Mine story quest."
+)
+check(
+    #provisioning.Objectives == 2
+        and provisioning.Objectives[1].TargetId == "TestDungeon"
+        and provisioning.Objectives[2].TargetId == "AbandonedMine",
+    "Provisioning must require one fresh clear of both launch dungeons."
+)
+check(
+    type(provisioning.Reward.Items) == "table"
+        and #provisioning.Reward.Items == 3
+        and provisioning.Reward.Gold == 75,
+    "Provisioning must expose the reviewed three-material reward bundle."
+)
+
 for _, trial_id in ipairs({
     "FighterAdvancementTrial",
     "MageAdvancementTrial",
