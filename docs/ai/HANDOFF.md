@@ -1,3 +1,40 @@
+## 28 September 2026 — v3.26 Dwarf world infrastructure GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_26_Dwarf_World_Infrastructure_GREEN_20260928.md);
+[evidence](
+../testing/c4-dwarf-world-v3-26-green-20260928.md).
+
+Dwarf world infrastructure is accepted on top of v3.25 backend GREEN.
+
+Accepted:
+
+- dedicated optional Dwarf Base hub;
+- 8 original-name quest actors;
+- 2 transfer mentors + 2 class trainers;
+- target-driven physical NPC quest receipts;
+- all five Gearwright/Deepclaimer quest monster identities in the real
+  Dungeon source-pack augmentation path;
+- generic quest-monster step registration;
+- same-owner source Spoil verification for Deepclaimer;
+- no guessed Dwarf quest-monster HP: temporary rigs inherit room health.
+
+Fresh Play evidence:
+Original Quest NPC Binding **46 PASS**,
+First Transfer Mentor Binding **21 PASS**,
+Dwarf Quest Hub Contract **5 PASS**,
+C4 Source Pack **61 PASS**,
+C4 Quest Combat Ledger **114 PASS**, and
+`VERIFIED_DWARF_WORLD_V6_BACKEND_PASS 25`.
+
+Important boundaries: Dwarf creation remains disabled; normal-player
+end-to-end Q417/Q418 is therefore not claimed. Final Dwarf quest-monster
+art/AI/templates remain content work. Spoil Festival's source radius 200 is
+still unconverted and its source salvage bridge remains default-off.
+
+Next: resolve the existing project-wide C4 source-unit/stud convention, then
+bind Spoil Festival's server-only area selection.
+
 ## 28 September 2026 — v3.25 Dwarf backend GREEN
 
 [Roadmap](
