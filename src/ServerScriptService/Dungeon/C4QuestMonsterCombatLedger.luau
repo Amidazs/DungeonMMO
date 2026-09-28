@@ -77,7 +77,7 @@ Args:
     enemy (Model): Server-spawned model with real living Humanoid.
     branch_id (string): Original source-quest class branch.
     encounter_id (string): Current authoritative dungeon encounter.
-    step_index (number?): Exact enabled stage three or six; defaults to three.
+    step_index (number?): Exact quest-monster step; defaults to three.
 
 Returns:
     boolean: Whether this exact model life can produce quest evidence.
@@ -93,9 +93,7 @@ function Ledger:register_enemy(
     local quest = Source.get(branch_id)
     local index = step_index or 3
     local step = quest and quest.Steps[index]
-    if (index ~= 3 and index ~= 5 and index ~= 6)
-        or not step or step.Kind ~= "QuestMonsterDefeat"
-    then
+    if not step or step.Kind ~= "QuestMonsterDefeat" then
         return false
     end
     local humanoid = enemy:FindFirstChildOfClass("Humanoid")
@@ -116,6 +114,7 @@ function Ledger:register_enemy(
         TargetId = step.TargetId,
         EncounterId = encounter_id,
         ReceiptId = HttpService:GenerateGUID(false),
+        Enemy = enemy,
         Hits = {},
         Claimed = false,
     }
@@ -240,6 +239,27 @@ local function next_proof(state: any): {[string]: boolean}?
 end
 
 --[[
+Checks whether this exact owner server-spoiled the registered enemy.
+
+Args:
+    enemy (any): Registered physical quest monster.
+    user_id (number): Eligible owner receiving the kill receipt.
+
+Returns:
+    boolean: True only for an owner-bound source Spoil or Spoil Festival mark.
+]]
+local function spoil_verified(enemy: any, user_id: number): boolean
+    if typeof(enemy) ~= "Instance" or not enemy:IsA("Model") then
+        return false
+    end
+
+    local source_skill_id = enemy:GetAttribute("C4SalvageSourceSkillId")
+    return enemy:GetAttribute("C4SalvageOwnerUserId") == user_id
+        and (source_skill_id == 254 or source_skill_id == 302)
+        and enemy:GetAttribute("C4SalvageClaimed") ~= true
+end
+
+--[[
 Creates server-only proof from a registered dead monster and its owner.
 
 Args:
@@ -281,6 +301,9 @@ local function event_for_owner(
         then {StonewatchBadge = true}
         elseif record.BranchId == "ElvenKnight"
         then {VerdantPatrolReport = true}
+        elseif record.BranchId == "DwarfArtisan"
+            or record.BranchId == "DwarfScavenger"
+        then {}
         else next_proof(state)
     if not proof_ids then return nil end
     return {
@@ -292,6 +315,8 @@ local function event_for_owner(
         TargetId = record.TargetId,
         VerifiedProofIds = proof_ids,
         TrialWeaponVerified = record.Hits[user_id] == true,
+        SpoilVerified = record.BranchId == "DwarfScavenger"
+            and spoil_verified(record.Enemy, user_id),
     }
 end
 
