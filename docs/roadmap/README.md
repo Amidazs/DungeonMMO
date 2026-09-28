@@ -1,3 +1,16 @@
+**v3.26 DWARF WORLD INFRASTRUCTURE — GREEN / CREATION DISABLED:** [roadmap](
+DungeonMMO_Roadmap_v3_26_Dwarf_World_Infrastructure_GREEN_20260928.md)
+and [evidence](
+../testing/c4-dwarf-world-v3-26-green-20260928.md).
+The dedicated Dwarf Base hub now binds **8 quest actors, 2 transfer mentors
+and 2 class trainers** without falling back to the Human spawn. The real
+Dungeon quest-pack path now physically supports all five Gearwright/
+Deepclaimer quest targets, with **61 source-pack assertions**, **114 quest
+ledger assertions**, and the full **25-suite Dwarf backend** still green.
+Deepclaimer kill proof requires the same player's server-owned Spoil mark.
+Fresh Dwarf creation remains disabled, unique final quest-monster art/AI is
+pending, and Spoil Festival's source-radius conversion is the next gate.
+
 **v3.25 DWARF FIRST-TRANSFER BACKEND — GREEN / WORLD BINDING PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_25_Dwarf_Backend_GREEN_20260928.md)
 and [evidence](
