@@ -93,7 +93,7 @@ local function main()
     local puzzle = Instance.new("Folder")
     puzzle.Name = "ResonancePuzzle"
     puzzle.Parent = temple
-    local moon = part(puzzle, "Moon")
+    local moon = part(puzzle, "MoonRune")
 
     local ward = part(temple, "ResonanceDefenseWard")
 
