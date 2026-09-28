@@ -1,3 +1,56 @@
+## 28 September 2026 — CURRENT v3.47 FRIEND TEST READY
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_47_Friend_Test_Ready_GREEN_20260928.md);
+[evidence](
+../testing/friend-test-v3-47-ready-20260928.md);
+[manual checklist](
+../testing/pre-section-d-user-playtest-checklist-20260928.md).
+
+The pre-Section-D build is now published for a real two-player test.
+
+Published TEST targets:
+
+- universe `10765241947`;
+- Base/start place `134132328219009`;
+- Dungeon place `117293035754309`.
+
+Independent fresh cloud reloads prove both Base and Dungeon are current at
+profile schema 15. Base contains the new-player tutorial and physical
+quest-giver definitions. Dungeon contains tutorial definitions,
+`DungeonQuestFeedbackRuntime` and the first-expedition tutorial client.
+
+Creator Dashboard access is intentionally restricted:
+
+- Audience: Limited;
+- Friends: ON;
+- Playtesters: ON;
+- Public: OFF.
+
+The Base tutorial teaches movement/camera, the Worldroot Keeper, first
+Adventure acceptance, party creation/invite/readiness, Temple entry, combat/HUD
+controls and hidden-room awareness. Low-level Dungeon entrants receive a first
+expedition tutorial covering party cohesion, checkpoints, recovery, controls
+and hidden mechanisms.
+
+Eight placeholder quest givers now use semantic hub locations rather than one
+board cluster. Mine Warden prefers `Base.DwarfQuestHub` and safely falls back
+to `Base.Travel.Dwarves` on the current authored lobby.
+
+Published Base composition was also corrected to package the six Combat runtime
+dependencies already required by current progression code. Both
+`published-base.project.json` and `test-lobby-sync.project.json` now include
+that subtree.
+
+Source checkpoint before the v3.47 documentation was
+`bb16fb7a1fa278dfcb648941f19019a20e1393a7`.
+
+Fresh final builds of published Base, published Dungeon and TEST lobby sync all
+pass, as does `git diff --check`.
+
+**HOLD remains active:** do not begin Section D until the user completes the
+two-player manual test and explicitly says to continue.
+
 ## 28 September 2026 — CURRENT v3.46 SECTION D READY — USER TEST HOLD
 
 [Roadmap](
