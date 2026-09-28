@@ -236,6 +236,8 @@ local function objective_label(objective: any): string
             return "Defeat Forest Wolves"
         elseif objective.TargetId == "marauder_captain" then
             return "Defeat the Marauder Captain"
+        elseif objective.TargetId == "corrupted_foreman" then
+            return "Defeat the Corrupted Foreman"
         end
     end
 
