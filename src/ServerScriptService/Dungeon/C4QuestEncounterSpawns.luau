@@ -17,6 +17,7 @@ local Careers = require(
 
 local Spawns = {}
 local PER_BRANCH_PER_ROOM = 2
+local TEMP_SOURCE_ARCHETYPE_ID = "Marauder"
 local CHALLENGES = table.freeze({
     HumanKnight = table.freeze({
         Name = "Gloam Striker",
@@ -228,6 +229,10 @@ local function create_challenge(options: any, factory: any): Model
     local enemy = factory.create(options)
     assert(typeof(enemy) == "Instance" and enemy:IsA("Model"))
     enemy:SetAttribute("SourceQuestMonsterId", options.SourceId)
+    enemy:SetAttribute(
+        "DungeonEnemyArchetypeId",
+        TEMP_SOURCE_ARCHETYPE_ID
+    )
     return enemy
 end
 
