@@ -1,3 +1,19 @@
+**v3.25 DWARF FIRST-TRANSFER BACKEND — GREEN / WORLD BINDING PENDING:** [roadmap](
+DungeonMMO_Roadmap_v3_25_Dwarf_Backend_GREEN_20260928.md)
+and [evidence](
+../testing/c4-dwarf-backend-v3-25-green-20260928.md).
+Both Dwarf first-transfer backends are now Studio-validated through level 30:
+Gearwright has **50/50 Artisan rows** and **1 gathering + 2 crafting**;
+Deepclaimer has **49/49 Scavenger rows** at exact **15/15/19** level
+20/24/28 brackets and **2 gathering + 1 crafting**. Aggregate source coverage
+is now **24 paths / 1419 rows / 171 source IDs**, with **18/18**
+first-transfer source inventories and rank schedules mapped. Genuine Play
+returned `VERIFIED_DWARF_BACKEND_FOCUS_PASS 25`,
+`VERIFIED_DWARF_CORPSE_RETENTION_PASS`, and
+`VERIFIED_DWARF_LIVE_SPOIL_SWEEP_LIFECYCLE_PASS`. Dwarf creation,
+Q417/Q418 world actors and Spoil Festival's reviewed Roblox area resolver
+remain deliberately pending.
+
 **v3.24 DWARF ARTISAN / GEARWRIGHT — VALIDATION PENDING:** [roadmap](
 DungeonMMO_Roadmap_v3_24_Gearwright_Validation_Pending_20260928.md).
 Pinned Dwarven Fighter class 53 and Artisan class 56 are now audited and
