@@ -20,11 +20,13 @@ local UiOrnament = require(
 -- obscures the selection highlight; leave IdentitySelectionUi untouched.
 local TARGET_GUIS = table.freeze({
     BankPanel = true,
+    C4FirstTransferChoiceUi = true,
     EquipmentPanelUi = true,
     GuildPanel = true,
     MarketPanel = true,
     ProfessionUi = true,
     ProgressionTrainerUi = true,
+    QuestBoard = true,
     RaceChangeProofPanel = true,
     TravelPanel = true,
 })
