@@ -1,3 +1,30 @@
+## 29 September 2026 — CURRENT v3.54 quest dungeon context / optional branches GREEN
+
+- `git diff --check`: PASS.
+- Base Rojo build: PASS.
+- Dungeon/default Rojo build: PASS.
+- Published Base Rojo build: PASS.
+- Published Dungeon Rojo build: PASS.
+- Optional Boss Flow: PASS.
+- Dungeon Encounter Flow: PASS.
+- Dungeon Encounter Sequencer: PASS.
+- Optional Depth Event: PASS.
+- Optional Entrance Gates: PASS.
+- Optional Dynamic Variant: PASS.
+- Timed Event Recovery: updated to the accepted optional-event contract.
+- Physical Temple required route with Event skipped: PASS.
+- Physical Temple required route with Secret skipped: PASS.
+- Run completion after both skips: PASS.
+- Real Temple entrance held-E UI open: PASS.
+- Quest dungeon/depth display: PASS.
+- Selected-depth mismatch warning: PASS.
+- Dungeon TEST publish terminal state: `PublishSuccessful`.
+- Base TEST publish terminal state: `PublishSuccessful`.
+- Fresh cloud changed-source equality: PASS.
+- Fresh cloud Dungeon Play startup: PASS.
+- Fresh cloud Base Play startup: PASS.
+- Section D: **HOLD for two-player friend test**.
+
 ## 27 September 2026 — CURRENT v3.15 Veilblade GREEN
 
 [Roadmap](
