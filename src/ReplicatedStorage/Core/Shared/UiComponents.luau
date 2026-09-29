@@ -5,7 +5,6 @@ local shared = ReplicatedStorage
     :WaitForChild("Core")
     :WaitForChild("Shared")
 local UiTheme = require(shared:WaitForChild("UiTheme"))
-local UiOrnament = require(shared:WaitForChild("UiOrnament"))
 local UiArt = require(shared:WaitForChild("UiArt"))
 
 local UiComponents = {}
