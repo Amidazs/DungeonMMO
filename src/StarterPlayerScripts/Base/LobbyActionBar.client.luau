@@ -2,7 +2,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local DISPLAY_SLOT_COUNT = 8
 local ACTIVE_SLOT_COUNT = 6
+
 local SLOT_TINTS = table.freeze({
     Color3.fromRGB(29, 82, 148),
     Color3.fromRGB(103, 47, 151),
@@ -10,6 +12,8 @@ local SLOT_TINTS = table.freeze({
     Color3.fromRGB(34, 105, 137),
     Color3.fromRGB(152, 105, 35),
     Color3.fromRGB(136, 43, 54),
+    Color3.fromRGB(55, 65, 77),
+    Color3.fromRGB(55, 65, 77),
 })
 
 local player = Players.LocalPlayer
@@ -31,11 +35,18 @@ local ProgressionConfig = require(
 local SkillDefinitions = require(
     combat_shared:WaitForChild("SkillDefinitions")
 )
-local UiArt = require(shared:WaitForChild("UiArt"))
+local HotbarConfig = require(
+    combat_shared:WaitForChild("HotbarConfig")
+)
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
 )
-local UiTheme = require(shared:WaitForChild("UiTheme"))
+local UiTheme = require(
+    shared:WaitForChild("UiTheme")
+)
 
 local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
@@ -58,23 +69,18 @@ local root = Instance.new("Frame")
 root.Name = "ActionBar"
 root.AnchorPoint = Vector2.new(0.5, 1)
 root.Position = UDim2.new(0.5, 0, 1, -8)
-root.Size = UDim2.fromOffset(768, 134)
+root.Size = UDim2.fromOffset(760, 114)
 root.BackgroundTransparency = 1
 root.BorderSizePixel = 0
 root.Parent = gui
-UiTheme.bind_responsive_scale(root, 1366, 0.68, 1)
+UiTheme.bind_responsive_scale(root, 1366, 0.64, 1)
 
-local action_bar_art = UiArt.popup_background(
-    root,
-    1
-)
-action_bar_art.Name = "ActionBarArt"
+UiArt.actionbar_background(root, 1)
 
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
-slots.AnchorPoint = Vector2.new(0.5, 0)
-slots.Position = UDim2.new(0.5, 0, 0, 16)
-slots.Size = UDim2.fromOffset(414, 78)
+slots.Position = UDim2.fromOffset(85, 13)
+slots.Size = UDim2.fromOffset(535, 62)
 slots.BackgroundTransparency = 1
 slots.BorderSizePixel = 0
 slots.ZIndex = 2
@@ -82,35 +88,90 @@ slots.Parent = root
 
 local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0, 6)
+layout.Padding = UDim.new(0, 5)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = slots
 
-local slot_names: {[number]: TextLabel} = {}
 local slot_sigils: {[number]: TextLabel} = {}
+local slot_wells: {[number]: Frame} = {}
+
+local xp_track = Instance.new("Frame")
+xp_track.Name = "ExperienceTrack"
+xp_track.Position = UDim2.fromOffset(86, 80)
+xp_track.Size = UDim2.fromOffset(598, 9)
+xp_track.BackgroundColor3 = Color3.fromRGB(25, 9, 33)
+xp_track.BackgroundTransparency = 0.05
+xp_track.BorderSizePixel = 0
+xp_track.ClipsDescendants = true
+xp_track.ZIndex = 2
+UiTheme.add_corner(xp_track, 4)
+xp_track.Parent = root
+
+local xp_fill = Instance.new("Frame")
+xp_fill.Name = "ExperienceFill"
+xp_fill.Size = UDim2.fromScale(0, 1)
+xp_fill.BackgroundColor3 = Color3.fromRGB(196, 27, 224)
+xp_fill.BorderSizePixel = 0
+xp_fill.ZIndex = 3
+UiTheme.add_corner(xp_fill, 4)
+UiTheme.add_gradient(
+    xp_fill,
+    Color3.fromRGB(236, 47, 255),
+    Color3.fromRGB(128, 19, 175)
+)
+xp_fill.Parent = xp_track
 
 local progression_text = UiComponents.label(
     root,
     "ProgressionText",
     "Lv. 1",
-    "Caption"
+    "Heading"
 )
-progression_text.AnchorPoint = Vector2.new(0.5, 1)
-progression_text.Position = UDim2.new(0.5, 0, 1, -1)
-progression_text.Size = UDim2.fromOffset(470, 18)
+progression_text.Position = UDim2.fromOffset(246, 89)
+progression_text.Size = UDim2.fromOffset(235, 22)
 progression_text.TextXAlignment = Enum.TextXAlignment.Center
-progression_text.TextColor3 = UiTheme.PALETTE.Text
-progression_text.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+progression_text.TextColor3 = Color3.fromRGB(248, 237, 211)
+progression_text.TextStrokeColor3 = Color3.new(0, 0, 0)
 progression_text.TextStrokeTransparency = 0.18
-progression_text.TextSize = 13
+progression_text.TextSize = 15
 progression_text.ZIndex = 4
 
 --[[
-Creates one display-only action slot for the Base lobby.
+Returns a compact keyboard label for a hotbar slot.
 
 Args:
-    slot (number): One-based loadout slot.
+    slot (number): One-based hotbar slot.
+
+Returns:
+    string: Player-facing key label.
+]]
+local function key_label(slot: number): string
+    local key = HotbarConfig.get_default_key(slot)
+    if not key then
+        return tostring(slot)
+    end
+
+    local names = {
+        One = "1",
+        Two = "2",
+        Three = "3",
+        Four = "4",
+        Five = "5",
+        Six = "6",
+        Seven = "7",
+        Eight = "8",
+    }
+
+    return names[key.Name] or key.Name
+end
+
+--[[
+Creates one high-resolution reference-framed action slot.
+
+Args:
+    slot (number): One-based display slot.
 
 Returns:
     None.
@@ -118,50 +179,40 @@ Returns:
 local function create_slot(slot: number)
     local frame = Instance.new("Frame")
     frame.Name = "Slot" .. tostring(slot)
-    frame.Size = UDim2.fromOffset(64, 78)
+    frame.LayoutOrder = slot
+    frame.Size = UDim2.fromOffset(62, 62)
     frame.BackgroundTransparency = 1
     frame.BorderSizePixel = 0
     frame.ZIndex = 2
     frame.Parent = slots
 
-    local slot_art = UiArt.image(
-        frame,
-        "SlotArt",
-        "HotbarSlot",
-        2
-    )
-    slot_art.Size = UDim2.fromOffset(62, 78)
-    slot_art.Position = UDim2.fromOffset(1, 0)
+    UiArt.action_slot(frame, 2)
 
     local icon_well = Instance.new("Frame")
     icon_well.Name = "IconWell"
-    icon_well.Position = UDim2.fromOffset(8, 8)
-    icon_well.Size = UDim2.fromOffset(48, 52)
-    icon_well.BackgroundColor3 =
-        SLOT_TINTS[slot]
-        or Color3.fromRGB(41, 69, 105)
+    icon_well.Position = UDim2.fromOffset(7, 8)
+    icon_well.Size = UDim2.fromOffset(48, 46)
+    icon_well.BackgroundColor3 = SLOT_TINTS[slot]
+    icon_well.BackgroundTransparency = if slot <= ACTIVE_SLOT_COUNT
+        then 0.08
+        else 0.58
     icon_well.BorderSizePixel = 0
+    icon_well.ClipsDescendants = true
     icon_well.ZIndex = 3
     icon_well.Parent = frame
 
     local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(
-            0,
-            icon_well.BackgroundColor3:Lerp(
-                Color3.new(1, 1, 1),
-                0.22
-            )
+    gradient.Color = ColorSequence.new(
+        SLOT_TINTS[slot]:Lerp(
+            Color3.new(1, 1, 1),
+            0.18
         ),
-        ColorSequenceKeypoint.new(
-            1,
-            icon_well.BackgroundColor3:Lerp(
-                Color3.new(0, 0, 0),
-                0.56
-            )
-        ),
-    })
-    gradient.Rotation = 90
+        SLOT_TINTS[slot]:Lerp(
+            Color3.new(0, 0, 0),
+            0.56
+        )
+    )
+    gradient.Rotation = 115
     gradient.Parent = icon_well
 
     local sigil = UiComponents.label(
@@ -172,41 +223,26 @@ local function create_slot(slot: number)
     )
     sigil.Size = UDim2.fromScale(1, 1)
     sigil.TextXAlignment = Enum.TextXAlignment.Center
-    sigil.TextColor3 = UiTheme.PALETTE.Text
-    sigil.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
-    sigil.TextStrokeTransparency = 0.1
-    sigil.TextSize = 25
+    sigil.TextColor3 = Color3.fromRGB(247, 232, 196)
+    sigil.TextStrokeColor3 = Color3.new(0, 0, 0)
+    sigil.TextStrokeTransparency = 0.14
+    sigil.TextSize = 24
     sigil.ZIndex = 4
     slot_sigils[slot] = sigil
-
-    local name = UiComponents.label(
-        frame,
-        "SkillName",
-        "Empty",
-        "Caption"
-    )
-    name.AnchorPoint = Vector2.new(0.5, 1)
-    name.Position = UDim2.new(0.5, 0, 1, -4)
-    name.Size = UDim2.new(1, -8, 0, 14)
-    name.TextXAlignment = Enum.TextXAlignment.Center
-    name.TextColor3 = UiTheme.PALETTE.TextMuted
-    name.TextTruncate = Enum.TextTruncate.AtEnd
-    name.TextSize = 8
-    name.ZIndex = 5
-    slot_names[slot] = name
+    slot_wells[slot] = icon_well
 
     local key = UiComponents.key_hint(
         frame,
-        tostring(slot)
+        key_label(slot)
     )
-    key.Position = UDim2.fromOffset(-3, -3)
-    key.Size = UDim2.fromOffset(19, 18)
+    key.Position = UDim2.fromOffset(2, 1)
+    key.Size = UDim2.fromOffset(18, 17)
     key.TextSize = 9
     key.ZIndex = 6
 end
 
 --[[
-Refreshes the displayed action slots from progression state.
+Refreshes the action slots and progression display.
 
 Args:
     snapshot (any): Current authoritative progression snapshot.
@@ -220,40 +256,53 @@ local function render(snapshot: any)
         then snapshot.Loadout
         else {}
 
-    for slot = 1, ACTIVE_SLOT_COUNT do
-        local skill_id = loadout[slot]
+    for slot = 1, DISPLAY_SLOT_COUNT do
+        local skill_id = if slot <= ACTIVE_SLOT_COUNT
+            then loadout[slot]
+            else nil
         local definition = if type(skill_id) == "string"
             then SkillDefinitions.get(skill_id)
             else nil
-        local display_name = if definition
-            then tostring(definition.DISPLAY_NAME)
-            else "Empty"
 
-        slot_names[slot].Text = display_name
-        slot_names[slot].TextColor3 = if definition
-            then UiTheme.PALETTE.Text
-            else UiTheme.PALETTE.TextMuted
         slot_sigils[slot].Text = if definition
-            then string.sub(display_name, 1, 1)
+            then string.sub(
+                tostring(definition.DISPLAY_NAME),
+                1,
+                1
+            )
             else "·"
+        slot_sigils[slot].TextTransparency =
+            if slot <= ACTIVE_SLOT_COUNT then 0 else 0.55
+        slot_wells[slot].BackgroundTransparency =
+            if definition then 0.08 else 0.62
     end
 
     local level = tonumber(snapshot.Level) or 1
     local xp = tonumber(snapshot.XP) or 0
     local required = ProgressionConfig.get_required_xp(level)
 
-    progression_text.Text = if required
-        then string.format(
-            "Lv. %d   %d / %d XP",
+    if required and required > 0 then
+        progression_text.Text = string.format(
+            "Lv. %d   %,d / %,d",
             level,
             xp,
             required
         )
-        else string.format("Lv. %d   MAX LEVEL", level)
+        UiTheme.set_bar_ratio(
+            xp_fill,
+            xp / required
+        )
+    else
+        progression_text.Text = string.format(
+            "Lv. %d   MAX LEVEL",
+            level
+        )
+        UiTheme.set_bar_ratio(xp_fill, 1)
+    end
 end
 
 --[[
-Builds the Base-only display bar and requests fresh progression data.
+Builds the Base-only display bar and requests progression data.
 
 Args:
     None.
@@ -262,7 +311,7 @@ Returns:
     None.
 ]]
 local function main()
-    for slot = 1, ACTIVE_SLOT_COUNT do
+    for slot = 1, DISPLAY_SLOT_COUNT do
         create_slot(slot)
     end
 
