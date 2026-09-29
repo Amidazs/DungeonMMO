@@ -69,7 +69,7 @@ local modal = UiComponents.modal(
     "StatsPanel",
     "Character",
     "Attributes, progression and current character identity.",
-    UDim2.fromOffset(640, 800)
+    UDim2.fromOffset(680, 850)
 )
 local panel = modal.Root
 panel.Visible = false
