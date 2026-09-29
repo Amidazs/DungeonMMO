@@ -834,6 +834,10 @@ local function build_difficulty_buttons(dungeon_id: string)
                 dungeon_id,
                 solo_difficulty_id
             )
+            render_quest_context(
+                dungeon_id,
+                solo_difficulty_id
+            )
         end)
     end
 end
