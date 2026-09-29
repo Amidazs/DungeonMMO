@@ -70,16 +70,18 @@ local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
-
--- Keep the modal's clean shell. Inventory items, character details,
--- tabs, counts and equipment are all rendered from live state.
+UiArt.reference_background(
+    panel,
+    "Inventory",
+    11
+)
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
@@ -379,16 +381,7 @@ local function render_tab_state(counts: any)
                 counts
             )
             local selected = category == selected_tab
-            button.BackgroundColor3 = if selected
-                then UiTheme.PALETTE.AccentDark
-                else UiTheme.PALETTE.SurfaceRaised
-            UiTheme.add_stroke(
-                button,
-                if selected
-                    then UiTheme.PALETTE.Accent
-                    else UiTheme.PALETTE.BorderSoft,
-                if selected then 0.15 else 0.5
-            )
+            UiArt.paint_tab(button, selected)
         end
     end
 end
@@ -495,6 +488,7 @@ for index, category in ipairs(
     button.LayoutOrder = index
     button.Size = UDim2.fromOffset(114, 32)
     button.ZIndex = 13
+    UiArt.paint_tab(button, category == selected_tab)
     tab_buttons[category] = button
 
     button.Activated:Connect(function()
@@ -521,7 +515,7 @@ UserInputService.InputBegan:Connect(function(
     end
 
     if input.KeyCode == Enum.KeyCode.I then
-        set_visible(not panel.Visible)
+        set_visible(true)
     end
 end)
 
