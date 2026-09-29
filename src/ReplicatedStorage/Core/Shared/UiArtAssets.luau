@@ -1,8 +1,8 @@
 --!strict
 -- High-resolution painted UI artwork selected for the DungeonMMO interface.
 --
--- Dynamic gameplay content is rendered on top of these images. The images
--- provide the ornamental shell, metal texture, borders, and fixed icon art.
+-- *_EMPTY assets are runtime-safe versions of the supplied reference art:
+-- ornamental chrome is preserved while example gameplay content is removed.
 local UiArtAssets = {
     SETTINGS = "rbxassetid://132224126962111",
     WORLD_MAP = "rbxassetid://130758325861721",
@@ -16,6 +16,22 @@ local UiArtAssets = {
     CHAT = "rbxassetid://71460224417787",
     QUEST_TRACKER = "rbxassetid://97905267503054",
     MINIMAP = "rbxassetid://79759172711173",
+
+    SETTINGS_EMPTY = "rbxassetid://78801248050804",
+    SKILLS_EMPTY = "rbxassetid://135444926286078",
+    INVENTORY_EMPTY = "rbxassetid://122867404635713",
+    STATS_EMPTY = "rbxassetid://77614870053318",
+    PARTY_EMPTY = "rbxassetid://104659434339393",
+    GUILD_EMPTY = "rbxassetid://140539119791709",
+    QUEST_JOURNAL_EMPTY = "rbxassetid://78234923581390",
+    QUEST_TRACKER_EMPTY = "rbxassetid://107100785940577",
+
+    TAB_ACTIVE = "rbxassetid://117843177421589",
+    TAB_INACTIVE = "rbxassetid://114493700555921",
+    BUTTON_BLUE = "rbxassetid://116858140687783",
+    BUTTON_RED = "rbxassetid://122776141249505",
+    BUTTON_GOLD = "rbxassetid://126792732962914",
+    BUTTON_DARK = "rbxassetid://123095682846583",
 }
 
 return table.freeze(UiArtAssets)
