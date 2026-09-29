@@ -123,7 +123,7 @@ local DIRECT_ART: {[string]: DirectArt} = {
 
 local EMPTY_DIRECT_ART: {[string]: DirectArt} = {
     Journal = {
-        Image = UiArtAssets.QUEST_JOURNAL_EMPTY,
+        Image = UiArtAssets.JOURNAL_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
     Tracker = {
@@ -131,27 +131,31 @@ local EMPTY_DIRECT_ART: {[string]: DirectArt} = {
         SourceSize = Vector2.new(1086, 1448),
     },
     Inventory = {
-        Image = UiArtAssets.INVENTORY_EMPTY,
+        Image = UiArtAssets.INVENTORY_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
     Skills = {
-        Image = UiArtAssets.SKILLS_EMPTY,
+        Image = UiArtAssets.SKILLS_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
     Stats = {
-        Image = UiArtAssets.STATS_EMPTY,
+        Image = UiArtAssets.STATS_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
     Guild = {
-        Image = UiArtAssets.GUILD_EMPTY,
+        Image = UiArtAssets.GUILD_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
     Party = {
-        Image = UiArtAssets.PARTY_EMPTY,
+        Image = UiArtAssets.PARTY_SHELL,
         SourceSize = Vector2.new(1086, 1448),
     },
     Settings = {
-        Image = UiArtAssets.SETTINGS_EMPTY,
+        Image = UiArtAssets.SETTINGS_SHELL,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    WorldMap = {
+        Image = UiArtAssets.MAP_SHELL,
         SourceSize = Vector2.new(1122, 1402),
     },
 }
@@ -237,43 +241,65 @@ function UiArt.reference_background(
     image.Size = UDim2.fromScale(1, 1)
     image.ZIndex = z_index or 1
     image.Parent = parent
-    local shells = {Stats = UiArtAssets.STATS_SHELL, Inventory = UiArtAssets.INVENTORY_SHELL,
-        Skills = UiArtAssets.SKILLS_SHELL, Guild = UiArtAssets.GUILD_SHELL,
-        Party = UiArtAssets.PARTY_SHELL, Journal = UiArtAssets.JOURNAL_SHELL}
-    if shells[art_name] then
-        local rail = Instance.new("ImageLabel")
-        rail.Name = "BottomOrnament"
-        rail.BackgroundTransparency = 1
-        rail.Image = shells[art_name]
-        rail.ImageRectOffset = Vector2.new(0, art.SourceSize.Y - 100)
-        rail.ImageRectSize = Vector2.new(art.SourceSize.X, 100)
-        rail.Position = UDim2.fromScale(0, 1 - 100 / art.SourceSize.Y)
-        rail.Size = UDim2.fromScale(1, 100 / art.SourceSize.Y)
-        rail.ZIndex = (z_index or 1) + 1
-        rail.Parent = image
-    end
     return image
 end
 
--- The target is parented to the artwork root, independent of the old modal header.
-function UiArt.align_close(parent: GuiObject, button: TextButton, art_name: string)
+--[[
+Aligns a modal's real close hit target with the painted X.
+
+Args:
+    parent (GuiObject): Window root that owns the painted shell.
+    button (TextButton): Interactive close button.
+    art_name (string): Reference artwork name.
+
+Returns:
+    None.
+]]
+function UiArt.align_close(
+    parent: GuiObject,
+    button: TextButton,
+    art_name: string
+)
     local centers = {
-        Stats = Vector2.new(1048, 115), Inventory = Vector2.new(1048, 128),
-        Skills = Vector2.new(1050, 110), Guild = Vector2.new(1045, 133),
-        Journal = Vector2.new(1050, 106), Party = Vector2.new(1009, 125),
+        Stats = Vector2.new(1048, 115),
+        Inventory = Vector2.new(1048, 128),
+        Skills = Vector2.new(1050, 110),
+        Guild = Vector2.new(1045, 133),
+        Journal = Vector2.new(1050, 106),
+        Party = Vector2.new(1009, 125),
         Settings = Vector2.new(1050, 104),
+        WorldMap = Vector2.new(1050, 106),
     }
     local point = centers[art_name]
+    assert(
+        point,
+        "No close-button geometry for: " .. art_name
+    )
+
     button.Parent = parent
     button.AnchorPoint = Vector2.new(0.5, 0.5)
-    button.Position = UiArt.position(art_name, point.X, point.Y)
-    button.Size = UiArt.rect(art_name, 0, 0, 64, 64)
+    button.Position = UiArt.position(
+        art_name,
+        point.X,
+        point.Y
+    )
+    button.Size = UiArt.rect(
+        art_name,
+        0,
+        0,
+        64,
+        64
+    )
     button.BackgroundTransparency = 1
     button.TextTransparency = 1
     button.ZIndex = 30
+
     for _, child in ipairs(button:GetChildren()) do
-        if child:IsA("GuiObject") then child.Visible = false end
-        if child:IsA("UIStroke") then child.Transparency = 1 end
+        if child:IsA("GuiObject") then
+            child.Visible = false
+        elseif child:IsA("UIStroke") then
+            child.Transparency = 1
+        end
     end
 end
 
