@@ -135,7 +135,13 @@ function UiComponents.progress_bar(
     track.Size = UDim2.new(1, 0, 0, 9)
     track.BackgroundColor3 = track_color
     track.BorderSizePixel = 0
-    UiTheme.add_corner(track, 4)
+    UiTheme.add_corner(track, 2)
+    local track_stroke = UiTheme.add_stroke(
+        track,
+        UiTheme.PALETTE.BorderDark,
+        0.12
+    )
+    track_stroke.Thickness = 1
     track.Parent = root
 
     local fill = Instance.new("Frame")
@@ -143,7 +149,7 @@ function UiComponents.progress_bar(
     fill.Size = UDim2.fromScale(1, 1)
     fill.BackgroundColor3 = fill_color
     fill.BorderSizePixel = 0
-    UiTheme.add_corner(fill, 4)
+    UiTheme.add_corner(fill, 1)
     UiTheme.add_gradient(
         fill,
         fill_color:Lerp(Color3.new(1, 1, 1), 0.12),
@@ -186,16 +192,45 @@ function UiComponents.modal(
     root.Position = UDim2.fromScale(0.5, 0.5)
     root.Size = size
     UiTheme.style_panel(root, false)
-    root.BackgroundColor3 = Color3.fromRGB(22, 26, 33)
     root.Parent = parent
     UiOrnament.frame(root, true)
 
+    local header_band = Instance.new("Frame")
+    header_band.Name = "HeaderBand"
+    header_band.Position = UDim2.fromOffset(7, 7)
+    header_band.Size = UDim2.new(1, -14, 0, 69)
+    header_band.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
+    header_band.BackgroundTransparency = 0.12
+    header_band.BorderSizePixel = 0
+    UiTheme.add_gradient(
+        header_band,
+        UiTheme.PALETTE.SurfaceWarm:Lerp(
+            UiTheme.PALETTE.AccentDark,
+            0.12
+        ),
+        UiTheme.PALETTE.BackdropSoft
+    )
+    header_band.Parent = root
+
     local header = Instance.new("Frame")
     header.Name = "Header"
-    header.Position = UDim2.fromOffset(18, 14)
-    header.Size = UDim2.new(1, -36, 0, 54)
+    header.Position = UDim2.fromOffset(20, 13)
+    header.Size = UDim2.new(1, -40, 0, 54)
     header.BackgroundTransparency = 1
     header.Parent = root
+
+    local emblem = Instance.new("TextLabel")
+    emblem.Name = "Emblem"
+    emblem.Position = UDim2.fromOffset(0, 2)
+    emblem.Size = UDim2.fromOffset(34, 34)
+    emblem.BackgroundTransparency = 1
+    emblem.Font = UiTheme.FONT.Heading
+    emblem.Text = "◆"
+    emblem.TextColor3 = UiTheme.PALETTE.AccentBright
+    emblem.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+    emblem.TextStrokeTransparency = 0.24
+    emblem.TextSize = 24
+    emblem.Parent = header
 
     local title = UiComponents.label(
         header,
@@ -203,7 +238,9 @@ function UiComponents.modal(
         title_text,
         "Title"
     )
-    title.Size = UDim2.new(1, -56, 0, 28)
+    title.Position = UDim2.fromOffset(39, 0)
+    title.Size = UDim2.new(1, -96, 0, 30)
+    title.TextColor3 = UiTheme.PALETTE.Text
 
     local subtitle = UiComponents.label(
         header,
@@ -211,8 +248,8 @@ function UiComponents.modal(
         subtitle_text,
         "Muted"
     )
-    subtitle.Position = UDim2.fromOffset(0, 29)
-    subtitle.Size = UDim2.new(1, -56, 0, 20)
+    subtitle.Position = UDim2.fromOffset(40, 31)
+    subtitle.Size = UDim2.new(1, -96, 0, 18)
 
     local close = UiComponents.button(
         header,
@@ -223,21 +260,19 @@ function UiComponents.modal(
     close.AnchorPoint = Vector2.new(1, 0)
     close.Position = UDim2.fromScale(1, 0)
     close.Size = UDim2.fromOffset(38, 38)
-    close.TextSize = 22
+    close.TextSize = 23
 
-    local divider = Instance.new("Frame")
-    divider.Name = "Divider"
-    divider.Position = UDim2.fromOffset(18, 78)
-    divider.Size = UDim2.new(1, -36, 0, 1)
-    divider.BackgroundColor3 = UiTheme.PALETTE.Border
-    divider.BackgroundTransparency = 0.1
-    divider.BorderSizePixel = 0
-    divider.Parent = root
+    UiOrnament.divider(
+        root,
+        UDim2.fromOffset(18, 78),
+        UDim2.new(1, -36, 0, 8),
+        root.ZIndex + 1
+    )
 
     local body = Instance.new("Frame")
     body.Name = "Body"
-    body.Position = UDim2.fromOffset(18, 92)
-    body.Size = UDim2.new(1, -36, 1, -110)
+    body.Position = UDim2.fromOffset(18, 91)
+    body.Size = UDim2.new(1, -36, 1, -108)
     body.BackgroundTransparency = 1
     body.Parent = root
 
@@ -275,7 +310,7 @@ function UiComponents.key_hint(
     label.BackgroundTransparency = 0.18
     label.TextXAlignment = Enum.TextXAlignment.Center
     label.Size = UDim2.fromOffset(25, 21)
-    UiTheme.add_corner(label, 5)
+    UiTheme.add_corner(label, 2)
     UiTheme.add_stroke(
         label,
         UiTheme.PALETTE.BorderSoft,
