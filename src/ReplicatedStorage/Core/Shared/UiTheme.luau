@@ -4,32 +4,38 @@ local TweenService = game:GetService("TweenService")
 local UiTheme = {}
 
 local PALETTE = table.freeze({
-    Backdrop = Color3.fromRGB(10, 12, 16),
-    Surface = Color3.fromRGB(21, 24, 30),
-    SurfaceRaised = Color3.fromRGB(29, 33, 41),
-    SurfaceHover = Color3.fromRGB(39, 44, 54),
-    SurfacePressed = Color3.fromRGB(47, 52, 62),
-    Border = Color3.fromRGB(93, 82, 62),
-    BorderSoft = Color3.fromRGB(66, 68, 72),
-    Text = Color3.fromRGB(239, 234, 218),
-    TextMuted = Color3.fromRGB(167, 170, 178),
-    TextFaint = Color3.fromRGB(112, 116, 124),
-    Accent = Color3.fromRGB(207, 163, 77),
-    AccentBright = Color3.fromRGB(232, 192, 101),
-    AccentDark = Color3.fromRGB(108, 80, 40),
-    Health = Color3.fromRGB(178, 65, 65),
-    HealthDark = Color3.fromRGB(82, 38, 38),
-    Stamina = Color3.fromRGB(72, 157, 103),
-    StaminaDark = Color3.fromRGB(35, 72, 50),
-    Mana = Color3.fromRGB(80, 112, 203),
-    ManaDark = Color3.fromRGB(37, 52, 97),
-    Ward = Color3.fromRGB(91, 169, 215),
-    WardDark = Color3.fromRGB(40, 73, 94),
-    Experience = Color3.fromRGB(185, 133, 59),
-    Success = Color3.fromRGB(83, 168, 111),
-    Warning = Color3.fromRGB(210, 153, 66),
-    Danger = Color3.fromRGB(178, 65, 65),
-    Disabled = Color3.fromRGB(67, 69, 75),
+    Backdrop = Color3.fromRGB(5, 7, 9),
+    BackdropSoft = Color3.fromRGB(10, 12, 14),
+    Surface = Color3.fromRGB(14, 16, 18),
+    SurfaceRaised = Color3.fromRGB(22, 24, 27),
+    SurfaceHover = Color3.fromRGB(37, 34, 29),
+    SurfacePressed = Color3.fromRGB(50, 42, 31),
+    SurfaceWarm = Color3.fromRGB(31, 27, 21),
+    Border = Color3.fromRGB(151, 112, 48),
+    BorderSoft = Color3.fromRGB(84, 69, 46),
+    BorderDark = Color3.fromRGB(48, 36, 20),
+    Metal = Color3.fromRGB(119, 88, 39),
+    MetalBright = Color3.fromRGB(219, 172, 78),
+    Text = Color3.fromRGB(239, 229, 205),
+    TextMuted = Color3.fromRGB(181, 174, 158),
+    TextFaint = Color3.fromRGB(119, 116, 109),
+    Accent = Color3.fromRGB(211, 164, 69),
+    AccentBright = Color3.fromRGB(246, 207, 111),
+    AccentDark = Color3.fromRGB(95, 65, 25),
+    Health = Color3.fromRGB(184, 40, 43),
+    HealthDark = Color3.fromRGB(67, 19, 21),
+    Stamina = Color3.fromRGB(76, 142, 74),
+    StaminaDark = Color3.fromRGB(27, 61, 33),
+    Mana = Color3.fromRGB(43, 104, 190),
+    ManaDark = Color3.fromRGB(19, 42, 79),
+    Ward = Color3.fromRGB(55, 147, 199),
+    WardDark = Color3.fromRGB(23, 61, 82),
+    Experience = Color3.fromRGB(149, 71, 178),
+    ExperienceDark = Color3.fromRGB(56, 28, 68),
+    Success = Color3.fromRGB(80, 159, 102),
+    Warning = Color3.fromRGB(220, 159, 56),
+    Danger = Color3.fromRGB(184, 58, 50),
+    Disabled = Color3.fromRGB(60, 59, 56),
 })
 
 local FONT = table.freeze({
@@ -40,7 +46,7 @@ local FONT = table.freeze({
 })
 
 local TWEEN_INFO = TweenInfo.new(
-    0.16,
+    0.14,
     Enum.EasingStyle.Quad,
     Enum.EasingDirection.Out
 )
@@ -63,7 +69,7 @@ export type LabelStyle =
     | "Key"
 
 --[[
-Adds or updates a standard corner on one GuiObject.
+Adds or updates a compact fantasy-interface corner.
 
 Args:
     object (GuiObject): UI object that needs rounded corners.
@@ -79,13 +85,13 @@ function UiTheme.add_corner(
     local corner = object:FindFirstChildOfClass("UICorner")
         or Instance.new("UICorner")
 
-    corner.CornerRadius = UDim.new(0, radius or 8)
+    corner.CornerRadius = UDim.new(0, radius or 3)
     corner.Parent = object
     return corner
 end
 
 --[[
-Adds or updates a standard outline on one GuiObject.
+Adds or updates a standard metallic outline on one GuiObject.
 
 Args:
     object (GuiObject): UI object that needs an outline.
@@ -105,14 +111,14 @@ function UiTheme.add_stroke(
 
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     stroke.Color = color or PALETTE.Border
-    stroke.Transparency = transparency or 0.35
+    stroke.Transparency = transparency or 0.24
     stroke.Thickness = 1
     stroke.Parent = object
     return stroke
 end
 
 --[[
-Adds a restrained top-to-bottom gradient to a GuiObject.
+Adds a top-to-bottom metallic gradient to a GuiObject.
 
 Args:
     object (GuiObject): UI object that receives the gradient.
@@ -137,7 +143,37 @@ function UiTheme.add_gradient(
 end
 
 --[[
-Styles a frame as a standard raised dark-fantasy panel.
+Styles an inset frame used inside ornate windows and HUD cards.
+
+Args:
+    frame (Frame): Inset frame to style.
+    warm (boolean?): Whether to bias the surface toward bronze.
+
+Returns:
+    None.
+]]
+function UiTheme.style_inset(
+    frame: Frame,
+    warm: boolean?
+)
+    local base = if warm
+        then PALETTE.SurfaceWarm
+        else PALETTE.BackdropSoft
+
+    frame.BorderSizePixel = 0
+    frame.BackgroundColor3 = base
+    frame.BackgroundTransparency = 0.08
+    UiTheme.add_corner(frame, 2)
+    UiTheme.add_stroke(frame, PALETTE.BorderDark, 0.15)
+    UiTheme.add_gradient(
+        frame,
+        base:Lerp(Color3.new(1, 1, 1), 0.025),
+        base:Lerp(Color3.new(0, 0, 0), 0.24)
+    )
+end
+
+--[[
+Styles a frame as a dark high-fantasy metal panel.
 
 Args:
     frame (Frame): Frame to style.
@@ -150,17 +186,26 @@ function UiTheme.style_panel(
     frame: Frame,
     raised: boolean?
 )
-    frame.BorderSizePixel = 0
-    frame.BackgroundColor3 = if raised
+    local base = if raised
         then PALETTE.SurfaceRaised
         else PALETTE.Surface
-    frame.BackgroundTransparency = 0.04
-    UiTheme.add_corner(frame, 10)
-    UiTheme.add_stroke(frame, PALETTE.Border, 0.36)
+
+    frame.BorderSizePixel = 0
+    frame.BackgroundColor3 = base
+    frame.BackgroundTransparency = 0.015
+    UiTheme.add_corner(frame, 3)
+
+    local stroke = UiTheme.add_stroke(
+        frame,
+        PALETTE.Border,
+        if raised then 0.08 else 0.18
+    )
+    stroke.Thickness = if raised then 2 else 1
+
     UiTheme.add_gradient(
         frame,
-        frame.BackgroundColor3:Lerp(Color3.new(1, 1, 1), 0.035),
-        frame.BackgroundColor3:Lerp(Color3.new(0, 0, 0), 0.08)
+        base:Lerp(PALETTE.SurfaceWarm, 0.22),
+        base:Lerp(Color3.new(0, 0, 0), 0.28)
     )
 end
 
@@ -185,15 +230,19 @@ function UiTheme.style_label(
     if style == "Title" then
         label.Font = FONT.Heading
         label.TextColor3 = PALETTE.Text
-        label.TextSize = 24
+        label.TextSize = 26
+        label.TextStrokeColor3 = PALETTE.Backdrop
+        label.TextStrokeTransparency = 0.58
     elseif style == "Heading" then
-        label.Font = FONT.Strong
+        label.Font = FONT.Heading
         label.TextColor3 = PALETTE.Text
-        label.TextSize = 17
+        label.TextSize = 18
+        label.TextStrokeColor3 = PALETTE.Backdrop
+        label.TextStrokeTransparency = 0.72
     elseif style == "Muted" then
         label.Font = FONT.Body
         label.TextColor3 = PALETTE.TextMuted
-        label.TextSize = 14
+        label.TextSize = 13
     elseif style == "Caption" then
         label.Font = FONT.Strong
         label.TextColor3 = PALETTE.TextMuted
@@ -201,11 +250,11 @@ function UiTheme.style_label(
     elseif style == "Key" then
         label.Font = FONT.Mono
         label.TextColor3 = PALETTE.AccentBright
-        label.TextSize = 12
+        label.TextSize = 11
     else
         label.Font = FONT.Body
         label.TextColor3 = PALETTE.Text
-        label.TextSize = 14
+        label.TextSize = 13
     end
 end
 
@@ -222,9 +271,9 @@ local function button_color(
     variant: ButtonVariant
 ): Color3
     if variant == "Primary" then
-        return PALETTE.AccentDark
+        return Color3.fromRGB(38, 65, 112)
     elseif variant == "Danger" then
-        return PALETTE.Danger
+        return Color3.fromRGB(87, 31, 29)
     elseif variant == "Ghost" then
         return PALETTE.Surface
     end
@@ -245,16 +294,86 @@ local function button_border(
     variant: ButtonVariant
 ): Color3
     if variant == "Primary" then
-        return PALETTE.Accent
+        return PALETTE.AccentBright
     elseif variant == "Danger" then
-        return PALETTE.Danger:Lerp(PALETTE.Text, 0.18)
+        return PALETTE.Danger:Lerp(PALETTE.Accent, 0.24)
+    elseif variant == "Ghost" then
+        return PALETTE.BorderSoft
     end
 
-    return PALETTE.BorderSoft
+    return PALETTE.Border
 end
 
 --[[
-Styles a TextButton with consistent colours, typography and hover feedback.
+Applies the stored hover state for one themed button.
+
+Args:
+    button (TextButton): Button whose stored base colour is used.
+    hovered (boolean): Whether the pointer is over the button.
+
+Returns:
+    None.
+]]
+local function apply_button_hover(
+    button: TextButton,
+    hovered: boolean
+)
+    local base = button:GetAttribute("DMMOUiBaseColor")
+    local base_transparency = button:GetAttribute(
+        "DMMOUiBaseTransparency"
+    )
+
+    if typeof(base) ~= "Color3"
+        or type(base_transparency) ~= "number"
+    then
+        return
+    end
+
+    local target_color = if hovered and button.Active
+        then base:Lerp(PALETTE.AccentDark, 0.34)
+        else base
+    local target_transparency = if hovered and button.Active
+        then 0
+        else base_transparency
+
+    TweenService:Create(
+        button,
+        TWEEN_INFO,
+        {
+            BackgroundColor3 = target_color,
+            BackgroundTransparency = target_transparency,
+        }
+    ):Play()
+end
+
+--[[
+Binds idempotent hover feedback to a themed button.
+
+Args:
+    button (TextButton): Button receiving pointer feedback.
+
+Returns:
+    None.
+]]
+local function ensure_button_hover(
+    button: TextButton
+)
+    if button:GetAttribute("DMMOUiHoverBound") == true then
+        return
+    end
+
+    button:SetAttribute("DMMOUiHoverBound", true)
+
+    button.MouseEnter:Connect(function()
+        apply_button_hover(button, true)
+    end)
+    button.MouseLeave:Connect(function()
+        apply_button_hover(button, false)
+    end)
+end
+
+--[[
+Styles a TextButton with metallic framing and restrained hover feedback.
 
 Args:
     button (TextButton): Button to style.
@@ -269,51 +388,38 @@ function UiTheme.style_button(
 )
     local style = variant or "Secondary"
     local base = button_color(style)
+    local transparency = if style == "Ghost" then 0.26 else 0.02
 
     button.BackgroundColor3 = base
-    button.BackgroundTransparency = if style == "Ghost" then 0.35 else 0.08
+    button.BackgroundTransparency = transparency
     button.BorderSizePixel = 0
-    button.Font = FONT.Strong
-    button.TextColor3 = if style == "Primary"
-        then PALETTE.Text
-        else PALETTE.Text
-    button.TextSize = 14
+    button.Font = FONT.Heading
+    button.TextColor3 = PALETTE.Text
+    button.TextSize = 15
     button.TextScaled = false
     button.AutoButtonColor = false
 
-    UiTheme.add_corner(button, 7)
-    UiTheme.add_stroke(button, button_border(style), 0.32)
+    button:SetAttribute("DMMOUiBaseColor", base)
+    button:SetAttribute(
+        "DMMOUiBaseTransparency",
+        transparency
+    )
 
-    button.MouseEnter:Connect(function()
-        if not button.Active then
-            return
-        end
+    UiTheme.add_corner(button, 2)
 
-        TweenService:Create(
-            button,
-            TWEEN_INFO,
-            {
-                BackgroundColor3 = base:Lerp(
-                    PALETTE.SurfaceHover,
-                    0.32
-                ),
-                BackgroundTransparency = 0,
-            }
-        ):Play()
-    end)
+    local stroke = UiTheme.add_stroke(
+        button,
+        button_border(style),
+        if style == "Primary" then 0.08 else 0.22
+    )
+    stroke.Thickness = if style == "Primary" then 2 else 1
 
-    button.MouseLeave:Connect(function()
-        TweenService:Create(
-            button,
-            TWEEN_INFO,
-            {
-                BackgroundColor3 = base,
-                BackgroundTransparency = if style == "Ghost"
-                    then 0.35
-                    else 0.08,
-            }
-        ):Play()
-    end)
+    UiTheme.add_gradient(
+        button,
+        base:Lerp(PALETTE.MetalBright, 0.08),
+        base:Lerp(Color3.new(0, 0, 0), 0.30)
+    )
+    ensure_button_hover(button)
 end
 
 --[[
@@ -333,12 +439,15 @@ function UiTheme.set_button_enabled(
     button.Active = enabled
     button.Selectable = enabled
     button.AutoButtonColor = false
-    button.TextTransparency = if enabled then 0 else 0.45
-    button.BackgroundTransparency = if enabled then 0.08 else 0.48
+    button.TextTransparency = if enabled then 0 else 0.50
+    button.BackgroundTransparency = if enabled
+        then button:GetAttribute("DMMOUiBaseTransparency")
+            or 0.02
+        else 0.52
 end
 
 --[[
-Styles a ScrollingFrame for the shared visual language.
+Styles a ScrollingFrame for the shared fantasy visual language.
 
 Args:
     scrolling_frame (ScrollingFrame): Scrolling region to style.
@@ -350,11 +459,16 @@ function UiTheme.style_scroll(
     scrolling_frame: ScrollingFrame
 )
     scrolling_frame.BackgroundColor3 = PALETTE.Backdrop
-    scrolling_frame.BackgroundTransparency = 0.58
+    scrolling_frame.BackgroundTransparency = 0.18
     scrolling_frame.BorderSizePixel = 0
     scrolling_frame.ScrollBarThickness = 5
     scrolling_frame.ScrollBarImageColor3 = PALETTE.AccentDark
-    UiTheme.add_corner(scrolling_frame, 7)
+    UiTheme.add_corner(scrolling_frame, 2)
+    UiTheme.add_stroke(
+        scrolling_frame,
+        PALETTE.BorderDark,
+        0.28
+    )
 end
 
 --[[
@@ -414,15 +528,6 @@ function UiTheme.bind_responsive_scale(
 
     scale.Parent = object
 
-    --[[
-    Refreshes responsive scale from the current camera viewport.
-
-    Args:
-        None.
-
-    Returns:
-        None.
-    ]]
     local function update()
         local camera = workspace.CurrentCamera
         if not camera then
@@ -439,15 +544,6 @@ function UiTheme.bind_responsive_scale(
         )
     end
 
-    --[[
-    Rebinds viewport tracking when CurrentCamera changes.
-
-    Args:
-        None.
-
-    Returns:
-        None.
-    ]]
     local function bind_camera()
         if camera_connection then
             camera_connection:Disconnect()
