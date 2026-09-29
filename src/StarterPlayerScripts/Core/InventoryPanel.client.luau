@@ -20,6 +20,9 @@ local UiTheme = require(
 local UiOrnament = require(
     shared:WaitForChild("UiOrnament")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 
 local inventory_snapshot = remotes:WaitForChild(
     "InventorySnapshot"
@@ -61,22 +64,150 @@ local modal = UiComponents.modal(
     "InventoryPanel",
     "Inventory",
     "Browse carried equipment, materials and consumables.",
-    UDim2.fromOffset(820, 590)
+    UDim2.fromOffset(640, 800)
 )
 local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
-modal.Header.ZIndex = 12
-modal.Title.ZIndex = 12
-modal.Subtitle.ZIndex = 12
-modal.Close.ZIndex = 12
-modal.Body.ZIndex = 12
+UiArt.clear_frame_chrome(panel)
+
+local old_reference_art = panel:FindFirstChild("ReferenceArt")
+if old_reference_art then
+    old_reference_art:Destroy()
+end
+
+local inventory_art = UiArt.background(
+    panel,
+    "Inventory",
+    11
+)
+inventory_art.Name = "InventoryArt"
+
+UiArt.content_mask(
+    panel,
+    "Inventory",
+    "CharacterContentMask",
+    48,
+    220,
+    410,
+    1060,
+    12
+)
+UiArt.content_mask(
+    panel,
+    "Inventory",
+    "InventoryContentMask",
+    472,
+    220,
+    602,
+    1060,
+    12
+)
+
+modal.Header.ZIndex = 14
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
+modal.Close.ZIndex = 15
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
+
+local header_band = panel:FindFirstChild("HeaderBand")
+if header_band and header_band:IsA("GuiObject") then
+    header_band.Visible = false
+end
+
+local divider = panel:FindFirstChild("OrnateDivider")
+if divider and divider:IsA("GuiObject") then
+    divider.Visible = false
+end
+
+modal.Body.Position = UiArt.position(
+    "Inventory",
+    472,
+    220
+)
+modal.Body.Size = UiArt.rect(
+    "Inventory",
+    472,
+    220,
+    602,
+    1060
+)
+modal.Body.ZIndex = 14
+
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.35,
+    0.62,
     1
 )
+
+local character_panel = Instance.new("Frame")
+character_panel.Name = "CharacterPreview"
+character_panel.Position = UiArt.position(
+    "Inventory",
+    66,
+    238
+)
+character_panel.Size = UiArt.rect(
+    "Inventory",
+    66,
+    238,
+    372,
+    1012
+)
+character_panel.BackgroundTransparency = 1
+character_panel.ZIndex = 14
+character_panel.Parent = panel
+
+local avatar = Instance.new("ImageLabel")
+avatar.Name = "Avatar"
+avatar.AnchorPoint = Vector2.new(0.5, 0)
+avatar.Position = UDim2.new(0.5, 0, 0, 34)
+avatar.Size = UDim2.new(0.82, 0, 0.62, 0)
+avatar.BackgroundTransparency = 1
+avatar.ScaleType = Enum.ScaleType.Fit
+avatar.ZIndex = 15
+avatar.Parent = character_panel
+
+local character_name = UiComponents.label(
+    character_panel,
+    "CharacterName",
+    player.DisplayName,
+    "Title"
+)
+character_name.AnchorPoint = Vector2.new(0.5, 0)
+character_name.Position = UDim2.new(0.5, 0, 0.69, 0)
+character_name.Size = UDim2.new(0.9, 0, 0, 28)
+character_name.TextXAlignment = Enum.TextXAlignment.Center
+character_name.ZIndex = 15
+
+local character_hint = UiComponents.label(
+    character_panel,
+    "CharacterHint",
+    "Carried equipment and adventure supplies",
+    "Muted"
+)
+character_hint.AnchorPoint = Vector2.new(0.5, 0)
+character_hint.Position = UDim2.new(0.5, 0, 0.75, 0)
+character_hint.Size = UDim2.new(0.84, 0, 0, 42)
+character_hint.TextWrapped = true
+character_hint.TextXAlignment = Enum.TextXAlignment.Center
+character_hint.ZIndex = 15
+
+task.spawn(function()
+    local ok, image = pcall(function()
+        return Players:GetUserThumbnailAsync(
+            player.UserId,
+            Enum.ThumbnailType.AvatarBust,
+            Enum.ThumbnailSize.Size420x420
+        )
+    end)
+
+    if ok then
+        avatar.Image = image
+    end
+end)
 
 local tab_strip = Instance.new("Frame")
 tab_strip.Name = "CategoryTabs"
@@ -119,8 +250,8 @@ padding.PaddingRight = UDim.new(0, 8)
 padding.Parent = list
 
 local layout = Instance.new("UIGridLayout")
-layout.CellSize = UDim2.fromOffset(108, 98)
-layout.CellPadding = UDim2.fromOffset(7, 7)
+layout.CellSize = UDim2.fromOffset(50, 62)
+layout.CellPadding = UDim2.fromOffset(4, 5)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = list
 
@@ -184,7 +315,7 @@ Returns:
 local function add_item_row(row: any)
     local frame = Instance.new("Frame")
     frame.Name = tostring(row.Id or row.Name or "Item")
-    frame.Size = UDim2.fromOffset(108, 98)
+    frame.Size = UDim2.fromOffset(50, 62)
     frame.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
     frame.BackgroundTransparency = 0.08
     frame.BorderSizePixel = 0
@@ -214,9 +345,9 @@ local function add_item_row(row: any)
         rarity_color(row.Rarity):Lerp(
             UiTheme.PALETTE.SurfaceRaised, 0.55
         ),
-        46
+        34
     )
-    icon.Position = UDim2.fromOffset(46, 11)
+    icon.Position = UDim2.fromOffset(8, 7)
 
     local name = UiComponents.label(
         frame,
@@ -224,9 +355,9 @@ local function add_item_row(row: any)
         tostring(row.Name),
         "Heading"
     )
-    name.Position = UDim2.fromOffset(5, 57)
-    name.Size = UDim2.new(1, -10, 0, 20)
-    name.TextSize = 10
+    name.Position = UDim2.fromOffset(3, 42)
+    name.Size = UDim2.new(1, -6, 0, 12)
+    name.TextSize = 7
     name.TextXAlignment = Enum.TextXAlignment.Center
     name.ZIndex = 14
 
@@ -243,10 +374,7 @@ local function add_item_row(row: any)
         ),
         "Muted"
     )
-    detail.Position = UDim2.fromOffset(5, 78)
-    detail.Size = UDim2.new(1, -10, 0, 13)
-    detail.TextSize = 8
-    detail.TextXAlignment = Enum.TextXAlignment.Center
+    detail.Visible = false
     detail.ZIndex = 14
 
     local quantity = UiComponents.label(
@@ -256,9 +384,9 @@ local function add_item_row(row: any)
         "Heading"
     )
     quantity.AnchorPoint = Vector2.new(1, 0.5)
-    quantity.Position = UDim2.new(1, -5, 0, 12)
-    quantity.Size = UDim2.fromOffset(28, 18)
-    quantity.TextSize = 10
+    quantity.Position = UDim2.new(1, -2, 0, 8)
+    quantity.Size = UDim2.fromOffset(22, 14)
+    quantity.TextSize = 8
     quantity.TextXAlignment = Enum.TextXAlignment.Right
     quantity.TextColor3 = UiTheme.PALETTE.AccentBright
     quantity.ZIndex = 14
