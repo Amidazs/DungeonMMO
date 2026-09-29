@@ -4,24 +4,24 @@ local TweenService = game:GetService("TweenService")
 local UiTheme = {}
 
 local PALETTE = table.freeze({
-    Backdrop = Color3.fromRGB(5, 7, 9),
-    BackdropSoft = Color3.fromRGB(10, 12, 14),
-    Surface = Color3.fromRGB(14, 16, 18),
-    SurfaceRaised = Color3.fromRGB(22, 24, 27),
-    SurfaceHover = Color3.fromRGB(37, 34, 29),
-    SurfacePressed = Color3.fromRGB(50, 42, 31),
-    SurfaceWarm = Color3.fromRGB(31, 27, 21),
-    Border = Color3.fromRGB(151, 112, 48),
-    BorderSoft = Color3.fromRGB(84, 69, 46),
-    BorderDark = Color3.fromRGB(48, 36, 20),
-    Metal = Color3.fromRGB(119, 88, 39),
-    MetalBright = Color3.fromRGB(219, 172, 78),
-    Text = Color3.fromRGB(239, 229, 205),
-    TextMuted = Color3.fromRGB(181, 174, 158),
-    TextFaint = Color3.fromRGB(119, 116, 109),
-    Accent = Color3.fromRGB(211, 164, 69),
-    AccentBright = Color3.fromRGB(246, 207, 111),
-    AccentDark = Color3.fromRGB(95, 65, 25),
+    Backdrop = Color3.fromRGB(6, 5, 4),
+    BackdropSoft = Color3.fromRGB(12, 10, 8),
+    Surface = Color3.fromRGB(18, 16, 13),
+    SurfaceRaised = Color3.fromRGB(28, 25, 20),
+    SurfaceHover = Color3.fromRGB(42, 35, 25),
+    SurfacePressed = Color3.fromRGB(55, 44, 29),
+    SurfaceWarm = Color3.fromRGB(38, 30, 19),
+    Border = Color3.fromRGB(132, 96, 41),
+    BorderSoft = Color3.fromRGB(88, 68, 39),
+    BorderDark = Color3.fromRGB(45, 32, 18),
+    Metal = Color3.fromRGB(113, 82, 36),
+    MetalBright = Color3.fromRGB(207, 159, 69),
+    Text = Color3.fromRGB(244, 232, 205),
+    TextMuted = Color3.fromRGB(193, 181, 157),
+    TextFaint = Color3.fromRGB(126, 119, 105),
+    Accent = Color3.fromRGB(207, 158, 67),
+    AccentBright = Color3.fromRGB(242, 197, 97),
+    AccentDark = Color3.fromRGB(92, 61, 23),
     Health = Color3.fromRGB(184, 40, 43),
     HealthDark = Color3.fromRGB(67, 19, 21),
     Stamina = Color3.fromRGB(76, 142, 74),
@@ -40,8 +40,8 @@ local PALETTE = table.freeze({
 
 local FONT = table.freeze({
     Heading = Enum.Font.Garamond,
-    Body = Enum.Font.Gotham,
-    Strong = Enum.Font.GothamSemibold,
+    Body = Enum.Font.Garamond,
+    Strong = Enum.Font.Garamond,
     Mono = Enum.Font.RobotoMono,
 })
 
@@ -193,7 +193,7 @@ function UiTheme.style_panel(
     frame.BorderSizePixel = 0
     frame.BackgroundColor3 = base
     frame.BackgroundTransparency = 0.015
-    UiTheme.add_corner(frame, 3)
+    UiTheme.add_corner(frame, 1)
 
     local stroke = UiTheme.add_stroke(
         frame,
@@ -204,8 +204,8 @@ function UiTheme.style_panel(
 
     UiTheme.add_gradient(
         frame,
-        base:Lerp(PALETTE.SurfaceWarm, 0.22),
-        base:Lerp(Color3.new(0, 0, 0), 0.28)
+        base:Lerp(PALETTE.SurfaceWarm, 0.34),
+        base:Lerp(Color3.new(0, 0, 0), 0.36)
     )
 end
 
@@ -230,19 +230,19 @@ function UiTheme.style_label(
     if style == "Title" then
         label.Font = FONT.Heading
         label.TextColor3 = PALETTE.Text
-        label.TextSize = 26
+        label.TextSize = 25
         label.TextStrokeColor3 = PALETTE.Backdrop
         label.TextStrokeTransparency = 0.58
     elseif style == "Heading" then
         label.Font = FONT.Heading
         label.TextColor3 = PALETTE.Text
-        label.TextSize = 18
+        label.TextSize = 17
         label.TextStrokeColor3 = PALETTE.Backdrop
         label.TextStrokeTransparency = 0.72
     elseif style == "Muted" then
         label.Font = FONT.Body
         label.TextColor3 = PALETTE.TextMuted
-        label.TextSize = 13
+        label.TextSize = 14
     elseif style == "Caption" then
         label.Font = FONT.Strong
         label.TextColor3 = PALETTE.TextMuted
@@ -271,7 +271,7 @@ local function button_color(
     variant: ButtonVariant
 ): Color3
     if variant == "Primary" then
-        return Color3.fromRGB(38, 65, 112)
+        return Color3.fromRGB(31, 54, 96)
     elseif variant == "Danger" then
         return Color3.fromRGB(87, 31, 29)
     elseif variant == "Ghost" then
@@ -395,7 +395,7 @@ function UiTheme.style_button(
     button.BorderSizePixel = 0
     button.Font = FONT.Heading
     button.TextColor3 = PALETTE.Text
-    button.TextSize = 15
+    button.TextSize = 16
     button.TextScaled = false
     button.AutoButtonColor = false
 
@@ -405,7 +405,7 @@ function UiTheme.style_button(
         transparency
     )
 
-    UiTheme.add_corner(button, 2)
+    UiTheme.add_corner(button, 1)
 
     local stroke = UiTheme.add_stroke(
         button,
@@ -459,7 +459,7 @@ function UiTheme.style_scroll(
     scrolling_frame: ScrollingFrame
 )
     scrolling_frame.BackgroundColor3 = PALETTE.Backdrop
-    scrolling_frame.BackgroundTransparency = 0.18
+    scrolling_frame.BackgroundTransparency = 0.08
     scrolling_frame.BorderSizePixel = 0
     scrolling_frame.ScrollBarThickness = 5
     scrolling_frame.ScrollBarImageColor3 = PALETTE.AccentDark
