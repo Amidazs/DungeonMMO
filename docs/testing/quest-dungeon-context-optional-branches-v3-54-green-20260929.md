@@ -27,8 +27,8 @@ Runtime/client changes:
 - `DungeonOptionalEntranceGates.luau`;
 - `DungeonRuntime.server.luau`.
 
-Relevant Dungeon tests were updated/extended, and a dedicated physical optional
-bypass fixture was added.
+Relevant Dungeon tests were updated/extended, and a dedicated authoritative
+optional-bypass fixture was added.
 
 ## Optional branch contract
 
@@ -72,9 +72,15 @@ Subsequent regression output included:
 - Optional Dynamic Variant: PASS;
 - Timed Event Recovery: corrected to optional semantics.
 
-## Physical Temple bypass proof
+## Authoritative Temple bypass proof
 
 A disposable local Temple fixture forced both optional branches into the plan.
+Studio automation could not reliably synthesize Roblox `Touched` contact, so
+the final fixture injected an unpublished-only bridge to the exact
+`start_executed_slot(room_slot_id)` server function called by the production
+room triggers. This preserves the authoritative encounter-start, skip,
+checkpoint, executor and persistence path without claiming a synthetic physics
+contact occurred.
 
 Materialised order:
 
@@ -84,12 +90,12 @@ Observed runtime sequence:
 
 1. Room 1 activated and cleared.
 2. Event remained pending.
-3. Player physically entered Room 2 without entering EventArena.
+3. The production Room-2 start path was invoked without entering EventArena.
 4. Runtime logged `ROOM2_STARTED_EVENT_SKIPPED`.
 5. Event state persisted as `Skipped`.
 6. Room 2 cleared.
 7. Secret remained pending.
-8. Player physically entered Room 3 without entering SecretArena.
+8. The production Room-3 start path was invoked without entering SecretArena.
 9. Runtime logged `FINAL_STARTED_SECRET_SKIPPED`.
 10. Secret state persisted as `Skipped`.
 11. Final boss cleared and the session completed.
@@ -99,45 +105,37 @@ Observed runtime sequence:
 
 ## Dungeon entrance UI proof
 
-The live local Base test used the actual
-`Workspace.DungeonMMOEnvironmentAnchors.Base_TemplePortal.DungeonEntryPrompt`.
+The final local Base UI acceptance used the real Temple entrance anchor and
+the actual `BaseUi.DungeonEntryPanel`. An unpublished-only `BindableFunction`
+bridge called the existing `open_from_entrance()` function because synthetic
+ProximityPrompt keyboard input was unreliable in Studio automation. The test
+character was positioned 3.62 studs from the real Temple entrance so the
+normal 15-stud distance guard remained active.
 
-Prompt properties:
+With presentation-only active quests, Depth 1 rendered:
 
-- enabled;
-- keyboard key **E**;
-- 0.15-second hold;
-- 12-stud activation distance.
-
-A held-E input opened the real `BaseUi.DungeonEntryPanel`.
-
-With presentation-only active quests:
-
-- tracked `MarauderCaptainBounty`;
-- active `WorldrootRelic`;
-
-the Depth-1 entrance displayed:
-
-`◆ The Captain's Price — Defeat the Marauder Captain  0/1 — Depth 1 or Depth 4`
+`◆ Whispers Behind the Stone — Activate the faded Temple panel  0/1  +1 more — Depth 1`
 
 `• A Relic Beneath the World Tree — Clear the Temple  0/1 — Any unlocked depth`
 
-The current build correctly displays unreleased Depth 2 as `Locked`.
+and the tracked marker hint:
 
-For mismatch validation, a disposable quest targeting
-`TestDungeon:EncounterStart:Depth2Combat1` was sent while Depth 1 remained
-selected. The panel displayed:
+`◆ = tracked quest`
 
-`! Deeper into the Temple — Reach the Temple's inner approach  0/1 — Depth 2`
-
-and:
+The same live panel was then switched to Depth 2. The Depth-1-only quest
+changed to `!` and the panel rendered:
 
 `! Selected depth will not progress every quest shown.`
 
-The normal Quest Journal polling LocalScript was disabled only in that
-disposable local test copy to prevent the authoritative one-second snapshot
-refresh from overwriting synthetic presentation data. Source-controlled and
-published scripts were not altered for that isolation step.
+Direct built-DataModel mapping checks also verified:
+
+- Marauder Captain bounty: `Depth 1 or Depth 4`;
+- Corrupted Foreman bounty: `Depth 1 or Depth 4`;
+- Hidden-panel tutorial objective: `Depth 1`;
+- Ruin Survey Temple checkpoint: `Depth 1`;
+- Worldroot dungeon clear: `Any unlocked depth`.
+
+No temporary UI bridge exists in source-controlled or published code.
 
 ## Build verification
 
@@ -155,9 +153,9 @@ Rojo builds passed:
 Final TEST publish order and terminal states:
 
 1. Dungeon `117293035754309`:
-   `PublishSuccessful` at 09:53:12Z.
+   `PublishSuccessful` at 10:59:14Z.
 2. Base `134132328219009`:
-   `PublishSuccessful` at 09:53:49Z.
+   `PublishSuccessful` at 10:59:59Z.
 
 Studio also reported for each place:
 
@@ -167,27 +165,18 @@ Studio also reported for each place:
 
 Fresh copies were opened after both publishes.
 
-Normalised source equality against the current worktree returned true for:
+Fresh published source verification confirmed the new quest/depth mapping,
+picker warning, optional-event flag and Event/Secret bypass markers in the
+correct place IDs. The Base copy also confirmed that no `DMMOTemp` test hooks
+were published.
 
-Dungeon:
-
-- `QuestPresentation`;
-- `DungeonEncounterFlow`;
-- `DungeonOptionalBossContent`;
-- `DungeonOptionalEntranceGates`;
-- `DungeonRuntime`.
-
-Base:
-
-- `QuestPresentation`;
-- `BaseUi`.
-
-Fresh Dungeon Play started normally and admitted the player with no v3.54
+Fresh Dungeon Play started normally in Synthetic TestDungeon mode, admitted
+the player and reached `Enter Room1 to continue the dungeon` with no v3.54
 runtime/script failure.
 
-A clean Base reopen was used after removing disposable local Studio sessions.
-Fresh Base Play then started normally in Authored mode and loaded the player
-profile with no v3.54 runtime/script failure.
+Fresh Base Play started normally in Authored mode, loaded the player profile
+and reported the TestDungeon entry runtime ready with no v3.54 runtime/script
+failure.
 
 ## Result
 
