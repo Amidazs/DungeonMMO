@@ -89,7 +89,7 @@ local optional_encounters = {
             Key = "EventActive",
             Value = true,
         },
-        CompletionRequired = true,
+        CompletionRequired = false,
         Encounter = {
             Id = "FestivalChampion",
             RoomSlotId = "EventArena",
@@ -142,12 +142,12 @@ check(
 check(
     controller:clear("CombatRoom1").next_encounter_id
         == "FestivalChampion",
-    "Event boss must become the next required encounter."
+    "Event boss must become the next optional encounter."
 )
 check(
     controller:start("CombatRoom2").reason
         == "EncounterOutOfOrder",
-    "Later room cannot bypass an inserted required event boss."
+    "Controller requires the runtime flow to persist an optional skip."
 )
 
 check(
