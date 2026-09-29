@@ -26,6 +26,9 @@ local UiTheme = require(
 local UiOrnament = require(
     shared:WaitForChild("UiOrnament")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 
 local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
@@ -70,20 +73,81 @@ local modal = UiComponents.modal(
     "SkillsPanel",
     "Skills & Loadout",
     "Select a learned skill, then choose the hotbar slot.",
-    UDim2.fromOffset(790, 520)
+    UDim2.fromOffset(640, 800)
 )
 local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
-modal.Header.ZIndex = 12
-modal.Title.ZIndex = 12
-modal.Subtitle.ZIndex = 12
-modal.Close.ZIndex = 12
-modal.Body.ZIndex = 12
+UiArt.clear_frame_chrome(panel)
+
+local old_reference_art = panel:FindFirstChild("ReferenceArt")
+if old_reference_art then
+    old_reference_art:Destroy()
+end
+
+local skills_art = UiArt.background(
+    panel,
+    "Skills",
+    11
+)
+skills_art.Name = "SkillsArt"
+
+UiArt.content_mask(
+    panel,
+    "Skills",
+    "SkillCatalogueMask",
+    52,
+    260,
+    508,
+    1045,
+    12
+)
+UiArt.content_mask(
+    panel,
+    "Skills",
+    "SkillDetailMask",
+    575,
+    260,
+    492,
+    1045,
+    12
+)
+
+modal.Header.ZIndex = 14
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
+modal.Close.ZIndex = 15
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
+
+local header_band = panel:FindFirstChild("HeaderBand")
+if header_band and header_band:IsA("GuiObject") then
+    header_band.Visible = false
+end
+
+local divider = panel:FindFirstChild("OrnateDivider")
+if divider and divider:IsA("GuiObject") then
+    divider.Visible = false
+end
+
+modal.Body.Position = UiArt.position(
+    "Skills",
+    52,
+    260
+)
+modal.Body.Size = UiArt.rect(
+    "Skills",
+    52,
+    260,
+    1015,
+    1045
+)
+modal.Body.ZIndex = 14
+
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.35,
+    0.62,
     1
 )
 
@@ -92,21 +156,21 @@ local skill_heading = UiComponents.section_heading(
     "LEARNED SKILLS"
 )
 skill_heading.Position = UDim2.fromOffset(0, 0)
-skill_heading.Size = UDim2.new(0.62, -10, 0, 20)
+skill_heading.Size = UDim2.new(0.50, -6, 0, 20)
 skill_heading.ZIndex = 12
 
 local loadout_heading = UiComponents.section_heading(
     modal.Body,
     "ACTIVE LOADOUT"
 )
-loadout_heading.Position = UDim2.new(0.64, 8, 0, 0)
-loadout_heading.Size = UDim2.new(0.36, -8, 0, 20)
+loadout_heading.Position = UDim2.new(0.50, 6, 0, 0)
+loadout_heading.Size = UDim2.new(0.50, -6, 0, 20)
 loadout_heading.ZIndex = 12
 
 local skill_list = Instance.new("ScrollingFrame")
 skill_list.Name = "SkillList"
 skill_list.Position = UDim2.fromOffset(0, 28)
-skill_list.Size = UDim2.new(0.62, -10, 1, -76)
+skill_list.Size = UDim2.new(0.50, -6, 1, -76)
 skill_list.CanvasSize = UDim2.fromOffset(0, 0)
 skill_list.ZIndex = 12
 UiTheme.style_scroll(skill_list)
@@ -120,15 +184,15 @@ skill_padding.PaddingRight = UDim.new(0, 8)
 skill_padding.Parent = skill_list
 
 local skill_layout = Instance.new("UIGridLayout")
-skill_layout.CellSize = UDim2.fromOffset(190, 72)
-skill_layout.CellPadding = UDim2.fromOffset(7, 7)
+skill_layout.CellSize = UDim2.fromOffset(86, 108)
+skill_layout.CellPadding = UDim2.fromOffset(5, 6)
 skill_layout.SortOrder = Enum.SortOrder.LayoutOrder
 skill_layout.Parent = skill_list
 
 local loadout = Instance.new("Frame")
 loadout.Name = "Loadout"
-loadout.Position = UDim2.new(0.64, 8, 0, 28)
-loadout.Size = UDim2.new(0.36, -8, 1, -76)
+loadout.Position = UDim2.new(0.50, 6, 0, 28)
+loadout.Size = UDim2.new(0.50, -6, 1, -76)
 loadout.BorderSizePixel = 0
 loadout.ZIndex = 12
 UiTheme.style_inset(loadout, true)
@@ -161,6 +225,8 @@ status.ZIndex = 12
 local selected_skill: string? = nil
 local latest: any = {}
 local skill_buttons: {[string]: TextButton} = {}
+local skill_name_labels: {[string]: TextLabel} = {}
+local skill_rank_labels: {[string]: TextLabel} = {}
 local slot_buttons: {[number]: TextButton} = {}
 local slot_sigils: {[number]: TextLabel} = {}
 
@@ -266,32 +332,56 @@ local function create_skill_button(
     local button = UiComponents.button(
         skill_list,
         skill_id,
-        display_name,
+        "",
         "Secondary"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.fromOffset(190, 72)
-    button.TextXAlignment = Enum.TextXAlignment.Left
-    button.TextWrapped = true
-    button.TextSize = 13
-    button.TextColor3 = UiTheme.PALETTE.Text
-    button.TextStrokeTransparency = 0.68
+    button.Size = UDim2.fromOffset(86, 108)
+    button.Text = ""
     button.ZIndex = 13
+    button:SetAttribute(
+        "SkillDisplayName",
+        display_name
+    )
 
     local icon = UiOrnament.icon(
         button,
         "SkillIcon",
         string.sub(display_name, 1, 1),
         Color3.fromRGB(42, 71, 113),
-        48
+        62
     )
-    icon.Position = UDim2.fromOffset(8, 12)
+    icon.AnchorPoint = Vector2.new(0.5, 0)
+    icon.Position = UDim2.new(0.5, 0, 0, 6)
     icon.ZIndex = 14
 
-    local padding = Instance.new("UIPadding")
-    padding.PaddingLeft = UDim.new(0, 64)
-    padding.PaddingRight = UDim.new(0, 8)
-    padding.Parent = button
+    local name_label = UiComponents.label(
+        button,
+        "SkillName",
+        display_name,
+        "Heading"
+    )
+    name_label.Position = UDim2.fromOffset(5, 72)
+    name_label.Size = UDim2.new(1, -10, 0, 18)
+    name_label.TextXAlignment = Enum.TextXAlignment.Center
+    name_label.TextTruncate = Enum.TextTruncate.AtEnd
+    name_label.TextSize = 9
+    name_label.ZIndex = 14
+
+    local rank_label = UiComponents.label(
+        button,
+        "Rank",
+        "Locked",
+        "Caption"
+    )
+    rank_label.Position = UDim2.fromOffset(5, 91)
+    rank_label.Size = UDim2.new(1, -10, 0, 12)
+    rank_label.TextXAlignment = Enum.TextXAlignment.Center
+    rank_label.TextSize = 8
+    rank_label.ZIndex = 14
+
+    skill_name_labels[skill_id] = name_label
+    skill_rank_labels[skill_id] = rank_label
 
     return button
 end
@@ -369,7 +459,10 @@ for order, skill_id in ipairs(sorted_skill_ids()) do
 
         selected_skill = skill_id
         status.Text = "Selected "
-            .. button.Text:gsub("   •.*$", "")
+            .. tostring(
+                button:GetAttribute("SkillDisplayName")
+                    or skill_id
+            )
             .. ". Choose a hotbar slot."
     end)
 end
@@ -426,25 +519,29 @@ local function render(snapshot: any)
             selected = false
         end
 
-        button.Text = string.format(
-            "%s   •   %s",
-            display_name,
-            if known
-                then "Rank " .. tostring(rank)
+        local name_label = skill_name_labels[skill_id]
+        local rank_label = skill_rank_labels[skill_id]
+
+        if name_label then
+            name_label.Text = display_name
+            name_label.TextColor3 = if known
+                then UiTheme.PALETTE.Text
+                else UiTheme.PALETTE.TextFaint
+        end
+
+        if rank_label then
+            rank_label.Text = if known
+                then "Lv. " .. tostring(rank)
                 else "Locked"
-        )
-        button.TextColor3 = if known
-            then UiTheme.PALETTE.Text
-            else UiTheme.PALETTE.TextFaint:Lerp(
-                UiTheme.PALETTE.Text,
-                0.36
-            )
+            rank_label.TextColor3 = if known
+                then UiTheme.PALETTE.Accent
+                else UiTheme.PALETTE.TextFaint
+        end
+
         button.BackgroundColor3 = if selected
             then UiTheme.PALETTE.AccentDark
             else UiTheme.PALETTE.SurfaceRaised
         UiTheme.set_button_enabled(button, known)
-        button.TextTransparency = if known then 0 else 0.04
-        button.TextStrokeTransparency = if known then 0.68 else 0.58
     end
 
     for slot = 1, 6 do
