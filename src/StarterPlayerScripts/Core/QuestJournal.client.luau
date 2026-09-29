@@ -21,6 +21,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 local WindowController = require(
     script.Parent:WaitForChild("HudWindowController")
 )
@@ -38,8 +41,8 @@ local quest_snapshot = remotes:WaitForChild(
 local WINDOW_NAME = "Quests"
 local GUI_NAME = "QuestJournal"
 local SNAPSHOT_REFRESH_SECONDS = 1
-local MAX_TRACKER_HEIGHT = 360
-local TRACKER_WIDTH = 330
+local MAX_TRACKER_HEIGHT = 430
+local TRACKER_WIDTH = 318
 local JOURNAL_ROW_HEIGHT = 168
 
 local player_scripts = player:WaitForChild("PlayerScripts")
@@ -98,11 +101,26 @@ gui.Parent = player_gui
 local tracker = Instance.new("Frame")
 tracker.Name = "ActiveQuestTracker"
 tracker.AnchorPoint = Vector2.new(1, 0)
-tracker.Position = UDim2.new(1, -18, 0, 104)
-tracker.Size = UDim2.fromOffset(TRACKER_WIDTH, 70)
+tracker.Position = UDim2.new(1, -18, 0, 226)
+tracker.Size = UDim2.fromOffset(TRACKER_WIDTH, 72)
 tracker.Visible = false
 UiTheme.style_panel(tracker, false)
 tracker.Parent = gui
+UiOrnament.frame(tracker, true)
+
+local tracker_header = Instance.new("Frame")
+tracker_header.Name = "HeaderBand"
+tracker_header.Position = UDim2.fromOffset(7, 7)
+tracker_header.Size = UDim2.new(1, -14, 0, 31)
+tracker_header.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
+tracker_header.BackgroundTransparency = 0.08
+tracker_header.BorderSizePixel = 0
+UiTheme.add_gradient(
+    tracker_header,
+    UiTheme.PALETTE.SurfaceWarm,
+    UiTheme.PALETTE.BackdropSoft
+)
+tracker_header.Parent = tracker
 UiTheme.bind_responsive_scale(
     tracker,
     1366,
@@ -113,28 +131,30 @@ UiTheme.bind_responsive_scale(
 local tracker_title = UiComponents.label(
     tracker,
     "Title",
-    "ACTIVE QUESTS",
-    "Caption"
+    "QUEST TRACKER",
+    "Heading"
 )
-tracker_title.Position = UDim2.fromOffset(14, 10)
-tracker_title.Size = UDim2.new(1, -28, 0, 18)
-tracker_title.TextColor3 = UiTheme.PALETTE.Accent
+tracker_title.Position = UDim2.fromOffset(17, 10)
+tracker_title.Size = UDim2.new(1, -34, 0, 24)
+tracker_title.TextColor3 = UiTheme.PALETTE.Text
+tracker_title.TextSize = 17
+tracker_title.ZIndex = 2
 
 local tracker_hint = UiComponents.label(
     tracker,
     "Hint",
-    "L  •  Quest Journal",
-    "Muted"
+    "L  JOURNAL",
+    "Caption"
 )
 tracker_hint.AnchorPoint = Vector2.new(1, 0)
-tracker_hint.Position = UDim2.new(1, -14, 0, 10)
-tracker_hint.Size = UDim2.fromOffset(150, 18)
+tracker_hint.Position = UDim2.new(1, -17, 0, 13)
+tracker_hint.Size = UDim2.fromOffset(105, 16)
 tracker_hint.TextXAlignment = Enum.TextXAlignment.Right
 
 local tracker_list = Instance.new("ScrollingFrame")
 tracker_list.Name = "QuestRows"
-tracker_list.Position = UDim2.fromOffset(10, 36)
-tracker_list.Size = UDim2.new(1, -20, 1, -46)
+tracker_list.Position = UDim2.fromOffset(10, 44)
+tracker_list.Size = UDim2.new(1, -20, 1, -54)
 tracker_list.CanvasSize = UDim2.new()
 tracker_list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 tracker_list.BackgroundTransparency = 1
@@ -152,9 +172,11 @@ local modal = UiComponents.modal(
     "QuestJournalWindow",
     "Quest Journal",
     "Accepted quests, objectives and rewards.",
-    UDim2.fromOffset(760, 590)
+    UDim2.fromOffset(720, 610)
 )
 local journal_panel = modal.Root
+journal_panel.AnchorPoint = Vector2.new(0, 0)
+journal_panel.Position = UDim2.fromOffset(20, 132)
 journal_panel.Visible = false
 UiTheme.bind_responsive_scale(
     journal_panel,
@@ -163,19 +185,58 @@ UiTheme.bind_responsive_scale(
     1
 )
 
+local tab_bar = Instance.new("Frame")
+tab_bar.Name = "JournalTabs"
+tab_bar.Size = UDim2.new(1, 0, 0, 34)
+tab_bar.BackgroundTransparency = 1
+tab_bar.Parent = modal.Body
+
+local tab_layout = Instance.new("UIListLayout")
+tab_layout.FillDirection = Enum.FillDirection.Horizontal
+tab_layout.Padding = UDim.new(0, 5)
+tab_layout.Parent = tab_bar
+
+local active_tab = UiComponents.button(
+    tab_bar,
+    "ActiveTab",
+    "Active",
+    "Primary"
+)
+active_tab.Size = UDim2.fromOffset(126, 30)
+active_tab.Active = false
+
+local completed_tab = UiComponents.button(
+    tab_bar,
+    "CompletedTab",
+    "Completed",
+    "Ghost"
+)
+completed_tab.Size = UDim2.fromOffset(126, 30)
+UiTheme.set_button_enabled(completed_tab, false)
+
+local failed_tab = UiComponents.button(
+    tab_bar,
+    "FailedTab",
+    "Failed",
+    "Ghost"
+)
+failed_tab.Size = UDim2.fromOffset(126, 30)
+UiTheme.set_button_enabled(failed_tab, false)
+
 local journal_status = UiComponents.label(
     modal.Body,
     "Status",
     "Loading accepted quests...",
     "Muted"
 )
-journal_status.Size = UDim2.new(1, 0, 0, 30)
+journal_status.Position = UDim2.fromOffset(4, 40)
+journal_status.Size = UDim2.new(1, -8, 0, 26)
 journal_status.TextWrapped = true
 
 local journal_list = Instance.new("ScrollingFrame")
 journal_list.Name = "ActiveQuests"
-journal_list.Position = UDim2.fromOffset(0, 38)
-journal_list.Size = UDim2.new(1, 0, 1, -38)
+journal_list.Position = UDim2.fromOffset(0, 70)
+journal_list.Size = UDim2.new(1, 0, 1, -70)
 journal_list.CanvasSize = UDim2.new()
 journal_list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 UiTheme.style_scroll(journal_list)
@@ -533,12 +594,14 @@ local function add_tracker_row(
     row.Name = definition.Id
     row.LayoutOrder = order
     row.Size = UDim2.new(1, 0, 0, row_height)
-    row.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
-    row.BackgroundTransparency = if tracked then 0.02 else 0.24
+    row.BackgroundColor3 = if tracked
+        then UiTheme.PALETTE.SurfaceWarm
+        else UiTheme.PALETTE.SurfaceRaised
+    row.BackgroundTransparency = if tracked then 0.02 else 0.12
     row.BorderSizePixel = 0
     row.Text = ""
     row.AutoButtonColor = false
-    UiTheme.add_corner(row, 7)
+    UiTheme.add_corner(row, 2)
     UiTheme.add_stroke(
         row,
         if tracked
@@ -653,7 +716,7 @@ local function render_tracker()
         TRACKER_WIDTH,
         math.min(
             MAX_TRACKER_HEIGHT,
-            46 + content_height
+            54 + content_height
         )
     )
 end
@@ -722,10 +785,12 @@ local function add_journal_row(
     row.Name = definition.Id
     row.LayoutOrder = order
     row.Size = UDim2.new(1, 0, 0, JOURNAL_ROW_HEIGHT)
-    row.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
-    row.BackgroundTransparency = 0.08
+    row.BackgroundColor3 = if tracked
+        then UiTheme.PALETTE.SurfaceWarm
+        else UiTheme.PALETTE.SurfaceRaised
+    row.BackgroundTransparency = 0.04
     row.BorderSizePixel = 0
-    UiTheme.add_corner(row, 8)
+    UiTheme.add_corner(row, 2)
     UiTheme.add_stroke(
         row,
         if tracked
