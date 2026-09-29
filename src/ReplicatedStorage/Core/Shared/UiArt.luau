@@ -123,7 +123,7 @@ local DIRECT_ART: {[string]: DirectArt} = {
 
 local EMPTY_DIRECT_ART: {[string]: DirectArt} = {
     Journal = {
-        Image = UiArtAssets.JOURNAL_SHELL,
+        Image = UiArtAssets.QUEST_JOURNAL_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     Tracker = {
@@ -131,27 +131,27 @@ local EMPTY_DIRECT_ART: {[string]: DirectArt} = {
         SourceSize = Vector2.new(1086, 1448),
     },
     Inventory = {
-        Image = UiArtAssets.INVENTORY_SHELL,
+        Image = UiArtAssets.INVENTORY_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     Skills = {
-        Image = UiArtAssets.SKILLS_SHELL,
+        Image = UiArtAssets.SKILLS_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     Stats = {
-        Image = UiArtAssets.STATS_SHELL,
+        Image = UiArtAssets.STATS_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     Guild = {
-        Image = UiArtAssets.GUILD_SHELL,
+        Image = UiArtAssets.GUILD_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     Party = {
-        Image = UiArtAssets.PARTY_SHELL,
+        Image = UiArtAssets.PARTY_EMPTY,
         SourceSize = Vector2.new(1086, 1448),
     },
     Settings = {
-        Image = UiArtAssets.SETTINGS_SHELL,
+        Image = UiArtAssets.SETTINGS_EMPTY,
         SourceSize = Vector2.new(1122, 1402),
     },
     WorldMap = {
