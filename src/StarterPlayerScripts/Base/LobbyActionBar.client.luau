@@ -2,7 +2,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local DISPLAY_SLOT_COUNT = 8
+local DISPLAY_SLOT_COUNT = 9
 local ACTIVE_SLOT_COUNT = 6
 
 local SLOT_TINTS = table.freeze({
@@ -12,6 +12,7 @@ local SLOT_TINTS = table.freeze({
     Color3.fromRGB(34, 105, 137),
     Color3.fromRGB(152, 105, 35),
     Color3.fromRGB(136, 43, 54),
+    Color3.fromRGB(55, 65, 77),
     Color3.fromRGB(55, 65, 77),
     Color3.fromRGB(55, 65, 77),
 })
@@ -80,7 +81,7 @@ UiArt.actionbar_background(root, 1)
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
 slots.Position = UDim2.fromOffset(85, 13)
-slots.Size = UDim2.fromOffset(535, 62)
+slots.Size = UDim2.fromOffset(602, 62)
 slots.BackgroundTransparency = 1
 slots.BorderSizePixel = 0
 slots.ZIndex = 2
@@ -99,10 +100,10 @@ local slot_wells: {[number]: Frame} = {}
 
 local xp_track = Instance.new("Frame")
 xp_track.Name = "ExperienceTrack"
-xp_track.Position = UDim2.fromOffset(86, 80)
-xp_track.Size = UDim2.fromOffset(598, 9)
+xp_track.Position = UDim2.fromOffset(92, 80)
+xp_track.Size = UDim2.fromOffset(576, 9)
 xp_track.BackgroundColor3 = Color3.fromRGB(25, 9, 33)
-xp_track.BackgroundTransparency = 0.05
+xp_track.BackgroundTransparency = 1
 xp_track.BorderSizePixel = 0
 xp_track.ClipsDescendants = true
 xp_track.ZIndex = 2
@@ -126,16 +127,16 @@ xp_fill.Parent = xp_track
 local progression_text = UiComponents.label(
     root,
     "ProgressionText",
-    "Lv. 1",
+    "0 / 100",
     "Heading"
 )
-progression_text.Position = UDim2.fromOffset(246, 89)
-progression_text.Size = UDim2.fromOffset(235, 22)
+progression_text.Position = UDim2.fromOffset(92, 75)
+progression_text.Size = UDim2.fromOffset(576, 20)
 progression_text.TextXAlignment = Enum.TextXAlignment.Center
 progression_text.TextColor3 = Color3.fromRGB(248, 237, 211)
 progression_text.TextStrokeColor3 = Color3.new(0, 0, 0)
-progression_text.TextStrokeTransparency = 0.18
-progression_text.TextSize = 15
+progression_text.TextStrokeTransparency = 0.08
+progression_text.TextSize = 13
 progression_text.ZIndex = 4
 
 --[[
@@ -162,6 +163,7 @@ local function key_label(slot: number): string
         Six = "6",
         Seven = "7",
         Eight = "8",
+        Nine = "9",
     }
 
     return names[key.Name] or key.Name
@@ -236,8 +238,11 @@ local function create_slot(slot: number)
         key_label(slot)
     )
     key.Position = UDim2.fromOffset(2, 1)
-    key.Size = UDim2.fromOffset(18, 17)
-    key.TextSize = 9
+    key.Size = UDim2.fromOffset(20, 18)
+    key.TextColor3 = Color3.fromRGB(255, 245, 220)
+    key.TextStrokeColor3 = Color3.new(0, 0, 0)
+    key.TextStrokeTransparency = 0.05
+    key.TextSize = 11
     key.ZIndex = 6
 end
 
@@ -283,8 +288,7 @@ local function render(snapshot: any)
 
     if required and required > 0 then
         progression_text.Text = string.format(
-            "Lv. %d   %d / %d",
-            level,
+            "%d / %d",
             xp,
             required
         )
@@ -293,10 +297,7 @@ local function render(snapshot: any)
             xp / required
         )
     else
-        progression_text.Text = string.format(
-            "Lv. %d   MAX LEVEL",
-            level
-        )
+        progression_text.Text = "MAX LEVEL"
         UiTheme.set_bar_ratio(xp_fill, 1)
     end
 end
