@@ -254,6 +254,29 @@ local function living_enemies(enemies: Folder): {Model}
 end
 
 --[[
+Overlaps the player's real character with one authored encounter trigger.
+
+This avoids depending on pathfinding or room geometry in a fixture whose purpose
+is to validate the server-owned trigger and encounter progression contract.
+
+Args:
+    root (BasePart): Player root used for physical contact.
+    trigger (BasePart): Authored encounter trigger volume.
+
+Returns:
+    nil: Leaves the character overlapping the trigger for a physics step.
+]]
+local function touch_trigger(
+    root: BasePart,
+    trigger: BasePart
+)
+    root.AssemblyLinearVelocity = Vector3.zero
+    root.AssemblyAngularVelocity = Vector3.zero
+    root.CFrame = trigger.CFrame
+    task.wait(0.35)
+end
+
+--[[
 Physically enters a required room, waits for activation, then clears it.
 
 Args:
@@ -279,12 +302,7 @@ local function enter_and_clear_required(
 )
     local trigger = anchor(room_anchor_id)
 
-    root.CFrame = trigger.CFrame * CFrame.new(0, 0, 9)
-    root.AssemblyLinearVelocity = Vector3.zero
-    task.wait(0.2)
-    humanoid:MoveTo(
-        trigger.Position + Vector3.new(0, 0, -2)
-    )
+    touch_trigger(root, trigger)
 
     wait_until(function()
         return encounter_state(
@@ -434,13 +452,7 @@ local function run()
     )
 
     local room2_trigger = anchor("Temple.Room2.Trigger")
-    root.CFrame =
-        room2_trigger.CFrame * CFrame.new(0, 0, 9)
-    root.AssemblyLinearVelocity = Vector3.zero
-    task.wait(0.2)
-    humanoid:MoveTo(
-        room2_trigger.Position + Vector3.new(0, 0, -2)
-    )
+    touch_trigger(root, room2_trigger)
 
     wait_until(function()
         return encounter_state(
@@ -486,13 +498,7 @@ local function run()
     )
 
     local final_trigger = anchor("Temple.Room3.Trigger")
-    root.CFrame =
-        final_trigger.CFrame * CFrame.new(0, 0, 9)
-    root.AssemblyLinearVelocity = Vector3.zero
-    task.wait(0.2)
-    humanoid:MoveTo(
-        final_trigger.Position + Vector3.new(0, 0, -2)
-    )
+    touch_trigger(root, final_trigger)
 
     wait_until(function()
         return encounter_state(
