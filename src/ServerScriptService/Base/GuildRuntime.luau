@@ -174,7 +174,32 @@ function GuildRuntime.attach(config: any): any
         elseif action == "Leave" then
             response = guilds:leave(player.UserId, tx)
         elseif action == "Upgrade" then
-            response = guilds:upgrade_guild(player.UserId, tx)
+            response = guilds:upgrade_guild(
+                player.UserId,
+                tx
+            )
+        elseif action == "SetSettingsAccess" then
+            local role = valid_short_id(body.Role)
+            local allowed = body.Allowed
+
+            response = if role
+                    and type(allowed) == "boolean"
+                then guilds:set_settings_access(
+                    player.UserId,
+                    role,
+                    allowed,
+                    tx
+                )
+                else {
+                    ok = false,
+                    reason = "InvalidGuildRequest",
+                }
+        elseif action == "SetMessage" then
+            response = guilds:set_message(
+                player.UserId,
+                body.Message,
+                tx
+            )
         elseif action == "HallEntry" then
             local travel_check = travel:validate_special_request(player.UserId)
             if travel_check.ok ~= true then
