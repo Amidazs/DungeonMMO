@@ -82,45 +82,15 @@ panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
 
-local old_reference_art = panel:FindFirstChild("ReferenceArt")
-if old_reference_art then
-    old_reference_art:Destroy()
-end
-
-local stats_art = UiArt.background(
-    panel,
-    "Stats",
-    11
-)
-stats_art.Name = "StatsArt"
-
-UiArt.content_mask(
-    panel,
-    "Stats",
-    "CharacterContentMask",
-    60,
-    190,
-    530,
-    1120,
-    12
-)
-UiArt.content_mask(
-    panel,
-    "Stats",
-    "StatContentMask",
-    610,
-    190,
-    442,
-    1120,
-    12
-)
+-- Keep the modal's clean shell. Identity, progression and
+-- spendable attributes are all generated from authoritative state.
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = false
-modal.Subtitle.Visible = false
+modal.Title.Visible = true
+modal.Subtitle.Visible = true
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 1
-modal.Close.TextTransparency = 1
+modal.Close.BackgroundTransparency = 0.18
+modal.Close.TextTransparency = 0
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
