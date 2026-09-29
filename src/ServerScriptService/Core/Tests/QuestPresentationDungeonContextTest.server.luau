@@ -167,7 +167,7 @@ check(
 
 local survey =
     QuestPresentation.objective_dungeon_requirement(
-        objective("RuinSurvey", "ReachInnerApproach")
+        objective("RuinSurvey", "ReachTempleInnerApproach")
     )
 check(
     survey ~= nil
