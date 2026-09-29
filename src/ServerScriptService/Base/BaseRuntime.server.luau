@@ -1349,11 +1349,12 @@ skill_rank_request.OnServerEvent:Connect(function(
 
     local result
 
-    if type(trainer_id) == "string" and type(skill_id) == "string"
-        and (not original_trainer_requires_proximity(trainer_id)
-            or original_transfer_mentors:nearby_trainer(
-                player, trainer_id
-            ))
+    if type(trainer_id) == "string"
+        and type(skill_id) == "string"
+        and nearby_progression_trainer(
+            player,
+            trainer_id
+        )
     then
         result = progression_controller:purchase_rank(
             player.UserId,
