@@ -31,6 +31,12 @@ local SkillUnlockRules = require(
     Shared:WaitForChild("SkillUnlockRules")
 )
 
+local AttributeConfig = require(
+    Shared:WaitForChild(
+        "AttributeConfig"
+    )
+)
+
 local RaceDefinitions = require(
     Shared:WaitForChild(
         "RaceDefinitions"
@@ -179,6 +185,7 @@ local function empty_snapshot(): any
         Gold = 0,
         APAvailable = 0,
         SPAvailable = 0,
+        MaxMana = AttributeConfig.BASE_MAX_MANA,
 
         Identity = identity,
 
@@ -241,6 +248,12 @@ function ProgressionSnapshotBuilder.build(
 
     local attribute_baseline =
         baseline_snapshot(identity)
+
+    local snapshot_attributes =
+        copy_attributes(
+            attributes,
+            attribute_baseline
+        )
 
     local skill_payload: any = {}
 
@@ -401,16 +414,19 @@ function ProgressionSnapshotBuilder.build(
                     character
                 ),
 
+        MaxMana =
+            AttributeConfig.max_mana(
+                snapshot_attributes.Intellect,
+                snapshot_attributes.Spirit
+            ),
+
         Identity = identity,
 
         AttributeBaseline =
             attribute_baseline,
 
         Attributes =
-            copy_attributes(
-                attributes,
-                attribute_baseline
-            ),
+            snapshot_attributes,
 
         Skills =
             skill_payload,
