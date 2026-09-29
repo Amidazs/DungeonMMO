@@ -15,6 +15,9 @@ local remotes = core:WaitForChild("Remotes")
 local QuestPresentation = require(
     shared:WaitForChild("QuestPresentation")
 )
+local DungeonDefinitions = require(
+    shared:WaitForChild("DungeonDefinitions")
+)
 local QuestNarrativeDefinitions = require(
     shared:WaitForChild("QuestNarrativeDefinitions")
 )
@@ -46,7 +49,7 @@ local GUI_NAME = "QuestJournal"
 local SNAPSHOT_REFRESH_SECONDS = 1
 local MAX_TRACKER_HEIGHT = 430
 local TRACKER_WIDTH = 318
-local JOURNAL_ROW_HEIGHT = 68
+local JOURNAL_ROW_HEIGHT = 76
 
 local player_scripts = player:WaitForChild("PlayerScripts")
 local ground_guide: any = nil
@@ -134,7 +137,7 @@ UiTheme.bind_responsive_scale(
 local tracker_title = UiComponents.label(
     tracker,
     "Title",
-    "QUEST TRACKER",
+    "Quest Tracker",
     "Heading"
 )
 tracker_title.Position = UDim2.fromOffset(17, 10)
@@ -175,11 +178,11 @@ local modal = UiComponents.modal(
     "QuestJournalWindow",
     "Quest Journal",
     "Accepted quests, objectives and rewards.",
-    UDim2.fromOffset(720, 610)
+    UDim2.fromOffset(760, 650)
 )
 local journal_panel = modal.Root
 journal_panel.AnchorPoint = Vector2.new(0, 0)
-journal_panel.Position = UDim2.fromOffset(20, 132)
+journal_panel.Position = UDim2.fromOffset(20, 116)
 journal_panel.Visible = false
 UiTheme.bind_responsive_scale(
     journal_panel,
@@ -205,7 +208,7 @@ local active_tab = UiComponents.button(
     "Active",
     "Primary"
 )
-active_tab.Size = UDim2.fromOffset(126, 30)
+active_tab.Size = UDim2.fromOffset(116, 30)
 active_tab.Active = false
 
 local completed_tab = UiComponents.button(
@@ -214,7 +217,7 @@ local completed_tab = UiComponents.button(
     "Completed",
     "Ghost"
 )
-completed_tab.Size = UDim2.fromOffset(126, 30)
+completed_tab.Size = UDim2.fromOffset(116, 30)
 UiTheme.set_button_enabled(completed_tab, false)
 
 local failed_tab = UiComponents.button(
@@ -223,7 +226,7 @@ local failed_tab = UiComponents.button(
     "Failed",
     "Ghost"
 )
-failed_tab.Size = UDim2.fromOffset(126, 30)
+failed_tab.Size = UDim2.fromOffset(116, 30)
 UiTheme.set_button_enabled(failed_tab, false)
 
 local journal_status = UiComponents.label(
@@ -245,7 +248,7 @@ journal_content.Parent = modal.Body
 
 local journal_list = Instance.new("ScrollingFrame")
 journal_list.Name = "QuestList"
-journal_list.Size = UDim2.new(0.36, -6, 1, 0)
+journal_list.Size = UDim2.new(0.39, -7, 1, 0)
 journal_list.CanvasSize = UDim2.new()
 journal_list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 UiTheme.style_scroll(journal_list)
@@ -265,8 +268,8 @@ journal_layout.Parent = journal_list
 
 local detail_panel = Instance.new("Frame")
 detail_panel.Name = "QuestDetail"
-detail_panel.Position = UDim2.new(0.36, 8, 0, 0)
-detail_panel.Size = UDim2.new(0.64, -8, 1, 0)
+detail_panel.Position = UDim2.new(0.39, 8, 0, 0)
+detail_panel.Size = UDim2.new(0.61, -8, 1, 0)
 detail_panel.BorderSizePixel = 0
 UiTheme.style_inset(detail_panel, false)
 detail_panel.Parent = journal_content
@@ -290,14 +293,50 @@ local detail_meta = UiComponents.label(
 detail_meta.Position = UDim2.fromOffset(18, 47)
 detail_meta.Size = UDim2.new(1, -36, 0, 20)
 
+local location_card = Instance.new("Frame")
+location_card.Name = "LocationCard"
+location_card.Position = UDim2.fromOffset(18, 74)
+location_card.Size = UDim2.new(1, -36, 0, 66)
+UiTheme.style_inset(location_card, true)
+location_card.Parent = detail_panel
+
+local location_kicker = UiComponents.label(
+    location_card,
+    "LocationKicker",
+    "QUEST LOCATION",
+    "Caption"
+)
+location_kicker.Position = UDim2.fromOffset(12, 7)
+location_kicker.Size = UDim2.new(1, -24, 0, 16)
+location_kicker.TextColor3 = UiTheme.PALETTE.Accent
+
+local location_name = UiComponents.label(
+    location_card,
+    "LocationName",
+    "Adventure",
+    "Heading"
+)
+location_name.Position = UDim2.fromOffset(12, 23)
+location_name.Size = UDim2.new(1, -24, 0, 22)
+
+local location_depth = UiComponents.label(
+    location_card,
+    "LocationDepth",
+    "",
+    "Muted"
+)
+location_depth.Position = UDim2.fromOffset(12, 44)
+location_depth.Size = UDim2.new(1, -24, 0, 16)
+location_depth.TextSize = 11
+
 local detail_story = UiComponents.label(
     detail_panel,
     "QuestStory",
     "",
     "Body"
 )
-detail_story.Position = UDim2.fromOffset(18, 78)
-detail_story.Size = UDim2.new(1, -36, 0, 88)
+detail_story.Position = UDim2.fromOffset(18, 151)
+detail_story.Size = UDim2.new(1, -36, 0, 72)
 detail_story.TextWrapped = true
 detail_story.TextYAlignment = Enum.TextYAlignment.Top
 detail_story.TextTruncate = Enum.TextTruncate.None
@@ -306,13 +345,13 @@ local objectives_heading = UiComponents.section_heading(
     detail_panel,
     "OBJECTIVES"
 )
-objectives_heading.Position = UDim2.fromOffset(18, 174)
+objectives_heading.Position = UDim2.fromOffset(18, 229)
 objectives_heading.Size = UDim2.new(1, -36, 0, 18)
 
 local detail_objectives = Instance.new("Frame")
 detail_objectives.Name = "Objectives"
-detail_objectives.Position = UDim2.fromOffset(18, 197)
-detail_objectives.Size = UDim2.new(1, -36, 0, 128)
+detail_objectives.Position = UDim2.fromOffset(18, 251)
+detail_objectives.Size = UDim2.new(1, -36, 0, 98)
 detail_objectives.BackgroundTransparency = 1
 detail_objectives.Parent = detail_panel
 
@@ -325,7 +364,7 @@ local rewards_heading = UiComponents.section_heading(
     detail_panel,
     "REWARDS"
 )
-rewards_heading.Position = UDim2.fromOffset(18, 336)
+rewards_heading.Position = UDim2.fromOffset(18, 354)
 rewards_heading.Size = UDim2.new(1, -36, 0, 18)
 
 local detail_reward = UiComponents.label(
@@ -334,8 +373,8 @@ local detail_reward = UiComponents.label(
     "",
     "Body"
 )
-detail_reward.Position = UDim2.fromOffset(18, 358)
-detail_reward.Size = UDim2.new(1, -36, 0, 54)
+detail_reward.Position = UDim2.fromOffset(18, 376)
+detail_reward.Size = UDim2.new(1, -36, 0, 34)
 detail_reward.TextWrapped = true
 detail_reward.TextYAlignment = Enum.TextYAlignment.Top
 
@@ -345,8 +384,8 @@ local detail_ready = UiComponents.label(
     "",
     "Caption"
 )
-detail_ready.Position = UDim2.fromOffset(18, 416)
-detail_ready.Size = UDim2.new(1, -36, 0, 22)
+detail_ready.Position = UDim2.fromOffset(18, 414)
+detail_ready.Size = UDim2.new(1, -36, 0, 18)
 detail_ready.TextColor3 = UiTheme.PALETTE.AccentBright
 
 local detail_track = UiComponents.button(
@@ -356,8 +395,8 @@ local detail_track = UiComponents.button(
     "Primary"
 )
 detail_track.AnchorPoint = Vector2.new(0, 1)
-detail_track.Position = UDim2.new(0, 18, 1, -16)
-detail_track.Size = UDim2.new(1, -36, 0, 40)
+detail_track.Position = UDim2.new(0, 18, 1, -14)
+detail_track.Size = UDim2.new(1, -36, 0, 38)
 
 local latest: any = nil
 local auto_track_requested = false
@@ -647,6 +686,50 @@ local function tracker_goal_text(
 end
 
 --[[
+Returns the dungeon and depth context for the current quest objective.
+
+Args:
+    definition (any): Active Adventure quest definition.
+    state (any): Current active quest state.
+
+Returns:
+    (string, string): Location name and eligible depth text.
+]]
+local function quest_location_text(
+    definition: any,
+    state: any
+): (string, string)
+    local row = QuestPresentation.first_incomplete(
+        definition,
+        state
+    )
+
+    if not row then
+        return "Adventure", "Objectives complete"
+    end
+
+    local requirement =
+        QuestPresentation.objective_dungeon_requirement(
+            row.Definition
+        )
+
+    if not requirement then
+        return "Sunridge Village", "Base objective"
+    end
+
+    local dungeon = DungeonDefinitions.get(
+        tostring(requirement.DungeonId or "")
+    )
+    local dungeon_name = if dungeon
+        then tostring(dungeon.DisplayName)
+        else tostring(requirement.DungeonId or "Dungeon")
+
+    return dungeon_name,
+        QuestPresentation.difficulty_text(requirement)
+end
+
+
+--[[
 Returns the compact tracker height needed by one active quest.
 
 Args:
@@ -661,7 +744,7 @@ local function tracker_row_height(
     state: any
 ): number
     if type(state) == "table" and state.Ready == true then
-        return 58
+        return 92
     end
 
     local objectives = QuestPresentation.objective_rows(
@@ -669,7 +752,7 @@ local function tracker_row_height(
         state
     )
 
-    return 34 + math.max(1, #objectives) * 22 + 6
+    return 70 + math.max(1, #objectives) * 21
 end
 
 --[[
@@ -724,11 +807,26 @@ local function add_tracker_row(
             .. tostring(definition.DisplayName or definition.Id),
         "Body"
     )
-    name.Position = UDim2.fromOffset(10, 6)
-    name.Size = UDim2.new(1, -20, 0, 20)
+    name.Position = UDim2.fromOffset(12, 6)
+    name.Size = UDim2.new(1, -24, 0, 20)
     name.TextColor3 = if tracked
         then UiTheme.PALETTE.AccentBright
         else UiTheme.PALETTE.Text
+
+    local location_text, depth_text = quest_location_text(
+        definition,
+        state
+    )
+    local location = UiComponents.label(
+        row,
+        "Location",
+        location_text .. "  •  " .. depth_text,
+        "Caption"
+    )
+    location.Position = UDim2.fromOffset(12, 26)
+    location.Size = UDim2.new(1, -24, 0, 16)
+    location.TextColor3 = UiTheme.PALETTE.TextMuted
+    location.TextTruncate = Enum.TextTruncate.AtEnd
 
     if type(state) == "table" and state.Ready == true then
         local goal = UiComponents.label(
@@ -737,8 +835,8 @@ local function add_tracker_row(
             tracker_goal_text(definition, state),
             "Muted"
         )
-        goal.Position = UDim2.fromOffset(10, 29)
-        goal.Size = UDim2.new(1, -20, 0, 20)
+        goal.Position = UDim2.fromOffset(12, 47)
+        goal.Size = UDim2.new(1, -24, 0, 18)
         goal.TextWrapped = false
         goal.TextTruncate = Enum.TextTruncate.AtEnd
         goal.TextColor3 = UiTheme.PALETTE.Accent
@@ -752,19 +850,32 @@ local function add_tracker_row(
             local goal = UiComponents.label(
                 row,
                 "Goal" .. tostring(index),
-                (if objective.Complete then "✓  " else "•  ")
+                (if objective.Complete then "✓  " else "□  ")
                     .. objective.Text,
                 if objective.Complete then "Muted" else "Body"
             )
             goal.Position = UDim2.fromOffset(
-                10,
-                28 + (index - 1) * 22
+                12,
+                46 + (index - 1) * 21
             )
-            goal.Size = UDim2.new(1, -20, 0, 20)
+            goal.Size = UDim2.new(1, -24, 0, 19)
             goal.TextWrapped = false
             goal.TextTruncate = Enum.TextTruncate.AtEnd
         end
     end
+
+    local reward = UiComponents.label(
+        row,
+        "Reward",
+        "Rewards  •  "
+            .. QuestPresentation.reward_text(definition.Reward),
+        "Caption"
+    )
+    reward.AnchorPoint = Vector2.new(0, 1)
+    reward.Position = UDim2.new(0, 12, 1, -6)
+    reward.Size = UDim2.new(1, -24, 0, 16)
+    reward.TextColor3 = UiTheme.PALETTE.Accent
+    reward.TextTruncate = Enum.TextTruncate.AtEnd
 
     row.Activated:Connect(function()
         if not tracked then
@@ -905,6 +1016,10 @@ local function render_journal_detail(
         and narrative.Speaker
         or "Adventure"
     local tracked = is_tracked(definition.Id)
+    local location_text, depth_text = quest_location_text(
+        definition,
+        state
+    )
 
     detail_title.Text = tostring(
         definition.DisplayName or definition.Id
@@ -914,6 +1029,9 @@ local function render_journal_detail(
         tostring(speaker),
         tonumber(definition.MinimumLevel) or 1
     )
+    location_name.Text = location_text
+    location_depth.Text = depth_text
+
     detail_story.Text = journal_story_text(
         definition,
         state
@@ -1002,32 +1120,53 @@ local function add_journal_row(
     row.Size = UDim2.new(1, 0, 0, JOURNAL_ROW_HEIGHT)
     row.Text = ""
 
+    local marker = Instance.new("Frame")
+    marker.Name = "QuestMarker"
+    marker.AnchorPoint = Vector2.new(0.5, 0.5)
+    marker.Position = UDim2.fromOffset(22, 31)
+    marker.Size = UDim2.fromOffset(16, 16)
+    marker.BackgroundColor3 = if tracked
+        then UiTheme.PALETTE.Accent
+        else UiTheme.PALETTE.AccentDark
+    marker.BorderSizePixel = 0
+    marker.Rotation = 45
+    marker.Parent = row
+    UiTheme.add_stroke(
+        marker,
+        UiTheme.PALETTE.AccentBright,
+        if tracked then 0.05 else 0.28
+    )
+
     local title = UiComponents.label(
         row,
         "QuestName",
-        (if tracked then "◆ " else "")
-            .. tostring(definition.DisplayName or definition.Id),
+        tostring(definition.DisplayName or definition.Id),
         "Heading"
     )
-    title.Position = UDim2.fromOffset(12, 8)
-    title.Size = UDim2.new(1, -24, 0, 24)
+    title.Position = UDim2.fromOffset(42, 8)
+    title.Size = UDim2.new(1, -52, 0, 24)
     title.TextSize = 15
     title.TextColor3 = if tracked
         then UiTheme.PALETTE.AccentBright
         else UiTheme.PALETTE.Text
 
+    local location_text, depth_text = quest_location_text(
+        definition,
+        state
+    )
     local subtitle = UiComponents.label(
         row,
         "QuestMeta",
         string.format(
-            "Lv. %d   •   %s",
+            "Lv. %d  •  %s  •  %s",
             tonumber(definition.MinimumLevel) or 1,
-            tracker_goal_text(definition, state)
+            location_text,
+            depth_text
         ),
         "Muted"
     )
-    subtitle.Position = UDim2.fromOffset(12, 35)
-    subtitle.Size = UDim2.new(1, -24, 0, 22)
+    subtitle.Position = UDim2.fromOffset(42, 35)
+    subtitle.Size = UDim2.new(1, -52, 0, 22)
     subtitle.TextSize = 10
     subtitle.TextTruncate = Enum.TextTruncate.AtEnd
 
@@ -1060,6 +1199,8 @@ render_journal = function()
             "You do not currently have any accepted Adventure quests."
         detail_title.Text = "No active quests"
         detail_meta.Text = ""
+        location_name.Text = "Adventure"
+        location_depth.Text = ""
         detail_story.Text =
             "Accepted Adventure quests will appear here."
         detail_reward.Text = ""
