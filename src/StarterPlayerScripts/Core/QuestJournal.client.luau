@@ -1447,7 +1447,7 @@ UserInputService.InputBegan:Connect(
         end
 
         if input.KeyCode == Enum.KeyCode.L then
-            WindowController.toggle(WINDOW_NAME)
+            WindowController.set_visible(WINDOW_NAME, true)
         end
     end
 )
