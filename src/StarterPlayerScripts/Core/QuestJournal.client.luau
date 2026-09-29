@@ -15,6 +15,9 @@ local remotes = core:WaitForChild("Remotes")
 local QuestPresentation = require(
     shared:WaitForChild("QuestPresentation")
 )
+local QuestNarrativeDefinitions = require(
+    shared:WaitForChild("QuestNarrativeDefinitions")
+)
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
 )
@@ -43,7 +46,7 @@ local GUI_NAME = "QuestJournal"
 local SNAPSHOT_REFRESH_SECONDS = 1
 local MAX_TRACKER_HEIGHT = 430
 local TRACKER_WIDTH = 318
-local JOURNAL_ROW_HEIGHT = 168
+local JOURNAL_ROW_HEIGHT = 68
 
 local player_scripts = player:WaitForChild("PlayerScripts")
 local ground_guide: any = nil
@@ -233,29 +236,132 @@ journal_status.Position = UDim2.fromOffset(4, 40)
 journal_status.Size = UDim2.new(1, -8, 0, 26)
 journal_status.TextWrapped = true
 
+local journal_content = Instance.new("Frame")
+journal_content.Name = "JournalContent"
+journal_content.Position = UDim2.fromOffset(0, 70)
+journal_content.Size = UDim2.new(1, 0, 1, -70)
+journal_content.BackgroundTransparency = 1
+journal_content.Parent = modal.Body
+
 local journal_list = Instance.new("ScrollingFrame")
-journal_list.Name = "ActiveQuests"
-journal_list.Position = UDim2.fromOffset(0, 70)
-journal_list.Size = UDim2.new(1, 0, 1, -70)
+journal_list.Name = "QuestList"
+journal_list.Size = UDim2.new(0.36, -6, 1, 0)
 journal_list.CanvasSize = UDim2.new()
 journal_list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 UiTheme.style_scroll(journal_list)
-journal_list.Parent = modal.Body
+journal_list.Parent = journal_content
 
 local journal_padding = Instance.new("UIPadding")
-journal_padding.PaddingTop = UDim.new(0, 4)
-journal_padding.PaddingBottom = UDim.new(0, 8)
-journal_padding.PaddingLeft = UDim.new(0, 4)
-journal_padding.PaddingRight = UDim.new(0, 4)
+journal_padding.PaddingTop = UDim.new(0, 7)
+journal_padding.PaddingBottom = UDim.new(0, 7)
+journal_padding.PaddingLeft = UDim.new(0, 7)
+journal_padding.PaddingRight = UDim.new(0, 7)
 journal_padding.Parent = journal_list
 
 local journal_layout = Instance.new("UIListLayout")
-journal_layout.Padding = UDim.new(0, 10)
+journal_layout.Padding = UDim.new(0, 7)
 journal_layout.SortOrder = Enum.SortOrder.LayoutOrder
 journal_layout.Parent = journal_list
 
+local detail_panel = Instance.new("Frame")
+detail_panel.Name = "QuestDetail"
+detail_panel.Position = UDim2.new(0.36, 8, 0, 0)
+detail_panel.Size = UDim2.new(0.64, -8, 1, 0)
+detail_panel.BorderSizePixel = 0
+UiTheme.style_inset(detail_panel, false)
+detail_panel.Parent = journal_content
+
+local detail_title = UiComponents.label(
+    detail_panel,
+    "QuestName",
+    "Select a quest",
+    "Title"
+)
+detail_title.Position = UDim2.fromOffset(18, 14)
+detail_title.Size = UDim2.new(1, -36, 0, 32)
+detail_title.TextSize = 24
+
+local detail_meta = UiComponents.label(
+    detail_panel,
+    "QuestMeta",
+    "",
+    "Muted"
+)
+detail_meta.Position = UDim2.fromOffset(18, 47)
+detail_meta.Size = UDim2.new(1, -36, 0, 20)
+
+local detail_story = UiComponents.label(
+    detail_panel,
+    "QuestStory",
+    "",
+    "Body"
+)
+detail_story.Position = UDim2.fromOffset(18, 78)
+detail_story.Size = UDim2.new(1, -36, 0, 88)
+detail_story.TextWrapped = true
+detail_story.TextYAlignment = Enum.TextYAlignment.Top
+detail_story.TextTruncate = Enum.TextTruncate.None
+
+local objectives_heading = UiComponents.section_heading(
+    detail_panel,
+    "OBJECTIVES"
+)
+objectives_heading.Position = UDim2.fromOffset(18, 174)
+objectives_heading.Size = UDim2.new(1, -36, 0, 18)
+
+local detail_objectives = Instance.new("Frame")
+detail_objectives.Name = "Objectives"
+detail_objectives.Position = UDim2.fromOffset(18, 197)
+detail_objectives.Size = UDim2.new(1, -36, 0, 128)
+detail_objectives.BackgroundTransparency = 1
+detail_objectives.Parent = detail_panel
+
+local objective_layout = Instance.new("UIListLayout")
+objective_layout.Padding = UDim.new(0, 5)
+objective_layout.SortOrder = Enum.SortOrder.LayoutOrder
+objective_layout.Parent = detail_objectives
+
+local rewards_heading = UiComponents.section_heading(
+    detail_panel,
+    "REWARDS"
+)
+rewards_heading.Position = UDim2.fromOffset(18, 336)
+rewards_heading.Size = UDim2.new(1, -36, 0, 18)
+
+local detail_reward = UiComponents.label(
+    detail_panel,
+    "Reward",
+    "",
+    "Body"
+)
+detail_reward.Position = UDim2.fromOffset(18, 358)
+detail_reward.Size = UDim2.new(1, -36, 0, 54)
+detail_reward.TextWrapped = true
+detail_reward.TextYAlignment = Enum.TextYAlignment.Top
+
+local detail_ready = UiComponents.label(
+    detail_panel,
+    "Ready",
+    "",
+    "Caption"
+)
+detail_ready.Position = UDim2.fromOffset(18, 416)
+detail_ready.Size = UDim2.new(1, -36, 0, 22)
+detail_ready.TextColor3 = UiTheme.PALETTE.AccentBright
+
+local detail_track = UiComponents.button(
+    detail_panel,
+    "Track",
+    "Track Quest",
+    "Primary"
+)
+detail_track.AnchorPoint = Vector2.new(0, 1)
+detail_track.Position = UDim2.new(0, 18, 1, -16)
+detail_track.Size = UDim2.new(1, -36, 0, 40)
+
 local latest: any = nil
 local auto_track_requested = false
+local selected_journal_quest_id: string? = nil
 
 --[[
 Removes generated GUI rows while preserving layout helpers.
@@ -722,23 +828,98 @@ local function render_tracker()
 end
 
 --[[
-Adds objective labels to one journal quest card.
+Returns one readable narrative paragraph for the selected quest.
 
 Args:
-    row (Frame): Journal card.
-    definition (any): Adventure quest definition.
-    state (any): Active quest state.
+    definition (any): Active Adventure quest definition.
+    state (any): Current active quest state.
 
 Returns:
-    number: Next vertical offset beneath objective rows.
+    string: Progress or ready narrative text when available.
 ]]
-local function add_journal_objectives(
-    row: Frame,
+local function journal_story_text(
     definition: any,
     state: any
-): number
-    local y = 50
+): string
+    local narrative = QuestNarrativeDefinitions.get(
+        definition.Id
+    )
+    if type(narrative) ~= "table" then
+        return "Continue this adventure and complete its current objectives."
+    end
 
+    local lines = if type(state) == "table"
+        and state.Ready == true
+        then narrative.Ready
+        else narrative.Progress
+
+    if type(lines) ~= "table" then
+        lines = narrative.Start
+    end
+
+    return if type(lines) == "table"
+        then table.concat(lines, " ")
+        else "Continue this adventure and complete its current objectives."
+end
+
+--[[
+Clears generated objective labels from the detail pane.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function clear_detail_objectives()
+    for _, child in ipairs(detail_objectives:GetChildren()) do
+        if child ~= objective_layout
+            and child:IsA("GuiObject")
+        then
+            child:Destroy()
+        end
+    end
+end
+
+--[[
+Renders the selected quest into the right-side detail pane.
+
+Args:
+    definition (any): Selected active Adventure definition.
+
+Returns:
+    None.
+]]
+local function render_journal_detail(
+    definition: any
+)
+    local state = active_state(definition.Id)
+    if not state then
+        return
+    end
+
+    local narrative = QuestNarrativeDefinitions.get(
+        definition.Id
+    )
+    local speaker = type(narrative) == "table"
+        and narrative.Speaker
+        or "Adventure"
+    local tracked = is_tracked(definition.Id)
+
+    detail_title.Text = tostring(
+        definition.DisplayName or definition.Id
+    )
+    detail_meta.Text = string.format(
+        "%s   •   Recommended level %d+",
+        tostring(speaker),
+        tonumber(definition.MinimumLevel) or 1
+    )
+    detail_story.Text = journal_story_text(
+        definition,
+        state
+    )
+
+    clear_detail_objectives()
     for index, objective in ipairs(
         QuestPresentation.objective_rows(
             definition,
@@ -746,30 +927,56 @@ local function add_journal_objectives(
         )
     ) do
         local label = UiComponents.label(
-            row,
+            detail_objectives,
             "Objective" .. tostring(index),
-            (if objective.Complete then "✓  " else "•  ")
+            (if objective.Complete then "✓  " else "□  ")
                 .. objective.Text,
             if objective.Complete then "Muted" else "Body"
         )
-        label.Position = UDim2.fromOffset(16, y)
-        label.Size = UDim2.new(1, -190, 0, 22)
+        label.LayoutOrder = index
+        label.Size = UDim2.new(1, 0, 0, 25)
         label.TextWrapped = true
-        y += 24
+        label.TextColor3 = if objective.Complete
+            then UiTheme.PALETTE.Success
+            else UiTheme.PALETTE.Text
     end
 
-    return y
+    detail_reward.Text =
+        QuestPresentation.reward_text(definition.Reward)
+
+    if type(state) == "table" and state.Ready == true then
+        local giver = QuestPresentation.giver_for_quest(
+            definition.Id
+        )
+        detail_ready.Text = if giver
+            then "READY • Return to " .. tostring(giver.Speaker)
+            else "READY TO TURN IN"
+    else
+        detail_ready.Text = ""
+    end
+
+    detail_track.Text = if tracked
+        then "Tracking Quest"
+        else "Track Quest"
+    UiTheme.style_button(
+        detail_track,
+        if tracked then "Ghost" else "Primary"
+    )
+    UiTheme.set_button_enabled(
+        detail_track,
+        not tracked
+    )
 end
 
 --[[
-Creates one detailed active quest card in the journal.
+Creates one selectable quest entry in the left-side journal list.
 
 Args:
     definition (any): Active Adventure definition.
-    order (number): Stable journal order.
+    order (number): Stable list order.
 
 Returns:
-    nil: Creates goals, rewards and track control.
+    None.
 ]]
 local function add_journal_row(
     definition: any,
@@ -780,103 +987,64 @@ local function add_journal_row(
         return
     end
 
+    local selected =
+        selected_journal_quest_id == definition.Id
     local tracked = is_tracked(definition.Id)
-    local row = Instance.new("Frame")
-    row.Name = definition.Id
+    local row = UiComponents.button(
+        journal_list,
+        definition.Id,
+        "",
+        if selected then "Primary" else "Ghost"
+    )
     row.LayoutOrder = order
     row.Size = UDim2.new(1, 0, 0, JOURNAL_ROW_HEIGHT)
-    row.BackgroundColor3 = if tracked
-        then UiTheme.PALETTE.SurfaceWarm
-        else UiTheme.PALETTE.SurfaceRaised
-    row.BackgroundTransparency = 0.04
-    row.BorderSizePixel = 0
-    UiTheme.add_corner(row, 2)
-    UiTheme.add_stroke(
-        row,
-        if tracked
-            then UiTheme.PALETTE.Accent
-            else UiTheme.PALETTE.BorderSoft,
-        if tracked then 0.18 else 0.52
-    )
-    row.Parent = journal_list
+    row.Text = ""
 
     local title = UiComponents.label(
         row,
         "QuestName",
-        tostring(definition.DisplayName or definition.Id),
+        (if tracked then "◆ " else "")
+            .. tostring(definition.DisplayName or definition.Id),
         "Heading"
     )
-    title.Position = UDim2.fromOffset(16, 12)
-    title.Size = UDim2.new(1, -190, 0, 26)
+    title.Position = UDim2.fromOffset(12, 8)
+    title.Size = UDim2.new(1, -24, 0, 24)
+    title.TextSize = 15
+    title.TextColor3 = if tracked
+        then UiTheme.PALETTE.AccentBright
+        else UiTheme.PALETTE.Text
 
-    local next_y = add_journal_objectives(
+    local subtitle = UiComponents.label(
         row,
-        definition,
-        state
-    )
-
-    local reward = UiComponents.label(
-        row,
-        "Reward",
-        "Rewards: "
-            .. QuestPresentation.reward_text(definition.Reward),
+        "QuestMeta",
+        string.format(
+            "Lv. %d   •   %s",
+            tonumber(definition.MinimumLevel) or 1,
+            tracker_goal_text(definition, state)
+        ),
         "Muted"
     )
-    reward.Position = UDim2.fromOffset(
-        16,
-        math.min(next_y + 4, 122)
-    )
-    reward.Size = UDim2.new(1, -190, 0, 34)
-    reward.TextWrapped = true
+    subtitle.Position = UDim2.fromOffset(12, 35)
+    subtitle.Size = UDim2.new(1, -24, 0, 22)
+    subtitle.TextSize = 10
+    subtitle.TextTruncate = Enum.TextTruncate.AtEnd
 
-    local track = UiComponents.button(
-        row,
-        "Track",
-        if tracked then "Tracking" else "Track Quest",
-        if tracked then "Ghost" else "Primary"
-    )
-    track.AnchorPoint = Vector2.new(1, 0.5)
-    track.Position = UDim2.new(1, -16, 0.5, 0)
-    track.Size = UDim2.fromOffset(150, 44)
-    UiTheme.set_button_enabled(track, not tracked)
-
-    if not tracked then
-        track.Activated:Connect(function()
-            request_track(definition.Id)
-        end)
-    end
-
-    if type(state) == "table" and state.Ready == true then
-        local giver = QuestPresentation.giver_for_quest(
-            definition.Id
-        )
-        local ready = UiComponents.label(
-            row,
-            "Ready",
-            if giver
-                then "READY • Return to "
-                    .. tostring(giver.Speaker)
-                else "READY TO TURN IN",
-            "Caption"
-        )
-        ready.AnchorPoint = Vector2.new(1, 0)
-        ready.Position = UDim2.new(1, -16, 0, 16)
-        ready.Size = UDim2.fromOffset(170, 20)
-        ready.TextXAlignment = Enum.TextXAlignment.Right
-        ready.TextColor3 = UiTheme.PALETTE.Accent
-    end
+    row.Activated:Connect(function()
+        selected_journal_quest_id = definition.Id
+        render_journal()
+    end)
 end
 
 --[[
-Renders the detailed Quest Journal window.
+Renders the master/detail Quest Journal.
 
 Args:
     None.
 
 Returns:
-    nil: Rebuilds only the active Adventure quest cards.
+    None.
 ]]
-local function render_journal()
+function render_journal()
     clear_generated_rows(
         journal_list,
         {journal_padding, journal_layout}
@@ -885,21 +1053,68 @@ local function render_journal()
     local definitions = active_definitions()
 
     if #definitions == 0 then
+        selected_journal_quest_id = nil
         journal_status.Text =
             "You do not currently have any accepted Adventure quests."
+        detail_title.Text = "No active quests"
+        detail_meta.Text = ""
+        detail_story.Text =
+            "Accepted Adventure quests will appear here."
+        detail_reward.Text = ""
+        detail_ready.Text = ""
+        clear_detail_objectives()
+        detail_track.Text = "Track Quest"
+        UiTheme.set_button_enabled(detail_track, false)
         return
     end
 
+    local selection_valid = false
+    for _, definition in ipairs(definitions) do
+        if definition.Id == selected_journal_quest_id then
+            selection_valid = true
+            break
+        end
+    end
+
+    if not selection_valid then
+        local tracked_id = type(latest) == "table"
+            and type(latest.State) == "table"
+            and latest.State.TrackedQuestId
+            or nil
+        selected_journal_quest_id =
+            if type(tracked_id) == "string"
+                then tracked_id
+                else definitions[1].Id
+    end
+
     journal_status.Text = string.format(
-        "%d active quest%s  •  Track one quest to guide Base navigation.",
+        "%d active quest%s",
         #definitions,
         if #definitions == 1 then "" else "s"
     )
 
+    local selected_definition = nil
     for index, definition in ipairs(definitions) do
         add_journal_row(definition, index)
+        if definition.Id == selected_journal_quest_id then
+            selected_definition = definition
+        end
+    end
+
+    if selected_definition then
+        render_journal_detail(selected_definition)
     end
 end
+
+detail_track.Activated:Connect(function()
+    if type(selected_journal_quest_id) ~= "string"
+        or is_tracked(selected_journal_quest_id)
+    then
+        return
+    end
+
+    request_track(selected_journal_quest_id)
+end)
 
 --[[
 Ensures legacy active quests obtain one tracked selection.
