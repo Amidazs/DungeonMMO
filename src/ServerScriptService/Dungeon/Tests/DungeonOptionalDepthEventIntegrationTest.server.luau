@@ -134,8 +134,8 @@ local function verify_selection(
     for index, encounter in ipairs(encounters) do
         if encounter.Kind == "EventBoss" then
             event_index = index
-            check(encounter.CompletionRequired == true,
-                "eligible Event remains required")
+            check(encounter.CompletionRequired == false,
+                "eligible Event remains optional")
         elseif encounter.Kind == "SecretBoss" then
             secret_index = index
             check(encounter.CompletionRequired == false,
@@ -162,9 +162,11 @@ local function verify_selection(
 
     local sequencer = Sequencer.new(encounters)
     for _, encounter in ipairs(encounters) do
-        if encounter.Kind == "SecretBoss" then
+        if encounter.Kind == "EventBoss"
+            or encounter.Kind == "SecretBoss"
+        then
             check(sequencer:skip(encounter.Id).ok,
-                "selected optional Secret can be bypassed")
+                "selected side encounter can be bypassed")
         else
             check(sequencer:start(encounter.Id).ok
                 and not sequencer:start(encounter.Id).ok,
@@ -174,7 +176,7 @@ local function verify_selection(
         end
     end
     check(sequencer:is_complete(),
-        "skipped Secret never blocks completed main progression")
+        "skipped side encounters never block main progression")
 end
 
 for _, dungeon_id in ipairs({"TestDungeon", "AbandonedMine"}) do
