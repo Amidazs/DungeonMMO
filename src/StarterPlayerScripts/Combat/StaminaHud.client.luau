@@ -39,11 +39,11 @@ local stamina_bar = UiComponents.progress_bar(
     20
 )
 stamina_bar.Root.LayoutOrder = 1
-stamina_bar.Root.Size = UDim2.new(1, 0, 0, 20)
-stamina_bar.Track.Position = UDim2.fromOffset(0, 13)
-stamina_bar.Track.Size = UDim2.new(1, 0, 0, 6)
-stamina_bar.Label.TextSize = 10
-stamina_bar.Value.TextSize = 10
+stamina_bar.Root.Size = UDim2.new(1, 0, 0, 15)
+stamina_bar.Track.Position = UDim2.fromOffset(0, 9)
+stamina_bar.Track.Size = UDim2.new(1, 0, 0, 5)
+stamina_bar.Label.TextSize = 8
+stamina_bar.Value.TextSize = 8
 
 local parry = UiComponents.label(
     profile_gui,
