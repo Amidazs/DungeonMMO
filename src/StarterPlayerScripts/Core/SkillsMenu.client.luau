@@ -23,6 +23,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
@@ -67,7 +70,7 @@ local modal = UiComponents.modal(
     "SkillsPanel",
     "Skills & Loadout",
     "Select a learned skill, then choose the hotbar slot.",
-    UDim2.fromOffset(820, 570)
+    UDim2.fromOffset(840, 600)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -86,7 +89,7 @@ UiTheme.bind_responsive_scale(
 
 local skill_heading = UiComponents.section_heading(
     modal.Body,
-    "AVAILABLE SKILLS"
+    "LEARNED SKILLS"
 )
 skill_heading.Position = UDim2.fromOffset(0, 0)
 skill_heading.Size = UDim2.new(0.56, -10, 0, 20)
@@ -127,7 +130,7 @@ loadout.Position = UDim2.new(0.58, 8, 0, 28)
 loadout.Size = UDim2.new(0.42, -8, 1, -76)
 loadout.BorderSizePixel = 0
 loadout.ZIndex = 12
-UiTheme.style_inset(loadout, false)
+UiTheme.style_inset(loadout, true)
 loadout.Parent = modal.Body
 
 local loadout_padding = Instance.new("UIPadding")
@@ -158,6 +161,7 @@ local selected_skill: string? = nil
 local latest: any = {}
 local skill_buttons: {[string]: TextButton} = {}
 local slot_buttons: {[number]: TextButton} = {}
+local slot_sigils: {[number]: TextLabel} = {}
 
 --[[
 Returns all skill IDs sorted by display name.
@@ -265,14 +269,24 @@ local function create_skill_button(
         "Secondary"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.new(1, 0, 0, 52)
+    button.Size = UDim2.new(1, 0, 0, 64)
     button.TextXAlignment = Enum.TextXAlignment.Left
-    button.TextSize = 14
+    button.TextSize = 15
     button.TextColor3 = UiTheme.PALETTE.Text
     button.ZIndex = 13
 
+    local icon = UiOrnament.icon(
+        button,
+        "SkillIcon",
+        string.sub(display_name, 1, 1),
+        Color3.fromRGB(42, 71, 113),
+        42
+    )
+    icon.Position = UDim2.fromOffset(8, 11)
+    icon.ZIndex = 14
+
     local padding = Instance.new("UIPadding")
-    padding.PaddingLeft = UDim.new(0, 14)
+    padding.PaddingLeft = UDim.new(0, 60)
     padding.PaddingRight = UDim.new(0, 14)
     padding.Parent = button
 
@@ -296,11 +310,24 @@ local function create_slot_button(slot: number): TextButton
         "Secondary"
     )
     button.LayoutOrder = slot
-    button.Size = UDim2.new(1, 0, 0, 56)
+    button.Size = UDim2.new(1, 0, 0, 62)
     button.TextWrapped = true
     button.TextXAlignment = Enum.TextXAlignment.Left
     button.TextColor3 = UiTheme.PALETTE.Text
     button.ZIndex = 13
+
+    local icon = UiOrnament.icon(
+        button,
+        "LoadoutIcon",
+        "·",
+        Color3.fromRGB(55, 49, 42),
+        40
+    )
+    icon.Position = UDim2.fromOffset(8, 11)
+    icon.ZIndex = 14
+    slot_sigils[slot] = icon
+        :WaitForChild("IconWell")
+        :WaitForChild("Sigil") :: TextLabel
 
     local key = UiComponents.key_hint(
         button,
@@ -308,10 +335,10 @@ local function create_slot_button(slot: number): TextButton
     )
     key.AnchorPoint = Vector2.new(1, 0.5)
     key.Position = UDim2.new(1, -8, 0.5, 0)
-    key.ZIndex = 14
+    key.ZIndex = 15
 
     local padding = Instance.new("UIPadding")
-    padding.PaddingLeft = UDim.new(0, 12)
+    padding.PaddingLeft = UDim.new(0, 58)
     padding.PaddingRight = UDim.new(0, 42)
     padding.Parent = button
 
@@ -420,15 +447,14 @@ local function render(snapshot: any)
             then definition.DISPLAY_NAME
             else "Empty"
 
-        slot_buttons[slot].Text = string.format(
-            "Slot %d   •   %s",
-            slot,
-            name
-        )
+        slot_buttons[slot].Text = name
         slot_buttons[slot].TextColor3 =
             if definition
                 then UiTheme.PALETTE.Text
                 else UiTheme.PALETTE.TextMuted
+        slot_sigils[slot].Text = if definition
+            then string.sub(name, 1, 1)
+            else "·"
     end
 
     task.defer(function()
