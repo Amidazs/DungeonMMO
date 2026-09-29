@@ -198,7 +198,7 @@ function UiComponents.modal(
     local header_band = Instance.new("Frame")
     header_band.Name = "HeaderBand"
     header_band.Position = UDim2.fromOffset(7, 7)
-    header_band.Size = UDim2.new(1, -14, 0, 69)
+    header_band.Size = UDim2.new(1, -14, 0, 58)
     header_band.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
     header_band.BackgroundTransparency = 0.12
     header_band.BorderSizePixel = 0
@@ -214,22 +214,22 @@ function UiComponents.modal(
 
     local header = Instance.new("Frame")
     header.Name = "Header"
-    header.Position = UDim2.fromOffset(20, 13)
-    header.Size = UDim2.new(1, -40, 0, 54)
+    header.Position = UDim2.fromOffset(20, 11)
+    header.Size = UDim2.new(1, -40, 0, 47)
     header.BackgroundTransparency = 1
     header.Parent = root
 
     local emblem = Instance.new("TextLabel")
     emblem.Name = "Emblem"
-    emblem.Position = UDim2.fromOffset(0, 2)
-    emblem.Size = UDim2.fromOffset(34, 34)
+    emblem.Position = UDim2.fromOffset(0, 1)
+    emblem.Size = UDim2.fromOffset(32, 32)
     emblem.BackgroundTransparency = 1
     emblem.Font = UiTheme.FONT.Heading
     emblem.Text = "◆"
     emblem.TextColor3 = UiTheme.PALETTE.AccentBright
     emblem.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
     emblem.TextStrokeTransparency = 0.24
-    emblem.TextSize = 24
+    emblem.TextSize = 22
     emblem.Parent = header
 
     local title = UiComponents.label(
@@ -238,8 +238,8 @@ function UiComponents.modal(
         title_text,
         "Title"
     )
-    title.Position = UDim2.fromOffset(39, 0)
-    title.Size = UDim2.new(1, -96, 0, 30)
+    title.Position = UDim2.fromOffset(38, 0)
+    title.Size = UDim2.new(1, -95, 0, 27)
     title.TextColor3 = UiTheme.PALETTE.Text
 
     local subtitle = UiComponents.label(
@@ -248,8 +248,8 @@ function UiComponents.modal(
         subtitle_text,
         "Muted"
     )
-    subtitle.Position = UDim2.fromOffset(40, 31)
-    subtitle.Size = UDim2.new(1, -96, 0, 18)
+    subtitle.Position = UDim2.fromOffset(39, 27)
+    subtitle.Size = UDim2.new(1, -95, 0, 17)
 
     local close = UiComponents.button(
         header,
@@ -259,20 +259,20 @@ function UiComponents.modal(
     )
     close.AnchorPoint = Vector2.new(1, 0)
     close.Position = UDim2.fromScale(1, 0)
-    close.Size = UDim2.fromOffset(38, 38)
-    close.TextSize = 23
+    close.Size = UDim2.fromOffset(34, 34)
+    close.TextSize = 21
 
     UiOrnament.divider(
         root,
-        UDim2.fromOffset(18, 78),
+        UDim2.fromOffset(18, 68),
         UDim2.new(1, -36, 0, 8),
         root.ZIndex + 1
     )
 
     local body = Instance.new("Frame")
     body.Name = "Body"
-    body.Position = UDim2.fromOffset(18, 91)
-    body.Size = UDim2.new(1, -36, 1, -108)
+    body.Position = UDim2.fromOffset(18, 81)
+    body.Size = UDim2.new(1, -36, 1, -98)
     body.BackgroundTransparency = 1
     body.Parent = root
 
