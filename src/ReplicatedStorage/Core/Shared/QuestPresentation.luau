@@ -196,6 +196,17 @@ local DEPTH1_TARGETS = table.freeze({
     temple_resonance_shard = DungeonDefinitions.TEST_DUNGEON.Id,
 })
 
+local BOSS_TARGETS = table.freeze({
+    marauder_captain = table.freeze({
+        DungeonId = DungeonDefinitions.TEST_DUNGEON.Id,
+        BossId = "MarauderCaptain",
+    }),
+    corrupted_foreman = table.freeze({
+        DungeonId = DungeonDefinitions.ABANDONED_MINE.Id,
+        BossId = "CorruptedForeman",
+    }),
+})
+
 --[[
 Returns difficulty IDs containing one runtime encounter or boss target.
 
@@ -294,15 +305,16 @@ function QuestPresentation.objective_dungeon_requirement(
     end
 
     if objective.Type == "EnemyDefeat" then
-        for _, dungeon_id in ipairs(DUNGEON_ORDER) do
+        local boss_target = BOSS_TARGETS[target_id]
+        if boss_target then
             local difficulty_ids = matching_difficulties(
-                dungeon_id,
+                boss_target.DungeonId,
                 nil,
-                target_id
+                boss_target.BossId
             )
             if #difficulty_ids > 0 then
                 return {
-                    DungeonId = dungeon_id,
+                    DungeonId = boss_target.DungeonId,
                     DifficultyIds = difficulty_ids,
                 }
             end
