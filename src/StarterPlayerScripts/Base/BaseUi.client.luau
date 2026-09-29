@@ -24,6 +24,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local entry_request = remotes:WaitForChild(
     "DungeonEntryRequest"
@@ -78,7 +81,7 @@ local modal = UiComponents.modal(
     "DungeonEntryPanel",
     "Dungeon Entrance",
     "Prepare your party before entering.",
-    UDim2.fromOffset(920, 760)
+    UDim2.fromOffset(900, 730)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -110,17 +113,15 @@ local dungeon_card = Instance.new("Frame")
 dungeon_card.Name = "DungeonContext"
 dungeon_card.Position = UDim2.fromOffset(0, 38)
 dungeon_card.Size = UDim2.new(1, 0, 0, 74)
-dungeon_card.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
-dungeon_card.BackgroundTransparency = 0.05
-dungeon_card.BorderSizePixel = 0
 dungeon_card.ZIndex = 12
-UiTheme.add_corner(dungeon_card, 8)
-UiTheme.add_stroke(
-    dungeon_card,
-    UiTheme.PALETTE.BorderSoft,
-    0.42
-)
+UiTheme.style_inset(dungeon_card, true)
 dungeon_card.Parent = modal.Body
+UiOrnament.divider(
+    dungeon_card,
+    UDim2.new(0, 14, 1, -8),
+    UDim2.new(1, -28, 0, 6),
+    13
+)
 
 local dungeon_name = UiComponents.label(
     dungeon_card,
@@ -160,16 +161,8 @@ local quest_context = Instance.new("Frame")
 quest_context.Name = "QuestContext"
 quest_context.Position = UDim2.fromOffset(0, 124)
 quest_context.Size = UDim2.new(1, 0, 0, 126)
-quest_context.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
-quest_context.BackgroundTransparency = 0.12
-quest_context.BorderSizePixel = 0
 quest_context.ZIndex = 12
-UiTheme.add_corner(quest_context, 8)
-UiTheme.add_stroke(
-    quest_context,
-    UiTheme.PALETTE.BorderSoft,
-    0.52
-)
+UiTheme.style_inset(quest_context, false)
 quest_context.Parent = modal.Body
 
 local quest_heading = UiComponents.section_heading(
@@ -344,7 +337,7 @@ invite_banner.BackgroundTransparency = 0.35
 invite_banner.BorderSizePixel = 0
 invite_banner.Visible = false
 invite_banner.ZIndex = 13
-UiTheme.add_corner(invite_banner, 7)
+UiTheme.add_corner(invite_banner, 2)
 UiTheme.add_stroke(
     invite_banner,
     UiTheme.PALETTE.Accent,
@@ -859,7 +852,7 @@ local function add_party_row(party: any, member: any)
     row.BackgroundTransparency = 0.12
     row.BorderSizePixel = 0
     row.ZIndex = 14
-    UiTheme.add_corner(row, 7)
+    UiTheme.add_corner(row, 2)
     row.Parent = party_list
 
     local is_leader = member.UserId == party.LeaderUserId
@@ -934,7 +927,7 @@ local function add_invite_row(
     row.BackgroundTransparency = 0.12
     row.BorderSizePixel = 0
     row.ZIndex = 14
-    UiTheme.add_corner(row, 7)
+    UiTheme.add_corner(row, 2)
     row.Parent = invite_list
 
     local name = UiComponents.label(
