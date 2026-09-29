@@ -25,6 +25,9 @@ local ProgressionClientState = require(
         :WaitForChild("Core")
         :WaitForChild("ProgressionClientState")
 )
+local ProgressionConfig = require(
+    shared:WaitForChild("ProgressionConfig")
+)
 local SkillDefinitions = require(
     combat_shared:WaitForChild("SkillDefinitions")
 )
@@ -87,6 +90,22 @@ layout.Parent = slots
 
 local slot_names: {[number]: TextLabel} = {}
 local slot_sigils: {[number]: TextLabel} = {}
+
+local progression_text = UiComponents.label(
+    root,
+    "ProgressionText",
+    "Lv. 1",
+    "Caption"
+)
+progression_text.AnchorPoint = Vector2.new(0.5, 1)
+progression_text.Position = UDim2.new(0.5, 0, 1, -2)
+progression_text.Size = UDim2.fromOffset(430, 15)
+progression_text.TextXAlignment = Enum.TextXAlignment.Center
+progression_text.TextColor3 = UiTheme.PALETTE.Text
+progression_text.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+progression_text.TextStrokeTransparency = 0.18
+progression_text.TextSize = 9
+progression_text.ZIndex = 4
 
 --[[
 Creates one display-only action slot for the Base lobby.
@@ -219,6 +238,19 @@ local function render(snapshot: any)
             then string.sub(display_name, 1, 1)
             else "·"
     end
+
+    local level = tonumber(snapshot.Level) or 1
+    local xp = tonumber(snapshot.XP) or 0
+    local required = ProgressionConfig.get_required_xp(level)
+
+    progression_text.Text = if required
+        then string.format(
+            "Lv. %d   %d / %d XP",
+            level,
+            xp,
+            required
+        )
+        else string.format("Lv. %d   MAX LEVEL", level)
 end
 
 --[[
