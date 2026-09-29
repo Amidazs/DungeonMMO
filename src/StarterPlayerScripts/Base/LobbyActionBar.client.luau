@@ -283,7 +283,7 @@ local function render(snapshot: any)
 
     if required and required > 0 then
         progression_text.Text = string.format(
-            "Lv. %d   %,d / %,d",
+            "Lv. %d   %d / %d",
             level,
             xp,
             required
