@@ -93,7 +93,20 @@ controller.next_encounter = "SecretEncounter"
 secret.Kind = "EventBoss"
 check(flow:skip_secret_before("Room3").reason
     == "NoOptionalSecretToSkip",
-    "A required Event boss must never be bypassed as a secret")
+    "Event encounters must not use Secret backtracking semantics")
+local event_skip = flow:skip_optional_before("Room3")
+check(event_skip.ok == true
+    and event_skip.next_binding == final,
+    "Optional Event can be forfeited by entering its successor")
+check(controller.skip_count == 2
+    and controller.next_encounter == "FinalBoss",
+    "Event bypass persists exactly once")
+
+controller.next_encounter = "SecretEncounter"
+controller.required = true
+check(flow:skip_optional_before("Room3").reason
+    == "EncounterRequired",
+    "Required encounters can never use the generic side-room bypass")
 
 print(string.format(
     "[Optional Boss Flow Tests] PASS: %d assertions.", count
