@@ -119,8 +119,8 @@ padding.PaddingRight = UDim.new(0, 8)
 padding.Parent = list
 
 local layout = Instance.new("UIGridLayout")
-layout.CellSize = UDim2.fromOffset(139, 119)
-layout.CellPadding = UDim2.fromOffset(8, 8)
+layout.CellSize = UDim2.fromOffset(108, 98)
+layout.CellPadding = UDim2.fromOffset(7, 7)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = list
 
@@ -184,7 +184,7 @@ Returns:
 local function add_item_row(row: any)
     local frame = Instance.new("Frame")
     frame.Name = tostring(row.Id or row.Name or "Item")
-    frame.Size = UDim2.fromOffset(139, 119)
+    frame.Size = UDim2.fromOffset(108, 98)
     frame.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
     frame.BackgroundTransparency = 0.08
     frame.BorderSizePixel = 0
@@ -224,9 +224,9 @@ local function add_item_row(row: any)
         tostring(row.Name),
         "Heading"
     )
-    name.Position = UDim2.fromOffset(7, 59)
-    name.Size = UDim2.new(1, -14, 0, 25)
-    name.TextSize = 11
+    name.Position = UDim2.fromOffset(5, 57)
+    name.Size = UDim2.new(1, -10, 0, 20)
+    name.TextSize = 10
     name.TextXAlignment = Enum.TextXAlignment.Center
     name.ZIndex = 14
 
@@ -243,9 +243,9 @@ local function add_item_row(row: any)
         ),
         "Muted"
     )
-    detail.Position = UDim2.fromOffset(7, 85)
-    detail.Size = UDim2.new(1, -14, 0, 14)
-    detail.TextSize = 9
+    detail.Position = UDim2.fromOffset(5, 78)
+    detail.Size = UDim2.new(1, -10, 0, 13)
+    detail.TextSize = 8
     detail.TextXAlignment = Enum.TextXAlignment.Center
     detail.ZIndex = 14
 
@@ -256,9 +256,9 @@ local function add_item_row(row: any)
         "Heading"
     )
     quantity.AnchorPoint = Vector2.new(1, 0.5)
-    quantity.Position = UDim2.new(1, -8, 0, 17)
-    quantity.Size = UDim2.fromOffset(31, 20)
-    quantity.TextSize = 11
+    quantity.Position = UDim2.new(1, -5, 0, 12)
+    quantity.Size = UDim2.fromOffset(28, 18)
+    quantity.TextSize = 10
     quantity.TextXAlignment = Enum.TextXAlignment.Right
     quantity.TextColor3 = UiTheme.PALETTE.AccentBright
     quantity.ZIndex = 14
