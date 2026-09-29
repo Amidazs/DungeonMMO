@@ -11,6 +11,8 @@ local remotes = core:WaitForChild("Remotes")
 local ItemDefinitions = require(shared:WaitForChild("ItemDefinitions"))
 local ProfessionDefinitions = require(shared:WaitForChild("ProfessionDefinitions"))
 local ProfessionRecipes = require(shared:WaitForChild("ProfessionRecipes"))
+local UiOrnament = require(shared:WaitForChild("UiOrnament"))
+local UiTheme = require(shared:WaitForChild("UiTheme"))
 
 local profession_snapshot = remotes:WaitForChild("ProfessionSnapshot") :: RemoteEvent
 local station_open = remotes:WaitForChild("ProfessionStationOpen") :: RemoteEvent
@@ -27,48 +29,54 @@ local panel = Instance.new("Frame")
 panel.AnchorPoint = Vector2.new(0.5, 0.5)
 panel.Position = UDim2.fromScale(0.5, 0.5)
 panel.Size = UDim2.fromOffset(760, 560)
-panel.BackgroundColor3 = Color3.fromRGB(24, 27, 31)
-panel.BackgroundTransparency = 0.04
 panel.BorderSizePixel = 0
 panel.Visible = false
+UiTheme.style_panel(panel, true)
 panel.Parent = gui
-
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = panel
+UiOrnament.frame(panel, true)
+UiTheme.bind_responsive_scale(panel, 1366, 0.72, 1)
 
 local title = Instance.new("TextLabel")
 title.Position = UDim2.fromOffset(20, 14)
 title.Size = UDim2.fromOffset(600, 40)
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(244, 238, 220)
+UiTheme.style_label(title, "Title")
+title.TextColor3 = UiTheme.PALETTE.Text
 title.TextXAlignment = Enum.TextXAlignment.Left
-title.TextScaled = true
+title.TextScaled = false
+title.TextSize = 30
 title.Text = "Professions"
 title.Parent = panel
 
 local close = Instance.new("TextButton")
 close.Position = UDim2.fromOffset(690, 14)
 close.Size = UDim2.fromOffset(48, 40)
-close.Text = "X"
+close.Text = "×"
 close.Parent = panel
+UiTheme.style_button(close, "Ghost")
+close.TextSize = 22
 
 local progress = Instance.new("TextLabel")
 progress.Position = UDim2.fromOffset(20, 62)
 progress.Size = UDim2.fromOffset(718, 46)
-progress.BackgroundTransparency = 0.25
-progress.TextColor3 = Color3.fromRGB(228, 228, 220)
+progress.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
+progress.BackgroundTransparency = 0.08
+progress.BorderSizePixel = 0
 progress.TextXAlignment = Enum.TextXAlignment.Left
 progress.Text = ""
+UiTheme.style_label(progress, "Muted")
+UiTheme.add_corner(progress, 2)
+UiTheme.add_stroke(
+    progress,
+    UiTheme.PALETTE.BorderDark,
+    0.16
+)
 progress.Parent = panel
 
 local recipe_container = Instance.new("ScrollingFrame")
 recipe_container.Position = UDim2.fromOffset(20, 122)
 recipe_container.Size = UDim2.fromOffset(718, 360)
-recipe_container.BackgroundTransparency = 0.15
-recipe_container.BorderSizePixel = 0
-recipe_container.ScrollBarThickness = 8
 recipe_container.CanvasSize = UDim2.fromOffset(0, 0)
+UiTheme.style_scroll(recipe_container)
 recipe_container.Parent = panel
 
 local layout = Instance.new("UIListLayout")
@@ -78,8 +86,7 @@ layout.Parent = recipe_container
 local status = Instance.new("TextLabel")
 status.Position = UDim2.fromOffset(20, 494)
 status.Size = UDim2.fromOffset(718, 44)
-status.BackgroundTransparency = 1
-status.TextColor3 = Color3.fromRGB(220, 220, 220)
+UiTheme.style_label(status, "Muted")
 status.TextXAlignment = Enum.TextXAlignment.Left
 status.TextWrapped = true
 status.Text = "Gather materials, then use a profession station."
@@ -89,16 +96,20 @@ local toast = Instance.new("TextLabel")
 toast.AnchorPoint = Vector2.new(0.5, 0)
 toast.Position = UDim2.fromScale(0.5, 0.08)
 toast.Size = UDim2.fromOffset(520, 54)
-toast.BackgroundColor3 = Color3.fromRGB(25, 29, 31)
+toast.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
 toast.BackgroundTransparency = 1
-toast.TextColor3 = Color3.fromRGB(244, 240, 220)
 toast.TextTransparency = 1
-toast.TextScaled = true
+toast.TextScaled = false
+toast.TextSize = 18
 toast.Visible = false
+UiTheme.style_label(toast, "Heading")
+UiTheme.add_corner(toast, 2)
+UiTheme.add_stroke(
+    toast,
+    UiTheme.PALETTE.Border,
+    0.22
+)
 toast.Parent = gui
-local toast_corner = Instance.new("UICorner")
-toast_corner.CornerRadius = UDim.new(0, 8)
-toast_corner.Parent = toast
 
 local latest: any = nil
 local station_id: string? = nil
@@ -182,10 +193,8 @@ local function render_choices(slots: any)
             if definition and definition.Kind == kind then
                 local row = Instance.new("TextButton")
                 row.Size = UDim2.new(1, -12, 0, 52)
-                row.BackgroundColor3 = Color3.fromRGB(37, 41, 45)
-                row.TextColor3 = Color3.fromRGB(244, 238, 220)
                 row.TextScaled = false
-                row.TextSize = 20
+                row.TextSize = 18
                 row.Text = string.format(
                     "%s: %s%s",
                     if kind == "Creation" then "Crafting"
@@ -197,8 +206,16 @@ local function render_choices(slots: any)
                     else " (choose)"
                 )
                 row.Active = selected == ""
-                row.AutoButtonColor = selected == ""
+                row.AutoButtonColor = false
                 row.Parent = recipe_container
+                UiTheme.style_button(
+                    row,
+                    if selected == "" then "Secondary" else "Ghost"
+                )
+                UiTheme.set_button_enabled(
+                    row,
+                    selected == ""
+                )
                 if selected == "" then
                     row.MouseButton1Click:Connect(function()
                         status.Text = "Choosing " .. definition.Name .. "..."
@@ -275,20 +292,14 @@ local function render()
     for _, recipe in ipairs(recipes) do
         local row = Instance.new("Frame")
         row.Size = UDim2.new(1, -12, 0, 104)
-        row.BackgroundTransparency = 0.08
-        row.BackgroundColor3 = Color3.fromRGB(37, 41, 45)
         row.BorderSizePixel = 0
         row.Parent = recipe_container
-
-        local row_corner = Instance.new("UICorner")
-        row_corner.CornerRadius = UDim.new(0, 6)
-        row_corner.Parent = row
+        UiTheme.style_inset(row, false)
 
         local name_label = Instance.new("TextLabel")
         name_label.Position = UDim2.fromOffset(12, 8)
         name_label.Size = UDim2.new(1, -170, 0, 26)
-        name_label.BackgroundTransparency = 1
-        name_label.TextColor3 = Color3.fromRGB(245, 240, 226)
+        UiTheme.style_label(name_label, "Heading")
         name_label.TextXAlignment = Enum.TextXAlignment.Left
         name_label.Text = recipe.Name
         name_label.Parent = row
@@ -296,8 +307,7 @@ local function render()
         local requirement = Instance.new("TextLabel")
         requirement.Position = UDim2.fromOffset(12, 36)
         requirement.Size = UDim2.new(1, -170, 0, 54)
-        requirement.BackgroundTransparency = 1
-        requirement.TextColor3 = Color3.fromRGB(211, 214, 206)
+        UiTheme.style_label(requirement, "Muted")
         requirement.TextXAlignment = Enum.TextXAlignment.Left
         requirement.TextYAlignment = Enum.TextYAlignment.Top
         requirement.TextWrapped = true
@@ -334,17 +344,14 @@ local function render()
         if slots.Creation ~= recipe.ProfessionId then
             button.Text = "Not Your Craft"
             button.Active = false
-            button.AutoButtonColor = false
         elseif not unlocked then
             button.Text = if level < recipe.RequiredLevel
                 then "Level " .. tostring(recipe.RequiredLevel)
                 else "Skill/Recipe Locked"
             button.Active = false
-            button.AutoButtonColor = false
         elseif not has_materials then
             button.Text = "Need Materials"
             button.Active = false
-            button.AutoButtonColor = false
         else
             button.Text = "Craft"
             button.Active = true
@@ -353,6 +360,12 @@ local function render()
                 craft_request:FireServer(recipe.Id)
             end)
         end
+
+        UiTheme.style_button(
+            button,
+            if button.Active then "Primary" else "Ghost"
+        )
+        UiTheme.set_button_enabled(button, button.Active)
     end
 
     task.defer(function()
