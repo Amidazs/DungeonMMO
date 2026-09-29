@@ -35,11 +35,11 @@ local actions = {
         tint = Color3.fromRGB(47, 83, 127),
     },
     {
-        name = "Quests",
-        label = "Quests",
-        key = "L",
-        glyph = "✧",
-        tint = Color3.fromRGB(104, 71, 33),
+        name = "Stats",
+        label = "Stats",
+        key = "C",
+        glyph = "✦",
+        tint = Color3.fromRGB(98, 76, 38),
     },
     {
         name = "Inventory",
