@@ -32,6 +32,13 @@ export type DirectArt = {
     SourceSize: Vector2,
 }
 
+export type PaintedButtonStyle =
+    "Primary"
+    | "Secondary"
+    | "Danger"
+    | "Accent"
+    | "Ghost"
+
 local REGIONS: {[string]: Region} = {
     Window = {
         Offset = Vector2.new(0, 0),
@@ -114,8 +121,54 @@ local DIRECT_ART: {[string]: DirectArt} = {
     },
 }
 
+local EMPTY_DIRECT_ART: {[string]: DirectArt} = {
+    Journal = {
+        Image = UiArtAssets.QUEST_JOURNAL_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Tracker = {
+        Image = UiArtAssets.QUEST_TRACKER_EMPTY,
+        SourceSize = Vector2.new(1086, 1448),
+    },
+    Inventory = {
+        Image = UiArtAssets.INVENTORY_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Skills = {
+        Image = UiArtAssets.SKILLS_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Stats = {
+        Image = UiArtAssets.STATS_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Guild = {
+        Image = UiArtAssets.GUILD_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Party = {
+        Image = UiArtAssets.PARTY_EMPTY,
+        SourceSize = Vector2.new(1086, 1448),
+    },
+    Settings = {
+        Image = UiArtAssets.SETTINGS_EMPTY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+}
+
+local PAINTED_BUTTON_IMAGES: {
+    [PaintedButtonStyle]: string
+} = {
+    Primary = UiArtAssets.BUTTON_BLUE,
+    Secondary = UiArtAssets.BUTTON_DARK,
+    Danger = UiArtAssets.BUTTON_RED,
+    Accent = UiArtAssets.BUTTON_GOLD,
+    Ghost = UiArtAssets.BUTTON_DARK,
+}
+
 UiArt.REGIONS = table.freeze(REGIONS)
 UiArt.DIRECT_ART = table.freeze(DIRECT_ART)
+UiArt.EMPTY_DIRECT_ART = table.freeze(EMPTY_DIRECT_ART)
 
 --[[
 Returns a named legacy atlas region.
@@ -144,6 +197,125 @@ Returns:
 function UiArt.get_direct_art(art_name: string): DirectArt
     local art = DIRECT_ART[art_name]
     assert(art, "Unknown DungeonMMO direct UI art: " .. art_name)
+    return art
+end
+
+--[[
+Creates a full-resolution empty reference-derived background.
+
+Args:
+    parent (GuiObject): GUI object receiving the artwork.
+    art_name (string): Stable empty-art name.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Empty painted reference background.
+]]
+function UiArt.reference_background(
+    parent: GuiObject,
+    art_name: string,
+    z_index: number?
+): ImageLabel
+    local art = EMPTY_DIRECT_ART[art_name]
+    assert(
+        art,
+        "No empty DungeonMMO reference art for: "
+            .. art_name
+    )
+
+    local existing = parent:FindFirstChild("ReferenceArt")
+    if existing then
+        existing:Destroy()
+    end
+
+    local image = Instance.new("ImageLabel")
+    image.Name = "ReferenceArt"
+    image.BackgroundTransparency = 1
+    image.BorderSizePixel = 0
+    image.Image = art.Image
+    image.ScaleType = Enum.ScaleType.Stretch
+    image.Size = UDim2.fromScale(1, 1)
+    image.ZIndex = z_index or 1
+    image.Parent = parent
+    return image
+end
+
+--[[
+Applies a reference-derived painted button surface.
+
+Args:
+    button (TextButton): Existing interactive button.
+    style (PaintedButtonStyle): Painted colour treatment.
+
+Returns:
+    ImageLabel: Painted background image.
+]]
+function UiArt.paint_button(
+    button: TextButton,
+    style: PaintedButtonStyle
+): ImageLabel
+    local existing = button:FindFirstChild(
+        "PaintedButtonArt"
+    )
+
+    if existing then
+        existing:Destroy()
+    end
+
+    button:SetAttribute("DMMOPaintedButton", true)
+    button.BackgroundTransparency = 1
+    button.BorderSizePixel = 0
+    button.TextColor3 = Color3.fromRGB(248, 234, 202)
+    button.TextStrokeColor3 = Color3.fromRGB(10, 7, 4)
+    button.TextStrokeTransparency = 0.32
+
+    for _, child in ipairs(button:GetChildren()) do
+        if child:IsA("UIStroke") then
+            child.Transparency = 1
+        elseif child:IsA("UIGradient") then
+            child.Enabled = false
+        elseif child:IsA("UICorner") then
+            child.CornerRadius = UDim.new(0, 0)
+        end
+    end
+
+    local art = Instance.new("ImageLabel")
+    art.Name = "PaintedButtonArt"
+    art.BackgroundTransparency = 1
+    art.BorderSizePixel = 0
+    art.Image = PAINTED_BUTTON_IMAGES[style]
+    art.ScaleType = Enum.ScaleType.Stretch
+    art.Size = UDim2.fromScale(1, 1)
+    art.ZIndex = math.max(1, button.ZIndex - 1)
+    art.Parent = button
+    return art
+end
+
+--[[
+Applies active or inactive reference tab artwork.
+
+Args:
+    button (TextButton): Existing tab button.
+    active (boolean): Whether the tab is selected.
+
+Returns:
+    ImageLabel: Painted tab background.
+]]
+function UiArt.paint_tab(
+    button: TextButton,
+    active: boolean
+): ImageLabel
+    local art = UiArt.paint_button(
+        button,
+        "Secondary"
+    )
+    art.Image = if active
+        then UiArtAssets.TAB_ACTIVE
+        else UiArtAssets.TAB_INACTIVE
+
+    button.TextColor3 = if active
+        then Color3.fromRGB(255, 224, 157)
+        else Color3.fromRGB(238, 229, 211)
     return art
 end
 
