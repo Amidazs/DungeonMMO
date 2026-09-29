@@ -101,8 +101,8 @@ local function check_variant(dungeon_id: string, depth_id: string,
         if encounter.Kind == "EventBoss" then
             event_count += 1
             check(i == 2 and encounter.RoomSlotId == "EventArena"
-                and encounter.CompletionRequired == true,
-                "Event remains required immediately after Room1")
+                and encounter.CompletionRequired == false,
+                "Event remains optional immediately after Room1")
         elseif encounter.Kind == "SecretBoss" then
             secret_count += 1
             check(i == #ordered - 1
@@ -116,14 +116,16 @@ local function check_variant(dungeon_id: string, depth_id: string,
         "no variant combination may spawn two of either kind")
     local sequencer = Sequencer.new(ordered)
     for _, encounter in ipairs(ordered) do
-        if encounter.Kind == "SecretBoss" then
+        if encounter.Kind == "EventBoss"
+            or encounter.Kind == "SecretBoss"
+        then
             check(sequencer:skip(encounter.Id).ok,
-                "variant Secret remains skippable")
+                "variant side encounter remains skippable")
         else
             check(sequencer:start(encounter.Id).ok
                 and not sequencer:start(encounter.Id).ok
                 and sequencer:clear(encounter.Id).ok,
-                "variant encounter starts and clears once")
+                "required encounter starts and clears once")
         end
     end
     check(sequencer:is_complete(),
