@@ -83,8 +83,8 @@ check(ready.encounters[1].Encounter.Kind == "EventBoss",
     "Event boss must retain EventBoss role")
 check(ready.encounters[2].Encounter.Kind == "SecretBoss",
     "Secret boss must retain SecretBoss role")
-check(ready.encounters[1].CompletionRequired == true,
-    "Triggered event must be completion-required")
+check(ready.encounters[1].CompletionRequired == false,
+    "Triggered event must remain optional bonus content")
 check(ready.encounters[2].CompletionRequired == false,
     "Secret boss must remain optional")
 
