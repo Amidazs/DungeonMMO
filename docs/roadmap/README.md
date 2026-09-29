@@ -1,3 +1,18 @@
+**v3.54 QUEST DUNGEON CONTEXT + OPTIONAL BRANCHES — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_54_Quest_Dungeon_Context_Optional_Branches_GREEN_20260929.md)
+and [evidence](
+../testing/quest-dungeon-context-optional-branches-v3-54-green-20260929.md).
+Dungeon entrance UI now lists accepted objectives for that entrance, including
+the tracked quest, objective progress and eligible depth such as
+`Depth 1 or Depth 4` or `Any unlocked depth`. It warns when the selected
+depth cannot progress every displayed quest. Event and Secret side rooms are
+now authoritative optional branches: entering their direct required successor
+persists the side encounter as `Skipped` and starts the required room.
+Physical Temple acceptance proved Room 1 -> skip Event -> Room 2 -> skip Secret
+-> final boss -> complete. Both TEST places reached `PublishSuccessful`,
+fresh cloud source matches the current worktree, and fresh cloud Play starts
+cleanly. **Section D remains on hold for the user's friend test.**
+
 **v3.53 QUEST JOURNAL + PERSISTENT TRACKER — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_53_Quest_Journal_Tracker_GREEN_20260929.md)
 and [evidence](
