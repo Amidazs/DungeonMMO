@@ -194,7 +194,7 @@ function UiComponents.modal(
     root.BackgroundTransparency = 1
     root.BorderSizePixel = 0
     root.Parent = parent
-    UiArt.background(root, "Window", 1)
+    UiArt.window_background(root, 1)
 
     local header_band = Instance.new("Frame")
     header_band.Name = "HeaderBand"
