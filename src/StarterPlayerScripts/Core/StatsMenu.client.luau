@@ -81,16 +81,18 @@ local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
-
--- Keep the modal's clean shell. Identity, progression and
--- spendable attributes are all generated from authoritative state.
+UiArt.reference_background(
+    panel,
+    "Stats",
+    11
+)
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
@@ -350,6 +352,7 @@ local apply_button = UiComponents.button(
 apply_button.Position = UDim2.fromOffset(16, 398)
 apply_button.Size = UDim2.new(0.62, -20, 0, 40)
 apply_button.ZIndex = 13
+UiArt.paint_button(apply_button, "Primary")
 
 local reset_button = UiComponents.button(
     attributes_panel,
@@ -361,6 +364,7 @@ reset_button.AnchorPoint = Vector2.new(1, 0)
 reset_button.Position = UDim2.new(1, -16, 0, 398)
 reset_button.Size = UDim2.new(0.38, -4, 0, 40)
 reset_button.ZIndex = 13
+UiArt.paint_button(reset_button, "Secondary")
 
 local attribute_status = UiComponents.label(
     attributes_panel,
