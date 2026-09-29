@@ -320,6 +320,24 @@ local function apply_button_hover(
     button: TextButton,
     hovered: boolean
 )
+    if button:GetAttribute("DMMOPaintedButton") == true then
+        local art = button:FindFirstChild("PaintedButtonArt")
+
+        if art and art:IsA("ImageLabel") then
+            local target = if hovered and button.Active
+                then Color3.fromRGB(225, 214, 192)
+                else Color3.new(1, 1, 1)
+
+            TweenService:Create(
+                art,
+                TWEEN_INFO,
+                {ImageColor3 = target}
+            ):Play()
+        end
+
+        return
+    end
+
     local base = button:GetAttribute("DMMOUiBaseColor")
     local base_transparency = button:GetAttribute(
         "DMMOUiBaseTransparency"
@@ -444,6 +462,18 @@ function UiTheme.set_button_enabled(
     button.Selectable = enabled
     button.AutoButtonColor = false
     button.TextTransparency = if enabled then 0 else 0.28
+
+    if button:GetAttribute("DMMOPaintedButton") == true then
+        button.BackgroundTransparency = 1
+
+        local art = button:FindFirstChild("PaintedButtonArt")
+        if art and art:IsA("ImageLabel") then
+            art.ImageTransparency = if enabled then 0 else 0.42
+        end
+
+        return
+    end
+
     button.BackgroundTransparency = if enabled
         then button:GetAttribute("DMMOUiBaseTransparency")
             or 0.02
