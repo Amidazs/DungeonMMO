@@ -59,7 +59,11 @@ card.Size = UDim2.fromOffset(382, 120)
 card.BackgroundTransparency = 1
 card.BorderSizePixel = 0
 card.Parent = gui
-UiArt.background(card, "Profile", 1)
+local profile_art = UiArt.popup_background(
+    card,
+    1
+)
+profile_art.Name = "ProfileArt"
 UiTheme.bind_responsive_scale(card, 1366, 0.62, 1)
 
 --[[
