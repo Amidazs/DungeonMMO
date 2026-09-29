@@ -16,6 +16,9 @@ local TutorialDefinitions = require(
     shared:WaitForChild("TutorialDefinitions")
 )
 local UiTheme = require(shared:WaitForChild("UiTheme"))
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 local TutorialPathGuide = require(
     script.Parent:WaitForChild("TutorialPathGuide")
 )
@@ -52,17 +55,32 @@ gui.Parent = player_gui
 
 local panel = Instance.new("Frame")
 panel.Name = "TutorialPanel"
-panel.AnchorPoint = Vector2.new(0, 0)
-panel.Position = UDim2.fromOffset(22, 96)
-panel.Size = UDim2.fromOffset(430, 238)
+panel.AnchorPoint = Vector2.new(0.5, 0)
+panel.Position = UDim2.new(0.5, 0, 0, 18)
+panel.Size = UDim2.fromOffset(470, 220)
 UiTheme.style_panel(panel, true)
 panel.Parent = gui
+UiOrnament.frame(panel, true)
 UiTheme.bind_responsive_scale(panel, 1366, 0.72, 1)
+
+local header_band = Instance.new("Frame")
+header_band.Name = "HeaderBand"
+header_band.Position = UDim2.fromOffset(7, 7)
+header_band.Size = UDim2.new(1, -14, 0, 48)
+header_band.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
+header_band.BackgroundTransparency = 0.08
+header_band.BorderSizePixel = 0
+UiTheme.add_gradient(
+    header_band,
+    UiTheme.PALETTE.SurfaceWarm,
+    UiTheme.PALETTE.BackdropSoft
+)
+header_band.Parent = panel
 
 local eyebrow = Instance.new("TextLabel")
 eyebrow.Name = "Eyebrow"
-eyebrow.Position = UDim2.fromOffset(20, 14)
-eyebrow.Size = UDim2.new(1, -40, 0, 20)
+eyebrow.Position = UDim2.fromOffset(22, 11)
+eyebrow.Size = UDim2.new(1, -44, 0, 16)
 eyebrow.Text = "NEW PLAYER GUIDE"
 UiTheme.style_label(eyebrow, "Caption")
 eyebrow.TextColor3 = UiTheme.PALETTE.Accent
@@ -70,15 +88,15 @@ eyebrow.Parent = panel
 
 local title = Instance.new("TextLabel")
 title.Name = "Title"
-title.Position = UDim2.fromOffset(20, 38)
-title.Size = UDim2.new(1, -40, 0, 28)
+title.Position = UDim2.fromOffset(22, 25)
+title.Size = UDim2.new(1, -44, 0, 26)
 UiTheme.style_label(title, "Heading")
 title.Parent = panel
 
 local body = Instance.new("TextLabel")
 body.Name = "Body"
-body.Position = UDim2.fromOffset(20, 72)
-body.Size = UDim2.new(1, -40, 0, 104)
+body.Position = UDim2.fromOffset(22, 66)
+body.Size = UDim2.new(1, -44, 0, 82)
 UiTheme.style_label(body, "Body")
 body.TextWrapped = true
 body.TextYAlignment = Enum.TextYAlignment.Top
@@ -87,7 +105,7 @@ body.Parent = panel
 
 local progress = Instance.new("TextLabel")
 progress.Name = "Progress"
-progress.Position = UDim2.fromOffset(20, 180)
+progress.Position = UDim2.fromOffset(22, 154)
 progress.Size = UDim2.new(0.45, 0, 0, 18)
 UiTheme.style_label(progress, "Caption")
 progress.Parent = panel
@@ -95,8 +113,8 @@ progress.Parent = panel
 local skip = Instance.new("TextButton")
 skip.Name = "Skip"
 skip.AnchorPoint = Vector2.new(0, 1)
-skip.Position = UDim2.new(0, 20, 1, -14)
-skip.Size = UDim2.fromOffset(116, 34)
+skip.Position = UDim2.new(0, 22, 1, -14)
+skip.Size = UDim2.fromOffset(122, 34)
 skip.Text = "Skip for now"
 UiTheme.style_button(skip, "Ghost")
 skip.Parent = panel
@@ -104,8 +122,8 @@ skip.Parent = panel
 local next_button = Instance.new("TextButton")
 next_button.Name = "Next"
 next_button.AnchorPoint = Vector2.new(1, 1)
-next_button.Position = UDim2.new(1, -20, 1, -14)
-next_button.Size = UDim2.fromOffset(150, 34)
+next_button.Position = UDim2.new(1, -22, 1, -14)
+next_button.Size = UDim2.fromOffset(156, 34)
 UiTheme.style_button(next_button, "Primary")
 next_button.Parent = panel
 
@@ -265,7 +283,7 @@ local function set_waypoint(
     label.TextColor3 = UiTheme.PALETTE.AccentBright
     label.Font = UiTheme.FONT.Strong
     label.TextSize = 14
-    UiTheme.add_corner(label, 7)
+    UiTheme.add_corner(label, 2)
     UiTheme.add_stroke(
         label,
         UiTheme.PALETTE.Accent,
