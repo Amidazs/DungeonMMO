@@ -32,9 +32,15 @@ function Controller.set_visible(name: string, visible: boolean)
     changed:Fire(active)
 end
 
--- Toggles a registered window from its menu button or shortcut.
+-- Opens a registered window from its menu button or shortcut.
+-- Repeating the same shortcut does not close it; the window's explicit
+-- close control owns dismissal.
 function Controller.toggle(name: string)
-    Controller.set_visible(name, active ~= name)
+    if active == name then
+        return
+    end
+
+    Controller.set_visible(name, true)
 end
 
 -- Returns the name of the currently open managed window.
