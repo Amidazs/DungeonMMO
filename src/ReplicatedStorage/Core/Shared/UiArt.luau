@@ -196,19 +196,12 @@ function UiArt.background(
     art_name: string,
     z_index: number?
 ): ImageLabel
-    local direct = DIRECT_ART[art_name]
-    if direct then
-        local image = Instance.new("ImageLabel")
-        image.Name = "ReferenceArt"
-        image.BackgroundTransparency = 1
-        image.BorderSizePixel = 0
-        image.Image = direct.Image
-        image.ScaleType = Enum.ScaleType.Stretch
-        image.Size = UDim2.fromScale(1, 1)
-        image.ZIndex = z_index or 1
-        image.Parent = parent
-        return image
-    end
+    assert(
+        DIRECT_ART[art_name] == nil,
+        "Filled reference art is not a runtime background: "
+            .. art_name
+            .. ". Use window_background or popup_background."
+    )
 
     local image = UiArt.image(
         parent,
