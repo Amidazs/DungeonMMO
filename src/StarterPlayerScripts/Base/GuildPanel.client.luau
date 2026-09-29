@@ -15,6 +15,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 
 local snapshot_request = remotes:WaitForChild(
     "GuildSnapshotRequest"
@@ -52,14 +55,71 @@ local modal = UiComponents.modal(
     "GuildWindow",
     "Guild",
     "Manage your guild, members and hall.",
-    UDim2.fromOffset(720, 600)
+    UDim2.fromOffset(640, 800)
 )
 local panel = modal.Root
 panel.Visible = false
+panel.ZIndex = 11
+UiArt.clear_frame_chrome(panel)
+
+local old_reference_art = panel:FindFirstChild("ReferenceArt")
+if old_reference_art then
+    old_reference_art:Destroy()
+end
+
+local guild_art = UiArt.background(
+    panel,
+    "Guild",
+    11
+)
+guild_art.Name = "GuildArt"
+
+UiArt.content_mask(
+    panel,
+    "Guild",
+    "GuildContentMask",
+    58,
+    250,
+    1008,
+    1060,
+    12
+)
+
+modal.Header.ZIndex = 14
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
+modal.Close.ZIndex = 15
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
+
+local header_band = panel:FindFirstChild("HeaderBand")
+if header_band and header_band:IsA("GuiObject") then
+    header_band.Visible = false
+end
+
+local divider = panel:FindFirstChild("OrnateDivider")
+if divider and divider:IsA("GuiObject") then
+    divider.Visible = false
+end
+
+modal.Body.Position = UiArt.position(
+    "Guild",
+    58,
+    250
+)
+modal.Body.Size = UiArt.rect(
+    "Guild",
+    58,
+    250,
+    1008,
+    1060
+)
+modal.Body.ZIndex = 14
+
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.35,
+    0.62,
     1
 )
 
@@ -69,7 +129,7 @@ status_card.Size = UDim2.new(1, 0, 0, 84)
 status_card.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
 status_card.BackgroundTransparency = 0.08
 status_card.BorderSizePixel = 0
-UiTheme.add_corner(status_card, 8)
+UiTheme.add_corner(status_card, 2)
 UiTheme.add_stroke(
     status_card,
     UiTheme.PALETTE.BorderSoft,
@@ -134,7 +194,7 @@ local function create_input(
     box.Font = UiTheme.FONT.Body
     box.TextSize = 14
     box.BorderSizePixel = 0
-    UiTheme.add_corner(box, 7)
+    UiTheme.add_corner(box, 2)
     UiTheme.add_stroke(
         box,
         UiTheme.PALETTE.BorderSoft,
