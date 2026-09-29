@@ -1,3 +1,44 @@
+## 29 September 2026 — v3.55 ORNATE MMORPG UI RESTYLE WIP
+
+The user selected a new visual target for the actual DungeonMMO interface:
+classic premium fantasy MMORPG presentation with near-black metal panels,
+aged-gold framing, cream typography, compact information density and ornate
+HUD chrome. This is an implementation pass, not a concept-image task.
+
+Current source checkpoint: `9ddcdef3d43e5f05c488b4c5eb9fd8ddcb8ba5b5`.
+
+Implemented so far:
+
+- shared `UiTheme` moved to the darker black/bronze/gold palette;
+- `UiOrnament` now builds layered metallic borders, corner brackets,
+  dividers and stronger framed skill/item wells;
+- shared modal/button/progress components inherit the new presentation;
+- Profile HUD moved from bottom-left to a top-left MMORPG unit frame;
+- desktop combat hotbar compacted and restyled at bottom-centre;
+- bottom-right command menu rebuilt as icon-style Guild/Skills/Quests/
+  Inventory controls;
+- Quest Tracker restyled as an ornate right-side panel;
+- Quest Journal shell moved toward the supplied reference with tab treatment;
+- Dungeon objective, boss, revive and completion UI received the same chrome.
+
+Safety boundary is unchanged: no combat, quest authority, dungeon progression,
+network payload, persistence or monetisation logic changed.
+
+Validation completed:
+
+- `git diff --check`: PASS;
+- `base.project.json`: PASS;
+- `default.project.json`: PASS;
+- `published-base.project.json`: PASS;
+- `published-dungeon.project.json`: PASS.
+
+This is **WIP, not GREEN**. No TEST/PROD publish was performed. Next action is
+fresh Studio visual/runtime inspection at real viewport sizes, then correct
+overlaps, sizing and remaining high-frequency windows before requesting
+publication.
+
+**Section D remains on hold** for the existing two-player friend-test boundary.
+
 ## 29 September 2026 — CURRENT v3.54 QUEST DUNGEON CONTEXT + OPTIONAL BRANCHES GREEN
 
 [Roadmap](
