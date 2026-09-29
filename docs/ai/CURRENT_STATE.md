@@ -1,3 +1,61 @@
+## 29 September 2026 — CURRENT v3.54 QUEST DUNGEON CONTEXT + OPTIONAL BRANCHES GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_54_Quest_Dungeon_Context_Optional_Branches_GREEN_20260929.md);
+[evidence](
+../testing/quest-dungeon-context-optional-branches-v3-54-green-20260929.md).
+
+The friend-test build now explains dungeon relevance before launch and no
+longer lets optional side content block the required route.
+
+At a physical dungeon entrance, the Base panel lists active incomplete
+Adventure objectives that belong to that dungeon. The tracked quest appears
+first. Each line includes quest name, current objective/progress and the
+eligible depth(s). Dungeon-clear objectives show `Any unlocked depth`.
+The panel warns when the currently selected depth cannot progress every quest
+shown.
+
+Accepted Temple example:
+
+`◆ The Captain's Price — Defeat the Marauder Captain  0/1 — Depth 1 or Depth 4`
+
+`• A Relic Beneath the World Tree — Clear the Temple  0/1 — Any unlocked depth`
+
+Optional Event and Secret side encounters now both materialise with
+`CompletionRequired = false`. When their direct required successor is
+entered, the authoritative encounter flow persists the optional encounter as
+`Skipped` and starts the required room. Secret-specific deferred backtracking
+remains available; skipped timed Events are forfeited for that run.
+
+Physical Temple acceptance proved the complete required path while ignoring
+both side rooms:
+
+- Room 1 clear;
+- Event skipped by entering Room 2;
+- Room 2 clear;
+- Secret skipped by entering Room 3;
+- final boss starts;
+- dungeon completes.
+
+The new entrance UI was also live-tested through the real Temple proximity
+prompt with held **E** input. A later-depth synthetic objective correctly
+rendered `Depth 2` and the mismatch warning while Depth 1 remained selected.
+
+Final TEST publication:
+
+- Dungeon `117293035754309`: `PublishSuccessful` at 09:53:12Z;
+- Base `134132328219009`: `PublishSuccessful` at 09:53:49Z.
+
+Fresh cloud copies were reopened after publication. Normalised source equality
+against the current worktree is true for every changed runtime/client file.
+Fresh cloud Dungeon and Base Play both start cleanly.
+
+Feature source checkpoint:
+`7cfb19a64aa6680de318827b54791c015a0794cf`.
+
+**HOLD remains active:** do not begin Section D until the user completes the
+two-player friend test and explicitly releases the hold.
+
 ## 29 September 2026 — CURRENT v3.53 QUEST JOURNAL + TRACKER GREEN
 
 [Roadmap](
