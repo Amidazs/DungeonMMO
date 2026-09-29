@@ -1,6 +1,7 @@
 --!strict
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
 
 local player = Players.LocalPlayer
 local core = ReplicatedStorage:WaitForChild("Core")
@@ -39,6 +40,12 @@ local party_action_request = remotes:FindFirstChild(
 
 local HUD_WIDTH = 432
 local HUD_HEIGHT = 129
+local NAME_X = 116
+local NAME_Y = 5
+local NAME_MIN_WIDTH = 205
+local NAME_MAX_WIDTH = 340
+local NAME_HORIZONTAL_PADDING = 24
+local NAME_EXTENSION_X = 310
 local BUFF_COLUMNS = 7
 local BUFF_SLOT_WIDTH = 39
 local BUFF_SLOT_HEIGHT = 40
@@ -242,18 +249,39 @@ task.spawn(function()
     end
 end)
 
+local name_extension = Instance.new("Frame")
+name_extension.Name = "NameExtension"
+name_extension.Position = UDim2.fromOffset(NAME_EXTENSION_X, 7)
+name_extension.Size = UDim2.fromOffset(0, 23)
+name_extension.BackgroundColor3 = Color3.fromRGB(13, 12, 13)
+name_extension.BackgroundTransparency = 0.04
+name_extension.BorderSizePixel = 0
+name_extension.Visible = false
+name_extension.ZIndex = 2
+UiTheme.add_corner(name_extension, 4)
+name_extension.Parent = card
+
+local name_extension_stroke = Instance.new("UIStroke")
+name_extension_stroke.Name = "GoldBorder"
+name_extension_stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+name_extension_stroke.Color = Color3.fromRGB(187, 126, 25)
+name_extension_stroke.Thickness = 1.5
+name_extension_stroke.Transparency = 0.05
+name_extension_stroke.Parent = name_extension
+
 local player_name = UiComponents.label(
     card,
     "PlayerName",
     player.DisplayName,
     "Title"
 )
-player_name.Position = UDim2.fromOffset(116, 5)
-player_name.Size = UDim2.fromOffset(205, 25)
+player_name.Position = UDim2.fromOffset(NAME_X, NAME_Y)
+player_name.Size = UDim2.fromOffset(NAME_MIN_WIDTH, 25)
 player_name.TextColor3 = Color3.fromRGB(249, 239, 214)
 player_name.TextSize = 22
 player_name.TextStrokeColor3 = Color3.fromRGB(8, 5, 3)
 player_name.TextStrokeTransparency = 0.28
+player_name.TextTruncate = Enum.TextTruncate.None
 player_name.ZIndex = 5
 
 local party_crown = Instance.new("ImageLabel")
@@ -262,10 +290,71 @@ party_crown.Position = UDim2.fromOffset(326, 9)
 party_crown.Size = UDim2.fromOffset(30, 22)
 party_crown.BackgroundTransparency = 1
 party_crown.Image = UiArtAssets.PROFILE_PARTY_CROWN
-party_crown.ScaleType = Enum.ScaleType.Stretch
+party_crown.ScaleType = Enum.ScaleType.Fit
 party_crown.Visible = false
 party_crown.ZIndex = 6
 party_crown.Parent = card
+
+--[[
+Resizes the name presentation so long display names keep their natural size.
+
+The supplied painted HUD remains the base shell. Only the dark name rail is
+extended when the measured text needs more room, so the portrait and HP/MP
+art are never stretched.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function update_name_layout()
+    local measured = TextService:GetTextSize(
+        player_name.Text,
+        player_name.TextSize,
+        player_name.Font,
+        Vector2.new(NAME_MAX_WIDTH, 25)
+    )
+    local name_width = math.clamp(
+        measured.X + NAME_HORIZONTAL_PADDING,
+        NAME_MIN_WIDTH,
+        NAME_MAX_WIDTH
+    )
+    local extension_width = math.max(
+        0,
+        NAME_X + name_width - NAME_EXTENSION_X + 8
+    )
+
+    player_name.Size = UDim2.fromOffset(name_width, 25)
+    name_extension.Size = UDim2.fromOffset(
+        extension_width,
+        23
+    )
+    name_extension.Visible = extension_width > 0
+
+    party_crown.Position = UDim2.fromOffset(
+        NAME_X + name_width + 7,
+        7
+    )
+end
+
+update_name_layout()
+
+local level_caption = UiComponents.label(
+    card,
+    "LevelCaption",
+    "Lv",
+    "Caption"
+)
+level_caption.Position = UDim2.fromOffset(5, 82)
+level_caption.Size = UDim2.fromOffset(47, 13)
+level_caption.TextXAlignment = Enum.TextXAlignment.Center
+level_caption.TextYAlignment = Enum.TextYAlignment.Center
+level_caption.TextColor3 = Color3.fromRGB(224, 198, 142)
+level_caption.TextSize = 10
+level_caption.TextStrokeColor3 = Color3.fromRGB(6, 4, 3)
+level_caption.TextStrokeTransparency = 0.18
+level_caption.ZIndex = 6
 
 local level_value = UiComponents.label(
     card,
@@ -273,12 +362,12 @@ local level_value = UiComponents.label(
     "1",
     "Title"
 )
-level_value.Position = UDim2.fromOffset(5, 82)
-level_value.Size = UDim2.fromOffset(47, 39)
+level_value.Position = UDim2.fromOffset(5, 94)
+level_value.Size = UDim2.fromOffset(47, 27)
 level_value.TextXAlignment = Enum.TextXAlignment.Center
 level_value.TextYAlignment = Enum.TextYAlignment.Center
 level_value.TextColor3 = Color3.fromRGB(248, 239, 218)
-level_value.TextSize = 23
+level_value.TextSize = 22
 level_value.TextStrokeColor3 = Color3.fromRGB(6, 4, 3)
 level_value.TextStrokeTransparency = 0.18
 level_value.ZIndex = 6
@@ -305,7 +394,7 @@ health_track.Parent = card
 
 local health_fill = Instance.new("Frame")
 health_fill.Name = "HealthFill"
-health_fill.Size = UDim2.fromScale(1, 1)
+health_fill.Size = UDim2.fromScale(0, 1)
 health_fill.BackgroundColor3 = Color3.fromRGB(226, 25, 42)
 health_fill.BorderSizePixel = 0
 health_fill.ZIndex = 3
@@ -317,17 +406,32 @@ UiTheme.add_gradient(
 )
 health_fill.Parent = health_track
 
+local health_label = UiComponents.label(
+    card,
+    "HealthLabel",
+    "HP",
+    "Heading"
+)
+health_label.Position = UDim2.fromOffset(131, 34)
+health_label.Size = UDim2.fromOffset(34, 24)
+health_label.TextXAlignment = Enum.TextXAlignment.Left
+health_label.TextColor3 = Color3.fromRGB(255, 241, 216)
+health_label.TextSize = 15
+health_label.TextStrokeColor3 = Color3.new(0, 0, 0)
+health_label.TextStrokeTransparency = 0.12
+health_label.ZIndex = 5
+
 local health_value = UiComponents.label(
     card,
     "HealthValue",
     "-- / --",
     "Heading"
 )
-health_value.Position = UDim2.fromOffset(124, 34)
-health_value.Size = UDim2.fromOffset(285, 24)
-health_value.TextXAlignment = Enum.TextXAlignment.Center
+health_value.Position = UDim2.fromOffset(257, 34)
+health_value.Size = UDim2.fromOffset(143, 24)
+health_value.TextXAlignment = Enum.TextXAlignment.Right
 health_value.TextColor3 = Color3.fromRGB(255, 246, 229)
-health_value.TextSize = 16
+health_value.TextSize = 15
 health_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 health_value.TextStrokeTransparency = 0.12
 health_value.ZIndex = 5
@@ -346,7 +450,7 @@ mana_track.Parent = card
 
 local mana_fill = Instance.new("Frame")
 mana_fill.Name = "ManaFill"
-mana_fill.Size = UDim2.fromScale(1, 1)
+mana_fill.Size = UDim2.fromScale(0, 1)
 mana_fill.BackgroundColor3 = Color3.fromRGB(25, 111, 226)
 mana_fill.BorderSizePixel = 0
 mana_fill.ZIndex = 3
@@ -358,17 +462,32 @@ UiTheme.add_gradient(
 )
 mana_fill.Parent = mana_track
 
+local mana_label = UiComponents.label(
+    card,
+    "ManaLabel",
+    "MP",
+    "Heading"
+)
+mana_label.Position = UDim2.fromOffset(131, 60)
+mana_label.Size = UDim2.fromOffset(34, 24)
+mana_label.TextXAlignment = Enum.TextXAlignment.Left
+mana_label.TextColor3 = Color3.fromRGB(232, 241, 255)
+mana_label.TextSize = 15
+mana_label.TextStrokeColor3 = Color3.new(0, 0, 0)
+mana_label.TextStrokeTransparency = 0.12
+mana_label.ZIndex = 5
+
 local mana_value = UiComponents.label(
     card,
     "ManaValue",
     "-- / --",
     "Heading"
 )
-mana_value.Position = UDim2.fromOffset(124, 60)
-mana_value.Size = UDim2.fromOffset(285, 24)
-mana_value.TextXAlignment = Enum.TextXAlignment.Center
+mana_value.Position = UDim2.fromOffset(257, 60)
+mana_value.Size = UDim2.fromOffset(143, 24)
+mana_value.TextXAlignment = Enum.TextXAlignment.Right
 mana_value.TextColor3 = Color3.fromRGB(255, 246, 229)
-mana_value.TextSize = 16
+mana_value.TextSize = 15
 mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
 mana_value.ZIndex = 5
