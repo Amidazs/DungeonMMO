@@ -61,7 +61,7 @@ local objective_card = Instance.new("Frame")
 objective_card.Name = "ObjectiveCard"
 objective_card.AnchorPoint = Vector2.new(0.5, 0)
 objective_card.Position = UDim2.fromScale(0.5, 0.022)
-objective_card.Size = UDim2.fromOffset(570, 62)
+objective_card.Size = UDim2.fromOffset(540, 58)
 UiTheme.style_panel(objective_card, false)
 objective_card.Parent = gui
 UiOrnament.frame(objective_card, true)
@@ -78,7 +78,7 @@ local objective_caption = UiComponents.label(
     "CURRENT OBJECTIVE",
     "Caption"
 )
-objective_caption.Position = UDim2.fromOffset(16, 8)
+objective_caption.Position = UDim2.fromOffset(16, 7)
 objective_caption.Size = UDim2.new(1, -32, 0, 14)
 objective_caption.TextColor3 = UiTheme.PALETTE.Accent
 objective_caption.TextXAlignment = Enum.TextXAlignment.Center
@@ -89,8 +89,8 @@ local objective = UiComponents.label(
     "Entering the dungeon...",
     "Heading"
 )
-objective.Position = UDim2.fromOffset(16, 25)
-objective.Size = UDim2.new(1, -32, 0, 27)
+objective.Position = UDim2.fromOffset(16, 23)
+objective.Size = UDim2.new(1, -32, 0, 25)
 objective.TextXAlignment = Enum.TextXAlignment.Center
 objective.TextWrapped = true
 
@@ -146,7 +146,12 @@ boss_track.Position = UDim2.fromOffset(16, 55)
 boss_track.Size = UDim2.new(1, -32, 0, 12)
 boss_track.BackgroundColor3 = UiTheme.PALETTE.HealthDark
 boss_track.BorderSizePixel = 0
-UiTheme.add_corner(boss_track, 6)
+UiTheme.add_corner(boss_track, 1)
+UiTheme.add_stroke(
+    boss_track,
+    UiTheme.PALETTE.BorderDark,
+    0.18
+)
 boss_track.Parent = boss_frame
 
 local boss_fill = Instance.new("Frame")
@@ -154,7 +159,7 @@ boss_fill.Name = "BossFill"
 boss_fill.Size = UDim2.fromScale(1, 1)
 boss_fill.BackgroundColor3 = UiTheme.PALETTE.Health
 boss_fill.BorderSizePixel = 0
-UiTheme.add_corner(boss_fill, 6)
+UiTheme.add_corner(boss_fill, 1)
 UiTheme.add_gradient(
     boss_fill,
     UiTheme.PALETTE.Health:Lerp(
