@@ -63,40 +63,15 @@ panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
 
-local guild_art = UiArt.background(
-    panel,
-    "Guild",
-    11
-)
-guild_art.Name = "GuildArt"
-
-UiArt.content_mask(
-    panel,
-    "Guild",
-    "GuildTabMask",
-    58,
-    180,
-    1008,
-    72,
-    12
-)
-UiArt.content_mask(
-    panel,
-    "Guild",
-    "GuildContentMask",
-    58,
-    250,
-    1008,
-    1060,
-    12
-)
+-- Keep the clean modal shell. Guild tabs, member rows, values,
+-- permissions and settings are generated from the server snapshot.
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = false
-modal.Subtitle.Visible = false
+modal.Title.Visible = true
+modal.Subtitle.Visible = true
 modal.Close.ZIndex = 18
-modal.Close.BackgroundTransparency = 1
-modal.Close.TextTransparency = 1
+modal.Close.BackgroundTransparency = 0.18
+modal.Close.TextTransparency = 0
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
