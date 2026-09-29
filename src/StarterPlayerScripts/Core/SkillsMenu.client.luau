@@ -79,16 +79,18 @@ local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
-
--- Keep the modal's clean shell. Learned skills, ranks and
--- loadout slots are populated exclusively from progression state.
+UiArt.reference_background(
+    panel,
+    "Skills",
+    11
+)
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
@@ -120,6 +122,61 @@ UiTheme.bind_responsive_scale(
     0.62,
     1
 )
+
+local reference_tabs = Instance.new("Frame")
+reference_tabs.Name = "ReferenceTabs"
+reference_tabs.Position = UiArt.position(
+    "Skills",
+    72,
+    190
+)
+reference_tabs.Size = UiArt.rect(
+    "Skills",
+    72,
+    190,
+    710,
+    58
+)
+reference_tabs.BackgroundTransparency = 1
+reference_tabs.ZIndex = 15
+reference_tabs.Parent = panel
+
+local reference_tab_layout = Instance.new("UIListLayout")
+reference_tab_layout.FillDirection = Enum.FillDirection.Horizontal
+reference_tab_layout.Padding = UDim.new(0, 8)
+reference_tab_layout.Parent = reference_tabs
+
+local active_skills_tab = UiComponents.button(
+    reference_tabs,
+    "ActiveSkillsTab",
+    "Active",
+    "Ghost"
+)
+active_skills_tab.Size = UDim2.new(0.333, -6, 1, 0)
+active_skills_tab.ZIndex = 16
+UiArt.paint_tab(active_skills_tab, true)
+
+local passive_skills_tab = UiComponents.button(
+    reference_tabs,
+    "PassiveSkillsTab",
+    "Passive",
+    "Ghost"
+)
+passive_skills_tab.Size = UDim2.new(0.333, -6, 1, 0)
+passive_skills_tab.ZIndex = 16
+passive_skills_tab.Active = false
+UiArt.paint_tab(passive_skills_tab, false)
+
+local class_skills_tab = UiComponents.button(
+    reference_tabs,
+    "ClassSkillsTab",
+    "Class",
+    "Ghost"
+)
+class_skills_tab.Size = UDim2.new(0.333, -6, 1, 0)
+class_skills_tab.ZIndex = 16
+class_skills_tab.Active = false
+UiArt.paint_tab(class_skills_tab, false)
 
 local skill_heading = UiComponents.section_heading(
     modal.Body,
@@ -309,6 +366,7 @@ local function create_skill_button(
     button.Size = UDim2.fromOffset(82, 108)
     button.Text = ""
     button.ZIndex = 13
+    UiArt.paint_button(button, "Secondary")
     button:SetAttribute(
         "SkillDisplayName",
         display_name
@@ -380,6 +438,7 @@ local function create_slot_button(slot: number): TextButton
     button.TextSize = 16
     button.TextStrokeTransparency = 0.68
     button.ZIndex = 13
+    UiArt.paint_button(button, "Secondary")
 
     local icon = UiOrnament.icon(
         button,
