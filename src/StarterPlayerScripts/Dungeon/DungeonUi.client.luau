@@ -27,6 +27,9 @@ local UiStateRules = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local dungeon_state = remotes:WaitForChild(
     "DungeonStateChanged"
@@ -61,6 +64,7 @@ objective_card.Position = UDim2.fromScale(0.5, 0.022)
 objective_card.Size = UDim2.fromOffset(570, 62)
 UiTheme.style_panel(objective_card, false)
 objective_card.Parent = gui
+UiOrnament.frame(objective_card, true)
 UiTheme.bind_responsive_scale(
     objective_card,
     1366,
@@ -98,6 +102,7 @@ boss_frame.Size = UDim2.fromOffset(640, 82)
 UiTheme.style_panel(boss_frame, false)
 boss_frame.Visible = false
 boss_frame.Parent = gui
+UiOrnament.frame(boss_frame, true)
 UiTheme.bind_responsive_scale(
     boss_frame,
     1366,
@@ -178,6 +183,7 @@ revive_panel.ZIndex = 21
 UiTheme.style_panel(revive_panel, true)
 revive_panel.Visible = false
 revive_panel.Parent = gui
+UiOrnament.frame(revive_panel, true)
 UiTheme.bind_responsive_scale(
     revive_panel,
     1366,
@@ -263,6 +269,7 @@ complete_panel.ZIndex = 21
 UiTheme.style_panel(complete_panel, true)
 complete_panel.Visible = false
 complete_panel.Parent = gui
+UiOrnament.frame(complete_panel, true)
 UiTheme.bind_responsive_scale(
     complete_panel,
     1366,
@@ -298,15 +305,15 @@ local reward_frame = Instance.new("Frame")
 reward_frame.Name = "RewardFrame"
 reward_frame.Position = UDim2.fromOffset(28, 102)
 reward_frame.Size = UDim2.new(1, -56, 0, 116)
-reward_frame.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-reward_frame.BackgroundTransparency = 0.36
+reward_frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
+reward_frame.BackgroundTransparency = 0.08
 reward_frame.BorderSizePixel = 0
 reward_frame.ZIndex = 22
-UiTheme.add_corner(reward_frame, 8)
+UiTheme.add_corner(reward_frame, 2)
 UiTheme.add_stroke(
     reward_frame,
-    UiTheme.PALETTE.BorderSoft,
-    0.5
+    UiTheme.PALETTE.Border,
+    0.30
 )
 reward_frame.Parent = complete_panel
 
