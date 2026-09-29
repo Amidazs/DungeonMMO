@@ -1,41 +1,66 @@
-## 29 September 2026 — v3.55 ORNATE MMORPG UI RESTYLE WIP
+## 29 September 2026 — v3.55 ORNATE MMORPG UI OVERHAUL — USER REVIEW HOLD
 
-The user selected a new visual target for the actual DungeonMMO interface:
-classic premium fantasy MMORPG presentation with near-black metal panels,
-aged-gold framing, cream typography, compact information density and ornate
-HUD chrome. This is an implementation pass, not a concept-image task.
+The actual DungeonMMO interface has received a full presentation overhaul
+against the user's supplied classic fantasy MMORPG reference. This is no
+longer a palette-only pass: major HUD/window composition was rebuilt.
 
-Current source checkpoint: `9ddcdef3d43e5f05c488b4c5eb9fd8ddcb8ba5b5`.
+Source checkpoint before this documentation:
+`a13d5b85f6934378d0a75e02e3ef4b98fe3a47c9`.
 
-Implemented so far:
+Current visual language:
 
-- shared `UiTheme` moved to the darker black/bronze/gold palette;
-- `UiOrnament` now builds layered metallic borders, corner brackets,
-  dividers and stronger framed skill/item wells;
-- shared modal/button/progress components inherit the new presentation;
-- Profile HUD moved from bottom-left to a top-left MMORPG unit frame;
-- desktop combat hotbar compacted and restyled at bottom-centre;
-- bottom-right command menu rebuilt as icon-style Guild/Skills/Quests/
-  Inventory controls;
-- Quest Tracker restyled as an ornate right-side panel;
-- Quest Journal shell moved toward the supplied reference with tab treatment;
-- Dungeon objective, boss, revive and completion UI received the same chrome.
+- warm near-black / dark-brown metal and leather-like surfaces;
+- layered antique-gold/bronze frame rails with shadow insets, corner brackets,
+  jewels and divider ornaments;
+- Garamond fantasy typography across shared labels/buttons;
+- compact squared controls and icon wells instead of modern rounded cards;
+- cream text with improved contrast on dark surfaces.
 
-Safety boundary is unchanged: no combat, quest authority, dungeon progression,
-network payload, persistence or monetisation logic changed.
+Major runtime presentation now includes:
 
-Validation completed:
+- ornate top-left player unit frame with portrait, level, class, HP, XP,
+  currency and class resource bars;
+- winged bottom-centre combat bar with six framed, colour-coded skill wells;
+- bottom-right functional command strip ordered
+  **Guild -> Skills -> Stats -> Inventory** in Base;
+- new read-only Character Stats window backed by authoritative progression
+  snapshots;
+- Quest Tracker rows with quest, dungeon/location, eligible depth, objectives
+  and rewards;
+- Quest Journal rebuilt as left quest list + right detail pane with
+  location/depth context, story, objectives, rewards and Track Quest control;
+- icon-grid Inventory and icon-based Skills/Loadout windows;
+- character creation, profession selection and both tutorial panels;
+- dungeon entrance/party/depth/quest-context window;
+- dungeon objective and boss HUDs;
+- defeat/revive and victory/replay panels;
+- Bank, Equipment, Guild, Market, Trainer, Race Change, Travel, Quest Board and
+  first-transfer screens covered by the shared legacy-service restyle.
 
-- `git diff --check`: PASS;
-- `base.project.json`: PASS;
-- `default.project.json`: PASS;
-- `published-base.project.json`: PASS;
-- `published-dungeon.project.json`: PASS.
+Studio visual acceptance performed on fresh local Base and Dungeon builds.
+Issues found and corrected during the pass:
 
-This is **WIP, not GREEN**. No TEST/PROD publish was performed. Next action is
-fresh Studio visual/runtime inspection at real viewport sizes, then correct
-overlaps, sizing and remaining high-frequency windows before requesting
-publication.
+- decorative chrome was initially counted by the command-bar UIListLayout,
+  pushing buttons out of the viewport; buttons now live in a dedicated row;
+- Base tutorial initially covered the unit frame; it was moved top-centre;
+- Dungeon first-expedition tutorial initially overlapped the objective HUD; it
+  now sits below it;
+- command buttons were alphabetically re-ordered by default; explicit
+  LayoutOrder sorting now preserves the reference order;
+- Skills rows were too faint at scaled viewport size; local contrast was raised;
+- combat skill wells were too visually uniform; six reference-like colour
+  families are now used.
+
+The latest pre-documentation source passed `git diff --check` and all four
+Rojo compositions. The last one-line command-order change still receives the
+final post-documentation build gate before handoff.
+
+No TEST or PROD publication has been performed for v3.55. Gameplay authority,
+combat calculations, quest/event-room progression, network payloads,
+persistence and monetisation were not changed.
+
+This is intentionally **USER REVIEW HOLD**, not GREEN: the implementation is
+runtime-tested but should be visually approved by the user before publication.
 
 **Section D remains on hold** for the existing two-player friend-test boundary.
 
