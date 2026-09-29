@@ -1,19 +1,38 @@
-## v3.55 ornate MMORPG UI restyle — WIP
+## v3.55 ornate MMORPG UI overhaul — USER REVIEW HOLD
 
-- Shared theme/chrome source update: IMPLEMENTED.
-- Top-left player unit frame: IMPLEMENTED, Studio visual check pending.
-- Bottom-centre combat hotbar restyle: IMPLEMENTED, Studio visual check pending.
-- Bottom-right command icon row: IMPLEMENTED, Studio visual check pending.
-- Quest Tracker / Journal shell restyle: IMPLEMENTED, Studio visual check pending.
-- Dungeon objective/boss/revive/completion chrome: IMPLEMENTED, Studio visual check pending.
-- git diff --check: PASS.
+- Shared antique fantasy theme/chrome: PASS.
+- Top-left player unit frame: Studio PASS.
+- HP / XP / Stamina / Mana resource presentation: Studio PASS.
+- Winged, colour-coded bottom-centre hotbar: Studio PASS.
+- Bottom-right Guild / Skills / Stats / Inventory strip: Studio PASS after
+  clipping and order fixes.
+- New read-only Character Stats window: Studio PASS.
+- Character creation restyle: Studio PASS.
+- Base tutorial overlap correction: Studio PASS.
+- Profession selection restyle: Studio PASS.
+- Inventory icon grid restyle: Studio PASS.
+- Skills/Loadout icon-book restyle: Studio PASS; final readability adjustment
+  implemented.
+- Quest Journal master/detail restructure: Studio PASS.
+- Quest dungeon/depth context presentation retained: PASS.
+- Quest Tracker location/depth/objective/reward restructure: IMPLEMENTED.
+- Dungeon entrance/party/depth presentation: IMPLEMENTED and build-clean.
+- Dungeon objective HUD: Studio PASS.
+- Dungeon tutorial/objective separation: Studio PASS.
+- Dungeon winged action bar colours: Studio PASS.
+- Defeat/revive presentation: Studio PASS.
+- Victory/replay presentation: Studio PASS.
+- Legacy Bank/Equipment/Guild/Market/Trainer/RaceChange/Travel/QuestBoard/
+  first-transfer shared restyle: IMPLEMENTED.
+- `git diff --check`: PASS before final documentation.
 - Base Rojo build: PASS.
 - Dungeon Rojo build: PASS.
 - Published Base Rojo build: PASS.
 - Published Dungeon Rojo build: PASS.
-- Fresh Studio runtime visual acceptance: PENDING.
-- TEST publish: NOT PERFORMED.
-- PROD publish: NOT PERFORMED.
+- TEST publish for v3.55: NOT PERFORMED.
+- PROD publish for v3.55: NOT PERFORMED.
+- User visual approval: PENDING.
+- Section D: **HOLD for existing two-player friend test**.
 
 ## 29 September 2026 — CURRENT v3.54 quest dungeon context / optional branches GREEN
 
