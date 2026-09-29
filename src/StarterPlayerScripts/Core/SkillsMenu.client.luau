@@ -70,7 +70,7 @@ local modal = UiComponents.modal(
     "SkillsPanel",
     "Skills & Loadout",
     "Select a learned skill, then choose the hotbar slot.",
-    UDim2.fromOffset(840, 600)
+    UDim2.fromOffset(790, 520)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -92,21 +92,21 @@ local skill_heading = UiComponents.section_heading(
     "LEARNED SKILLS"
 )
 skill_heading.Position = UDim2.fromOffset(0, 0)
-skill_heading.Size = UDim2.new(0.56, -10, 0, 20)
+skill_heading.Size = UDim2.new(0.62, -10, 0, 20)
 skill_heading.ZIndex = 12
 
 local loadout_heading = UiComponents.section_heading(
     modal.Body,
     "ACTIVE LOADOUT"
 )
-loadout_heading.Position = UDim2.new(0.58, 8, 0, 0)
-loadout_heading.Size = UDim2.new(0.42, -8, 0, 20)
+loadout_heading.Position = UDim2.new(0.64, 8, 0, 0)
+loadout_heading.Size = UDim2.new(0.36, -8, 0, 20)
 loadout_heading.ZIndex = 12
 
 local skill_list = Instance.new("ScrollingFrame")
 skill_list.Name = "SkillList"
 skill_list.Position = UDim2.fromOffset(0, 28)
-skill_list.Size = UDim2.new(0.56, -10, 1, -76)
+skill_list.Size = UDim2.new(0.62, -10, 1, -76)
 skill_list.CanvasSize = UDim2.fromOffset(0, 0)
 skill_list.ZIndex = 12
 UiTheme.style_scroll(skill_list)
@@ -119,15 +119,16 @@ skill_padding.PaddingLeft = UDim.new(0, 8)
 skill_padding.PaddingRight = UDim.new(0, 8)
 skill_padding.Parent = skill_list
 
-local skill_layout = Instance.new("UIListLayout")
-skill_layout.Padding = UDim.new(0, 7)
+local skill_layout = Instance.new("UIGridLayout")
+skill_layout.CellSize = UDim2.fromOffset(190, 72)
+skill_layout.CellPadding = UDim2.fromOffset(7, 7)
 skill_layout.SortOrder = Enum.SortOrder.LayoutOrder
 skill_layout.Parent = skill_list
 
 local loadout = Instance.new("Frame")
 loadout.Name = "Loadout"
-loadout.Position = UDim2.new(0.58, 8, 0, 28)
-loadout.Size = UDim2.new(0.42, -8, 1, -76)
+loadout.Position = UDim2.new(0.64, 8, 0, 28)
+loadout.Size = UDim2.new(0.36, -8, 1, -76)
 loadout.BorderSizePixel = 0
 loadout.ZIndex = 12
 UiTheme.style_inset(loadout, true)
@@ -269,9 +270,10 @@ local function create_skill_button(
         "Secondary"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.new(1, 0, 0, 64)
+    button.Size = UDim2.fromOffset(190, 72)
     button.TextXAlignment = Enum.TextXAlignment.Left
-    button.TextSize = 16
+    button.TextWrapped = true
+    button.TextSize = 13
     button.TextColor3 = UiTheme.PALETTE.Text
     button.TextStrokeTransparency = 0.68
     button.ZIndex = 13
@@ -281,14 +283,14 @@ local function create_skill_button(
         "SkillIcon",
         string.sub(display_name, 1, 1),
         Color3.fromRGB(42, 71, 113),
-        42
+        48
     )
-    icon.Position = UDim2.fromOffset(8, 11)
+    icon.Position = UDim2.fromOffset(8, 12)
     icon.ZIndex = 14
 
     local padding = Instance.new("UIPadding")
-    padding.PaddingLeft = UDim.new(0, 60)
-    padding.PaddingRight = UDim.new(0, 14)
+    padding.PaddingLeft = UDim.new(0, 64)
+    padding.PaddingRight = UDim.new(0, 8)
     padding.Parent = button
 
     return button
