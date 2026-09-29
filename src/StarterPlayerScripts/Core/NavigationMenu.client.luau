@@ -102,6 +102,29 @@ local function get_prompt_part(
 end
 
 --[[
+Returns a readable local-map name for one prompt.
+
+Args:
+    prompt (ProximityPrompt): Prompt represented by the marker.
+
+Returns:
+    string: Player-facing landmark name.
+]]
+local function prompt_display_name(
+    prompt: ProximityPrompt
+): string
+    if prompt.ObjectText ~= "" then
+        return prompt.ObjectText
+    end
+
+    if prompt.ActionText ~= "" then
+        return prompt.ActionText
+    end
+
+    return "Landmark"
+end
+
+--[[
 Adds one nearby interaction point to the local map.
 
 Args:
@@ -212,7 +235,7 @@ map_description.TextColor3 = UiTheme.PALETTE.TextMuted
 local map_area = Instance.new("Frame")
 map_area.Name = "LocalLandmarks"
 map_area.Position = UDim2.fromOffset(0, 48)
-map_area.Size = UDim2.new(1, 0, 1, -105)
+map_area.Size = UDim2.new(1, 0, 1, -175)
 map_area.BackgroundColor3 = Color3.fromRGB(
     19,
     26,
@@ -246,6 +269,44 @@ player_marker.TextColor3 = Color3.fromRGB(
     248
 )
 player_marker.ZIndex = 20
+
+local nearby_heading = create_label(
+    map.Body,
+    "NearbyHeading",
+    "Nearby",
+    0,
+    0,
+    560,
+    22
+)
+nearby_heading.Position = UDim2.new(
+    0,
+    0,
+    1,
+    -124
+)
+nearby_heading.TextColor3 =
+    UiTheme.PALETTE.AccentBright
+
+local nearby_list = create_label(
+    map.Body,
+    "NearbyList",
+    "",
+    0,
+    0,
+    560,
+    58
+)
+nearby_list.Position = UDim2.new(
+    0,
+    0,
+    1,
+    -100
+)
+nearby_list.TextYAlignment =
+    Enum.TextYAlignment.Top
+nearby_list.TextColor3 =
+    UiTheme.PALETTE.TextMuted
 
 local coordinates = create_label(
     map.Body,
@@ -409,6 +470,8 @@ local function update_location()
     coordinates.Text = coordinate_text
     mini_coordinates.Text = coordinate_text
 
+    local nearby = {}
+
     for _, point in ipairs(map_points) do
         local part = point.Part
         local prompt = point.Prompt
@@ -417,40 +480,25 @@ local function update_location()
             continue
         end
 
-        local marker = prompt:GetAttribute(
-            "DMMOMapMarker"
-        )
-        if not marker then
-            local text = if prompt.ObjectText ~= ""
-                then prompt.ObjectText
-                else prompt.ActionText
-            local label = create_label(
+        local marker_label = point.Marker
+        if not marker_label then
+            marker_label = create_label(
                 map_area,
                 "Landmark",
-                text,
+                "◆",
                 0,
                 0,
-                100,
-                28
+                18,
+                18
             )
-            label.TextSize = 12
-            label.AnchorPoint = Vector2.new(
+            marker_label.TextSize = 14
+            marker_label.AnchorPoint = Vector2.new(
                 0.5,
                 0.5
             )
-            label.TextColor3 =
+            marker_label.TextColor3 =
                 UiTheme.PALETTE.AccentBright
-            marker = label
-            prompt:SetAttribute(
-                "DMMOMapMarker",
-                true
-            )
-            point.Marker = label
-        end
-
-        local marker_label = point.Marker
-        if not marker_label then
-            continue
+            point.Marker = marker_label
         end
 
         local delta = part.Position - position
@@ -465,7 +513,41 @@ local function update_location()
             x,
             z
         )
+
+        local horizontal_distance = Vector2.new(
+            delta.X,
+            delta.Z
+        ).Magnitude
+        table.insert(
+            nearby,
+            {
+                Name = prompt_display_name(prompt),
+                Distance = horizontal_distance,
+            }
+        )
     end
+
+    table.sort(
+        nearby,
+        function(a: any, b: any): boolean
+            return a.Distance < b.Distance
+        end
+    )
+
+    local lines = {}
+    for index = 1, math.min(5, #nearby) do
+        local item = nearby[index]
+        table.insert(
+            lines,
+            string.format(
+                "%s  •  %d studs",
+                item.Name,
+                math.floor(item.Distance + 0.5)
+            )
+        )
+    end
+
+    nearby_list.Text = table.concat(lines, "\n")
 end
 
 task.spawn(function()
