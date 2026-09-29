@@ -786,6 +786,8 @@ function UiArt.profile_background(
         UiArtAssets.PROFILE_EMPTY,
         z_index
     )
+    image.ScaleType = Enum.ScaleType.Fit
+
     local editable_image = get_profile_editable_image()
 
     if editable_image then
