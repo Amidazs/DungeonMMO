@@ -30,10 +30,53 @@ local joined = service:accept_invite(2, created.guild.GuildId, "join:2")
 assert(joined.ok)
 assert(service:get_membership(2, 1).Role == "Member")
 
+local leader_snapshot = service:build_snapshot(1, 1)
+assert(leader_snapshot.permissions.CanViewSettings == true)
+assert(leader_snapshot.permissions.CanEditSettings == true)
+assert(leader_snapshot.guild.Settings ~= nil)
+
+local member_snapshot = service:build_snapshot(2, 1)
+assert(member_snapshot.permissions.CanViewSettings == false)
+assert(member_snapshot.guild.Settings == nil)
+
+local settings_denied = service:set_settings_access(
+    2,
+    "Officer",
+    true,
+    "settings:bad"
+)
+assert(
+    not settings_denied.ok
+        and settings_denied.reason == "GuildPermissionDenied"
+)
+assert(
+    service:set_settings_access(
+        1,
+        "Officer",
+        true,
+        "settings:officer"
+    ).ok
+)
+assert(
+    service:set_message(
+        1,
+        "Welcome to Night Watch",
+        "settings:message"
+    ).ok
+)
+
 local denied = service:set_role(2, 1, "Officer", "role:bad")
 assert(not denied.ok and denied.reason == "GuildPermissionDenied")
 assert(service:set_role(1, 2, "Officer", "role:2").ok)
 assert(service:get_membership(2, 1).Role == "Officer")
+
+local officer_snapshot = service:build_snapshot(2, 1)
+assert(officer_snapshot.permissions.CanViewSettings == true)
+assert(officer_snapshot.permissions.CanEditSettings == false)
+assert(
+    officer_snapshot.guild.Settings.MessageOfTheDay
+        == "Welcome to Night Watch"
+)
 
 local invite3 = service:create_invite(2, 3, "invite:3")
 assert(invite3.ok, "Officer must be allowed to invite.")
