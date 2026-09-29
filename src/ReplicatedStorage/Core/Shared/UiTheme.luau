@@ -439,11 +439,11 @@ function UiTheme.set_button_enabled(
     button.Active = enabled
     button.Selectable = enabled
     button.AutoButtonColor = false
-    button.TextTransparency = if enabled then 0 else 0.50
+    button.TextTransparency = if enabled then 0 else 0.28
     button.BackgroundTransparency = if enabled
         then button:GetAttribute("DMMOUiBaseTransparency")
             or 0.02
-        else 0.52
+        else 0.40
 end
 
 --[[
