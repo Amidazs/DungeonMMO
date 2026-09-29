@@ -6,6 +6,7 @@ local shared = ReplicatedStorage
     :WaitForChild("Shared")
 local UiTheme = require(shared:WaitForChild("UiTheme"))
 local UiOrnament = require(shared:WaitForChild("UiOrnament"))
+local UiArt = require(shared:WaitForChild("UiArt"))
 
 local UiComponents = {}
 
@@ -191,30 +192,18 @@ function UiComponents.modal(
     root.AnchorPoint = Vector2.new(0.5, 0.5)
     root.Position = UDim2.fromScale(0.5, 0.5)
     root.Size = size
-    UiTheme.style_panel(root, false)
+    root.BackgroundTransparency = 1
+    root.BorderSizePixel = 0
     root.Parent = parent
-    UiOrnament.frame(root, true)
+    UiArt.background(root, "Window", 1)
 
     local header_band = Instance.new("Frame")
     header_band.Name = "HeaderBand"
     header_band.Position = UDim2.fromOffset(8, 8)
     header_band.Size = UDim2.new(1, -16, 0, 43)
-    header_band.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
-    header_band.BackgroundTransparency = 0.04
+    header_band.BackgroundTransparency = 1
     header_band.BorderSizePixel = 0
-    UiTheme.add_gradient(
-        header_band,
-        UiTheme.PALETTE.SurfaceWarm:Lerp(
-            UiTheme.PALETTE.Metal,
-            0.18
-        ),
-        UiTheme.PALETTE.BackdropSoft
-    )
-    UiTheme.add_stroke(
-        header_band,
-        UiTheme.PALETTE.BorderDark,
-        0.18
-    )
+    header_band.ZIndex = 2
     header_band.Parent = root
 
     local header = Instance.new("Frame")
@@ -224,29 +213,14 @@ function UiComponents.modal(
     header.BackgroundTransparency = 1
     header.Parent = root
 
-    local emblem = Instance.new("Frame")
-    emblem.Name = "Emblem"
-    emblem.AnchorPoint = Vector2.new(0.5, 0.5)
-    emblem.Position = UDim2.fromOffset(15, 20)
-    emblem.Size = UDim2.fromOffset(13, 13)
-    emblem.BackgroundColor3 = UiTheme.PALETTE.Accent
-    emblem.BorderSizePixel = 0
-    emblem.Rotation = 45
-    emblem.Parent = header
-    UiTheme.add_stroke(
-        emblem,
-        UiTheme.PALETTE.AccentBright,
-        0.08
-    )
-
     local title = UiComponents.label(
         header,
         "Title",
         title_text,
         "Title"
     )
-    title.Position = UDim2.fromOffset(31, 1)
-    title.Size = UDim2.new(1, -78, 0, 23)
+    title.Position = UDim2.fromOffset(18, 1)
+    title.Size = UDim2.new(1, -64, 0, 23)
     title.TextColor3 = UiTheme.PALETTE.Text
     title.TextSize = 22
 
@@ -256,8 +230,8 @@ function UiComponents.modal(
         subtitle_text,
         "Muted"
     )
-    subtitle.Position = UDim2.fromOffset(32, 23)
-    subtitle.Size = UDim2.new(1, -79, 0, 14)
+    subtitle.Position = UDim2.fromOffset(19, 23)
+    subtitle.Size = UDim2.new(1, -65, 0, 14)
     subtitle.TextSize = 11
     subtitle.TextColor3 = UiTheme.PALETTE.TextFaint
 
@@ -269,20 +243,22 @@ function UiComponents.modal(
     )
     close.AnchorPoint = Vector2.new(1, 0.5)
     close.Position = UDim2.new(1, 0, 0.5, 0)
-    close.Size = UDim2.fromOffset(29, 29)
-    close.TextSize = 18
-
-    UiOrnament.divider(
-        root,
-        UDim2.fromOffset(16, 54),
-        UDim2.new(1, -32, 0, 7),
-        root.ZIndex + 1
-    )
+    close.Size = UDim2.fromOffset(34, 34)
+    close.BackgroundTransparency = 1
+    close.TextTransparency = 1
+    close.ZIndex = 4
+    for _, child in ipairs(close:GetChildren()) do
+        if child:IsA("UIStroke") then
+            child.Transparency = 1
+        elseif child:IsA("UIGradient") then
+            child.Enabled = false
+        end
+    end
 
     local body = Instance.new("Frame")
     body.Name = "Body"
-    body.Position = UDim2.fromOffset(16, 65)
-    body.Size = UDim2.new(1, -32, 1, -79)
+    body.Position = UDim2.fromOffset(18, 61)
+    body.Size = UDim2.new(1, -36, 1, -76)
     body.BackgroundTransparency = 1
     body.Parent = root
 
