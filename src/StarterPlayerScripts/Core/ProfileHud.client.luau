@@ -43,11 +43,11 @@ local HUD_HEIGHT = 144
 local NAME_X = 116
 local NAME_Y = 6
 local NAME_MIN_WIDTH = 205
-local NAME_MAX_WIDTH = 340
+local NAME_MAX_WIDTH = 270
 local NAME_HORIZONTAL_PADDING = 24
 local BUFF_COLUMNS = 7
-local BUFF_SLOT_WIDTH = 39
-local BUFF_SLOT_HEIGHT = 40
+local BUFF_SLOT_WIDTH = 36
+local BUFF_SLOT_HEIGHT = 36
 local BUFF_SLOT_GAP = 3
 
 local BUFF_DEFINITIONS = table.freeze({
@@ -124,7 +124,7 @@ card.ClipsDescendants = false
 card.Parent = gui
 
 UiArt.profile_background(card, 1)
-UiTheme.bind_responsive_scale(card, 1366, 0.62, 1)
+UiTheme.bind_responsive_scale(card, 1366, 0.56, 0.78)
 
 --[[
 Formats an integer with thousands separators for HUD resource values.
@@ -208,13 +208,13 @@ bind_viewport()
 
 local portrait_inner = Instance.new("Frame")
 portrait_inner.Name = "PortraitInner"
-portrait_inner.Position = UDim2.fromOffset(20, 4)
-portrait_inner.Size = UDim2.fromOffset(84, 96)
+portrait_inner.Position = UDim2.fromOffset(20, 7)
+portrait_inner.Size = UDim2.fromOffset(86, 86)
 portrait_inner.BackgroundColor3 = UiTheme.PALETTE.Backdrop
 portrait_inner.BorderSizePixel = 0
 portrait_inner.ClipsDescendants = true
 portrait_inner.ZIndex = 4
-UiTheme.add_corner(portrait_inner, 48)
+UiTheme.add_corner(portrait_inner, 43)
 portrait_inner.Parent = card
 
 local portrait_outline = Instance.new("UIStroke")
@@ -231,14 +231,14 @@ portrait.Size = UDim2.fromScale(1, 1)
 portrait.BackgroundTransparency = 1
 portrait.ScaleType = Enum.ScaleType.Crop
 portrait.ZIndex = 5
-UiTheme.add_corner(portrait, 48)
+UiTheme.add_corner(portrait, 43)
 portrait.Parent = portrait_inner
 
 task.spawn(function()
     local ok, image = pcall(function()
         return Players:GetUserThumbnailAsync(
             player.UserId,
-            Enum.ThumbnailType.AvatarBust,
+            Enum.ThumbnailType.HeadShot,
             Enum.ThumbnailSize.Size352x352
         )
     end)
@@ -289,7 +289,7 @@ player_name.ZIndex = 5
 local party_crown = Instance.new("ImageLabel")
 party_crown.Name = "PartyLeaderCrown"
 party_crown.Position = UDim2.fromOffset(326, 9)
-party_crown.Size = UDim2.fromOffset(30, 22)
+party_crown.Size = UDim2.fromOffset(22, 16)
 party_crown.BackgroundTransparency = 1
 party_crown.Image = UiArtAssets.PROFILE_PARTY_CROWN
 party_crown.ScaleType = Enum.ScaleType.Fit
@@ -337,28 +337,12 @@ local function update_name_layout()
     name_extension.Visible = extension_width > 0
 
     party_crown.Position = UDim2.fromOffset(
-        NAME_X + name_width + 7,
-        8
+        NAME_X + name_width + 18,
+        9
     )
 end
 
 update_name_layout()
-
-local level_caption = UiComponents.label(
-    card,
-    "LevelCaption",
-    "Lv",
-    "Caption"
-)
-level_caption.Position = UDim2.fromOffset(5, 92)
-level_caption.Size = UDim2.fromOffset(47, 14)
-level_caption.TextXAlignment = Enum.TextXAlignment.Center
-level_caption.TextYAlignment = Enum.TextYAlignment.Center
-level_caption.TextColor3 = Color3.fromRGB(224, 198, 142)
-level_caption.TextSize = 10
-level_caption.TextStrokeColor3 = Color3.fromRGB(6, 4, 3)
-level_caption.TextStrokeTransparency = 0.18
-level_caption.ZIndex = 6
 
 local level_value = UiComponents.label(
     card,
@@ -366,8 +350,8 @@ local level_value = UiComponents.label(
     "1",
     "Title"
 )
-level_value.Position = UDim2.fromOffset(5, 106)
-level_value.Size = UDim2.fromOffset(47, 29)
+level_value.Position = UDim2.fromOffset(5, 98)
+level_value.Size = UDim2.fromOffset(47, 38)
 level_value.TextXAlignment = Enum.TextXAlignment.Center
 level_value.TextYAlignment = Enum.TextYAlignment.Center
 level_value.TextColor3 = Color3.fromRGB(248, 239, 218)
@@ -399,31 +383,16 @@ health_track.Parent = card
 local health_fill = Instance.new("Frame")
 health_fill.Name = "HealthFill"
 health_fill.Size = UDim2.fromScale(0, 1)
-health_fill.BackgroundColor3 = Color3.fromRGB(151, 18, 30)
+health_fill.BackgroundColor3 = Color3.fromRGB(150, 22, 30)
 health_fill.BorderSizePixel = 0
 health_fill.ZIndex = 3
 UiTheme.add_corner(health_fill, 5)
 UiTheme.add_gradient(
     health_fill,
-    Color3.fromRGB(181, 24, 38),
-    Color3.fromRGB(103, 8, 20)
+    Color3.fromRGB(185, 39, 44),
+    Color3.fromRGB(105, 10, 24)
 )
 health_fill.Parent = health_track
-
-local health_label = UiComponents.label(
-    card,
-    "HealthLabel",
-    "HP",
-    "Heading"
-)
-health_label.Position = UDim2.fromOffset(135, 39)
-health_label.Size = UDim2.fromOffset(34, 23)
-health_label.TextXAlignment = Enum.TextXAlignment.Left
-health_label.TextColor3 = Color3.fromRGB(255, 241, 216)
-health_label.TextSize = 15
-health_label.TextStrokeColor3 = Color3.new(0, 0, 0)
-health_label.TextStrokeTransparency = 0.12
-health_label.ZIndex = 5
 
 local health_value = UiComponents.label(
     card,
@@ -455,31 +424,16 @@ mana_track.Parent = card
 local mana_fill = Instance.new("Frame")
 mana_fill.Name = "ManaFill"
 mana_fill.Size = UDim2.fromScale(0, 1)
-mana_fill.BackgroundColor3 = Color3.fromRGB(24, 65, 145)
+mana_fill.BackgroundColor3 = Color3.fromRGB(35, 90, 175)
 mana_fill.BorderSizePixel = 0
 mana_fill.ZIndex = 3
 UiTheme.add_corner(mana_fill, 5)
 UiTheme.add_gradient(
     mana_fill,
-    Color3.fromRGB(31, 83, 171),
-    Color3.fromRGB(9, 34, 94)
+    Color3.fromRGB(39, 120, 205),
+    Color3.fromRGB(12, 45, 115)
 )
 mana_fill.Parent = mana_track
-
-local mana_label = UiComponents.label(
-    card,
-    "ManaLabel",
-    "MP",
-    "Heading"
-)
-mana_label.Position = UDim2.fromOffset(135, 66)
-mana_label.Size = UDim2.fromOffset(34, 23)
-mana_label.TextXAlignment = Enum.TextXAlignment.Left
-mana_label.TextColor3 = Color3.fromRGB(232, 241, 255)
-mana_label.TextSize = 15
-mana_label.TextStrokeColor3 = Color3.new(0, 0, 0)
-mana_label.TextStrokeTransparency = 0.12
-mana_label.ZIndex = 5
 
 local mana_value = UiComponents.label(
     card,
@@ -498,7 +452,7 @@ mana_value.ZIndex = 5
 
 local buff_container = Instance.new("Frame")
 buff_container.Name = "BuffContainer"
-buff_container.Position = UDim2.fromOffset(107, 96)
+buff_container.Position = UDim2.fromOffset(107, 90)
 buff_container.Size = UDim2.fromOffset(300, 84)
 buff_container.BackgroundTransparency = 1
 buff_container.BorderSizePixel = 0
