@@ -55,7 +55,7 @@ local card = Instance.new("Frame")
 card.Name = "StatusCard"
 card.AnchorPoint = Vector2.new(0, 0)
 card.Position = UDim2.fromOffset(18, 18)
-card.Size = UDim2.fromOffset(410, 142)
+card.Size = UDim2.fromOffset(410, 188)
 UiTheme.style_panel(card, false)
 card.Parent = gui
 UiOrnament.frame(card, true)
@@ -206,10 +206,10 @@ local currency_label = UiComponents.label(
     "0 GOLD   •   0 AP   •   0 SP",
     "Caption"
 )
-currency_label.Position = UDim2.fromOffset(108, 116)
-currency_label.Size = UDim2.new(1, -126, 0, 16)
-currency_label.TextWrapped = false
-currency_label.TextYAlignment = Enum.TextYAlignment.Center
+currency_label.Position = UDim2.fromOffset(18, 108)
+currency_label.Size = UDim2.fromOffset(76, 58)
+currency_label.TextWrapped = true
+currency_label.TextYAlignment = Enum.TextYAlignment.Top
 currency_label.TextColor3 = UiTheme.PALETTE.TextMuted
 
 local health = UiComponents.progress_bar(
@@ -238,10 +238,10 @@ xp.Label.Text = "XP"
 
 local resource_stack = Instance.new("Frame")
 resource_stack.Name = "ResourceStack"
-resource_stack.Position = UDim2.fromOffset(0, 0)
-resource_stack.Size = UDim2.fromOffset(0, 0)
+resource_stack.Position = UDim2.fromOffset(108, 116)
+resource_stack.Size = UDim2.new(1, -126, 0, 64)
 resource_stack.BackgroundTransparency = 1
-resource_stack.Visible = false
+resource_stack.Visible = true
 resource_stack.Parent = card
 
 local resource_layout = Instance.new("UIListLayout")
