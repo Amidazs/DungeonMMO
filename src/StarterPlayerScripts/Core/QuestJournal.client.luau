@@ -117,23 +117,11 @@ tracker.BackgroundTransparency = 1
 tracker.BorderSizePixel = 0
 tracker.Parent = gui
 
-local tracker_art = UiArt.background(
+local tracker_art = UiArt.popup_background(
     tracker,
-    "Tracker",
     1
 )
 tracker_art.Name = "TrackerArt"
-
-UiArt.content_mask(
-    tracker,
-    "Tracker",
-    "TrackerContentMask",
-    94,
-    258,
-    898,
-    1092,
-    2
-)
 
 local tracker_header = Instance.new("Frame")
 tracker_header.Name = "HeaderBand"
@@ -159,7 +147,7 @@ local tracker_title = UiComponents.label(
 tracker_title.Position = UDim2.fromOffset(17, 10)
 tracker_title.Size = UDim2.new(1, -34, 0, 24)
 tracker_title.TextColor3 = UiTheme.PALETTE.Text
-tracker_title.Visible = false
+tracker_title.Visible = true
 tracker_title.TextSize = 17
 tracker_title.ZIndex = 2
 
@@ -174,7 +162,7 @@ tracker_hint.Position = UDim2.new(1, -15, 0, 13)
 tracker_hint.Size = UDim2.fromOffset(88, 14)
 tracker_hint.TextXAlignment = Enum.TextXAlignment.Right
 tracker_hint.TextSize = 9
-tracker_hint.Visible = false
+tracker_hint.Visible = true
 tracker_hint.ZIndex = 3
 
 local tracker_list = Instance.new("ScrollingFrame")
@@ -207,37 +195,8 @@ journal_panel.Position = UDim2.fromOffset(22, 86)
 journal_panel.Visible = false
 journal_panel.ZIndex = 1
 UiArt.clear_frame_chrome(journal_panel)
-local generic_art = journal_panel:FindFirstChild("ReferenceArt")
-if generic_art then
-    generic_art:Destroy()
-end
-local journal_art = UiArt.background(
-    journal_panel,
-    "Journal",
-    1
-)
-journal_art.Name = "JournalArt"
-
-UiArt.content_mask(
-    journal_panel,
-    "Journal",
-    "QuestListMask",
-    62,
-    300,
-    438,
-    1017,
-    2
-)
-UiArt.content_mask(
-    journal_panel,
-    "Journal",
-    "QuestDetailMask",
-    525,
-    300,
-    531,
-    1017,
-    2
-)
+-- Keep the modal's clean shell. Quest lists, objectives,
+-- rewards and progress are rendered entirely from live quest state.
 
 modal.Body.Position = UiArt.position(
     "Journal",
@@ -253,8 +212,8 @@ modal.Body.Size = UiArt.rect(
 )
 modal.Body.ZIndex = 3
 modal.Header.ZIndex = 3
-modal.Title.Visible = false
-modal.Subtitle.Visible = false
+modal.Title.Visible = true
+modal.Subtitle.Visible = true
 
 local modal_header_band = journal_panel:FindFirstChild("HeaderBand")
 if modal_header_band and modal_header_band:IsA("GuiObject") then
@@ -266,16 +225,9 @@ if modal_divider and modal_divider:IsA("GuiObject") then
     modal_divider.Visible = false
 end
 
-modal.Close.BackgroundTransparency = 1
-modal.Close.TextTransparency = 1
+modal.Close.BackgroundTransparency = 0.18
+modal.Close.TextTransparency = 0
 modal.Close.ZIndex = 4
-for _, child in ipairs(modal.Close:GetChildren()) do
-    if child:IsA("UIStroke") then
-        child.Transparency = 1
-    elseif child:IsA("UIGradient") then
-        child.Enabled = false
-    end
-end
 UiTheme.bind_responsive_scale(
     journal_panel,
     1366,
