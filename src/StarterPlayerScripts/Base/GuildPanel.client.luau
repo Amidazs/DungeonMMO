@@ -1052,7 +1052,7 @@ UserInputService.InputBegan:Connect(function(
     end
 
     if input.KeyCode == Enum.KeyCode.J then
-        WindowController.toggle("Guild")
+        WindowController.set_visible("Guild", true)
     end
 end)
 
