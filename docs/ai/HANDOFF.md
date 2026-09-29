@@ -1,3 +1,34 @@
+## 29 September 2026 — v3.55 ORNATE MMORPG UI RESTYLE WIP
+
+The current task is a real in-game UI/HUD overhaul using the user's supplied
+fantasy MMORPG screenshot as the visual target.
+
+Source checkpoint: `9ddcdef3d43e5f05c488b4c5eb9fd8ddcb8ba5b5`.
+
+Changed source:
+
+- `UiTheme.luau`;
+- `UiOrnament.luau`;
+- `UiComponents.luau`;
+- `ProfileHud.client.luau`;
+- `CombatHotbar.client.luau`;
+- `HudCommandMenu.client.luau`;
+- `QuestJournal.client.luau`;
+- `DungeonUi.client.luau`.
+
+The direction is now dark forged-metal surfaces, antique-gold trim, Garamond
+headings, compact classic-MMO density and ornate corner/detail framing.
+Structural HUD changes already place the player frame top-left, hotbar
+bottom-centre, quest tracker right and icon command row bottom-right.
+
+All four Rojo builds and `git diff --check` pass. No publish occurred.
+
+Next: run fresh local Studio Base and Dungeon playtests, inspect the actual
+PlayerGui/viewport for overlap and readability, and iterate. Do not mark this
+gate GREEN from builds alone.
+
+**Do not begin Section D.**
+
 ## 29 September 2026 — v3.54 QUEST DUNGEON CONTEXT + OPTIONAL BRANCHES GREEN
 
 [Roadmap](
