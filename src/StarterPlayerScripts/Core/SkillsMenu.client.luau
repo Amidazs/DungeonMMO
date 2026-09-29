@@ -271,8 +271,9 @@ local function create_skill_button(
     button.LayoutOrder = order
     button.Size = UDim2.new(1, 0, 0, 64)
     button.TextXAlignment = Enum.TextXAlignment.Left
-    button.TextSize = 15
+    button.TextSize = 16
     button.TextColor3 = UiTheme.PALETTE.Text
+    button.TextStrokeTransparency = 0.68
     button.ZIndex = 13
 
     local icon = UiOrnament.icon(
@@ -314,6 +315,8 @@ local function create_slot_button(slot: number): TextButton
     button.TextWrapped = true
     button.TextXAlignment = Enum.TextXAlignment.Left
     button.TextColor3 = UiTheme.PALETTE.Text
+    button.TextSize = 16
+    button.TextStrokeTransparency = 0.68
     button.ZIndex = 13
 
     local icon = UiOrnament.icon(
@@ -430,12 +433,12 @@ local function render(snapshot: any)
         )
         button.TextColor3 = if known
             then UiTheme.PALETTE.Text
-            else UiTheme.PALETTE.TextFaint
+            else UiTheme.PALETTE.TextMuted
         button.BackgroundColor3 = if selected
             then UiTheme.PALETTE.AccentDark
             else UiTheme.PALETTE.SurfaceRaised
         UiTheme.set_button_enabled(button, known)
-        button.TextTransparency = if known then 0 else 0.24
+        button.TextTransparency = if known then 0 else 0.12
     end
 
     for slot = 1, 6 do
