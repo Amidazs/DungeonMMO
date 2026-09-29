@@ -1,5 +1,5 @@
 --!strict
--- Focused physical acceptance for optional Temple side-room bypass.
+-- Focused authoritative acceptance for optional Temple side-room bypass.
 -- Run only against a disposable unpublished local Dungeon place.
 
 assert(
@@ -138,6 +138,16 @@ replace_once(
     'local runtime = RuntimeServices.new("Dungeon")',
     'local runtime = RuntimeServices.new("Dungeon")\n'
         .. '_G.DungeonMMOTempFixtureRuntime = runtime'
+)
+
+replace_once(
+    dungeon.DungeonRuntime,
+    '    return started\nend\n\n-- Args:\n'
+        .. '--   session: any; active session with an interrupted encounter.',
+    '    return started\nend\n\n'
+        .. '_G.DungeonMMOTempStartSlot = start_executed_slot\n\n'
+        .. '-- Args:\n'
+        .. '--   session: any; active session with an interrupted encounter.'
 )
 
 ServerScriptService:SetAttribute(
@@ -303,55 +313,37 @@ local function living_enemies(enemies: Folder): {Model}
 end
 
 --[[
-Overlaps the player's real character with one authored encounter trigger.
+Starts one room through the same authoritative server function used by the
+physical encounter trigger, then waits for activation and clears it.
 
-This avoids depending on pathfinding or room geometry in a fixture whose purpose
-is to validate the server-owned trigger and encounter progression contract.
-
-Args:
-    root (BasePart): Player root used for physical contact.
-    trigger (BasePart): Authored encounter trigger volume.
-
-Returns:
-    nil: Leaves the character overlapping the trigger for a physics step.
-]]
-local function touch_trigger(
-    root: BasePart,
-    trigger: BasePart
-)
-    root.AssemblyLinearVelocity = Vector3.zero
-    root.AssemblyAngularVelocity = Vector3.zero
-    root.CFrame = trigger.CFrame
-    task.wait(0.35)
-end
-
---[[
-Physically enters a required room, waits for activation, then clears it.
+The temporary bridge is injected only into this unpublished fixture copy. It
+avoids relying on Studio to synthesize a Touched event while still exercising
+the real encounter-start, optional-skip, checkpoint and executor path.
 
 Args:
-    root (BasePart): Player root used for physical movement.
-    humanoid (Humanoid): Player movement controller.
+    start_slot ((string) -> any): Authoritative DungeonRuntime room starter.
     enemies (Folder): Dungeon enemy container.
     runtime (any): Shared runtime service container.
     session_id (string): Active session identifier.
-    room_anchor_id (string): Required-room trigger anchor.
+    room_slot_id (string): Encounter slot to start.
     encounter_id (string): Required encounter identifier.
 
 Returns:
     nil: Leaves the required encounter cleared.
 ]]
 local function enter_and_clear_required(
-    root: BasePart,
-    humanoid: Humanoid,
+    start_slot: (string) -> any,
     enemies: Folder,
     runtime: any,
     session_id: string,
-    room_anchor_id: string,
+    room_slot_id: string,
     encounter_id: string
 )
-    local trigger = anchor(room_anchor_id)
-
-    touch_trigger(root, trigger)
+    local started = start_slot(room_slot_id)
+    must(
+        started ~= nil,
+        room_slot_id .. " authoritative start returned nil"
+    )
 
     wait_until(function()
         return encounter_state(
@@ -384,7 +376,7 @@ local function enter_and_clear_required(
 end
 
 --[[
-Runs the physical optional-bypass acceptance path.
+Runs the authoritative optional-bypass acceptance path.
 
 Args:
     None.
@@ -455,22 +447,9 @@ local function run()
         "unexpected materialized encounter order"
     )
 
-    local character = wait_until(function()
-        local current = player.Character
-        local root_part =
-            current and current:FindFirstChild("HumanoidRootPart")
-
-        return current and root_part and current or nil
-    end, "player character", 20)
-
-    local root =
-        character:FindFirstChild("HumanoidRootPart") :: BasePart
-    local humanoid =
-        character:FindFirstChildOfClass("Humanoid") :: Humanoid
-
-    must(humanoid ~= nil, "player humanoid missing")
-    humanoid.MaxHealth = 100000
-    humanoid.Health = 100000
+    local start_slot = wait_until(function()
+        return _G.DungeonMMOTempStartSlot
+    end, "authoritative room-start bridge", 20)
 
     local enemies = wait_until(function()
         local gameplay =
@@ -486,12 +465,11 @@ local function run()
     local session_id = session.SessionId
 
     enter_and_clear_required(
-        root,
-        humanoid,
+        start_slot,
         enemies,
         runtime,
         session_id,
-        "Temple.Room1.Trigger",
+        "Room1",
         "CombatRoom1"
     )
 
@@ -500,8 +478,11 @@ local function run()
         "Event side encounter must remain pending after Room 1"
     )
 
-    local room2_trigger = anchor("Temple.Room2.Trigger")
-    touch_trigger(root, room2_trigger)
+    local room2_started = start_slot("Room2")
+    must(
+        room2_started ~= nil,
+        "Room2 authoritative start returned nil"
+    )
 
     wait_until(function()
         return encounter_state(
@@ -546,8 +527,11 @@ local function run()
         "Secret side encounter must remain pending after Room 2"
     )
 
-    local final_trigger = anchor("Temple.Room3.Trigger")
-    touch_trigger(root, final_trigger)
+    local final_started = start_slot("Room3")
+    must(
+        final_started ~= nil,
+        "Room3 authoritative start returned nil"
+    )
 
     wait_until(function()
         return encounter_state(
