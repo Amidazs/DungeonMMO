@@ -39,11 +39,11 @@ local mana_bar = UiComponents.progress_bar(
     20
 )
 mana_bar.Root.LayoutOrder = 2
-mana_bar.Root.Size = UDim2.new(1, 0, 0, 20)
-mana_bar.Track.Position = UDim2.fromOffset(0, 13)
-mana_bar.Track.Size = UDim2.new(1, 0, 0, 6)
-mana_bar.Label.TextSize = 10
-mana_bar.Value.TextSize = 10
+mana_bar.Root.Size = UDim2.new(1, 0, 0, 15)
+mana_bar.Track.Position = UDim2.fromOffset(0, 9)
+mana_bar.Track.Size = UDim2.new(1, 0, 0, 5)
+mana_bar.Label.TextSize = 8
+mana_bar.Value.TextSize = 8
 mana_bar.Root.Visible = false
 
 local mage = false
