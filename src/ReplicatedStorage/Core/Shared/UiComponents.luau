@@ -197,40 +197,47 @@ function UiComponents.modal(
 
     local header_band = Instance.new("Frame")
     header_band.Name = "HeaderBand"
-    header_band.Position = UDim2.fromOffset(7, 7)
-    header_band.Size = UDim2.new(1, -14, 0, 58)
+    header_band.Position = UDim2.fromOffset(8, 8)
+    header_band.Size = UDim2.new(1, -16, 0, 43)
     header_band.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
-    header_band.BackgroundTransparency = 0.12
+    header_band.BackgroundTransparency = 0.04
     header_band.BorderSizePixel = 0
     UiTheme.add_gradient(
         header_band,
         UiTheme.PALETTE.SurfaceWarm:Lerp(
-            UiTheme.PALETTE.AccentDark,
-            0.12
+            UiTheme.PALETTE.Metal,
+            0.18
         ),
         UiTheme.PALETTE.BackdropSoft
+    )
+    UiTheme.add_stroke(
+        header_band,
+        UiTheme.PALETTE.BorderDark,
+        0.18
     )
     header_band.Parent = root
 
     local header = Instance.new("Frame")
     header.Name = "Header"
-    header.Position = UDim2.fromOffset(20, 11)
-    header.Size = UDim2.new(1, -40, 0, 47)
+    header.Position = UDim2.fromOffset(15, 9)
+    header.Size = UDim2.new(1, -30, 0, 40)
     header.BackgroundTransparency = 1
     header.Parent = root
 
-    local emblem = Instance.new("TextLabel")
+    local emblem = Instance.new("Frame")
     emblem.Name = "Emblem"
-    emblem.Position = UDim2.fromOffset(0, 1)
-    emblem.Size = UDim2.fromOffset(32, 32)
-    emblem.BackgroundTransparency = 1
-    emblem.Font = UiTheme.FONT.Heading
-    emblem.Text = "◆"
-    emblem.TextColor3 = UiTheme.PALETTE.AccentBright
-    emblem.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
-    emblem.TextStrokeTransparency = 0.24
-    emblem.TextSize = 22
+    emblem.AnchorPoint = Vector2.new(0.5, 0.5)
+    emblem.Position = UDim2.fromOffset(15, 20)
+    emblem.Size = UDim2.fromOffset(13, 13)
+    emblem.BackgroundColor3 = UiTheme.PALETTE.Accent
+    emblem.BorderSizePixel = 0
+    emblem.Rotation = 45
     emblem.Parent = header
+    UiTheme.add_stroke(
+        emblem,
+        UiTheme.PALETTE.AccentBright,
+        0.08
+    )
 
     local title = UiComponents.label(
         header,
@@ -238,9 +245,10 @@ function UiComponents.modal(
         title_text,
         "Title"
     )
-    title.Position = UDim2.fromOffset(38, 0)
-    title.Size = UDim2.new(1, -95, 0, 27)
+    title.Position = UDim2.fromOffset(31, 1)
+    title.Size = UDim2.new(1, -78, 0, 23)
     title.TextColor3 = UiTheme.PALETTE.Text
+    title.TextSize = 22
 
     local subtitle = UiComponents.label(
         header,
@@ -248,8 +256,10 @@ function UiComponents.modal(
         subtitle_text,
         "Muted"
     )
-    subtitle.Position = UDim2.fromOffset(39, 27)
-    subtitle.Size = UDim2.new(1, -95, 0, 17)
+    subtitle.Position = UDim2.fromOffset(32, 23)
+    subtitle.Size = UDim2.new(1, -79, 0, 14)
+    subtitle.TextSize = 11
+    subtitle.TextColor3 = UiTheme.PALETTE.TextFaint
 
     local close = UiComponents.button(
         header,
@@ -257,22 +267,22 @@ function UiComponents.modal(
         "×",
         "Ghost"
     )
-    close.AnchorPoint = Vector2.new(1, 0)
-    close.Position = UDim2.fromScale(1, 0)
-    close.Size = UDim2.fromOffset(34, 34)
-    close.TextSize = 21
+    close.AnchorPoint = Vector2.new(1, 0.5)
+    close.Position = UDim2.new(1, 0, 0.5, 0)
+    close.Size = UDim2.fromOffset(29, 29)
+    close.TextSize = 18
 
     UiOrnament.divider(
         root,
-        UDim2.fromOffset(18, 68),
-        UDim2.new(1, -36, 0, 8),
+        UDim2.fromOffset(16, 54),
+        UDim2.new(1, -32, 0, 7),
         root.ZIndex + 1
     )
 
     local body = Instance.new("Frame")
     body.Name = "Body"
-    body.Position = UDim2.fromOffset(18, 81)
-    body.Size = UDim2.new(1, -36, 1, -98)
+    body.Position = UDim2.fromOffset(16, 65)
+    body.Size = UDim2.new(1, -32, 1, -79)
     body.BackgroundTransparency = 1
     body.Parent = root
 
