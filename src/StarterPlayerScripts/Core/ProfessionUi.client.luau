@@ -4,6 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local player = Players.LocalPlayer
+local is_base_place =
+    script.Parent.Parent:FindFirstChild("Base") ~= nil
 local core = ReplicatedStorage:WaitForChild("Core")
 local shared = core:WaitForChild("Shared")
 local remotes = core:WaitForChild("Remotes")
@@ -399,7 +401,7 @@ profession_snapshot.OnClientEvent:Connect(function(payload: any)
         local needs_choice = slots.Gathering == ""
             or slots.Creation == ""
         if needs_choice then
-            panel.Visible = true
+            panel.Visible = is_base_place
         elseif not station_id then
             panel.Visible = false
         end
