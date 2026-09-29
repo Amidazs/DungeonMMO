@@ -199,7 +199,7 @@ local modal = UiComponents.modal(
     "QuestJournalWindow",
     "Quest Journal",
     "Accepted quests, objectives and rewards.",
-    UDim2.fromOffset(620, 775)
+    UDim2.fromOffset(680, 850)
 )
 local journal_panel = modal.Root
 journal_panel.AnchorPoint = Vector2.new(0, 0)
