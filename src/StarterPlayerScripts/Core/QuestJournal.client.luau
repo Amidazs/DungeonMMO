@@ -117,8 +117,9 @@ tracker.BackgroundTransparency = 1
 tracker.BorderSizePixel = 0
 tracker.Parent = gui
 
-local tracker_art = UiArt.popup_background(
+local tracker_art = UiArt.reference_background(
     tracker,
+    "Tracker",
     1
 )
 tracker_art.Name = "TrackerArt"
@@ -147,7 +148,7 @@ local tracker_title = UiComponents.label(
 tracker_title.Position = UDim2.fromOffset(17, 10)
 tracker_title.Size = UDim2.new(1, -34, 0, 24)
 tracker_title.TextColor3 = UiTheme.PALETTE.Text
-tracker_title.Visible = true
+tracker_title.Visible = false
 tracker_title.TextSize = 17
 tracker_title.ZIndex = 2
 
@@ -162,7 +163,7 @@ tracker_hint.Position = UDim2.new(1, -15, 0, 13)
 tracker_hint.Size = UDim2.fromOffset(88, 14)
 tracker_hint.TextXAlignment = Enum.TextXAlignment.Right
 tracker_hint.TextSize = 9
-tracker_hint.Visible = true
+tracker_hint.Visible = false
 tracker_hint.ZIndex = 3
 
 local tracker_list = Instance.new("ScrollingFrame")
@@ -195,8 +196,11 @@ journal_panel.Position = UDim2.fromOffset(22, 86)
 journal_panel.Visible = false
 journal_panel.ZIndex = 1
 UiArt.clear_frame_chrome(journal_panel)
--- Keep the modal's clean shell. Quest lists, objectives,
--- rewards and progress are rendered entirely from live quest state.
+UiArt.reference_background(
+    journal_panel,
+    "Journal",
+    1
+)
 
 modal.Body.Position = UiArt.position(
     "Journal",
@@ -212,8 +216,8 @@ modal.Body.Size = UiArt.rect(
 )
 modal.Body.ZIndex = 3
 modal.Header.ZIndex = 3
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 
 local modal_header_band = journal_panel:FindFirstChild("HeaderBand")
 if modal_header_band and modal_header_band:IsA("GuiObject") then
@@ -225,8 +229,8 @@ if modal_divider and modal_divider:IsA("GuiObject") then
     modal_divider.Visible = false
 end
 
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 modal.Close.ZIndex = 4
 UiTheme.bind_responsive_scale(
     journal_panel,
@@ -237,10 +241,22 @@ UiTheme.bind_responsive_scale(
 
 local tab_bar = Instance.new("Frame")
 tab_bar.Name = "JournalTabs"
-tab_bar.Size = UDim2.new(1, 0, 0, 34)
+tab_bar.Position = UiArt.position(
+    "Journal",
+    70,
+    214
+)
+tab_bar.Size = UiArt.rect(
+    "Journal",
+    70,
+    214,
+    710,
+    58
+)
 tab_bar.BackgroundTransparency = 1
-tab_bar.Visible = false
-tab_bar.Parent = modal.Body
+tab_bar.Visible = true
+tab_bar.ZIndex = 3
+tab_bar.Parent = journal_panel
 
 local tab_layout = Instance.new("UIListLayout")
 tab_layout.FillDirection = Enum.FillDirection.Horizontal
@@ -253,8 +269,10 @@ local active_tab = UiComponents.button(
     "Active",
     "Primary"
 )
-active_tab.Size = UDim2.fromOffset(116, 30)
+active_tab.Size = UDim2.new(0.333, -4, 1, 0)
+active_tab.ZIndex = 4
 active_tab.Active = false
+UiArt.paint_tab(active_tab, true)
 
 local completed_tab = UiComponents.button(
     tab_bar,
@@ -262,8 +280,10 @@ local completed_tab = UiComponents.button(
     "Completed",
     "Ghost"
 )
-completed_tab.Size = UDim2.fromOffset(116, 30)
-UiTheme.set_button_enabled(completed_tab, false)
+completed_tab.Size = UDim2.new(0.333, -4, 1, 0)
+completed_tab.ZIndex = 4
+completed_tab.Active = false
+UiArt.paint_tab(completed_tab, false)
 
 local failed_tab = UiComponents.button(
     tab_bar,
@@ -271,8 +291,10 @@ local failed_tab = UiComponents.button(
     "Failed",
     "Ghost"
 )
-failed_tab.Size = UDim2.fromOffset(116, 30)
-UiTheme.set_button_enabled(failed_tab, false)
+failed_tab.Size = UDim2.new(0.333, -4, 1, 0)
+failed_tab.ZIndex = 4
+failed_tab.Active = false
+UiArt.paint_tab(failed_tab, false)
 
 local journal_status = UiComponents.label(
     modal.Body,
