@@ -36,7 +36,9 @@ local last_gold = 0
 local last_ap = 0
 local last_sp = 0
 local last_class = "Adventurer"
+local last_max_mana = 0
 local character_connections: {RBXScriptConnection} = {}
+local update_mana: () -> ()
 
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("ProfileHud")
@@ -425,6 +427,10 @@ local function apply_progression(payload: any)
     last_gold = tonumber(payload.Gold) or last_gold
     last_ap = tonumber(payload.APAvailable) or 0
     last_sp = tonumber(payload.SPAvailable) or 0
+    last_max_mana = math.max(
+        0,
+        tonumber(payload.MaxMana) or last_max_mana
+    )
 
     local identity = payload.Identity
     if type(identity) == "table" then
@@ -438,6 +444,7 @@ local function apply_progression(payload: any)
     end
 
     render_progression()
+    update_mana()
 end
 
 --[[
@@ -482,13 +489,64 @@ task.defer(function()
     progression_snapshot:FireServer("Request")
 end)
 
--- Replicated combat resources are authoritative. Base may not expose combat MP.
-local function update_mana()
-    local maximum = tonumber(player:GetAttribute("CombatMaxMana")) or 0
-    local current = tonumber(player:GetAttribute("CombatMana"))
-    mana_value.Text = if maximum > 0 then string.format("%.0f / %.0f", math.clamp(current or maximum, 0, maximum), maximum) else "MP unavailable in Base"
-    UiTheme.set_bar_ratio(mana_fill, if maximum > 0 then math.clamp(current or maximum, 0, maximum) / maximum else 0, true)
+--[[
+Updates MP from live combat attributes or the server progression snapshot.
+
+The combat service owns current MP inside dungeons. Base does not run that
+service, so the progression snapshot supplies the authoritative maximum and
+Base presents it as full while the player is out of combat.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+update_mana = function()
+    local combat_maximum = tonumber(
+        player:GetAttribute("CombatMaxMana")
+    ) or 0
+    local combat_current = tonumber(
+        player:GetAttribute("CombatMana")
+    )
+
+    local maximum = if combat_maximum > 0
+        then combat_maximum
+        else last_max_mana
+
+    if maximum <= 0 then
+        mana_value.Text = "-- / --"
+        UiTheme.set_bar_ratio(
+            mana_fill,
+            0,
+            true
+        )
+        return
+    end
+
+    local current = if combat_maximum > 0
+        then math.clamp(
+            combat_current or maximum,
+            0,
+            maximum
+        )
+        else maximum
+
+    mana_value.Text = string.format(
+        "%.0f / %.0f",
+        current,
+        maximum
+    )
+    UiTheme.set_bar_ratio(
+        mana_fill,
+        current / maximum
+    )
 end
-player:GetAttributeChangedSignal("CombatMana"):Connect(update_mana)
-player:GetAttributeChangedSignal("CombatMaxMana"):Connect(update_mana)
+
+player:GetAttributeChangedSignal(
+    "CombatMana"
+):Connect(update_mana)
+player:GetAttributeChangedSignal(
+    "CombatMaxMana"
+):Connect(update_mana)
 update_mana()
