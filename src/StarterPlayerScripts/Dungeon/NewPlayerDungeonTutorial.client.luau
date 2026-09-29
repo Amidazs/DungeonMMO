@@ -42,8 +42,8 @@ gui.Parent = player_gui
 local panel = Instance.new("Frame")
 panel.Name = "TutorialPanel"
 panel.AnchorPoint = Vector2.new(0.5, 0)
-panel.Position = UDim2.new(0.5, 0, 0, 24)
-panel.Size = UDim2.fromOffset(560, 246)
+panel.Position = UDim2.new(0.5, 0, 0, 104)
+panel.Size = UDim2.fromOffset(540, 232)
 UiTheme.style_panel(panel, true)
 panel.Parent = gui
 UiOrnament.frame(panel, true)
@@ -69,7 +69,7 @@ title.Parent = panel
 local body = Instance.new("TextLabel")
 body.Name = "Body"
 body.Position = UDim2.fromOffset(22, 70)
-body.Size = UDim2.new(1, -44, 0, 116)
+body.Size = UDim2.new(1, -44, 0, 102)
 body.Text = TutorialDefinitions.DUNGEON_TEXT
 UiTheme.style_label(body, "Body")
 body.TextWrapped = true
