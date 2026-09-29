@@ -64,25 +64,74 @@ end
 
 local definitions = shared.DungeonDefinitions
 local source = definitions.Source
-local lock_text = "OptionalBossRuntimeEnabled = false,"
-local first_lock = assert(
-    string.find(source, lock_text, 1, true),
-    "Temple optional rollout flag was not found."
+local temple_marker =
+    "DungeonDefinitions.TEST_DUNGEON = table.freeze({"
+local mine_marker =
+    "DungeonDefinitions.ABANDONED_MINE = table.freeze({"
+local temple_start = assert(
+    string.find(source, temple_marker, 1, true),
+    "Temple definition was not found."
+)
+local mine_start = assert(
+    string.find(source, mine_marker, temple_start, true),
+    "Mine definition was not found."
+)
+local temple_source = string.sub(
+    source,
+    temple_start,
+    mine_start - 1
+)
+local disabled_flag = "OptionalBossRuntimeEnabled = false,"
+local enabled_flag =
+    "OptionalBossRuntimeEnabled = true, -- TEMP fixture only"
+local flag_start = string.find(
+    temple_source,
+    disabled_flag,
+    1,
+    true
 )
 
+if flag_start then
+    temple_source = string.sub(
+        temple_source,
+        1,
+        flag_start - 1
+    )
+        .. enabled_flag
+        .. string.sub(
+            temple_source,
+            flag_start + #disabled_flag
+        )
+else
+    assert(
+        string.find(
+            temple_source,
+            "OptionalBossRuntimeEnabled = true",
+            1,
+            true
+        ),
+        "Temple optional rollout flag was not found."
+    )
+end
+
+local mine_source = string.sub(source, mine_start)
 assert(
     string.find(
-        source,
-        lock_text,
-        first_lock + #lock_text,
+        mine_source,
+        disabled_flag,
+        1,
         true
     ),
-    "Mine rollout flag must remain untouched."
+    "Mine rollout flag must remain disabled."
 )
 
-definitions.Source = string.sub(source, 1, first_lock - 1)
-    .. "OptionalBossRuntimeEnabled = true, -- TEMP fixture only"
-    .. string.sub(source, first_lock + #lock_text)
+definitions.Source = string.sub(
+    source,
+    1,
+    temple_start - 1
+)
+    .. temple_source
+    .. mine_source
 
 replace_once(
     dungeon.DungeonRuntime,
