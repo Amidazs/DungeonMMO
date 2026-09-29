@@ -94,10 +94,13 @@ Args:
 Returns:
     any?: Direct successor binding, when one exists.
 ]]
-local function direct_successor(current: any): any?
-    for index, binding in ipairs(self._bindings.ordered) do
+local function direct_successor(
+    flow: any,
+    current: any
+): any?
+    for index, binding in ipairs(flow._bindings.ordered) do
         if binding.PlanEncounterId == current.PlanEncounterId then
-            return self._bindings.ordered[index + 1]
+            return flow._bindings.ordered[index + 1]
         end
     end
 
