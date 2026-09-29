@@ -33,6 +33,9 @@ local ProgressionClientState = require(
         :WaitForChild("Core")
         :WaitForChild("ProgressionClientState")
 )
+local ProgressionConfig = require(
+    core_shared:WaitForChild("ProgressionConfig")
+)
 local ClientCombatController = require(
     script.Parent:WaitForChild("ClientCombatController")
 )
@@ -250,19 +253,21 @@ for slot = 1, HotbarConfig.ACTIVE_SLOT_COUNT do
     create_slot(slot)
 end
 
-local hints = UiComponents.label(
+local progression_text = UiComponents.label(
     root,
-    "CombatHints",
-    "LMB ATTACK   RMB BLOCK   SHIFT DODGE   CTRL VIEW LOCK",
+    "ProgressionText",
+    "Lv. 1",
     "Caption"
 )
-hints.AnchorPoint = Vector2.new(0.5, 1)
-hints.Position = UDim2.new(0.5, 0, 1, -1)
-hints.Size = UDim2.fromOffset(500, 12)
-hints.TextXAlignment = Enum.TextXAlignment.Center
-hints.TextColor3 = UiTheme.PALETTE.TextFaint
-hints.TextSize = 8
-hints.ZIndex = 3
+progression_text.AnchorPoint = Vector2.new(0.5, 1)
+progression_text.Position = UDim2.new(0.5, 0, 1, -2)
+progression_text.Size = UDim2.fromOffset(430, 15)
+progression_text.TextXAlignment = Enum.TextXAlignment.Center
+progression_text.TextColor3 = UiTheme.PALETTE.Text
+progression_text.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+progression_text.TextStrokeTransparency = 0.18
+progression_text.TextSize = 9
+progression_text.ZIndex = 4
 
 --[[
 Starts local cooldown presentation for a server-confirmed skill.
@@ -297,6 +302,8 @@ Returns:
     None.
 ]]
 local function refresh_loadout()
+    local snapshot = ProgressionClientState.get_snapshot()
+
     for slot = 1, HotbarConfig.ACTIVE_SLOT_COUNT do
         local skill_id = ProgressionClientState.get_skill_for_slot(
             slot
@@ -316,6 +323,19 @@ local function refresh_loadout()
             then string.sub(definition.DISPLAY_NAME, 1, 1)
             else "·"
     end
+
+    local level = tonumber(snapshot.Level) or 1
+    local xp = tonumber(snapshot.XP) or 0
+    local required = ProgressionConfig.get_required_xp(level)
+
+    progression_text.Text = if required
+        then string.format(
+            "Lv. %d   %d / %d XP",
+            level,
+            xp,
+            required
+        )
+        else string.format("Lv. %d   MAX LEVEL", level)
 end
 
 --[[
