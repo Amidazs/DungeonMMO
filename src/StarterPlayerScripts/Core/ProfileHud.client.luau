@@ -13,6 +13,9 @@ local ProgressionClientState = require(
 local UiArt = require(
     shared:WaitForChild("UiArt")
 )
+local UiArtAssets = require(
+    shared:WaitForChild("UiArtAssets")
+)
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
 )
@@ -27,8 +30,57 @@ local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
 ) :: RemoteEvent
 
+local party_snapshot = remotes:FindFirstChild(
+    "PartySnapshot"
+)
+local party_action_request = remotes:FindFirstChild(
+    "PartyActionRequest"
+)
+
 local HUD_WIDTH = 432
 local HUD_HEIGHT = 129
+local BUFF_COLUMNS = 7
+local BUFF_SLOT_WIDTH = 39
+local BUFF_SLOT_HEIGHT = 40
+local BUFF_SLOT_GAP = 3
+
+local BUFF_DEFINITIONS = table.freeze({
+    {
+        Id = "PhysicalPower",
+        Attribute = "C4PhysicalPowerBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_AURA,
+    },
+    {
+        Id = "PhysicalGuard",
+        Attribute = "C4PhysicalGuardBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_GUARD,
+    },
+    {
+        Id = "Fortress",
+        Attribute = "C4FortressDualDefenseBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_GUARD,
+    },
+    {
+        Id = "BowGuard",
+        Attribute = "C4BowGuardBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_GUARD,
+    },
+    {
+        Id = "Evasion",
+        Attribute = "C4EvasionBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_NATURE,
+    },
+    {
+        Id = "MagicPower",
+        Attribute = "C4MagicPowerBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_ARCANE,
+    },
+    {
+        Id = "Movement",
+        Attribute = "C4MovementBonus",
+        Icon = UiArtAssets.PROFILE_BUFF_NATURE,
+    },
+})
 
 local last_level = 1
 local last_xp = 0
@@ -37,8 +89,10 @@ local last_ap = 0
 local last_sp = 0
 local last_class = "Adventurer"
 local last_max_mana = 0
+local latest_party_leader_user_id: number? = nil
 local character_connections: {RBXScriptConnection} = {}
 local update_mana: () -> ()
+local refresh_buffs: () -> ()
 
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("ProfileHud")
@@ -60,10 +114,40 @@ card.Position = UDim2.fromOffset(16, 16)
 card.Size = UDim2.fromOffset(HUD_WIDTH, HUD_HEIGHT)
 card.BackgroundTransparency = 1
 card.BorderSizePixel = 0
+card.ClipsDescendants = false
 card.Parent = gui
 
 UiArt.profile_background(card, 1)
 UiTheme.bind_responsive_scale(card, 1366, 0.62, 1)
+
+--[[
+Formats an integer with thousands separators for HUD resource values.
+
+Args:
+    value (number): Resource value to display.
+
+Returns:
+    string: Rounded integer using comma separators.
+]]
+local function format_number(value: number): string
+    local text = tostring(math.floor(value + 0.5))
+    local formatted = text
+
+    while true do
+        local next_text, count = string.gsub(
+            formatted,
+            "^(-?%d+)(%d%d%d)",
+            "%1,%2"
+        )
+        formatted = next_text
+
+        if count == 0 then
+            break
+        end
+    end
+
+    return formatted
+end
 
 --[[
 Keeps the unit frame below Roblox chrome on narrow Studio viewports.
@@ -118,30 +202,38 @@ bind_viewport()
 
 local portrait_inner = Instance.new("Frame")
 portrait_inner.Name = "PortraitInner"
-portrait_inner.Position = UDim2.fromOffset(27, 9)
-portrait_inner.Size = UDim2.fromOffset(72, 72)
+portrait_inner.Position = UDim2.fromOffset(20, 3)
+portrait_inner.Size = UDim2.fromOffset(84, 86)
 portrait_inner.BackgroundColor3 = UiTheme.PALETTE.Backdrop
 portrait_inner.BorderSizePixel = 0
 portrait_inner.ClipsDescendants = true
-portrait_inner.ZIndex = 2
-UiTheme.add_corner(portrait_inner, 36)
+portrait_inner.ZIndex = 4
+UiTheme.add_corner(portrait_inner, 42)
 portrait_inner.Parent = card
+
+local portrait_outline = Instance.new("UIStroke")
+portrait_outline.Name = "PortraitGoldOutline"
+portrait_outline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+portrait_outline.Color = Color3.fromRGB(223, 171, 58)
+portrait_outline.Thickness = 1.4
+portrait_outline.Transparency = 0.08
+portrait_outline.Parent = portrait_inner
 
 local portrait = Instance.new("ImageLabel")
 portrait.Name = "PlayerPortrait"
 portrait.Size = UDim2.fromScale(1, 1)
 portrait.BackgroundTransparency = 1
 portrait.ScaleType = Enum.ScaleType.Crop
-portrait.ZIndex = 3
-UiTheme.add_corner(portrait, 36)
+portrait.ZIndex = 5
+UiTheme.add_corner(portrait, 42)
 portrait.Parent = portrait_inner
 
 task.spawn(function()
     local ok, image = pcall(function()
         return Players:GetUserThumbnailAsync(
             player.UserId,
-            Enum.ThumbnailType.HeadShot,
-            Enum.ThumbnailSize.Size150x150
+            Enum.ThumbnailType.AvatarBust,
+            Enum.ThumbnailSize.Size352x352
         )
     end)
 
@@ -156,13 +248,24 @@ local player_name = UiComponents.label(
     player.DisplayName,
     "Title"
 )
-player_name.Position = UDim2.fromOffset(119, 5)
-player_name.Size = UDim2.fromOffset(203, 25)
+player_name.Position = UDim2.fromOffset(116, 5)
+player_name.Size = UDim2.fromOffset(205, 25)
 player_name.TextColor3 = Color3.fromRGB(249, 239, 214)
 player_name.TextSize = 22
 player_name.TextStrokeColor3 = Color3.fromRGB(8, 5, 3)
 player_name.TextStrokeTransparency = 0.28
-player_name.ZIndex = 4
+player_name.ZIndex = 5
+
+local party_crown = Instance.new("ImageLabel")
+party_crown.Name = "PartyLeaderCrown"
+party_crown.Position = UDim2.fromOffset(326, 9)
+party_crown.Size = UDim2.fromOffset(30, 22)
+party_crown.BackgroundTransparency = 1
+party_crown.Image = UiArtAssets.PROFILE_PARTY_CROWN
+party_crown.ScaleType = Enum.ScaleType.Stretch
+party_crown.Visible = false
+party_crown.ZIndex = 6
+party_crown.Parent = card
 
 local level_value = UiComponents.label(
     card,
@@ -170,14 +273,15 @@ local level_value = UiComponents.label(
     "1",
     "Title"
 )
-level_value.Position = UDim2.fromOffset(8, 84)
-level_value.Size = UDim2.fromOffset(46, 36)
+level_value.Position = UDim2.fromOffset(5, 82)
+level_value.Size = UDim2.fromOffset(47, 39)
 level_value.TextXAlignment = Enum.TextXAlignment.Center
+level_value.TextYAlignment = Enum.TextYAlignment.Center
 level_value.TextColor3 = Color3.fromRGB(248, 239, 218)
 level_value.TextSize = 23
 level_value.TextStrokeColor3 = Color3.fromRGB(6, 4, 3)
 level_value.TextStrokeTransparency = 0.18
-level_value.ZIndex = 4
+level_value.ZIndex = 6
 
 local class_label = UiComponents.label(
     card,
@@ -269,13 +373,29 @@ mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
 mana_value.ZIndex = 5
 
-local resource_stack = Instance.new("Frame")
-resource_stack.Name = "ResourceStack"
-resource_stack.Position = UDim2.fromOffset(124, 64)
-resource_stack.Size = UDim2.fromOffset(285, 16)
-resource_stack.BackgroundTransparency = 1
-resource_stack.Visible = false
-resource_stack.Parent = card
+local buff_container = Instance.new("Frame")
+buff_container.Name = "BuffContainer"
+buff_container.Position = UDim2.fromOffset(107, 86)
+buff_container.Size = UDim2.fromOffset(300, 84)
+buff_container.BackgroundTransparency = 1
+buff_container.BorderSizePixel = 0
+buff_container.ClipsDescendants = false
+buff_container.ZIndex = 5
+buff_container.Parent = card
+
+local buff_layout = Instance.new("UIGridLayout")
+buff_layout.Name = "BuffLayout"
+buff_layout.CellSize = UDim2.fromOffset(
+    BUFF_SLOT_WIDTH,
+    BUFF_SLOT_HEIGHT
+)
+buff_layout.CellPadding = UDim2.fromOffset(
+    BUFF_SLOT_GAP,
+    BUFF_SLOT_GAP
+)
+buff_layout.FillDirectionMaxCells = BUFF_COLUMNS
+buff_layout.SortOrder = Enum.SortOrder.LayoutOrder
+buff_layout.Parent = buff_container
 
 local progression_cache = Instance.new("Folder")
 progression_cache.Name = "ProgressionDisplayState"
@@ -294,7 +414,157 @@ required_xp_cache.Name = "RequiredXP"
 required_xp_cache.Parent = progression_cache
 
 --[[
-Disconnects character-specific Health listeners.
+Refreshes the party-leader crown from Base party state or Dungeon metadata.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function refresh_party_crown()
+    local dungeon_leader = tonumber(
+        player:GetAttribute("PartyLeaderUserId")
+    )
+    local leader_user_id =
+        latest_party_leader_user_id
+        or dungeon_leader
+
+    party_crown.Visible =
+        leader_user_id ~= nil
+        and leader_user_id > 0
+        and leader_user_id == player.UserId
+end
+
+--[[
+Applies the latest Base party snapshot to the local crown.
+
+Args:
+    payload (any): PartySnapshot server payload.
+
+Returns:
+    None.
+]]
+local function apply_party_snapshot(payload: any)
+    local party = if type(payload) == "table"
+        then payload.Party
+        else nil
+
+    latest_party_leader_user_id =
+        if type(party) == "table"
+            then tonumber(party.LeaderUserId)
+            else nil
+
+    refresh_party_crown()
+end
+
+--[[
+Removes runtime-created buff slots while preserving the grid layout.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+local function clear_buff_slots()
+    for _, child in ipairs(buff_container:GetChildren()) do
+        if child ~= buff_layout
+            and child:IsA("GuiObject")
+        then
+            child:Destroy()
+        end
+    end
+end
+
+--[[
+Creates one visible active-buff slot.
+
+Args:
+    definition (any): HUD buff definition.
+    order (number): Stable display order.
+
+Returns:
+    None.
+]]
+local function create_buff_slot(
+    definition: any,
+    order: number
+)
+    local slot = Instance.new("Frame")
+    slot.Name = tostring(definition.Id) .. "Buff"
+    slot.LayoutOrder = order
+    slot.BackgroundTransparency = 1
+    slot.BorderSizePixel = 0
+    slot.ZIndex = 6
+    slot.Parent = buff_container
+
+    local frame_art = Instance.new("ImageLabel")
+    frame_art.Name = "FrameArt"
+    frame_art.Size = UDim2.fromScale(1, 1)
+    frame_art.BackgroundTransparency = 1
+    frame_art.Image = UiArtAssets.PROFILE_BUFF_SLOT
+    frame_art.ScaleType = Enum.ScaleType.Stretch
+    frame_art.ZIndex = 6
+    frame_art.Parent = slot
+
+    local icon = Instance.new("ImageLabel")
+    icon.Name = "BuffIcon"
+    icon.Position = UDim2.fromOffset(5, 5)
+    icon.Size = UDim2.new(1, -10, 1, -10)
+    icon.BackgroundTransparency = 1
+    icon.Image = tostring(definition.Icon)
+    icon.ScaleType = Enum.ScaleType.Crop
+    icon.ZIndex = 7
+    icon.Parent = slot
+
+    slot:SetAttribute(
+        "BuffId",
+        tostring(definition.Id)
+    )
+end
+
+--[[
+Rebuilds active buff icons from replicated server-authored status values.
+
+A buff has no slot when inactive. The grid supports seven icons on the
+reference row and automatically continues onto further rows when future
+systems expose more simultaneous buffs.
+
+Args:
+    None.
+
+Returns:
+    None.
+]]
+refresh_buffs = function()
+    clear_buff_slots()
+
+    local character = player.Character
+    if not character then
+        return
+    end
+
+    local order = 0
+    for _, definition in ipairs(BUFF_DEFINITIONS) do
+        local magnitude = tonumber(
+            character:GetAttribute(
+                tostring(definition.Attribute)
+            )
+        ) or 0
+
+        if magnitude > 0 then
+            order += 1
+            create_buff_slot(
+                definition,
+                order
+            )
+        end
+    end
+end
+
+--[[
+Disconnects character-specific Health and buff listeners.
 
 Args:
     None.
@@ -329,9 +599,9 @@ local function update_health(humanoid: Humanoid?)
     local maximum = math.max(1, humanoid.MaxHealth)
     local current = math.max(0, humanoid.Health)
     health_value.Text = string.format(
-        "%.0f / %.0f",
-        current,
-        maximum
+        "%s / %s",
+        format_number(current),
+        format_number(maximum)
     )
     UiTheme.set_bar_ratio(
         health_fill,
@@ -370,7 +640,17 @@ local function bind_character(character: Model)
         end)
     )
 
+    for _, definition in ipairs(BUFF_DEFINITIONS) do
+        table.insert(
+            character_connections,
+            character:GetAttributeChangedSignal(
+                tostring(definition.Attribute)
+            ):Connect(refresh_buffs)
+        )
+    end
+
     update_health(humanoid)
+    refresh_buffs()
 end
 
 --[[
@@ -470,23 +750,44 @@ end
 profile_snapshot.OnClientEvent:Connect(apply_profile)
 progression_snapshot.OnClientEvent:Connect(apply_progression)
 
+if party_snapshot and party_snapshot:IsA("RemoteEvent") then
+    party_snapshot.OnClientEvent:Connect(
+        apply_party_snapshot
+    )
+end
+
+player:GetAttributeChangedSignal(
+    "PartyLeaderUserId"
+):Connect(refresh_party_crown)
+
 player.CharacterAdded:Connect(bind_character)
 player.CharacterRemoving:Connect(function()
     disconnect_character()
     update_health(nil)
+    refresh_buffs()
 end)
 
 if player.Character then
     bind_character(player.Character)
 else
     update_health(nil)
+    refresh_buffs()
 end
 
 render_progression()
+refresh_party_crown()
 
 task.defer(function()
     profile_snapshot:FireServer("Request")
     progression_snapshot:FireServer("Request")
+
+    if party_action_request
+        and party_action_request:IsA("RemoteEvent")
+    then
+        party_action_request:FireServer({
+            Action = "RequestSnapshot",
+        })
+    end
 end)
 
 --[[
@@ -533,9 +834,9 @@ update_mana = function()
         else maximum
 
     mana_value.Text = string.format(
-        "%.0f / %.0f",
-        current,
-        maximum
+        "%s / %s",
+        format_number(current),
+        format_number(maximum)
     )
     UiTheme.set_bar_ratio(
         mana_fill,
