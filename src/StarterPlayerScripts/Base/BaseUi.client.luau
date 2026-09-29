@@ -15,6 +15,9 @@ local DungeonDefinitions = require(
 local DungeonDifficultyDefinitions = require(
     shared:WaitForChild("DungeonDifficultyDefinitions")
 )
+local QuestPresentation = require(
+    shared:WaitForChild("QuestPresentation")
+)
 local UiComponents = require(
     shared:WaitForChild("UiComponents")
 )
@@ -36,6 +39,12 @@ local party_snapshot = remotes:WaitForChild(
 ) :: RemoteEvent
 local party_result = remotes:WaitForChild(
     "PartyActionResult"
+) :: RemoteEvent
+local quest_action_request = remotes:WaitForChild(
+    "QuestActionRequest"
+) :: RemoteEvent
+local quest_snapshot = remotes:WaitForChild(
+    "QuestSnapshot"
 ) :: RemoteEvent
 
 local MAX_ENTRANCE_DISTANCE = 15
@@ -69,7 +78,7 @@ local modal = UiComponents.modal(
     "DungeonEntryPanel",
     "Dungeon Entrance",
     "Prepare your party before entering.",
-    UDim2.fromOffset(920, 650)
+    UDim2.fromOffset(920, 760)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -147,17 +156,64 @@ entrance_hint.TextXAlignment = Enum.TextXAlignment.Right
 entrance_hint.TextColor3 = UiTheme.PALETTE.Accent
 entrance_hint.ZIndex = 13
 
+local quest_context = Instance.new("Frame")
+quest_context.Name = "QuestContext"
+quest_context.Position = UDim2.fromOffset(0, 124)
+quest_context.Size = UDim2.new(1, 0, 0, 126)
+quest_context.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
+quest_context.BackgroundTransparency = 0.12
+quest_context.BorderSizePixel = 0
+quest_context.ZIndex = 12
+UiTheme.add_corner(quest_context, 8)
+UiTheme.add_stroke(
+    quest_context,
+    UiTheme.PALETTE.BorderSoft,
+    0.52
+)
+quest_context.Parent = modal.Body
+
+local quest_heading = UiComponents.section_heading(
+    quest_context,
+    "QUEST OBJECTIVES HERE"
+)
+quest_heading.Position = UDim2.fromOffset(14, 8)
+quest_heading.Size = UDim2.new(1, -28, 0, 18)
+quest_heading.ZIndex = 13
+
+local quest_summary = UiComponents.label(
+    quest_context,
+    "QuestSummary",
+    "Checking accepted quests...",
+    "Body"
+)
+quest_summary.Position = UDim2.fromOffset(14, 31)
+quest_summary.Size = UDim2.new(1, -28, 0, 68)
+quest_summary.TextWrapped = true
+quest_summary.TextYAlignment = Enum.TextYAlignment.Top
+quest_summary.ZIndex = 13
+
+local quest_hint = UiComponents.label(
+    quest_context,
+    "QuestHint",
+    "",
+    "Caption"
+)
+quest_hint.Position = UDim2.fromOffset(14, 103)
+quest_hint.Size = UDim2.new(1, -28, 0, 17)
+quest_hint.TextColor3 = UiTheme.PALETTE.Accent
+quest_hint.ZIndex = 13
+
 local difficulty_heading = UiComponents.section_heading(
     modal.Body,
     "DIFFICULTY"
 )
-difficulty_heading.Position = UDim2.fromOffset(0, 124)
+difficulty_heading.Position = UDim2.fromOffset(0, 262)
 difficulty_heading.Size = UDim2.new(1, 0, 0, 18)
 difficulty_heading.ZIndex = 12
 
 local difficulty_strip = Instance.new("Frame")
 difficulty_strip.Name = "DifficultyStrip"
-difficulty_strip.Position = UDim2.fromOffset(0, 148)
+difficulty_strip.Position = UDim2.fromOffset(0, 286)
 difficulty_strip.Size = UDim2.new(1, 0, 0, 72)
 difficulty_strip.BackgroundTransparency = 1
 difficulty_strip.ZIndex = 12
@@ -171,7 +227,7 @@ difficulty_layout.Parent = difficulty_strip
 
 local action_bar = Instance.new("Frame")
 action_bar.Name = "ActionBar"
-action_bar.Position = UDim2.fromOffset(0, 232)
+action_bar.Position = UDim2.fromOffset(0, 370)
 action_bar.Size = UDim2.new(1, 0, 0, 44)
 action_bar.BackgroundTransparency = 1
 action_bar.ZIndex = 12
@@ -229,8 +285,8 @@ start_button.ZIndex = 13
 
 local columns = Instance.new("Frame")
 columns.Name = "PartyColumns"
-columns.Position = UDim2.fromOffset(0, 292)
-columns.Size = UDim2.new(1, 0, 1, -292)
+columns.Position = UDim2.fromOffset(0, 430)
+columns.Size = UDim2.new(1, 0, 1, -430)
 columns.BackgroundTransparency = 1
 columns.ZIndex = 12
 columns.Parent = modal.Body
@@ -344,6 +400,7 @@ invite_layout.Padding = UDim.new(0, 7)
 invite_layout.Parent = invite_list
 
 local snapshot: any = nil
+local quest_payload: any = nil
 local entrance_dungeon_id: string? = nil
 local entrance_anchor: BasePart? = nil
 local solo_difficulty_id: string? = nil
@@ -527,6 +584,182 @@ local function difficulty_summary(definition: any): string
         tonumber(definition.EnemyHealthMultiplier) or 1,
         tonumber(definition.EnemyDamageMultiplier) or 1
     )
+end
+
+--[[
+Returns active Adventure rows that can progress at one dungeon.
+
+Args:
+    dungeon_id (string): Dungeon represented by the entrance.
+
+Returns:
+    {any}: Active quest rows with unfinished dungeon objectives.
+]]
+local function quest_rows_for_dungeon(dungeon_id: string): {any}
+    local result = {}
+    local state = quest_payload and quest_payload.State
+    local active = state and state.Active
+
+    if type(active) ~= "table" then
+        return result
+    end
+
+    for _, definition in ipairs(
+        (quest_payload and quest_payload.Definitions) or {}
+    ) do
+        local quest_state = active[definition.Id]
+        if type(quest_state) == "table" then
+            local objectives =
+                QuestPresentation.dungeon_objective_rows(
+                    definition,
+                    quest_state,
+                    dungeon_id
+                )
+            if #objectives > 0 then
+                table.insert(result, {
+                    Definition = definition,
+                    Objectives = objectives,
+                    Tracked = state.TrackedQuestId == definition.Id,
+                })
+            end
+        end
+    end
+
+    table.sort(result, function(left: any, right: any): boolean
+        if left.Tracked ~= right.Tracked then
+            return left.Tracked == true
+        end
+
+        return tostring(left.Definition.DisplayName)
+            < tostring(right.Definition.DisplayName)
+    end)
+
+    return result
+end
+
+--[[
+Checks whether the selected depth advances at least one objective in a row.
+
+Args:
+    row (any): Active quest entrance row.
+    difficulty_id (string?): Currently selected difficulty.
+
+Returns:
+    boolean: True when the selected depth can progress the quest here.
+]]
+local function quest_progresses_at_depth(
+    row: any,
+    difficulty_id: string?
+): boolean
+    for _, objective in ipairs(row.Objectives or {}) do
+        if QuestPresentation.requirement_allows_difficulty(
+            objective,
+            difficulty_id
+        ) then
+            return true
+        end
+    end
+
+    return false
+end
+
+--[[
+Builds one compact line for the dungeon entrance quest summary.
+
+Args:
+    row (any): Active quest entrance row.
+    difficulty_id (string?): Currently selected difficulty.
+
+Returns:
+    string: Quest name, current objective and valid difficulty.
+]]
+local function quest_context_line(
+    row: any,
+    difficulty_id: string?
+): string
+    local first = row.Objectives[1]
+    local progresses = quest_progresses_at_depth(
+        row,
+        difficulty_id
+    )
+    local marker = if not progresses
+        then "!"
+        elseif row.Tracked
+            then "◆"
+            else "•"
+    local more = math.max(0, #row.Objectives - 1)
+    local objective_text = first.Text
+        .. (if more > 0
+            then "  +" .. tostring(more) .. " more"
+            else "")
+
+    return string.format(
+        "%s %s — %s — %s",
+        marker,
+        tostring(row.Definition.DisplayName),
+        objective_text,
+        QuestPresentation.difficulty_text(first)
+    )
+end
+
+--[[
+Refreshes quest context for the active dungeon and selected depth.
+
+Args:
+    dungeon_id (string): Dungeon represented by the entrance.
+    difficulty_id (string?): Currently selected difficulty.
+
+Returns:
+    None.
+]]
+local function render_quest_context(
+    dungeon_id: string,
+    difficulty_id: string?
+)
+    if not quest_payload then
+        quest_summary.Text = "Checking accepted quests..."
+        quest_hint.Text = ""
+        return
+    end
+
+    local rows = quest_rows_for_dungeon(dungeon_id)
+    if #rows == 0 then
+        quest_summary.Text =
+            "No accepted quest objectives currently point here."
+        quest_hint.Text = "Open the Quest Journal with L for all quests."
+        return
+    end
+
+    local lines = {}
+    local incompatible = false
+    local visible_count = math.min(3, #rows)
+
+    for index = 1, visible_count do
+        local row = rows[index]
+        table.insert(
+            lines,
+            quest_context_line(row, difficulty_id)
+        )
+        incompatible = incompatible
+            or not quest_progresses_at_depth(
+                row,
+                difficulty_id
+            )
+    end
+
+    quest_summary.Text = table.concat(lines, "\n")
+
+    if incompatible then
+        quest_hint.Text =
+            "! Selected depth will not progress every quest shown."
+    elseif #rows > visible_count then
+        quest_hint.Text = string.format(
+            "+%d more quest(s) in the Quest Journal.",
+            #rows - visible_count
+        )
+    else
+        quest_hint.Text = "◆ = tracked quest"
+    end
 end
 
 --[[
@@ -784,6 +1017,10 @@ local function render()
         dungeon_id,
         difficulty_id
     )
+    render_quest_context(
+        dungeon_id,
+        difficulty_id
+    )
 
     local difficulty =
         if difficulty_id
@@ -898,6 +1135,7 @@ local function set_visible(visible: boolean)
 
     if visible then
         fire("RequestSnapshot")
+        quest_action_request:FireServer("Snapshot")
     else
         entrance_anchor = nil
         entrance_dungeon_id = nil
@@ -1118,6 +1356,22 @@ party_snapshot.OnClientEvent:Connect(
         end
     end
 )
+
+quest_snapshot.OnClientEvent:Connect(function(payload: any)
+    if type(payload) ~= "table"
+        or type(payload.Definitions) ~= "table"
+        or type(payload.State) ~= "table"
+        or payload.State.ok ~= true
+    then
+        return
+    end
+
+    quest_payload = payload
+
+    if panel.Visible then
+        render()
+    end
+end)
 
 party_result.OnClientEvent:Connect(function(result: any)
     if result.ok then
