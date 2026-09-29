@@ -46,7 +46,7 @@ local UiArtAssets = {
     ACTIONBAR_SHELL = "rbxassetid://73946518126554",
     ACTION_SLOT_EMPTY = "rbxassetid://101119280543074",
     RECALL_EMPTY = "rbxassetid://70424393350959",
-    COMMAND_STRIP = "rbxassetid://137651054387577",
+    COMMAND_STRIP = "rbxassetid://108104530658215",
 }
 
 return table.freeze(UiArtAssets)
