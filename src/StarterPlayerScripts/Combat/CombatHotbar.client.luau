@@ -70,22 +70,24 @@ gui.Parent = player_gui
 local root = Instance.new("Frame")
 root.Name = "Hotbar"
 root.AnchorPoint = Vector2.new(0.5, 1)
-root.Position = UDim2.new(0.5, 0, 1, -18)
-root.Size = UDim2.fromOffset(492, 112)
+root.Position = UDim2.new(0.5, 0, 1, -16)
+root.Size = UDim2.fromOffset(510, 104)
 root.BackgroundTransparency = 1
 root.Parent = gui
 UiTheme.bind_responsive_scale(root, 1366, 0.76, 1)
 
 local tray = Instance.new("Frame")
 tray.Name = "ActionBarFrame"
-tray.Size = UDim2.new(1, 0, 0, 91)
+tray.Position = UDim2.fromOffset(0, 4)
+tray.Size = UDim2.new(1, 0, 0, 82)
 UiTheme.style_panel(tray, true)
 tray.Parent = root
 UiOrnament.frame(tray, true)
 
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
-slots.Size = UDim2.new(1, 0, 0, 88)
+slots.Position = UDim2.fromOffset(10, 6)
+slots.Size = UDim2.new(1, -20, 0, 78)
 slots.BackgroundTransparency = 1
 slots.Parent = root
 
@@ -93,7 +95,7 @@ local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0, 8)
+layout.Padding = UDim.new(0, 7)
 layout.Parent = slots
 
 --[[
@@ -108,25 +110,27 @@ Returns:
 local function create_slot(slot: number)
     local frame = Instance.new("Frame")
     frame.Name = "Slot" .. tostring(slot)
-    frame.Size = UDim2.fromOffset(74, 82)
-    frame.BackgroundColor3 = UiTheme.PALETTE.Surface
+    frame.Size = UDim2.fromOffset(70, 70)
+    frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
+    frame.BackgroundTransparency = 0.02
     frame.BorderSizePixel = 0
-    UiTheme.add_corner(frame, 8)
-    UiTheme.add_stroke(
+    UiTheme.add_corner(frame, 2)
+    local frame_stroke = UiTheme.add_stroke(
         frame,
-        UiTheme.PALETTE.BorderSoft,
-        0.24
+        UiTheme.PALETTE.Border,
+        0.08
     )
+    frame_stroke.Thickness = 1
     frame.Parent = slots
 
     local icon = UiOrnament.icon(
         frame,
         "AbilityIcon",
         "✦",
-        Color3.fromRGB(59, 76, 94),
-        48
+        Color3.fromRGB(41, 69, 105),
+        54
     )
-    icon.Position = UDim2.fromOffset(13, 4)
+    icon.Position = UDim2.fromOffset(8, 5)
     slot_sigils[slot] = icon:WaitForChild("IconWell")
         :WaitForChild("Sigil") :: TextLabel
 
@@ -134,7 +138,7 @@ local function create_slot(slot: number)
         frame,
         tostring(slot)
     )
-    key.Position = UDim2.fromOffset(2, 2)
+    key.Position = UDim2.fromOffset(3, 3)
     key.ZIndex = 3
 
     local name = UiComponents.label(
@@ -143,11 +147,14 @@ local function create_slot(slot: number)
         "Empty",
         "Body"
     )
-    name.Position = UDim2.fromOffset(3, 55)
-    name.Size = UDim2.new(1, -6, 0, 23)
+    name.AnchorPoint = Vector2.new(0.5, 1)
+    name.Position = UDim2.new(0.5, 0, 1, -2)
+    name.Size = UDim2.new(1, -8, 0, 14)
     name.TextXAlignment = Enum.TextXAlignment.Center
-    name.TextWrapped = true
-    name.TextSize = 10
+    name.TextWrapped = false
+    name.TextTruncate = Enum.TextTruncate.AtEnd
+    name.TextSize = 9
+    name.TextColor3 = UiTheme.PALETTE.TextMuted
 
     local overlay = Instance.new("Frame")
     overlay.Name = "CooldownOverlay"
@@ -158,7 +165,7 @@ local function create_slot(slot: number)
     overlay.BackgroundTransparency = 0.18
     overlay.BorderSizePixel = 0
     overlay.ZIndex = 4
-    UiTheme.add_corner(overlay, 8)
+    UiTheme.add_corner(overlay, 2)
     overlay.Parent = frame
 
     local cooldown = UiComponents.label(
@@ -191,8 +198,8 @@ local hints = UiComponents.label(
     "Caption"
 )
 hints.AnchorPoint = Vector2.new(0.5, 1)
-hints.Position = UDim2.new(0.5, 0, 1, 0)
-hints.Size = UDim2.new(1, 0, 0, 20)
+hints.Position = UDim2.new(0.5, 0, 1, -1)
+hints.Size = UDim2.new(1, 0, 0, 16)
 hints.TextXAlignment = Enum.TextXAlignment.Center
 hints.TextColor3 = UiTheme.PALETTE.TextMuted
 
