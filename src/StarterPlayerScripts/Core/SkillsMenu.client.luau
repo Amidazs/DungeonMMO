@@ -598,10 +598,6 @@ end
 modal.Close.Activated:Connect(function()
     set_visible(false)
 end)
-backdrop.Activated:Connect(function()
-    set_visible(false)
-end)
-
 UserInputService.InputBegan:Connect(function(
     input: InputObject,
     processed: boolean
