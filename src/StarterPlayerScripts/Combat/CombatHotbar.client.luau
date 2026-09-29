@@ -84,12 +84,12 @@ gui.Parent = player_gui
 local root = Instance.new("Frame")
 root.Name = "Hotbar"
 root.AnchorPoint = Vector2.new(0.5, 1)
-root.Position = UDim2.new(0.5, 0, 1, -8)
+root.Position = UDim2.new(0.48, 0, 1, -8)
 root.Size = UDim2.fromOffset(760, 114)
 root.BackgroundTransparency = 1
 root.BorderSizePixel = 0
 root.Parent = gui
-UiTheme.bind_responsive_scale(root, 1366, 0.64, 1)
+UiTheme.bind_responsive_scale(root, 1600, 0.64, 1)
 
 UiArt.actionbar_background(root, 1)
 
