@@ -12,15 +12,17 @@
 - Optional Entrance Gates: PASS.
 - Optional Dynamic Variant: PASS.
 - Timed Event Recovery: updated to the accepted optional-event contract.
-- Physical Temple required route with Event skipped: PASS.
-- Physical Temple required route with Secret skipped: PASS.
+- Authoritative production room-start path with Event skipped: PASS.
+- Authoritative production room-start path with Secret skipped: PASS.
 - Run completion after both skips: PASS.
-- Real Temple entrance held-E UI open: PASS.
+- Actual BaseUi rendered at the real Temple entrance via unpublished-only test bridge: PASS.
 - Quest dungeon/depth display: PASS.
+- Captain/Foreman `Depth 1 or Depth 4` mapping: PASS.
 - Selected-depth mismatch warning: PASS.
 - Dungeon TEST publish terminal state: `PublishSuccessful`.
 - Base TEST publish terminal state: `PublishSuccessful`.
-- Fresh cloud changed-source equality: PASS.
+- Fresh cloud v3.54 source-marker / quest-mapping verification: PASS.
+- Published Base temporary-hook absence: PASS.
 - Fresh cloud Dungeon Play startup: PASS.
 - Fresh cloud Base Play startup: PASS.
 - Section D: **HOLD for two-player friend test**.
