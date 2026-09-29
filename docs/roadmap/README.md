@@ -1,3 +1,16 @@
+**v3.53 QUEST JOURNAL + PERSISTENT TRACKER — GREEN:** [roadmap](
+DungeonMMO_Roadmap_v3_53_Quest_Journal_Tracker_GREEN_20260929.md)
+and [evidence](
+../testing/quest-journal-tracker-v3-53-green-20260929.md).
+Accepted Adventure quests now remain visible through Base/Dungeon handoff using
+a shared right-side tracker and Quest Journal. The journal opens from
+**QUESTS** or **L**, shows objectives and rewards, and lets the player select
+one persistent Adventure quest for tracking. Base floor guidance follows only
+that selected quest, redirects to the correct physical giver when ready, and
+never appears in Dungeon. Both TEST places reached Studio
+`PublishSuccessful` and fresh cloud copies passed the published UI checks.
+**Section D remains on hold for the user's friend test.**
+
 **v3.52 LOOPING OBJECTIVE-WARD TUTORIAL FLOW — GREEN:** [roadmap](
 DungeonMMO_Roadmap_v3_52_Looping_Objective_Flow_GREEN_20260929.md)
 and [evidence](
