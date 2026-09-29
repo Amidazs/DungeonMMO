@@ -24,7 +24,12 @@ local function make_gate(bridge_name: string, slot: string)
 end
 local event_gate = make_gate("EventBridge", "EventArena")
 local secret_gate = make_gate("SecretBridge", "SecretArena")
-local states = {Room1 = "Pending", Room2 = "Pending"}
+local states = {
+    Room1 = "Pending",
+    Room2 = "Pending",
+    EventArena = "Pending",
+    SecretArena = "Pending",
+}
 local flow = {
     state_for_slot = function(_, id) return states[id] end,
 }
@@ -50,9 +55,24 @@ states.Room2 = "Cleared"
 check(Gates.sync(root, bindings, flow).ok, "room-two clear gate sync")
 check(not secret_gate.CanCollide and not secret_gate.CanTouch,
     "eligible Secret becomes accessible after Room2 and for backtracking")
--- A skipped optional boss must remain physically enterable on return.
+-- A skipped Secret remains physically enterable for deferred backtracking.
+states.SecretArena = "Skipped"
 check(Gates.status("SecretArena", bindings, flow) == true,
-    "skipping secret on next-room approach does not re-lock bridge")
+    "skipping Secret does not re-lock its backtracking route")
+
+-- A skipped timed Event is forfeited and its side-room gate closes.
+states.EventArena = "Skipped"
+local event_allowed, event_reason =
+    Gates.status("EventArena", bindings, flow)
+check(not event_allowed
+    and event_reason == "Event skipped for this run.",
+    "skipped Event is visibly forfeited for this run")
+check(Gates.sync(root, bindings, flow).ok
+    and event_gate.CanCollide,
+    "skipped Event gate closes after required-route bypass")
+
+states.EventArena = "Pending"
+states.SecretArena = "Pending"
 
 -- Reconstructing the gate state must use persisted prerequisite states.
 event_gate.CanCollide = true
