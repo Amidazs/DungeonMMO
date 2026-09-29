@@ -71,23 +71,24 @@ local root = Instance.new("Frame")
 root.Name = "Hotbar"
 root.AnchorPoint = Vector2.new(0.5, 1)
 root.Position = UDim2.new(0.5, 0, 1, -16)
-root.Size = UDim2.fromOffset(510, 104)
+root.Size = UDim2.fromOffset(510, 100)
 root.BackgroundTransparency = 1
 root.Parent = gui
 UiTheme.bind_responsive_scale(root, 1366, 0.76, 1)
 
 local tray = Instance.new("Frame")
 tray.Name = "ActionBarFrame"
-tray.Position = UDim2.fromOffset(0, 4)
-tray.Size = UDim2.new(1, 0, 0, 82)
+tray.Position = UDim2.fromOffset(0, 3)
+tray.Size = UDim2.new(1, 0, 0, 80)
 UiTheme.style_panel(tray, true)
 tray.Parent = root
 UiOrnament.frame(tray, true)
+UiOrnament.action_bar_wings(tray)
 
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
-slots.Position = UDim2.fromOffset(10, 6)
-slots.Size = UDim2.new(1, -20, 0, 78)
+slots.Position = UDim2.fromOffset(10, 5)
+slots.Size = UDim2.new(1, -20, 0, 74)
 slots.BackgroundTransparency = 1
 slots.Parent = root
 
@@ -110,7 +111,7 @@ Returns:
 local function create_slot(slot: number)
     local frame = Instance.new("Frame")
     frame.Name = "Slot" .. tostring(slot)
-    frame.Size = UDim2.fromOffset(70, 70)
+    frame.Size = UDim2.fromOffset(72, 70)
     frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
     frame.BackgroundTransparency = 0.02
     frame.BorderSizePixel = 0
@@ -128,9 +129,9 @@ local function create_slot(slot: number)
         "AbilityIcon",
         "✦",
         Color3.fromRGB(41, 69, 105),
-        54
+        56
     )
-    icon.Position = UDim2.fromOffset(8, 5)
+    icon.Position = UDim2.fromOffset(8, 4)
     slot_sigils[slot] = icon:WaitForChild("IconWell")
         :WaitForChild("Sigil") :: TextLabel
 
@@ -198,10 +199,11 @@ local hints = UiComponents.label(
     "Caption"
 )
 hints.AnchorPoint = Vector2.new(0.5, 1)
-hints.Position = UDim2.new(0.5, 0, 1, -1)
-hints.Size = UDim2.new(1, 0, 0, 16)
+hints.Position = UDim2.new(0.5, 0, 1, 0)
+hints.Size = UDim2.new(1, 0, 0, 14)
 hints.TextXAlignment = Enum.TextXAlignment.Center
-hints.TextColor3 = UiTheme.PALETTE.TextMuted
+hints.TextColor3 = UiTheme.PALETTE.TextFaint
+hints.TextSize = 10
 
 --[[
 Starts local cooldown presentation for a server-confirmed skill.
