@@ -23,9 +23,6 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
-local UiOrnament = require(
-    shared:WaitForChild("UiOrnament")
-)
 
 local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
