@@ -216,6 +216,10 @@ local function render_choices(slots: any)
                     row,
                     selected == ""
                 )
+                row.TextColor3 = if selected == ""
+                    then UiTheme.PALETTE.Text
+                    else UiTheme.PALETTE.TextMuted
+                row.TextTransparency = if selected == "" then 0 else 0.28
                 if selected == "" then
                     row.MouseButton1Click:Connect(function()
                         status.Text = "Choosing " .. definition.Name .. "..."
