@@ -31,21 +31,21 @@ local actions = {
         name = "Skills",
         label = "Skills",
         key = "K",
-        glyph = "S",
+        glyph = "⚔",
         tint = Color3.fromRGB(47, 83, 127),
     },
     {
         name = "Quests",
         label = "Quests",
         key = "L",
-        glyph = "Q",
+        glyph = "✧",
         tint = Color3.fromRGB(104, 71, 33),
     },
     {
         name = "Inventory",
         label = "Inventory",
         key = "I",
-        glyph = "I",
+        glyph = "▣",
         tint = Color3.fromRGB(93, 61, 31),
     },
 }
@@ -55,7 +55,7 @@ if script.Parent.Parent:FindFirstChild("Base") then
         name = "Guild",
         label = "Guild",
         key = "J",
-        glyph = "G",
+        glyph = "♜",
         tint = Color3.fromRGB(88, 67, 30),
     })
 end
@@ -65,8 +65,8 @@ frame.Name = "CommandBar"
 frame.AnchorPoint = Vector2.new(1, 1)
 frame.Position = UDim2.new(1, -18, 1, -18)
 frame.Size = UDim2.fromOffset(
-    22 + #actions * 70,
-    78
+    18 + #actions * 68,
+    76
 )
 frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
 frame.BackgroundTransparency = 0.12
@@ -83,8 +83,8 @@ UiTheme.bind_responsive_scale(frame, 1366, 0.58, 1)
 
 local button_row = Instance.new("Frame")
 button_row.Name = "ButtonRow"
-button_row.Position = UDim2.fromOffset(9, 6)
-button_row.Size = UDim2.new(1, -18, 1, -12)
+button_row.Position = UDim2.fromOffset(8, 5)
+button_row.Size = UDim2.new(1, -16, 1, -10)
 button_row.BackgroundTransparency = 1
 button_row.Parent = frame
 
@@ -92,7 +92,7 @@ local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0, 5)
+layout.Padding = UDim.new(0, 4)
 layout.Parent = button_row
 
 local buttons: {[string]: TextButton} = {}
@@ -119,7 +119,7 @@ local function create_command(
         "Ghost"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.fromOffset(64, 66)
+    button.Size = UDim2.fromOffset(62, 64)
     button.BackgroundTransparency = 1
     button:SetAttribute(
         "DMMOUiBaseTransparency",
@@ -131,10 +131,10 @@ local function create_command(
         "Icon",
         action.glyph,
         action.tint,
-        42
+        44
     )
     icon.AnchorPoint = Vector2.new(0.5, 0)
-    icon.Position = UDim2.new(0.5, 0, 0, 2)
+    icon.Position = UDim2.new(0.5, 0, 0, 1)
 
     local label = UiComponents.label(
         button,
