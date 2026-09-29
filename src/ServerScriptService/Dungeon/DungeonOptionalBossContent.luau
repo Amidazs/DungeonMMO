@@ -113,7 +113,7 @@ function DungeonOptionalBossContent.for_difficulty(
             InsertAfterId = event_template.InsertAfterId,
             RequiresPlacementContract =
                 event_template.RequiresPlacementContract,
-            CompletionRequired = true,
+            CompletionRequired = false,
             AllowedDifficulties = {[difficulty_id] = true},
             Activation = {
                 Type = "InstanceFlag",
