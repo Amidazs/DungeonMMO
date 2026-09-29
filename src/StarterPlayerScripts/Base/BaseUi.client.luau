@@ -91,35 +91,15 @@ panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
 
-local old_reference_art = panel:FindFirstChild("ReferenceArt")
-if old_reference_art then
-    old_reference_art:Destroy()
-end
-
-local party_art = UiArt.background(
-    panel,
-    "Party",
-    11
-)
-party_art.Name = "PartyArt"
-
-UiArt.content_mask(
-    panel,
-    "Party",
-    "PartyContentMask",
-    58,
-    220,
-    970,
-    1150,
-    12
-)
+-- The modal's built-in window art is intentionally empty.
+-- All party and dungeon information below is live Roblox UI.
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = false
-modal.Subtitle.Visible = false
+modal.Title.Visible = true
+modal.Subtitle.Visible = true
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 1
-modal.Close.TextTransparency = 1
+modal.Close.BackgroundTransparency = 0.18
+modal.Close.TextTransparency = 0
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
