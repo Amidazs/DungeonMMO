@@ -183,6 +183,9 @@ local inventory_snapshot = remotes:WaitForChild("InventorySnapshot") :: RemoteEv
 local equipment_snapshot = remotes:WaitForChild("EquipmentSnapshot") :: RemoteEvent
 local progression_snapshot = remotes:WaitForChild("ProgressionSnapshot") :: RemoteEvent
 local progression_action_result = remotes:WaitForChild("ProgressionActionResult") :: RemoteEvent
+local attribute_commit_request = remotes:WaitForChild(
+    "AttributeCommitRequest"
+) :: RemoteEvent
 local loadout_request = remotes:WaitForChild("LoadoutRequest") :: RemoteEvent
 local return_request = remotes:WaitForChild("ReturnRequest") :: RemoteEvent
 
@@ -2586,6 +2589,47 @@ end)
 
 progression_snapshot.OnServerEvent:Connect(function(player: Player, action: any)
     if action == "Request" and loaded_users[player.UserId] then send_progression(player) end
+end)
+
+attribute_commit_request.OnServerEvent:Connect(function(
+    player: Player,
+    desired: any
+)
+    if not loaded_users[player.UserId] then
+        return
+    end
+
+    local result = attributes:commit(
+        player.UserId,
+        desired
+    )
+
+    progression_action_result:FireClient(player, {
+        action = "AttributeCommit",
+        ok = result and result.ok == true,
+        reason = result and result.reason or nil,
+    })
+
+    if not result or result.ok ~= true then
+        return
+    end
+
+    local character = profiles:get_character(
+        player.UserId,
+        1
+    )
+
+    if character then
+        ProgressionRuntimeState.set_character(
+            player.UserId,
+            character
+        )
+        ProgressionRuntimeState.apply_runtime_stats(
+            player
+        )
+    end
+
+    send_profile(player)
 end)
 
 loadout_request.OnServerEvent:Connect(function(player: Player, first: any, second: any)
