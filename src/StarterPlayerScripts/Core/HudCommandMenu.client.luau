@@ -8,7 +8,7 @@ local player_gui = Players.LocalPlayer:WaitForChild("PlayerGui")
 local shared = ReplicatedStorage:WaitForChild("Core")
     :WaitForChild("Shared")
 local UiComponents = require(shared:WaitForChild("UiComponents"))
-local UiOrnament = require(shared:WaitForChild("UiOrnament"))
+local UiArt = require(shared:WaitForChild("UiArt"))
 local UiTheme = require(shared:WaitForChild("UiTheme"))
 local Controller = require(
     script.Parent:WaitForChild("HudWindowController")
@@ -65,26 +65,18 @@ frame.Name = "CommandBar"
 frame.AnchorPoint = Vector2.new(1, 1)
 frame.Position = UDim2.new(1, -18, 1, -18)
 frame.Size = UDim2.fromOffset(
-    14 + #actions * 52,
-    58
+    #actions * 58,
+    76
 )
-frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
-frame.BackgroundTransparency = 0.12
+frame.BackgroundTransparency = 1
 frame.BorderSizePixel = 0
-UiTheme.add_corner(frame, 2)
-UiTheme.add_stroke(
-    frame,
-    UiTheme.PALETTE.Border,
-    0.18
-)
 frame.Parent = gui
-UiOrnament.frame(frame, false)
 UiTheme.bind_responsive_scale(frame, 1366, 0.58, 1)
 
 local button_row = Instance.new("Frame")
 button_row.Name = "ButtonRow"
-button_row.Position = UDim2.fromOffset(6, 4)
-button_row.Size = UDim2.new(1, -12, 1, -8)
+button_row.Position = UDim2.fromOffset(0, 0)
+button_row.Size = UDim2.fromScale(1, 1)
 button_row.BackgroundTransparency = 1
 button_row.Parent = frame
 
@@ -92,7 +84,7 @@ local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0, 2)
+layout.Padding = UDim.new(0, -1)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = button_row
 
@@ -120,22 +112,53 @@ local function create_command(
         "Ghost"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.fromOffset(50, 50)
+    button.Size = UDim2.fromOffset(58, 76)
     button.BackgroundTransparency = 1
     button:SetAttribute(
         "DMMOUiBaseTransparency",
         1
     )
 
-    local icon = UiOrnament.icon(
+    local button_art = UiArt.image(
         button,
-        "Icon",
-        action.glyph,
-        action.tint,
-        39
+        "ButtonArt",
+        "CommandButton",
+        2
     )
+    button_art.Size = UDim2.fromScale(1, 1)
+
+    local icon = Instance.new("Frame")
+    icon.Name = "Icon"
     icon.AnchorPoint = Vector2.new(0.5, 0)
-    icon.Position = UDim2.new(0.5, 0, 0, 1)
+    icon.Position = UDim2.new(0.5, 0, 0, 9)
+    icon.Size = UDim2.fromOffset(35, 35)
+    icon.BackgroundColor3 = action.tint
+    icon.BackgroundTransparency = 0.08
+    icon.BorderSizePixel = 0
+    icon.ZIndex = 3
+    icon.Parent = button
+
+    local icon_gradient = Instance.new("UIGradient")
+    icon_gradient.Color = ColorSequence.new(
+        action.tint:Lerp(Color3.new(1, 1, 1), 0.18),
+        action.tint:Lerp(Color3.new(0, 0, 0), 0.54)
+    )
+    icon_gradient.Rotation = 120
+    icon_gradient.Parent = icon
+
+    local glyph = UiComponents.label(
+        icon,
+        "Glyph",
+        action.glyph,
+        "Heading"
+    )
+    glyph.Size = UDim2.fromScale(1, 1)
+    glyph.TextXAlignment = Enum.TextXAlignment.Center
+    glyph.TextColor3 = UiTheme.PALETTE.AccentBright
+    glyph.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+    glyph.TextStrokeTransparency = 0.08
+    glyph.TextSize = 21
+    glyph.ZIndex = 4
 
     local label = UiComponents.label(
         button,
@@ -144,19 +167,20 @@ local function create_command(
         "Caption"
     )
     label.AnchorPoint = Vector2.new(0.5, 1)
-    label.Position = UDim2.new(0.5, 0, 1, 0)
-    label.Size = UDim2.new(1, -2, 0, 13)
+    label.Position = UDim2.new(0.5, 0, 1, -7)
+    label.Size = UDim2.new(1, -4, 0, 15)
     label.TextXAlignment = Enum.TextXAlignment.Center
     label.TextColor3 = UiTheme.PALETTE.TextMuted
-    label.TextSize = 8
+    label.TextSize = 9
+    label.ZIndex = 4
 
     local key = UiComponents.key_hint(
         button,
         action.key
     )
     key.AnchorPoint = Vector2.new(1, 0)
-    key.Position = UDim2.new(1, 1, 0, -2)
-    key.Size = UDim2.fromOffset(17, 16)
+    key.Position = UDim2.new(1, -2, 0, 2)
+    key.Size = UDim2.fromOffset(16, 15)
     key.TextSize = 8
     key.ZIndex = 5
 
@@ -187,15 +211,14 @@ local function update_selection(
     for name, button in pairs(buttons) do
         local active = name == active_name
         local icon = icon_frames[name]
-        local stroke = icon:FindFirstChildOfClass("UIStroke")
+        button.BackgroundTransparency = 1
 
-        button.BackgroundTransparency = if active then 0.72 else 1
-
-        if stroke then
-            stroke.Color = if active
-                then UiTheme.PALETTE.AccentBright
-                else UiTheme.PALETTE.Border
-            stroke.Thickness = if active then 3 else 2
+        icon.BackgroundTransparency = if active then 0 else 0.08
+        local glyph = icon:FindFirstChild("Glyph")
+        if glyph and glyph:IsA("TextLabel") then
+            glyph.TextColor3 = if active
+                then Color3.fromRGB(255, 240, 181)
+                else UiTheme.PALETTE.AccentBright
         end
     end
 end
