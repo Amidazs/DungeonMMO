@@ -15,6 +15,9 @@ local TutorialDefinitions = require(
     shared:WaitForChild("TutorialDefinitions")
 )
 local UiTheme = require(shared:WaitForChild("UiTheme"))
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local profile_snapshot = remotes:WaitForChild(
     "ProfileSnapshot"
@@ -39,15 +42,16 @@ gui.Parent = player_gui
 local panel = Instance.new("Frame")
 panel.Name = "TutorialPanel"
 panel.AnchorPoint = Vector2.new(0.5, 0)
-panel.Position = UDim2.new(0.5, 0, 0, 88)
-panel.Size = UDim2.fromOffset(560, 270)
+panel.Position = UDim2.new(0.5, 0, 0, 24)
+panel.Size = UDim2.fromOffset(560, 246)
 UiTheme.style_panel(panel, true)
-UiTheme.bind_responsive_scale(panel, 1366, 0.68, 1)
 panel.Parent = gui
+UiOrnament.frame(panel, true)
+UiTheme.bind_responsive_scale(panel, 1366, 0.68, 1)
 
 local eyebrow = Instance.new("TextLabel")
 eyebrow.Name = "Eyebrow"
-eyebrow.Position = UDim2.fromOffset(22, 16)
+eyebrow.Position = UDim2.fromOffset(22, 12)
 eyebrow.Size = UDim2.new(1, -44, 0, 18)
 eyebrow.Text = "EXPEDITION TUTORIAL"
 UiTheme.style_label(eyebrow, "Caption")
@@ -56,7 +60,7 @@ eyebrow.Parent = panel
 
 local title = Instance.new("TextLabel")
 title.Name = "Title"
-title.Position = UDim2.fromOffset(22, 40)
+title.Position = UDim2.fromOffset(22, 34)
 title.Size = UDim2.new(1, -44, 0, 30)
 title.Text = TutorialDefinitions.DUNGEON_TITLE
 UiTheme.style_label(title, "Heading")
@@ -64,8 +68,8 @@ title.Parent = panel
 
 local body = Instance.new("TextLabel")
 body.Name = "Body"
-body.Position = UDim2.fromOffset(22, 78)
-body.Size = UDim2.new(1, -44, 0, 138)
+body.Position = UDim2.fromOffset(22, 70)
+body.Size = UDim2.new(1, -44, 0, 116)
 body.Text = TutorialDefinitions.DUNGEON_TEXT
 UiTheme.style_label(body, "Body")
 body.TextWrapped = true
@@ -76,7 +80,7 @@ body.Parent = panel
 local dismiss_button = Instance.new("TextButton")
 dismiss_button.Name = "Dismiss"
 dismiss_button.AnchorPoint = Vector2.new(1, 1)
-dismiss_button.Position = UDim2.new(1, -22, 1, -18)
+dismiss_button.Position = UDim2.new(1, -22, 1, -16)
 dismiss_button.Size = UDim2.fromOffset(150, 36)
 dismiss_button.Text = "Start Expedition"
 UiTheme.style_button(dismiss_button, "Primary")
@@ -85,7 +89,7 @@ dismiss_button.Parent = panel
 local note = Instance.new("TextLabel")
 note.Name = "Note"
 note.AnchorPoint = Vector2.new(0, 1)
-note.Position = UDim2.new(0, 22, 1, -22)
+note.Position = UDim2.new(0, 22, 1, -20)
 note.Size = UDim2.new(1, -200, 0, 32)
 note.Text = "This reminder is shown only to low-level test characters."
 UiTheme.style_label(note, "Caption")
