@@ -1,7 +1,6 @@
 --!strict
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 
 local player_gui = Players.LocalPlayer:WaitForChild("PlayerGui")
 local shared = ReplicatedStorage
@@ -108,7 +107,7 @@ local function create_command(
     end)
 
     button.Activated:Connect(function()
-        Controller.toggle(name)
+        Controller.set_visible(name, true)
     end)
 
     buttons[name] = button
@@ -137,17 +136,3 @@ end
 
 Controller.Changed:Connect(update_selection)
 update_selection(Controller.active())
-
-UserInputService.InputBegan:Connect(function(
-    input: InputObject,
-    processed: boolean
-)
-    if processed or input.KeyCode ~= Enum.KeyCode.Escape then
-        return
-    end
-
-    local active = Controller.active()
-    if active then
-        Controller.set_visible(active, false)
-    end
-end)
