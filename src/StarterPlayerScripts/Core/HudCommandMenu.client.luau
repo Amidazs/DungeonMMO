@@ -31,21 +31,21 @@ local actions = {
         name = "Skills",
         label = "Skills",
         key = "K",
-        glyph = "✦",
+        glyph = "S",
         tint = Color3.fromRGB(47, 83, 127),
     },
     {
         name = "Quests",
         label = "Quests",
         key = "L",
-        glyph = "◆",
+        glyph = "Q",
         tint = Color3.fromRGB(104, 71, 33),
     },
     {
         name = "Inventory",
         label = "Inventory",
         key = "I",
-        glyph = "▣",
+        glyph = "I",
         tint = Color3.fromRGB(93, 61, 31),
     },
 }
@@ -55,7 +55,7 @@ if script.Parent.Parent:FindFirstChild("Base") then
         name = "Guild",
         label = "Guild",
         key = "J",
-        glyph = "♜",
+        glyph = "G",
         tint = Color3.fromRGB(88, 67, 30),
     })
 end
@@ -81,12 +81,19 @@ frame.Parent = gui
 UiOrnament.frame(frame, false)
 UiTheme.bind_responsive_scale(frame, 1366, 0.58, 1)
 
+local button_row = Instance.new("Frame")
+button_row.Name = "ButtonRow"
+button_row.Position = UDim2.fromOffset(9, 6)
+button_row.Size = UDim2.new(1, -18, 1, -12)
+button_row.BackgroundTransparency = 1
+button_row.Parent = frame
+
 local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 layout.Padding = UDim.new(0, 5)
-layout.Parent = frame
+layout.Parent = button_row
 
 local buttons: {[string]: TextButton} = {}
 local icon_frames: {[string]: Frame} = {}
@@ -106,7 +113,7 @@ local function create_command(
     order: number
 )
     local button = UiComponents.button(
-        frame,
+        button_row,
         action.name .. "Command",
         "",
         "Ghost"
