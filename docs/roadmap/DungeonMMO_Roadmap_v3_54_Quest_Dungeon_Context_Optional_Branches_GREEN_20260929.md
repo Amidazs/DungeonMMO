@@ -68,40 +68,43 @@ The optional entrance-gate runtime also recognises `Skipped` state so a
 forfeited Event branch does not remain presented as an active progression
 requirement.
 
-## Physical acceptance
+## Authoritative acceptance
 
 A disposable unpublished Temple fixture materialised:
 
 `Room1, EventArena, Room2, SecretArena, Room3`
 
-The physical test then proved:
+The final fixture used an unpublished-only bridge to the exact
+`start_executed_slot()` server function called by the production room trigger,
+because Studio automation did not reliably synthesize `Touched` contact. It
+proved:
 
 - Room 1 started and cleared;
 - EventArena remained pending and was not entered;
-- entering Room 2 persisted the Event as `Skipped` and started Room 2;
+- starting Room 2 persisted the Event as `Skipped` and started Room 2;
 - Room 2 cleared;
 - SecretArena remained pending and was not entered;
-- entering Room 3 persisted the Secret as `Skipped` and started the final
+- starting Room 3 persisted the Secret as `Skipped` and started the final
   required boss;
 - the run completed successfully;
 - skipped Secret content did not count as discovered.
 
 ## Base UI acceptance
 
-A disposable local Base run used the real Temple entrance prompt and real held
-**E** input.
+A disposable local Base run used the actual `BaseUi.DungeonEntryPanel` at the
+real Temple entrance anchor. Because synthetic prompt keyboard input was
+unreliable, an unpublished-only bridge called the existing
+`open_from_entrance()` function; the player remained within the normal
+entrance-distance guard.
 
-At Depth 1 the accepted quest card rendered the Captain bounty and Worldroot
-dungeon-clear quest with the expected difficulty text.
+At Depth 1 the quest card rendered the tracked Hidden Ward objective as
+`Depth 1` and the Worldroot dungeon-clear objective as `Any unlocked depth`.
+Switching the same live panel to Depth 2 changed the incompatible quest marker
+to `!` and displayed the selected-depth mismatch warning.
 
-A synthetic presentation-only Depth-2 checkpoint quest was then sent while
-Depth 1 remained selected. The panel rendered:
-
-`! Deeper into the Temple — Reach the Temple's inner approach  0/1 — Depth 2`
-
-and the expected selected-depth mismatch warning.
-
-No saved player quest state was modified by these presentation probes.
+Direct mapping checks also verified Captain and Foreman bounties as
+`Depth 1 or Depth 4`. No saved player quest state was modified and no temporary
+bridge was published.
 
 ## Build and regression status
 
@@ -126,17 +129,17 @@ TEST universe: `10765241947`
 
 Studio terminal publish states:
 
-- Dungeon: `PublishSuccessful` at 09:53:12Z;
-- Base: `PublishSuccessful` at 09:53:49Z.
+- Dungeon: `PublishSuccessful` at 10:59:14Z;
+- Base: `PublishSuccessful` at 10:59:59Z.
 
 Fresh cloud copies were reopened after publication.
 
-After normalising Studio line endings and trailing newlines, every changed
-runtime/client source matched the current worktree exactly.
+Fresh cloud verification confirmed the v3.54 source markers, quest/depth
+mapping and absence of unpublished test hooks in the correct place IDs.
 
 Fresh published Dungeon Play:
 
-- authored TestDungeon runtime started;
+- Synthetic TestDungeon runtime started;
 - player admitted normally;
 - no v3.54 runtime/script error.
 
