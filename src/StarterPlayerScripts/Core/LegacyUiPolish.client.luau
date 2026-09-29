@@ -22,7 +22,6 @@ local TARGET_GUIS = table.freeze({
     BankPanel = true,
     C4FirstTransferChoiceUi = true,
     EquipmentPanelUi = true,
-    GuildPanel = true,
     MarketPanel = true,
     ProfessionUi = true,
     ProgressionTrainerUi = true,
