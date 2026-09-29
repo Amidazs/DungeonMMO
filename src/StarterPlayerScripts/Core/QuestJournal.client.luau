@@ -968,6 +968,8 @@ local function render_journal_detail(
     )
 end
 
+local render_journal: () -> ()
+
 --[[
 Creates one selectable quest entry in the left-side journal list.
 
@@ -1044,7 +1046,7 @@ Args:
 Returns:
     None.
 ]]
-function render_journal()
+render_journal = function()
     clear_generated_rows(
         journal_list,
         {journal_padding, journal_layout}
