@@ -61,7 +61,7 @@ local modal = UiComponents.modal(
     "InventoryPanel",
     "Inventory",
     "Browse carried equipment, materials and consumables.",
-    UDim2.fromOffset(800, 570)
+    UDim2.fromOffset(820, 590)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -189,7 +189,7 @@ local function add_item_row(row: any)
     frame.BackgroundTransparency = 0.08
     frame.BorderSizePixel = 0
     frame.ZIndex = 13
-    UiTheme.add_corner(frame, 7)
+    UiTheme.add_corner(frame, 1)
     UiTheme.add_stroke(
         frame,
         UiTheme.PALETTE.BorderSoft,
@@ -214,9 +214,9 @@ local function add_item_row(row: any)
         rarity_color(row.Rarity):Lerp(
             UiTheme.PALETTE.SurfaceRaised, 0.55
         ),
-        42
+        46
     )
-    icon.Position = UDim2.fromOffset(48, 12)
+    icon.Position = UDim2.fromOffset(46, 11)
 
     local name = UiComponents.label(
         frame,
@@ -398,7 +398,7 @@ for index, category in ipairs(
         "Secondary"
     )
     button.LayoutOrder = index
-    button.Size = UDim2.fromOffset(118, 34)
+    button.Size = UDim2.fromOffset(114, 32)
     button.ZIndex = 13
     tab_buttons[category] = button
 
