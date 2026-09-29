@@ -237,7 +237,44 @@ function UiArt.reference_background(
     image.Size = UDim2.fromScale(1, 1)
     image.ZIndex = z_index or 1
     image.Parent = parent
+    local shells = {Stats = UiArtAssets.STATS_SHELL, Inventory = UiArtAssets.INVENTORY_SHELL,
+        Skills = UiArtAssets.SKILLS_SHELL, Guild = UiArtAssets.GUILD_SHELL,
+        Party = UiArtAssets.PARTY_SHELL, Journal = UiArtAssets.JOURNAL_SHELL}
+    if shells[art_name] then
+        local rail = Instance.new("ImageLabel")
+        rail.Name = "BottomOrnament"
+        rail.BackgroundTransparency = 1
+        rail.Image = shells[art_name]
+        rail.ImageRectOffset = Vector2.new(0, art.SourceSize.Y - 100)
+        rail.ImageRectSize = Vector2.new(art.SourceSize.X, 100)
+        rail.Position = UDim2.fromScale(0, 1 - 100 / art.SourceSize.Y)
+        rail.Size = UDim2.fromScale(1, 100 / art.SourceSize.Y)
+        rail.ZIndex = (z_index or 1) + 1
+        rail.Parent = image
+    end
     return image
+end
+
+-- The target is parented to the artwork root, independent of the old modal header.
+function UiArt.align_close(parent: GuiObject, button: TextButton, art_name: string)
+    local centers = {
+        Stats = Vector2.new(1048, 115), Inventory = Vector2.new(1048, 128),
+        Skills = Vector2.new(1050, 110), Guild = Vector2.new(1045, 133),
+        Journal = Vector2.new(1050, 106), Party = Vector2.new(1009, 125),
+        Settings = Vector2.new(1050, 104),
+    }
+    local point = centers[art_name]
+    button.Parent = parent
+    button.AnchorPoint = Vector2.new(0.5, 0.5)
+    button.Position = UiArt.position(art_name, point.X, point.Y)
+    button.Size = UiArt.rect(art_name, 0, 0, 64, 64)
+    button.BackgroundTransparency = 1
+    button.TextTransparency = 1
+    button.ZIndex = 30
+    for _, child in ipairs(button:GetChildren()) do
+        if child:IsA("GuiObject") then child.Visible = false end
+        if child:IsA("UIStroke") then child.Transparency = 1 end
+    end
 end
 
 --[[
@@ -288,6 +325,30 @@ function UiArt.paint_button(
     art.Size = UDim2.fromScale(1, 1)
     art.ZIndex = math.max(1, button.ZIndex - 1)
     art.Parent = button
+    local caption = button:FindFirstChild("PaintedCaption")
+    if not caption then
+        caption = Instance.new("TextLabel")
+        caption.Name = "PaintedCaption"
+        caption.BackgroundTransparency = 1
+        caption.Size = UDim2.fromScale(1, 1)
+        caption.Parent = button
+        local function sync()
+            caption.Text = button.Text
+            caption.FontFace = button.FontFace
+            caption.TextSize = button.TextSize
+            caption.TextColor3 = button.TextColor3
+            caption.TextStrokeColor3 = button.TextStrokeColor3
+            caption.TextStrokeTransparency = button.TextStrokeTransparency
+            caption.TextWrapped = button.TextWrapped
+            caption.TextTransparency = if button.Active then 0 else 0.3
+            art.ZIndex = button.ZIndex
+            caption.ZIndex = button.ZIndex + 1
+        end
+        for _, property in ipairs({"Text", "TextSize", "TextColor3", "FontFace", "Active", "ZIndex"}) do
+            button:GetPropertyChangedSignal(property):Connect(sync)
+        end
+        sync()
+    end
     return art
 end
 

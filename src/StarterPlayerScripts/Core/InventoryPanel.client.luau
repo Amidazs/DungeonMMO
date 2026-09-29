@@ -154,6 +154,13 @@ character_name.Size = UDim2.new(0.9, 0, 0, 28)
 character_name.TextXAlignment = Enum.TextXAlignment.Center
 character_name.ZIndex = 15
 
+local view_stats = UiComponents.button(character_panel, "ViewStats", "View Stats", "Primary")
+view_stats.Position = UDim2.fromScale(0.1, 0.88)
+view_stats.Size = UDim2.new(0.8, 0, 0, 36)
+view_stats.ZIndex = 16
+UiArt.paint_button(view_stats, "Primary")
+view_stats.Activated:Connect(function() WindowController.set_visible("Stats", true) end)
+
 local character_hint = UiComponents.label(
     character_panel,
     "CharacterHint",
@@ -186,7 +193,9 @@ tab_strip.Name = "CategoryTabs"
 tab_strip.Size = UDim2.new(1, 0, 0, 38)
 tab_strip.BackgroundTransparency = 1
 tab_strip.ZIndex = 12
-tab_strip.Parent = modal.Body
+tab_strip.Parent = panel
+ tab_strip.Position = UiArt.position("Inventory", 68, 185)
+ tab_strip.Size = UiArt.rect("Inventory", 0, 0, 985, 62)
 
 local tab_layout = Instance.new("UIListLayout")
 tab_layout.FillDirection = Enum.FillDirection.Horizontal
@@ -327,7 +336,11 @@ local function add_item_row(row: any)
         tostring(row.Name),
         "Heading"
     )
-    name.Visible = false
+    name.Visible = true
+    name.Position = UDim2.fromOffset(2, 43)
+    name.Size = UDim2.new(1, -4, 0, 18)
+    name.TextSize = 9
+    name.TextTruncate = Enum.TextTruncate.AtEnd
     name.ZIndex = 14
 
     local detail = UiComponents.label(
@@ -502,6 +515,8 @@ WindowController.register("Inventory", apply_visibility)
 local function set_visible(visible: boolean)
     WindowController.set_visible("Inventory", visible)
 end
+
+UiArt.align_close(panel, modal.Close, "Inventory")
 
 modal.Close.Activated:Connect(function()
     set_visible(false)

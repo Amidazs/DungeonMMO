@@ -1379,6 +1379,8 @@ start_button.Activated:Connect(function()
     })
 end)
 
+UiArt.align_close(panel, modal.Close, "Party")
+
 modal.Close.Activated:Connect(function()
     set_visible(false)
 end)

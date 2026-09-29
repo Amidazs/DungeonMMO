@@ -1,3 +1,15 @@
+## 29 September 2026 - Reference HUD remediation in progress
+
+User-requested worktree: DungeonMMO_Phase4_HUD_Integration_v1, branch
+wip/phase-4-test-hud-integration-v1, starting HEAD 5a17304a645f7be1a958967d296c645d5635a14e.
+This reconciles the older v3.55 handoff with the subsequent committed reference-art changes.
+The current user request supersedes the old procedural styling direction; use supplied high-resolution artwork and authoritative dynamic content.
+Tracked files were clean; existing untracked assets and temporary places are preserved.
+Initial Studio Base v3 evidence: Stats 680x850 exceeds 1584x841 viewport (top -33.5);
+painted close and actual close target differ; Map/Settings commands lack renderers.
+ManaHud waits for StatusCard.ManaFill, but the fill is inside ManaTrack.
+Current status: NOT ACCEPTED. No push, merge or publish authorized/performed.
+Next: repair shared window geometry and text layering, audit HUD ownership, complete missing command views, then fresh Base/Dungeon visual and interaction QA.
 ## 29 September 2026 — v3.55 ORNATE MMORPG UI OVERHAUL — USER REVIEW HOLD
 
 The actual DungeonMMO interface has received a full presentation overhaul

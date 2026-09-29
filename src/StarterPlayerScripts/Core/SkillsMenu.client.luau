@@ -625,6 +625,8 @@ local function set_visible(visible: boolean)
     WindowController.set_visible("Skills", visible)
 end
 
+UiArt.align_close(panel, modal.Close, "Skills")
+
 modal.Close.Activated:Connect(function()
     set_visible(false)
 end)

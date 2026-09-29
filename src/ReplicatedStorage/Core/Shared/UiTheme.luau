@@ -568,14 +568,17 @@ function UiTheme.bind_responsive_scale(
             return
         end
 
-        scale.Scale = math.clamp(
-            math.min(
-                camera.ViewportSize.X / reference_width,
-                camera.ViewportSize.Y / 720
-            ),
-            minimum,
-            maximum
-        )
+        local viewport = camera.ViewportSize
+        local desired = math.clamp(math.min(viewport.X / reference_width, viewport.Y / 720), minimum, maximum)
+        local size = object.Size
+        if size.X.Scale == 0 and size.Y.Scale == 0 and size.Y.Offset >= 500 then
+            local parent = object.Parent
+            local available = if parent and parent:IsA("ScreenGui") then parent.AbsoluteSize else viewport
+            local top = if object.AnchorPoint.Y == 0 then math.max(0, object.Position.Y.Offset) else 0
+            local left = if object.AnchorPoint.X == 0 then math.max(0, object.Position.X.Offset) else 0
+            desired = math.min(desired, (available.X - left - 24) / size.X.Offset, (available.Y - top - 24) / size.Y.Offset)
+        end
+        scale.Scale = math.max(0.1, desired)
     end
 
     local function bind_camera()
@@ -592,12 +595,15 @@ function UiTheme.bind_responsive_scale(
         update()
     end
 
-    workspace:GetPropertyChangedSignal(
-        "CurrentCamera"
-    ):Connect(bind_camera)
+    local viewport_parent = object.Parent
+    local bounds_connection = if viewport_parent and viewport_parent:IsA("ScreenGui")
+        then viewport_parent:GetPropertyChangedSignal("AbsoluteSize"):Connect(update) else nil
+    workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(bind_camera)
     bind_camera()
+    task.defer(update)
 
     return function()
+        if bounds_connection then bounds_connection:Disconnect() end
         if camera_connection then
             camera_connection:Disconnect()
         end

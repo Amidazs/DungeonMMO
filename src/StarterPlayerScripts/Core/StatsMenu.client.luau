@@ -623,6 +623,8 @@ end
 
 WindowController.register("Stats", apply_visibility)
 
+UiArt.align_close(panel, modal.Close, "Stats")
+
 modal.Close.Activated:Connect(function()
     WindowController.set_visible("Stats", false)
 end)

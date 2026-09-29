@@ -1034,6 +1034,8 @@ end
 
 WindowController.register("Guild", apply_visibility)
 
+UiArt.align_close(panel, modal.Close, "Guild")
+
 modal.Close.Activated:Connect(function()
     WindowController.set_visible(
         "Guild",

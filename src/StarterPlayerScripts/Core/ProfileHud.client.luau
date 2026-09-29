@@ -481,3 +481,14 @@ task.defer(function()
     profile_snapshot:FireServer("Request")
     progression_snapshot:FireServer("Request")
 end)
+
+-- Replicated combat resources are authoritative. Base may not expose combat MP.
+local function update_mana()
+    local maximum = tonumber(player:GetAttribute("CombatMaxMana")) or 0
+    local current = tonumber(player:GetAttribute("CombatMana"))
+    mana_value.Text = if maximum > 0 then string.format("%.0f / %.0f", math.clamp(current or maximum, 0, maximum), maximum) else "MP unavailable in Base"
+    UiTheme.set_bar_ratio(mana_fill, if maximum > 0 then math.clamp(current or maximum, 0, maximum) / maximum else 0, true)
+end
+player:GetAttributeChangedSignal("CombatMana"):Connect(update_mana)
+player:GetAttributeChangedSignal("CombatMaxMana"):Connect(update_mana)
+update_mana()

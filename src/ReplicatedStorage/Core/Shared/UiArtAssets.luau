@@ -4,6 +4,15 @@
 -- *_EMPTY assets are runtime-safe versions of the supplied reference art:
 -- ornamental chrome is preserved while example gameplay content is removed.
 local UiArtAssets = {
+    -- Original user-supplied empty shells, 29 September evening exports.
+    GUILD_SHELL = "rbxassetid://87416361775937",
+    PARTY_SHELL = "rbxassetid://134318791633868",
+    STATS_SHELL = "rbxassetid://123415513156960",
+    INVENTORY_SHELL = "rbxassetid://77336241903057",
+    SKILLS_SHELL = "rbxassetid://104008326052532",
+    MAP_SHELL = "rbxassetid://133743939772126",
+    SETTINGS_SHELL = "rbxassetid://138224029547718",
+    JOURNAL_SHELL = "rbxassetid://119642804028924",
     SETTINGS = "rbxassetid://132224126962111",
     WORLD_MAP = "rbxassetid://130758325861721",
     SKILLS = "rbxassetid://132294974170417",

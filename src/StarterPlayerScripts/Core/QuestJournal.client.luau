@@ -1434,6 +1434,8 @@ WindowController.register(
     set_journal_visible
 )
 
+UiArt.align_close(journal_panel, modal.Close, "Journal")
+
 modal.Close.Activated:Connect(function()
     WindowController.set_visible(WINDOW_NAME, false)
 end)
