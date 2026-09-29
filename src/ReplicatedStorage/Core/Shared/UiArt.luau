@@ -299,8 +299,8 @@ function UiArt.content_mask(
     width: number,
     height: number,
     z_index: number?
-): Frame
-    local mask = Instance.new("Frame")
+): ImageLabel
+    local mask = Instance.new("ImageLabel")
     mask.Name = name
     mask.Position = UiArt.position(art_name, x, y)
     mask.Size = UiArt.rect(
@@ -310,9 +310,13 @@ function UiArt.content_mask(
         width,
         height
     )
-    mask.BackgroundColor3 = Color3.fromRGB(10, 13, 16)
-    mask.BackgroundTransparency = 0.02
+    mask.BackgroundTransparency = 1
     mask.BorderSizePixel = 0
+    mask.Image = UiArtAssets.QUEST_JOURNAL
+    mask.ImageRectOffset = Vector2.new(360, 950)
+    mask.ImageRectSize = Vector2.new(140, 140)
+    mask.ScaleType = Enum.ScaleType.Stretch
+    mask.ImageColor3 = Color3.fromRGB(235, 235, 235)
     mask.ZIndex = z_index or 2
     mask.Parent = parent
     return mask
