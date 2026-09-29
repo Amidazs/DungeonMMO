@@ -4,11 +4,19 @@
 -- Older atlas regions remain available for the four horizontal HUD elements
 -- until their new high-resolution source images are uploaded. Main windows
 -- use the full-resolution images registered in UiArtAssets.
+local AssetService = game:GetService("AssetService")
+local EncodingService = game:GetService("EncodingService")
+
+local ProfileHudArtData = require(
+    script.Parent:WaitForChild("ProfileHudArtData")
+)
 local UiArtAssets = require(
     script.Parent:WaitForChild("UiArtAssets")
 )
 
 local UiArt = {}
+
+local profile_editable_image: EditableImage? = nil
 
 UiArt.ATLAS_IMAGE = "rbxassetid://107368787767290"
 UiArt.WINDOW_IMAGE = "rbxassetid://127588383054650"
@@ -681,7 +689,85 @@ local function hud_asset(
 end
 
 --[[
-Adds the high-resolution empty player unit-frame artwork.
+Builds the approved player HUD shell from the embedded image payload.
+
+The embedded source avoids depending on an older Roblox image asset that used
+different artwork. A cached EditableImage is shared by every player HUD image
+created by this client.
+
+Args:
+    None.
+
+Returns:
+    EditableImage?: Runtime image containing the approved empty HUD shell.
+]]
+local function get_profile_editable_image(): EditableImage?
+    if profile_editable_image then
+        return profile_editable_image
+    end
+
+    local ok, result = pcall(function()
+        local encoded = string.gsub(
+            ProfileHudArtData.Base64,
+            "%s+",
+            ""
+        )
+        local compressed = EncodingService:Base64Decode(
+            buffer.fromstring(encoded)
+        )
+        local raw_byte_count =
+            EncodingService:GetDecompressedBufferSize(
+                compressed,
+                Enum.CompressionAlgorithm.Zstd
+            )
+
+        assert(
+            raw_byte_count == ProfileHudArtData.RawByteCount,
+            "Embedded player HUD image payload has an unexpected size"
+        )
+
+        local pixels = EncodingService:DecompressBuffer(
+            compressed,
+            Enum.CompressionAlgorithm.Zstd
+        )
+        local editable_image = AssetService:CreateEditableImage({
+            Size = Vector2.new(
+                ProfileHudArtData.Width,
+                ProfileHudArtData.Height
+            ),
+        })
+
+        assert(
+            editable_image ~= nil,
+            "Could not allocate the embedded player HUD image"
+        )
+
+        editable_image:WritePixelsBuffer(
+            Vector2.zero,
+            Vector2.new(
+                ProfileHudArtData.Width,
+                ProfileHudArtData.Height
+            ),
+            pixels
+        )
+
+        return editable_image
+    end)
+
+    if not ok or not result then
+        warn(
+            "DungeonMMO player HUD shell fallback:",
+            result
+        )
+        return nil
+    end
+
+    profile_editable_image = result
+    return profile_editable_image
+end
+
+--[[
+Adds the approved empty player unit-frame artwork.
 
 Args:
     parent (GuiObject): Player HUD root.
@@ -694,12 +780,21 @@ function UiArt.profile_background(
     parent: GuiObject,
     z_index: number?
 ): ImageLabel
-    return hud_asset(
+    local image = hud_asset(
         parent,
         "ProfileArt",
         UiArtAssets.PROFILE_EMPTY,
         z_index
     )
+    local editable_image = get_profile_editable_image()
+
+    if editable_image then
+        image.ImageContent = Content.fromObject(
+            editable_image
+        )
+    end
+
+    return image
 end
 
 --[[
