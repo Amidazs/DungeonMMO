@@ -2,12 +2,12 @@
 -- Shared native Roblox ornamentation for the fantasy interface.
 local UiOrnament = {}
 
-local GOLD = Color3.fromRGB(158, 116, 49)
-local GOLD_BRIGHT = Color3.fromRGB(232, 187, 88)
-local GOLD_PALE = Color3.fromRGB(247, 219, 151)
-local BRONZE = Color3.fromRGB(89, 60, 27)
-local SHADOW = Color3.fromRGB(4, 6, 8)
-local METAL = Color3.fromRGB(28, 29, 30)
+local GOLD = Color3.fromRGB(145, 103, 43)
+local GOLD_BRIGHT = Color3.fromRGB(218, 168, 75)
+local GOLD_PALE = Color3.fromRGB(246, 214, 142)
+local BRONZE = Color3.fromRGB(82, 55, 25)
+local SHADOW = Color3.fromRGB(4, 3, 3)
+local METAL = Color3.fromRGB(24, 22, 19)
 
 --[[
 Creates one thin decorative edge strip.
@@ -67,7 +67,7 @@ local function make_corner(
     corner.Name = name
     corner.AnchorPoint = Vector2.new(x, y)
     corner.Position = UDim2.fromScale(x, y)
-    corner.Size = UDim2.fromOffset(19, 19)
+    corner.Size = UDim2.fromOffset(23, 23)
     corner.BackgroundTransparency = 1
     corner.BorderSizePixel = 0
     corner.ZIndex = z_index
@@ -77,7 +77,7 @@ local function make_corner(
         corner,
         "Horizontal",
         UDim2.fromOffset(if x == 0 then 0 else 1, 0),
-        UDim2.fromOffset(18, 3),
+        UDim2.fromOffset(22, 3),
         GOLD_BRIGHT,
         z_index
     )
@@ -88,7 +88,7 @@ local function make_corner(
         corner,
         "Vertical",
         UDim2.fromOffset(0, if y == 0 then 0 else 1),
-        UDim2.fromOffset(3, 18),
+        UDim2.fromOffset(3, 22),
         GOLD_BRIGHT,
         z_index
     )
@@ -99,7 +99,7 @@ local function make_corner(
     jewel.Name = "CornerJewel"
     jewel.AnchorPoint = Vector2.new(0.5, 0.5)
     jewel.Position = UDim2.fromScale(0.5, 0.5)
-    jewel.Size = UDim2.fromOffset(7, 7)
+    jewel.Size = UDim2.fromOffset(8, 8)
     jewel.BackgroundColor3 = GOLD
     jewel.BorderSizePixel = 0
     jewel.Rotation = 45
@@ -154,10 +154,26 @@ function UiOrnament.frame(
     outer.Thickness = if prominent then 2 else 1
     outer.Parent = chrome
 
+    local shadow_inset = Instance.new("Frame")
+    shadow_inset.Name = "ShadowInset"
+    shadow_inset.Position = UDim2.fromOffset(3, 3)
+    shadow_inset.Size = UDim2.new(1, -6, 1, -6)
+    shadow_inset.BackgroundTransparency = 1
+    shadow_inset.BorderSizePixel = 0
+    shadow_inset.ZIndex = frame.ZIndex
+    shadow_inset.Parent = chrome
+
+    local shadow_stroke = Instance.new("UIStroke")
+    shadow_stroke.Name = "ShadowStroke"
+    shadow_stroke.Color = SHADOW
+    shadow_stroke.Transparency = 0.08
+    shadow_stroke.Thickness = 2
+    shadow_stroke.Parent = shadow_inset
+
     local inset = Instance.new("Frame")
     inset.Name = "MetalInset"
-    inset.Position = UDim2.fromOffset(5, 5)
-    inset.Size = UDim2.new(1, -10, 1, -10)
+    inset.Position = UDim2.fromOffset(6, 6)
+    inset.Size = UDim2.new(1, -12, 1, -12)
     inset.BackgroundTransparency = 1
     inset.BorderSizePixel = 0
     inset.ZIndex = frame.ZIndex
@@ -168,15 +184,15 @@ function UiOrnament.frame(
     inner.Color = if prominent
         then GOLD
         else GOLD:Lerp(BRONZE, 0.44)
-    inner.Transparency = if prominent then 0.15 else 0.38
+    inner.Transparency = if prominent then 0.14 else 0.42
     inner.Thickness = 1
     inner.Parent = inset
 
     local top_glint = make_edge(
         chrome,
         "TopGlint",
-        UDim2.fromOffset(28, 2),
-        UDim2.new(1, -56, 0, 1),
+        UDim2.fromOffset(34, 2),
+        UDim2.new(1, -68, 0, 1),
         if prominent then GOLD_PALE else GOLD,
         frame.ZIndex + 1
     )
@@ -185,8 +201,8 @@ function UiOrnament.frame(
     local bottom_shadow = make_edge(
         chrome,
         "BottomShadow",
-        UDim2.new(0, 28, 1, -3),
-        UDim2.new(1, -56, 0, 1),
+        UDim2.new(0, 34, 1, -3),
+        UDim2.new(1, -68, 0, 1),
         BRONZE,
         frame.ZIndex + 1
     )
@@ -328,6 +344,103 @@ function UiOrnament.icon(
     sigil.Parent = well
 
     return outer
+end
+
+
+--[[
+Adds flared side ornaments to the combat action bar.
+
+Args:
+    frame (Frame): Action-bar panel that receives the side ornaments.
+
+Returns:
+    None.
+]]
+function UiOrnament.action_bar_wings(frame: Frame)
+    local previous = frame:FindFirstChild("DMMOActionBarWings")
+    if previous then
+        previous:Destroy()
+    end
+
+    local root = Instance.new("Frame")
+    root.Name = "DMMOActionBarWings"
+    root.Size = UDim2.fromScale(1, 1)
+    root.BackgroundTransparency = 1
+    root.BorderSizePixel = 0
+    root.ZIndex = frame.ZIndex
+    root.Parent = frame
+
+    for _, side in ipairs({-1, 1}) do
+        local anchor = if side < 0 then 1 else 0
+        local x_scale = if side < 0 then 0 else 1
+
+        local wing = Instance.new("Frame")
+        wing.Name = if side < 0 then "LeftWing" else "RightWing"
+        wing.AnchorPoint = Vector2.new(anchor, 0.5)
+        wing.Position = UDim2.new(
+            x_scale,
+            if side < 0 then 5 else -5,
+            0.5,
+            0
+        )
+        wing.Size = UDim2.fromOffset(54, 54)
+        wing.BackgroundTransparency = 1
+        wing.BorderSizePixel = 0
+        wing.ZIndex = frame.ZIndex + 1
+        wing.Parent = root
+
+        local diamond = Instance.new("Frame")
+        diamond.Name = "Crest"
+        diamond.AnchorPoint = Vector2.new(0.5, 0.5)
+        diamond.Position = UDim2.fromScale(0.5, 0.5)
+        diamond.Size = UDim2.fromOffset(31, 31)
+        diamond.BackgroundColor3 = METAL
+        diamond.BorderSizePixel = 0
+        diamond.Rotation = 45
+        diamond.ZIndex = wing.ZIndex
+        diamond.Parent = wing
+
+        local rim = Instance.new("UIStroke")
+        rim.Color = GOLD_BRIGHT
+        rim.Transparency = 0.08
+        rim.Thickness = 2
+        rim.Parent = diamond
+
+        local rune = Instance.new("TextLabel")
+        rune.Name = "Rune"
+        rune.AnchorPoint = Vector2.new(0.5, 0.5)
+        rune.Position = UDim2.fromScale(0.5, 0.5)
+        rune.Size = UDim2.fromOffset(27, 27)
+        rune.BackgroundTransparency = 1
+        rune.Font = Enum.Font.Garamond
+        rune.Text = "✦"
+        rune.TextColor3 = GOLD_PALE
+        rune.TextStrokeColor3 = SHADOW
+        rune.TextStrokeTransparency = 0.25
+        rune.TextSize = 20
+        rune.Rotation = -45
+        rune.ZIndex = wing.ZIndex + 1
+        rune.Parent = diamond
+
+        local rail = make_edge(
+            wing,
+            "Rail",
+            UDim2.new(
+                if side < 0 then 0.42 else 0,
+                0,
+                0.5,
+                -1
+            ),
+            UDim2.fromOffset(31, 2),
+            GOLD,
+            wing.ZIndex
+        )
+        rail.AnchorPoint = Vector2.new(
+            if side < 0 then 0 else 1,
+            0.5
+        )
+        rail.BackgroundTransparency = 0.18
+    end
 end
 
 return table.freeze(UiOrnament)
