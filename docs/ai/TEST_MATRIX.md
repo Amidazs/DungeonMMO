@@ -1,3 +1,20 @@
+## v3.55 ornate MMORPG UI restyle — WIP
+
+- Shared theme/chrome source update: IMPLEMENTED.
+- Top-left player unit frame: IMPLEMENTED, Studio visual check pending.
+- Bottom-centre combat hotbar restyle: IMPLEMENTED, Studio visual check pending.
+- Bottom-right command icon row: IMPLEMENTED, Studio visual check pending.
+- Quest Tracker / Journal shell restyle: IMPLEMENTED, Studio visual check pending.
+- Dungeon objective/boss/revive/completion chrome: IMPLEMENTED, Studio visual check pending.
+- git diff --check: PASS.
+- Base Rojo build: PASS.
+- Dungeon Rojo build: PASS.
+- Published Base Rojo build: PASS.
+- Published Dungeon Rojo build: PASS.
+- Fresh Studio runtime visual acceptance: PENDING.
+- TEST publish: NOT PERFORMED.
+- PROD publish: NOT PERFORMED.
+
 ## 29 September 2026 — CURRENT v3.54 quest dungeon context / optional branches GREEN
 
 - `git diff --check`: PASS.
