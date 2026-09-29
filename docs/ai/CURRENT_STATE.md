@@ -27,8 +27,8 @@ entered, the authoritative encounter flow persists the optional encounter as
 `Skipped` and starts the required room. Secret-specific deferred backtracking
 remains available; skipped timed Events are forfeited for that run.
 
-Physical Temple acceptance proved the complete required path while ignoring
-both side rooms:
+Authoritative Temple acceptance proved the complete required path while
+ignoring both side rooms:
 
 - Room 1 clear;
 - Event skipped by entering Room 2;
@@ -37,18 +37,23 @@ both side rooms:
 - final boss starts;
 - dungeon completes.
 
-The new entrance UI was also live-tested through the real Temple proximity
-prompt with held **E** input. A later-depth synthetic objective correctly
-rendered `Depth 2` and the mismatch warning while Depth 1 remained selected.
+The actual `BaseUi.DungeonEntryPanel` was live-tested at the real Temple
+entrance anchor using unpublished-only test hooks that call the existing
+entrance-opening and difficulty-selection functions. Depth 1 rendered the
+tracked Hidden Ward objective plus Worldroot clear objective correctly;
+switching the same panel to Depth 2 produced the expected incompatibility
+marker and warning. Direct mapping checks also verified Captain and Foreman as
+`Depth 1 or Depth 4`. No test hooks were published.
 
 Final TEST publication:
 
-- Dungeon `117293035754309`: `PublishSuccessful` at 09:53:12Z;
-- Base `134132328219009`: `PublishSuccessful` at 09:53:49Z.
+- Dungeon `117293035754309`: `PublishSuccessful` at 10:59:14Z;
+- Base `134132328219009`: `PublishSuccessful` at 10:59:59Z.
 
-Fresh cloud copies were reopened after publication. Normalised source equality
-against the current worktree is true for every changed runtime/client file.
-Fresh cloud Dungeon and Base Play both start cleanly.
+Fresh cloud copies were reopened after publication. The expected v3.54 source
+markers and quest/depth mappings were present in the correct place IDs, the
+Base contained no unpublished test hooks, and fresh cloud Dungeon/Base Play
+both started cleanly.
 
 Feature source checkpoint:
 `7cfb19a64aa6680de318827b54791c015a0794cf`.
