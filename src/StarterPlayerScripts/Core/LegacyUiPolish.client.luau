@@ -69,6 +69,44 @@ local function button_variant(
     return "Secondary"
 end
 
+
+--[[
+Returns whether a legacy frame is a visible content surface worth restyling.
+
+Args:
+    frame (Frame): Legacy frame being inspected.
+
+Returns:
+    boolean: True for visible cards, rows, panels and section surfaces.
+]]
+local function should_style_frame(frame: Frame): boolean
+    if frame.BackgroundTransparency >= 1 then
+        return false
+    end
+
+    local name = string.lower(frame.Name)
+    local keywords = {
+        "panel",
+        "card",
+        "row",
+        "banner",
+        "slot",
+        "entry",
+        "section",
+        "context",
+        "content",
+        "header",
+    }
+
+    for _, keyword in ipairs(keywords) do
+        if string.find(name, keyword, 1, true) then
+            return true
+        end
+    end
+
+    return false
+end
+
 --[[
 Styles one legacy descendant without changing layout or behaviour.
 
@@ -79,7 +117,17 @@ Returns:
     None.
 ]]
 local function style_descendant(object: Instance)
-    if object:IsA("TextButton") then
+    if object:IsA("Frame")
+        and should_style_frame(object)
+    then
+        local warm = string.find(
+            string.lower(object.Name),
+            "header",
+            1,
+            true
+        ) ~= nil
+        UiTheme.style_inset(object, warm)
+    elseif object:IsA("TextButton") then
         UiTheme.style_button(
             object,
             button_variant(object)
