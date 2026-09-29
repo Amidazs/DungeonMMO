@@ -73,7 +73,7 @@ local modal = UiComponents.modal(
     "SkillsPanel",
     "Skills & Loadout",
     "Select a learned skill, then choose the hotbar slot.",
-    UDim2.fromOffset(640, 800)
+    UDim2.fromOffset(680, 850)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -184,7 +184,7 @@ skill_padding.PaddingRight = UDim.new(0, 8)
 skill_padding.Parent = skill_list
 
 local skill_layout = Instance.new("UIGridLayout")
-skill_layout.CellSize = UDim2.fromOffset(86, 108)
+skill_layout.CellSize = UDim2.fromOffset(82, 108)
 skill_layout.CellPadding = UDim2.fromOffset(5, 6)
 skill_layout.SortOrder = Enum.SortOrder.LayoutOrder
 skill_layout.Parent = skill_list
@@ -336,7 +336,7 @@ local function create_skill_button(
         "Secondary"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.fromOffset(86, 108)
+    button.Size = UDim2.fromOffset(82, 108)
     button.Text = ""
     button.ZIndex = 13
     button:SetAttribute(
@@ -349,7 +349,7 @@ local function create_skill_button(
         "SkillIcon",
         string.sub(display_name, 1, 1),
         Color3.fromRGB(42, 71, 113),
-        62
+        58
     )
     icon.AnchorPoint = Vector2.new(0.5, 0)
     icon.Position = UDim2.new(0.5, 0, 0, 6)
@@ -365,7 +365,7 @@ local function create_skill_button(
     name_label.Size = UDim2.new(1, -10, 0, 18)
     name_label.TextXAlignment = Enum.TextXAlignment.Center
     name_label.TextTruncate = Enum.TextTruncate.AtEnd
-    name_label.TextSize = 9
+    name_label.TextSize = 11
     name_label.ZIndex = 14
 
     local rank_label = UiComponents.label(
@@ -377,7 +377,7 @@ local function create_skill_button(
     rank_label.Position = UDim2.fromOffset(5, 91)
     rank_label.Size = UDim2.new(1, -10, 0, 12)
     rank_label.TextXAlignment = Enum.TextXAlignment.Center
-    rank_label.TextSize = 8
+    rank_label.TextSize = 9
     rank_label.ZIndex = 14
 
     skill_name_labels[skill_id] = name_label
