@@ -38,7 +38,7 @@ frame.Size = UDim2.fromOffset(420, 82)
 frame.BackgroundTransparency = 1
 frame.BorderSizePixel = 0
 frame.Parent = gui
-UiTheme.bind_responsive_scale(frame, 1366, 0.58, 1)
+UiTheme.bind_responsive_scale(frame, 1600, 0.58, 1)
 
 UiArt.command_strip(frame, 1)
 
