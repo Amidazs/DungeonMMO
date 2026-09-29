@@ -1,31 +1,43 @@
-## 29 September 2026 — v3.55 ORNATE MMORPG UI RESTYLE WIP
+## 29 September 2026 — v3.55 ORNATE MMORPG UI OVERHAUL — USER REVIEW HOLD
 
-The current task is a real in-game UI/HUD overhaul using the user's supplied
-fantasy MMORPG screenshot as the visual target.
+The current source is a real in-game UI/HUD overhaul based on the user's
+supplied classic fantasy MMORPG reference, not a concept image.
 
-Source checkpoint: `9ddcdef3d43e5f05c488b4c5eb9fd8ddcb8ba5b5`.
+Source checkpoint before documentation:
+`a13d5b85f6934378d0a75e02e3ef4b98fe3a47c9`.
 
-Changed source:
+High-frequency UI now uses one shared aged-metal visual system:
 
-- `UiTheme.luau`;
-- `UiOrnament.luau`;
-- `UiComponents.luau`;
-- `ProfileHud.client.luau`;
-- `CombatHotbar.client.luau`;
-- `HudCommandMenu.client.luau`;
-- `QuestJournal.client.luau`;
-- `DungeonUi.client.luau`.
+- warm black/brown panels;
+- antique gold/bronze double rails, corner jewels and shadow insets;
+- Garamond/cream typography;
+- squared compact controls;
+- framed icon/skill/item wells.
 
-The direction is now dark forged-metal surfaces, antique-gold trim, Garamond
-headings, compact classic-MMO density and ornate corner/detail framing.
-Structural HUD changes already place the player frame top-left, hotbar
-bottom-centre, quest tracker right and icon command row bottom-right.
+The runtime layout has been structurally rebuilt:
 
-All four Rojo builds and `git diff --check` pass. No publish occurred.
+- top-left player portrait/unit frame;
+- winged colour-coded action bar bottom-centre;
+- Base command row: **Guild / Skills / Stats / Inventory**;
+- new authoritative read-only Stats window;
+- right-side Quest Tracker with dungeon/depth/objective/reward context;
+- Quest Journal as left list + right detailed quest pane;
+- icon-grid Inventory and icon-based Skills/Loadout;
+- themed character creation, professions and tutorial screens;
+- themed dungeon entrance, objective, boss, revive and completion UI;
+- shared restyle coverage for Bank, Equipment, Guild, Market, Trainer,
+  Race Change, Travel, Quest Board and first-transfer windows.
 
-Next: run fresh local Studio Base and Dungeon playtests, inspect the actual
-PlayerGui/viewport for overlap and readability, and iterate. Do not mark this
-gate GREEN from builds alone.
+Fresh local Studio Base and Dungeon runs were used throughout. The pass found
+and fixed command-bar clipping, Base tutorial overlap, Dungeon tutorial/objective
+overlap, skill-row readability and command-order sorting. The latest Dungeon
+run visibly showed the separated objective/tutorial panels and the coloured
+winged hotbar. The latest Base run visibly showed the new Stats window with
+live Human/Fighter attributes.
+
+No v3.55 TEST/PROD publish has occurred. Do not publish until the user approves
+the new visual direction. Do not alter accepted v3.54 quest/depth/event-room
+authority while iterating on presentation.
 
 **Do not begin Section D.**
 
