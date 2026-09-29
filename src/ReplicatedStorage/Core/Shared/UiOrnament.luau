@@ -208,6 +208,48 @@ function UiOrnament.frame(
     )
     bottom_shadow.BackgroundTransparency = 0.34
 
+    local crest = Instance.new("Frame")
+    crest.Name = "TopCrest"
+    crest.AnchorPoint = Vector2.new(0.5, 0.5)
+    crest.Position = UDim2.new(0.5, 0, 0, 3)
+    crest.Size = UDim2.fromOffset(
+        if prominent then 13 else 9,
+        if prominent then 13 else 9
+    )
+    crest.BackgroundColor3 = METAL
+    crest.BorderSizePixel = 0
+    crest.Rotation = 45
+    crest.ZIndex = frame.ZIndex + 4
+    crest.Parent = chrome
+
+    local crest_stroke = Instance.new("UIStroke")
+    crest_stroke.Color = GOLD_BRIGHT
+    crest_stroke.Transparency = 0.06
+    crest_stroke.Thickness = 2
+    crest_stroke.Parent = crest
+
+    local crest_core = Instance.new("Frame")
+    crest_core.Name = "Core"
+    crest_core.AnchorPoint = Vector2.new(0.5, 0.5)
+    crest_core.Position = UDim2.fromScale(0.5, 0.5)
+    crest_core.Size = UDim2.fromScale(0.42, 0.42)
+    crest_core.BackgroundColor3 = GOLD_PALE
+    crest_core.BorderSizePixel = 0
+    crest_core.ZIndex = crest.ZIndex + 1
+    crest_core.Parent = crest
+
+    for index, y_scale in ipairs({0.33, 0.67}) do
+        local grain = make_edge(
+            chrome,
+            "MetalGrain" .. tostring(index),
+            UDim2.new(0, 12, y_scale, 0),
+            UDim2.new(1, -24, 0, 1),
+            GOLD,
+            frame.ZIndex
+        )
+        grain.BackgroundTransparency = 0.92
+    end
+
     for _, x in ipairs({0, 1}) do
         for _, y in ipairs({0, 1}) do
             make_corner(
@@ -295,40 +337,72 @@ function UiOrnament.icon(
     local outer = Instance.new("Frame")
     outer.Name = name
     outer.Size = UDim2.fromOffset(size, size)
-    outer.BackgroundColor3 = METAL
+    outer.BackgroundColor3 = SHADOW
     outer.BorderSizePixel = 0
     outer.Parent = parent
 
     local rim = Instance.new("UIStroke")
     rim.Color = GOLD_BRIGHT
     rim.Thickness = 2
-    rim.Transparency = 0.05
+    rim.Transparency = 0.02
     rim.Parent = outer
+
+    local bronze_plate = Instance.new("Frame")
+    bronze_plate.Name = "BronzePlate"
+    bronze_plate.Position = UDim2.fromOffset(3, 3)
+    bronze_plate.Size = UDim2.new(1, -6, 1, -6)
+    bronze_plate.BackgroundColor3 = BRONZE
+    bronze_plate.BorderSizePixel = 0
+    bronze_plate.Parent = outer
 
     local inner = Instance.new("Frame")
     inner.Name = "InnerRim"
-    inner.Position = UDim2.fromOffset(3, 3)
-    inner.Size = UDim2.new(1, -6, 1, -6)
-    inner.BackgroundColor3 = BRONZE
+    inner.Position = UDim2.fromOffset(5, 5)
+    inner.Size = UDim2.new(1, -10, 1, -10)
+    inner.BackgroundColor3 = METAL
     inner.BorderSizePixel = 0
     inner.Parent = outer
 
+    local inner_stroke = Instance.new("UIStroke")
+    inner_stroke.Color = GOLD
+    inner_stroke.Transparency = 0.18
+    inner_stroke.Thickness = 1
+    inner_stroke.Parent = inner
+
     local well = Instance.new("Frame")
     well.Name = "IconWell"
-    well.Position = UDim2.fromOffset(5, 5)
-    well.Size = UDim2.new(1, -10, 1, -10)
+    well.Position = UDim2.fromOffset(7, 7)
+    well.Size = UDim2.new(1, -14, 1, -14)
     well.BackgroundColor3 = tint
     well.BorderSizePixel = 0
-    well.ZIndex = inner.ZIndex + 1
+    well.ZIndex = 2
     well.Parent = outer
 
     local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new(
-        tint:Lerp(Color3.new(1, 1, 1), 0.22),
-        tint:Lerp(Color3.new(0, 0, 0), 0.64)
-    )
-    gradient.Rotation = 120
+    gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(
+            0,
+            tint:Lerp(Color3.new(1, 1, 1), 0.30)
+        ),
+        ColorSequenceKeypoint.new(0.45, tint),
+        ColorSequenceKeypoint.new(
+            1,
+            tint:Lerp(Color3.new(0, 0, 0), 0.72)
+        ),
+    })
+    gradient.Rotation = 115
     gradient.Parent = well
+
+    local vignette = Instance.new("Frame")
+    vignette.Name = "LowerShade"
+    vignette.AnchorPoint = Vector2.new(0, 1)
+    vignette.Position = UDim2.fromScale(0, 1)
+    vignette.Size = UDim2.new(1, 0, 0.38, 0)
+    vignette.BackgroundColor3 = SHADOW
+    vignette.BackgroundTransparency = 0.62
+    vignette.BorderSizePixel = 0
+    vignette.ZIndex = 3
+    vignette.Parent = well
 
     local sigil = Instance.new("TextLabel")
     sigil.Name = "Sigil"
@@ -338,14 +412,29 @@ function UiOrnament.icon(
     sigil.Text = caption
     sigil.TextColor3 = GOLD_PALE
     sigil.TextStrokeColor3 = SHADOW
-    sigil.TextStrokeTransparency = 0.18
-    sigil.TextSize = math.floor(size * 0.56)
-    sigil.ZIndex = 2
+    sigil.TextStrokeTransparency = 0.08
+    sigil.TextSize = math.floor(size * 0.52)
+    sigil.ZIndex = 4
     sigil.Parent = well
+
+    for _, position in ipairs({
+        UDim2.fromOffset(3, 3),
+        UDim2.new(1, -6, 0, 3),
+        UDim2.new(0, 3, 1, -6),
+        UDim2.new(1, -6, 1, -6),
+    }) do
+        local stud = Instance.new("Frame")
+        stud.Size = UDim2.fromOffset(3, 3)
+        stud.Position = position
+        stud.BackgroundColor3 = GOLD_PALE
+        stud.BackgroundTransparency = 0.16
+        stud.BorderSizePixel = 0
+        stud.ZIndex = 5
+        stud.Parent = outer
+    end
 
     return outer
 end
-
 
 --[[
 Adds flared side ornaments to the combat action bar.
