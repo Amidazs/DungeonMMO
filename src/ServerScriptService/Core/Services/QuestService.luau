@@ -57,6 +57,22 @@ local function ensure_state(character: any): any
         quests.TrackedQuestId = nil
     end
 
+    if type(quests.TrackedQuestId) == "string" then
+        local tracked_definition = QuestDefinitions.get(
+            quests.TrackedQuestId
+        )
+        local tracked_state = quests.Active[
+            quests.TrackedQuestId
+        ]
+
+        if not tracked_definition
+            or tracked_definition.Kind ~= "Adventure"
+            or type(tracked_state) ~= "table"
+        then
+            quests.TrackedQuestId = nil
+        end
+    end
+
     return quests
 end
 
@@ -326,7 +342,10 @@ function QuestService:start(user_id: number, quest_id: string): any
             end
 
             live_quests.Active[quest_id] = initial_state(definition)
-            live_quests.TrackedQuestId = quest_id
+
+            if definition.Kind == "Adventure" then
+                live_quests.TrackedQuestId = quest_id
+            end
         end
     )
 
