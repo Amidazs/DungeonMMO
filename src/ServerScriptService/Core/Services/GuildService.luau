@@ -46,6 +46,41 @@ local function ensure_history(guild: any)
     end
 end
 
+--[[
+Ensures older stored guilds have the current settings shape.
+
+Args:
+    guild (any): Mutable guild object.
+
+Returns:
+    None.
+]]
+local function ensure_settings(guild: any)
+    if type(guild.Settings) ~= "table" then
+        guild.Settings = GuildDefinitions.default_settings()
+        return
+    end
+
+    if type(guild.Settings.MessageOfTheDay) ~= "string" then
+        guild.Settings.MessageOfTheDay = ""
+    end
+
+    if type(guild.Settings.ViewSettingsByRole) ~= "table" then
+        guild.Settings.ViewSettingsByRole = {}
+    end
+
+    local permissions = guild.Settings.ViewSettingsByRole
+    permissions.Leader = true
+
+    if type(permissions.Officer) ~= "boolean" then
+        permissions.Officer = false
+    end
+
+    if type(permissions.Member) ~= "boolean" then
+        permissions.Member = false
+    end
+end
+
 function GuildService.new(adapter: any, clock: (() -> number)?, id_generator: (() -> string)?): any
     assert(adapter ~= nil, "GuildService requires entity adapter")
     local self = setmetatable({}, GuildService)
@@ -72,6 +107,11 @@ end
 
 function GuildService:get_guild(guild_id: string): any?
     local guild = self._adapter:load(guild_key(guild_id))
+
+    if type(guild) == "table" then
+        ensure_settings(guild)
+    end
+
     return guild
 end
 
@@ -136,6 +176,7 @@ function GuildService:create_guild(user_id: number, slot: number?, raw_name: any
                 JoinedAt = now,
             },
         },
+        Settings = GuildDefinitions.default_settings(),
         History = {[transaction_id] = true},
     }
 
@@ -479,15 +520,207 @@ function GuildService:upgrade_guild(actor_user_id: number, transaction_id: strin
     return result(true, nil, {guild = updated})
 end
 
-function GuildService:build_snapshot(user_id: number, slot: number?): any
-    local membership = self:get_membership(user_id, slot or 1)
-    if not membership then
-        return result(true, nil, {membership = nil, guild = nil})
+--[[
+Updates which standard guild roles may see the Guild Settings page.
+
+Args:
+    actor_user_id (number): Requesting player.
+    role (string): Officer or Member.
+    allowed (boolean): Desired page visibility.
+    transaction_id (string): Idempotency key.
+    slot (number?): Character slot.
+
+Returns:
+    any: Guild action result.
+]]
+function GuildService:set_settings_access(
+    actor_user_id: number,
+    role: string,
+    allowed: boolean,
+    transaction_id: string,
+    slot: number?
+): any
+    if role ~= "Officer" and role ~= "Member" then
+        return result(false, "InvalidGuildRole")
     end
-    return result(true, nil, {
-        membership = membership,
-        guild = self:get_guild(membership.GuildId),
-    })
+
+    local membership = self:get_membership(
+        actor_user_id,
+        slot or 1
+    )
+
+    if not membership or membership.Role ~= "Leader" then
+        return result(false, "GuildPermissionDenied")
+    end
+
+    local updated, err = self._adapter:update(
+        guild_key(membership.GuildId),
+        function(guild)
+            if type(guild) ~= "table" then
+                return nil
+            end
+
+            ensure_history(guild)
+            ensure_settings(guild)
+
+            if guild.History[transaction_id] then
+                return guild
+            end
+
+            guild.Settings.ViewSettingsByRole[role] = allowed
+            guild.History[transaction_id] = true
+            return guild
+        end
+    )
+
+    if not updated then
+        return result(
+            false,
+            err or "GuildSettingsUpdateFailed"
+        )
+    end
+
+    return result(true, nil, {guild = updated})
+end
+
+--[[
+Updates the guild message shown on the Overview page.
+
+Args:
+    actor_user_id (number): Requesting player.
+    raw_message (any): Proposed message.
+    transaction_id (string): Idempotency key.
+    slot (number?): Character slot.
+
+Returns:
+    any: Guild action result.
+]]
+function GuildService:set_message(
+    actor_user_id: number,
+    raw_message: any,
+    transaction_id: string,
+    slot: number?
+): any
+    local membership = self:get_membership(
+        actor_user_id,
+        slot or 1
+    )
+
+    if not membership or membership.Role ~= "Leader" then
+        return result(false, "GuildPermissionDenied")
+    end
+
+    local message = GuildDefinitions.normalize_message(
+        raw_message
+    )
+
+    if message == nil then
+        return result(false, "InvalidGuildMessage")
+    end
+
+    local updated, err = self._adapter:update(
+        guild_key(membership.GuildId),
+        function(guild)
+            if type(guild) ~= "table" then
+                return nil
+            end
+
+            ensure_history(guild)
+            ensure_settings(guild)
+
+            if guild.History[transaction_id] then
+                return guild
+            end
+
+            guild.Settings.MessageOfTheDay = message
+            guild.History[transaction_id] = true
+            return guild
+        end
+    )
+
+    if not updated then
+        return result(
+            false,
+            err or "GuildSettingsUpdateFailed"
+        )
+    end
+
+    return result(true, nil, {guild = updated})
+end
+
+--[[
+Builds a client-safe guild snapshot with permission-gated settings.
+
+Args:
+    user_id (number): Requesting player.
+    slot (number?): Character slot.
+
+Returns:
+    any: Snapshot result.
+]]
+function GuildService:build_snapshot(
+    user_id: number,
+    slot: number?
+): any
+    local membership = self:get_membership(
+        user_id,
+        slot or 1
+    )
+
+    if not membership then
+        return result(
+            true,
+            nil,
+            {
+                membership = nil,
+                guild = nil,
+                permissions = {
+                    CanViewSettings = false,
+                },
+            }
+        )
+    end
+
+    local guild = self:get_guild(membership.GuildId)
+
+    if not guild then
+        return result(false, "GuildNotFound")
+    end
+
+    ensure_settings(guild)
+
+    local can_view_settings =
+        GuildDefinitions.can_view_settings(
+            guild,
+            membership.Role
+        )
+
+    local public_guild = {
+        Version = guild.Version,
+        GuildId = guild.GuildId,
+        Name = guild.Name,
+        Level = guild.Level,
+        XP = guild.XP,
+        Gold = guild.Gold,
+        Members = guild.Members,
+        Settings = if can_view_settings
+            then guild.Settings
+            else nil,
+    }
+
+    return result(
+        true,
+        nil,
+        {
+            membership = membership,
+            guild = public_guild,
+            permissions = {
+                CanViewSettings = can_view_settings,
+                CanEditSettings =
+                    membership.Role == "Leader",
+            },
+        }
+    )
 end
 
 return table.freeze(GuildService)
