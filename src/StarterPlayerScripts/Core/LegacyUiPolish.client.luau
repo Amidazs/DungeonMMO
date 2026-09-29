@@ -11,6 +11,9 @@ local shared = ReplicatedStorage
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 -- Character creation owns its mandatory full-screen overlay and the
 -- selected race/class card appearance. Auto-styling its buttons on hover
@@ -105,7 +108,7 @@ local function style_descendant(object: Instance)
         object.PlaceholderColor3 = UiTheme.PALETTE.TextFaint
         object.Font = UiTheme.FONT.Body
         object.BorderSizePixel = 0
-        UiTheme.add_corner(object, 7)
+        UiTheme.add_corner(object, 2)
         UiTheme.add_stroke(
             object,
             UiTheme.PALETTE.BorderSoft,
@@ -127,6 +130,14 @@ local function style_root_frames(gui: ScreenGui)
     for _, child in ipairs(gui:GetChildren()) do
         if child:IsA("Frame") then
             UiTheme.style_panel(child, false)
+
+            local has_direct_layout =
+                child:FindFirstChildOfClass("UIListLayout") ~= nil
+                or child:FindFirstChildOfClass("UIGridLayout") ~= nil
+
+            if not has_direct_layout then
+                UiOrnament.frame(child, true)
+            end
         end
     end
 end
