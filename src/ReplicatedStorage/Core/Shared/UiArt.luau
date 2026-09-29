@@ -3,7 +3,16 @@
 local UiArt = {}
 
 UiArt.ATLAS_IMAGE = "rbxassetid://107368787767290"
+UiArt.WINDOW_IMAGE = "rbxassetid://127588383054650"
+UiArt.POPUP_IMAGE = "rbxassetid://125369844739576"
 UiArt.ATLAS_SIZE = Vector2.new(1024, 512)
+
+local SHELL_SLICE_CENTER = Rect.new(
+    18,
+    44,
+    272,
+    280
+)
 
 export type Region = {
     Offset: Vector2,
@@ -129,6 +138,82 @@ function UiArt.background(
     image.Position = UDim2.fromScale(0, 0)
     image.Size = UDim2.fromScale(1, 1)
     return image
+end
+
+--[[
+Creates a clean reference-derived sliced shell.
+
+Args:
+    parent (GuiObject): GUI object receiving the shell.
+    name (string): Stable image instance name.
+    image_asset (string): Roblox image asset identifier.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Sliced image shell.
+]]
+local function sliced_shell(
+    parent: GuiObject,
+    name: string,
+    image_asset: string,
+    z_index: number?
+): ImageLabel
+    local image = Instance.new("ImageLabel")
+    image.Name = name
+    image.BackgroundTransparency = 1
+    image.BorderSizePixel = 0
+    image.Image = image_asset
+    image.ScaleType = Enum.ScaleType.Slice
+    image.SliceCenter = SHELL_SLICE_CENTER
+    image.SliceScale = 1
+    image.Size = UDim2.fromScale(1, 1)
+    image.ZIndex = z_index or 1
+    image.Parent = parent
+    return image
+end
+
+--[[
+Adds the cleaned reference window art to a modal.
+
+Args:
+    parent (GuiObject): Modal root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Window shell.
+]]
+function UiArt.window_background(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return sliced_shell(
+        parent,
+        "ReferenceArt",
+        UiArt.WINDOW_IMAGE,
+        z_index
+    )
+end
+
+--[[
+Adds the close-button-free popup art to a modal.
+
+Args:
+    parent (GuiObject): Popup root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Popup shell.
+]]
+function UiArt.popup_background(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return sliced_shell(
+        parent,
+        "ReferencePopupArt",
+        UiArt.POPUP_IMAGE,
+        z_index
+    )
 end
 
 --[[
