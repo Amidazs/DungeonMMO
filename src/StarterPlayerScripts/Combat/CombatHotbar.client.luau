@@ -260,13 +260,13 @@ local progression_text = UiComponents.label(
     "Caption"
 )
 progression_text.AnchorPoint = Vector2.new(0.5, 1)
-progression_text.Position = UDim2.new(0.5, 0, 1, -2)
-progression_text.Size = UDim2.fromOffset(430, 15)
+progression_text.Position = UDim2.new(0.5, 0, 1, -1)
+progression_text.Size = UDim2.fromOffset(470, 18)
 progression_text.TextXAlignment = Enum.TextXAlignment.Center
 progression_text.TextColor3 = UiTheme.PALETTE.Text
 progression_text.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
 progression_text.TextStrokeTransparency = 0.18
-progression_text.TextSize = 9
+progression_text.TextSize = 13
 progression_text.ZIndex = 4
 
 --[[
