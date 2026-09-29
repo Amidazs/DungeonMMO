@@ -100,6 +100,15 @@ function Gates.status(slot_id: string, bindings: any, flow: any): (boolean, stri
             then "Event unavailable this run."
             else "Secret route unavailable this run."
     end
+
+    local state = flow:state_for_slot(slot_id)
+    if (slot_id == "EventArena"
+        or slot_id == "EventArenaLate")
+        and state == "Skipped"
+    then
+        return false, "Event skipped for this run."
+    end
+
     local prerequisite = prerequisite_for(slot_id, bindings)
     if not prerequisite then
         return false, "Entrance unavailable."
