@@ -1,3 +1,53 @@
+## 29 September 2026 — CURRENT v3.53 QUEST JOURNAL + TRACKER GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_53_Quest_Journal_Tracker_GREEN_20260929.md);
+[evidence](
+../testing/quest-journal-tracker-v3-53-green-20260929.md).
+
+The friend-test build now has a persistent MMORPG-style Adventure quest
+presentation layer across both places.
+
+Active Adventure quests remain visible in a compact right-side tracker in Base
+and Dungeon. The shared Quest Journal opens from **QUESTS** or **L** and shows
+accepted quests, all current objective rows, progress counts and rewards.
+Exactly one Adventure quest is persistently selected for tracking.
+
+Base floor guidance follows only the selected quest. Incomplete quests route
+toward their relevant dungeon area; ready quests change to
+`Return to <giver>` and route to the real physical giver. Dungeon keeps the
+tracker/journal but creates no floor guide.
+
+The underlying quest authority remains the existing persisted QuestService.
+Dungeon exposes only Snapshot/Track presentation actions and cannot start or
+claim Adventure quests through the new runtime. Class-advancement trials do
+not replace the selected Adventure quest.
+
+Acceptance caught and fixed two integration regressions:
+
+- DungeonRuntime exceeded Luau's 200-local-register limit until the new runtime
+  was required/attached inline;
+- shared Core client code could start before the Base sibling folder existed,
+  so Base guide initialization is now lazy.
+
+Both TEST places were published in the required order and Studio reached
+`PublishSuccessful`:
+
+- Dungeon `117293035754309`: 00:16:31Z;
+- Base `134132328219009`: 00:18:26Z.
+
+Fresh cloud reloads contain the final source. Published Dungeon acceptance
+showed both Hidden Ward objective rows, the journal opened through the real
+QUESTS button, and no floor guide existed. Published Base acceptance showed
+`Return to Worldroot Keeper` plus a 48-piece route ending 1.80 studs from the
+physical giver.
+
+Feature source checkpoint:
+`888018cb33ce7e5314a5b1cd3b8f66a68a67830d`.
+
+**HOLD remains active:** do not begin Section D until the user completes the
+two-player friend test and explicitly releases the hold.
+
 ## 28 September 2026 — CURRENT v3.48 TUTORIAL GUIDANCE + NPC PRESENTATION GREEN
 
 [Roadmap](
