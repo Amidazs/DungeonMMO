@@ -17,8 +17,8 @@ local PALETTE = table.freeze({
     Metal = Color3.fromRGB(113, 82, 36),
     MetalBright = Color3.fromRGB(207, 159, 69),
     Text = Color3.fromRGB(244, 232, 205),
-    TextMuted = Color3.fromRGB(193, 181, 157),
-    TextFaint = Color3.fromRGB(126, 119, 105),
+    TextMuted = Color3.fromRGB(205, 192, 168),
+    TextFaint = Color3.fromRGB(148, 138, 119),
     Accent = Color3.fromRGB(207, 158, 67),
     AccentBright = Color3.fromRGB(242, 197, 97),
     AccentDark = Color3.fromRGB(92, 61, 23),
@@ -226,6 +226,8 @@ function UiTheme.style_label(
     label.BackgroundTransparency = 1
     label.TextWrapped = false
     label.TextTruncate = Enum.TextTruncate.AtEnd
+    label.TextStrokeColor3 = PALETTE.Backdrop
+    label.TextStrokeTransparency = 0.90
 
     if style == "Title" then
         label.Font = FONT.Heading
@@ -395,6 +397,8 @@ function UiTheme.style_button(
     button.BorderSizePixel = 0
     button.Font = FONT.Heading
     button.TextColor3 = PALETTE.Text
+    button.TextStrokeColor3 = PALETTE.Backdrop
+    button.TextStrokeTransparency = 0.84
     button.TextSize = 16
     button.TextScaled = false
     button.AutoButtonColor = false
