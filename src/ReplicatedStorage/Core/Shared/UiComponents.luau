@@ -243,16 +243,10 @@ function UiComponents.modal(
     close.AnchorPoint = Vector2.new(1, 0.5)
     close.Position = UDim2.new(1, 0, 0.5, 0)
     close.Size = UDim2.fromOffset(34, 34)
-    close.BackgroundTransparency = 1
-    close.TextTransparency = 1
+    close.BackgroundTransparency = 0.18
+    close.TextTransparency = 0
+    close.TextSize = 24
     close.ZIndex = 4
-    for _, child in ipairs(close:GetChildren()) do
-        if child:IsA("UIStroke") then
-            child.Transparency = 1
-        elseif child:IsA("UIGradient") then
-            child.Enabled = false
-        end
-    end
 
     local body = Instance.new("Frame")
     body.Name = "Body"
