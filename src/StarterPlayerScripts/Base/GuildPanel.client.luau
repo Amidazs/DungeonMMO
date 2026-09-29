@@ -62,16 +62,18 @@ local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
-
--- Keep the clean modal shell. Guild tabs, member rows, values,
--- permissions and settings are generated from the server snapshot.
+UiArt.reference_background(
+    panel,
+    "Guild",
+    11
+)
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 modal.Close.ZIndex = 18
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
@@ -200,6 +202,7 @@ for index, name in ipairs(TAB_NAMES) do
     button.Size = UDim2.new(0.2, -4, 1, 0)
     button.TextSize = 14
     button.ZIndex = 16
+    UiArt.paint_tab(button, name == "Overview")
     tab_buttons[name] = button
 end
 
@@ -518,6 +521,21 @@ settings_note.TextWrapped = true
 settings_note.TextYAlignment = Enum.TextYAlignment.Top
 settings_note.ZIndex = 15
 
+UiArt.paint_button(hall_button, "Primary")
+UiArt.paint_button(upgrade_button, "Secondary")
+UiArt.paint_button(leave_button, "Danger")
+UiArt.paint_button(refresh_button, "Ghost")
+UiArt.paint_button(create_guild_button, "Primary")
+UiArt.paint_button(accept_invite_button, "Secondary")
+UiArt.paint_button(invite_button, "Primary")
+UiArt.paint_button(officer_button, "Secondary")
+UiArt.paint_button(member_button, "Secondary")
+UiArt.paint_button(kick_button, "Danger")
+UiArt.paint_button(transfer_button, "Danger")
+UiArt.paint_button(save_message_button, "Primary")
+UiArt.paint_button(officer_access, "Secondary")
+UiArt.paint_button(member_access, "Secondary")
+
 local status = UiComponents.label(
     modal.Body,
     "Status",
@@ -637,11 +655,9 @@ local function show_page(requested_page: string)
     end
 
     for name, button in pairs(tab_buttons) do
-        UiTheme.style_button(
+        UiArt.paint_tab(
             button,
-            if name == active_page
-                then "Primary"
-                else "Ghost"
+            name == active_page
         )
     end
 end
