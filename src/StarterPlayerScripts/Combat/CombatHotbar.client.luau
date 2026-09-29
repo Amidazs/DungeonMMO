@@ -42,8 +42,8 @@ local UiComponents = require(
 local UiTheme = require(
     core_shared:WaitForChild("UiTheme")
 )
-local UiOrnament = require(
-    core_shared:WaitForChild("UiOrnament")
+local UiArt = require(
+    core_shared:WaitForChild("UiArt")
 )
 
 local State = CombatTypes.State
@@ -79,28 +79,28 @@ gui.Parent = player_gui
 local root = Instance.new("Frame")
 root.Name = "Hotbar"
 root.AnchorPoint = Vector2.new(0.5, 1)
-root.Position = UDim2.new(0.5, 0, 1, -12)
-root.Size = UDim2.fromOffset(530, 91)
+root.Position = UDim2.new(0.5, 0, 1, -8)
+root.Size = UDim2.fromOffset(768, 134)
 root.BackgroundTransparency = 1
+root.BorderSizePixel = 0
 root.Parent = gui
-UiTheme.bind_responsive_scale(root, 1366, 0.78, 1)
+UiTheme.bind_responsive_scale(root, 1366, 0.68, 1)
 
-local tray = Instance.new("Frame")
-tray.Name = "ActionBarFrame"
-tray.AnchorPoint = Vector2.new(0.5, 0)
-tray.Position = UDim2.new(0.5, 0, 0, 4)
-tray.Size = UDim2.fromOffset(448, 72)
-UiTheme.style_panel(tray, true)
-tray.Parent = root
-UiOrnament.frame(tray, true)
-UiOrnament.action_bar_wings(tray)
+local action_bar_art = UiArt.background(
+    root,
+    "ActionBar",
+    1
+)
+action_bar_art.Name = "ActionBarArt"
 
 local slots = Instance.new("Frame")
 slots.Name = "Slots"
 slots.AnchorPoint = Vector2.new(0.5, 0)
-slots.Position = UDim2.new(0.5, 0, 0, 7)
-slots.Size = UDim2.fromOffset(418, 66)
+slots.Position = UDim2.new(0.5, 0, 0, 16)
+slots.Size = UDim2.fromOffset(414, 78)
 slots.BackgroundTransparency = 1
+slots.BorderSizePixel = 0
+slots.ZIndex = 2
 slots.Parent = root
 
 local layout = Instance.new("UIListLayout")
@@ -111,7 +111,7 @@ layout.Padding = UDim.new(0, 6)
 layout.Parent = slots
 
 --[[
-Creates one compact reference-style hotbar slot.
+Creates one reference-art-backed hotbar slot.
 
 Args:
     slot (number): One-based active skill slot.
@@ -122,32 +122,73 @@ Returns:
 local function create_slot(slot: number)
     local frame = Instance.new("Frame")
     frame.Name = "Slot" .. tostring(slot)
-    frame.Size = UDim2.fromOffset(64, 64)
-    frame.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-    frame.BackgroundTransparency = 0
+    frame.Size = UDim2.fromOffset(64, 78)
+    frame.BackgroundTransparency = 1
     frame.BorderSizePixel = 0
+    frame.ZIndex = 2
     frame.Parent = slots
 
-    local icon = UiOrnament.icon(
+    local slot_art = UiArt.image(
         frame,
-        "AbilityIcon",
-        "·",
-        SLOT_TINTS[slot] or Color3.fromRGB(41, 69, 105),
-        58
+        "SlotArt",
+        "HotbarSlot",
+        2
     )
-    icon.AnchorPoint = Vector2.new(0.5, 0.5)
-    icon.Position = UDim2.fromScale(0.5, 0.5)
+    slot_art.Size = UDim2.fromOffset(62, 78)
+    slot_art.Position = UDim2.fromOffset(1, 0)
 
-    slot_sigils[slot] = icon:WaitForChild("IconWell")
-        :WaitForChild("Sigil") :: TextLabel
+    local icon_well = Instance.new("Frame")
+    icon_well.Name = "IconWell"
+    icon_well.Position = UDim2.fromOffset(8, 8)
+    icon_well.Size = UDim2.fromOffset(48, 52)
+    icon_well.BackgroundColor3 =
+        SLOT_TINTS[slot] or Color3.fromRGB(41, 69, 105)
+    icon_well.BorderSizePixel = 0
+    icon_well.ZIndex = 3
+    icon_well.Parent = frame
+
+    local icon_gradient = Instance.new("UIGradient")
+    icon_gradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(
+            0,
+            icon_well.BackgroundColor3:Lerp(
+                Color3.new(1, 1, 1),
+                0.24
+            )
+        ),
+        ColorSequenceKeypoint.new(
+            1,
+            icon_well.BackgroundColor3:Lerp(
+                Color3.new(0, 0, 0),
+                0.58
+            )
+        ),
+    })
+    icon_gradient.Rotation = 120
+    icon_gradient.Parent = icon_well
+
+    local sigil = UiComponents.label(
+        icon_well,
+        "Sigil",
+        "·",
+        "Title"
+    )
+    sigil.Size = UDim2.fromScale(1, 1)
+    sigil.TextXAlignment = Enum.TextXAlignment.Center
+    sigil.TextColor3 = UiTheme.PALETTE.AccentBright
+    sigil.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+    sigil.TextStrokeTransparency = 0.10
+    sigil.TextSize = 30
+    sigil.ZIndex = 4
+    slot_sigils[slot] = sigil
 
     local name_back = Instance.new("Frame")
     name_back.Name = "NameBack"
     name_back.AnchorPoint = Vector2.new(0, 1)
-    name_back.Position = UDim2.fromScale(0, 1)
-    name_back.Size = UDim2.new(1, 0, 0, 15)
+    name_back.Position = UDim2.new(0, 7, 1, -8)
+    name_back.Size = UDim2.new(1, -14, 0, 16)
     name_back.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-    name_back.BackgroundTransparency = 0.12
+    name_back.BackgroundTransparency = 0.18
     name_back.BorderSizePixel = 0
     name_back.ZIndex = 5
     name_back.Parent = frame
@@ -170,18 +211,18 @@ local function create_slot(slot: number)
         frame,
         tostring(slot)
     )
-    key.Position = UDim2.fromOffset(-3, -3)
-    key.Size = UDim2.fromOffset(19, 18)
-    key.TextSize = 9
+    key.Position = UDim2.fromOffset(1, 1)
+    key.Size = UDim2.fromOffset(18, 17)
+    key.TextSize = 8
     key.ZIndex = 8
 
     local overlay = Instance.new("Frame")
     overlay.Name = "CooldownOverlay"
     overlay.AnchorPoint = Vector2.new(0, 1)
-    overlay.Position = UDim2.new(0, 4, 1, -4)
-    overlay.Size = UDim2.new(1, -8, 0, 0)
+    overlay.Position = UDim2.new(0, 8, 1, -8)
+    overlay.Size = UDim2.new(1, -16, 0, 0)
     overlay.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-    overlay.BackgroundTransparency = 0.14
+    overlay.BackgroundTransparency = 0.12
     overlay.BorderSizePixel = 0
     overlay.ZIndex = 7
     overlay.Parent = frame
@@ -195,7 +236,7 @@ local function create_slot(slot: number)
     cooldown.Size = UDim2.fromScale(1, 1)
     cooldown.TextXAlignment = Enum.TextXAlignment.Center
     cooldown.TextColor3 = UiTheme.PALETTE.Text
-    cooldown.TextStrokeTransparency = 0.18
+    cooldown.TextStrokeTransparency = 0.12
     cooldown.TextSize = 18
     cooldown.ZIndex = 9
 
@@ -216,11 +257,12 @@ local hints = UiComponents.label(
     "Caption"
 )
 hints.AnchorPoint = Vector2.new(0.5, 1)
-hints.Position = UDim2.new(0.5, 0, 1, 0)
-hints.Size = UDim2.fromOffset(520, 12)
+hints.Position = UDim2.new(0.5, 0, 1, -1)
+hints.Size = UDim2.fromOffset(500, 12)
 hints.TextXAlignment = Enum.TextXAlignment.Center
 hints.TextColor3 = UiTheme.PALETTE.TextFaint
-hints.TextSize = 9
+hints.TextSize = 8
+hints.ZIndex = 3
 
 --[[
 Starts local cooldown presentation for a server-confirmed skill.
@@ -317,7 +359,7 @@ local function refresh_runtime()
             1
         )
 
-        overlay.Size = UDim2.new(1, -8, ratio, 0)
+        overlay.Size = UDim2.new(1, -16, ratio, 0)
         cooldown.Text = if remaining > 0
             then string.format("%.1f", remaining)
             else ""
