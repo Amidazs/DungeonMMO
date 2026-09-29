@@ -18,6 +18,16 @@ local player = Players.LocalPlayer
 local Core = ReplicatedStorage
     :WaitForChild("Core")
 
+local Shared =
+    Core:WaitForChild("Shared")
+
+local UiTheme = require(
+    Shared:WaitForChild("UiTheme")
+)
+local UiOrnament = require(
+    Shared:WaitForChild("UiOrnament")
+)
+
 local Remotes =
     Core:WaitForChild("Remotes")
 
@@ -58,8 +68,8 @@ local blocker = Instance.new("Frame")
 blocker.Name = "MandatoryOverlay"
 blocker.Size = UDim2.fromScale(1, 1)
 blocker.BackgroundColor3 =
-    Color3.fromRGB(8, 10, 14)
-blocker.BackgroundTransparency = 0.08
+    UiTheme.PALETTE.Backdrop
+blocker.BackgroundTransparency = 0.16
 blocker.BorderSizePixel = 0
 blocker.Active = true
 blocker.Visible = false
@@ -73,10 +83,10 @@ panel.Position =
     UDim2.fromScale(0.5, 0.5)
 panel.Size =
     UDim2.new(0.82, 0, 0.80, 0)
-panel.BackgroundColor3 =
-    Color3.fromRGB(24, 28, 36)
 panel.BorderSizePixel = 0
+UiTheme.style_panel(panel, true)
 panel.Parent = blocker
+UiOrnament.frame(panel, true)
 
 local size_constraint =
     Instance.new("UISizeConstraint")
@@ -86,32 +96,15 @@ size_constraint.MaxSize =
     Vector2.new(980, 720)
 size_constraint.Parent = panel
 
-local panel_corner =
-    Instance.new("UICorner")
-panel_corner.CornerRadius =
-    UDim.new(0, 14)
-panel_corner.Parent = panel
-
-local panel_stroke =
-    Instance.new("UIStroke")
-panel_stroke.Thickness = 2
-panel_stroke.Transparency = 0.35
-panel_stroke.Color =
-    Color3.fromRGB(145, 160, 185)
-panel_stroke.Parent = panel
-
 local title = Instance.new("TextLabel")
 title.Name = "Title"
 title.Position =
     UDim2.new(0, 28, 0, 20)
 title.Size =
     UDim2.new(1, -56, 0, 54)
-title.BackgroundTransparency = 1
-title.TextColor3 =
-    Color3.fromRGB(245, 245, 245)
-title.Font =
-    Enum.Font.GothamBold
-title.TextSize = 32
+UiTheme.style_label(title, "Title")
+title.TextColor3 = UiTheme.PALETTE.Text
+title.TextSize = 34
 title.TextXAlignment =
     Enum.TextXAlignment.Left
 title.Text =
@@ -123,12 +116,9 @@ subtitle.Position =
     UDim2.new(0, 28, 0, 76)
 subtitle.Size =
     UDim2.new(1, -56, 0, 48)
-subtitle.BackgroundTransparency = 1
-subtitle.TextColor3 =
-    Color3.fromRGB(190, 198, 212)
-subtitle.Font =
-    Enum.Font.Gotham
-subtitle.TextSize = 17
+UiTheme.style_label(subtitle, "Muted")
+subtitle.TextColor3 = UiTheme.PALETTE.TextMuted
+subtitle.TextSize = 16
 subtitle.TextWrapped = true
 subtitle.TextXAlignment =
     Enum.TextXAlignment.Left
@@ -149,12 +139,8 @@ status.Position =
     UDim2.new(0, 28, 1, -88)
 status.Size =
     UDim2.new(1, -260, 0, 54)
-status.BackgroundTransparency = 1
-status.TextColor3 =
-    Color3.fromRGB(220, 220, 220)
-status.Font =
-    Enum.Font.Gotham
-status.TextSize = 15
+UiTheme.style_label(status, "Muted")
+status.TextSize = 14
 status.TextWrapped = true
 status.TextXAlignment =
     Enum.TextXAlignment.Left
@@ -170,22 +156,10 @@ confirm.Position =
     UDim2.new(1, -28, 1, -61)
 confirm.Size =
     UDim2.fromOffset(190, 48)
-confirm.BackgroundColor3 =
-    Color3.fromRGB(74, 105, 150)
-confirm.TextColor3 =
-    Color3.fromRGB(255, 255, 255)
-confirm.Font =
-    Enum.Font.GothamBold
-confirm.TextSize = 18
 confirm.Text = "Confirm"
-confirm.AutoButtonColor = true
 confirm.Parent = panel
-
-local confirm_corner =
-    Instance.new("UICorner")
-confirm_corner.CornerRadius =
-    UDim.new(0, 9)
-confirm_corner.Parent = confirm
+UiTheme.style_button(confirm, "Primary")
+confirm.TextSize = 18
 
 local current_snapshot: any = {}
 local current_stage = ""
@@ -224,16 +198,8 @@ local function style_card(
 )
     button.BackgroundColor3 =
         if selected
-            then Color3.fromRGB(
-                60,
-                80,
-                108
-            )
-            else Color3.fromRGB(
-                34,
-                39,
-                49
-            )
+            then UiTheme.PALETTE.SurfaceWarm
+            else UiTheme.PALETTE.SurfaceRaised
 
     local stroke =
         button:FindFirstChildOfClass(
@@ -241,11 +207,15 @@ local function style_card(
         )
 
     if stroke then
+        stroke.Color =
+            if selected
+                then UiTheme.PALETTE.AccentBright
+                else UiTheme.PALETTE.BorderSoft
         stroke.Thickness =
-            if selected then 3 else 1
+            if selected then 2 else 1
 
         stroke.Transparency =
-            if selected then 0.05 else 0.55
+            if selected then 0.05 else 0.30
     end
 end
 
@@ -279,35 +249,21 @@ local function make_race_card(
         )
 
     button.BackgroundColor3 =
-        Color3.fromRGB(
-            34,
-            39,
-            49
-        )
+        UiTheme.PALETTE.SurfaceRaised
 
     button.Text = ""
     button.AutoButtonColor = false
     button.Parent = content
 
-    local corner =
-        Instance.new("UICorner")
-
-    corner.CornerRadius =
-        UDim.new(0, 12)
-
-    corner.Parent = button
+    UiTheme.add_corner(button, 2)
 
     local stroke =
         Instance.new("UIStroke")
 
     stroke.Thickness = 1
-    stroke.Transparency = 0.55
+    stroke.Transparency = 0.30
     stroke.Color =
-        Color3.fromRGB(
-            168,
-            180,
-            205
-        )
+        UiTheme.PALETTE.BorderSoft
 
     stroke.Parent = button
 
@@ -320,18 +276,8 @@ local function make_race_card(
     name_label.Size =
         UDim2.new(1, -40, 0, 42)
 
-    name_label.BackgroundTransparency = 1
-
-    name_label.TextColor3 =
-        Color3.fromRGB(
-            250,
-            250,
-            250
-        )
-
-    name_label.Font =
-        Enum.Font.GothamBold
-
+    UiTheme.style_label(name_label, "Title")
+    name_label.TextColor3 = UiTheme.PALETTE.Text
     name_label.TextSize = 25
 
     name_label.TextXAlignment =
@@ -349,19 +295,9 @@ local function make_race_card(
     body_label.Size =
         UDim2.new(1, -40, 1, -90)
 
-    body_label.BackgroundTransparency = 1
-
-    body_label.TextColor3 =
-        Color3.fromRGB(
-            210,
-            216,
-            228
-        )
-
-    body_label.Font =
-        Enum.Font.Gotham
-
-    body_label.TextSize = 17
+    UiTheme.style_label(body_label, "Body")
+    body_label.TextColor3 = UiTheme.PALETTE.TextMuted
+    body_label.TextSize = 16
     body_label.TextWrapped = true
 
     body_label.TextXAlignment =
@@ -485,27 +421,24 @@ local function show_class_selection()
             0
         )
         button.Size = UDim2.new(1 / 2, -8, 1, 0)
-        button.BackgroundColor3 = Color3.fromRGB(34, 39, 49)
+        button.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
         button.Text = ""
         button.AutoButtonColor = false
         button.Parent = content
 
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 12)
-        corner.Parent = button
+        UiTheme.add_corner(button, 2)
 
         local stroke = Instance.new("UIStroke")
         stroke.Thickness = 1
-        stroke.Transparency = 0.55
-        stroke.Color = Color3.fromRGB(168, 180, 205)
+        stroke.Transparency = 0.30
+        stroke.Color = UiTheme.PALETTE.BorderSoft
         stroke.Parent = button
 
         local name_label = Instance.new("TextLabel")
         name_label.Position = UDim2.new(0, 20, 0, 18)
         name_label.Size = UDim2.new(1, -40, 0, 42)
-        name_label.BackgroundTransparency = 1
-        name_label.TextColor3 = Color3.fromRGB(250, 250, 250)
-        name_label.Font = Enum.Font.GothamBold
+        UiTheme.style_label(name_label, "Title")
+        name_label.TextColor3 = UiTheme.PALETTE.Text
         name_label.TextSize = 25
         name_label.TextXAlignment = Enum.TextXAlignment.Left
         name_label.Text = heading
@@ -514,10 +447,9 @@ local function show_class_selection()
         local body_label = Instance.new("TextLabel")
         body_label.Position = UDim2.new(0, 20, 0, 70)
         body_label.Size = UDim2.new(1, -40, 1, -90)
-        body_label.BackgroundTransparency = 1
-        body_label.TextColor3 = Color3.fromRGB(210, 216, 228)
-        body_label.Font = Enum.Font.Gotham
-        body_label.TextSize = 16
+        UiTheme.style_label(body_label, "Body")
+        body_label.TextColor3 = UiTheme.PALETTE.TextMuted
+        body_label.TextSize = 15
         body_label.TextWrapped = true
         body_label.TextXAlignment = Enum.TextXAlignment.Left
         body_label.TextYAlignment = Enum.TextYAlignment.Top
