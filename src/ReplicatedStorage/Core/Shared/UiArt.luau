@@ -564,6 +564,146 @@ function UiArt.popup_background(
 end
 
 --[[
+Creates a full-frame ImageLabel for a named high-resolution HUD asset.
+
+Args:
+    parent (GuiObject): UI container receiving the image.
+    name (string): Stable ImageLabel name.
+    asset_id (string): Roblox image asset identifier.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Configured full-frame image.
+]]
+local function hud_asset(
+    parent: GuiObject,
+    name: string,
+    asset_id: string,
+    z_index: number?
+): ImageLabel
+    local image = Instance.new("ImageLabel")
+    image.Name = name
+    image.BackgroundTransparency = 1
+    image.BorderSizePixel = 0
+    image.Image = asset_id
+    image.ScaleType = Enum.ScaleType.Stretch
+    image.Size = UDim2.fromScale(1, 1)
+    image.ZIndex = z_index or 1
+    image.Parent = parent
+    return image
+end
+
+--[[
+Adds the high-resolution empty player unit-frame artwork.
+
+Args:
+    parent (GuiObject): Player HUD root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Player-frame artwork.
+]]
+function UiArt.profile_background(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return hud_asset(
+        parent,
+        "ProfileArt",
+        UiArtAssets.PROFILE_EMPTY,
+        z_index
+    )
+end
+
+--[[
+Adds the high-resolution empty action-bar shell.
+
+Args:
+    parent (GuiObject): Action-bar root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Action-bar shell artwork.
+]]
+function UiArt.actionbar_background(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return hud_asset(
+        parent,
+        "ActionBarArt",
+        UiArtAssets.ACTIONBAR_SHELL,
+        z_index
+    )
+end
+
+--[[
+Adds one high-resolution empty hotbar slot frame.
+
+Args:
+    parent (GuiObject): Slot root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Slot artwork.
+]]
+function UiArt.action_slot(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return hud_asset(
+        parent,
+        "SlotArt",
+        UiArtAssets.ACTION_SLOT_EMPTY,
+        z_index
+    )
+end
+
+--[[
+Adds the high-resolution recall progress shell.
+
+Args:
+    parent (GuiObject): Recall HUD root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Recall artwork.
+]]
+function UiArt.recall_background(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return hud_asset(
+        parent,
+        "RecallArt",
+        UiArtAssets.RECALL_EMPTY,
+        z_index
+    )
+end
+
+--[[
+Adds the high-resolution six-button command strip.
+
+Args:
+    parent (GuiObject): Command-bar root.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    ImageLabel: Command-strip artwork.
+]]
+function UiArt.command_strip(
+    parent: GuiObject,
+    z_index: number?
+): ImageLabel
+    return hud_asset(
+        parent,
+        "CommandStripArt",
+        UiArtAssets.COMMAND_STRIP,
+        z_index
+    )
+end
+
+--[[
 Makes a procedural frame transparent so painted artwork supplies its shell.
 
 Args:
