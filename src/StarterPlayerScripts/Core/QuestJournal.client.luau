@@ -480,6 +480,32 @@ local function tracker_goal_text(
 end
 
 --[[
+Returns the compact tracker height needed by one active quest.
+
+Args:
+    definition (any): Active Adventure definition.
+    state (any): Active quest state.
+
+Returns:
+    number: Pixel height for the tracker row.
+]]
+local function tracker_row_height(
+    definition: any,
+    state: any
+): number
+    if type(state) == "table" and state.Ready == true then
+        return 58
+    end
+
+    local objectives = QuestPresentation.objective_rows(
+        definition,
+        state
+    )
+
+    return 34 + math.max(1, #objectives) * 22 + 6
+end
+
+--[[
 Creates one compact right-side active quest row.
 
 Args:
@@ -487,22 +513,26 @@ Args:
     order (number): Stable tracker order.
 
 Returns:
-    nil: Creates a clickable quest row.
+    number: Rendered row height in pixels.
 ]]
 local function add_tracker_row(
     definition: any,
     order: number
-)
+): number
     local state = active_state(definition.Id)
     if not state then
-        return
+        return 0
     end
 
     local tracked = is_tracked(definition.Id)
+    local row_height = tracker_row_height(
+        definition,
+        state
+    )
     local row = Instance.new("TextButton")
     row.Name = definition.Id
     row.LayoutOrder = order
-    row.Size = UDim2.new(1, 0, 0, 58)
+    row.Size = UDim2.new(1, 0, 0, row_height)
     row.BackgroundColor3 = UiTheme.PALETTE.SurfaceRaised
     row.BackgroundTransparency = if tracked then 0.02 else 0.24
     row.BorderSizePixel = 0
@@ -531,22 +561,49 @@ local function add_tracker_row(
         then UiTheme.PALETTE.AccentBright
         else UiTheme.PALETTE.Text
 
-    local goal = UiComponents.label(
-        row,
-        "Goal",
-        tracker_goal_text(definition, state),
-        "Muted"
-    )
-    goal.Position = UDim2.fromOffset(10, 29)
-    goal.Size = UDim2.new(1, -20, 0, 20)
-    goal.TextWrapped = false
-    goal.TextTruncate = Enum.TextTruncate.AtEnd
+    if type(state) == "table" and state.Ready == true then
+        local goal = UiComponents.label(
+            row,
+            "Goal",
+            tracker_goal_text(definition, state),
+            "Muted"
+        )
+        goal.Position = UDim2.fromOffset(10, 29)
+        goal.Size = UDim2.new(1, -20, 0, 20)
+        goal.TextWrapped = false
+        goal.TextTruncate = Enum.TextTruncate.AtEnd
+        goal.TextColor3 = UiTheme.PALETTE.Accent
+    else
+        local objectives = QuestPresentation.objective_rows(
+            definition,
+            state
+        )
+
+        for index, objective in ipairs(objectives) do
+            local goal = UiComponents.label(
+                row,
+                "Goal" .. tostring(index),
+                (if objective.Complete then "✓  " else "•  ")
+                    .. objective.Text,
+                if objective.Complete then "Muted" else "Body"
+            )
+            goal.Position = UDim2.fromOffset(
+                10,
+                28 + (index - 1) * 22
+            )
+            goal.Size = UDim2.new(1, -20, 0, 20)
+            goal.TextWrapped = false
+            goal.TextTruncate = Enum.TextTruncate.AtEnd
+        end
+    end
 
     row.Activated:Connect(function()
         if not tracked then
             request_track(definition.Id)
         end
     end)
+
+    return row_height
 end
 
 --[[
@@ -578,15 +635,25 @@ local function render_tracker()
         return tostring(a.DisplayName) < tostring(b.DisplayName)
     end)
 
+    local content_height = 0
+
     for index, definition in ipairs(definitions) do
-        add_tracker_row(definition, index)
+        content_height += add_tracker_row(
+            definition,
+            index
+        )
     end
+
+    content_height += math.max(
+        0,
+        #definitions - 1
+    ) * 6
 
     tracker.Size = UDim2.fromOffset(
         TRACKER_WIDTH,
         math.min(
             MAX_TRACKER_HEIGHT,
-            46 + #definitions * 64
+            46 + content_height
         )
     )
 end
