@@ -55,7 +55,7 @@ local card = Instance.new("Frame")
 card.Name = "StatusCard"
 card.AnchorPoint = Vector2.new(0, 0)
 card.Position = UDim2.fromOffset(18, 18)
-card.Size = UDim2.fromOffset(410, 190)
+card.Size = UDim2.fromOffset(410, 142)
 UiTheme.style_panel(card, false)
 card.Parent = gui
 UiOrnament.frame(card, true)
@@ -114,8 +114,8 @@ accent.Parent = card
 
 local level_badge = Instance.new("Frame")
 level_badge.Name = "LevelBadge"
-level_badge.Position = UDim2.fromOffset(18, 22)
-level_badge.Size = UDim2.fromOffset(70, 70)
+level_badge.Position = UDim2.fromOffset(18, 20)
+level_badge.Size = UDim2.fromOffset(76, 76)
 level_badge.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
 level_badge.BorderSizePixel = 0
 UiTheme.add_corner(level_badge, 3)
@@ -186,9 +186,9 @@ local player_name = UiComponents.label(
     player.DisplayName,
     "Title"
 )
-player_name.Position = UDim2.fromOffset(102, 17)
-player_name.Size = UDim2.new(1, -120, 0, 27)
-player_name.TextSize = 22
+player_name.Position = UDim2.fromOffset(108, 12)
+player_name.Size = UDim2.new(1, -126, 0, 27)
+player_name.TextSize = 21
 
 local class_label = UiComponents.label(
     card,
@@ -196,8 +196,8 @@ local class_label = UiComponents.label(
     last_class,
     "Muted"
 )
-class_label.Position = UDim2.fromOffset(103, 43)
-class_label.Size = UDim2.new(1, -121, 0, 18)
+class_label.Position = UDim2.fromOffset(109, 38)
+class_label.Size = UDim2.new(1, -127, 0, 17)
 class_label.TextColor3 = UiTheme.PALETTE.AccentBright
 
 local currency_label = UiComponents.label(
@@ -206,10 +206,10 @@ local currency_label = UiComponents.label(
     "0 GOLD   •   0 AP   •   0 SP",
     "Caption"
 )
-currency_label.Position = UDim2.fromOffset(18, 102)
-currency_label.Size = UDim2.fromOffset(70, 48)
-currency_label.TextWrapped = true
-currency_label.TextYAlignment = Enum.TextYAlignment.Top
+currency_label.Position = UDim2.fromOffset(108, 116)
+currency_label.Size = UDim2.new(1, -126, 0, 16)
+currency_label.TextWrapped = false
+currency_label.TextYAlignment = Enum.TextYAlignment.Center
 currency_label.TextColor3 = UiTheme.PALETTE.TextMuted
 
 local health = UiComponents.progress_bar(
@@ -220,8 +220,8 @@ local health = UiComponents.progress_bar(
     UiTheme.PALETTE.HealthDark,
     30
 )
-health.Root.Position = UDim2.fromOffset(102, 64)
-health.Root.Size = UDim2.new(1, -120, 0, 30)
+health.Root.Position = UDim2.fromOffset(108, 58)
+health.Root.Size = UDim2.new(1, -126, 0, 27)
 health.Label.Text = "HP"
 
 local xp = UiComponents.progress_bar(
@@ -232,15 +232,16 @@ local xp = UiComponents.progress_bar(
     UiTheme.PALETTE.AccentDark,
     30
 )
-xp.Root.Position = UDim2.fromOffset(18, 158)
-xp.Root.Size = UDim2.new(1, -36, 0, 27)
+xp.Root.Position = UDim2.fromOffset(108, 87)
+xp.Root.Size = UDim2.new(1, -126, 0, 26)
 xp.Label.Text = "XP"
 
 local resource_stack = Instance.new("Frame")
 resource_stack.Name = "ResourceStack"
-resource_stack.Position = UDim2.fromOffset(102, 98)
-resource_stack.Size = UDim2.new(1, -120, 0, 58)
+resource_stack.Position = UDim2.fromOffset(0, 0)
+resource_stack.Size = UDim2.fromOffset(0, 0)
 resource_stack.BackgroundTransparency = 1
+resource_stack.Visible = false
 resource_stack.Parent = card
 
 local resource_layout = Instance.new("UIListLayout")
