@@ -64,9 +64,8 @@ root.BorderSizePixel = 0
 root.Parent = gui
 UiTheme.bind_responsive_scale(root, 1366, 0.68, 1)
 
-local action_bar_art = UiArt.background(
+local action_bar_art = UiArt.popup_background(
     root,
-    "ActionBar",
     1
 )
 action_bar_art.Name = "ActionBarArt"
