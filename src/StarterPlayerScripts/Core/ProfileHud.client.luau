@@ -280,7 +280,7 @@ local player_name = UiComponents.label(
 player_name.Position = UDim2.fromOffset(NAME_X, NAME_Y)
 player_name.Size = UDim2.fromOffset(NAME_MIN_WIDTH, 21)
 player_name.TextColor3 = Color3.fromRGB(249, 239, 214)
-player_name.TextSize = 15
+player_name.TextSize = 18
 player_name.TextStrokeColor3 = Color3.fromRGB(8, 5, 3)
 player_name.TextStrokeTransparency = 0.28
 player_name.TextTruncate = Enum.TextTruncate.None
@@ -350,12 +350,12 @@ local level_value = UiComponents.label(
     "1",
     "Title"
 )
-level_value.Position = UDim2.fromOffset(19, 87)
-level_value.Size = UDim2.fromOffset(30, 30)
+level_value.Position = UDim2.fromOffset(17, 84)
+level_value.Size = UDim2.fromOffset(31, 31)
 level_value.TextXAlignment = Enum.TextXAlignment.Center
 level_value.TextYAlignment = Enum.TextYAlignment.Center
 level_value.TextColor3 = Color3.fromRGB(248, 239, 218)
-level_value.TextSize = 18
+level_value.TextSize = 21
 level_value.TextStrokeColor3 = Color3.fromRGB(6, 4, 3)
 level_value.TextStrokeTransparency = 0.18
 level_value.ZIndex = 6
@@ -370,8 +370,8 @@ class_label.Visible = false
 
 local health_track = Instance.new("Frame")
 health_track.Name = "HealthTrack"
-health_track.Position = UDim2.fromOffset(133, 59)
-health_track.Size = UDim2.fromOffset(256, 11)
+health_track.Position = UDim2.fromOffset(126, 59)
+health_track.Size = UDim2.fromOffset(274, 15)
 health_track.BackgroundColor3 = Color3.fromRGB(31, 8, 11)
 health_track.BackgroundTransparency = 1
 health_track.BorderSizePixel = 0
@@ -400,19 +400,19 @@ local health_value = UiComponents.label(
     "-- / --",
     "Heading"
 )
-health_value.Position = UDim2.fromOffset(133, 56)
-health_value.Size = UDim2.fromOffset(256, 18)
+health_value.Position = UDim2.fromOffset(126, 56)
+health_value.Size = UDim2.fromOffset(274, 21)
 health_value.TextXAlignment = Enum.TextXAlignment.Center
 health_value.TextColor3 = Color3.fromRGB(255, 246, 229)
-health_value.TextSize = 12
+health_value.TextSize = 15
 health_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 health_value.TextStrokeTransparency = 0.12
 health_value.ZIndex = 5
 
 local mana_track = Instance.new("Frame")
 mana_track.Name = "ManaTrack"
-mana_track.Position = UDim2.fromOffset(133, 81)
-mana_track.Size = UDim2.fromOffset(256, 11)
+mana_track.Position = UDim2.fromOffset(126, 79)
+mana_track.Size = UDim2.fromOffset(274, 15)
 mana_track.BackgroundColor3 = Color3.fromRGB(6, 14, 35)
 mana_track.BackgroundTransparency = 1
 mana_track.BorderSizePixel = 0
@@ -441,11 +441,11 @@ local mana_value = UiComponents.label(
     "-- / --",
     "Heading"
 )
-mana_value.Position = UDim2.fromOffset(133, 78)
-mana_value.Size = UDim2.fromOffset(256, 18)
+mana_value.Position = UDim2.fromOffset(126, 76)
+mana_value.Size = UDim2.fromOffset(274, 21)
 mana_value.TextXAlignment = Enum.TextXAlignment.Center
 mana_value.TextColor3 = Color3.fromRGB(255, 246, 229)
-mana_value.TextSize = 12
+mana_value.TextSize = 15
 mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
 mana_value.ZIndex = 5
