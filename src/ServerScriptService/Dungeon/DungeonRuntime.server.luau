@@ -2161,6 +2161,23 @@ local function admit_player(player: Player)
         return
     end
 
+    local member_user_ids =
+        if type(session) == "table"
+            and type(session.MemberUserIds) == "table"
+            then session.MemberUserIds
+            else {}
+
+    local party_leader_user_id = 0
+    if #member_user_ids > 1 then
+        party_leader_user_id =
+            tonumber(member_user_ids[1]) or 0
+    end
+
+    player:SetAttribute(
+        "PartyLeaderUserId",
+        party_leader_user_id
+    )
+
     if not RunService:IsStudio() then
         local claimed, claim_error = claim_published_handoff(player, session)
         if not claimed then
