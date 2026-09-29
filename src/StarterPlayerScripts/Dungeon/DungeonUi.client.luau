@@ -27,6 +27,9 @@ local UiStateRules = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 local UiOrnament = require(
     shared:WaitForChild("UiOrnament")
 )
@@ -185,10 +188,11 @@ revive_panel.AnchorPoint = Vector2.new(0.5, 0.5)
 revive_panel.Position = UDim2.fromScale(0.5, 0.5)
 revive_panel.Size = UDim2.fromOffset(500, 282)
 revive_panel.ZIndex = 21
-UiTheme.style_panel(revive_panel, true)
+revive_panel.BackgroundTransparency = 1
+revive_panel.BorderSizePixel = 0
 revive_panel.Visible = false
 revive_panel.Parent = gui
-UiOrnament.frame(revive_panel, true)
+UiArt.popup_background(revive_panel, 21)
 UiTheme.bind_responsive_scale(
     revive_panel,
     1366,
@@ -271,10 +275,11 @@ complete_panel.AnchorPoint = Vector2.new(0.5, 0.5)
 complete_panel.Position = UDim2.fromScale(0.5, 0.5)
 complete_panel.Size = UDim2.fromOffset(560, 320)
 complete_panel.ZIndex = 21
-UiTheme.style_panel(complete_panel, true)
+complete_panel.BackgroundTransparency = 1
+complete_panel.BorderSizePixel = 0
 complete_panel.Visible = false
 complete_panel.Parent = gui
-UiOrnament.frame(complete_panel, true)
+UiArt.popup_background(complete_panel, 21)
 UiTheme.bind_responsive_scale(
     complete_panel,
     1366,
