@@ -567,9 +567,10 @@ local function render(snapshot: any)
                 else UiTheme.PALETTE.TextFaint
         end
 
-        button.BackgroundColor3 = if selected
-            then UiTheme.PALETTE.AccentDark
-            else UiTheme.PALETTE.SurfaceRaised
+        UiArt.paint_button(
+            button,
+            if selected then "Accent" else "Secondary"
+        )
         UiTheme.set_button_enabled(button, known)
     end
 
@@ -636,7 +637,7 @@ UserInputService.InputBegan:Connect(function(
     end
 
     if input.KeyCode == Enum.KeyCode.K then
-        set_visible(not panel.Visible)
+        set_visible(true)
     end
 end)
 
