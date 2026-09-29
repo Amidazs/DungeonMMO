@@ -192,6 +192,10 @@ journal_panel.Position = UDim2.fromOffset(22, 128)
 journal_panel.Visible = false
 journal_panel.ZIndex = 1
 UiArt.clear_frame_chrome(journal_panel)
+local generic_art = journal_panel:FindFirstChild("ReferenceArt")
+if generic_art then
+    generic_art:Destroy()
+end
 local journal_art = UiArt.background(
     journal_panel,
     "Journal",
