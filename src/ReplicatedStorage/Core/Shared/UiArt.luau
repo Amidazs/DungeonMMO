@@ -813,12 +813,30 @@ function UiArt.actionbar_background(
     parent: GuiObject,
     z_index: number?
 ): ImageLabel
-    return hud_asset(
-        parent,
+    local visible_ratio = 0.86
+
+    local clip = Instance.new("Frame")
+    clip.Name = "ActionBarArtClip"
+    clip.Size = UDim2.new(1, 0, visible_ratio, 0)
+    clip.BackgroundTransparency = 1
+    clip.BorderSizePixel = 0
+    clip.ClipsDescendants = true
+    clip.ZIndex = z_index or 1
+    clip.Parent = parent
+
+    local image = hud_asset(
+        clip,
         "ActionBarArt",
         UiArtAssets.ACTIONBAR_SHELL,
         z_index
     )
+    image.Size = UDim2.new(
+        1,
+        0,
+        1 / visible_ratio,
+        0
+    )
+    return image
 end
 
 --[[
