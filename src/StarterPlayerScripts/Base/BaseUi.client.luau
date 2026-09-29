@@ -90,16 +90,18 @@ local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
-
--- The modal's built-in window art is intentionally empty.
--- All party and dungeon information below is live Roblox UI.
+UiArt.reference_background(
+    panel,
+    "Party",
+    11
+)
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = true
-modal.Subtitle.Visible = true
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 0.18
-modal.Close.TextTransparency = 0
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
@@ -309,6 +311,12 @@ start_button.Position = UDim2.fromScale(1, 0)
 start_button.Size = UDim2.fromOffset(210, 40)
 start_button.ZIndex = 13
 
+UiArt.paint_button(create_button, "Secondary")
+UiArt.paint_button(ready_button, "Accent")
+UiArt.paint_button(leave_button, "Danger")
+UiArt.paint_button(refresh_button, "Ghost")
+UiArt.paint_button(start_button, "Primary")
+
 local columns = Instance.new("Frame")
 columns.Name = "PartyColumns"
 columns.Position = UDim2.fromOffset(0, 430)
@@ -399,6 +407,7 @@ accept_button.AnchorPoint = Vector2.new(1, 0.5)
 accept_button.Position = UDim2.new(1, -76, 0.5, 0)
 accept_button.Size = UDim2.fromOffset(70, 36)
 accept_button.ZIndex = 14
+UiArt.paint_button(accept_button, "Primary")
 
 local decline_button = UiComponents.button(
     invite_banner,
@@ -410,6 +419,7 @@ decline_button.AnchorPoint = Vector2.new(1, 0.5)
 decline_button.Position = UDim2.new(1, -8, 0.5, 0)
 decline_button.Size = UDim2.fromOffset(58, 36)
 decline_button.ZIndex = 14
+UiArt.paint_button(decline_button, "Danger")
 
 local invite_list = Instance.new("ScrollingFrame")
 invite_list.Name = "InviteList"
