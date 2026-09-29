@@ -1,3 +1,53 @@
+## 29 September 2026 — v3.54 QUEST DUNGEON CONTEXT + OPTIONAL BRANCHES GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_54_Quest_Dungeon_Context_Optional_Branches_GREEN_20260929.md);
+[evidence](
+../testing/quest-dungeon-context-optional-branches-v3-54-green-20260929.md).
+
+Latest accepted friend-test state adds two fixes on top of v3.53:
+
+1. **Dungeon entrance quest context**
+   - active quest objectives are filtered to the physical dungeon entrance;
+   - tracked quest is listed first;
+   - objective progress and eligible depth(s) are shown;
+   - incompatible selected-depth warning is implemented and live-tested.
+
+2. **Optional side-room progression**
+   - Event boss, Event combat and Secret boss branches are
+     `CompletionRequired = false`;
+   - entering a direct required successor persists a pending side encounter as
+     `Skipped`;
+   - Room 2 no longer requires the Room-1 Event/side room;
+   - final required progression no longer requires the Secret side room;
+   - deferred Secret backtracking semantics remain separate from forfeited
+     timed Events.
+
+Physical Temple fixture acceptance:
+
+`Room1,EventArena,Room2,SecretArena,Room3`
+
+passed the exact skip route:
+Room 1 -> skip Event -> Room 2 -> skip Secret -> final boss -> complete.
+
+The Base entrance UI was tested via the real Temple prompt and held **E**.
+The Captain bounty displayed `Depth 1 or Depth 4`; a synthetic Depth-2
+checkpoint objective displayed `Depth 2` and the expected mismatch warning.
+
+TEST publication and fresh-cloud verification are complete:
+
+- Dungeon `117293035754309`: `PublishSuccessful` at 09:53:12Z;
+- Base `134132328219009`: `PublishSuccessful` at 09:53:49Z;
+- all changed fresh-cloud source matches the current worktree after normalising
+  Studio line endings;
+- fresh cloud Play starts cleanly in both places.
+
+Feature source checkpoint:
+`7cfb19a64aa6680de318827b54791c015a0794cf`.
+
+**DO NOT START SECTION D** until the user finishes the two-player friend test
+and explicitly releases the hold.
+
 ## 29 September 2026 — v3.53 QUEST JOURNAL + TRACKER GREEN
 
 [Roadmap](
