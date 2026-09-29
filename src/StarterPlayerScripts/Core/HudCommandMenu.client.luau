@@ -34,7 +34,7 @@ local frame = Instance.new("Frame")
 frame.Name = "CommandBar"
 frame.AnchorPoint = Vector2.new(1, 1)
 frame.Position = UDim2.new(1, -18, 1, -18)
-frame.Size = UDim2.fromOffset(420, 82)
+frame.Size = UDim2.fromOffset(354, 82)
 frame.BackgroundTransparency = 1
 frame.BorderSizePixel = 0
 frame.Parent = gui
@@ -48,7 +48,6 @@ local ACTIONS = {
     "Stats",
     "Inventory",
     "Map",
-    "Settings",
 }
 
 local buttons: {[string]: TextButton} = {}
