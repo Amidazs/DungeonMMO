@@ -54,6 +54,15 @@ local slot_cooldowns: {[number]: TextLabel} = {}
 local slot_overlays: {[number]: Frame} = {}
 local slot_sigils: {[number]: TextLabel} = {}
 
+local SLOT_TINTS = table.freeze({
+    Color3.fromRGB(29, 82, 148),
+    Color3.fromRGB(103, 47, 151),
+    Color3.fromRGB(173, 104, 30),
+    Color3.fromRGB(34, 105, 137),
+    Color3.fromRGB(152, 105, 35),
+    Color3.fromRGB(136, 43, 54),
+})
+
 local player_gui = player:WaitForChild("PlayerGui")
 local old = player_gui:FindFirstChild("CombatHotbarGui")
 if old then
@@ -128,7 +137,7 @@ local function create_slot(slot: number)
         frame,
         "AbilityIcon",
         "✦",
-        Color3.fromRGB(41, 69, 105),
+        SLOT_TINTS[slot] or Color3.fromRGB(41, 69, 105),
         56
     )
     icon.Position = UDim2.fromOffset(8, 4)
