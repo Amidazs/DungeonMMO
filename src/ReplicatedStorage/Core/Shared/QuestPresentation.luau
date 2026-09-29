@@ -1,6 +1,12 @@
 --!strict
 -- Shared formatting and Base navigation rules for Adventure quest UI.
 
+local DungeonDefinitions = require(
+    script.Parent:WaitForChild("DungeonDefinitions")
+)
+local DungeonDifficultyDefinitions = require(
+    script.Parent:WaitForChild("DungeonDifficultyDefinitions")
+)
 local ItemDefinitions = require(
     script.Parent:WaitForChild("ItemDefinitions")
 )
@@ -179,6 +185,248 @@ function QuestPresentation.objective_rows(
     return rows
 end
 
+local DUNGEON_ORDER = table.freeze({
+    DungeonDefinitions.TEST_DUNGEON.Id,
+    DungeonDefinitions.ABANDONED_MINE.Id,
+})
+
+local DEPTH1_TARGETS = table.freeze({
+    forest_wolf = DungeonDefinitions.TEST_DUNGEON.Id,
+    hidden_ward_fragment = DungeonDefinitions.TEST_DUNGEON.Id,
+    temple_resonance_shard = DungeonDefinitions.TEST_DUNGEON.Id,
+})
+
+--[[
+Returns difficulty IDs containing one runtime encounter or boss target.
+
+Args:
+    dungeon_id (string): Stable dungeon identifier.
+    runtime_id (string?): Runtime encounter identifier to match.
+    boss_id (string?): Boss content identifier to match.
+
+Returns:
+    {string}: Ordered matching difficulty IDs.
+]]
+local function matching_difficulties(
+    dungeon_id: string,
+    runtime_id: string?,
+    boss_id: string?
+): {string}
+    local result = {}
+
+    for _, difficulty in ipairs(
+        DungeonDifficultyDefinitions.ordered(dungeon_id)
+    ) do
+        for _, encounter in ipairs(
+            difficulty.EncounterSequence or {}
+        ) do
+            local runtime_matches = runtime_id ~= nil
+                and encounter.RuntimeEncounterId == runtime_id
+            local boss_matches = boss_id ~= nil
+                and encounter.BossId == boss_id
+
+            if runtime_matches or boss_matches then
+                table.insert(result, difficulty.Id)
+                break
+            end
+        end
+    end
+
+    return result
+end
+
+--[[
+Resolves one quest objective to its dungeon and eligible difficulties.
+
+A nil DifficultyIds value means every unlocked depth can progress it.
+
+Args:
+    objective (any): Shared Adventure objective definition.
+
+Returns:
+    any?: Dungeon requirement descriptor when the objective is dungeon-bound.
+]]
+function QuestPresentation.objective_dungeon_requirement(
+    objective: any
+): any?
+    if type(objective) ~= "table" then
+        return nil
+    end
+
+    local target_id = tostring(objective.TargetId or "")
+
+    if objective.Type == "DungeonClear"
+        and DungeonDefinitions.get(target_id)
+    then
+        return {
+            DungeonId = target_id,
+            DifficultyIds = nil,
+        }
+    end
+
+    local depth1_dungeon = DEPTH1_TARGETS[target_id]
+    if depth1_dungeon then
+        return {
+            DungeonId = depth1_dungeon,
+            DifficultyIds = {"Depth1"},
+        }
+    end
+
+    local checkpoint_dungeon, runtime_id = string.match(
+        target_id,
+        "^([^:]+):EncounterStart:(.+)$"
+    )
+    if checkpoint_dungeon
+        and runtime_id
+        and DungeonDefinitions.get(checkpoint_dungeon)
+    then
+        local difficulty_ids = matching_difficulties(
+            checkpoint_dungeon,
+            runtime_id,
+            nil
+        )
+        if #difficulty_ids > 0 then
+            return {
+                DungeonId = checkpoint_dungeon,
+                DifficultyIds = difficulty_ids,
+            }
+        end
+    end
+
+    if objective.Type == "EnemyDefeat" then
+        for _, dungeon_id in ipairs(DUNGEON_ORDER) do
+            local difficulty_ids = matching_difficulties(
+                dungeon_id,
+                nil,
+                target_id
+            )
+            if #difficulty_ids > 0 then
+                return {
+                    DungeonId = dungeon_id,
+                    DifficultyIds = difficulty_ids,
+                }
+            end
+        end
+    end
+
+    for _, dungeon_id in ipairs(DUNGEON_ORDER) do
+        local prefix = dungeon_id .. ":"
+        if string.sub(target_id, 1, #prefix) == prefix then
+            return {
+                DungeonId = dungeon_id,
+                DifficultyIds = {"Depth1"},
+            }
+        end
+    end
+
+    return nil
+end
+
+--[[
+Returns incomplete objectives for one specific dungeon entrance.
+
+Args:
+    definition (any): Shared Adventure quest definition.
+    state (any): Active quest state.
+    dungeon_id (string): Dungeon represented by the entrance.
+
+Returns:
+    {any}: Objective rows extended with dungeon requirements.
+]]
+function QuestPresentation.dungeon_objective_rows(
+    definition: any,
+    state: any,
+    dungeon_id: string
+): {any}
+    local result = {}
+
+    for _, row in ipairs(
+        QuestPresentation.objective_rows(definition, state)
+    ) do
+        if not row.Complete then
+            local requirement =
+                QuestPresentation.objective_dungeon_requirement(
+                    row.Definition
+                )
+            if requirement
+                and requirement.DungeonId == dungeon_id
+            then
+                row.DungeonId = requirement.DungeonId
+                row.DifficultyIds = requirement.DifficultyIds
+                table.insert(result, row)
+            end
+        end
+    end
+
+    return result
+end
+
+--[[
+Returns whether one difficulty can progress a dungeon objective.
+
+Args:
+    requirement (any): Dungeon requirement or objective row.
+    difficulty_id (string?): Selected difficulty identifier.
+
+Returns:
+    boolean: True when the selected depth can progress the objective.
+]]
+function QuestPresentation.requirement_allows_difficulty(
+    requirement: any,
+    difficulty_id: string?
+): boolean
+    if type(requirement) ~= "table"
+        or type(difficulty_id) ~= "string"
+    then
+        return false
+    end
+
+    if requirement.DifficultyIds == nil then
+        return true
+    end
+
+    for _, allowed_id in ipairs(requirement.DifficultyIds) do
+        if allowed_id == difficulty_id then
+            return true
+        end
+    end
+
+    return false
+end
+
+--[[
+Builds the player-facing difficulty text for one dungeon objective.
+
+Args:
+    requirement (any): Dungeon requirement or objective row.
+
+Returns:
+    string: "Any unlocked depth" or the eligible depth names.
+]]
+function QuestPresentation.difficulty_text(requirement: any): string
+    if type(requirement) ~= "table"
+        or requirement.DifficultyIds == nil
+    then
+        return "Any unlocked depth"
+    end
+
+    local names = {}
+    for _, difficulty_id in ipairs(requirement.DifficultyIds) do
+        local definition = DungeonDifficultyDefinitions.get(
+            tostring(requirement.DungeonId or ""),
+            difficulty_id
+        )
+        table.insert(
+            names,
+            definition and definition.DisplayName or difficulty_id
+        )
+    end
+
+    return if #names > 0
+        then table.concat(names, " or ")
+        else "Any unlocked depth"
+end
+
 --[[
 Builds a compact reward string for one Adventure quest.
 
@@ -325,13 +573,15 @@ function QuestPresentation.base_navigation_target(
         return nil
     end
 
-    local objective = row.Definition
-    local target_id = tostring(objective.TargetId or "")
-    local mine_target =
-        string.find(target_id, "AbandonedMine", 1, true) ~= nil
-        or target_id == "corrupted_foreman"
+    local requirement =
+        QuestPresentation.objective_dungeon_requirement(
+            row.Definition
+        )
 
-    if mine_target then
+    if requirement
+        and requirement.DungeonId
+            == DungeonDefinitions.ABANDONED_MINE.Id
+    then
         return {
             Kind = "Anchor",
             Id = "Base.Travel.Dwarves",
@@ -339,11 +589,18 @@ function QuestPresentation.base_navigation_target(
         }
     end
 
-    return {
-        Kind = "Anchor",
-        Id = "Base.TemplePortal",
-        Label = "Head toward the Temple",
-    }
+    if requirement
+        and requirement.DungeonId
+            == DungeonDefinitions.TEST_DUNGEON.Id
+    then
+        return {
+            Kind = "Anchor",
+            Id = "Base.TemplePortal",
+            Label = "Head toward the Temple",
+        }
+    end
+
+    return nil
 end
 
 return table.freeze(QuestPresentation)
