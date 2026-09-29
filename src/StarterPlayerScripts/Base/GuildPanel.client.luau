@@ -55,7 +55,7 @@ local modal = UiComponents.modal(
     "GuildWindow",
     "Guild",
     "Manage your guild, members and hall.",
-    UDim2.fromOffset(640, 800)
+    UDim2.fromOffset(680, 850)
 )
 local panel = modal.Root
 panel.Visible = false
