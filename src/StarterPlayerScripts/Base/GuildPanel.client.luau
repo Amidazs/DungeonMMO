@@ -162,6 +162,32 @@ local TAB_NAMES = {
     "Settings",
 }
 
+--[[
+Applies the shared dark-metal treatment to a guild text box.
+
+Args:
+    box (TextBox): Input field to style.
+
+Returns:
+    None.
+]]
+local function style_input(box: TextBox)
+    box.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
+    box.BackgroundTransparency = 0.04
+    box.BorderSizePixel = 0
+    box.Font = UiTheme.FONT.Body
+    box.TextColor3 = UiTheme.PALETTE.Text
+    box.PlaceholderColor3 = UiTheme.PALETTE.TextFaint
+    box.TextSize = 14
+    box.TextXAlignment = Enum.TextXAlignment.Left
+    UiTheme.add_corner(box, 2)
+    UiTheme.add_stroke(
+        box,
+        UiTheme.PALETTE.BorderSoft,
+        0.22
+    )
+end
+
 local pages: {[string]: Frame} = {}
 local tab_buttons: {[string]: TextButton} = {}
 local active_page = "Overview"
@@ -304,7 +330,7 @@ create_name.PlaceholderText = "Guild name"
 create_name.ClearTextOnFocus = false
 create_name.Text = ""
 create_name.ZIndex = 16
-UiTheme.style_input(create_name)
+style_input(create_name)
 create_name.Parent = join_panel
 
 local invite_guild_id = Instance.new("TextBox")
@@ -315,7 +341,7 @@ invite_guild_id.PlaceholderText = "Guild ID from invitation"
 invite_guild_id.ClearTextOnFocus = false
 invite_guild_id.Text = ""
 invite_guild_id.ZIndex = 16
-UiTheme.style_input(invite_guild_id)
+style_input(invite_guild_id)
 invite_guild_id.Parent = join_panel
 
 local create_guild_button = UiComponents.button(
@@ -370,7 +396,7 @@ target_user.PlaceholderText = "Target UserId"
 target_user.ClearTextOnFocus = false
 target_user.Text = ""
 target_user.ZIndex = 15
-UiTheme.style_input(target_user)
+style_input(target_user)
 target_user.Parent = members_page
 
 local member_actions = Instance.new("Frame")
@@ -463,7 +489,7 @@ message_box.TextYAlignment = Enum.TextYAlignment.Top
 message_box.PlaceholderText = "Guild message of the day"
 message_box.Text = ""
 message_box.ZIndex = 15
-UiTheme.style_input(message_box)
+style_input(message_box)
 message_box.Parent = settings_page
 
 local save_message_button = UiComponents.button(
