@@ -47,8 +47,8 @@ local quest_snapshot = remotes:WaitForChild(
 local WINDOW_NAME = "Quests"
 local GUI_NAME = "QuestJournal"
 local SNAPSHOT_REFRESH_SECONDS = 1
-local MAX_TRACKER_HEIGHT = 410
-local TRACKER_WIDTH = 292
+local MAX_TRACKER_HEIGHT = 440
+local TRACKER_WIDTH = 330
 local JOURNAL_ROW_HEIGHT = 76
 
 local player_scripts = player:WaitForChild("PlayerScripts")
@@ -108,7 +108,10 @@ local tracker = Instance.new("Frame")
 tracker.Name = "ActiveQuestTracker"
 tracker.AnchorPoint = Vector2.new(1, 0)
 tracker.Position = UDim2.new(1, -18, 0, 226)
-tracker.Size = UDim2.fromOffset(TRACKER_WIDTH, 92)
+tracker.Size = UDim2.fromOffset(
+    TRACKER_WIDTH,
+    MAX_TRACKER_HEIGHT
+)
 tracker.Visible = false
 tracker.BackgroundTransparency = 1
 tracker.BorderSizePixel = 0
@@ -120,6 +123,17 @@ local tracker_art = UiArt.background(
     1
 )
 tracker_art.Name = "TrackerArt"
+
+UiArt.content_mask(
+    tracker,
+    "Tracker",
+    "TrackerContentMask",
+    94,
+    258,
+    898,
+    1092,
+    2
+)
 
 local tracker_header = Instance.new("Frame")
 tracker_header.Name = "HeaderBand"
@@ -160,12 +174,13 @@ tracker_hint.Position = UDim2.new(1, -15, 0, 13)
 tracker_hint.Size = UDim2.fromOffset(88, 14)
 tracker_hint.TextXAlignment = Enum.TextXAlignment.Right
 tracker_hint.TextSize = 9
+tracker_hint.Visible = false
 tracker_hint.ZIndex = 3
 
 local tracker_list = Instance.new("ScrollingFrame")
 tracker_list.Name = "QuestRows"
-tracker_list.Position = UDim2.fromOffset(12, 43)
-tracker_list.Size = UDim2.new(1, -24, 1, -54)
+tracker_list.Position = UDim2.fromOffset(30, 82)
+tracker_list.Size = UDim2.new(1, -60, 1, -108)
 tracker_list.CanvasSize = UDim2.new()
 tracker_list.AutomaticCanvasSize = Enum.AutomaticSize.Y
 tracker_list.BackgroundTransparency = 1
@@ -184,11 +199,11 @@ local modal = UiComponents.modal(
     "QuestJournalWindow",
     "Quest Journal",
     "Accepted quests, objectives and rewards.",
-    UDim2.fromOffset(590, 590)
+    UDim2.fromOffset(620, 775)
 )
 local journal_panel = modal.Root
 journal_panel.AnchorPoint = Vector2.new(0, 0)
-journal_panel.Position = UDim2.fromOffset(22, 128)
+journal_panel.Position = UDim2.fromOffset(22, 86)
 journal_panel.Visible = false
 journal_panel.ZIndex = 1
 UiArt.clear_frame_chrome(journal_panel)
@@ -202,7 +217,41 @@ local journal_art = UiArt.background(
     1
 )
 journal_art.Name = "JournalArt"
-modal.Body.ZIndex = 2
+
+UiArt.content_mask(
+    journal_panel,
+    "Journal",
+    "QuestListMask",
+    62,
+    300,
+    438,
+    1017,
+    2
+)
+UiArt.content_mask(
+    journal_panel,
+    "Journal",
+    "QuestDetailMask",
+    525,
+    300,
+    531,
+    1017,
+    2
+)
+
+modal.Body.Position = UiArt.position(
+    "Journal",
+    62,
+    300
+)
+modal.Body.Size = UiArt.rect(
+    "Journal",
+    62,
+    300,
+    994,
+    1017
+)
+modal.Body.ZIndex = 3
 modal.Header.ZIndex = 3
 modal.Title.Visible = false
 modal.Subtitle.Visible = false
@@ -230,7 +279,7 @@ end
 UiTheme.bind_responsive_scale(
     journal_panel,
     1366,
-    0.70,
+    0.72,
     1
 )
 
@@ -283,12 +332,13 @@ journal_status.Position = UDim2.fromOffset(6, 39)
 journal_status.Size = UDim2.new(1, -12, 0, 23)
 journal_status.TextWrapped = true
 journal_status.TextSize = 10
+journal_status.Visible = false
 journal_status.ZIndex = 3
 
 local journal_content = Instance.new("Frame")
 journal_content.Name = "JournalContent"
-journal_content.Position = UDim2.fromOffset(0, 67)
-journal_content.Size = UDim2.new(1, 0, 1, -67)
+journal_content.Position = UDim2.fromScale(0, 0)
+journal_content.Size = UDim2.fromScale(1, 1)
 journal_content.BackgroundTransparency = 1
 journal_content.ZIndex = 2
 journal_content.Parent = modal.Body
@@ -359,6 +409,12 @@ location_card.Name = "LocationCard"
 location_card.Position = UDim2.fromOffset(18, 74)
 location_card.Size = UDim2.new(1, -36, 0, 66)
 UiTheme.style_inset(location_card, true)
+location_card.BackgroundTransparency = 1
+local location_stroke =
+    location_card:FindFirstChildOfClass("UIStroke")
+if location_stroke then
+    location_stroke.Transparency = 1
+end
 location_card.Parent = detail_panel
 
 local location_kicker = UiComponents.label(
@@ -992,10 +1048,7 @@ local function render_tracker()
 
     tracker.Size = UDim2.fromOffset(
         TRACKER_WIDTH,
-        math.min(
-            MAX_TRACKER_HEIGHT,
-            54 + content_height
-        )
+        MAX_TRACKER_HEIGHT
     )
 end
 
