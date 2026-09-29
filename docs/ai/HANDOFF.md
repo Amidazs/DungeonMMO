@@ -1,3 +1,42 @@
+## 29 September 2026 — v3.53 QUEST JOURNAL + TRACKER GREEN
+
+[Roadmap](
+../roadmap/DungeonMMO_Roadmap_v3_53_Quest_Journal_Tracker_GREEN_20260929.md);
+[evidence](
+../testing/quest-journal-tracker-v3-53-green-20260929.md).
+
+Latest accepted friend-test presentation state:
+
+- persistent Adventure `TrackedQuestId`;
+- Adventure accept auto-tracks; class trials do not steal tracking;
+- right-side active quest tracker in Base and Dungeon;
+- all objective rows and counts visible;
+- Quest Journal via **QUESTS** / **L** with goals and rewards;
+- one active Adventure can be selected for tracking;
+- Base-only floor guidance follows that selected quest;
+- ready quests route back to their physical giver;
+- Dungeon exposes Snapshot/Track only and never creates floor guidance.
+
+Two integration issues were found and fixed during acceptance:
+
+1. DungeonRuntime register overflow from one extra top-level local;
+2. Base client folder replication race during shared journal startup.
+
+TEST publication is complete and independently cloud-verified:
+
+- Dungeon `117293035754309` reached `PublishSuccessful` first;
+- Base `134132328219009` reached `PublishSuccessful` second;
+- fresh cloud copies contain the v3.53 source markers;
+- fresh Play startup is clean on both places;
+- published Dungeon multi-objective tracker/journal acceptance passes;
+- published Base ready-to-hand-in tracker and 48-piece giver route pass.
+
+Feature source checkpoint:
+`888018cb33ce7e5314a5b1cd3b8f66a68a67830d`.
+
+**DO NOT START SECTION D** until the user finishes the two-player friend test
+and explicitly releases the hold.
+
 ## 28 September 2026 — v3.48 PRESENTATION POLISH GREEN / FRIEND TEST HOLD
 
 [Roadmap](
