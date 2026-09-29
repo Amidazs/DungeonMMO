@@ -435,12 +435,16 @@ local function render(snapshot: any)
         )
         button.TextColor3 = if known
             then UiTheme.PALETTE.Text
-            else UiTheme.PALETTE.TextMuted
+            else UiTheme.PALETTE.TextFaint:Lerp(
+                UiTheme.PALETTE.Text,
+                0.36
+            )
         button.BackgroundColor3 = if selected
             then UiTheme.PALETTE.AccentDark
             else UiTheme.PALETTE.SurfaceRaised
         UiTheme.set_button_enabled(button, known)
-        button.TextTransparency = if known then 0 else 0.12
+        button.TextTransparency = if known then 0 else 0.04
+        button.TextStrokeTransparency = if known then 0.68 else 0.58
     end
 
     for slot = 1, 6 do
