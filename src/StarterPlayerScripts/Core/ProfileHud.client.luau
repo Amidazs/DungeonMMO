@@ -55,7 +55,7 @@ local card = Instance.new("Frame")
 card.Name = "StatusCard"
 card.AnchorPoint = Vector2.new(0, 0)
 card.Position = UDim2.fromOffset(18, 18)
-card.Size = UDim2.fromOffset(410, 212)
+card.Size = UDim2.fromOffset(410, 190)
 UiTheme.style_panel(card, false)
 card.Parent = gui
 UiOrnament.frame(card, true)
@@ -220,7 +220,7 @@ local health = UiComponents.progress_bar(
     UiTheme.PALETTE.HealthDark,
     30
 )
-health.Root.Position = UDim2.fromOffset(102, 68)
+health.Root.Position = UDim2.fromOffset(102, 64)
 health.Root.Size = UDim2.new(1, -120, 0, 30)
 health.Label.Text = "HP"
 
@@ -232,14 +232,14 @@ local xp = UiComponents.progress_bar(
     UiTheme.PALETTE.AccentDark,
     30
 )
-xp.Root.Position = UDim2.fromOffset(102, 100)
-xp.Root.Size = UDim2.new(1, -120, 0, 28)
+xp.Root.Position = UDim2.fromOffset(18, 158)
+xp.Root.Size = UDim2.new(1, -36, 0, 27)
 xp.Label.Text = "XP"
 
 local resource_stack = Instance.new("Frame")
 resource_stack.Name = "ResourceStack"
-resource_stack.Position = UDim2.fromOffset(102, 134)
-resource_stack.Size = UDim2.new(1, -120, 0, 66)
+resource_stack.Position = UDim2.fromOffset(102, 98)
+resource_stack.Size = UDim2.new(1, -120, 0, 58)
 resource_stack.BackgroundTransparency = 1
 resource_stack.Parent = card
 
