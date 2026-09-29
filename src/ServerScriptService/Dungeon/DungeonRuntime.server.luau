@@ -1040,22 +1040,44 @@ local function start_executed_slot(room_slot_id: string): any?
 
     local next_binding = encounter_flow
         and encounter_flow:next_binding()
-    if next_binding
-        and next_binding.Kind == "SecretBoss"
+    local optional_side_pending = next_binding
         and next_binding.RoomSlotId ~= room_slot_id
-    then
-        local skipped = encounter_flow:skip_secret_before(
+        and (
+            next_binding.Kind == "EventBoss"
+            or next_binding.Kind == "EventCombat"
+            or next_binding.Kind == "SecretBoss"
+        )
+
+    if optional_side_pending then
+        local skipped = encounter_flow:skip_optional_before(
             room_slot_id
         )
         if skipped.ok ~= true then
             return nil
         end
+
+        local updated_gates = DungeonOptionalEntranceGates.sync(
+            Workspace:FindFirstChild(
+                "DungeonMMOPlaceholderPhysicalContent"
+            ),
+            encounter_bindings,
+            encounter_flow
+        )
+        if updated_gates.ok ~= true then
+            warn(
+                "[Dungeon Runtime] Optional skip gate update failed: "
+                    .. tostring(updated_gates.reason)
+            )
+        end
+
         if skipped.next_binding
             and not advance_checkpoint(
                 skipped.next_binding.CheckpointId
             )
         then
-            warn("[Dungeon Runtime] Secret skip checkpoint failed.")
+            warn(
+                "[Dungeon Runtime] Optional skip checkpoint failed."
+            )
             return nil
         end
     end
