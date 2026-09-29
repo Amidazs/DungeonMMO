@@ -32,6 +32,12 @@ local UiArtAssets = {
     BUTTON_RED = "rbxassetid://122776141249505",
     BUTTON_GOLD = "rbxassetid://126792732962914",
     BUTTON_DARK = "rbxassetid://123095682846583",
+
+    PROFILE_EMPTY = "rbxassetid://118389738843052",
+    ACTIONBAR_SHELL = "rbxassetid://73946518126554",
+    ACTION_SLOT_EMPTY = "rbxassetid://101119280543074",
+    RECALL_EMPTY = "rbxassetid://70424393350959",
+    COMMAND_STRIP = "rbxassetid://137651054387577",
 }
 
 return table.freeze(UiArtAssets)
