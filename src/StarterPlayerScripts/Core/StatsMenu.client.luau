@@ -638,7 +638,7 @@ UserInputService.InputBegan:Connect(function(
     end
 
     if input.KeyCode == Enum.KeyCode.C then
-        WindowController.toggle("Stats")
+        WindowController.set_visible("Stats", true)
     end
 end)
 
