@@ -76,7 +76,7 @@ status.Position = UDim2.fromOffset(18, 536)
 status.Size = UDim2.fromOffset(744, 30)
 status.BackgroundTransparency = 1
 status.TextXAlignment = Enum.TextXAlignment.Left
-status.Text = "Server-authoritative trainer catalogue"
+status.Text = "Skills are learned and upgraded only at this class trainer."
 status.Parent = panel
 
 local attr_names = {
@@ -96,6 +96,7 @@ attr_heading.Size = UDim2.fromOffset(270, 28)
 attr_heading.BackgroundTransparency = 1
 attr_heading.TextXAlignment = Enum.TextXAlignment.Left
 attr_heading.Text = "ATTRIBUTES"
+attr_heading.Visible = false
 attr_heading.Parent = panel
 
 for index, name in ipairs(attr_names) do
@@ -107,6 +108,7 @@ for index, name in ipairs(attr_names) do
     label.BackgroundTransparency = 0.25
     label.TextXAlignment = Enum.TextXAlignment.Left
     label.Text = "  " .. name .. ": 5"
+    label.Visible = false
     label.Parent = panel
     attr_labels[name] = label
 
@@ -114,6 +116,7 @@ for index, name in ipairs(attr_names) do
     plus.Position = UDim2.fromOffset(234, y)
     plus.Size = UDim2.fromOffset(44, 38)
     plus.Text = "+"
+    plus.Visible = false
     plus.Parent = panel
     plus_buttons[name] = plus
 end
@@ -122,31 +125,34 @@ local confirm = Instance.new("TextButton")
 confirm.Position = UDim2.fromOffset(18, 382)
 confirm.Size = UDim2.fromOffset(124, 40)
 confirm.Text = "Confirm"
+confirm.Visible = false
 confirm.Parent = panel
 
 local cancel = Instance.new("TextButton")
 cancel.Position = UDim2.fromOffset(150, 382)
 cancel.Size = UDim2.fromOffset(128, 40)
 cancel.Text = "Cancel"
+cancel.Visible = false
 cancel.Parent = panel
 
 local attr_respec_button = Instance.new("TextButton")
 attr_respec_button.Position = UDim2.fromOffset(18, 432)
 attr_respec_button.Size = UDim2.fromOffset(260, 42)
 attr_respec_button.Text = "Attribute Respec • Free (TEST)"
+attr_respec_button.Visible = false
 attr_respec_button.Parent = panel
 
 local skill_heading = Instance.new("TextLabel")
-skill_heading.Position = UDim2.fromOffset(310, 96)
-skill_heading.Size = UDim2.fromOffset(452, 28)
+skill_heading.Position = UDim2.fromOffset(18, 96)
+skill_heading.Size = UDim2.fromOffset(744, 28)
 skill_heading.BackgroundTransparency = 1
 skill_heading.TextXAlignment = Enum.TextXAlignment.Left
 skill_heading.Text = "TRAINER CATALOGUE"
 skill_heading.Parent = panel
 
 local skill_scroller = Instance.new("ScrollingFrame")
-skill_scroller.Position = UDim2.fromOffset(310, 132)
-skill_scroller.Size = UDim2.fromOffset(452, 292)
+skill_scroller.Position = UDim2.fromOffset(18, 132)
+skill_scroller.Size = UDim2.fromOffset(744, 342)
 skill_scroller.BackgroundTransparency = 0.12
 skill_scroller.BorderSizePixel = 0
 skill_scroller.ScrollBarThickness = 8
@@ -158,8 +164,8 @@ skill_layout.Padding = UDim.new(0, 8)
 skill_layout.Parent = skill_scroller
 
 local skill_respec_button = Instance.new("TextButton")
-skill_respec_button.Position = UDim2.fromOffset(310, 432)
-skill_respec_button.Size = UDim2.fromOffset(452, 42)
+skill_respec_button.Position = UDim2.fromOffset(18, 484)
+skill_respec_button.Size = UDim2.fromOffset(744, 42)
 skill_respec_button.Text = "Skill/SP Respec • Free (TEST)"
 skill_respec_button.Parent = panel
 
@@ -240,7 +246,7 @@ local function render_skills()
 
     if #trainer_entries == 0 then
         local empty = Instance.new("TextLabel")
-        empty.Size = UDim2.fromOffset(430, 42)
+        empty.Size = UDim2.fromOffset(722, 42)
         empty.BackgroundTransparency = 1
         empty.TextXAlignment = Enum.TextXAlignment.Left
         empty.Text = "  Waiting for trainer catalogue..."
@@ -253,13 +259,13 @@ local function render_skills()
         local state = skills[skill_id] or {}
 
         local row = Instance.new("Frame")
-        row.Size = UDim2.fromOffset(430, 86)
+        row.Size = UDim2.fromOffset(722, 86)
         row.BackgroundTransparency = 0.12
         row.Parent = skill_scroller
 
         local label = Instance.new("TextLabel")
         label.Position = UDim2.fromOffset(8, 4)
-        label.Size = UDim2.fromOffset(414, 44)
+        label.Size = UDim2.fromOffset(706, 44)
         label.BackgroundTransparency = 1
         label.TextWrapped = true
         label.TextXAlignment = Enum.TextXAlignment.Left
@@ -289,7 +295,7 @@ local function render_skills()
 
         local button = Instance.new("TextButton")
         button.Position = UDim2.fromOffset(8, 52)
-        button.Size = UDim2.fromOffset(414, 28)
+        button.Size = UDim2.fromOffset(706, 28)
         button.Parent = row
 
         local mode = tostring(entry.Mode or "")
@@ -470,7 +476,9 @@ trainer_snapshot.OnClientEvent:Connect(function(payload)
     trainer_entries = if type(payload.Skills) == "table"
         then payload.Skills
         else {}
-    status.Text = "Catalogue loaded from server."
+    status.Text =
+        "Class trainer catalogue loaded. "
+        .. "Attribute Points are spent in Character Stats."
     render_skills()
 end)
 
