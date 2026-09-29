@@ -23,6 +23,9 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiOrnament = require(
+    shared:WaitForChild("UiOrnament")
+)
 
 local progression_snapshot = remotes:WaitForChild(
     "ProgressionSnapshot"
@@ -125,11 +128,9 @@ local loadout = Instance.new("Frame")
 loadout.Name = "Loadout"
 loadout.Position = UDim2.new(0.58, 8, 0, 28)
 loadout.Size = UDim2.new(0.42, -8, 1, -76)
-loadout.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-loadout.BackgroundTransparency = 0.55
 loadout.BorderSizePixel = 0
 loadout.ZIndex = 12
-UiTheme.add_corner(loadout, 8)
+UiTheme.style_inset(loadout, false)
 loadout.Parent = modal.Body
 
 local loadout_padding = Instance.new("UIPadding")
@@ -270,6 +271,7 @@ local function create_skill_button(
     button.Size = UDim2.new(1, 0, 0, 52)
     button.TextXAlignment = Enum.TextXAlignment.Left
     button.TextSize = 14
+    button.TextColor3 = UiTheme.PALETTE.Text
     button.ZIndex = 13
 
     local padding = Instance.new("UIPadding")
@@ -300,6 +302,7 @@ local function create_slot_button(slot: number): TextButton
     button.Size = UDim2.new(1, 0, 0, 56)
     button.TextWrapped = true
     button.TextXAlignment = Enum.TextXAlignment.Left
+    button.TextColor3 = UiTheme.PALETTE.Text
     button.ZIndex = 13
 
     local key = UiComponents.key_hint(
@@ -408,6 +411,7 @@ local function render(snapshot: any)
             then UiTheme.PALETTE.AccentDark
             else UiTheme.PALETTE.SurfaceRaised
         UiTheme.set_button_enabled(button, known)
+        button.TextTransparency = if known then 0 else 0.24
     end
 
     for slot = 1, 6 do
@@ -424,6 +428,10 @@ local function render(snapshot: any)
             slot,
             name
         )
+        slot_buttons[slot].TextColor3 =
+            if definition
+                then UiTheme.PALETTE.Text
+                else UiTheme.PALETTE.TextMuted
     end
 
     task.defer(function()
