@@ -27,6 +27,9 @@ local UiTheme = require(
 local UiOrnament = require(
     shared:WaitForChild("UiOrnament")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 
 local entry_request = remotes:WaitForChild(
     "DungeonEntryRequest"
@@ -81,21 +84,71 @@ local modal = UiComponents.modal(
     "DungeonEntryPanel",
     "Dungeon Entrance",
     "Prepare your party before entering.",
-    UDim2.fromOffset(900, 730)
+    UDim2.fromOffset(690, 920)
 )
 local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
-modal.Header.ZIndex = 12
-modal.Title.ZIndex = 12
-modal.Subtitle.ZIndex = 12
-modal.Close.ZIndex = 12
-modal.Body.ZIndex = 12
+UiArt.clear_frame_chrome(panel)
+
+local old_reference_art = panel:FindFirstChild("ReferenceArt")
+if old_reference_art then
+    old_reference_art:Destroy()
+end
+
+local party_art = UiArt.background(
+    panel,
+    "Party",
+    11
+)
+party_art.Name = "PartyArt"
+
+UiArt.content_mask(
+    panel,
+    "Party",
+    "PartyContentMask",
+    58,
+    220,
+    970,
+    1150,
+    12
+)
+
+modal.Header.ZIndex = 14
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
+modal.Close.ZIndex = 15
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
+
+local header_band = panel:FindFirstChild("HeaderBand")
+if header_band and header_band:IsA("GuiObject") then
+    header_band.Visible = false
+end
+
+local divider = panel:FindFirstChild("OrnateDivider")
+if divider and divider:IsA("GuiObject") then
+    divider.Visible = false
+end
+
+modal.Body.Position = UiArt.position(
+    "Party",
+    58,
+    220
+)
+modal.Body.Size = UiArt.rect(
+    "Party",
+    58,
+    220,
+    970,
+    1150
+)
+modal.Body.ZIndex = 14
 
 UiTheme.bind_responsive_scale(
     panel,
-    1440,
-    0.68,
+    1366,
+    0.58,
     1
 )
 
@@ -107,13 +160,13 @@ local status = UiComponents.label(
 )
 status.Size = UDim2.new(1, 0, 0, 26)
 status.TextWrapped = true
-status.ZIndex = 12
+status.ZIndex = 15
 
 local dungeon_card = Instance.new("Frame")
 dungeon_card.Name = "DungeonContext"
 dungeon_card.Position = UDim2.fromOffset(0, 38)
 dungeon_card.Size = UDim2.new(1, 0, 0, 74)
-dungeon_card.ZIndex = 12
+dungeon_card.ZIndex = 15
 UiTheme.style_inset(dungeon_card, true)
 dungeon_card.Parent = modal.Body
 UiOrnament.divider(
@@ -202,14 +255,14 @@ local difficulty_heading = UiComponents.section_heading(
 )
 difficulty_heading.Position = UDim2.fromOffset(0, 262)
 difficulty_heading.Size = UDim2.new(1, 0, 0, 18)
-difficulty_heading.ZIndex = 12
+difficulty_heading.ZIndex = 15
 
 local difficulty_strip = Instance.new("Frame")
 difficulty_strip.Name = "DifficultyStrip"
 difficulty_strip.Position = UDim2.fromOffset(0, 286)
 difficulty_strip.Size = UDim2.new(1, 0, 0, 72)
 difficulty_strip.BackgroundTransparency = 1
-difficulty_strip.ZIndex = 12
+difficulty_strip.ZIndex = 15
 difficulty_strip.Parent = modal.Body
 
 local difficulty_layout = Instance.new("UIListLayout")
@@ -223,7 +276,7 @@ action_bar.Name = "ActionBar"
 action_bar.Position = UDim2.fromOffset(0, 370)
 action_bar.Size = UDim2.new(1, 0, 0, 44)
 action_bar.BackgroundTransparency = 1
-action_bar.ZIndex = 12
+action_bar.ZIndex = 15
 action_bar.Parent = modal.Body
 
 local create_button = UiComponents.button(
@@ -281,14 +334,14 @@ columns.Name = "PartyColumns"
 columns.Position = UDim2.fromOffset(0, 430)
 columns.Size = UDim2.new(1, 0, 1, -430)
 columns.BackgroundTransparency = 1
-columns.ZIndex = 12
+columns.ZIndex = 15
 columns.Parent = modal.Body
 
 local party_column = Instance.new("Frame")
 party_column.Name = "PartyColumn"
 party_column.Size = UDim2.new(0.48, -6, 1, 0)
 party_column.BackgroundTransparency = 1
-party_column.ZIndex = 12
+party_column.ZIndex = 15
 party_column.Parent = columns
 
 local invite_column = Instance.new("Frame")
@@ -297,7 +350,7 @@ invite_column.AnchorPoint = Vector2.new(1, 0)
 invite_column.Position = UDim2.fromScale(1, 0)
 invite_column.Size = UDim2.new(0.52, -6, 1, 0)
 invite_column.BackgroundTransparency = 1
-invite_column.ZIndex = 12
+invite_column.ZIndex = 15
 invite_column.Parent = columns
 
 local party_header = UiComponents.section_heading(
