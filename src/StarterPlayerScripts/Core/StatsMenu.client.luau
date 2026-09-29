@@ -21,6 +21,9 @@ local UiOrnament = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
+local UiArt = require(
+    shared:WaitForChild("UiArt")
+)
 local WindowController = require(
     script.Parent:WaitForChild("HudWindowController")
 )
@@ -66,26 +69,87 @@ local modal = UiComponents.modal(
     "StatsPanel",
     "Character",
     "Attributes, progression and current character identity.",
-    UDim2.fromOffset(650, 540)
+    UDim2.fromOffset(640, 800)
 )
 local panel = modal.Root
 panel.Visible = false
 panel.ZIndex = 11
-modal.Header.ZIndex = 12
-modal.Title.ZIndex = 12
-modal.Subtitle.ZIndex = 12
-modal.Close.ZIndex = 12
-modal.Body.ZIndex = 12
+UiArt.clear_frame_chrome(panel)
+
+local old_reference_art = panel:FindFirstChild("ReferenceArt")
+if old_reference_art then
+    old_reference_art:Destroy()
+end
+
+local stats_art = UiArt.background(
+    panel,
+    "Stats",
+    11
+)
+stats_art.Name = "StatsArt"
+
+UiArt.content_mask(
+    panel,
+    "Stats",
+    "CharacterContentMask",
+    60,
+    190,
+    530,
+    1120,
+    12
+)
+UiArt.content_mask(
+    panel,
+    "Stats",
+    "StatContentMask",
+    610,
+    190,
+    442,
+    1120,
+    12
+)
+
+modal.Header.ZIndex = 14
+modal.Title.Visible = false
+modal.Subtitle.Visible = false
+modal.Close.ZIndex = 15
+modal.Close.BackgroundTransparency = 1
+modal.Close.TextTransparency = 1
+
+local header_band = panel:FindFirstChild("HeaderBand")
+if header_band and header_band:IsA("GuiObject") then
+    header_band.Visible = false
+end
+
+local divider = panel:FindFirstChild("OrnateDivider")
+if divider and divider:IsA("GuiObject") then
+    divider.Visible = false
+end
+
+modal.Body.Position = UiArt.position(
+    "Stats",
+    60,
+    190
+)
+modal.Body.Size = UiArt.rect(
+    "Stats",
+    60,
+    190,
+    992,
+    1120
+)
+modal.Body.ZIndex = 14
+
 UiTheme.bind_responsive_scale(
     panel,
     1366,
-    0.48,
+    0.62,
     1
 )
 
 local identity_card = Instance.new("Frame")
 identity_card.Name = "IdentityCard"
-identity_card.Size = UDim2.new(0.38, -8, 1, -52)
+identity_card.Size = UDim2.new(0.52, -8, 1, -52)
 identity_card.ZIndex = 12
 UiTheme.style_inset(identity_card, true)
 identity_card.Parent = modal.Body
@@ -93,8 +157,8 @@ identity_card.Parent = modal.Body
 local portrait_frame = Instance.new("Frame")
 portrait_frame.Name = "PortraitFrame"
 portrait_frame.AnchorPoint = Vector2.new(0.5, 0)
-portrait_frame.Position = UDim2.new(0.5, 0, 0, 20)
-portrait_frame.Size = UDim2.fromOffset(136, 136)
+portrait_frame.Position = UDim2.new(0.5, 0, 0, 18)
+portrait_frame.Size = UDim2.fromOffset(224, 260)
 portrait_frame.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
 portrait_frame.BorderSizePixel = 0
 portrait_frame.ZIndex = 13
@@ -109,7 +173,7 @@ local portrait = Instance.new("ImageLabel")
 portrait.Name = "Portrait"
 portrait.Size = UDim2.fromScale(1, 1)
 portrait.BackgroundTransparency = 1
-portrait.ScaleType = Enum.ScaleType.Crop
+portrait.ScaleType = Enum.ScaleType.Fit
 portrait.ZIndex = 14
 portrait.Parent = portrait_frame
 
@@ -117,8 +181,8 @@ task.spawn(function()
     local ok, image = pcall(function()
         return Players:GetUserThumbnailAsync(
             player.UserId,
-            Enum.ThumbnailType.HeadShot,
-            Enum.ThumbnailSize.Size150x150
+            Enum.ThumbnailType.AvatarBust,
+            Enum.ThumbnailSize.Size420x420
         )
     end)
 
@@ -133,7 +197,7 @@ local name_label = UiComponents.label(
     player.DisplayName,
     "Title"
 )
-name_label.Position = UDim2.fromOffset(16, 171)
+name_label.Position = UDim2.fromOffset(16, 290)
 name_label.Size = UDim2.new(1, -32, 0, 30)
 name_label.TextXAlignment = Enum.TextXAlignment.Center
 name_label.TextSize = 22
@@ -145,7 +209,7 @@ local identity_label = UiComponents.label(
     "Adventurer",
     "Muted"
 )
-identity_label.Position = UDim2.fromOffset(16, 205)
+identity_label.Position = UDim2.fromOffset(16, 326)
 identity_label.Size = UDim2.new(1, -32, 0, 44)
 identity_label.TextWrapped = true
 identity_label.TextXAlignment = Enum.TextXAlignment.Center
@@ -153,7 +217,7 @@ identity_label.ZIndex = 13
 
 UiOrnament.divider(
     identity_card,
-    UDim2.fromOffset(18, 257),
+    UDim2.fromOffset(18, 380),
     UDim2.new(1, -36, 0, 6),
     13
 )
@@ -164,7 +228,7 @@ local progression_label = UiComponents.label(
     "Level 1",
     "Body"
 )
-progression_label.Position = UDim2.fromOffset(16, 275)
+progression_label.Position = UDim2.fromOffset(16, 396)
 progression_label.Size = UDim2.new(1, -32, 0, 72)
 progression_label.TextWrapped = true
 progression_label.TextXAlignment = Enum.TextXAlignment.Center
@@ -173,8 +237,8 @@ progression_label.ZIndex = 13
 
 local attributes_panel = Instance.new("Frame")
 attributes_panel.Name = "AttributesPanel"
-attributes_panel.Position = UDim2.new(0.38, 8, 0, 0)
-attributes_panel.Size = UDim2.new(0.62, -8, 1, -52)
+attributes_panel.Position = UDim2.new(0.52, 8, 0, 0)
+attributes_panel.Size = UDim2.new(0.48, -8, 1, -52)
 attributes_panel.ZIndex = 12
 UiTheme.style_inset(attributes_panel, false)
 attributes_panel.Parent = modal.Body
