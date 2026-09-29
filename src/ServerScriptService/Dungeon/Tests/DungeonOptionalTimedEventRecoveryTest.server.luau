@@ -108,8 +108,11 @@ local function check_recovery(
     local saved_plan = frozen.InstanceState.EncounterPlan
     local event = assert(find_kind(saved_plan, "EventBoss"))
     local secret = assert(find_kind(saved_plan, "SecretBoss"))
-    check(event.CompletionRequired and not secret.CompletionRequired,
-        "frozen optional encounter roles must remain distinct")
+    check(
+        event.CompletionRequired == false
+            and secret.CompletionRequired == false,
+        "recovered Event and Secret encounters must remain optional"
+    )
 
     now = 250
     local new_entrant = Issuer.issue(
