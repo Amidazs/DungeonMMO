@@ -71,45 +71,15 @@ panel.Visible = false
 panel.ZIndex = 11
 UiArt.clear_frame_chrome(panel)
 
-local old_reference_art = panel:FindFirstChild("ReferenceArt")
-if old_reference_art then
-    old_reference_art:Destroy()
-end
-
-local inventory_art = UiArt.background(
-    panel,
-    "Inventory",
-    11
-)
-inventory_art.Name = "InventoryArt"
-
-UiArt.content_mask(
-    panel,
-    "Inventory",
-    "CharacterContentMask",
-    48,
-    220,
-    410,
-    1060,
-    12
-)
-UiArt.content_mask(
-    panel,
-    "Inventory",
-    "InventoryContentMask",
-    472,
-    220,
-    602,
-    1060,
-    12
-)
+-- Keep the modal's clean shell. Inventory items, character details,
+-- tabs, counts and equipment are all rendered from live state.
 
 modal.Header.ZIndex = 14
-modal.Title.Visible = false
-modal.Subtitle.Visible = false
+modal.Title.Visible = true
+modal.Subtitle.Visible = true
 modal.Close.ZIndex = 15
-modal.Close.BackgroundTransparency = 1
-modal.Close.TextTransparency = 1
+modal.Close.BackgroundTransparency = 0.18
+modal.Close.TextTransparency = 0
 
 local header_band = panel:FindFirstChild("HeaderBand")
 if header_band and header_band:IsA("GuiObject") then
