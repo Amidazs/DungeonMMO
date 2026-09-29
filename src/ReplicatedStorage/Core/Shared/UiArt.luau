@@ -1,5 +1,13 @@
 --!strict
--- Reference-derived UI artwork shared by DungeonMMO client interfaces.
+-- Painted reference UI artwork shared by DungeonMMO client interfaces.
+--
+-- Older atlas regions remain available for the four horizontal HUD elements
+-- until their new high-resolution source images are uploaded. Main windows
+-- use the full-resolution images registered in UiArtAssets.
+local UiArtAssets = require(
+    script.Parent:WaitForChild("UiArtAssets")
+)
+
 local UiArt = {}
 
 UiArt.ATLAS_IMAGE = "rbxassetid://107368787767290"
@@ -19,18 +27,15 @@ export type Region = {
     Size: Vector2,
 }
 
+export type DirectArt = {
+    Image: string,
+    SourceSize: Vector2,
+}
+
 local REGIONS: {[string]: Region} = {
     Window = {
         Offset = Vector2.new(0, 0),
         Size = Vector2.new(290, 295),
-    },
-    Journal = {
-        Offset = Vector2.new(296, 0),
-        Size = Vector2.new(290, 295),
-    },
-    Tracker = {
-        Offset = Vector2.new(592, 0),
-        Size = Vector2.new(132, 187),
     },
     Profile = {
         Offset = Vector2.new(732, 0),
@@ -56,16 +61,64 @@ local REGIONS: {[string]: Region} = {
         Offset = Vector2.new(524, 310),
         Size = Vector2.new(61, 16),
     },
+}
+
+local DIRECT_ART: {[string]: DirectArt} = {
+    Journal = {
+        Image = UiArtAssets.QUEST_JOURNAL,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Tracker = {
+        Image = UiArtAssets.QUEST_TRACKER,
+        SourceSize = Vector2.new(1086, 1448),
+    },
+    Inventory = {
+        Image = UiArtAssets.INVENTORY,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Skills = {
+        Image = UiArtAssets.SKILLS,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Stats = {
+        Image = UiArtAssets.STATS,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Guild = {
+        Image = UiArtAssets.GUILD,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Party = {
+        Image = UiArtAssets.PARTY,
+        SourceSize = Vector2.new(1086, 1448),
+    },
+    Settings = {
+        Image = UiArtAssets.SETTINGS,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    WorldMap = {
+        Image = UiArtAssets.WORLD_MAP,
+        SourceSize = Vector2.new(1122, 1402),
+    },
+    Minimap = {
+        Image = UiArtAssets.MINIMAP,
+        SourceSize = Vector2.new(1254, 1254),
+    },
     DungeonCard = {
-        Offset = Vector2.new(592, 310),
-        Size = Vector2.new(134, 54),
+        Image = UiArtAssets.DUNGEON_CARD,
+        SourceSize = Vector2.new(1448, 1086),
+    },
+    Chat = {
+        Image = UiArtAssets.CHAT,
+        SourceSize = Vector2.new(1448, 1086),
     },
 }
 
 UiArt.REGIONS = table.freeze(REGIONS)
+UiArt.DIRECT_ART = table.freeze(DIRECT_ART)
 
 --[[
-Returns a named atlas region.
+Returns a named legacy atlas region.
 
 Args:
     region_name (string): Stable region name from REGIONS.
@@ -80,7 +133,22 @@ function UiArt.get_region(region_name: string): Region
 end
 
 --[[
-Creates one cropped atlas image.
+Returns one full-resolution painted art definition.
+
+Args:
+    art_name (string): Stable art name from DIRECT_ART.
+
+Returns:
+    DirectArt: Image id and original pixel dimensions.
+]]
+function UiArt.get_direct_art(art_name: string): DirectArt
+    local art = DIRECT_ART[art_name]
+    assert(art, "Unknown DungeonMMO direct UI art: " .. art_name)
+    return art
+end
+
+--[[
+Creates one cropped legacy atlas image.
 
 Args:
     parent (Instance): Parent GUI container.
@@ -113,31 +181,141 @@ function UiArt.image(
 end
 
 --[[
-Adds a named atlas region as a full-size background for a GuiObject.
+Adds either full-resolution painted art or a legacy atlas region.
 
 Args:
-    parent (GuiObject): GUI object receiving the art shell.
-    region_name (string): Named atlas region to display.
+    parent (GuiObject): GUI object receiving the artwork.
+    art_name (string): Direct-art or legacy-region name.
     z_index (number?): Optional rendering order.
 
 Returns:
-    ImageLabel: Created background image.
+    ImageLabel: Created image label.
 ]]
 function UiArt.background(
     parent: GuiObject,
-    region_name: string,
+    art_name: string,
     z_index: number?
 ): ImageLabel
+    local direct = DIRECT_ART[art_name]
+    if direct then
+        local image = Instance.new("ImageLabel")
+        image.Name = "ReferenceArt"
+        image.BackgroundTransparency = 1
+        image.BorderSizePixel = 0
+        image.Image = direct.Image
+        image.ScaleType = Enum.ScaleType.Stretch
+        image.Size = UDim2.fromScale(1, 1)
+        image.ZIndex = z_index or 1
+        image.Parent = parent
+        return image
+    end
+
     local image = UiArt.image(
         parent,
         "ReferenceArt",
-        region_name,
+        art_name,
         z_index
     )
     image.AnchorPoint = Vector2.zero
     image.Position = UDim2.fromScale(0, 0)
     image.Size = UDim2.fromScale(1, 1)
     return image
+end
+
+--[[
+Converts a rectangle from source-image pixels to scale-based UI coordinates.
+
+Args:
+    art_name (string): Direct artwork whose source size defines coordinates.
+    x (number): Source x coordinate.
+    y (number): Source y coordinate.
+    width (number): Source rectangle width.
+    height (number): Source rectangle height.
+
+Returns:
+    UDim2: Scale-based rectangle matching the source artwork.
+]]
+function UiArt.rect(
+    art_name: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+): UDim2
+    local source = UiArt.get_direct_art(art_name).SourceSize
+
+    return UDim2.fromScale(
+        width / source.X,
+        height / source.Y
+    )
+end
+
+--[[
+Returns the source-relative position for a painted UI coordinate.
+
+Args:
+    art_name (string): Direct artwork whose source size defines coordinates.
+    x (number): Source x coordinate.
+    y (number): Source y coordinate.
+
+Returns:
+    UDim2: Scale-based position matching the source artwork.
+]]
+function UiArt.position(
+    art_name: string,
+    x: number,
+    y: number
+): UDim2
+    local source = UiArt.get_direct_art(art_name).SourceSize
+
+    return UDim2.fromScale(
+        x / source.X,
+        y / source.Y
+    )
+end
+
+--[[
+Covers baked example content while retaining the surrounding painted frame.
+
+Args:
+    parent (GuiObject): Artwork container.
+    art_name (string): Direct artwork defining source coordinates.
+    name (string): Stable mask instance name.
+    x (number): Source x coordinate.
+    y (number): Source y coordinate.
+    width (number): Source mask width.
+    height (number): Source mask height.
+    z_index (number?): Optional rendering order.
+
+Returns:
+    Frame: Opaque dark content mask.
+]]
+function UiArt.content_mask(
+    parent: GuiObject,
+    art_name: string,
+    name: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    z_index: number?
+): Frame
+    local mask = Instance.new("Frame")
+    mask.Name = name
+    mask.Position = UiArt.position(art_name, x, y)
+    mask.Size = UiArt.rect(
+        art_name,
+        x,
+        y,
+        width,
+        height
+    )
+    mask.BackgroundColor3 = Color3.fromRGB(10, 13, 16)
+    mask.BackgroundTransparency = 0.02
+    mask.BorderSizePixel = 0
+    mask.ZIndex = z_index or 2
+    mask.Parent = parent
+    return mask
 end
 
 --[[
@@ -173,7 +351,7 @@ local function sliced_shell(
 end
 
 --[[
-Adds the cleaned reference window art to a modal.
+Adds the cleaned fallback window art to a modal.
 
 Args:
     parent (GuiObject): Modal root.
@@ -195,7 +373,7 @@ function UiArt.window_background(
 end
 
 --[[
-Adds the close-button-free popup art to a modal.
+Adds the close-button-free fallback popup art to a modal.
 
 Args:
     parent (GuiObject): Popup root.
@@ -217,7 +395,7 @@ function UiArt.popup_background(
 end
 
 --[[
-Makes a procedural frame transparent so atlas artwork can provide its shell.
+Makes a procedural frame transparent so painted artwork supplies its shell.
 
 Args:
     frame (Frame): Existing frame whose shape is supplied by artwork.
