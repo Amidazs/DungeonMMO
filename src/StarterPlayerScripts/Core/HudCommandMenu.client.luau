@@ -65,8 +65,8 @@ frame.Name = "CommandBar"
 frame.AnchorPoint = Vector2.new(1, 1)
 frame.Position = UDim2.new(1, -18, 1, -18)
 frame.Size = UDim2.fromOffset(
-    18 + #actions * 68,
-    76
+    14 + #actions * 52,
+    58
 )
 frame.BackgroundColor3 = UiTheme.PALETTE.BackdropSoft
 frame.BackgroundTransparency = 0.12
@@ -83,8 +83,8 @@ UiTheme.bind_responsive_scale(frame, 1366, 0.58, 1)
 
 local button_row = Instance.new("Frame")
 button_row.Name = "ButtonRow"
-button_row.Position = UDim2.fromOffset(8, 5)
-button_row.Size = UDim2.new(1, -16, 1, -10)
+button_row.Position = UDim2.fromOffset(6, 4)
+button_row.Size = UDim2.new(1, -12, 1, -8)
 button_row.BackgroundTransparency = 1
 button_row.Parent = frame
 
@@ -92,7 +92,7 @@ local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Horizontal
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Padding = UDim.new(0, 4)
+layout.Padding = UDim.new(0, 2)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = button_row
 
@@ -120,7 +120,7 @@ local function create_command(
         "Ghost"
     )
     button.LayoutOrder = order
-    button.Size = UDim2.fromOffset(62, 64)
+    button.Size = UDim2.fromOffset(50, 50)
     button.BackgroundTransparency = 1
     button:SetAttribute(
         "DMMOUiBaseTransparency",
@@ -132,7 +132,7 @@ local function create_command(
         "Icon",
         action.glyph,
         action.tint,
-        44
+        39
     )
     icon.AnchorPoint = Vector2.new(0.5, 0)
     icon.Position = UDim2.new(0.5, 0, 0, 1)
@@ -144,19 +144,20 @@ local function create_command(
         "Caption"
     )
     label.AnchorPoint = Vector2.new(0.5, 1)
-    label.Position = UDim2.new(0.5, 0, 1, -1)
-    label.Size = UDim2.new(1, -4, 0, 18)
+    label.Position = UDim2.new(0.5, 0, 1, 0)
+    label.Size = UDim2.new(1, -2, 0, 13)
     label.TextXAlignment = Enum.TextXAlignment.Center
-    label.TextColor3 = UiTheme.PALETTE.Text
+    label.TextColor3 = UiTheme.PALETTE.TextMuted
+    label.TextSize = 8
 
     local key = UiComponents.key_hint(
         button,
         action.key
     )
     key.AnchorPoint = Vector2.new(1, 0)
-    key.Position = UDim2.new(1, -3, 0, 1)
-    key.Size = UDim2.fromOffset(19, 17)
-    key.TextSize = 9
+    key.Position = UDim2.new(1, 1, 0, -2)
+    key.Size = UDim2.fromOffset(17, 16)
+    key.TextSize = 8
     key.ZIndex = 5
 
     button.Activated:Connect(function()
