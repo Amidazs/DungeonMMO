@@ -542,9 +542,88 @@ Returns:
 local function original_trainer_requires_proximity(
     trainer_id: string
 ): boolean
-    for _, definition in ipairs(OriginalFirstTransferDefinitions.all()) do
-        if definition.TrainerId == trainer_id then return true end
+    for _, definition in ipairs(
+        OriginalFirstTransferDefinitions.all()
+    ) do
+        if definition.TrainerId == trainer_id then
+            return true
+        end
     end
+
+    return false
+end
+
+--[[
+Returns the world position of a trainer anchor.
+
+Args:
+    trainer (Instance): Candidate trainer anchor.
+
+Returns:
+    Vector3?: Anchor position when one can be resolved.
+]]
+local function trainer_position(
+    trainer: Instance
+): Vector3?
+    if trainer:IsA("BasePart") then
+        return trainer.Position
+    end
+
+    if trainer:IsA("Model") then
+        return trainer:GetPivot().Position
+    end
+
+    local part = trainer:FindFirstChildWhichIsA(
+        "BasePart",
+        true
+    )
+
+    return if part then part.Position else nil
+end
+
+--[[
+Checks that the player is physically beside the requested class trainer.
+
+Args:
+    player (Player): Authenticated player.
+    trainer_id (string): Requested trainer catalogue id.
+
+Returns:
+    boolean: True only while the matching trainer is nearby.
+]]
+local function nearby_progression_trainer(
+    player: Player,
+    trainer_id: string
+): boolean
+    if original_trainer_requires_proximity(trainer_id)
+        and original_transfer_mentors:nearby_trainer(
+            player,
+            trainer_id
+        )
+    then
+        return true
+    end
+
+    local character = player.Character
+    local root = character
+        and character:FindFirstChild("HumanoidRootPart")
+
+    if not root or not root:IsA("BasePart") then
+        return false
+    end
+
+    for _, candidate in ipairs(Workspace:GetDescendants()) do
+        if candidate:GetAttribute("TrainerId") == trainer_id then
+            local position = trainer_position(candidate)
+
+            if position
+                and (root.Position - position).Magnitude <= 18
+            then
+                return true
+            end
+        end
+    end
+
     return false
 end
 
@@ -951,14 +1030,13 @@ trainer_snapshot_request.OnServerEvent:Connect(function(
         return
     end
 
-    if original_trainer_requires_proximity(trainer_id)
-        and not original_transfer_mentors:nearby_trainer(
-            player, trainer_id
-        )
-    then
+    if not nearby_progression_trainer(
+        player,
+        trainer_id
+    ) then
         trainer_snapshot:FireClient(player, {
             ok = false,
-            reason = "TransferTrainerNotNearby",
+            reason = "TrainerNotNearby",
         })
         return
     end
@@ -1241,11 +1319,12 @@ skill_learn_request.OnServerEvent:Connect(function(
 
     local result
 
-    if type(trainer_id) == "string" and type(skill_id) == "string"
-        and (not original_trainer_requires_proximity(trainer_id)
-            or original_transfer_mentors:nearby_trainer(
-                player, trainer_id
-            ))
+    if type(trainer_id) == "string"
+        and type(skill_id) == "string"
+        and nearby_progression_trainer(
+            player,
+            trainer_id
+        )
     then
         result = progression_controller:learn_skill(
             player.UserId,
