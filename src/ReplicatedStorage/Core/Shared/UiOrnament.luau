@@ -299,11 +299,12 @@ function UiOrnament.icon(
 
     local well = Instance.new("Frame")
     well.Name = "IconWell"
-    well.Position = UDim2.fromOffset(2, 2)
-    well.Size = UDim2.new(1, -4, 1, -4)
+    well.Position = UDim2.fromOffset(5, 5)
+    well.Size = UDim2.new(1, -10, 1, -10)
     well.BackgroundColor3 = tint
     well.BorderSizePixel = 0
-    well.Parent = inner
+    well.ZIndex = inner.ZIndex + 1
+    well.Parent = outer
 
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new(
