@@ -23,23 +23,28 @@ Latest accepted friend-test state adds two fixes on top of v3.53:
    - deferred Secret backtracking semantics remain separate from forfeited
      timed Events.
 
-Physical Temple fixture acceptance:
+Authoritative Temple fixture acceptance:
 
 `Room1,EventArena,Room2,SecretArena,Room3`
 
-passed the exact skip route:
+passed the exact skip route through the same server room-start function used
+by production triggers:
 Room 1 -> skip Event -> Room 2 -> skip Secret -> final boss -> complete.
 
-The Base entrance UI was tested via the real Temple prompt and held **E**.
-The Captain bounty displayed `Depth 1 or Depth 4`; a synthetic Depth-2
-checkpoint objective displayed `Depth 2` and the expected mismatch warning.
+The actual Base dungeon-entry panel was tested at the real Temple entrance
+anchor using unpublished-only test hooks. The rendered Depth-1 panel showed
+the tracked Hidden Ward objective and Worldroot clear objective; switching the
+same panel to Depth 2 produced the expected incompatibility warning. Direct
+mapping checks verified the Captain and Foreman bounties as
+`Depth 1 or Depth 4`. No temporary hooks were published.
 
 TEST publication and fresh-cloud verification are complete:
 
-- Dungeon `117293035754309`: `PublishSuccessful` at 09:53:12Z;
-- Base `134132328219009`: `PublishSuccessful` at 09:53:49Z;
-- all changed fresh-cloud source matches the current worktree after normalising
-  Studio line endings;
+- Dungeon `117293035754309`: `PublishSuccessful` at 10:59:14Z;
+- Base `134132328219009`: `PublishSuccessful` at 10:59:59Z;
+- fresh cloud source markers and quest/depth mappings match the accepted
+  v3.54 behavior;
+- the published Base contains no temporary test hooks;
 - fresh cloud Play starts cleanly in both places.
 
 Feature source checkpoint:
