@@ -64,7 +64,7 @@ local modal = UiComponents.modal(
     "InventoryPanel",
     "Inventory",
     "Browse carried equipment, materials and consumables.",
-    UDim2.fromOffset(640, 800)
+    UDim2.fromOffset(680, 850)
 )
 local panel = modal.Root
 panel.Visible = false
@@ -345,9 +345,9 @@ local function add_item_row(row: any)
         rarity_color(row.Rarity):Lerp(
             UiTheme.PALETTE.SurfaceRaised, 0.55
         ),
-        34
+        40
     )
-    icon.Position = UDim2.fromOffset(8, 7)
+    icon.Position = UDim2.fromOffset(5, 4)
 
     local name = UiComponents.label(
         frame,
@@ -355,10 +355,7 @@ local function add_item_row(row: any)
         tostring(row.Name),
         "Heading"
     )
-    name.Position = UDim2.fromOffset(3, 42)
-    name.Size = UDim2.new(1, -6, 0, 12)
-    name.TextSize = 7
-    name.TextXAlignment = Enum.TextXAlignment.Center
+    name.Visible = false
     name.ZIndex = 14
 
     local detail = UiComponents.label(
@@ -386,7 +383,7 @@ local function add_item_row(row: any)
     quantity.AnchorPoint = Vector2.new(1, 0.5)
     quantity.Position = UDim2.new(1, -2, 0, 8)
     quantity.Size = UDim2.fromOffset(22, 14)
-    quantity.TextSize = 8
+    quantity.TextSize = 9
     quantity.TextXAlignment = Enum.TextXAlignment.Right
     quantity.TextColor3 = UiTheme.PALETTE.AccentBright
     quantity.ZIndex = 14
