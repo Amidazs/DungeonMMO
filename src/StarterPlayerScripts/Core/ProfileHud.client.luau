@@ -19,8 +19,8 @@ local UiComponents = require(
 local UiTheme = require(
     shared:WaitForChild("UiTheme")
 )
-local UiOrnament = require(
-    shared:WaitForChild("UiOrnament")
+local UiArt = require(
+    shared:WaitForChild("UiArt")
 )
 
 local profile_snapshot = remotes:WaitForChild(
@@ -55,10 +55,11 @@ local card = Instance.new("Frame")
 card.Name = "StatusCard"
 card.AnchorPoint = Vector2.new(0, 0)
 card.Position = UDim2.fromOffset(18, 18)
-card.Size = UDim2.fromOffset(356, 148)
-UiTheme.style_panel(card, false)
+card.Size = UDim2.fromOffset(382, 120)
+card.BackgroundTransparency = 1
+card.BorderSizePixel = 0
 card.Parent = gui
-UiOrnament.frame(card, true)
+UiArt.background(card, "Profile", 1)
 UiTheme.bind_responsive_scale(card, 1366, 0.62, 1)
 
 --[[
@@ -114,36 +115,32 @@ bind_viewport()
 
 local portrait_frame = Instance.new("Frame")
 portrait_frame.Name = "PortraitFrame"
-portrait_frame.Position = UDim2.fromOffset(12, 14)
-portrait_frame.Size = UDim2.fromOffset(70, 70)
-portrait_frame.BackgroundColor3 = UiTheme.PALETTE.Backdrop
+portrait_frame.Position = UDim2.fromOffset(0, 0)
+portrait_frame.Size = UDim2.fromOffset(110, 120)
+portrait_frame.BackgroundTransparency = 1
 portrait_frame.BorderSizePixel = 0
+portrait_frame.ZIndex = 2
 portrait_frame.Parent = card
-UiTheme.add_stroke(
-    portrait_frame,
-    UiTheme.PALETTE.AccentBright,
-    0.04
-)
 
 local portrait_inner = Instance.new("Frame")
 portrait_inner.Name = "PortraitInner"
-portrait_inner.Position = UDim2.fromOffset(4, 4)
-portrait_inner.Size = UDim2.new(1, -8, 1, -8)
-portrait_inner.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
+portrait_inner.Position = UDim2.fromOffset(17, 8)
+portrait_inner.Size = UDim2.fromOffset(76, 76)
+portrait_inner.BackgroundColor3 = UiTheme.PALETTE.Backdrop
 portrait_inner.BorderSizePixel = 0
+portrait_inner.ZIndex = 2
+UiTheme.add_corner(portrait_inner, 38)
+portrait_inner.ClipsDescendants = true
 portrait_inner.Parent = portrait_frame
-UiTheme.add_stroke(
-    portrait_inner,
-    UiTheme.PALETTE.BorderDark,
-    0.08
-)
 
 local portrait = Instance.new("ImageLabel")
 portrait.Name = "PlayerPortrait"
-portrait.Position = UDim2.fromOffset(3, 3)
-portrait.Size = UDim2.new(1, -6, 1, -6)
+portrait.Position = UDim2.fromOffset(2, 2)
+portrait.Size = UDim2.new(1, -4, 1, -4)
 portrait.BackgroundTransparency = 1
 portrait.ScaleType = Enum.ScaleType.Crop
+portrait.ZIndex = 3
+UiTheme.add_corner(portrait, 36)
 portrait.Parent = portrait_inner
 
 task.spawn(function()
@@ -167,32 +164,23 @@ local level_value = UiComponents.label(
     "Heading"
 )
 level_value.AnchorPoint = Vector2.new(0.5, 0.5)
-level_value.Position = UDim2.new(0, 1, 1, -1)
+level_value.Position = UDim2.fromOffset(29, 95)
 level_value.Size = UDim2.fromOffset(29, 29)
-level_value.BackgroundColor3 = UiTheme.PALETTE.Backdrop
-level_value.BackgroundTransparency = 0.02
+level_value.BackgroundTransparency = 1
 level_value.TextXAlignment = Enum.TextXAlignment.Center
 level_value.TextSize = 16
 level_value.ZIndex = 4
-UiTheme.add_stroke(
-    level_value,
-    UiTheme.PALETTE.AccentBright,
-    0.02
-)
+level_value.TextStrokeColor3 = UiTheme.PALETTE.Backdrop
+level_value.TextStrokeTransparency = 0.1
 
 local name_plate = Instance.new("Frame")
 name_plate.Name = "NamePlate"
-name_plate.Position = UDim2.fromOffset(90, 10)
-name_plate.Size = UDim2.new(1, -103, 0, 35)
-name_plate.BackgroundColor3 = UiTheme.PALETTE.SurfaceWarm
-name_plate.BackgroundTransparency = 0.20
+name_plate.Position = UDim2.fromOffset(112, 7)
+name_plate.Size = UDim2.new(1, -124, 0, 28)
+name_plate.BackgroundTransparency = 1
 name_plate.BorderSizePixel = 0
+name_plate.ZIndex = 2
 name_plate.Parent = card
-UiTheme.add_stroke(
-    name_plate,
-    UiTheme.PALETTE.BorderDark,
-    0.18
-)
 
 local player_name = UiComponents.label(
     name_plate,
@@ -200,9 +188,10 @@ local player_name = UiComponents.label(
     player.DisplayName,
     "Heading"
 )
-player_name.Position = UDim2.fromOffset(9, 2)
-player_name.Size = UDim2.new(1, -18, 0, 18)
+player_name.Position = UDim2.fromOffset(4, 0)
+player_name.Size = UDim2.new(1, -8, 0, 18)
 player_name.TextSize = 17
+player_name.ZIndex = 3
 
 local class_label = UiComponents.label(
     name_plate,
@@ -210,10 +199,11 @@ local class_label = UiComponents.label(
     last_class,
     "Caption"
 )
-class_label.Position = UDim2.fromOffset(9, 19)
-class_label.Size = UDim2.new(1, -18, 0, 13)
+class_label.Position = UDim2.fromOffset(4, 17)
+class_label.Size = UDim2.new(1, -8, 0, 11)
 class_label.TextColor3 = UiTheme.PALETTE.AccentBright
-class_label.TextSize = 10
+class_label.TextSize = 9
+class_label.ZIndex = 3
 
 local health = UiComponents.progress_bar(
     card,
@@ -223,20 +213,26 @@ local health = UiComponents.progress_bar(
     UiTheme.PALETTE.HealthDark,
     27
 )
-health.Root.Position = UDim2.fromOffset(90, 48)
-health.Root.Size = UDim2.new(1, -103, 0, 27)
-health.Track.Position = UDim2.fromOffset(0, 13)
-health.Track.Size = UDim2.new(1, 0, 0, 11)
+health.Root.Position = UDim2.fromOffset(112, 36)
+health.Root.Size = UDim2.new(1, -126, 0, 24)
+health.Root.ZIndex = 3
+health.Track.Position = UDim2.fromOffset(0, 11)
+health.Track.Size = UDim2.new(1, 0, 0, 10)
+health.Track.ZIndex = 3
+health.Fill.ZIndex = 4
+health.Label.ZIndex = 4
+health.Value.ZIndex = 4
 health.Label.Text = "HP"
 health.Label.TextSize = 9
 health.Value.TextSize = 9
 
 local resource_stack = Instance.new("Frame")
 resource_stack.Name = "ResourceStack"
-resource_stack.Position = UDim2.fromOffset(90, 77)
-resource_stack.Size = UDim2.new(1, -103, 0, 45)
+resource_stack.Position = UDim2.fromOffset(112, 62)
+resource_stack.Size = UDim2.new(1, -126, 0, 48)
 resource_stack.BackgroundTransparency = 1
 resource_stack.Visible = true
+resource_stack.ZIndex = 3
 resource_stack.Parent = card
 
 local resource_layout = Instance.new("UIListLayout")
@@ -250,8 +246,9 @@ local currency_label = UiComponents.label(
     "0G  •  0AP  •  0SP",
     "Caption"
 )
-currency_label.Position = UDim2.fromOffset(12, 91)
-currency_label.Size = UDim2.fromOffset(70, 30)
+currency_label.Visible = false
+currency_label.Position = UDim2.fromOffset(0, 0)
+currency_label.Size = UDim2.fromOffset(1, 1)
 currency_label.TextWrapped = true
 currency_label.TextYAlignment = Enum.TextYAlignment.Top
 currency_label.TextXAlignment = Enum.TextXAlignment.Center
@@ -266,8 +263,9 @@ local xp = UiComponents.progress_bar(
     UiTheme.PALETTE.AccentDark,
     18
 )
-xp.Root.Position = UDim2.fromOffset(12, 126)
-xp.Root.Size = UDim2.new(1, -24, 0, 16)
+xp.Root.Visible = false
+xp.Root.Position = UDim2.fromOffset(0, 0)
+xp.Root.Size = UDim2.fromOffset(1, 1)
 xp.Track.Position = UDim2.fromOffset(0, 8)
 xp.Track.Size = UDim2.new(1, 0, 0, 6)
 xp.Label.Text = "XP"
