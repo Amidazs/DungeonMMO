@@ -445,10 +445,6 @@ modal.Close.Activated:Connect(function()
     WindowController.set_visible("Stats", false)
 end)
 
-backdrop.Activated:Connect(function()
-    WindowController.set_visible("Stats", false)
-end)
-
 UserInputService.InputBegan:Connect(function(
     input: InputObject,
     processed: boolean
