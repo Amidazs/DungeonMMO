@@ -14,6 +14,9 @@ local ProgressionClientState = require(
 local UiArt = require(
     shared:WaitForChild("UiArt")
 )
+local UiProfileTaperRuntime = require(
+    shared:WaitForChild("UiProfileTaperRuntime")
+)
 local UiArtAssets = require(
     shared:WaitForChild("UiArtAssets")
 )
@@ -49,10 +52,11 @@ local BUFF_COLUMNS = 7
 local BUFF_SLOT_WIDTH = 29
 local BUFF_SLOT_HEIGHT = 29
 local BUFF_SLOT_GAP = 3
-local PROFILE_BAR_MAIN_WIDTH = 274
-local PROFILE_BAR_TIP_WIDTH = 5
+local PROFILE_BAR_X = 126
+local PROFILE_BAR_MAIN_WIDTH = 264
+local PROFILE_BAR_TAPER_WIDTH = 10
 local PROFILE_BAR_TOTAL_WIDTH =
-    PROFILE_BAR_MAIN_WIDTH + PROFILE_BAR_TIP_WIDTH
+    PROFILE_BAR_MAIN_WIDTH + PROFILE_BAR_TAPER_WIDTH
 local PROFILE_BAR_HEIGHT = 15
 
 local BUFF_DEFINITIONS = table.freeze({
@@ -374,89 +378,24 @@ local class_label = UiComponents.label(
 class_label.Visible = false
 
 --[[
-Creates the clipped tapered continuation used at the end of a profile bar.
+Maps one resource ratio across the rectangular rail and exact painted taper.
 
-The main fill remains rectangular, while this small rotated square is clipped
-to its right half. Revealing it progressively lets a full bar follow the
-painted arrow-shaped cap without drawing a rectangle into the world behind it.
-
-Args:
-    track (Frame): Full logical bar track.
-    name (string): Stable prefix for the taper instances.
-    color (Color3): End colour matching the bar gradient.
-
-Returns:
-    Frame: Reveal frame whose width is driven from zero to one.
-]]
-local function create_profile_bar_tip(
-    track: Frame,
-    name: string,
-    color: Color3
-): Frame
-    local holder = Instance.new("Frame")
-    holder.Name = name .. "Holder"
-    holder.Position = UDim2.fromOffset(
-        PROFILE_BAR_MAIN_WIDTH,
-        0
-    )
-    holder.Size = UDim2.fromOffset(
-        PROFILE_BAR_TIP_WIDTH,
-        PROFILE_BAR_HEIGHT
-    )
-    holder.BackgroundTransparency = 1
-    holder.BorderSizePixel = 0
-    holder.ClipsDescendants = true
-    holder.ZIndex = 3
-    holder.Parent = track
-
-    local reveal = Instance.new("Frame")
-    reveal.Name = name .. "Reveal"
-    reveal.Size = UDim2.fromScale(0, 1)
-    reveal.BackgroundTransparency = 1
-    reveal.BorderSizePixel = 0
-    reveal.ClipsDescendants = true
-    reveal.ZIndex = 3
-    reveal.Parent = holder
-
-    local diamond = Instance.new("Frame")
-    diamond.Name = name .. "Diamond"
-    diamond.AnchorPoint = Vector2.new(0.5, 0.5)
-    diamond.Position = UDim2.fromOffset(
-        0,
-        PROFILE_BAR_HEIGHT / 2
-    )
-    diamond.Size = UDim2.fromOffset(
-        PROFILE_BAR_HEIGHT,
-        PROFILE_BAR_HEIGHT
-    )
-    diamond.Rotation = 45
-    diamond.BackgroundColor3 = color
-    diamond.BorderSizePixel = 0
-    diamond.ZIndex = 3
-    diamond.Parent = reveal
-
-    return reveal
-end
-
---[[
-Maps one logical bar ratio across the rectangular rail and tapered cap.
-
-This mirrors the EXP-bar treatment: the resource fill reaches into the
-decorative end instead of stopping before it, while the taper remains clipped
-to the painted cap shape.
+The rectangular fill continues under the right-cap mask. The reference-derived
+taper overlay is then revealed only as the fill reaches that end of the rail,
+matching the same layered approach used by the EXP bar.
 
 Args:
-    fill (Frame): Rectangular main fill.
-    tip_reveal (Frame): Clipped tapered continuation.
+    fill (Frame): Rectangular resource fill.
+    taper (any): Exact taper overlay handle.
     ratio (number): Current resource ratio from zero to one.
-    immediate (boolean?): Whether to skip tweening.
+    immediate (boolean?): Whether to skip fill tweening.
 
 Returns:
     None.
 ]]
 local function set_profile_bar_ratio(
     fill: Frame,
-    tip_reveal: Frame,
+    taper: any,
     ratio: number,
     immediate: boolean?
 )
@@ -468,28 +407,23 @@ local function set_profile_bar_ratio(
         0,
         1
     )
-    local tip_ratio = math.clamp(
-        (filled_width - PROFILE_BAR_MAIN_WIDTH)
-            / PROFILE_BAR_TIP_WIDTH,
-        0,
-        1
-    )
 
     UiTheme.set_bar_ratio(
         fill,
         main_ratio,
         immediate
     )
-    UiTheme.set_bar_ratio(
-        tip_reveal,
-        tip_ratio,
-        immediate
+    UiProfileTaperRuntime.set_ratio(
+        taper,
+        safe_ratio,
+        PROFILE_BAR_X,
+        PROFILE_BAR_TOTAL_WIDTH
     )
 end
 
 local health_track = Instance.new("Frame")
 health_track.Name = "HealthTrack"
-health_track.Position = UDim2.fromOffset(126, 59)
+health_track.Position = UDim2.fromOffset(PROFILE_BAR_X, 59)
 health_track.Size = UDim2.fromOffset(
     PROFILE_BAR_TOTAL_WIDTH,
     PROFILE_BAR_HEIGHT
@@ -508,6 +442,7 @@ health_main.Size = UDim2.fromOffset(
 )
 health_main.BackgroundTransparency = 1
 health_main.BorderSizePixel = 0
+health_main.ClipsDescendants = true
 health_main.ZIndex = 2
 health_main.Parent = health_track
 
@@ -525,12 +460,6 @@ UiTheme.add_gradient(
 )
 health_fill.Parent = health_main
 
-local health_tip_reveal = create_profile_bar_tip(
-    health_track,
-    "HealthTip",
-    Color3.fromRGB(165, 18, 29)
-)
-
 local health_value = UiComponents.label(
     card,
     "HealthValue",
@@ -547,11 +476,11 @@ health_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 health_value.TextSize = 15
 health_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 health_value.TextStrokeTransparency = 0.12
-health_value.ZIndex = 5
+health_value.ZIndex = 6
 
 local mana_track = Instance.new("Frame")
 mana_track.Name = "ManaTrack"
-mana_track.Position = UDim2.fromOffset(126, 79)
+mana_track.Position = UDim2.fromOffset(PROFILE_BAR_X, 79)
 mana_track.Size = UDim2.fromOffset(
     PROFILE_BAR_TOTAL_WIDTH,
     PROFILE_BAR_HEIGHT
@@ -570,6 +499,7 @@ mana_main.Size = UDim2.fromOffset(
 )
 mana_main.BackgroundTransparency = 1
 mana_main.BorderSizePixel = 0
+mana_main.ClipsDescendants = true
 mana_main.ZIndex = 2
 mana_main.Parent = mana_track
 
@@ -587,12 +517,6 @@ UiTheme.add_gradient(
 )
 mana_fill.Parent = mana_main
 
-local mana_tip_reveal = create_profile_bar_tip(
-    mana_track,
-    "ManaTip",
-    Color3.fromRGB(20, 71, 166)
-)
-
 local mana_value = UiComponents.label(
     card,
     "ManaValue",
@@ -609,7 +533,12 @@ mana_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 mana_value.TextSize = 15
 mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
-mana_value.ZIndex = 5
+mana_value.ZIndex = 6
+
+local profile_tapers = UiProfileTaperRuntime.add_overlays(
+    card,
+    5
+)
 
 local buff_container = Instance.new("Frame")
 buff_container.Name = "BuffContainer"
@@ -832,7 +761,7 @@ local function update_health(humanoid: Humanoid?)
         health_value.Text = "-- / --"
         set_profile_bar_ratio(
             health_fill,
-            health_tip_reveal,
+            profile_tapers.Health,
             0,
             true
         )
@@ -848,7 +777,7 @@ local function update_health(humanoid: Humanoid?)
     )
     set_profile_bar_ratio(
         health_fill,
-        health_tip_reveal,
+        profile_tapers.Health,
         current / maximum
     )
 end
@@ -1063,7 +992,7 @@ update_mana = function()
         mana_value.Text = "-- / --"
         set_profile_bar_ratio(
             mana_fill,
-            mana_tip_reveal,
+            profile_tapers.Mana,
             0,
             true
         )
@@ -1085,7 +1014,7 @@ update_mana = function()
     )
     set_profile_bar_ratio(
         mana_fill,
-        mana_tip_reveal,
+        profile_tapers.Mana,
         current / maximum
     )
 end
