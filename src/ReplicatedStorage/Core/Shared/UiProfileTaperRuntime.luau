@@ -16,6 +16,17 @@ type TaperDefinition = {
     Data: string,
 }
 
+export type GradientColors = {
+    Base: Color3,
+    Top: Color3,
+    Bottom: Color3,
+}
+
+export type TaperGradients = {
+    Health: GradientColors,
+    Mana: GradientColors,
+}
+
 export type TaperOverlay = {
     Clip: Frame,
     Image: ImageLabel,
@@ -94,6 +105,7 @@ local function create_overlay(
     parent: GuiObject,
     name: string,
     definition: TaperDefinition,
+    gradient: GradientColors,
     z_index: number
 ): TaperOverlay?
     local editable = create_editable_image(definition)
@@ -127,9 +139,19 @@ local function create_overlay(
     image.BackgroundTransparency = 1
     image.BorderSizePixel = 0
     image.ImageContent = Content.fromObject(editable)
+    image.ImageColor3 = gradient.Base
     image.ScaleType = Enum.ScaleType.Stretch
     image.ZIndex = z_index
     image.Parent = clip
+
+    local fill_gradient = Instance.new("UIGradient")
+    fill_gradient.Name = "FillGradient"
+    fill_gradient.Color = ColorSequence.new(
+        gradient.Top,
+        gradient.Bottom
+    )
+    fill_gradient.Rotation = 90
+    fill_gradient.Parent = image
 
     return {
         Clip = clip,
@@ -150,6 +172,7 @@ Returns:
 ]]
 function UiProfileTaperRuntime.add_overlays(
     parent: GuiObject,
+    gradients: TaperGradients,
     z_index: number?
 ): TaperOverlays
     local order = z_index or 4
@@ -159,12 +182,14 @@ function UiProfileTaperRuntime.add_overlays(
             parent,
             "HealthRightTaper",
             TaperData.HEALTH,
+            gradients.Health,
             order
         ),
         Mana = create_overlay(
             parent,
             "ManaRightTaper",
             TaperData.MANA,
+            gradients.Mana,
             order
         ),
     }
