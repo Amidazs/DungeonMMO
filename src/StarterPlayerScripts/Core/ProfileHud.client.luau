@@ -58,6 +58,16 @@ local PROFILE_BAR_TAPER_WIDTH = 10
 local PROFILE_BAR_TOTAL_WIDTH =
     PROFILE_BAR_MAIN_WIDTH + PROFILE_BAR_TAPER_WIDTH
 local PROFILE_BAR_HEIGHT = 15
+local HEALTH_BAR_COLORS = table.freeze({
+    Base = Color3.fromRGB(218, 38, 48),
+    Top = Color3.fromRGB(247, 65, 70),
+    Bottom = Color3.fromRGB(165, 18, 29),
+})
+local MANA_BAR_COLORS = table.freeze({
+    Base = Color3.fromRGB(39, 117, 220),
+    Top = Color3.fromRGB(70, 158, 255),
+    Bottom = Color3.fromRGB(20, 71, 166),
+})
 
 local BUFF_DEFINITIONS = table.freeze({
     {
@@ -449,14 +459,14 @@ health_main.Parent = health_track
 local health_fill = Instance.new("Frame")
 health_fill.Name = "HealthFill"
 health_fill.Size = UDim2.fromScale(0, 1)
-health_fill.BackgroundColor3 = Color3.fromRGB(218, 38, 48)
+health_fill.BackgroundColor3 = HEALTH_BAR_COLORS.Base
 health_fill.BorderSizePixel = 0
 health_fill.ZIndex = 3
 UiTheme.add_corner(health_fill, 2)
 UiTheme.add_gradient(
     health_fill,
-    Color3.fromRGB(247, 65, 70),
-    Color3.fromRGB(165, 18, 29)
+    HEALTH_BAR_COLORS.Top,
+    HEALTH_BAR_COLORS.Bottom
 )
 health_fill.Parent = health_main
 
@@ -506,14 +516,14 @@ mana_main.Parent = mana_track
 local mana_fill = Instance.new("Frame")
 mana_fill.Name = "ManaFill"
 mana_fill.Size = UDim2.fromScale(0, 1)
-mana_fill.BackgroundColor3 = Color3.fromRGB(39, 117, 220)
+mana_fill.BackgroundColor3 = MANA_BAR_COLORS.Base
 mana_fill.BorderSizePixel = 0
 mana_fill.ZIndex = 3
 UiTheme.add_corner(mana_fill, 2)
 UiTheme.add_gradient(
     mana_fill,
-    Color3.fromRGB(70, 158, 255),
-    Color3.fromRGB(20, 71, 166)
+    MANA_BAR_COLORS.Top,
+    MANA_BAR_COLORS.Bottom
 )
 mana_fill.Parent = mana_main
 
@@ -537,6 +547,10 @@ mana_value.ZIndex = 6
 
 local profile_tapers = UiProfileTaperRuntime.add_overlays(
     card,
+    {
+        Health = HEALTH_BAR_COLORS,
+        Mana = MANA_BAR_COLORS,
+    },
     5
 )
 
