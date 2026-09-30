@@ -380,8 +380,8 @@ class_label.Visible = false
 --[[
 Maps one resource ratio across the rectangular rail and exact painted taper.
 
-The rectangular fill continues under the right-cap mask. The reference-derived
-taper overlay is then revealed only as the fill reaches that end of the rail,
+The rectangular fill ends where the painted rail begins to taper. The
+reference-derived taper overlay is revealed only as the fill reaches that end,
 matching the same layered approach used by the EXP bar.
 
 Args:
