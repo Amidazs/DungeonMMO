@@ -49,6 +49,11 @@ local BUFF_COLUMNS = 7
 local BUFF_SLOT_WIDTH = 29
 local BUFF_SLOT_HEIGHT = 29
 local BUFF_SLOT_GAP = 3
+local PROFILE_BAR_MAIN_WIDTH = 274
+local PROFILE_BAR_TIP_WIDTH = 5
+local PROFILE_BAR_TOTAL_WIDTH =
+    PROFILE_BAR_MAIN_WIDTH + PROFILE_BAR_TIP_WIDTH
+local PROFILE_BAR_HEIGHT = 15
 
 local BUFF_DEFINITIONS = table.freeze({
     {
@@ -123,63 +128,8 @@ card.BorderSizePixel = 0
 card.ClipsDescendants = false
 card.Parent = gui
 
-local profile_art = UiArt.profile_background(card, 1)
+UiArt.profile_background(card, 1)
 UiTheme.bind_responsive_scale(card, 1366, 0.56, 0.78)
-
---[[
-Redraws a clipped piece of the painted profile frame above dynamic bars.
-
-This lets HP and MP fills continue beneath the decorative right cap while
-the original gold bevel remains visible above the fill.
-
-Args:
-    parent (GuiObject): HUD root that receives the clipped overlay.
-    source_art (ImageLabel): Full profile artwork used as the source.
-    name (string): Stable name for the clipped overlay frame.
-    x (number): Left edge in HUD pixels.
-    y (number): Top edge in HUD pixels.
-    width (number): Overlay width in HUD pixels.
-    height (number): Overlay height in HUD pixels.
-    z_index (number): Rendering order for the overlay.
-
-Returns:
-    Frame: Clipped frame containing the matching artwork section.
-]]
-local function add_profile_art_piece(
-    parent: GuiObject,
-    source_art: ImageLabel,
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    z_index: number
-): Frame
-    local clip = Instance.new("Frame")
-    clip.Name = name
-    clip.Position = UDim2.fromOffset(x, y)
-    clip.Size = UDim2.fromOffset(width, height)
-    clip.BackgroundTransparency = 1
-    clip.BorderSizePixel = 0
-    clip.ClipsDescendants = true
-    clip.ZIndex = z_index
-    clip.Parent = parent
-
-    local art = Instance.new("ImageLabel")
-    art.Name = "Art"
-    art.Position = UDim2.fromOffset(-x, -y)
-    art.Size = UDim2.fromOffset(HUD_WIDTH, HUD_HEIGHT)
-    art.BackgroundTransparency = 1
-    art.BorderSizePixel = 0
-    art.Image = source_art.Image
-    art.ImageColor3 = source_art.ImageColor3
-    art.ImageTransparency = source_art.ImageTransparency
-    art.ScaleType = Enum.ScaleType.Stretch
-    art.ZIndex = z_index
-    art.Parent = clip
-
-    return clip
-end
 
 --[[
 Formats an integer with thousands separators for HUD resource values.
@@ -423,31 +373,163 @@ local class_label = UiComponents.label(
 )
 class_label.Visible = false
 
+--[[
+Creates the clipped tapered continuation used at the end of a profile bar.
+
+The main fill remains rectangular, while this small rotated square is clipped
+to its right half. Revealing it progressively lets a full bar follow the
+painted arrow-shaped cap without drawing a rectangle into the world behind it.
+
+Args:
+    track (Frame): Full logical bar track.
+    name (string): Stable prefix for the taper instances.
+    color (Color3): End colour matching the bar gradient.
+
+Returns:
+    Frame: Reveal frame whose width is driven from zero to one.
+]]
+local function create_profile_bar_tip(
+    track: Frame,
+    name: string,
+    color: Color3
+): Frame
+    local holder = Instance.new("Frame")
+    holder.Name = name .. "Holder"
+    holder.Position = UDim2.fromOffset(
+        PROFILE_BAR_MAIN_WIDTH,
+        0
+    )
+    holder.Size = UDim2.fromOffset(
+        PROFILE_BAR_TIP_WIDTH,
+        PROFILE_BAR_HEIGHT
+    )
+    holder.BackgroundTransparency = 1
+    holder.BorderSizePixel = 0
+    holder.ClipsDescendants = true
+    holder.ZIndex = 3
+    holder.Parent = track
+
+    local reveal = Instance.new("Frame")
+    reveal.Name = name .. "Reveal"
+    reveal.Size = UDim2.fromScale(0, 1)
+    reveal.BackgroundTransparency = 1
+    reveal.BorderSizePixel = 0
+    reveal.ClipsDescendants = true
+    reveal.ZIndex = 3
+    reveal.Parent = holder
+
+    local diamond = Instance.new("Frame")
+    diamond.Name = name .. "Diamond"
+    diamond.AnchorPoint = Vector2.new(0.5, 0.5)
+    diamond.Position = UDim2.fromOffset(
+        0,
+        PROFILE_BAR_HEIGHT / 2
+    )
+    diamond.Size = UDim2.fromOffset(
+        PROFILE_BAR_HEIGHT,
+        PROFILE_BAR_HEIGHT
+    )
+    diamond.Rotation = 45
+    diamond.BackgroundColor3 = color
+    diamond.BorderSizePixel = 0
+    diamond.ZIndex = 3
+    diamond.Parent = reveal
+
+    return reveal
+end
+
+--[[
+Maps one logical bar ratio across the rectangular rail and tapered cap.
+
+This mirrors the EXP-bar treatment: the resource fill reaches into the
+decorative end instead of stopping before it, while the taper remains clipped
+to the painted cap shape.
+
+Args:
+    fill (Frame): Rectangular main fill.
+    tip_reveal (Frame): Clipped tapered continuation.
+    ratio (number): Current resource ratio from zero to one.
+    immediate (boolean?): Whether to skip tweening.
+
+Returns:
+    None.
+]]
+local function set_profile_bar_ratio(
+    fill: Frame,
+    tip_reveal: Frame,
+    ratio: number,
+    immediate: boolean?
+)
+    local safe_ratio = math.clamp(ratio, 0, 1)
+    local filled_width =
+        PROFILE_BAR_TOTAL_WIDTH * safe_ratio
+    local main_ratio = math.clamp(
+        filled_width / PROFILE_BAR_MAIN_WIDTH,
+        0,
+        1
+    )
+    local tip_ratio = math.clamp(
+        (filled_width - PROFILE_BAR_MAIN_WIDTH)
+            / PROFILE_BAR_TIP_WIDTH,
+        0,
+        1
+    )
+
+    UiTheme.set_bar_ratio(
+        fill,
+        main_ratio,
+        immediate
+    )
+    UiTheme.set_bar_ratio(
+        tip_reveal,
+        tip_ratio,
+        immediate
+    )
+end
+
 local health_track = Instance.new("Frame")
 health_track.Name = "HealthTrack"
 health_track.Position = UDim2.fromOffset(126, 59)
-health_track.Size = UDim2.fromOffset(282, 15)
-health_track.BackgroundColor3 = Color3.fromRGB(31, 8, 11)
+health_track.Size = UDim2.fromOffset(
+    PROFILE_BAR_TOTAL_WIDTH,
+    PROFILE_BAR_HEIGHT
+)
 health_track.BackgroundTransparency = 1
 health_track.BorderSizePixel = 0
 health_track.ClipsDescendants = true
 health_track.ZIndex = 2
-UiTheme.add_corner(health_track, 2)
 health_track.Parent = card
+
+local health_main = Instance.new("Frame")
+health_main.Name = "HealthMain"
+health_main.Size = UDim2.fromOffset(
+    PROFILE_BAR_MAIN_WIDTH,
+    PROFILE_BAR_HEIGHT
+)
+health_main.BackgroundTransparency = 1
+health_main.BorderSizePixel = 0
+health_main.ZIndex = 2
+health_main.Parent = health_track
 
 local health_fill = Instance.new("Frame")
 health_fill.Name = "HealthFill"
 health_fill.Size = UDim2.fromScale(0, 1)
-health_fill.BackgroundColor3 = Color3.fromRGB(150, 22, 30)
+health_fill.BackgroundColor3 = Color3.fromRGB(218, 38, 48)
 health_fill.BorderSizePixel = 0
 health_fill.ZIndex = 3
 UiTheme.add_corner(health_fill, 2)
 UiTheme.add_gradient(
     health_fill,
-    Color3.fromRGB(185, 39, 44),
-    Color3.fromRGB(105, 10, 24)
+    Color3.fromRGB(247, 65, 70),
+    Color3.fromRGB(165, 18, 29)
 )
-health_fill.Parent = health_track
+health_fill.Parent = health_main
+
+local health_tip_reveal = create_profile_bar_tip(
+    health_track,
+    "HealthTip",
+    Color3.fromRGB(165, 18, 29)
+)
 
 local health_value = UiComponents.label(
     card,
@@ -456,7 +538,10 @@ local health_value = UiComponents.label(
     "Heading"
 )
 health_value.Position = UDim2.fromOffset(126, 56)
-health_value.Size = UDim2.fromOffset(282, 21)
+health_value.Size = UDim2.fromOffset(
+    PROFILE_BAR_TOTAL_WIDTH,
+    21
+)
 health_value.TextXAlignment = Enum.TextXAlignment.Center
 health_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 health_value.TextSize = 15
@@ -467,28 +552,46 @@ health_value.ZIndex = 5
 local mana_track = Instance.new("Frame")
 mana_track.Name = "ManaTrack"
 mana_track.Position = UDim2.fromOffset(126, 79)
-mana_track.Size = UDim2.fromOffset(282, 15)
-mana_track.BackgroundColor3 = Color3.fromRGB(6, 14, 35)
+mana_track.Size = UDim2.fromOffset(
+    PROFILE_BAR_TOTAL_WIDTH,
+    PROFILE_BAR_HEIGHT
+)
 mana_track.BackgroundTransparency = 1
 mana_track.BorderSizePixel = 0
 mana_track.ClipsDescendants = true
 mana_track.ZIndex = 2
-UiTheme.add_corner(mana_track, 2)
 mana_track.Parent = card
+
+local mana_main = Instance.new("Frame")
+mana_main.Name = "ManaMain"
+mana_main.Size = UDim2.fromOffset(
+    PROFILE_BAR_MAIN_WIDTH,
+    PROFILE_BAR_HEIGHT
+)
+mana_main.BackgroundTransparency = 1
+mana_main.BorderSizePixel = 0
+mana_main.ZIndex = 2
+mana_main.Parent = mana_track
 
 local mana_fill = Instance.new("Frame")
 mana_fill.Name = "ManaFill"
 mana_fill.Size = UDim2.fromScale(0, 1)
-mana_fill.BackgroundColor3 = Color3.fromRGB(35, 90, 175)
+mana_fill.BackgroundColor3 = Color3.fromRGB(39, 117, 220)
 mana_fill.BorderSizePixel = 0
 mana_fill.ZIndex = 3
 UiTheme.add_corner(mana_fill, 2)
 UiTheme.add_gradient(
     mana_fill,
-    Color3.fromRGB(39, 120, 205),
-    Color3.fromRGB(12, 45, 115)
+    Color3.fromRGB(70, 158, 255),
+    Color3.fromRGB(20, 71, 166)
 )
-mana_fill.Parent = mana_track
+mana_fill.Parent = mana_main
+
+local mana_tip_reveal = create_profile_bar_tip(
+    mana_track,
+    "ManaTip",
+    Color3.fromRGB(20, 71, 166)
+)
 
 local mana_value = UiComponents.label(
     card,
@@ -497,34 +600,16 @@ local mana_value = UiComponents.label(
     "Heading"
 )
 mana_value.Position = UDim2.fromOffset(126, 76)
-mana_value.Size = UDim2.fromOffset(282, 21)
+mana_value.Size = UDim2.fromOffset(
+    PROFILE_BAR_TOTAL_WIDTH,
+    21
+)
 mana_value.TextXAlignment = Enum.TextXAlignment.Center
 mana_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 mana_value.TextSize = 15
 mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
 mana_value.ZIndex = 5
-
-add_profile_art_piece(
-    card,
-    profile_art,
-    "HealthRightCapOverlay",
-    384,
-    52,
-    42,
-    29,
-    4
-)
-add_profile_art_piece(
-    card,
-    profile_art,
-    "ManaRightCapOverlay",
-    384,
-    72,
-    42,
-    29,
-    4
-)
 
 local buff_container = Instance.new("Frame")
 buff_container.Name = "BuffContainer"
@@ -745,7 +830,12 @@ Returns:
 local function update_health(humanoid: Humanoid?)
     if not humanoid then
         health_value.Text = "-- / --"
-        UiTheme.set_bar_ratio(health_fill, 0, true)
+        set_profile_bar_ratio(
+            health_fill,
+            health_tip_reveal,
+            0,
+            true
+        )
         return
     end
 
@@ -756,8 +846,9 @@ local function update_health(humanoid: Humanoid?)
         format_number(current),
         format_number(maximum)
     )
-    UiTheme.set_bar_ratio(
+    set_profile_bar_ratio(
         health_fill,
+        health_tip_reveal,
         current / maximum
     )
 end
@@ -970,8 +1061,9 @@ update_mana = function()
 
     if maximum <= 0 then
         mana_value.Text = "-- / --"
-        UiTheme.set_bar_ratio(
+        set_profile_bar_ratio(
             mana_fill,
+            mana_tip_reveal,
             0,
             true
         )
@@ -991,8 +1083,9 @@ update_mana = function()
         format_number(current),
         format_number(maximum)
     )
-    UiTheme.set_bar_ratio(
+    set_profile_bar_ratio(
         mana_fill,
+        mana_tip_reveal,
         current / maximum
     )
 end
