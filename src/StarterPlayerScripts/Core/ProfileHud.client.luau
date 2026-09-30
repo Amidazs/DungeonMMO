@@ -123,8 +123,63 @@ card.BorderSizePixel = 0
 card.ClipsDescendants = false
 card.Parent = gui
 
-UiArt.profile_background(card, 1)
+local profile_art = UiArt.profile_background(card, 1)
 UiTheme.bind_responsive_scale(card, 1366, 0.56, 0.78)
+
+--[[
+Redraws a clipped piece of the painted profile frame above dynamic bars.
+
+This lets HP and MP fills continue beneath the decorative right cap while
+the original gold bevel remains visible above the fill.
+
+Args:
+    parent (GuiObject): HUD root that receives the clipped overlay.
+    source_art (ImageLabel): Full profile artwork used as the source.
+    name (string): Stable name for the clipped overlay frame.
+    x (number): Left edge in HUD pixels.
+    y (number): Top edge in HUD pixels.
+    width (number): Overlay width in HUD pixels.
+    height (number): Overlay height in HUD pixels.
+    z_index (number): Rendering order for the overlay.
+
+Returns:
+    Frame: Clipped frame containing the matching artwork section.
+]]
+local function add_profile_art_piece(
+    parent: GuiObject,
+    source_art: ImageLabel,
+    name: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    z_index: number
+): Frame
+    local clip = Instance.new("Frame")
+    clip.Name = name
+    clip.Position = UDim2.fromOffset(x, y)
+    clip.Size = UDim2.fromOffset(width, height)
+    clip.BackgroundTransparency = 1
+    clip.BorderSizePixel = 0
+    clip.ClipsDescendants = true
+    clip.ZIndex = z_index
+    clip.Parent = parent
+
+    local art = Instance.new("ImageLabel")
+    art.Name = "Art"
+    art.Position = UDim2.fromOffset(-x, -y)
+    art.Size = UDim2.fromOffset(HUD_WIDTH, HUD_HEIGHT)
+    art.BackgroundTransparency = 1
+    art.BorderSizePixel = 0
+    art.Image = source_art.Image
+    art.ImageColor3 = source_art.ImageColor3
+    art.ImageTransparency = source_art.ImageTransparency
+    art.ScaleType = Enum.ScaleType.Stretch
+    art.ZIndex = z_index
+    art.Parent = clip
+
+    return clip
+end
 
 --[[
 Formats an integer with thousands separators for HUD resource values.
@@ -371,7 +426,7 @@ class_label.Visible = false
 local health_track = Instance.new("Frame")
 health_track.Name = "HealthTrack"
 health_track.Position = UDim2.fromOffset(126, 59)
-health_track.Size = UDim2.fromOffset(274, 15)
+health_track.Size = UDim2.fromOffset(282, 15)
 health_track.BackgroundColor3 = Color3.fromRGB(31, 8, 11)
 health_track.BackgroundTransparency = 1
 health_track.BorderSizePixel = 0
@@ -401,7 +456,7 @@ local health_value = UiComponents.label(
     "Heading"
 )
 health_value.Position = UDim2.fromOffset(126, 56)
-health_value.Size = UDim2.fromOffset(274, 21)
+health_value.Size = UDim2.fromOffset(282, 21)
 health_value.TextXAlignment = Enum.TextXAlignment.Center
 health_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 health_value.TextSize = 15
@@ -412,7 +467,7 @@ health_value.ZIndex = 5
 local mana_track = Instance.new("Frame")
 mana_track.Name = "ManaTrack"
 mana_track.Position = UDim2.fromOffset(126, 79)
-mana_track.Size = UDim2.fromOffset(274, 15)
+mana_track.Size = UDim2.fromOffset(282, 15)
 mana_track.BackgroundColor3 = Color3.fromRGB(6, 14, 35)
 mana_track.BackgroundTransparency = 1
 mana_track.BorderSizePixel = 0
@@ -442,13 +497,34 @@ local mana_value = UiComponents.label(
     "Heading"
 )
 mana_value.Position = UDim2.fromOffset(126, 76)
-mana_value.Size = UDim2.fromOffset(274, 21)
+mana_value.Size = UDim2.fromOffset(282, 21)
 mana_value.TextXAlignment = Enum.TextXAlignment.Center
 mana_value.TextColor3 = Color3.fromRGB(255, 246, 229)
 mana_value.TextSize = 15
 mana_value.TextStrokeColor3 = Color3.new(0, 0, 0)
 mana_value.TextStrokeTransparency = 0.12
 mana_value.ZIndex = 5
+
+add_profile_art_piece(
+    card,
+    profile_art,
+    "HealthRightCapOverlay",
+    384,
+    52,
+    42,
+    29,
+    4
+)
+add_profile_art_piece(
+    card,
+    profile_art,
+    "ManaRightCapOverlay",
+    384,
+    72,
+    42,
+    29,
+    4
+)
 
 local buff_container = Instance.new("Frame")
 buff_container.Name = "BuffContainer"
